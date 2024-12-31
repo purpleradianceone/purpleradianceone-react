@@ -1,0 +1,211 @@
+
+/**
+ * @import React for using react library
+ * @import useState for state management
+ * @import {Eye,EyeOff} for Icons from lucide-react
+ * @import FormInput for form custom input component
+ * @import FormCheckbox for form custom checkbox component
+ * @import {Link} for Link component from react-router-dom
+ * @import ReCAPTCHA from google recaptcha
+ */
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import FormInput from "../ui/FormInput";
+import FormCheckbox from "../ui/FormCheckbox";
+import { Link } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
+
+
+/**
+ * 
+ * @returns JSX.Element for the login form
+ */
+const SignInForm = () => {
+  /**
+   * State to store boolean values for password visibility
+   **/
+  const [showPassword, setShowPassword] = useState(false);
+
+  /**
+   * State to store Login form data i.e. email and password
+   **/
+  const [loginUserCredentials, setLoginUserCredentials] = useState({
+    email: "",
+    password: "",
+  });
+
+  /**
+   * States to store error messages for email and paswword empty/blank feilds
+   **/
+  const [loginEmailErrorMessage, setLoginEmailErrorMessage] =
+    useState<string>("");
+  const [loginPasswordErrorMessage, setLoginPasswordErrorMessage] =
+    useState<string>("");
+
+  /**
+   * @param event - event handler for email and password feild changes
+   * @function handleLoginOnchange handles the change event on email and password feild values changes and 
+     updates the loginUserCredentials state
+   */
+  const handleLoginOnchange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setLoginUserCredentials((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  /**
+   * @param event - event handler for password feild change
+   * @function handleLoginOnBlurPassword handles the blur event on password feild and checks if password is empty 
+     or not and updates the loginPasswordErrorMessage state
+   */
+  const handleLoginOnBlurPassword = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.value == "") {
+      setLoginPasswordErrorMessage("Password is required");
+    } else {
+      setLoginPasswordErrorMessage("");
+    }
+  };
+
+  /** 
+   * @param event - event handler for email feild change
+   * @function handleLoginOnBlurEmail handles the blur event on email feild and checks if email is empty
+     or not and updates the loginEmailErrorMessage state
+  */
+  const handleLoginOnBlurEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value == "") {
+      setLoginEmailErrorMessage("Email Address is required");
+    } else {
+      setLoginEmailErrorMessage("");
+    }
+  };
+
+  /**
+   * 
+   * @param event event handler for login button click
+   * @function handleLoginSubmit handles the submit event on login button click and check if email and password
+     is entered or not and if entered then it checks the value of rememberMe key is present or not in localstorage
+     and if present then it sets the the loginUserCredentials in localstorage
+   */
+  const handleLoginSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (
+      loginUserCredentials.email == "" ||
+      loginUserCredentials.password == ""
+    ) {
+      setLoginEmailErrorMessage("Email Address is required");
+      setLoginPasswordErrorMessage("Password is required");
+    } else if (
+      loginUserCredentials.email != "" &&
+      loginUserCredentials.password != "" &&
+      localStorage.getItem("rememberMe") === "true"
+    ) {
+      localStorage.setItem(
+        "loginUserCredentials",
+        JSON.stringify(loginUserCredentials)
+      );
+    }
+  };
+
+  /**
+   * 
+   * @param event event handler for remember me checkbox click
+   * @function handleRememberMeChange handles the change event on remember me checkbox click and updates the 
+     rememberMe key in localstorage which will be used for remembering the user credentials
+   */
+  const handleRememberMeCheckBoxChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      localStorage.setItem("rememberMe", "true");
+    } else {
+      localStorage.removeItem("rememberMe");
+    }
+  };
+
+  return (
+    <div className="mt-0 sm:mx-auto sm:w-full sm:max-w-md lg:px-3">
+      <div className="py-8 px-1  sm:px-10">
+        <form className="space-y-6">
+          <FormInput
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            onChange={handleLoginOnchange}
+            onBlur={handleLoginOnBlurEmail}
+            error={loginEmailErrorMessage}
+          />
+          <FormInput
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Enter your password"
+            onChange={handleLoginOnchange}
+            onBlur={handleLoginOnBlurPassword}
+            error={loginPasswordErrorMessage}
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            }
+          />
+
+          <div className="flex items-center justify-between">
+            <FormCheckbox
+              label="Remember me"
+              name="remember"
+              onChange={handleRememberMeCheckBoxChange}
+            />
+            <button
+              type="button"
+              className="text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              Forgot Password?
+            </button>
+          </div>
+            <div className="">
+            <ReCAPTCHA sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" />
+            </div>
+          
+
+          <button
+            type="submit"
+            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Sign in
+          </button>
+
+          <div className="text-center">
+            <span className="text-gray-600 text-sm">
+              Don't have an account yet?{" "}
+              <button
+                type="button"
+                className="font-medium text-blue-600 hover:text-blue-500"
+                onClick={handleLoginSubmit}
+              >
+                <Link to="/">Sign Up</Link>
+              </button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * @exports SignInForm component as default export
+ */
+export default SignInForm;
