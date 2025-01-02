@@ -1,14 +1,14 @@
 import { createBrowserRouter, Link } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
-
+import SignUpForm from "../../components/forms/SignUpForm";
 export const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <AuthLayout>
         <div>
-          <Link to="/signin">Home Screen</Link>
+          <Link to="/signin" style={{color:"black"}}>Home Screen</Link>
         </div>
       </AuthLayout>
     ),
@@ -21,13 +21,13 @@ export const router = createBrowserRouter([
       </AuthLayout>
     ),
   },
-//   {
-//     path: "/signup",
-//     element: (
-//       <AuthLayout title="Sign Up and get your account" subtitle="Create Account">
-//         <SignInForm />
-//       </AuthLayout>
-//     ),
-//   },
+  {
+    path: "/signup",
+    element: (
+      <AuthLayout title=" Create your account" subtitle="Sign Up">
+        <SignUpForm />
+      </AuthLayout>
+    ),
+  },
 ]);
 export default router;
