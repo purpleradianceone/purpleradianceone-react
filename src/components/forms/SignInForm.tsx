@@ -127,9 +127,9 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="mt-0 sm:mx-auto sm:w-full sm:max-w-md lg:px-3">
-      <div className="py-8 px-1  sm:px-10">
-        <form className="space-y-6">
+    // <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-md lg:px-3">
+      // <div className="py-8 px-1  sm:px-10">
+        <form className="space-y-5">
           <FormInput
             label="Email"
             type="email"
@@ -184,7 +184,7 @@ const SignInForm = () => {
             type="submit"
             className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Sign in
+            Log In
           </button>
 
           <div className="text-center">
@@ -195,13 +195,14 @@ const SignInForm = () => {
                 className="font-medium text-blue-600 hover:text-blue-500"
                 onClick={handleLoginSubmit}
               >
-                <Link to="/">Sign Up</Link>
+                 {/* <Button type="submit">Sign up</Button> */}
+                <Link to="/signup">Sign Up</Link>
               </button>
             </span>
           </div>
         </form>
-      </div>
-    </div>
+      // </div>
+    // </div>
   );
 };
 
