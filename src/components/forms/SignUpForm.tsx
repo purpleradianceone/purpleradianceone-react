@@ -12,7 +12,7 @@ import ReCAPTCHA from "react-google-recaptcha";
  */
 const SignUpPage: React.FC = () => {
   /**
-   * state is defined for getting calues from the input fields.
+   * state is defined for getting values from the input fields.
    */
   const [SignUpData, setSignUpData] = useState<CredentialSignUp>({
     name: "",
@@ -200,11 +200,9 @@ const SignUpPage: React.FC = () => {
                 value={SignUpData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                // error={loginEmailErrorMessage}
+                error={errors.email}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email}</p>
-              )}
+              
            
 
             {/* Password Field */}
@@ -220,7 +218,7 @@ const SignUpPage: React.FC = () => {
                 minLength={8}
                 maxLength={20}
                 required
-                // error={loginEmailErrorMessage}
+                error={errors.password}
               />
               <button
                 type="button"
@@ -229,9 +227,7 @@ const SignUpPage: React.FC = () => {
               >
                 {visibility.password ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
-              {errors.password && (
-                <p className="text-red-500 text-sm">{errors.password}</p>
-              )}
+            
               </div>
             {/* Confirm Password Field */}
             <div className=" relative">
@@ -246,6 +242,7 @@ const SignUpPage: React.FC = () => {
                 minLength={8}
                 maxLength={20}
                 required
+                error={errors.confirmPassword}
               />
               <button
                 type="button"
@@ -258,9 +255,7 @@ const SignUpPage: React.FC = () => {
                   <EyeOff size={20} />
                 )}
               </button>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-              )}
+            
             </div>
             <ReCAPTCHA
               sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" // Replace with your site key
@@ -268,7 +263,7 @@ const SignUpPage: React.FC = () => {
             />
 
             {/* Button for submitting the form */}
-            <Button type="submit">Sign Up</Button>
+            <Button type="submit"><Link to= "/"></Link>Sign Up</Button>
           </form>
           <p className="text-sm text-left mt-3">
             Already have an account? {/* link */}

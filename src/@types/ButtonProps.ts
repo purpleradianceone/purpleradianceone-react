@@ -9,6 +9,8 @@ type ButtonProps = {
     icon?: string;
     className?: string | undefined;
     children?: React.ReactNode;
+    link? : string;
+    onClick? : (event : React.FormEvent<HTMLButtonElement>) => void;
   };
   
   export default ButtonProps;
