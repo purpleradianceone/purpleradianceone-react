@@ -27,11 +27,12 @@ const FormInput = ({
   rightElement,
   onChange,
   onBlur,
-  error
+  error,
+  center
 }: FormInputProps) => {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
         {label}
       </label>
       <div className="mt-1 relative">
@@ -52,7 +53,7 @@ const FormInput = ({
           </div>
         )}
       </div>
-      {error && <div className="text-red-500">{error}</div>}
+      {error && <div className="text-red-500 text-sm">{error}</div>}
     </div>
   );
 };

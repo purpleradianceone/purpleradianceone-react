@@ -21,8 +21,7 @@ const AuthLayout = (props: AuthLayoutProps) => {
       {/* left side code */}
       <div className="grid lg:grid-cols-3">
         <div
-          className="h-screen bg-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1"
-          style={{
+          className = { (props.title == 'Sign Up'  ? '' : 'h-screen ') + 'g-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1'}        style={{
             backgroundImage: "url(/images/auth-side-bg.jpg)",
             backgroundSize: "cover",
           }}
@@ -50,10 +49,10 @@ const AuthLayout = (props: AuthLayoutProps) => {
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
             <div className="flex justify-center"></div>
             <h2 className="mt-5 text-center text-3xl font-extrabold text-gray-900">
-              {props.subtitle}
+            {props.title}
             </h2>
             <p className="mt-1 text-center text-sm text-gray-600">
-              {props.title}
+              {props.subtitle}
             </p>
           </div>
           {/* 

@@ -14,6 +14,7 @@ import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
+import Button from "../ui/Button";
 
 
 /**
@@ -98,6 +99,7 @@ const SignInForm = () => {
     ) {
       setLoginEmailErrorMessage("Email Address is required");
       setLoginPasswordErrorMessage("Password is required");
+      
     } else if (
       loginUserCredentials.email != "" &&
       loginUserCredentials.password != "" &&
@@ -172,7 +174,7 @@ const SignInForm = () => {
               type="button"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              Forgot Password?
+              <Link to= "/forgotpassword">Forgot Password?</Link>
             </button>
           </div>
             <div className="">
@@ -180,12 +182,7 @@ const SignInForm = () => {
             </div>
           
 
-          <button
-            type="submit"
-            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Log In
-          </button>
+            <Button type="submit" onClick={handleLoginSubmit}>Log In</Button>
 
           <div className="text-center">
             <span className="text-gray-600 text-sm">
@@ -193,7 +190,6 @@ const SignInForm = () => {
               <button
                 type="button"
                 className="font-medium text-blue-600 hover:text-blue-500"
-                onClick={handleLoginSubmit}
               >
                  {/* <Button type="submit">Sign up</Button> */}
                 <Link to="/signup">Sign Up</Link>

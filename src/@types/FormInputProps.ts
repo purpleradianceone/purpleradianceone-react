@@ -22,6 +22,7 @@ type FormInputProps = {
     defaultValue?: string | number | readonly string[] | undefined
     pattern? : string, 
     className?: string,
+    center? : boolean
   }
 
   /**
