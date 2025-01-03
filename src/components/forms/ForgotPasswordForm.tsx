@@ -4,18 +4,30 @@ import FormInput from "../ui/FormInput";
 import { useState } from "react";
 import ForgotPasswordRequestPage from "../views/auth/pages/ForgotPasswordRequestPage";
 
-
+/**
+ * 
+ * @returns JSX.Element of animation after mail sent for forgot password
+ */
 function ForgotPasswordForm(){
 
 
+    /**
+     * state to manage the visibility of animation
+     */
     const [showAnimation, setShowAnimation] = useState(false);
 
+    /**
+     * @function handleResetPasswordClick handles the click event of the reset password button 
+     and redirect to login page on completion of setTimeout
+     */
     const handleResetPasswordClick = () => {
         setShowAnimation(true);
         setTimeout(() => {
             window.location.href = '/signin';
         }, 15000);
     };
+
+
     return (
         <><form className="space-y-5" >
             <FormInput
@@ -41,4 +53,7 @@ function ForgotPasswordForm(){
     );
 }
 
+/**
+ * @exports ForgotPasswordForm as a default export
+ */
 export default ForgotPasswordForm;

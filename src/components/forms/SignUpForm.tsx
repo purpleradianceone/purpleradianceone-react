@@ -263,12 +263,19 @@ const SignUpPage: React.FC = () => {
             />
 
             {/* Button for submitting the form */}
-            <Button type="submit"><Link to= "/"></Link>Sign Up</Button>
+            <Button type="submit">Sign Up</Button>
           </form>
-          <p className="text-sm text-left mt-3">
-            Already have an account? {/* link */}
-            <Link className="text-blue-600" to="/signin">Log In</Link>
-          </p>
+           <div className="text-center">
+                      <span className="text-gray-600 text-sm">
+                        Already Have an account?{" "}
+                        <button
+                          type="button"
+                          className="font-medium text-blue-600 hover:text-blue-500"
+                        >
+                          <Link to="/signin">Log In</Link>
+                        </button>
+                      </span>
+                    </div>
       </>
   );
 };
