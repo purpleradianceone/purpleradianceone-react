@@ -4,6 +4,7 @@ import SignInForm from "../../components/forms/SignInForm";
 import SignUpForm from "../../components/forms/SignUpForm";
 import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
 import ForgotPasswordRequestPage from "../../components/views/auth/pages/ForgotPasswordRequestPage";
+import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -45,6 +46,12 @@ export const router = createBrowserRouter([
       <AuthLayout title="Mail Sent" subtitle="Check your email to and click on link in email to reset your password" >
         <ForgotPasswordRequestPage></ForgotPasswordRequestPage>
       </AuthLayout>
+    ),
+  },
+  {
+    path : "/createpassword",
+    element : (
+      <AuthLayout title="Create Password" subtitle="Enter your new password"><CreatePasswordForm></CreatePasswordForm></AuthLayout>
     ),
   },
 ]);

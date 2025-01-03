@@ -1,5 +1,10 @@
-// import { MailCheck } from "lucide-react";
+
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+
+/**
+ * 
+ * @returns JSX.Element animation of email sent
+ */
 function ForgotPasswordRequestPage(){
     return (
         <DotLottieReact
@@ -10,4 +15,7 @@ function ForgotPasswordRequestPage(){
     );
 }
 
+/**
+ * @exports ForgotPasswordRequestPage component as a default export
+ */
 export default ForgotPasswordRequestPage;
