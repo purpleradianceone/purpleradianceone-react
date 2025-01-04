@@ -4,6 +4,7 @@
  */
 import AuthLayoutProps from "../../../@types/auth/views/AuthLayoutProps";
 import "../../../assets/styles/AuthLayout.css";
+// import Logo from "../../../assets/svg/Logo";
 
 /**
  *  
@@ -21,35 +22,43 @@ const AuthLayout = (props: AuthLayoutProps) => {
       {/* left side code */}
       <div className="grid lg:grid-cols-3">
         <div
-          className = { (props.title == 'Sign Up'  ? '' : 'h-screen ') + 'g-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1'}        style={{
-            backgroundImage: "url(/images/auth-side-bg.jpg)",
+          className="g-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1 h-screen sticky top-0"
+          style={{
+            backgroundImage: "url(/images/auth/auth-side-bg-dark.jpg)",
             backgroundSize: "cover",
           }}
         >
-          <div className="logo ">
-            <h2 className="mt-2 text-center text-3xl font-extrabold text-white">
-              Purple Radiance
-            </h2>
-            {/* <img src="/images/logo.png" alt="" /> */}
+          <div className="logo flex justify-center">
+            <img src="/images/logo/logo.png" alt="" className="w-52 h-32"/>
+
+            {/* <Logo></Logo> */}
           </div>
-          <div className="mt-3 text-center text-3xl font-extrabold text-gray-900">
-            <div className="circular"></div>
-            <h1 className="text-white">Welcome!</h1>
-            <div className="col-span-2 p-6 text-sm text-white">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. In eius
-              vel autem doloribus excepturi corrupti dolore, exercitationem
-              error tempora libero modi non sapiente, commodi at quam quo quidem
-              perspiciatis voluptatibus.
+          <div>
+            <div className="mb-6 flex items-center gap-4">
+              <span className="avatar avatar-circle avatar-md">
+                <img
+                  className="w-16 h-16 rounded-full object-cover border-2"
+                  src="/images/avatars/thumb-1.jpg"
+                  
+                ></img>
+              </span>
+              <div className="text-white">
+                <div className="font-semibold text-base">Purple Radiance</div>
+                <span className="opacity-80">CTO, Onward</span>
+              </div>
             </div>
+            <p className="text-lg text-white opacity-80">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla sint quam beatae suscipit necessitatibus eius sit impedit dolor, autem quasi aspernatur perspiciatis blanditiis. Pariatur quos perferendis porro dolor officia impedit.
+            </p>
           </div>
         </div>
 
         {/* right side code */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 overflow-y-auto">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
             <div className="flex justify-center"></div>
             <h2 className="mt-5 text-center text-3xl font-extrabold text-gray-900">
-            {props.title}
+              {props.title}
             </h2>
             <p className="mt-1 text-center text-sm text-gray-600">
               {props.subtitle}

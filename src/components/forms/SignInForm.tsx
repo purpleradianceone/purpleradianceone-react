@@ -129,8 +129,6 @@ const SignInForm = () => {
   };
 
   return (
-    // <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-md lg:px-3">
-      // <div className="py-8 px-1  sm:px-10">
         <form className="space-y-5">
           <FormInput
             label="Email"
@@ -177,9 +175,9 @@ const SignInForm = () => {
               <Link to= "/forgotpassword">Forgot Password?</Link>
             </button>
           </div>
-            <div className="">
+            
             <ReCAPTCHA sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" />
-            </div>
+            
           
 
             <Button type="submit" onClick={handleLoginSubmit}>Log In</Button>
@@ -197,8 +195,7 @@ const SignInForm = () => {
             </span>
           </div>
         </form>
-      // </div>
-    // </div>
+
   );
 };
 

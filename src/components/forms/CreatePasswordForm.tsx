@@ -14,7 +14,7 @@ function CreatePasswordForm () {
 
     return (
         <>
-        <form className="space-y-12">
+        <form className="space-y-5">
             <div className=" relative">
             <FormInput
             label="New Password"

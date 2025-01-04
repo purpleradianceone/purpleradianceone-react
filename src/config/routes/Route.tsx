@@ -1,19 +1,27 @@
-import { createBrowserRouter, Link } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
 import SignUpForm from "../../components/forms/SignUpForm";
 import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
 import ForgotPasswordRequestPage from "../../assets/animations/ForgotPasswordRequestPage";
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
+import Navbar from "../../components/views/home/Navbar";
+import Hero from "../../components/views/home/Hero";
+import Features from "../../components/views/home/Features";
+import CallToAction from "../../components/views/home/CallToAction";
+import Testimonials from "../../components/views/home/Testimonials";
+import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
 export const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <AuthLayout>
-        <div>
-          <Link to="/signin" style={{color:"black"}}>Home Screen</Link>
-        </div>
-      </AuthLayout>
+      <div className="min-h-screen">
+      <Navbar />
+      <Hero />
+      <Features />
+      <Testimonials />
+      <CallToAction />
+    </div>
     ),
   },
   {
@@ -54,5 +62,11 @@ export const router = createBrowserRouter([
       <AuthLayout title="Create Password" subtitle="Enter your new password"><CreatePasswordForm></CreatePasswordForm></AuthLayout>
     ),
   },
+  {
+    path: "/emailverfication",
+    element : (
+      <EmailVerificationLayout/>
+    ),
+  }
 ]);
 export default router;
