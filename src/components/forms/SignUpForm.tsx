@@ -41,10 +41,9 @@ const SignUpPage: React.FC = () => {
   /**
    * state is defined for toggling the visibility of password and confirmPassword, default false.
    */
-  const [visibility, setVisibility] = useState({
-    password: false,
-    confirmPassword: false,
-  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword,setConfirmPassword] = useState(false);
+
   /**
    *
    * @param email for validation
@@ -116,13 +115,6 @@ const SignUpPage: React.FC = () => {
    * @param field : which is the field to be validated
    * common method is defined for toggling the visibility of password and confirm password
    */
-  const toggleVisibility = (field: "password" | "confirmPassword") => {
-    setVisibility((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
   /**
    *
    * @param e is an react formEvent
@@ -166,7 +158,7 @@ const SignUpPage: React.FC = () => {
   return (
     <>
           {/* form  */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* <div className="mb-3"> */}
             <FormInput
                 label="Full Name"
@@ -206,10 +198,9 @@ const SignUpPage: React.FC = () => {
            
 
             {/* Password Field */}
-            <div className=" relative">
             <FormInput
                 label="Password"
-                type={visibility.password ? "text" : "password"}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter password"
                 value={SignUpData.password}
@@ -219,21 +210,24 @@ const SignUpPage: React.FC = () => {
                 maxLength={20}
                 required
                 error={errors.password}
+                rightElement={
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-gray-400 hover:text-gray-500"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-5 w-5" />
+                                ) : (
+                                  <Eye className="h-5 w-5" />
+                                )}
+                              </button>
+                            }
               />
-              <button
-                type="button"
-                onClick={() => toggleVisibility("password")}
-                className="absolute right-2 top-8 text-gray-500"
-              >
-                {visibility.password ? <Eye size={20} /> : <EyeOff size={20} />}
-              </button>
-            
-              </div>
             {/* Confirm Password Field */}
-            <div className=" relative">
-                <FormInput
-                label="Confirn Password"
-                type={visibility.confirmPassword ? "text" : "password"}
+            <FormInput
+                label="Password"
+                type={showConfirmPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter password"
                 value={SignUpData.password}
@@ -242,21 +236,23 @@ const SignUpPage: React.FC = () => {
                 minLength={8}
                 maxLength={20}
                 required
-                error={errors.confirmPassword}
+                error={errors.password}
+                rightElement={
+                              <button
+                                type="button"
+                                onClick={() => setConfirmPassword(!showConfirmPassword)}
+                                className="text-gray-400 hover:text-gray-500"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-5 w-5" />
+                                ) : (
+                                  <Eye className="h-5 w-5" />
+                                )}
+                              </button>
+                            }
               />
-              <button
-                type="button"
-                onClick={() => toggleVisibility("confirmPassword")}
-                className="absolute right-2 top-8 text-gray-500"
-              >
-                {visibility.confirmPassword ? (
-                  <Eye size={20} />
-                ) : (
-                  <EyeOff size={20} />
-                )}
-              </button>
-            
-            </div>
+
+
             <ReCAPTCHA
               sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" // Replace with your site key
               onChange={onChange}
@@ -264,8 +260,8 @@ const SignUpPage: React.FC = () => {
 
             {/* Button for submitting the form */}
             <Button type="submit">Sign Up</Button>
-          </form>
-           <div className="text-center">
+          
+            <div className="text-center">
                       <span className="text-gray-600 text-sm">
                         Already Have an account?{" "}
                         <button
@@ -276,6 +272,9 @@ const SignUpPage: React.FC = () => {
                         </button>
                       </span>
                     </div>
+            
+          </form>
+           
       </>
   );
 };
