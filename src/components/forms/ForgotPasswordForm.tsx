@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
 import { useState } from "react";
-import ForgotPasswordRequestPage from "../views/auth/pages/ForgotPasswordRequestPage";
+import ForgotPasswordRequestPage from "../../assets/animations/ForgotPasswordRequestPage";
 
 /**
  * 

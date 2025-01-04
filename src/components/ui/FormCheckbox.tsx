@@ -2,7 +2,7 @@
 /**
  * @import FormCheckboxProps type object for props i.e. {label,name,onChange} validation from src/@types/FormCheckboxProps
  */
-import FormCheckboxProps from "../../@types/FormCheckboxProps";
+import FormCheckboxProps from "../../@types/ui/FormCheckboxProps";
 
 /**
  * @param label label text for check box
