@@ -2,7 +2,7 @@
  * @import AuthLayoutPropsimported type object for props validation from from src/@types/AuthLayoutProps
  * @import "../../../assets/styles/AuthLayout.css" importing styles from the AuthLayout.css file
  */
-import AuthLayoutProps from "../../../@types/AuthLayoutProps";
+import AuthLayoutProps from "../../../@types/auth/views/AuthLayoutProps";
 import "../../../assets/styles/AuthLayout.css";
 
 /**

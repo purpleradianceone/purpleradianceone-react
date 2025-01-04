@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CredentialSignUp from "../../@types/CredentialSignUp";
+import CredentialSignUp from "../../@types/auth/forms/SignUpFormProps";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
 import { Link } from "react-router-dom";

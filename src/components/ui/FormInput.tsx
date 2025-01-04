@@ -3,7 +3,7 @@
  * @import FormInputProps type object for props i.e. 
    {label,type,name,placeholder,required,rightElement,onChange,onBlur,error} validation from src/@types/FormInputProps
  */
-import FormInputProps from "../../@types/FormInputProps";
+import FormInputProps from "../../@types/ui/FormInputProps";
 
 /**
  * 
