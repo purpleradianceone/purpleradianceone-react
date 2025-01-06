@@ -226,10 +226,10 @@ const SignUpPage: React.FC = () => {
               />
             {/* Confirm Password Field */}
             <FormInput
-                label="Password"
+                label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter password"
+                name="confirmPassword"
+                placeholder="confirm password"
                 value={SignUpData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -243,7 +243,7 @@ const SignUpPage: React.FC = () => {
                                 onClick={() => setConfirmPassword(!showConfirmPassword)}
                                 className="text-gray-400 hover:text-gray-500"
                               >
-                                {showPassword ? (
+                                {showConfirmPassword ? (
                                   <EyeOff className="h-5 w-5" />
                                 ) : (
                                   <Eye className="h-5 w-5" />
