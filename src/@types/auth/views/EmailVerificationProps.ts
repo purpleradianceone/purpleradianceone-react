@@ -3,4 +3,4 @@ type EmailVerificationProps =  {
     message: string;
   }
 
-  export default EmailVerificationProps;
+export default EmailVerificationProps;
