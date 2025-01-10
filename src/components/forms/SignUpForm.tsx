@@ -5,6 +5,7 @@ import FormInput from "../ui/FormInput";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
+import axios from "axios";
 
 /**
  * created functional components for SignUp Form
@@ -128,18 +129,27 @@ const SignUpPage: React.FC = () => {
     e.preventDefault();
 
     if (!SignUpData.email) {
-      alert("Email Address is required!");
-      return;
+      setErrors((prev) => ({
+        ...prev,
+        "email": "Email Address is required!" ,
+      }));
+      
     }
 
     if (!validateEmail(SignUpData.email)) {
-      alert("Email Address must be valid!");
-      return;
+      setErrors((prev) => ({
+        ...prev,
+        "email": "Email Address must be valid!" ,
+      }));
+     
     }
 
     if (SignUpData.password !== SignUpData.confirmPassword) {
       alert("Passwords do not match!");
-      return;
+      setErrors((prev) => ({
+        ...prev,
+        "confirmPassword": "Passwords do not match!" ,
+      }));
     }
 
     if (captchaToken) {
@@ -148,8 +158,44 @@ const SignUpPage: React.FC = () => {
       setMessage("Please complete the CAPTCHA.");
     }
 
-    console.log("User Data:", SignUpData);
-    alert("Sign-Up Successful!");
+   
+
+    
+    const signupDataPost = {
+      name : SignUpData.name,
+      mobilenumber: SignUpData.mobileNumber,
+      email: SignUpData.email,
+      login_password: SignUpData.password
+    };
+    if(signupDataPost.email != "" && signupDataPost.mobilenumber  != "" && signupDataPost.name  != "" && signupDataPost.login_password  != "" && SignUpData.confirmPassword != ""){
+      axios.post("/api/authentication/purple-crm-api/signup",signupDataPost)
+      .then(respone => {
+        console.log(respone);
+        alert(respone.data.message);
+        if(respone.data.status === true){
+          const sendVerificationEmailPost = {
+            onboarding_status_id : 2,
+            email_sent : false
+          }
+          axios.post("/api/notification/purple-crm-api/send-signup-verification-mail",sendVerificationEmailPost)
+          .then(response => {
+            if(response.data == "Email Sent"){
+              alert("Verification Email Sent Check your Email");
+              window.location.href = '/signin';
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+
+      })
+      .catch(error => {
+       console.log(error)
+      })
+    }
+      
+
   };
 
   /**
@@ -158,7 +204,7 @@ const SignUpPage: React.FC = () => {
   return (
     <>
           {/* form  */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form className="space-y-5">
             {/* <div className="mb-3"> */}
             <FormInput
                 label="Full Name"
@@ -168,6 +214,7 @@ const SignUpPage: React.FC = () => {
                 value={SignUpData.name}
                 onChange={handleChange}
                 maxLength={100}
+                
             />
             {/* </div> */}
             <FormInput
@@ -259,7 +306,7 @@ const SignUpPage: React.FC = () => {
             />
 
             {/* Button for submitting the form */}
-            <Button type="submit">Sign Up</Button>
+            <Button type="submit" onClick={handleSubmit}>Sign Up</Button>
           
             <div className="text-center">
                       <span className="text-gray-600 text-sm">
