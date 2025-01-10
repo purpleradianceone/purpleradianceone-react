@@ -63,7 +63,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/emailverfication",
+    path: "/emailverfication/verify",
     element : (
       <EmailVerificationLayout/>
     ),
