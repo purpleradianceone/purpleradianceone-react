@@ -1,7 +1,8 @@
 import  { useState } from 'react';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import EmailVerificationProps from '../../../@types/auth/views/EmailVerificationProps';
-import { data, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 
 
 
@@ -9,6 +10,7 @@ function EmailVerificationLayout() {
 
   const [searchParams] = useSearchParams();
     const email = searchParams.get('email');
+    const verificationCode = searchParams.get('token');
   const [verificationState, setVerificationState] = useState<EmailVerificationProps>({
     status: 'idle',
     message: '',
@@ -16,7 +18,7 @@ function EmailVerificationLayout() {
 
   
   // Function to decode Base64 string
-function decodeBase64(encodedString : string) {
+const decodeBase64 = (encodedString : string) => {
   // Decode the Base64 string
   const decodedString = atob(encodedString);
   
@@ -29,22 +31,15 @@ function decodeBase64(encodedString : string) {
   }
 }
 
-// Example usage
-const encodedEmail = "dmFpYmhhdi5zaGluZGVAcHVycGxlcmFkaWFuY2UuY29t"; // Replace with your actual encoded string
-const decodedEmail = decodeBase64(encodedEmail);
-
-console.log("Decoded Email:", decodedEmail);
-
   
   const handleVerification = () => {
     setVerificationState({ status: 'loading', message: 'Verifying your email...' });
-    
-    setTimeout(() => {
-      setVerificationState({
-        status: 'success',
-        message: 'Your email has been successfully verified!',
-      });
-    }, 2000);
+    axios.get("http://localhost:8080/api/authentication/purple-crm-api/emailverfication/verify?token=" + verificationCode)
+    .then(data => {
+      if (data.data === true) {
+        setVerificationState({ status: 'success', message: 'Email verified successfully' });
+      }
+    })
   };
 
   return (
