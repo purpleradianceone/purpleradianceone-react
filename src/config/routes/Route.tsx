@@ -3,7 +3,7 @@ import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
 import SignUpForm from "../../components/forms/SignUpForm";
 import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
-import ForgotPasswordRequestPage from "../../assets/animations/ForgotPasswordRequestPage";
+import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
 import Navbar from "../../components/views/home/Navbar";
 import Hero from "../../components/views/home/Hero";

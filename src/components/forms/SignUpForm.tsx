@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
+import EmailSentAnimation from "../../assets/animations/EmailSentAnimation";
 
 /**
  * created functional components for SignUp Form
@@ -22,6 +23,8 @@ const SignUpPage: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const [showAnimation,setShowAnimation] = useState<boolean>(false);
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
@@ -171,7 +174,6 @@ const SignUpPage: React.FC = () => {
       axios.post("/api/authentication/purple-crm-api/signup",signupDataPost)
       .then(respone => {
         console.log(respone);
-        alert(respone.data.message);
         if(respone.data.status === true){
           const sendVerificationEmailPost = {
             onboarding_status_id : 2,
@@ -180,8 +182,11 @@ const SignUpPage: React.FC = () => {
           axios.post("/api/notification/purple-crm-api/send-signup-verification-mail",sendVerificationEmailPost)
           .then(response => {
             if(response.data == "Email Sent"){
-              alert("Verification Email Sent Check your Email");
-              window.location.href = '/signin';
+              setShowAnimation(!showAnimation);
+              setTimeout(()=>{
+                window.location.href = '/signin';
+              },15000)
+             
             }
           })
           .catch(error => {
@@ -321,6 +326,18 @@ const SignUpPage: React.FC = () => {
                     </div>
             
           </form>
+
+          {showAnimation && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-95">
+                    <div className="bg-white p-6 h-auto w-auto rounded-2xl shadow-lg animate-fade-in">
+                      <button></button>
+                      <h2 className="text-lg font-semibold text-center">Please Check Your Email</h2>
+                      <EmailSentAnimation/>
+                      
+                        
+                    </div>
+                </div>
+            )}
            
       </>
   );

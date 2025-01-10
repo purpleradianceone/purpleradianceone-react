@@ -5,7 +5,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
  * 
  * @returns JSX.Element animation of email sent
  */
-function ForgotPasswordRequestPage(){
+function EmailSentAnimation(){
     return (
         <DotLottieReact
         src="https://lottie.host/ec89b362-d160-4c83-bbaf-cd8b2bf1ebf5/kP2XGeVKvO.lottie"
@@ -18,4 +18,4 @@ function ForgotPasswordRequestPage(){
 /**
  * @exports ForgotPasswordRequestPage component as a default export
  */
-export default ForgotPasswordRequestPage;
+export default EmailSentAnimation;
