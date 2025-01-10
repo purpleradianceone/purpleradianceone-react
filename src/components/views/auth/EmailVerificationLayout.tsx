@@ -35,8 +35,10 @@ const decodeBase64 = (encodedString : string) => {
   const handleVerification = () => {
     setVerificationState({ status: 'loading', message: 'Verifying your email...' });
     axios.get("http://localhost:8080/api/authentication/purple-crm-api/emailverfication/verify?token=" + verificationCode)
-    .then(data => {
-      if (data.data === true) {
+    .then(response => {
+      console.log(response);
+      
+      if (response.data.status === true) {
         setVerificationState({ status: 'success', message: 'Email verified successfully' });
       }
     })
