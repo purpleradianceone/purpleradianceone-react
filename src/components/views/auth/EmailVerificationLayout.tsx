@@ -41,6 +41,15 @@ const decodeBase64 = (encodedString : string) => {
       
       if (response.data.status === true) {
         setVerificationState({ status: 'success', message: 'Email verified successfully' });
+        setTimeout(()=>{
+          window.location.href = "/signin";
+        },2000)
+      }
+      else if (response.data.message === "User is already verified. Please log in.") {
+        setVerificationState({ status: 'success', message: 'User Already Verified. Please Log in' });
+        setTimeout(()=>{
+          window.location.href = "/signin";
+        },2000)
       }
     })
   };

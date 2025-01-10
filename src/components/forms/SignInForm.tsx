@@ -9,12 +9,13 @@
  * @import ReCAPTCHA from google recaptcha
  */
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, User } from "lucide-react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
+import axios from "axios";
 
 
 /**
@@ -93,23 +94,46 @@ const SignInForm = () => {
    */
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (
-      loginUserCredentials.email == "" ||
-      loginUserCredentials.password == ""
-    ) {
+    if (loginUserCredentials.email == "") {
       setLoginEmailErrorMessage("Email Address is required");
-      setLoginPasswordErrorMessage("Password is required");
-      
-    } else if (
-      loginUserCredentials.email != "" &&
-      loginUserCredentials.password != "" &&
-      localStorage.getItem("rememberMe") === "true"
-    ) {
-      localStorage.setItem(
-        "loginUserCredentials",
-        JSON.stringify(loginUserCredentials)
-      );
     }
+    else if(loginUserCredentials.password == ""){
+      setLoginPasswordErrorMessage("Password is required");
+    }
+     else{
+
+      if (
+        loginUserCredentials.email != "" &&
+        loginUserCredentials.password != "" &&
+        localStorage.getItem("rememberMe") === "true"
+      ) {
+        localStorage.setItem(
+          "loginUserCredentials",
+          JSON.stringify(loginUserCredentials)
+        );
+    }
+
+    const user = {
+      email: loginUserCredentials.email,
+      login_password : loginUserCredentials.password
+    }
+    axios.post("/api/authentication/purple-crm-api/authenticate" , user)
+    .then( response => {
+      if(response.data.status === true){
+        localStorage.setItem("token",response.data.token);
+        alert("login Succesfully");
+      }
+      else{
+        alert("wrong Credentials")
+      }
+    } )
+    .catch( error => {
+      console.log(error);
+    } );
+
+    }
+
+
   };
 
   /**
