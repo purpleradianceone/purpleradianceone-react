@@ -20,7 +20,7 @@ const AuthLayout = (props: AuthLayoutProps) => {
   return (
     <div className="bg-gray-100 flex flex-col justify-center">
       {/* left side code */}
-      <div className="grid lg:grid-cols-3">
+      <div className="h-screen grid lg:grid-cols-3">
         <div
           className="g-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1 h-screen sticky top-0"
           style={{

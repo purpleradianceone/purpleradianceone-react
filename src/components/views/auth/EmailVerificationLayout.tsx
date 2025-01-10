@@ -1,14 +1,39 @@
 import  { useState } from 'react';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import EmailVerificationProps from '../../../@types/auth/views/EmailVerificationProps';
+import { data, useSearchParams } from 'react-router-dom';
 
 
 
 function EmailVerificationLayout() {
+
+  const [searchParams] = useSearchParams();
+    const email = searchParams.get('email');
   const [verificationState, setVerificationState] = useState<EmailVerificationProps>({
     status: 'idle',
     message: '',
   });
+
+  
+  // Function to decode Base64 string
+function decodeBase64(encodedString : string) {
+  // Decode the Base64 string
+  const decodedString = atob(encodedString);
+  
+  // Convert the decoded string to a UTF-8 string
+  try {
+      return decodeURIComponent(decodedString);
+  } catch (e) {
+      console.error("Decoding error:", e);
+      return null;
+  }
+}
+
+// Example usage
+const encodedEmail = "dmFpYmhhdi5zaGluZGVAcHVycGxlcmFkaWFuY2UuY29t"; // Replace with your actual encoded string
+const decodedEmail = decodeBase64(encodedEmail);
+
+console.log("Decoded Email:", decodedEmail);
 
   
   const handleVerification = () => {
@@ -43,7 +68,7 @@ function EmailVerificationLayout() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900">Verification Email Sent</p>
-              <p className="text-sm text-gray-500 truncate">user@example.com</p>
+              <p className="text-sm text-gray-500 truncate">{decodeBase64(email || "")}</p>
             </div>
           </div>
 
