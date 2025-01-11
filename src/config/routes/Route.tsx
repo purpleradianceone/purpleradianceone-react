@@ -5,12 +5,14 @@ import SignUpForm from "../../components/forms/SignUpForm";
 import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
 import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
-import Navbar from "../../components/views/home/Navbar";
+import Navbar from "../../components/views/home/navbar/Navbar";
 import Hero from "../../components/views/home/Hero";
 import Features from "../../components/views/home/Features";
 import CallToAction from "../../components/views/home/CallToAction";
 import Testimonials from "../../components/views/home/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
+
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -28,8 +30,10 @@ export const router = createBrowserRouter([
     path: "/signin",
     element: (
       <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
-        <SignInForm />
+          <SignInForm />
       </AuthLayout>
+      
+      
     ),
   },
   {
@@ -66,6 +70,12 @@ export const router = createBrowserRouter([
     path: "/emailverfication/verify",
     element : (
       <EmailVerificationLayout/>
+    ),
+  },
+  {
+    path: "/home",
+    element: (
+      <Navbar />
     ),
   }
 ]);

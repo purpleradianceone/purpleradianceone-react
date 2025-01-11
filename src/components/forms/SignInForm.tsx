@@ -12,10 +12,12 @@ import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
 import axios from "axios";
+import { useNavBarContext } from "../../context/home/NavBarContext";
+// import SignInFormProps from "../../@types/auth/forms/SignInFormProps";
 
 
 /**
@@ -23,6 +25,10 @@ import axios from "axios";
  * @returns JSX.Element for the login form
  */
 const SignInForm = () => {
+
+  const {isLoggedIn,setLoginStatus} = useNavBarContext();
+  const navigate = useNavigate();
+
   /**
    * State to store boolean values for password visibility
    **/
@@ -121,14 +127,22 @@ const SignInForm = () => {
     .then( response => {
       if(response.data.status === true){
         localStorage.setItem("token",response.data.token);
+        console.log(isLoggedIn);
+        
+        setLoginStatus(true);
+        console.log("User logged in successfully");
+        console.log(isLoggedIn);
         alert("login Succesfully");
+        navigate("/home");
       }
       else{
-        alert("wrong Credentials")
+        alert("wrong Credentials");
+        setLoginStatus(false);
       }
     } )
     .catch( error => {
       console.log(error);
+
     } );
 
     }

@@ -5,6 +5,7 @@
  */
 import { RouterProvider} from 'react-router-dom';
 import { router } from './config/routes/Route';
+import { NavBarContextProvider } from './context/home/NavBarContext';
 
 /**
  * 
@@ -12,7 +13,10 @@ import { router } from './config/routes/Route';
  */
 function App() {
   return (
-  <RouterProvider router={router} />
+    <NavBarContextProvider>
+      <RouterProvider router={router}/>
+    </NavBarContextProvider>
+  
   );
 }
 
