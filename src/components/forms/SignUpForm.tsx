@@ -91,7 +91,12 @@ const SignUpPage: React.FC = () => {
     }
 
     if (name === "confirmPassword") {
-      if (value !== SignUpData.password) {
+      if(!value){
+        setErrors((prev)=> ({
+          ...prev, confirmPassword:" confirm password is required"
+        }))
+      }
+      else if (value !== SignUpData.password) {
         setErrors((prev) => ({
           ...prev,
           confirmPassword: "Password and Confirm Password do not match",
@@ -281,14 +286,14 @@ const SignUpPage: React.FC = () => {
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                placeholder="confirm password"
+                placeholder="Confirm password"
                 value={SignUpData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 minLength={8}
                 maxLength={20}
                 required
-                error={errors.password}
+                error={errors.confirmPassword}
                 rightElement={
                               <button
                                 type="button"
