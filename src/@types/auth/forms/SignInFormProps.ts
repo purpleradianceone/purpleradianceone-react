@@ -3,7 +3,8 @@
  * @typedef SignInFormProps defines the props and its data types of a SignInForm component
  */
 type SignInFormProps = {
-    handleOnchange :(event: React.ChangeEvent<HTMLInputElement>) => void;
+    isLoggedInLogin : boolean;
+    setLoginStatusLogin : (status : boolean) => void;
 }
 
 /**
