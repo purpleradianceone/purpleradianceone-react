@@ -9,7 +9,7 @@
  * @import ReCAPTCHA from google recaptcha
  */
 import React, { useState } from "react";
-import { Eye, EyeOff, User } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link } from "react-router-dom";
