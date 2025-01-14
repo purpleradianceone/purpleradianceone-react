@@ -26,6 +26,7 @@ import { useNavBarContext } from "../../context/home/NavBarContext";
  */
 const SignInForm = () => {
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {isLoggedIn,setLoginStatus} = useNavBarContext();
   const navigate = useNavigate();
 
@@ -127,11 +128,9 @@ const SignInForm = () => {
     .then( response => {
       if(response.data.status === true){
         localStorage.setItem("token",response.data.token);
-        console.log(isLoggedIn);
-        
+      
         setLoginStatus(true);
         console.log("User logged in successfully");
-        console.log(isLoggedIn);
         alert("login Succesfully");
         navigate("/home");
       }

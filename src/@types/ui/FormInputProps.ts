@@ -15,8 +15,8 @@ type FormInputProps = {
     onBlur? : (event : React.FocusEvent<HTMLInputElement>) => void;
     error?:string;
     readonly? : boolean
-    maxLength? :number | undefined,
-    minLength? :number | undefined,
+    maxLength? :number 
+    minLength? :number 
     size?:number | undefined,
     // required?: boolean | undefined,
     defaultValue?: string | number | readonly string[] | undefined
