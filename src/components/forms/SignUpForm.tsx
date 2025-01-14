@@ -36,11 +36,11 @@ const SignUpPage: React.FC = () => {
   /**
    * state is defined for logging the errors
    */
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [errors, setErrors] = useState<{
+    email?:string,
+    password?:string,
+    confirmPassword?:string,
+  }>({});
 
   /**
    * state is defined for toggling the visibility of password and confirmPassword, default false.
@@ -85,7 +85,10 @@ const SignUpPage: React.FC = () => {
     if (name === "password") {
       if (!value) {
         setErrors((prev) => ({ ...prev, password: "Password is required" }));
-      } else {
+      }else if (value.length <8 || value.length>20){
+        setErrors((prev) => ({ ...prev, password: "Password must be between 8 to 20 characters" }));
+      } 
+      else {
         setErrors((prev) => ({ ...prev, password: "" }));
       }
     }
@@ -96,6 +99,7 @@ const SignUpPage: React.FC = () => {
           ...prev, confirmPassword:" confirm password is required"
         }))
       }
+      
       else if (value !== SignUpData.password) {
         setErrors((prev) => ({
           ...prev,
@@ -119,11 +123,8 @@ const SignUpPage: React.FC = () => {
       [name]: value,
     }));
   };
-  /**
-   *
-   * @param field : which is the field to be validated
-   * common method is defined for toggling the visibility of password and confirm password
-   */
+ 
+  
   /**
    *
    * @param e is an react formEvent
@@ -133,31 +134,51 @@ const SignUpPage: React.FC = () => {
    * @returns the alerts
    *
    */
+
+  //THIS IS THE MAIN METHOD FOR SIGN UP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    //Regex for password and confirm password length
+    const passwordRegex = /^.{8,20}$/;
+
 
     if (!SignUpData.email) {
       setErrors((prev) => ({
         ...prev,
-        "email": "Email Address is required!" ,
+        email: "Email Address is required!",
       }));
-      
-    }
-
-    if (!validateEmail(SignUpData.email)) {
+    } else if (!validateEmail(SignUpData.email)) {
       setErrors((prev) => ({
         ...prev,
-        "email": "Email Address must be valid!" ,
+        email: "Email Address must be valid!",
       }));
-     
     }
 
-    if (SignUpData.password !== SignUpData.confirmPassword) {
-      alert("Passwords do not match!");
+    if (!SignUpData.password) {
       setErrors((prev) => ({
         ...prev,
-        "confirmPassword": "Passwords do not match!" ,
+        password: "Password is required!",
       }));
+    } else if (!passwordRegex.test(SignUpData.password)) {
+      setErrors((prev) => ({
+        ...prev,
+        password: "Password must be between 8 to 20 characters!",
+      }));
+      return;
+    }
+
+    if (!SignUpData.confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Confirm Password is required!",
+      }));
+    } else if (SignUpData.password !== SignUpData.confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Passwords do not match!",
+      }));
+      return;
     }
 
     if (captchaToken) {
@@ -166,32 +187,33 @@ const SignUpPage: React.FC = () => {
       setMessage("Please complete the CAPTCHA.");
     }
 
-   
-
-    
     const signupDataPost = {
       name : SignUpData.name,
       mobilenumber: SignUpData.mobileNumber,
       email: SignUpData.email,
       login_password: SignUpData.password
     };
-    if(signupDataPost.email != "" && signupDataPost.mobilenumber  != "" && signupDataPost.name  != "" && signupDataPost.login_password  != "" && SignUpData.confirmPassword != ""){
-      axios.post("/api/authentication/purple-crm-api/signup",signupDataPost)
+
+    if(signupDataPost.email != ""  && signupDataPost.login_password  != "" && SignUpData.confirmPassword != ""){
+
+      const signUpRequest="/api/authentication/purple-crm-api/signup";
+      axios.post(signUpRequest,signupDataPost)
       .then(respone => {
         console.log(respone);
+
         if(respone.data.status === true){
           const sendVerificationEmailPost = {
             onboarding_status_id : 2,
             email_sent : false
           }
+
           axios.post("/api/notification/purple-crm-api/send-signup-verification-mail",sendVerificationEmailPost)
           .then(response => {
             if(response.data == "Email Sent"){
               setShowAnimation(!showAnimation);
               setTimeout(()=>{
                 window.location.href = '/signin';
-              },15000)
-             
+              },10000)
             }
           })
           .catch(error => {
@@ -204,8 +226,6 @@ const SignUpPage: React.FC = () => {
        console.log(error)
       })
     }
-      
-
   };
 
   /**
@@ -237,8 +257,6 @@ const SignUpPage: React.FC = () => {
                 maxLength={15}
               />
 
-          
-
             {/* Email Field */}
             
               <FormInput
@@ -252,8 +270,6 @@ const SignUpPage: React.FC = () => {
                 error={errors.email}
               />
               
-           
-
             {/* Password Field */}
             <FormInput
                 label="Password"
@@ -308,8 +324,6 @@ const SignUpPage: React.FC = () => {
                               </button>
                             }
               />
-
-
             <ReCAPTCHA
               sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" // Replace with your site key
               onChange={onChange}
