@@ -19,6 +19,8 @@ function GetCompanyUsers(){
         axios.post("/api/main/purple-crm-api/getcompanyuser",postData)
         .then((response) => {
             setCompanyUsers(response.data);
+            console.log("this is the response");
+            
             console.log(response.data);
         })
         .catch((error) => {
