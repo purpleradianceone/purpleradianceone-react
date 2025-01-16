@@ -200,25 +200,14 @@ const SignUpPage: React.FC = () => {
       axios.post(signUpRequest,signupDataPost)
       .then(respone => {
         console.log(respone);
+        alert("Please check your email for verification");
 
         if(respone.data.status === true){
-          const sendVerificationEmailPost = {
-            onboarding_status_id : 2,
-            email_sent : false
-          }
+          setShowAnimation(!showAnimation);
+          setTimeout(()=>{
+            window.location.href = '/signin';
+          },15000)
 
-          axios.post("/api/notification/purple-crm-api/send-signup-verification-mail",sendVerificationEmailPost)
-          .then(response => {
-            if(response.data == "Email Sent"){
-              setShowAnimation(!showAnimation);
-              setTimeout(()=>{
-                window.location.href = '/signin';
-              },10000)
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
         }
 
       })

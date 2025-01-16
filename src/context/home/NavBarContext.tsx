@@ -13,7 +13,7 @@ const NavBarContext = createContext<NavBarProps | undefined>(undefined);
 export const NavBarContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [isLoggedIn, setLoginStatus] = useState(() => {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const storedValue = localStorage.getItem("isLoggedIn");
     return storedValue === "true" ? true : false;
   });
@@ -23,7 +23,7 @@ export const NavBarContextProvider: React.FC<{ children: ReactNode }> = ({
   }, [isLoggedIn]);
 
   return (
-    <NavBarContext.Provider value={{ isLoggedIn, setLoginStatus }}>
+    <NavBarContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
       {children}
     </NavBarContext.Provider>
   );

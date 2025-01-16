@@ -6,11 +6,13 @@ import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
 import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
 import Navbar from "../../components/views/home/navbar/Navbar";
-import Hero from "../../components/views/home/Hero";
-import Features from "../../components/views/home/Features";
-import CallToAction from "../../components/views/home/CallToAction";
-import Testimonials from "../../components/views/home/Testimonials";
+import Hero from "../../components/views/home/landing-page/Hero";
+import Features from "../../components/views/home/landing-page/Features";
+import CallToAction from "../../components/views/home/landing-page/CallToAction";
+import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
+import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
+import GetCompanyUsers from "../../components/views/manage-company-users/GetCompanyUsers";
 
 
 export const router = createBrowserRouter([
@@ -18,11 +20,13 @@ export const router = createBrowserRouter([
     path: "/",
     element: (
       <div className="min-h-screen">
-      <Navbar />
+      <Navbar >
       <Hero />
       <Features />
       <Testimonials />
       <CallToAction />
+      </Navbar>
+      
     </div>
     ),
   },
@@ -75,7 +79,38 @@ export const router = createBrowserRouter([
   {
     path: "/home",
     element: (
-      <Navbar />
+      <div className="min-h-screen">
+      <Navbar >
+      <Hero />
+      <Features />
+      <Testimonials />
+      <CallToAction />
+      </Navbar>
+      
+    </div>
+    ),
+  },
+  {
+    path: "/home/manage-users/add-user",
+    element: (
+      <div>
+        <Navbar>
+        <AddCompanyUser />
+        </Navbar>
+        
+      </div>
+      
+    ),
+  },
+  {
+    path: "/home/manage-users/users",
+    element: (
+      <div>
+        <Navbar>
+        <GetCompanyUsers />
+        </Navbar>
+      </div>
+      
     ),
   }
 ]);

@@ -1,6 +1,6 @@
 type NavBarProps = {
     isLoggedIn: boolean;
-    setLoginStatus: (loggedIn: boolean) => void;
+    setIsLoggedIn: (loggedIn: boolean) => void;
 };
 
 export default NavBarProps;

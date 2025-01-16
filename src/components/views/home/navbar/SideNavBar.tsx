@@ -1,6 +1,8 @@
-import { Calendar, FileText, Home, LayoutDashboard, Mail, Menu, MessageSquare, Settings, ShoppingBag, X } from "lucide-react";
+import { Building2, Calendar, FileText, Home, LayoutDashboard, Mail, Menu, MessageSquare, Settings, X } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
+import { Link } from "react-router-dom";
+
 
 const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
     return(
@@ -19,19 +21,21 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
                 icon={LayoutDashboard} 
                 label="Dashboards" 
                 isOpen={isOpen}
-                children={['Default', 'Analytics', 'Sales', 'CRM']}
+                children={[<>Default</>, <>Analytics</>, <>Sales</>, <>CRM</>]}
               />
               <SideNavBarItem 
-                icon={ShoppingBag} 
-                label="E-Commerce" 
+                icon={Building2} 
+                label="Manage Users" 
                 isOpen={isOpen}
-                children={['Products', 'Orders', 'Customers']}
+                children={[
+                <Link to="/home/manage-users/add-user">Add User</Link>, 
+                <Link to="/home/manage-users/users">Get Users</Link>, <>Customers</>]}
               />
               <SideNavBarItem 
                 icon={FileText} 
                 label="Pages" 
                 isOpen={isOpen}
-                children={['Profile', 'Settings', 'Invoice']}
+                children={[<>Profile</>, <>Settings</>, <>Invoice</>]}
               />
               <SideNavBarItem icon={Mail} label="Mail" isOpen={isOpen} />
               <SideNavBarItem icon={MessageSquare} label="Chat" isOpen={isOpen} />
