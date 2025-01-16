@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 
 const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
+  
     return(
         <aside className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
             ${isOpen ? 'w-64' : 'w-20'}`}
