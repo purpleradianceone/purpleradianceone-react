@@ -25,7 +25,7 @@ function GetCompanyUsers() {
         console.log(error);
       });
   }, []);
-
+    
   return (
     <div>
       <GetCompanyUsersList users={companyUsers}></GetCompanyUsersList>
