@@ -21,6 +21,7 @@ function AddCompanyUserForm() {
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    
     setCreateCompanyUser((prevData) => ({
       ...prevData,
       [name]: value,
@@ -98,7 +99,7 @@ function AddCompanyUserForm() {
         <FormInput
           label="Mobile Number"
           type="text"
-          name="MobileNumber"
+          name="mobileNumber"
           placeholder="Enter your Mobile Number"
           onChange={handleOnChange}
           value={createCompanyUser.mobileNumber}
