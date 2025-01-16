@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
 import axios from "axios";
-import { useNavBarContext } from "../../context/home/NavBarContext";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 // import SignInFormProps from "../../@types/auth/forms/SignInFormProps";
 
 
@@ -26,9 +26,9 @@ import { useNavBarContext } from "../../context/home/NavBarContext";
  */
 const SignInForm = () => {
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {isLoggedIn,setLoginStatus} = useNavBarContext();
   const navigate = useNavigate();
+  const {setLoginStatus} = useLoggedInUserContext();
+
 
   /**
    * State to store boolean values for password visibility
@@ -127,16 +127,32 @@ const SignInForm = () => {
     axios.post("/api/authentication/purple-crm-api/authenticate" , user)
     .then( response => {
       if(response.data.status === true){
-        localStorage.setItem("token",response.data.token);
-      
-        setLoginStatus(true);
-        console.log("User logged in successfully");
-        alert("login Succesfully");
+        setLoginStatus({
+          userId : response.data.user_id,
+          companyId : response.data.company_id,
+          status: response.data.status,
+          message: response.data.message,
+          token: response.data.token,
+          email: user.email
+        });
+        console.log(response.data);
+        if (response.data.token && response.data.token !== "") {
+          axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
+          
+      }
+
         navigate("/home");
       }
       else{
         alert("wrong Credentials");
-        setLoginStatus(false);
+        setLoginStatus({
+          userId : 0,
+          companyId : 0,
+          status: false,
+          message: "",
+          token: "",
+          email: ""
+        });
       }
     } )
     .catch( error => {

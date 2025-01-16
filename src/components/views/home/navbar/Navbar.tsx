@@ -1,20 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { Bell, Menu, Search, Settings, X } from "lucide-react";
 import { Link ,useNavigate } from "react-router-dom";
-import { useNavBarContext } from "../../../../context/home/NavBarContext";
 import SideNavBar from "./SideNavBar";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-const Navbar = () => {
+const Navbar = ({children} : {children : React.ReactNode}) => {
   const [isOpen, setIsOpen] = useState<boolean>();
-  // const { isLoggedIn } = useNavBarContext();
-   const {isLoggedIn,setLoginStatus} = useNavBarContext();
+   const {loginStatus,setLoginStatus} = useLoggedInUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const Navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(isLoggedIn);
-  }, [isLoggedIn]);
 
   const [isCardVisible, setIsCardVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -40,11 +36,20 @@ const Navbar = () => {
 
   const handleLogout=()=>{
     Navigate("/signin");
-    setLoginStatus(false);
+    setLoginStatus({
+      userId : 0,
+    companyId : 0,
+    message : "",
+    token : "",
+    status : false,
+    email : "",
+    });
   }
 
-  if (!isLoggedIn) {
+  if (!loginStatus.status) {
     return (
+      <div>
+        <header>
       <nav className="fixed w-full bg-white shadow-sm z-50 py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-10">
@@ -115,9 +120,17 @@ const Navbar = () => {
           </div>
         )}
       </nav>
+      </header>
+      <main>
+        {children}
+      </main>
+      </div>
+      
     );
   } else {
     return (
+      <div>
+      <header>
       <nav className="bg-white border-b border-gray-200 fixed w-full z-30 top-0 h-16">
         <div className="px-4 py-3 lg:px-6">
           <div className="flex items-center justify-between">
@@ -164,8 +177,8 @@ const Navbar = () => {
 
                 <div className="ml-2 cursor-default">
                   <h4 className="font-semibold text-gray-700">Admin</h4>
-                  <h5 className="font-semibold text-gray-300"></h5>
-                  <p>User1</p>
+                  
+                  <span className="text-sm text-gray-300 break-all">{loginStatus.email}</span>
                   {/* Profile Card */}
                   {isCardVisible && (
                     <div
@@ -179,9 +192,9 @@ const Navbar = () => {
                           className="rounded-full w-10 h-10"
                         />
                         <div className="ml-3">
-                          <p className="font-semibold text-gray-700">admin1</p>
+                        
                           <p className="text-sm break-all text-gray-500">
-                            hrutik.sargar@purpleradiance.com
+                          {loginStatus.email}
                           </p>
                         </div>
                       </div>
@@ -207,6 +220,11 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+      </header>
+      <main>
+          {children}
+      </main>
+      </div>
     );
   }
 };
