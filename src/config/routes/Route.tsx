@@ -81,10 +81,7 @@ export const router = createBrowserRouter([
     element: (
       <div className="min-h-screen">
       <Navbar >
-      <Hero />
-      <Features />
-      <Testimonials />
-      <CallToAction />
+      <div className="flex items-center justify-center">Home Screen</div>
       </Navbar>
       
     </div>
