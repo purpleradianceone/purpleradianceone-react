@@ -2,19 +2,20 @@ import { Users, ArrowUpDown, CheckCircle2, XCircle } from 'lucide-react';
 import companyUsersProps from '../../@types/company-users/CompanyUserProps';
 import Button from '../ui/Button';
 import {  useState } from 'react';
-
+import { Modal } from '../modal/ModalAccess';
 
 export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
 
-  const [showAccessModaleCard, setShowAccessModaleCard]=useState<number | null>(null);
+  // const [showAccessModaleCard, setShowAccessModaleCard]=useState<number | null>(null);
 
-  const handleModalOpen = (index: number) => {
-    setShowAccessModaleCard(index);
-  };
+  // const handleModalOpen = (index: number) => {
+  //   setShowAccessModaleCard(index);
+  // };
 
-  const handleModalClose = () => {
-    setShowAccessModaleCard(null);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const handleModalClose = () => {
+  //   setShowAccessModaleCard(null);
+  // };
 
 
   
@@ -95,7 +96,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">
-                    <Button  onClick={() => handleModalOpen(index)}
+                    <Button  onClick={() => setIsModalOpen(true)}
                     //  onClick={()=>{
                     //   setShowAccessModaleCard(!showAccessModaleCard)
                     // }} 
@@ -104,30 +105,17 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                   
                 </td>
               </tr>
+               
               
             ))}
             
           </tbody>
         </table>
       </div>
-
-     
-      {showAccessModaleCard !== null && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10">
-          <div className="bg-white w-96 p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Access Modal</h2>
-            <p className="text-gray-600">
-              You clicked on the button for row ID: {showAccessModaleCard+1}
-            </p>
-            <button
-              onClick={handleModalClose}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-400"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      
+        <Modal  isOpen={isModalOpen}
+               onClose={() => setIsModalOpen(false)}
+               userName="[Company User Name]"/>
     </div>
   );
 }
