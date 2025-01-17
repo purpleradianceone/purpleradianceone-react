@@ -221,7 +221,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
         </div>
       </nav>
       </header>
-      <main>
+      <main className="mt-16 ml-16 flex justify-center items-center">
           {children}
       </main>
       </div>

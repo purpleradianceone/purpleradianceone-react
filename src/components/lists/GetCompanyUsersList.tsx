@@ -1,29 +1,42 @@
-import { Users, ArrowUpDown, CheckCircle2, XCircle } from 'lucide-react';
-import companyUsersProps from '../../@types/company-users/CompanyUserProps';
-import Button from '../ui/Button';
-import {  useState } from 'react';
-import { Modal } from '../modal/ModalAccess';
+import {
+  Users,
+  ArrowUpDown,
+  CheckCircle2,
+  XCircle,
+  Search,
+} from "lucide-react";
+import companyUsersProps from "../../@types/company-users/CompanyUserProps";
+import Button from "../ui/Button";
+import { useState } from "react";
+import { Modal } from "../modal/ModalAccess";
 
 export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
-
-  // const [showAccessModaleCard, setShowAccessModaleCard]=useState<number | null>(null);
-
-  // const handleModalOpen = (index: number) => {
-  //   setShowAccessModaleCard(index);
-  // };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const handleModalClose = () => {
-  //   setShowAccessModaleCard(null);
-  // };
 
-
-  
   return (
-    <div className="mx-16 p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Users className="w-6 h-6 text-blue-600" />
-        <h1 className="text-2xl font-bold text-gray-900">Company Members</h1>
+    <div className="mx-5 p-6">
+      <div className="flex items-center justify-between mb-6 w-full">
+        <div className="flex items-center gap-2">
+          <Users className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl font-bold">Company Members</h1>
+        </div>
+        
+        <div className="relative w-80">
+          <input
+            type="search"
+            className="w-full h-10 pl-10 pr-12 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            placeholder="Search members..."
+          />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="w-4 h-4 text-gray-400" />
+          </div>
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-sm text-white bg-blue-600 rounded-r-lg hover:bg-blue-700 focus:outline-none"
+          >
+            Search
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -31,24 +44,21 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
           <thead className="bg-gray-50">
             <tr>
               {[
-                 { key: 'createdby', label: 'Created By' },
-                { key: 'id', label: 'User Id' },
-                { key: 'fullname', label: 'Name' },
-                { key: 'email', label: 'Email' },
-                { key: 'mobileNumber', label: 'Mobile Number' },
-                { key: 'isactive', label: 'Status' },
-                {key : 'Access' , label:'Access'},
-                
+                { key: "createdby", label: "Created By" },
+                { key: "id", label: "User Id" },
+                { key: "fullname", label: "Name" },
+                { key: "email", label: "Email" },
+                { key: "mobileNumber", label: "Mobile Number" },
+                { key: "isactive", label: "Status" },
+                { key: "Access", label: "Access" },
               ].map(({ key, label }) => (
                 <th
                   key={key}
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {key !== 'status' ? (
-                    <button
-                      className="flex items-center gap-1 hover:text-gray-700"
-                    >
+                  {key !== "status" ? (
+                    <button className="flex items-center gap-1 hover:text-gray-700">
                       {label}
                       <ArrowUpDown className="w-4 h-4" />
                     </button>
@@ -60,25 +70,27 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user , index) => (
+            {users.map((user, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                 <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.company_id}</div>
                 </td>
-                 <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.id}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{user.fullname}</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {user.fullname}
+                  </div>
                 </td>
-               
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-600">{user.mobilenumber}</div>
+                  <div className="text-sm text-gray-600">
+                    {user.mobilenumber}
+                  </div>
                 </td>
-               
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-1">
                     {user.isactive ? (
@@ -96,26 +108,25 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">
-                    <Button  onClick={() => setIsModalOpen(true)}
-                    //  onClick={()=>{
-                    //   setShowAccessModaleCard(!showAccessModaleCard)
-                    // }} 
-                    className='w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-lime-500 hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500'>Access</Button>
+                    <Button
+                      onClick={() => setIsModalOpen(true)}
+                      className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-lime-500 hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
+                    >
+                      Access
+                    </Button>
                   </div>
-                  
                 </td>
               </tr>
-               
-              
             ))}
-            
           </tbody>
         </table>
       </div>
-      
-        <Modal  isOpen={isModalOpen}
-               onClose={() => setIsModalOpen(false)}
-               userName="[Company User Name]"/>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        userName="[Company User Name]"
+      />
     </div>
   );
 }
