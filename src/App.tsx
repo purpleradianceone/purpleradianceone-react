@@ -14,6 +14,7 @@ import { LoggedInUserContextProvider } from './context/user/LoggedInUserContext'
  */
 function App() {
   return (
+
     <LoggedInUserContextProvider>
     <NavBarContextProvider>
       <RouterProvider router={router}/>
