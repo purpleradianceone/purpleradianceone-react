@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { UserPlus, WineOff, X } from 'lucide-react';
+import { UserPlus, X } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import Button from '../ui/Button';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
+import MessageSnackBar from '../ui/MessageSnackbar';
 
 
 type FormData= {
@@ -41,9 +42,66 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
     }));
   };
 
+  const [snackbar , setSnackbar]=useState<{
+    open: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    type: "success"
+  })
+  const showSnackbar = (message: string, type: 'success' | 'error') => {
+    setSnackbar({ open: true, message, type });
+  };
+
+  const handleClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false  }));
+  };
+
+   /**
+   *
+   * @param email for validation
+   * @returns boolean , does email validation using provided regex
+   */
+   const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
   
   const handleSubmit = (event : React.FormEvent<HTMLButtonElement>)=> {
     event.preventDefault();
+
+
+    if(!formData.fullName){
+      setErrorMessage((prev)=>({
+        ...prev,
+        fullName:"Name is required"
+      }))
+    }else{
+      setErrorMessage((prev)=>({
+        ...prev,
+        fullName:""
+      }))
+    }
+
+
+    if(!formData.email){
+      setErrorMessage((prev)=>({
+        ...prev,
+        email:"Email is required"
+      }))
+    }else if (!validateEmail(formData.email)) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        email: "Email Address must be valid!",
+      }));
+    }else{
+      setErrorMessage((prev)=>({
+        ...prev,
+        email:""
+      }))
+    }
 
     if (formData.fullName !== "" && formData.email !== "") {
 
@@ -54,18 +112,27 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
         createdby:loginStatus.userId,
         company_id:loginStatus.companyId,
       };
-        axios.post("/api/main/purple-crm-api/createuser",createCompanyUserData)
+        axios.post("",createCompanyUserData)
         .then((response) => {
+          if(response.data.status){
+            showSnackbar(response.data.message, 'success');
             console.log(response);
-           if(response.data.status){
-            window.location.href="/home/manage-users/users";
-           }
-            //NEED TO ADD GOOD ALERT MESSAGE
-          //  alert(response.data.message); 
-           onClose();
+            if(response.data.status){
+             window.location.href="/home/manage-users/users";
+            }
+             //NEED TO ADD GOOD ALERT MESSAGE
+           //  alert(response.data.message); 
+            onClose();
+          }else{
+            showSnackbar(response.data.message, 'error');
+          }
+           
            
         })
       }
+      // else{
+      //   showSnackbar("Please fill required fields", 'error');
+      // }
       
     }
 
@@ -75,7 +142,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
         if(!value){
             setErrorMessage((prevData) => ({
                 ...prevData,
-                [name]: "This field is required",
+                [name]: "Name is required",
               }));
         }
         else {
@@ -91,9 +158,14 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
       if (!value) {
         setErrorMessage((prevData) => ({
           ...prevData,
-          [name]: "This field is required",
+          [name]: "Email is required",
         }));
-      } else {
+      }else if(!validateEmail(value)){
+        setErrorMessage((prevData)=>({
+          ...prevData,
+          [name]: "Email is not valid!",
+        }))
+      }else {
         setErrorMessage((prevData) => ({
           ...prevData,
           [name]: "",
@@ -123,7 +195,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
 
           <form className="space-y-4">
             <div>
-              <FormInput label='Full Name' 
+              <FormInput label='Name : ' 
                 type="text"
                 name="fullName"
                 placeholder="Enter User Name"
@@ -136,26 +208,26 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
 
             <div>
               <FormInput
-              label='mobile Number'
+              label='Mobile Number : '
               type='tel'
               name='mobilenumber'
               onChange={handleOnChange}
               value={formData.mobilenumber}
               onBlur={handleOnBlur}
-              placeholder="Enter your Mobile Number"
+              placeholder="Enter  Mobile Number"
              
               />
             </div>
             <div>
             <FormInput
-              label='Enter Email'
+              label='Email : '
               type='text'
               name='email'
               onChange={handleOnChange}
               value={formData.email}
               error={errorMessage.email}
               onBlur={handleOnBlur}
-              placeholder="Enter your Email"
+              placeholder="Enter Email Address"
               />
             </div>
 
@@ -168,6 +240,13 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
           </form>
         </div>
       </div>
+      <MessageSnackBar
+        isOpen={snackbar.open}
+        message={snackbar.message}
+        type={snackbar.type}
+        onClose={handleClose}
+        duration={2000}
+      />
     </div>
   );
 }

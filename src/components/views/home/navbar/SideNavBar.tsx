@@ -30,7 +30,7 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
                 isOpen={isOpen}
                 children={[
                 <Link to="/home/manage-users/add-user">Add User</Link>, 
-                <Link to="/home/manage-users/users">Get Users</Link>, <>Customers</>]}
+                <Link to="/home/manage-users/users">Manage Company Users</Link>, <>Customers</>]}
               />
               <SideNavBarItem 
                 icon={FileText} 

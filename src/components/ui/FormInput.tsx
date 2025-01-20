@@ -28,7 +28,8 @@ const FormInput = ({
   onChange,
   onBlur,
   error,
-  center
+  center,
+  ref
 }: FormInputProps) => {
   return (
     <div>
@@ -37,6 +38,7 @@ const FormInput = ({
       </label>
       <div className="mt-1 relative">
         <input
+        ref ={ref}
           type={type}
           name={name}
           id={name}

@@ -30,6 +30,7 @@ const ManageCompanyUserContext = createContext<ManageCompanyUserContextProps | u
     return (
       <ManageCompanyUserContext.Provider value={{companyUserAddedStatus , setcompanyUserAddedStatus }}>
         {children}
+        
       </ManageCompanyUserContext.Provider>
     );
   };

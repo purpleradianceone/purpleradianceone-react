@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
 import { FormEvent, useState } from "react";
 import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
+import axios from "axios";
+import MessageSnackBar from "../ui/MessageSnackbar";
 
 /**
  *
@@ -12,9 +14,11 @@ function ForgotPasswordForm() {
   /**
    * state to manage the visibility of animation
    */
+  const navigate=useNavigate();
+
   const [showAnimation, setShowAnimation] = useState(false);
   const [formState, setFormState] = useState({ email: '' });
-
+  // const [showAnimation,setShowAnimation] = useState<boolean>(false);
     /**
      * State is declared for errors
      */
@@ -22,6 +26,24 @@ function ForgotPasswordForm() {
         email: "",
     });
 
+
+    const [snackbar , setSnackbar]= useState<{
+        open: boolean,
+        message: string,
+        type:'success'|'error',
+      }>({
+        open: false,
+        message: "",
+        type: "success",
+      })
+    
+      const showSnackbar=(message:string , type:'success' | 'error')=>{
+        setSnackbar({open:true,message, type})
+      }
+    
+      const handleClose=()=>{
+        setSnackbar(prev=>({...prev , open:false}))
+      }
   /**
    * email regex for validation
    * @param email 
@@ -72,12 +94,24 @@ function ForgotPasswordForm() {
             email: "Invalid email address",
           }));
     }else{
-        setShowAnimation(true);
-        setTimeout(() => {
-          window.location.href = "/signin";
-        }, 15000);
-    }
-    
+      const requestData={
+        email:formState.email
+      }
+
+      axios.post("/api/authentication/purple-crm-api/forgotpassword/otp", requestData)
+      .then((response)=>{
+        if(response.data[0].status){
+          setShowAnimation(!showAnimation);
+          showSnackbar(response.data[0].message, 'success')
+          localStorage.setItem("forgetPasswordEmail", formState.email);
+          setTimeout(() => {
+           navigate("/createpassword"); 
+          } , 5000);
+        }else{
+          showSnackbar(response.data[0].message,'error')
+        }
+      })
+    }  
   };
 
     function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -118,6 +152,14 @@ function ForgotPasswordForm() {
           </div>
         </div>
       )}
+
+<MessageSnackBar
+            isOpen={snackbar.open}
+            message={snackbar.message}
+            type={snackbar.type}
+            onClose={handleClose}
+            duration={2000}
+          /> 
     </>
   );
 }

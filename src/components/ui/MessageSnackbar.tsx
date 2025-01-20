@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { CheckCircle, XCircle, X } from "lucide-react";
 import MessageSnackbarProps from "../../@types/ui/MessageSnackbarProps";
 
@@ -11,12 +11,13 @@ function MessageSnackBar(props: MessageSnackbarProps) {
 
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isOpen, props.duration, props.onClose]);
 
   if (!props.isOpen) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-up">
+    <div className="fixed  top-6 right-4 z-50 animate-slide-up">
       <div
         className={`flex items-center gap-2 rounded-lg px-4 py-3 shadow-lg ${
           props.type === "success"

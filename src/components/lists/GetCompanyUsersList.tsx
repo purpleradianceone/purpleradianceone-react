@@ -14,14 +14,14 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   const [isOpen, setIsOpen] = useState(false);
  
   return (
-    <div className="mx-5 p-6">
-      <div className="flex items-center justify-between mb-6 w-full">
+    <div className="w-full p-6">
+      <div className="  flex items-center justify-between mb-6 w-full">
         <div className="flex items-center gap-2">
           <Users className="w-6 h-6 text-blue-600" />
           <h1 className="text-2xl font-bold">Company Members</h1>
         </div>
         
-        <div className="relative w-80">
+        <div className="relative w-80 -z-10">
           <input
             type="search"
             className="w-full h-10 pl-10 pr-12 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -38,6 +38,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
           </button>
         </div>
         <div>
+
           <Button
            onClick={() => setIsOpen(true)}
             className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600"
@@ -52,13 +53,13 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
           </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto overflow-y-auto  rounded-lg border border-gray-200 bg-white">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               {[
                 { key: "createdby", label: "Created By" },
-                { key: "id", label: "User Id" },
+                // { key: "id", label: "User Id" },
                 { key: "fullname", label: "Name" },
                 { key: "email", label: "Email" },
                 { key: "mobileNumber", label: "Mobile Number" },
@@ -88,9 +89,9 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.company_id}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                {/* <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.id}</div>
-                </td>
+                </td> */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
                     {user.fullname}
@@ -133,7 +134,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> 
 
       <ModalAccessCompanyUser
         isOpen={isModalOpen}
