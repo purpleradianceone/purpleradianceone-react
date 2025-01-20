@@ -11,7 +11,7 @@ import Features from "../../components/views/home/landing-page/Features";
 import CallToAction from "../../components/views/home/landing-page/CallToAction";
 import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
-import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
+// import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
 import GetCompanyUsers from "../../components/views/manage-company-users/GetCompanyUsers";
 
 
@@ -67,7 +67,9 @@ export const router = createBrowserRouter([
   {
     path : "/createpassword",
     element : (
-      <AuthLayout title="Create Password" subtitle="Enter your new password"><CreatePasswordForm></CreatePasswordForm></AuthLayout>
+      <AuthLayout title="Create Password" subtitle="Enter your new password">
+        <CreatePasswordForm></CreatePasswordForm>
+        </AuthLayout>
     ),
   },
   {
@@ -87,18 +89,7 @@ export const router = createBrowserRouter([
     </div>
     ),
   },
-  {
-    path: "/home/manage-users/add-user",
-    element: (
-      <div>
-        <Navbar>
-        <AddCompanyUser />
-        </Navbar>
-        
-      </div>
-      
-    ),
-  },
+  
   {
     path: "/home/manage-users/users",
     element: (

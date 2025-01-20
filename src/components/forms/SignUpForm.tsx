@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
 import EmailSentAnimation from "../../assets/animations/EmailSentAnimation";
+import MessageSnackBar from "../ui/MessageSnackbar";
 
 /**
  * created functional components for SignUp Form
@@ -58,6 +59,27 @@ const SignUpPage: React.FC = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   };
+
+  /**
+   * for alert Message 
+   */
+  const [snackbar , setSnackbar]= useState<{
+    open: boolean,
+    message: string,
+    type:'success'|'error',
+  }>({
+    open: false,
+    message: "",
+    type: "success",
+  })
+
+  const showSnackbar=(message:string , type:'success' | 'error')=>{
+    setSnackbar({open:true,message, type})
+  }
+
+  const handleClose=()=>{
+    setSnackbar(prev=>({...prev , open:false}))
+  }
 
   /**
    *
@@ -203,17 +225,24 @@ const SignUpPage: React.FC = () => {
         alert("Please check your email for verification");
 
         if(respone.data.status === true){
+
+          showSnackbar(respone.data.message,'success');
+
           setShowAnimation(!showAnimation);
           setTimeout(()=>{
             window.location.href = '/signin';
           },15000)
 
+        }else{
+          showSnackbar(respone.data.message,'error');
         }
 
       })
       .catch(error => {
        console.log(error)
       })
+    }else{
+      showSnackbar('Fill required fields','error');
     }
   };
 
@@ -346,7 +375,14 @@ const SignUpPage: React.FC = () => {
                     </div>
                 </div>
             )}
-           
+
+          <MessageSnackBar
+            isOpen={snackbar.open}
+            message={snackbar.message}
+            type={snackbar.type}
+            onClose={handleClose}
+            duration={2000}
+          /> 
       </>
   );
 };

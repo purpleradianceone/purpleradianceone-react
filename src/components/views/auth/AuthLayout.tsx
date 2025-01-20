@@ -43,13 +43,12 @@ const AuthLayout = (props: AuthLayoutProps) => {
                 ></img>
               </span>
               <div className="text-white">
-                <div className="font-semibold text-base">Purple Radiance</div>
+                <div className="font-semibold text-base">Radhika Apte</div>
                 <span className="opacity-80">CTO, Onward</span>
               </div>
             </div>
             <p className="text-lg text-white opacity-80">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla sint quam beatae suscipit necessitatibus eius sit impedit dolor, autem quasi aspernatur perspiciatis blanditiis. Pariatur quos perferendis porro dolor officia impedit.
-            </p>
+            Purple CRM has helped us achieve 4x ROI in just two years, allowing us to excel as one of the largest full-service stores for interiors in the real estate industry. Purple's 360-degree view has enabled us to offer great value and experiences to our customers.            </p>
           </div>
         </div>
 

@@ -131,7 +131,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
     return (
       <div>
       <header>
-      <nav className="bg-white border-b border-gray-200 fixed w-full z-30 top-0 h-16">
+      <nav className="bg-white border-b border-gray-200 fixed w-full  top-0 h-16">
         <div className="px-4 py-3 lg:px-6">
           <div className="flex items-center justify-between">
             <div className="flex justify-between">
@@ -221,7 +221,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
         </div>
       </nav>
       </header>
-      <main className="mt-16 ml-16 flex justify-center items-center">
+      <main className={sidebarOpen?  "mt-16 ml-64 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
           {children}
       </main>
       </div>

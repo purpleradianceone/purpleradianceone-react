@@ -165,7 +165,7 @@ const SignInForm = () => {
           showSnackbar('Login successful!', 'success');
           setTimeout(() => {
             navigate("/home");
-          }, 1800);
+          }, 1000);
       }
         
         
@@ -329,7 +329,7 @@ const SignInForm = () => {
         message={snackbar.message}
         type={snackbar.type}
         onClose={handleClose}
-        duration={3000}
+        duration={2000}
       />
         </>
   );

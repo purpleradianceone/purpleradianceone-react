@@ -1,6 +1,6 @@
 type MessageSnackbarProps = {
       message: string;
-      type: 'success' | 'error';
+      type: 'success' | 'error' ;
       isOpen: boolean;
       onClose: () => void;
       duration?: number;
