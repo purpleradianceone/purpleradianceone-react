@@ -8,7 +8,7 @@ import React, {
   } from "react";
 import {LoggedInUserProps, LoggedInUserContextProps } from "../../@types/company-users/LoggedInUserProps";
   
-  const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(undefined);
+const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(undefined);
   
   export const LoggedInUserContextProvider: React.FC<{ children: ReactNode }> = ({
     children,

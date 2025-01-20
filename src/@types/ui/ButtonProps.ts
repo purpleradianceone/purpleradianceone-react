@@ -10,6 +10,7 @@ type ButtonProps = {
     className?: string | undefined;
     children?: React.ReactNode;
     link? : string;
+    disabled? : boolean;
     onClick? : (event : React.FormEvent<HTMLButtonElement>) => void;
   };
   

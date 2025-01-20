@@ -1,18 +1,18 @@
-import {
-  Users,
-  ArrowUpDown,
-  CheckCircle2,
-  XCircle,
-  Search,
-} from "lucide-react";
+import {Users,ArrowUpDown,CheckCircle2,XCircle,Search,UserPlus,} from "lucide-react";
 import companyUsersProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
 import { useState } from "react";
-import { Modal } from "../modal/ModalAccess";
+import { ModalAccessCompanyUser } from "../moduleaccessrights/ModalAccessCompanyUser";
+import { AddCompanyUserPopUp } from "../forms/AddCompanyUserPopUp";
+
+
+
 
 export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+ 
   return (
     <div className="mx-5 p-6">
       <div className="flex items-center justify-between mb-6 w-full">
@@ -37,6 +37,19 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
             Search
           </button>
         </div>
+        <div>
+          <Button
+           onClick={() => setIsOpen(true)}
+            className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600"
+          >
+            <UserPlus size={20} />  Add Company User
+          </Button>
+          {/* Component for adding a new company user ,  it will open in pop up     */}
+          <AddCompanyUserPopUp
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+          />
+          </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -122,7 +135,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
         </table>
       </div>
 
-      <Modal
+      <ModalAccessCompanyUser
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         userName="[Company User Name]"

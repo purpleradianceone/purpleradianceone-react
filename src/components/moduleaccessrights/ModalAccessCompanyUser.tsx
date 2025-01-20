@@ -1,7 +1,8 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import Button from '../ui/Button';
 
-interface Module {
+type  Module= {
   id: number;
   name: string;
   add: boolean;
@@ -9,17 +10,17 @@ interface Module {
   update: boolean;
 }
 
-interface ModalProps {
+type  ModalProps= {
   isOpen: boolean;
   onClose: () => void;
   userName: string;
 }
 
-export function Modal({ isOpen, onClose, userName }: ModalProps) {
+export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps) {
   const [modules, setModules] = React.useState<Module[]>([
-    { id: 1, name: 'Module 1 ', add: true, view: true, update: true },
-    { id: 2, name: 'Module 2', add: true, view: true, update: true },
-    { id: 3, name: 'Module 3', add: true, view: true, update: true },
+    { id: 1, name: 'Module 1 ', add: false, view: true, update: true },
+    { id: 2, name: 'Module 2', add: true, view: true, update: false },
+    { id: 3, name: 'Module 3', add: true, view: false, update: true },
     { id: 4, name: 'Module 4', add: true, view: true, update: true },
     
   ]);
@@ -47,7 +48,7 @@ export function Modal({ isOpen, onClose, userName }: ModalProps) {
     modules.every(module => module[field]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 mt-16">
+    <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center p-4 mt-16">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-medium text-gray-700">
@@ -138,18 +139,15 @@ export function Modal({ isOpen, onClose, userName }: ModalProps) {
           </table>
         </div>
         
-        <div className="flex justify-end p-2 border-t">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 mr-2"
-          >
-            Cancel
-          </button>
-          <button
+        <div className="flex justify-end p-2 border-t gap-3">
+         
+          <div>
+          <Button
             className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600"
           >
             Save
-          </button>
+          </Button>
+          </div>
         </div>
       </div>
     </div>
