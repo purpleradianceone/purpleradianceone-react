@@ -9,6 +9,8 @@ function GetCompanyUsers() {
   const { loginStatus } = useLoggedInUserContext();
 
   useEffect(() => {
+
+   
     axios.defaults.headers.common["Authorization"] =
       "Bearer " + loginStatus.token;
     const postData = {
@@ -20,6 +22,7 @@ function GetCompanyUsers() {
       .then((response) => {
         setCompanyUsers(response.data);
         console.log(response.data);
+        
       })
       .catch((error) => {
         console.log(error);
