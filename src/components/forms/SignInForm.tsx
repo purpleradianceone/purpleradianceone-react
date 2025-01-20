@@ -8,7 +8,7 @@
  * @import {Link} for Link component from react-router-dom
  * @import ReCAPTCHA from google recaptcha
  */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
@@ -17,7 +17,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-// import SignInFormProps from "../../@types/auth/forms/SignInFormProps";
+import MessageSnackBar from "../ui/MessageSnackbar";
 
 
 /**
@@ -28,6 +28,10 @@ const SignInForm = () => {
 
   const navigate = useNavigate();
   const {setLoginStatus} = useLoggedInUserContext();
+  const [recaptchaVerified, setRecaptchaVerified] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string|null>(null);
+  const sitekey = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
+  const secretKey = '6LcLKaYqAAAAAGpStS9lxqb_jKhV14dXqTypdqN1';
 
 
   /**
@@ -42,6 +46,24 @@ const SignInForm = () => {
     email: "",
     password: "",
   });
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showSnackbar = (message: string, type: 'success' | 'error') => {
+    setSnackbar({ open: true, message, type });
+  };
+
+  const handleClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
 
   /**
    * States to store error messages for email and paswword empty/blank feilds
@@ -92,6 +114,8 @@ const SignInForm = () => {
     }
   };
 
+ 
+
   /**
    * 
    * @param event event handler for login button click
@@ -135,16 +159,19 @@ const SignInForm = () => {
           token: response.data.token,
           email: user.email
         });
-        console.log(response.data);
+        
         if (response.data.token && response.data.token !== "") {
           axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
-          
+          showSnackbar('Login successful!', 'success');
+          setTimeout(() => {
+            navigate("/home");
+          }, 1800);
       }
-
-        navigate("/home");
+        
+        
       }
       else{
-        alert("wrong Credentials");
+        showSnackbar('Wrong email and Password!', 'error');
         setLoginStatus({
           userId : 0,
           companyId : 0,
@@ -157,6 +184,7 @@ const SignInForm = () => {
     } )
     .catch( error => {
       console.log(error);
+      showSnackbar('Something Went Wrong!', 'error');
 
     } );
 
@@ -181,7 +209,52 @@ const SignInForm = () => {
     }
   };
 
+  const handleCaptchaChange = ( value : string | null) => {
+    console.log(value);
+    setRecaptchaToken(value);
+   }
+
+  //  const verifyRecaptcha = async () => {
+  //   try {
+  //     const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`);
+  //     const data = await response.json();
+
+  //     if (data.success) {
+  //       setRecaptchaVerified(true);
+  //       console.log('Recaptcha verified successfully!');
+  //     } else {
+  //       setRecaptchaVerified(false);
+  //       console.log('Recaptcha verification failed.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error verifying Recaptcha:', error);
+  //     setRecaptchaVerified(false);
+  //   }
+  // };
+  const verifyRecaptcha = async () => {
+    const capthchaQueryParams = {
+      secret : secretKey,
+      response: recaptchaToken
+    }
+
+    try{
+          
+    }
+    catch(error){
+      console.error('Error verifying Recaptcha:', error);
+    }
+  }
+  
+
+  useEffect(() => {
+    if (recaptchaToken) {
+      verifyRecaptcha();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recaptchaToken]);
+
   return (
+    <>
         <form className="space-y-5">
           <FormInput
             label="Email"
@@ -229,7 +302,10 @@ const SignInForm = () => {
             </button>
           </div>
             
-            <ReCAPTCHA sitekey="6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70" />
+            <ReCAPTCHA 
+            sitekey={sitekey}
+            onChange={handleCaptchaChange}
+            />
             
           
 
@@ -248,7 +324,14 @@ const SignInForm = () => {
             </span>
           </div>
         </form>
-
+        <MessageSnackBar
+        isOpen={snackbar.open}
+        message={snackbar.message}
+        type={snackbar.type}
+        onClose={handleClose}
+        duration={3000}
+      />
+        </>
   );
 };
 
