@@ -149,8 +149,6 @@ export function CreatePasswordForm() {
           setIsSubmitting(false)
         }
       });
-
-    // showSnackbar("Failed to update password. Please try again.", "error");
   };
 
   return (
@@ -158,7 +156,7 @@ export function CreatePasswordForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Enter your OTP below:
+            Enter your OTP :
           </label>
           <div className="flex gap-2 justify-between">
             {formData.otp.map((digit, index) => (
@@ -186,7 +184,7 @@ export function CreatePasswordForm() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            New Password
+            Enter new password :
           </label>
           <div className="relative">
             <input
@@ -200,7 +198,7 @@ export function CreatePasswordForm() {
                       ? "border-red-500 focus:ring-red-200"
                       : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
                   } focus:ring-4 outline-none transition-all`}
-              placeholder="Enter your new password"
+              placeholder="Enter new password"
             />
             <button
               type="button"
@@ -214,7 +212,7 @@ export function CreatePasswordForm() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Confirm new Password
+            Re-enter new password : 
           </label>
           <div className="relative">
             <input
@@ -228,7 +226,7 @@ export function CreatePasswordForm() {
                       ? "border-red-500 focus:ring-red-200"
                       : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
                   } focus:ring-4 outline-none transition-all`}
-              placeholder="Confirm your new password"
+              placeholder="Confirm new password"
             />
             <button
               type="button"
