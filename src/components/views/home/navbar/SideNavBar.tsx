@@ -11,7 +11,7 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
             ${isOpen ? 'w-64' : 'w-20'}`}
           >
             <div className="flex items-center border-b justify-between px-4 h-16">
-              {isOpen && <span className="text-xl font-bold">Elstar</span>}
+              {isOpen && <span className="text-xl font-bold">Purple CRM</span>}
               <button onClick={onToggle} className="p-2 hover:bg-gray-100 rounded-lg">
                 {isOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
@@ -29,8 +29,10 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
                 label="Manage Users" 
                 isOpen={isOpen}
                 children={[
-                <Link to="/home/manage-users/add-user">Add User</Link>, 
-                <Link to="/home/manage-users/users">Manage Company Users</Link>, <>Customers</>]}
+                // <Link to="/home/manage-users/add-user">Add User</Link>, 
+                <Link to="/home/manage-users/users">Manage Company  Users</Link>,
+                //  <>Customers</>
+                ]}
               />
               <SideNavBarItem 
                 icon={FileText} 

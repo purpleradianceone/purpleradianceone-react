@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
   {
     path : "/createpassword",
     element : (
-      <AuthLayout title="Create Password" subtitle="Enter your new password">
+      <AuthLayout title="Reset Password" subtitle="Create a new password">
         <CreatePasswordForm></CreatePasswordForm>
         </AuthLayout>
     ),

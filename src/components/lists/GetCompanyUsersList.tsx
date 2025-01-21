@@ -1,4 +1,4 @@
-import {Users,ArrowUpDown,CheckCircle2,XCircle,Search,UserPlus,} from "lucide-react";
+import {Users,CheckCircle2,XCircle,Search,UserPlus,} from "lucide-react";
 import companyUsersProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
 import { useState } from "react";
@@ -15,7 +15,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
  
   return (
     <div className="w-full p-6">
-      <div className="  flex items-center justify-between mb-6 w-full">
+      <div className=" flex items-center justify-between mb-4 w-full">
         <div className="flex items-center gap-2">
           <Users className="w-6 h-6 text-blue-600" />
           <h1 className="text-2xl font-bold">Company Members</h1>
@@ -74,7 +74,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                   {key !== "status" ? (
                     <button className="flex items-center gap-1 hover:text-gray-700">
                       {label}
-                      <ArrowUpDown className="w-4 h-4" />
+                      {/* <ArrowUpDown className="w-4 h-4" /> */}
                     </button>
                   ) : (
                     label
@@ -124,7 +124,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                   <div className="text-sm text-gray-600">
                     <Button
                       onClick={() => setIsModalOpen(true)}
-                      className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-lime-500 hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500"
+                      className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Access
                     </Button>
@@ -134,13 +134,14 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
             ))}
           </tbody>
         </table>
-      </div> 
-
-      <ModalAccessCompanyUser
+        <ModalAccessCompanyUser
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         userName="[Company User Name]"
-      />
+        />
+      </div> 
+
+      
     </div>
   );
 }

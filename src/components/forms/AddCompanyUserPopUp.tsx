@@ -112,7 +112,8 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
         createdby:loginStatus.userId,
         company_id:loginStatus.companyId,
       };
-        axios.post("",createCompanyUserData)
+
+        axios.post("/api/main/purple-crm-api/createuser",createCompanyUserData)
         .then((response) => {
           if(response.data.status){
             showSnackbar(response.data.message, 'success');
@@ -129,6 +130,10 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
            
            
         })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .catch((error) => {
+          showSnackbar('Something went wrong please check your network', 'error');
+          });
       }
       // else{
       //   showSnackbar("Please fill required fields", 'error');
