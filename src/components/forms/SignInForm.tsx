@@ -206,7 +206,8 @@ const SignInForm = () => {
       })
       .catch( error => {
         console.log(error);
-        showSnackbar("Something Went Wrong","error")
+        showSnackbar("Captcha Invalid","error")
+        
       });
     }
     else{

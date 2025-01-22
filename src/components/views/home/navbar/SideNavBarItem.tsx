@@ -20,7 +20,7 @@ const SideNavBarItem = ({
       const rect = buttonRef.current.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top + 15, // Position above the button
-        left: rect.left + 60, // Center horizontally
+        left: rect.left + 20, // Center horizontally
       });
     }
   }, [isTooltipVisible]); // Add isTooltipVisible as dependency
@@ -30,7 +30,7 @@ const SideNavBarItem = ({
       const rect = buttonRef.current.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top + 15,
-        left: rect.left + 60,
+        left: rect.left + 20,
       });
     }
   };

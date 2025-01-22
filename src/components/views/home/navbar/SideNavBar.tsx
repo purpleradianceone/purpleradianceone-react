@@ -24,16 +24,11 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
                 isOpen={isOpen}
                 children={[<>Default</>, <>Analytics</>, <>Sales</>, <>CRM</>]}
               />
-              <SideNavBarItem 
+              <Link to="/home/manage-users/users"><SideNavBarItem 
                 icon={Building2} 
-                label="Manage Users" 
+                label="Manage Company Users" 
                 isOpen={isOpen}
-                children={[
-                // <Link to="/home/manage-users/add-user">Add User</Link>, 
-                <Link to="/home/manage-users/users">Manage Company  Users</Link>,
-                //  <>Customers</>
-                ]}
-              />
+              /></Link>
               <SideNavBarItem 
                 icon={FileText} 
                 label="Pages" 
