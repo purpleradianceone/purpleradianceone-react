@@ -14,8 +14,8 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   const [isOpen, setIsOpen] = useState(false);
  
   return (
-    <div className="w-full p-6">
-      <div className=" flex items-center justify-between mb-4 w-full">
+    <div className="w-full pt-2 px-6">
+      <div className="sticky z-0 top-16 p-2 flex items-center bg-gray-50 rounded-lg justify-between mb-4 w-full">
         <div className="flex items-center gap-2">
           <Users className="w-6 h-6 text-blue-600" />
           <h1 className="text-2xl font-bold">Company Members</h1>
@@ -41,7 +41,6 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
 
           <Button
            onClick={() => setIsOpen(true)}
-            className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600"
           >
             <UserPlus size={20} />  Add Company User
           </Button>
@@ -86,26 +85,26 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
           <tbody className="bg-white divide-y divide-gray-200">
             {users.map((user, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.company_id}</div>
                 </td>
-                {/* <td className="px-6 py-4 whitespace-nowrap">
+                {/* <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.id}</div>
                 </td> */}
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
                     {user.fullname}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">{user.email}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">
                     {user.mobilenumber}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="flex items-center gap-1">
                     {user.isactive ? (
                       <>
@@ -120,11 +119,11 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">
                     <Button
                       onClick={() => setIsModalOpen(true)}
-                      className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="w-full flex justify-center py-1.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Access
                     </Button>

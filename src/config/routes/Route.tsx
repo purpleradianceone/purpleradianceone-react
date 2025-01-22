@@ -13,31 +13,35 @@ import Testimonials from "../../components/views/home/landing-page/Testimonials"
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
 // import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
 import GetCompanyUsers from "../../components/views/manage-company-users/GetCompanyUsers";
-
+import PrivateRoute from "./PrivateRoute";
+import NotFoundPage from "../../components/views/not-found/NotFoundPage";
 
 export const router = createBrowserRouter([
+  {
+    path: "*",
+    element:(
+        <NotFoundPage></NotFoundPage>
+    ),
+  },
   {
     path: "/",
     element: (
       <div className="min-h-screen">
-      <Navbar >
-      <Hero />
-      <Features />
-      <Testimonials />
-      <CallToAction />
-      </Navbar>
-      
-    </div>
+        <Navbar>
+          <Hero />
+          <Features />
+          <Testimonials />
+          <CallToAction />
+        </Navbar>
+      </div>
     ),
   },
   {
     path: "/signin",
     element: (
       <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
-          <SignInForm />
+        <SignInForm />
       </AuthLayout>
-      
-      
     ),
   },
   {
@@ -50,56 +54,62 @@ export const router = createBrowserRouter([
   },
   {
     path: "/forgotpassword",
-    element : (
-      <AuthLayout title="Forgot Password" subtitle="Enter your email to reset your password">
+    element: (
+      <AuthLayout
+        title="Forgot Password"
+        subtitle="Enter your email to reset your password"
+      >
         <ForgotPasswordForm></ForgotPasswordForm>
       </AuthLayout>
     ),
   },
   {
     path: "/forgotpasswordrequestpage",
-    element : (
-      <AuthLayout title="Mail Sent" subtitle="Check your email to and click on link in email to reset your password" >
+    element: (
+      <AuthLayout
+        title="Mail Sent"
+        subtitle="Check your email to and click on link in email to reset your password"
+      >
         <ForgotPasswordRequestPage></ForgotPasswordRequestPage>
       </AuthLayout>
     ),
   },
   {
-    path : "/createpassword",
-    element : (
+    path: "/createpassword",
+    element: (
       <AuthLayout title="Reset Password" subtitle="Create a new password">
         <CreatePasswordForm></CreatePasswordForm>
-        </AuthLayout>
+      </AuthLayout>
     ),
   },
   {
     path: "/emailverfication/verify",
-    element : (
-      <EmailVerificationLayout/>
-    ),
+    element: <EmailVerificationLayout />,
   },
   {
     path: "/home",
     element: (
-      <div className="min-h-screen">
-      <Navbar >
-      <div className="flex items-center justify-center">Home Screen</div>
-      </Navbar>
-      
-    </div>
+      <PrivateRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <div className="flex items-center justify-center">Home Screen</div>
+          </Navbar>
+        </div>
+      </PrivateRoute>
     ),
   },
-  
+
   {
     path: "/home/manage-users/users",
     element: (
-      <div>
-        <Navbar>
-        <GetCompanyUsers />
-        </Navbar>
-      </div>
-      
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <GetCompanyUsers />
+          </Navbar>
+        </div>
+      </PrivateRoute>
     ),
-  }
+  },
 ]);
 export default router;

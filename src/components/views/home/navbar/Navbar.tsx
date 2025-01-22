@@ -147,7 +147,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
               <h1>CRM</h1>
             </div>
 
-            <div className="flex-1 max-w-xl ml-8 hidden lg:block">
+            <div className="flex-1 max-w-xl ml-28 hidden lg:block">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -221,7 +221,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
         </div>
       </nav>
       </header>
-      <main className={sidebarOpen?  "mt-16 ml-64 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
+      <main className={sidebarOpen?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
           {children}
       </main>
       </div>

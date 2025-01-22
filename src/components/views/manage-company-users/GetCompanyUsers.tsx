@@ -3,13 +3,28 @@ import companyUsersProps from "../../../@types/company-users/CompanyUserProps";
 import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
 
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
+  const {setLoginStatus} = useLoggedInUserContext();
 
   useEffect(() => {
-    axios.defaults.headers.common["Authorization"] =
+
+    if(isTokenExpired(loginStatus.token)){
+      window.location.href = '/signin';
+      setLoginStatus({
+        userId : 0,
+        companyId : 0,
+        status: false,
+        message: "",
+        token: "",
+        email: ""
+      });
+    }
+    else{
+      axios.defaults.headers.common["Authorization"] =
       "Bearer " + loginStatus.token;
     const postData = {
       company_id: loginStatus.companyId,
@@ -25,6 +40,10 @@ function GetCompanyUsers() {
       .catch((error) => {
         console.log(error);
       });
+    }
+
+
+    
   }, []);
     
   return (
