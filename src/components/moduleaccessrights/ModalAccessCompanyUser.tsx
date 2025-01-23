@@ -48,7 +48,7 @@ export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps
     modules.every(module => module[field]);
 
   return (
-    <div className="fixed inset-0  bg-black bg-opacity-10 flex items-center justify-center p-4 ">
+    <div className="fixed z-10 inset-0  bg-black bg-opacity-10 flex items-center justify-center p-4 ">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-medium text-gray-700">
@@ -138,12 +138,9 @@ export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps
             </tbody>
           </table>
         </div>
-        
         <div className="flex justify-end p-2 border-t gap-3">
-         
           <div>
           <Button
-            className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600"
           >
             Save
           </Button>

@@ -27,6 +27,10 @@ import useRecaptcha from "../../config/hooks/useRecaptcha";
  */
 const SignInForm = () => {
 
+
+  // const apiUrl=import.meta.env.VITE_API_URL
+
+
   const navigate = useNavigate();
   const {setLoginStatus} = useLoggedInUserContext();
 
@@ -34,6 +38,7 @@ const SignInForm = () => {
   // const secretKey = '6LcLKaYqAAAAAGpStS9lxqb_jKhV14dXqTypdqN1';
 
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {captchaToken,handleRecaptcha,recaptchaRef} = useRecaptcha();
 
 
@@ -151,7 +156,8 @@ const SignInForm = () => {
       const captchaRequest = {
         token : captchaToken
       }
-      axios.post("/api/authentication/purple-crm-api/cpatcha/verify",captchaRequest)
+      // axios.post(`${apiUrl}/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
+      axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       .then(response => {
         console.log(response)
         
@@ -160,7 +166,9 @@ const SignInForm = () => {
             email: loginUserCredentials.email,
             login_password : loginUserCredentials.password
           }
-          axios.post("/api/authentication/purple-crm-api/authenticate" , user)
+          axios.post(`/api/authentication/purple-crm-api/authenticate`,user)
+
+          // axios.post(`${apiUrl}/api/authentication/purple-crm-api/authenticate`,user)
           .then( response => {
             if(response.data.status === true){
               setLoginStatus({

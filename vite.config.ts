@@ -8,5 +8,10 @@ export default defineConfig({
         '/api': 'http://localhost:8080', // Adjust this to your backend URL
     },
 },
+build: {
+  outDir: 'build',
+}
+,
+
   plugins: [react()],
 })

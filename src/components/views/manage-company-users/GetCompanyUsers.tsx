@@ -41,9 +41,6 @@ function GetCompanyUsers() {
         console.log(error);
       });
     }
-
-
-    
   }, []);
     
   return (
