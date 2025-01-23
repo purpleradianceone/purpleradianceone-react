@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ag-grid-community/client-side-row-model": "^32.3.3",
+    "@ag-grid-community/core": "^32.3.3",
     "@heroicons/react": "^2.2.0",
     "@lottiefiles/dotlottie-react": "^0.12.1",
     "@material-tailwind/react": "^2.1.10",
     "@mui/material": "^6.4.0",
+    "ag-grid-community": "^33.0.4",
+    "ag-grid-react": "^33.0.4",
     "axios": "^1.7.9",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.344.0",

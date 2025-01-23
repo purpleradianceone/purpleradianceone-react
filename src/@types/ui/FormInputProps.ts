@@ -23,6 +23,7 @@ type FormInputProps = {
     pattern? : string, 
     className?: string,
     center? : boolean
+    ref?:React.LegacyRef<HTMLInputElement> | undefined
   }
 
   /**

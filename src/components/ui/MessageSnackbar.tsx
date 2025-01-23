@@ -17,9 +17,9 @@ function MessageSnackBar(props: MessageSnackbarProps) {
   if (!props.isOpen) return null;
 
   return (
-    <div className="fixed  top-6 right-4 z-50 animate-slide-up">
+    <div className="fixed top-20 right-4  animate-slide-up">
       <div
-        className={`flex items-center gap-2 rounded-lg px-4 py-3 shadow-lg ${
+        className={`flex items-center gap-2 rounded-lg px-2 py-2 shadow-lg ${
           props.type === "success"
             ? "bg-green-100 text-green-800"
             : "bg-red-100 text-red-800"

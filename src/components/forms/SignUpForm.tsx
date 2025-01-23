@@ -9,6 +9,7 @@ import axios from "axios";
 import EmailSentAnimation from "../../assets/animations/EmailSentAnimation";
 import MessageSnackBar from "../ui/MessageSnackbar";
 
+
 /**
  * created functional components for SignUp Form
  * @returns the xml for signUp form
@@ -48,6 +49,8 @@ const SignUpPage: React.FC = () => {
    */
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword,setConfirmPassword] = useState(false);
+
+  
 
   /**
    *
@@ -222,7 +225,6 @@ const SignUpPage: React.FC = () => {
       axios.post(signUpRequest,signupDataPost)
       .then(respone => {
         console.log(respone);
-        alert("Please check your email for verification");
 
         if(respone.data.status === true){
 

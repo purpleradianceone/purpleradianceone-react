@@ -131,7 +131,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
     return (
       <div>
       <header>
-      <nav className="bg-white border-b border-gray-200 fixed w-full  top-0 h-16">
+      <nav className="z-20 bg-white border-b border-gray-200 fixed w-full  top-0 h-16">
         <div className="px-4 py-3 lg:px-6">
           <div className="flex items-center justify-between">
             <div className="flex justify-between">
@@ -158,7 +158,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className=" flex items-center space-x-4">
               <button className="p-2 rounded-lg hover:bg-gray-100">
                 <Bell className="h-5 w-5" />
               </button>
@@ -175,7 +175,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                   className="h-8 w-8 rounded-full hover:bg-gray-100"
                 />
 
-                <div className="ml-2 cursor-default">
+                <div className=" ml-2 cursor-default">
                   <h4 className="font-semibold text-gray-700">Admin</h4>
                   
                   <span className="text-sm text-gray-300 break-all">{loginStatus.email}</span>
@@ -185,7 +185,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                       ref={cardRef}
                       className="absolute right-0 mt-4  mr-3 w-64 bg-white shadow-2xl rounded-lg"
                     >
-                      <div className="p-4 border-b border-gray-200 flex items-center">
+                      <div className="p-4  border-b border-gray-200 flex items-center">
                         <img
                           src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                           alt="User"
