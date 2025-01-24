@@ -43,6 +43,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
     token : "",
     status : false,
     email : "",
+    fullname : "",
     });
   }
 
@@ -175,10 +176,9 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                   className="h-8 w-8 rounded-full hover:bg-gray-100"
                 />
 
-                <div className=" ml-2 cursor-default">
-                  <h4 className="font-semibold text-gray-700">Admin</h4>
-                  
-                  <span className="text-sm text-gray-300 break-all">{loginStatus.email}</span>
+                <div className=" ml-2 cursor-default grid gap-y-0.5">
+                  <span className="font-semibold text-sm text-gray-700 ">{loginStatus.fullname}</span>
+                  <span className="text-sm text-gray-500 break-all">{loginStatus.email}</span>
                   {/* Profile Card */}
                   {isCardVisible && (
                     <div
@@ -189,13 +189,14 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                         <img
                           src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                           alt="User"
-                          className="rounded-full w-10 h-10"
+                          className="rounded-full w-10 h-10 text-xs text-gray-300"
                         />
                         <div className="ml-3">
                         
-                          <p className="text-sm break-all text-gray-500">
-                          {loginStatus.email}
-                          </p>
+                          <span className="text-sm">{loginStatus.fullname}</span>
+                          <span className="grid text-xs break-all text-gray-500">
+                            {loginStatus.email}
+                          </span>
                         </div>
                       </div>
                       <div className="flex flex-col">

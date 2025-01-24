@@ -346,9 +346,9 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
     }
 
     const createCompanyUserData = {
-      fullname: formData.fullName,
-      mobilenumber: formData.mobilenumber,
-      email: formData.email,
+      fullname: formData.fullName.trim(),
+      mobilenumber: formData.mobilenumber.trim(),
+      email: formData.email.trim(),
       createdby: loginStatus.userId,
       company_id: loginStatus.companyId,
     };

@@ -22,6 +22,7 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
       token : '',
       status : false,
       email : '',
+      fullname : '',
   }
     });
   

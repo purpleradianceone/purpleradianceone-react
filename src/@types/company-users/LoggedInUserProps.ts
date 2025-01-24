@@ -5,6 +5,8 @@ export type LoggedInUserProps = {
     token : string;
     status : boolean;
     email : string;
+    // name : string;
+    fullname :string
 };  
 
 export type LoggedInUserContextProps = {
