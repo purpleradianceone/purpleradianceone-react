@@ -19,6 +19,7 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
+// import { json } from "stream/consumers";
 
 
 /**
@@ -159,7 +160,7 @@ const SignInForm = () => {
       // axios.post(`${apiUrl}/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       .then(response => {
-        console.log(response)
+       
         
         if(response.data.status){
           const user = {
@@ -170,6 +171,7 @@ const SignInForm = () => {
 
           // axios.post(`${apiUrl}/api/authentication/purple-crm-api/authenticate`,user)
           .then( response => {
+            console.log("this is the response "+JSON.stringify(response))
             if(response.data.status === true){
               setLoginStatus({
                 userId : response.data.user_id,
@@ -177,7 +179,8 @@ const SignInForm = () => {
                 status: response.data.status,
                 message: response.data.message,
                 token: response.data.token,
-                email: user.email
+                email: response.data.email,
+                fullname:response.data.fullname,
               });
               
               if (response.data.token && response.data.token !== "") {
@@ -198,7 +201,8 @@ const SignInForm = () => {
                 status: false,
                 message: "",
                 token: "",
-                email: ""
+                email: "",
+                fullname:""
               });
             }
           } )

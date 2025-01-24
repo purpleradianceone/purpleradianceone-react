@@ -213,10 +213,10 @@ const SignUpPage: React.FC = () => {
     }
 
     const signupDataPost = {
-      name : SignUpData.name,
-      mobilenumber: SignUpData.mobileNumber,
-      email: SignUpData.email,
-      login_password: SignUpData.password
+      name : SignUpData.name?.trim(),
+      mobilenumber: SignUpData.mobileNumber?.trim(),
+      email: SignUpData.email.trim(),
+      login_password: SignUpData.password.trim()
     };
 
     if(signupDataPost.email != ""  && signupDataPost.login_password  != "" && SignUpData.confirmPassword != ""){
