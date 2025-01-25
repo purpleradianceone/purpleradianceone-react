@@ -6,7 +6,7 @@ export type LoggedInUserProps = {
     status : boolean;
     email : string;
     // name : string;
-    fullname :string
+    fullname? :string
 };  
 
 export type LoggedInUserContextProps = {

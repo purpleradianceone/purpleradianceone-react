@@ -13,8 +13,17 @@ import { AllCommunityModule, ColDef } from "ag-grid-community";
 export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<string>("");
-
+  const [selectedUser, setSelectedUser] = useState({
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password:""
+  });
   const pagination =true;
   const paginationPageSize = 10;
   const paginationPageSizeSelector=[20,50,100];
@@ -33,6 +42,13 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
       flex: 0.5,
       // editable:true,
       // cellEditor:"agSelectCellEditor"
+    },
+    {
+      field: 'id',
+      headerName: 'User ID',
+      sortable: true,
+      filter: true,
+      flex:1
     },
     { 
       field: 'fullname',
@@ -92,7 +108,19 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
           <Button
           className="w-24 mt-0.5 flex justify-center py-1.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             onClick={() => {
-              setSelectedUser(params.data.fullname);
+              setSelectedUser({
+                company_id: params.data.company_id,
+                id:  params.data.id,
+                fullname:  params.data.fullname,
+                email: params.email,
+                mobilenumber: params.data.mobilenumber,
+                createdby: "",
+                isactive: params.data.isactive,
+                requestedby: "",
+                generate_password:""
+
+              });
+              
               setIsModalOpen(true);
             }}
           >
@@ -169,7 +197,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
         <ModalAccessCompanyUser
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        userName={selectedUser}
+        users={selectedUser}
       />
       </div>
     </div>

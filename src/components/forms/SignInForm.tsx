@@ -19,6 +19,7 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
+import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 // import { json } from "stream/consumers";
 
 
@@ -34,12 +35,11 @@ const SignInForm = () => {
 
   const navigate = useNavigate();
   const {setLoginStatus} = useLoggedInUserContext();
+  const {accessModules,setAccessModules} = useAccessManagementContext();
 
   const sitekey = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
   // const secretKey = '6LcLKaYqAAAAAGpStS9lxqb_jKhV14dXqTypdqN1';
 
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {captchaToken,handleRecaptcha,recaptchaRef} = useRecaptcha();
 
 
@@ -186,6 +186,26 @@ const SignInForm = () => {
               if (response.data.token && response.data.token !== "") {
                 axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
                 showSnackbar('Login successful!', 'success');
+
+
+                
+                const getCrmModuleAccess={
+                  company_user_id: response.data.user_id,
+                }
+            
+                axios.post("/api/main/purple-crm-api/getcrmmoduleaccess",getCrmModuleAccess)
+                .then(response => 
+                {
+                  setAccessModules(response.data)
+                  console.log(accessModules)
+                  setTimeout(() => {
+                    navigate("/home");
+                  }, 1000);
+                }
+                )
+                .catch(error => {
+                  console.error(error);
+                });
                 setTimeout(() => {
                   navigate("/home");
                 }, 1000);

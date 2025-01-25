@@ -20,7 +20,8 @@ function GetCompanyUsers() {
         status: false,
         message: "",
         token: "",
-        email: ""
+        email: "",
+        fullname:"",
       });
     }
     else{

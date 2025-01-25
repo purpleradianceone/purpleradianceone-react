@@ -1,29 +1,57 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import Button from '../ui/Button';
+import AccessRightsModalProps from '../../@types/company-users/AccessRightsModalProps';
+import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
+import { AccessManagementProps } from '../../@types/company-users/AccessManagementProps';
+import axios from 'axios';
 
-type  Module= {
-  id: number;
-  name: string;
-  add: boolean;
-  view: boolean;
-  update: boolean;
-}
 
-type  ModalProps= {
-  isOpen: boolean;
-  onClose: () => void;
-  userName: string;
-}
+export function ModalAccessCompanyUser({ isOpen, onClose, users }: AccessRightsModalProps) {
+  const [modules, setModules] = React.useState<AccessManagementProps[]>([{
+    add : false,
+  company_user_id : 0,
+  createdon : "",
+  crm_module_id : 0,
+  id : 0,
+  module_name: "",
+  update : false,
+  updatedby : 0,
+  updatedby_user : "",
+  view : false
+  }]);
 
-export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps) {
-  const [modules, setModules] = React.useState<Module[]>([
-    { id: 1, name: 'Module 1 ', add: false, view: true, update: true },
-    { id: 2, name: 'Module 2', add: true, view: true, update: false },
-    { id: 3, name: 'Module 3', add: true, view: false, update: true },
-    { id: 4, name: 'Module 4', add: true, view: true, update: true },
-    
-  ]);
+  const {loginStatus} = useLoggedInUserContext();
+
+
+  useEffect(()=>{
+    if(isOpen){
+      const getCrmModuleAccess={
+        company_user_id: users.id,
+      }
+      console.log(users.id);
+      
+      axios.defaults.headers.common["Authorization"] =
+      "Bearer " + loginStatus.token;
+      axios.post("/api/main/purple-crm-api//get/crmmodules/access",getCrmModuleAccess)
+      .then(response => 
+      {
+        setModules(response.data);
+        
+      }
+      )
+      .catch(error => {
+        console.error(error);
+      });
+  
+    }
+   else{
+    setModules([]);
+   }
+
+
+
+  },[isOpen])
 
   if (!isOpen) return null;
 
@@ -52,7 +80,7 @@ export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-medium text-gray-700">
-            Update Access rights of {userName}
+            Update Access rights of {users.fullname}
           </h2>
           <button
             onClick={onClose}
@@ -107,7 +135,7 @@ export function ModalAccessCompanyUser({ isOpen, onClose, userName }: ModalProps
               {modules.map((module) => (
                 <tr key={module.id} className="border-t">
                   <td className="py-3">{module.id}</td>
-                  <td className="py-3">{module.name}</td>
+                  <td className="py-3">{module.module_name}</td>
                   <td className="py-3 text-center">
                     <input
                       type="checkbox"
