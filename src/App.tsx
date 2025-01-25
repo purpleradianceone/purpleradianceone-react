@@ -7,6 +7,7 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./config/routes/Route";
 import { NavBarContextProvider } from "./context/home/NavBarContext";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
+import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
 // import { UserContextProvider } from "./context/user/UserContextProvider";
 // import { ManageCompanyUserContextProvider } from './context/user/ManageCompanyUserContext';
 
@@ -17,6 +18,7 @@ import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext"
 function App() {
   return (
 
+    <AccessManagementContextProvider>
     <LoggedInUserContextProvider>
       {/* <UserContextProvider> */}
         <NavBarContextProvider>
@@ -24,6 +26,7 @@ function App() {
         </NavBarContextProvider>
       {/* </UserContextProvider> */}
     </LoggedInUserContextProvider>
+    </AccessManagementContextProvider>
   );
 }
 
