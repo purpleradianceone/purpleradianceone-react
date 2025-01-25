@@ -7,6 +7,7 @@ import { ModalAccessCompanyUser } from "../moduleaccessrights/ModalAccessCompany
 import { AddCompanyUserPopUp } from "../forms/AddCompanyUserPopUp";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
+import Pagination from "./Pagination";
 
 
 
@@ -26,7 +27,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   });
   const pagination =true;
   const paginationPageSize = 10;
-  const paginationPageSizeSelector=[20,50,100];
+  const paginationPageSizeSelector=[10,50,100];
 
   // const rowSelection: RowSelectionOptions = {
     // mode: "singleRow",
@@ -139,7 +140,24 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
       // suppressSizeToFit: true
     };
   }, []);
+
+/////////////////////////////////////////////////////
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(100);
+  const totalPages = 10; // Replace with dynamic total pages
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to page 1 when page size changes
+  };
  
+  //////////////////////////////////////////// 
   return (
     <div className="w-full pt-2 px-6">
       <div className="sticky z-10 top-16 p-4 flex items-center  bg-gray-50 rounded-lg shadow-sm justify-between mb-4 w-full">
@@ -180,7 +198,7 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
         <div 
           className="ag-theme-alpine w-full" 
-          style={{ height: '477px', width: '100%' }}
+          style={{ height: '400px', width: '100%' }}
         >
           <AgGridReact
             rowData={users}
@@ -188,16 +206,28 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
             defaultColDef={defaultColDef}
             // animateRows={true}
             // rowSelection={rowSelection}
-            pagination={pagination}
-            paginationPageSize={paginationPageSize} 
-            paginationPageSizeSelector={paginationPageSizeSelector} 
+            // pagination={pagination}
+            // paginationPageSize={paginationPageSize} 
+            // paginationPageSizeSelector={paginationPageSizeSelector} 
            modules={[AllCommunityModule]}
           />
+           <div>
+      
+    </div>
         </div>
         <ModalAccessCompanyUser
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         users={selectedUser}
+      />
+      </div>
+      <div className="flex items-center justify-center">
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
       </div>
     </div>
