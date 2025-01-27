@@ -8,7 +8,7 @@ import axios from "axios";
 // import AccessDeniedPage from "../views/not-found/AccessDeniedPage";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
-
+import LoadingPage from "../views/loading/LoadingPage";
 function CompanyUserAccessManagementModal({
   isOpen,
   onClose,
@@ -16,6 +16,7 @@ function CompanyUserAccessManagementModal({
 }: AccessRightsModalProps) {
   const{accessModules}= useAccessManagementContext();
 
+  const[dataStatus,setDataStatus] = useState(false);
     const [snackbar, setSnackbar] = useState<{
       open: boolean;
       message: string;
@@ -45,6 +46,7 @@ function CompanyUserAccessManagementModal({
 
   useEffect(() => {
     if (isOpen) {
+      setDataStatus(true);
       const getCrmModuleAccessData = {
         company_user_id: users.id,
       };
@@ -53,11 +55,12 @@ function CompanyUserAccessManagementModal({
         "Bearer " + loginStatus.token;
       axios
         .post(
-          "/api/main/purple-crm-api//get/crmmodules/access",
+          "/api/main/purple-crm-api/get/crmmodules/access",
           getCrmModuleAccessData
         )
         .then((response) => {
           setModules(response.data);
+          setDataStatus(false);
         })
         .catch((error) => {
           console.error(error);
@@ -146,87 +149,100 @@ function CompanyUserAccessManagementModal({
                 <X size={20} />
               </button>
             </div>
-    
+            {dataStatus ? 
+          (<div className="flex w-full h-48 justify-center items-center">
+            <LoadingPage></LoadingPage>
+          </div>) 
+          :
+          (
             <div className="p-6">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left">
-                    <th className="pb-4 w-16">Sr. No.</th>
-                    <th className="pb-4">Module Name</th>
-                    <th className="pb-4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span>Add</span>
-                        <input
-                          type="checkbox"
-                          checked={isColumnSelected("add")}
-                          onChange={() => handleColumnSelectAll("add")}
-                          className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                    </th>
-                    <th className="pb-4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span>View</span>
-                        <input
-                          type="checkbox"
-                          checked={isColumnSelected("view")}
-                          onChange={() => handleColumnSelectAll("view")}
-                          className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                    </th>
-                    <th className="pb-4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span>Update</span>
-                        <input
-                          type="checkbox"
-                          checked={isColumnSelected("update")}
-                          onChange={() => handleColumnSelectAll("update")}
-                          className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                    </th>
+            <table className="w-full">
+              <thead>
+                <tr className="text-left">
+                  <th className="pb-4 w-16">Sr. No.</th>
+                  <th className="pb-4">Module Name</th>
+                  <th className="pb-4 text-center">
+                    <div className="flex flex-col items-center">
+                      <span>Add</span>
+                      <input
+                        type="checkbox"
+                        checked={isColumnSelected("add")}
+                        onChange={() => handleColumnSelectAll("add")}
+                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </div>
+                  </th>
+                  <th className="pb-4 text-center">
+                    <div className="flex flex-col items-center">
+                      <span>View</span>
+                      <input
+                        type="checkbox"
+                        checked={isColumnSelected("view")}
+                        onChange={() => handleColumnSelectAll("view")}
+                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </div>
+                  </th>
+                  <th className="pb-4 text-center">
+                    <div className="flex flex-col items-center">
+                      <span>Update</span>
+                      <input
+                        type="checkbox"
+                        checked={isColumnSelected("update")}
+                        onChange={() => handleColumnSelectAll("update")}
+                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                modules.map((module) => (
+                  <tr key={module.id} className="border-t">
+                    <td className="py-3">{module.id}</td>
+                    <td className="py-3">{module.module_name}</td>
+                    <td className="py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={module.add}
+                        onChange={() => handleCheckboxChange(module.id, "add")}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={module.view}
+                        onChange={() => handleCheckboxChange(module.id, "view")}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={module.update}
+                        onChange={() => handleCheckboxChange(module.id, "update")}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {modules.map((module) => (
-                    <tr key={module.id} className="border-t">
-                      <td className="py-3">{module.id}</td>
-                      <td className="py-3">{module.module_name}</td>
-                      <td className="py-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={module.add}
-                          onChange={() => handleCheckboxChange(module.id, "add")}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                      <td className="py-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={module.view}
-                          onChange={() => handleCheckboxChange(module.id, "view")}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                      <td className="py-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={module.update}
-                          onChange={() => handleCheckboxChange(module.id, "update")}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex justify-end p-2 border-t gap-3">
-              <div>
-                {accessModule.update ? <Button onClick={handleSaveAccessModule}>Save</Button> : <Button disabled={true}>Save</Button>}
+                ))}
+               
+                
+                
+              </tbody>
+            </table>
+          </div>
+          ) 
+          }
+                
+              <div className="flex justify-end p-2 border-t gap-3">
+                <div>
+                  {accessModule.update ? <Button onClick={handleSaveAccessModule}>Save</Button> : <Button disabled={true}>Save</Button>}
+                </div>
               </div>
-            </div>
+            
           </div>
           <MessageSnackBar
         isOpen={snackbar.open}
@@ -239,8 +255,7 @@ function CompanyUserAccessManagementModal({
       );
     }
   })
-    
- 
 }
+
 
 export default CompanyUserAccessManagementModal;

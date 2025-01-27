@@ -33,6 +33,13 @@ const SignInForm = () => {
   // const apiUrl=import.meta.env.VITE_API_URL
 
 
+  const [spinnerAnimation,setSpinnerAnimation] = useState<{
+    status: 'idle' | 'loading' | 'success' | 'error';
+    message: string;
+  }>({
+    status : "idle",
+    message : ""
+  })
   const navigate = useNavigate();
   const {setLoginStatus} = useLoggedInUserContext();
   const {setAccessModules} = useAccessManagementContext();
@@ -158,6 +165,10 @@ const SignInForm = () => {
         token : captchaToken
       }
       // axios.post(`${apiUrl}/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
+      setSpinnerAnimation({
+        status: "loading",
+        message: "Logging In",
+      })
       axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       .then(response => {
         if(response.data.status){
@@ -192,6 +203,10 @@ const SignInForm = () => {
                 .then(response => 
                 {
                   setAccessModules(response.data)
+                  setSpinnerAnimation({
+                    status: "success",
+                    message:"Logged In"
+                  })
                   showSnackbar('Login successful!', 'success');
                   setTimeout(() => {
                     navigate("/home");
@@ -200,6 +215,10 @@ const SignInForm = () => {
                 )
                 .catch(error => {
                   console.error(error);
+                  setSpinnerAnimation({
+                    status: "idle",
+                    message :""                 
+                  })
                 });
                 
             }
@@ -208,6 +227,10 @@ const SignInForm = () => {
             }
             else{
               showSnackbar('Wrong email and Password!', 'error');
+              setSpinnerAnimation({
+                status: "idle",
+                message :""                 
+              })
               setLoginStatus({
                 userId : 0,
                 companyId : 0,
@@ -222,7 +245,11 @@ const SignInForm = () => {
           .catch( error => {
             console.log(error);
             showSnackbar('Something Went Wrong!', 'error');
-      
+            setSpinnerAnimation({
+              status: "idle",
+              message :""                 
+            })
+            
           } );
   
         }
@@ -232,6 +259,10 @@ const SignInForm = () => {
       .catch( error => {
         console.log(error);
         showSnackbar("Captcha Invalid","error")
+        setSpinnerAnimation({
+          status: "idle",
+          message :""                 
+        })
         
       });
     }
@@ -322,7 +353,7 @@ const SignInForm = () => {
             
           
 
-            <Button type="submit" onClick={handleLoginSubmit}>Log In</Button>
+            <Button type="submit" onClick={handleLoginSubmit} spinner={spinnerAnimation}>Log In</Button>
 
           <div className="text-center">
             <span className="text-gray-600 text-sm">

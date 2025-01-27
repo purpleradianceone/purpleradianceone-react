@@ -1,3 +1,5 @@
+import EmailVerificationProps from "../auth/views/EmailVerificationProps";
+
 /**
  * button property created 
  */
@@ -12,6 +14,8 @@ type ButtonProps = {
     link? : string;
     disabled? : boolean;
     onClick? : (event : React.FormEvent<HTMLButtonElement>) => void;
+    spinner? : EmailVerificationProps;
+    setSpinner? : (spinner : EmailVerificationProps) => void;
   };
   
   export default ButtonProps;
