@@ -8,8 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import Pagination from "./Pagination";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
-import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
-import Pagination from "./Pagination"; 
+import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal"; 
 
 type paginationDataProps = {
   pageSize : number,
@@ -261,11 +260,11 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
           </div>
           <div className="flex items-center justify-center">
           <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
+            totalPages={paginationData.totalPages}
+            currentPage={paginationData.currentPage}
+            pageSize={paginationData.pageSize}
+            onPageChange={paginationData.handlePageChange}
+            onPageSizeChange={paginationData.selectedPageSize}
           />
           </div>
         </div>
