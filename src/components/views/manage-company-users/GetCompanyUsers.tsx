@@ -35,7 +35,6 @@ function GetCompanyUsers() {
       .post("/api/main/purple-crm-api/getcompanyuser", postData)
       .then((response) => {
         setCompanyUsers(response.data);
-        console.log(response.data);
         
       })
       .catch((error) => {

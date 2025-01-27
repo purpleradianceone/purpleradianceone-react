@@ -4,6 +4,7 @@ type SideNavBarItemProps =  {
     children?: React.ReactNode[];
     isOpen: boolean;
     onClick?: () => void;
+    disabled?:boolean;
   }
 
   export default SideNavBarItemProps;
