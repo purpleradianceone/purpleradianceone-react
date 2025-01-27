@@ -1,5 +1,5 @@
 export type AccessManagementProps = {
-    add : boolean
+  add : boolean
   company_user_id : number
   createdon : string
   crm_module_id : number

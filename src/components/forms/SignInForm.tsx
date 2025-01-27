@@ -35,7 +35,7 @@ const SignInForm = () => {
 
   const navigate = useNavigate();
   const {setLoginStatus} = useLoggedInUserContext();
-  const {accessModules,setAccessModules} = useAccessManagementContext();
+  const {setAccessModules} = useAccessManagementContext();
 
   const sitekey = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
   // const secretKey = '6LcLKaYqAAAAAGpStS9lxqb_jKhV14dXqTypdqN1';
@@ -160,8 +160,6 @@ const SignInForm = () => {
       // axios.post(`${apiUrl}/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       .then(response => {
-       
-        
         if(response.data.status){
           const user = {
             email: loginUserCredentials.email,
@@ -171,7 +169,6 @@ const SignInForm = () => {
 
           // axios.post(`${apiUrl}/api/authentication/purple-crm-api/authenticate`,user)
           .then( response => {
-            console.log("this is the response "+JSON.stringify(response))
             if(response.data.status === true){
               setLoginStatus({
                 userId : response.data.user_id,
@@ -185,19 +182,17 @@ const SignInForm = () => {
               
               if (response.data.token && response.data.token !== "") {
                 axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
-                showSnackbar('Login successful!', 'success');
-
-
-                
-                const getCrmModuleAccess={
+               
+                const getCrmModuleAccessData={
+                  company_id :response.data.company_id,
                   company_user_id: response.data.user_id,
                 }
             
-                axios.post("/api/main/purple-crm-api/getcrmmoduleaccess",getCrmModuleAccess)
+                axios.post("/api/main/purple-crm-api/get/crmmodules/access",getCrmModuleAccessData)
                 .then(response => 
                 {
                   setAccessModules(response.data)
-                  console.log(accessModules)
+                  showSnackbar('Login successful!', 'success');
                   setTimeout(() => {
                     navigate("/home");
                   }, 1000);
@@ -206,9 +201,7 @@ const SignInForm = () => {
                 .catch(error => {
                   console.error(error);
                 });
-                setTimeout(() => {
-                  navigate("/home");
-                }, 1000);
+                
             }
               
               

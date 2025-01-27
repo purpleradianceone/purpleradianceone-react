@@ -8,6 +8,7 @@ const SideNavBarItem = ({
   children,
   isOpen,
   onClick,
+  disabled
 }: SideNavBarItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(false);
@@ -35,88 +36,160 @@ const SideNavBarItem = ({
     }
   };
 
-  return (
-    <div>
-      {isOpen ? (
-        <>
-          <button
-            onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
-            className="w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50 text-gray-700"
-          >
-            <div className="flex items-center">
-              <Icon size={20} className="mr-3" />
-              <span>{label}</span>
-            </div>
-            {children && (
-              <ChevronDown
-                size={16}
-                className={`transition-transform ${expanded ? "rotate-180" : ""}`}
-              />
+  if(disabled){
+    return (
+      <div className="cursor-not-allowed opacity-50">
+        {isOpen ? (
+          <>
+            <button
+              onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
+              className="w-full cursor-not-allowed opacity-50 flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50 text-gray-700"
+            >
+              <div className="flex items-center cursor-not-allowed">
+                <Icon size={20} className="mr-3" />
+                <span>{label}</span>
+              </div>
+              {children && (
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                />
+              )}
+            </button>
+            {children && expanded && (
+              <div className="ml-4 mt-1 space-y-1">
+                {children.map((child, index) => (
+                  <button
+                    key={index}
+                    className="w-full cursor-not-allowed opacity-50 flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg"
+                  >
+                    {child}
+                  </button>
+                ))}
+              </div>
             )}
-          </button>
-          {children && expanded && (
-            <div className="ml-4 mt-1 space-y-1">
-              {children.map((child, index) => (
-                <button
-                  key={index}
-                  className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg"
-                >
-                  {child}
-                </button>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div
-          className="relative"
-          onClick={() => setHoveredItem(true)}
-          onMouseLeave={() => setIsTooltipVisible(false)}
-        >
-          <button
-            ref={buttonRef}
-            onClick={onClick}
-            onMouseEnter={() => {
-              setIsTooltipVisible(true);
-              updateTooltipPosition();
-            }}
-            onMouseMove={updateTooltipPosition}
-            className="w-full cursor-pointer flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+          </>
+        ) : (
+          <div
+            className="relative"
+            onClick={() => setHoveredItem(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
           >
-            <Icon size={20} />
-          </button>
-          {isTooltipVisible && (
-            <div
-              className="fixed cursor-pointer z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded transform -translate-x"
-              style={{
-                top: `${tooltipPosition.top}px`,
-                left: `${tooltipPosition.left}px`,
+            <button
+              ref={buttonRef}
+              onClick={onClick}
+              onMouseEnter={() => {
+                setIsTooltipVisible(true);
+                updateTooltipPosition();
               }}
+              onMouseMove={updateTooltipPosition}
+              className="w-full cursor-not-allowed opacity-50 flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
             >
-              {label}
-              
-            </div>
-          )}
-          {children && hoveredItem && (
-            <div
-              onMouseLeave={() => setHoveredItem(false)}
-              onMouseEnter={()=> setIsTooltipVisible(false)}
-              className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-48 z-50"
+              <Icon size={20} />
+            </button>
+            {isTooltipVisible && (
+              <div
+                className="fixed cursor-not-allowed z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded transform -translate-x"
+                style={{
+                  top: `${tooltipPosition.top}px`,
+                  left: `${tooltipPosition.left}px`,
+                }}
+              >
+                {label}
+                
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+  else{
+    return (
+      <div>
+        {isOpen ? (
+          <>
+            <button
+              onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
+              className="w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50 text-gray-700"
             >
-              {children.map((child, index) => (
-                <button
-                  key={index}
-                  className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50"
-                >
-                  {child}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+              <div className="flex items-center">
+                <Icon size={20} className="mr-3" />
+                <span>{label}</span>
+              </div>
+              {children && (
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                />
+              )}
+            </button>
+            {children && expanded && (
+              <div className="ml-4 mt-1 space-y-1">
+                {children.map((child, index) => (
+                  <button
+                    key={index}
+                    className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg"
+                  >
+                    {child}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div
+            className="relative"
+            onClick={() => setHoveredItem(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
+          >
+            <button
+              ref={buttonRef}
+              onClick={onClick}
+              onMouseEnter={() => {
+                setIsTooltipVisible(true);
+                updateTooltipPosition();
+              }}
+              onMouseMove={updateTooltipPosition}
+              className="w-full cursor-pointer flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+            >
+              <Icon size={20} />
+            </button>
+            {isTooltipVisible && (
+              <div
+                className="fixed cursor-pointer z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded transform -translate-x"
+                style={{
+                  top: `${tooltipPosition.top}px`,
+                  left: `${tooltipPosition.left}px`,
+                }}
+              >
+                {label}
+                
+              </div>
+            )}
+            {children && hoveredItem && (
+              <div
+                onMouseLeave={() => setHoveredItem(false)}
+                onMouseEnter={()=> setIsTooltipVisible(false)}
+                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-48 z-50"
+              >
+                {children.map((child, index) => (
+                  <button
+                    key={index}
+                    className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50"
+                  >
+                    {child}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  
 };
 
 export default SideNavBarItem;

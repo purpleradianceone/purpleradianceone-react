@@ -8,7 +8,6 @@ interface DecodedToken {
 
 export const decodeToken = (token: string): DecodedToken | null => {
     try {
-        console.log(jwtDecode<DecodedToken>(token));
         return jwtDecode<DecodedToken>(token);
     } catch (error) {
         console.error('Token decoding failed:', error);

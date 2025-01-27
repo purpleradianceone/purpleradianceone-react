@@ -17,8 +17,9 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
               </button>
             </div>
             <nav className="p-3 space-y-1">
-              <SideNavBarItem icon={Home} label="Home" isOpen={isOpen} />
+              <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}  disabled={true}/>
               <SideNavBarItem 
+             
                 icon={LayoutDashboard} 
                 label="Dashboards" 
                 isOpen={isOpen}
