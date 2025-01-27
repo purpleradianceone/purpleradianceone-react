@@ -28,3 +28,15 @@
   .ag-theme-alpine .ag-row-hover {
     background-color: var(--ag-row-hover-color) !important;
   }
+
+  @keyframes loading {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }

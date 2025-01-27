@@ -4,12 +4,12 @@ import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
-
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const {setLoginStatus} = useLoggedInUserContext();
   const [pageSize,setPageSize] = useState<number>(15);
+ 
 
   const handlePageSizeChange = (size: number) => {
           setPageSize(size);
@@ -63,19 +63,20 @@ function GetCompanyUsers() {
       });
     }
   }, [pageSize,currentPage]);
+    return (
+      <div className="w-full">
+        
+        <GetCompanyUsersList paginationData={{
+          selectedPageSize:handlePageSizeChange,
+          currentPage:currentPage,
+          handlePageChange: handlePageChange,
+          totalPages:totalPages,
+          pageSize : pageSize,
+          }} users={companyUsers}></GetCompanyUsersList>
+      </div>
+    );
     
-  return (
-    <div className="w-full">
-      
-      <GetCompanyUsersList paginationData={{
-        selectedPageSize:handlePageSizeChange,
-        currentPage:currentPage,
-        handlePageChange: handlePageChange,
-        totalPages:totalPages,
-        pageSize : pageSize,
-        }} users={companyUsers}></GetCompanyUsersList>
-    </div>
-  );
+  
 }
 
 export default GetCompanyUsers;
