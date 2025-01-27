@@ -1,3 +1,4 @@
+// import { useEffect } from "react";
 import PaginationProps from "../../@types/List/PaginationProps";
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -11,6 +12,10 @@ const Pagination: React.FC<PaginationProps> = ({
       const newSize = Number(e.target.value);
       onPageSizeChange(newSize);
     };
+
+    // useEffect(()=>{
+    //   onPageSizeChange(sizeArray[0]);
+    // },[])
   
     const handlePreviousPage = () => {
       if (currentPage > 1) {
@@ -24,6 +29,10 @@ const Pagination: React.FC<PaginationProps> = ({
       }
     };
   
+    const sizeArray=[15,10,5];
+
+
+
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <label htmlFor="pageSize">Page Size</label>
@@ -37,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({
             borderRadius: "5px",
           }}
         >
-          {[20,50,100].map((size) => (
+          {sizeArray.map((size) => (
             <option key={size} value={size}>
               {size}
             </option>
@@ -61,7 +70,9 @@ const Pagination: React.FC<PaginationProps> = ({
           <input
             type="number"
             value={currentPage}
-            onChange={(e) => onPageChange(Number(e.target.value))}
+            onChange={(e) => {onPageChange(Number(e.target.value))
+
+            }}
             style={{
               width: "50px",
               textAlign: "center",
@@ -70,7 +81,7 @@ const Pagination: React.FC<PaginationProps> = ({
               borderRadius: "5px",
             }}
           />{" "}
-          of {totalPages}
+          of {Number(totalPages)}
         </span>
         <button
           onClick={handleNextPage}
@@ -91,3 +102,6 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   export default Pagination;
+
+
+

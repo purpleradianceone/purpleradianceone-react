@@ -9,9 +9,20 @@ import { AllCommunityModule, ColDef } from "ag-grid-community";
 import Pagination from "./Pagination";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
+import Pagination from "./Pagination"; 
+
+type paginationDataProps = {
+  pageSize : number,
+  currentPage : number,
+  totalPages : number
+  selectedPageSize: (size:number) =>void,
+  handlePageChange : (page : number) => void,
+}
 
 
-export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
+
+
+export function GetCompanyUsersList({ users,paginationData }: { users: companyUsersProps[],paginationData : paginationDataProps }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,10 +40,11 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
     requestedby: "",
     generate_password:""
   });
-  const pagination =true;
-  const paginationPageSize = 10;
-  const paginationPageSizeSelector=[5,20,100];
-  
+
+  // const pagination =true;
+  // const paginationPageSize = 10;
+  // const paginationPageSizeSelector=[10,50,100];
+
 
   // const rowSelection: RowSelectionOptions = {
     // mode: "singleRow",
@@ -168,20 +180,9 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   }, []);
 
 /////////////////////////////////////////////////////
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
-  const totalPages = 10; // Replace with dynamic total pages
 
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1); // Reset to page 1 when page size changes
-  };
+
  
   //////////////////////////////////////////// 
 
@@ -278,3 +279,4 @@ export function GetCompanyUsersList({ users }: { users: companyUsersProps[] }) {
   
  
 }
+      
