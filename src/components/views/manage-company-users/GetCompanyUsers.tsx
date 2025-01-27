@@ -9,7 +9,25 @@ function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const {setLoginStatus} = useLoggedInUserContext();
+  const [pageSize,setPageSize] = useState<number>(15);
 
+  const handlePageSizeChange = (size: number) => {
+          setPageSize(size);
+          setCurrentPage(1); // Reset to page 1 when page size changes
+  };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages,setTotalPages] = useState<number>(0);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getTotalPageNumberAsPerPageSize = (count : number) => {
+      return Math.ceil(count / pageSize);
+  }
   useEffect(() => {
 
     if(isTokenExpired(loginStatus.token)){
@@ -30,23 +48,32 @@ function GetCompanyUsers() {
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.userId,
+      limit: pageSize,
+      offset: (currentPage*pageSize)-pageSize,
     };
     axios
       .post("/api/main/purple-crm-api/getcompanyuser", postData)
       .then((response) => {
         setCompanyUsers(response.data);
-        console.log(response.data);
+        setTotalPages(Number(getTotalPageNumberAsPerPageSize(response.data[0].count)));
         
       })
       .catch((error) => {
         console.log(error);
       });
     }
-  }, []);
+  }, [pageSize,currentPage]);
     
   return (
     <div className="w-full">
-      <GetCompanyUsersList users={companyUsers}></GetCompanyUsersList>
+      
+      <GetCompanyUsersList paginationData={{
+        selectedPageSize:handlePageSizeChange,
+        currentPage:currentPage,
+        handlePageChange: handlePageChange,
+        totalPages:totalPages,
+        pageSize : pageSize,
+        }} users={companyUsers}></GetCompanyUsersList>
     </div>
   );
 }
