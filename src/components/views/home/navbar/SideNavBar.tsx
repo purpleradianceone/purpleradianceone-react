@@ -24,9 +24,8 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
             </button>
           </div>
           <nav className="p-3 space-y-1">
-            <Link to="/home">
+            <Link to= "/home"></Link>
             <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}/>
-            </Link>
             <SideNavBarItem 
            
               icon={LayoutDashboard} 
@@ -35,7 +34,8 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
               children={[<>Default</>, <>Analytics</>, <>Sales</>, <>CRM</>]}
             />
 
-            {module.crm_module_id === 1 && module.view ? (
+            {module.crm_module_id === 1 ?
+             module.view ? (
                 <Link to="/home/manage-users/users">
                 <SideNavBarItem 
                   icon={Building2} 
@@ -51,6 +51,13 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
               disabled={true}
             />
             </Link>
+            ) : (
+              <Link to="/home/manage-users/users">
+              <SideNavBarItem 
+                icon={Building2} 
+                label="Manage Company Users" 
+                isOpen={isOpen}
+              /></Link>
             )
             }
             

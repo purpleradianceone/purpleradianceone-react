@@ -40,7 +40,7 @@ function AccessDeniedPopup({
           <div className='flex items-center justify-center'>
               <div>
               <Button
-            onClick={onClose}          >
+            onClick={onClose}>
             Got it
           </Button>
               </div>
