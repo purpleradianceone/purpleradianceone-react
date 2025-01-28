@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
 
-function LoadingPage(){
+function LoadingSpinner(){
         return (
 
                 <div className="w-14 h-14 bg-white rounded-lg flex justify-center">
@@ -11,4 +11,4 @@ function LoadingPage(){
     
 }
 
-export default LoadingPage;
+export default LoadingSpinner;

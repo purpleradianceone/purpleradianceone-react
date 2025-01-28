@@ -8,7 +8,7 @@ import axios from "axios";
 // import AccessDeniedPage from "../views/not-found/AccessDeniedPage";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
-import LoadingPage from "../views/loading/LoadingPage";
+import LoadingSpinner from "../../assets/animations/LoadingSpinner";
 function CompanyUserAccessManagementModal({
   isOpen,
   onClose,
@@ -26,6 +26,14 @@ function CompanyUserAccessManagementModal({
       message: '',
       type: 'success'
     });
+
+     const [spinnerAnimation,setSpinnerAnimation] = useState<{
+        status: 'idle' | 'loading' | 'success' | 'error';
+        message: string;
+      }>({
+        status : "idle",
+        message : ""
+      })
 
   const [modules, setModules] = React.useState<AccessManagementProps[]>([
     {
@@ -48,6 +56,7 @@ function CompanyUserAccessManagementModal({
     if (isOpen) {
       setDataStatus(true);
       const getCrmModuleAccessData = {
+        company_id : loginStatus.companyId,
         company_user_id: users.id,
         company_id: loginStatus.userId
       };
@@ -104,27 +113,42 @@ function CompanyUserAccessManagementModal({
   };
 
   const handleSaveAccessModule = () => {
-    const saveCrmModuleAccessData = modules.map((module) => ({
-        company_id:loginStatus.companyId,
-        id : module.id,
-        add : module.add,
-        view : module.view,
-        update : module.update,
-        updatedby : loginStatus.userId
-      }))
+    setSpinnerAnimation({
+      status: "loading",
+      message: "Saving",
+    })
 
-    axios.defaults.headers.common["Authorization"] =
-    "Bearer " + loginStatus.token;
-    axios.post("/api/main/purple-crm-api/update/crmmodules/access",saveCrmModuleAccessData)
-    .then(response => {
-      if(response.data.status){
-        showSnackbar(response.data.message, 'success');
-      }
+    const saveCrmModuleAccessData = modules.map((module) => ({
+      company_id: loginStatus.companyId,
+      id: module.id,
+      add: module.add,
+      view: module.view,
+      update: module.update,
+      updatedby: loginStatus.userId
+  }));
+  
+  axios.defaults.headers.common["Authorization"] =
+  "Bearer " + loginStatus.token;
+
+  axios.post("/api/main/purple-crm-api/update/crmmodules/access", saveCrmModuleAccessData)
+  .then(response => {
+    showSnackbar(response.data.message,"success")
+    setSpinnerAnimation({
+      status: "success",
+      message: "Saved",
     })
-    .catch(error => {
-      console.log(error);
-      showSnackbar(error.message, 'error');
-    })
+
+    setTimeout(()=>{
+      setSpinnerAnimation({
+        status: "idle",
+        message: "",
+      });
+    },1000)
+  })
+  .catch(error => {
+      showSnackbar("Something Went Wrong", "error");
+      console.error("Error saving data:", error);
+  });
     
   }
 
@@ -150,7 +174,7 @@ function CompanyUserAccessManagementModal({
             </div>
             {dataStatus ? 
           (<div className="flex w-full h-48 justify-center items-center">
-            <LoadingPage></LoadingPage>
+            <LoadingSpinner></LoadingSpinner>
           </div>) 
           :
           (
@@ -237,8 +261,8 @@ function CompanyUserAccessManagementModal({
           }
                 
               <div className="flex justify-end p-2 border-t gap-3">
-                <div>
-                  {accessModule.update ? <Button onClick={handleSaveAccessModule}>Save</Button> : <Button disabled={true}>Save</Button>}
+                <div className="min-w-24">
+                  {accessModule.update ? <Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>Save</Button> : <Button disabled={true}>Save</Button>}
                 </div>
               </div>
             
