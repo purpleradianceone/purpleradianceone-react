@@ -58,6 +58,7 @@ function CompanyUserAccessManagementModal({
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: users.id,
+        company_id: loginStatus.userId
       };
 
       axios.defaults.headers.common["Authorization"] =
