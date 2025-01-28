@@ -4,12 +4,15 @@ import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
+import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
+import AccessDeniedPage from "../not-found/AccessDeniedPage";
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const {setLoginStatus} = useLoggedInUserContext();
   const [pageSize,setPageSize] = useState<number>(15);
  
+  const {accessModules,setAccessModules} = useAccessManagementContext();
 
   const handlePageSizeChange = (size: number) => {
           setPageSize(size);
@@ -43,6 +46,25 @@ function GetCompanyUsers() {
       });
     }
     else{
+      const getCrmModuleAccessData = {
+        company_id : loginStatus.companyId,
+        company_user_id: loginStatus.userId,
+      };
+
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + loginStatus.token;
+      axios
+        .post(
+          "/api/main/purple-crm-api/get/crmmodules/access",
+          getCrmModuleAccessData
+        )
+        .then((response) => {
+          setAccessModules(response.data)
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
       axios.defaults.headers.common["Authorization"] =
       "Bearer " + loginStatus.token;
     const postData = {
@@ -63,18 +85,30 @@ function GetCompanyUsers() {
       });
     }
   }, [pageSize,currentPage]);
-    return (
+
+
+  return accessModules.map((module) => {
+    if(module.crm_module_id ===1 && module.view){
+      return (
+        <div className="w-full">
+          <GetCompanyUsersList paginationData={{
+            selectedPageSize:handlePageSizeChange,
+            currentPage:currentPage,
+            handlePageChange: handlePageChange,
+            totalPages:totalPages,
+            pageSize : pageSize,
+            }} users={companyUsers}></GetCompanyUsersList>
+        </div>
+      );
+    }
+    else{
       <div className="w-full">
-        
-        <GetCompanyUsersList paginationData={{
-          selectedPageSize:handlePageSizeChange,
-          currentPage:currentPage,
-          handlePageChange: handlePageChange,
-          totalPages:totalPages,
-          pageSize : pageSize,
-          }} users={companyUsers}></GetCompanyUsersList>
+        <AccessDeniedPage></AccessDeniedPage>
       </div>
-    );
+    }
+    
+  })
+    
     
   
 }

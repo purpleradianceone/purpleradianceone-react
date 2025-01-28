@@ -1,7 +1,7 @@
 import { ArrowLeft, ShieldAlert } from "lucide-react";
 
 
-function AccessDeniedPage (){
+function AccessDeniedPage(){
     return (
         <div>
           <div className="flex justify-center mb-6">
