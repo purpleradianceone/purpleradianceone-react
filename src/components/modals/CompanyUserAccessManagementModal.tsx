@@ -49,6 +49,7 @@ function CompanyUserAccessManagementModal({
       setDataStatus(true);
       const getCrmModuleAccessData = {
         company_user_id: users.id,
+        company_id: loginStatus.userId
       };
 
       axios.defaults.headers.common["Authorization"] =
@@ -112,12 +113,9 @@ function CompanyUserAccessManagementModal({
         updatedby : loginStatus.userId
       }))
 
-    axios.post("/api/main/purple-crm-api/update/crmmodules/access",JSON.stringify(saveCrmModuleAccessData),{
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization" : loginStatus.token
-      }
-    })
+    axios.defaults.headers.common["Authorization"] =
+    "Bearer " + loginStatus.token;
+    axios.post("/api/main/purple-crm-api/update/crmmodules/access",saveCrmModuleAccessData)
     .then(response => {
       if(response.data.status){
         showSnackbar(response.data.message, 'success');
@@ -125,6 +123,7 @@ function CompanyUserAccessManagementModal({
     })
     .catch(error => {
       console.log(error);
+      showSnackbar(error.message, 'error');
     })
     
   }

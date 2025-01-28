@@ -31,8 +31,6 @@ const Pagination: React.FC<PaginationProps> = ({
   
     const sizeArray=[15,10,5];
 
-
-
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <label htmlFor="pageSize">Page Size</label>
