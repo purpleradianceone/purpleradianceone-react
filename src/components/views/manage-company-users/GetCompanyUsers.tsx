@@ -5,12 +5,14 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
-import AccessDeniedPage from "../not-found/AccessDeniedPage";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const {setLoginStatus} = useLoggedInUserContext();
   const [pageSize,setPageSize] = useState<number>(15);
+
+  const[accessDeniedPopUpOpen,setAccessDeniedPopUpOpen] = useState(false);
  
   const {accessModules,setAccessModules} = useAccessManagementContext();
 
@@ -86,28 +88,45 @@ function GetCompanyUsers() {
     }
   }, [pageSize,currentPage]);
 
+  
+  useEffect(() => {
+    const hasAccess = accessModules.some(module => module.crm_module_id === 1 && module.view);
+    setAccessDeniedPopUpOpen(!hasAccess);
+  }, []);
 
-  return accessModules.map((module) => {
-    if(module.crm_module_id ===1 && module.view){
-      return (
-        <div className="w-full">
-          <GetCompanyUsersList paginationData={{
-            selectedPageSize:handlePageSizeChange,
-            currentPage:currentPage,
-            handlePageChange: handlePageChange,
-            totalPages:totalPages,
-            pageSize : pageSize,
-            }} users={companyUsers}></GetCompanyUsersList>
-        </div>
-      );
-    }
-    else{
-      <div className="w-full">
-        <AccessDeniedPage></AccessDeniedPage>
+
+  return (
+    <div className="w-full">
+    {accessModules.map((module) => {
+      if (module.crm_module_id === 1 && module.view) {
+        return (
+          <GetCompanyUsersList
+            key={module.id} // Ensure to add a unique key for each module
+            paginationData={{
+              selectedPageSize: handlePageSizeChange,
+              currentPage: currentPage,
+              handlePageChange: handlePageChange,
+              totalPages: totalPages,
+              pageSize: pageSize,
+            }}
+            users={companyUsers}
+          />
+        );
+      }
+      return null; // Return null if no valid module is found
+    })}
+    {accessDeniedPopUpOpen && (
+      <div className="flex-none mx-96 mt-14">
+        <AccessDeniedPopup
+          isOpen={accessDeniedPopUpOpen}
+          onClose={() => {
+            setAccessDeniedPopUpOpen(false);
+          }}
+        />
       </div>
-    }
-    
-  })
+    )}
+  </div>
+);
     
     
   
