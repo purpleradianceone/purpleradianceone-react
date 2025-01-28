@@ -58,7 +58,7 @@ function CompanyUserAccessManagementModal({
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: users.id,
-        company_id: loginStatus.userId
+        requestedby : loginStatus.userId
       };
 
       axios.defaults.headers.common["Authorization"] =
@@ -262,7 +262,11 @@ function CompanyUserAccessManagementModal({
                 
               <div className="flex justify-end p-2 border-t gap-3">
                 <div className="min-w-24">
-                  {accessModule.update ? <Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>Save</Button> : <Button disabled={true}>Save</Button>}
+                  {accessModule.update ? 
+                  users.id === loginStatus.userId ?
+                  <Button disabled={true}>Save</Button>
+                    :<Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>Save</Button>:
+                     <Button disabled={true}>Save</Button>}
                 </div>
               </div>
             

@@ -121,6 +121,7 @@ function GetCompanyUsers() {
           isOpen={accessDeniedPopUpOpen}
           onClose={() => {
             setAccessDeniedPopUpOpen(false);
+            window.history.back();
           }}
         />
       </div>

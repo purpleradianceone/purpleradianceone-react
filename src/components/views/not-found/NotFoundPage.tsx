@@ -30,7 +30,7 @@ function NotFoundPage() {
             Go Back
           </Button>
           <Button 
-            onClick={() => window.location.href = '/'}>
+            onClick={() => window.location.href = '/home'}>
             <HomeIcon className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
             Home Page
           </Button>
