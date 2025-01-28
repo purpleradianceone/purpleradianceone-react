@@ -52,18 +52,13 @@ const mockDateOptions: DropdownOption[] = [
 export function GetCompanyUsersList({ users,paginationData }: { users: companyUsersProps[],paginationData : paginationDataProps }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
   const {accessModules}=useAccessManagementContext();
-
-
-  // 
-
   const [searchBy, setSearchBy] = useState<'column' | 'date'>('column');
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOption[]>(mockColumnOptions);
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
-  // const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
 
   useEffect(() => {
     fetchDropdownOptions();
@@ -80,8 +75,6 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
       setDropdownOptions([]);
     }
   };
-
-  // 
 
   const [selectedUser, setSelectedUser] = useState({
     company_id: 0,
@@ -100,14 +93,15 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
       field: 'company_id',
       headerName: 'Created By',
       sortable: true,
-      filter: true,
+      filter: "agNumberColumnFilter",
       flex: 0.5,
+      
     },
     {
       field: 'id',
       headerName: 'User ID',
       sortable: true,
-      filter: true,
+      filter: "agNumberColumnFilter",
       flex:1
     },
     { 
@@ -142,7 +136,7 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cellRenderer: (params: any) => {
         return (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 mt-3">
             {params.value ? (
               <>
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -161,9 +155,9 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
     {
       headerName: 'Access',
       sortable: false,
-      filter: false,
+      // filter: false,
       flex: 0.6,
-      pinned:'right',
+      // pinned:'right',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cellRenderer: (params: any) => {
 
@@ -217,9 +211,12 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
   const defaultColDef = useMemo(() => {
     return{
       filter:"agTextColumnFilter",
-      floatingFilter:true,
+      // floatingFilter:true,
       // resizable: true,
       // suppressSizeToFit: true
+      minWidth:150,
+      suppressHeaderMenuButton: true,
+      suppressHeaderContextMenu: true,
     };
   }, []);
 
@@ -339,6 +336,7 @@ export function GetCompanyUsersList({ users,paginationData }: { users: companyUs
                 // paginationPageSize={paginationPageSize} 
                 // paginationPageSizeSelector={paginationPageSizeSelector} 
                modules={[AllCommunityModule]}
+              //  onGridReady={onGridReady}
               />
                <div>
           
