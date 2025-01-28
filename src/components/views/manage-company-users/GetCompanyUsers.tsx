@@ -4,12 +4,17 @@ import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
+import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const {setLoginStatus} = useLoggedInUserContext();
   const [pageSize,setPageSize] = useState<number>(15);
+
+  const[accessDeniedPopUpOpen,setAccessDeniedPopUpOpen] = useState(false);
  
+  const {accessModules,setAccessModules} = useAccessManagementContext();
 
   const handlePageSizeChange = (size: number) => {
           setPageSize(size);
@@ -43,6 +48,25 @@ function GetCompanyUsers() {
       });
     }
     else{
+      const getCrmModuleAccessData = {
+        company_id : loginStatus.companyId,
+        company_user_id: loginStatus.userId,
+      };
+
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + loginStatus.token;
+      axios
+        .post(
+          "/api/main/purple-crm-api/get/crmmodules/access",
+          getCrmModuleAccessData
+        )
+        .then((response) => {
+          setAccessModules(response.data)
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
       axios.defaults.headers.common["Authorization"] =
       "Bearer " + loginStatus.token;
     const postData = {
@@ -63,18 +87,47 @@ function GetCompanyUsers() {
       });
     }
   }, [pageSize,currentPage]);
-    return (
-      <div className="w-full">
-        
-        <GetCompanyUsersList paginationData={{
-          selectedPageSize:handlePageSizeChange,
-          currentPage:currentPage,
-          handlePageChange: handlePageChange,
-          totalPages:totalPages,
-          pageSize : pageSize,
-          }} users={companyUsers}></GetCompanyUsersList>
+
+  
+  useEffect(() => {
+    const hasAccess = accessModules.some(module => module.crm_module_id === 1 && module.view);
+    setAccessDeniedPopUpOpen(!hasAccess);
+  }, []);
+
+
+  return (
+    <div className="w-full">
+    {accessModules.map((module) => {
+      if (module.crm_module_id === 1 && module.view) {
+        return (
+          <GetCompanyUsersList
+            key={module.id} // Ensure to add a unique key for each module
+            paginationData={{
+              selectedPageSize: handlePageSizeChange,
+              currentPage: currentPage,
+              handlePageChange: handlePageChange,
+              totalPages: totalPages,
+              pageSize: pageSize,
+            }}
+            users={companyUsers}
+          />
+        );
+      }
+      return null; // Return null if no valid module is found
+    })}
+    {accessDeniedPopUpOpen && (
+      <div className="flex-none mx-96 mt-14">
+        <AccessDeniedPopup
+          isOpen={accessDeniedPopUpOpen}
+          onClose={() => {
+            setAccessDeniedPopUpOpen(false);
+          }}
+        />
       </div>
-    );
+    )}
+  </div>
+);
+    
     
   
 }
