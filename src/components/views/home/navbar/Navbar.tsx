@@ -9,6 +9,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+
   const Navigate = useNavigate();
 
 
@@ -33,6 +34,22 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // const handleModuleSearch = (event : React.ChangeEvent<HTMLInputElement>) => {
+    // const query = event.target.value.toLowerCase();
+    // setSearchQuery(query);
+    // setIsSearching(query.length > 0);
+    
+    // if (query.length > 0) {
+    //   const filtered = APP_MODULES.filter(module => 
+    //     module.name.toLowerCase().includes(query) || 
+    //     module.description.toLowerCase().includes(query)
+    //   );
+    //   setSearchResults(filtered);
+    // } else {
+    //   setSearchResults([]);
+    // }
+  // }
 
   const handleLogout=()=>{
     Navigate("/signin");
@@ -154,6 +171,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 <input
                   type="text"
                   placeholder="Search..."
+                  // onChange={handleModuleSearch}
                   className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-indigo-500"
                 />
               </div>

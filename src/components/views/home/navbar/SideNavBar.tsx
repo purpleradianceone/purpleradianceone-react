@@ -24,8 +24,9 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
             </button>
           </div>
           <nav className="p-3 space-y-1">
-            <Link to= "/home"></Link>
+            <Link to= "/home">
             <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}/>
+            </Link>
             <SideNavBarItem 
            
               icon={LayoutDashboard} 
@@ -36,7 +37,7 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
 
             {module.crm_module_id === 1 ?
              module.view ? (
-                <Link to="/home/manage-users/users">
+                <Link to="/home/manage-users/users" onClick={() => {window.location.href = "/home/manage-users/users"}}>
                 <SideNavBarItem 
                   icon={Building2} 
                   label="Manage Company Users" 
