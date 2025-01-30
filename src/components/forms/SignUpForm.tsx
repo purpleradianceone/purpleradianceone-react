@@ -9,7 +9,6 @@ import axios from "axios";
 import EmailSentAnimation from "../../assets/animations/EmailSentAnimation";
 import MessageSnackBar from "../ui/MessageSnackbar";
 
-
 /**
  * created functional components for SignUp Form
  * @returns the xml for signUp form
@@ -42,6 +41,7 @@ const SignUpPage: React.FC = () => {
     email?:string,
     password?:string,
     confirmPassword?:string,
+    mobileNumber?:string
   }>({});
 
   /**
@@ -92,6 +92,7 @@ const SignUpPage: React.FC = () => {
    * it checks data entered is correct or not as per requirements.
    */
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+
     const { name, value } = e.target;
 
     if (name === "email") {
@@ -104,6 +105,17 @@ const SignUpPage: React.FC = () => {
         }));
       } else {
         setErrors((prev) => ({ ...prev, email: "" }));
+      }
+    }
+    // 
+    const mobileRegex = /^[0-9]{10,15}$/;
+
+    
+    if (name === "mobileNumber") {
+      if (!mobileRegex.test(value) && value !=="") {
+        setErrors((prev) => ({ ...prev, mobileNumber: "Please enter a valid mobile number." }));
+      }  else {
+        setErrors((prev) => ({ ...prev, mobileNumber: "" }));
       }
     }
 
@@ -165,9 +177,8 @@ const SignUpPage: React.FC = () => {
     e.preventDefault();
 
     //Regex for password and confirm password length
+   
     const passwordRegex = /^.{8,20}$/;
-
-
     if (!SignUpData.email) {
       setErrors((prev) => ({
         ...prev,
@@ -227,14 +238,17 @@ const SignUpPage: React.FC = () => {
         console.log(respone);
 
         if(respone.data.status === true){
-
-          showSnackbar(respone.data.message,'success');
-
-          setShowAnimation(!showAnimation);
+          console.log(respone.data.message);
+          if(respone.data.message=="Your email is already verified. You can now log in and start using your account."){
+            
+            showSnackbar(respone.data.message,'error');
+          }else{
+            showSnackbar(respone.data.message,'success');
+            setShowAnimation(!showAnimation);
+          }
           setTimeout(()=>{
             window.location.href = '/signin';
-          },15000)
-
+          },5000)
         }else{
           showSnackbar(respone.data.message,'error');
         }
@@ -275,6 +289,11 @@ const SignUpPage: React.FC = () => {
                 value={SignUpData.mobileNumber}
                 onChange={handleChange}
                 maxLength={15}
+                onBlur={handleBlur}
+                //  inputMode="numeric"
+                // pattern="[0-9]*"
+                error={errors.mobileNumber}
+                
               />
 
             {/* Email Field */}
