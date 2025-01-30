@@ -26,35 +26,80 @@ function GetCompanyUsers() {
   const [dateRangeId, setDateRangeId] = useState(0);
   const [searchParameter, setSearchParameter] = useState("");
   const [criteriaId, setCriteriaId] = useState(0);
+  // const [isStartDateEmpty, setIsStartDateEmpty]= useState(false);
+
+   // Function to get default date in "01-January-2025" format
+   const getDefaultStartDateOfYear = (): string => {
+    const today = new Date();
+    const defaultYear = today.getFullYear();
+    return `01-January-${defaultYear}`;
+  };
+
+   // Function to get current date in "DD-MMMM-YYYY" format
+   const getCurrentDate = (): string => {
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, "0"); // Ensures 2-digit day
+    const month = today.toLocaleString("en-US", { month: "long" }); // Full month name
+    const year = today.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+
   const [concatDate, setConcatDate] = useState("");
   const [radioButtonClicked, setRadioButtonClicked] = useState<
     "Column" | "Date"
   >();
 
   const handleStartDateChange = (startDate: Date) => {
-    const day = startDate.getDate().toString().padStart(2, "0");
-    const month = startDate.toLocaleString("en-US", { month: "long" });
-    const year = startDate.getFullYear();
+  
     // setStartDate(startDate.toLocaleDateString())
-    setStartDate(`${day}-${month}-${year}`);
+   
+    if(startDate.toLocaleDateString().toString().length<1 || startDate.toLocaleDateString().toString()==="Invalid Date"){
+      setStartDate(getDefaultStartDateOfYear());
+    }else{
+      const day = startDate.getDate().toString().padStart(2, "0");
+      const month = startDate.toLocaleString("en-US", { month: "long" });
+      const year = startDate.getFullYear();
+
+      setStartDate(`${day}-${month}-${year}`);
+    }
+   
   };
 
   const handleEndDateChange = (endDate: Date) => {
-    // setEndDate(endDate.toLocaleDateString())
-    const day = endDate.getDate().toString().padStart(2, "0");
-    const month = endDate.toLocaleString("en-US", { month: "long" });
-    const year = endDate.getFullYear();
-    // setStartDate(startDate.toLocaleDateString())
-    setEndDate(`${day}-${month}-${year}`);
+    if(endDate.toLocaleDateString().toString().length<1   || endDate.toLocaleDateString().toString()==="Invalid Date"){
+      setEndDate(getCurrentDate());
+    }else{
+      const day = endDate.getDate().toString().padStart(2, "0");
+      const month = endDate.toLocaleString("en-US", { month: "long" });
+      const year = endDate.getFullYear();
+      setEndDate(`${day}-${month}-${year}`);
+    }
+    console.log(typeof endDate+" type of end date" );
+    console.log(endDate);
+    
+    
   };
 
-  const onSubmitButtonDateRangePickerClick = () => {
-    setConcatDate(startDate + "@" + endDate);
+  // const onSubmitButtonDateRangePickerClick = () => {
+   
+  // };
+
+  useEffect(()=>{
+    if(startDate==""  && endDate.length>1 ){
+      setConcatDate(getDefaultStartDateOfYear() +'@'+ endDate)
+
+    }else if(startDate.length>1 && endDate==""){
+      setConcatDate(startDate +'@'+ getCurrentDate())
+    }else{
+      setConcatDate(startDate + "@" + endDate);
+    }
     console.log(concatDate);
-  };
+  },[startDate,endDate])
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -85,7 +130,7 @@ function GetCompanyUsers() {
     }
   };
 
-  // to go to forst page of ag-grid
+  // to go to first page of ag-grid
   useEffect(() => {
     setCurrentPage(1);
   }, [criteriaId, dateRangeId, concatDate]);
@@ -94,6 +139,7 @@ function GetCompanyUsers() {
     if (radioButtonClicked === "Column") {
       setDateRangeId(0);
       setConcatDate("");
+     
     } else {
       setCriteriaId(0);
     }
@@ -120,6 +166,7 @@ function GetCompanyUsers() {
 
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
+      
       axios
         .post(
           "/api/main/purple-crm-api/get/crmmodules/access",
@@ -134,20 +181,24 @@ function GetCompanyUsers() {
 
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
-      const postData = {
-        company_id: loginStatus.companyId,
-        requestedby: loginStatus.userId,
-        limit: pageSize,
-        search_company_specific_date_range_id: dateRangeId,
-        search_parameter: searchParameter || concatDate === "@" ? searchParameter : concatDate.charAt(concatDate.length - 1) === "@" ? searchParameter : concatDate,
-        search_company_specific_criteria_id: criteriaId,
-        offset: currentPage * pageSize - pageSize,
-      };
-      axios
+      
+      if((dateRangeId ==8 && searchParameter == "") && (concatDate=="@")){
+       const postData = {
+          company_id: loginStatus.companyId,
+          requestedby: loginStatus.userId,
+          limit: pageSize,
+          search_company_specific_date_range_id: 0,
+          search_parameter: "",
+          search_company_specific_criteria_id: 0,
+          offset: currentPage * pageSize - pageSize,
+        };
+
+        axios
         .post("/api/main/purple-crm-api/getcompanyuser", postData)
         .then((response) => {
           setCompanyUsers(response.data);
-
+          console.log("from 1st");
+          
           if (response.data[0].count) {
             setTotalPages(
               Number(getTotalPageNumberAsPerPageSize(response.data[0].count))
@@ -159,6 +210,36 @@ function GetCompanyUsers() {
           console.log(error);
           console.log(concatDate);
         });
+      }else {
+        const postData = {
+          company_id: loginStatus.companyId,
+          requestedby: loginStatus.userId,
+          limit: pageSize,
+          search_company_specific_date_range_id: dateRangeId,
+          search_parameter: searchParameter || concatDate === "@" ? searchParameter : concatDate.charAt(concatDate.length - 1) === "@" ? searchParameter : concatDate,
+          search_company_specific_criteria_id: criteriaId,
+          offset: currentPage * pageSize - pageSize,
+        };
+
+        axios
+        .post("/api/main/purple-crm-api/getcompanyuser", postData)
+        .then((response) => {
+          setCompanyUsers(response.data);
+          console.log("from 2nd");
+          
+          if (response.data[0].count) {
+            setTotalPages(
+              Number(getTotalPageNumberAsPerPageSize(response.data[0].count))
+            );
+          }
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log(concatDate);
+        });
+      }
+      
     }
   }, [
     criteriaId,
@@ -183,9 +264,9 @@ function GetCompanyUsers() {
           return (
             <GetCompanyUsersList
             key = {module.id}
-              onSubmitButtonDateRangePickerClick={
-                onSubmitButtonDateRangePickerClick
-              }
+              // onSubmitButtonDateRangePickerClick={
+              //   onSubmitButtonDateRangePickerClick
+              // }
               onRadioButtonClick={handleRadioButtonClick}
               onEndDateChange={handleEndDateChange}
               onStartDateChange={handleStartDateChange}

@@ -35,7 +35,7 @@ export function GetCompanyUsersList({
   onStartDateChange, 
   onEndDateChange ,
   onRadioButtonClick,
-  onSubmitButtonDateRangePickerClick
+  // onSubmitButtonDateRangePickerClick
 }: {
   users: companyUsersProps[];
   paginationData: PaginationDataProps;
@@ -43,7 +43,7 @@ export function GetCompanyUsersList({
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   onRadioButtonClick:(radioValue:string)=>void;
-  onSubmitButtonDateRangePickerClick:()=>void;
+  // onSubmitButtonDateRangePickerClick:()=>void;
 }) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
   const [isEditAccessModalOpen,setIsEditModalOpen]= useState(false);
@@ -557,7 +557,7 @@ export function GetCompanyUsersList({
             {isCustomDateOptionSelected && (
               <>
                 <DateRangePicker
-                onSubmitButtonClick={onSubmitButtonDateRangePickerClick}
+                // onSubmitButtonClick={onSubmitButtonDateRangePickerClick}
                 onStartDateChange={onStartDateChange}
                 onEndDateChange={onEndDateChange}
               />
