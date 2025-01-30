@@ -1,7 +1,19 @@
-import { Users, CheckCircle2, XCircle, UserPlus } from "lucide-react";
+
+/* eslint-disable react-hooks/rules-of-hooks */
+import {
+  Users,
+  CheckCircle2,
+  XCircle,
+  Search,
+  UserPlus,
+  UserCheck,
+  Edit,
+  
+} from "lucide-react";
+
 import companyUsersProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AddCompanyUserPopUp } from "../forms/AddCompanyUserPopUp";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
@@ -10,8 +22,10 @@ import { useAccessManagementContext } from "../../context/user/AccessManagementC
 import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import DropDownOption from "../../@types/DropDownOptionProps";
-import PaginationDataProps from "../../@types/PaginationDataProps";
+import DropDownOption from "../../@types/ag-grid/SearchDropDownOptionProps";
+import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
+import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
+import { createPortal } from "react-dom";
 import HandleSearchOptionProps from "../../@types/HandleSearchOptionProps";
 import { DateRangePicker } from "../DateRangePicker";
 
@@ -32,8 +46,9 @@ export function GetCompanyUsersList({
   onRadioButtonClick:(radioValue:string)=>void;
   onSubmitButtonDateRangePickerClick:()=>void;
 }) {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
+  const [isEditAccessModalOpen,setIsEditModalOpen]= useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { accessModules } = useAccessManagementContext();
   const [isSearchBoxVisible, setIsSearchBoxVisible] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -202,7 +217,9 @@ export function GetCompanyUsersList({
       {
         headerName: "Access",
         sortable: false,
-        flex: 0.6,
+        flex: 1,
+        maxWidth:100,
+        filter:false,
         // pinned:'right',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
@@ -210,31 +227,36 @@ export function GetCompanyUsersList({
             if (accessModule.crm_module_id === 2) {
               if (accessModule.view) {
                 return (
-                  <Button
-                    className="w-24 mt-0.5 flex justify-center py-1.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  <div className="flex justify-center items-center" title="Access">
+                      <button
+                    className="text-blue-600 text-center size-1"
                     onClick={() => {
                       setSelectedUser({
                         company_id: params.data.company_id,
                         id: params.data.id,
                         fullname: params.data.fullname,
-                        email: params.email,
+                        email: params.data.email,
                         mobilenumber: params.data.mobilenumber,
                         createdby: "",
                         isactive: params.data.isactive,
                         requestedby: "",
                         generate_password: "",
                       });
-
-                      setIsModalOpen(true);
+                      console.log(params.email);
+                      setIsAccessModalOpen(true);
                     }}
                   >
-                    Access
-                  </Button>
+                    <UserCheck></UserCheck>
+                  </button>
+                  </div>
+                  
                 );
               } else {
                 return (
                   <div>
-                    <Button disabled={true}>Access</Button>
+                    <Button disabled={true}>
+                    <UserCheck></UserCheck>
+                    </Button>
                   </div>
                 );
               }
@@ -242,6 +264,170 @@ export function GetCompanyUsersList({
           });
         },
       },
+      {
+        headerName: "Edit",
+        sortable: false,
+        filter:false,
+        flex: 0.6,
+        maxWidth:100,
+        // pinned:'right',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: any) => {
+          return accessModules.map((accessModule) => {
+            if (accessModule.crm_module_id === 1) {
+              if (accessModule.view) {
+                return (
+                  <div className="flex justify-center items-center" title="Edit">
+                  <button
+                    className="text-blue-600 text-center size-1"
+                    onClick={() => {
+                      setSelectedUser({
+                        company_id: params.data.company_id,
+                        id: params.data.id,
+                        fullname: params.data.fullname,
+                        email: params.data.email,
+                        mobilenumber: params.data.mobilenumber,
+                        createdby: "",
+                        isactive: params.data.isactive,
+                        requestedby: "",
+                        generate_password: "",
+                      });
+
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    <Edit></Edit>
+                  </button>
+                  </div>
+                );
+              } else {
+                return (
+                  <div>
+                    <Button disabled={true}>
+                    <Edit></Edit>
+                    </Button>
+                  </div>
+                );
+              }
+            }
+          });
+        },
+      },
+      {
+        headerName: "Actions",
+        sortable: false,
+        flex: 0.8,
+        maxWidth:100,
+        pinned: "right",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: any) => {
+          const [isOpen, setIsOpen] = useState(false);
+          const [position, setPosition] = useState({ top: 0, left: 0 });
+          const dropdownRef = useRef<HTMLDivElement | null>(null);
+      
+          const userHasAccess = accessModules.some(
+            (accessModule) => accessModule.crm_module_id === 2 && accessModule.view
+          );
+      
+          const handleButtonClick = (event: React.MouseEvent) => {
+            event.stopPropagation();
+            setIsOpen((prev) => !prev);
+      
+            const rect = event.currentTarget.getBoundingClientRect();
+            setPosition({
+              top: rect.bottom + window.scrollY -15, // Position below button
+              left: rect.left + window.scrollX, // Align with button
+            });
+          };
+      
+          useEffect(() => {
+            const handleClickOutside = (event: MouseEvent) => {
+              if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+              }
+            };
+      
+            document.addEventListener("mousedown", handleClickOutside);
+            return () => document.removeEventListener("mousedown", handleClickOutside);
+          }, []);
+      
+          return (
+            <>
+              <button
+                className="text-blue-600 p-2"
+                onClick={handleButtonClick}
+              >
+                Actions ▾
+              </button>
+      
+              {isOpen &&
+                createPortal(
+                  <div
+                    ref={dropdownRef}
+                    className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
+                    style={{ top: position.top, left: position.left }}
+                  >
+                    {userHasAccess ? (
+                      <>
+                        <button
+                          className="block w-full text-left text-blue-600 py-1 text-sm hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedUser({
+                              company_id: params.data.company_id,
+                              id: params.data.id,
+                              fullname: params.data.fullname,
+                              email: params.data.email,
+                              mobilenumber: params.data.mobilenumber,
+                              createdby: "",
+                              isactive: params.data.isactive,
+                              requestedby: "",
+                              generate_password: "",
+                            });
+                            setIsAccessModalOpen(true);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <UserCheck className="inline mr-2 size-4" /> Access
+                        </button>
+                        <button
+                          className="block w-full text-blue-600 text-sm py-1 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedUser({
+                              company_id: params.data.company_id,
+                              id: params.data.id,
+                              fullname: params.data.fullname,
+                              email: params.data.email,
+                              mobilenumber: params.data.mobilenumber,
+                              createdby: "",
+                              isactive: params.data.isactive,
+                              requestedby: "",
+                              generate_password: "",
+                            });
+                            setIsEditModalOpen(true);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <Edit className="inline mr-2 size-4" /> Edit
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button disabled className="block w-full px-4 py-2 text-gray-400">
+                          <UserCheck className="inline mr-2" /> Access
+                        </button>
+                        <button disabled className="block w-full px-4 py-2 text-gray-400">
+                          <Edit className="inline mr-2" /> Edit
+                        </button>
+                      </>
+                    )}
+                  </div>,
+                  document.body // Render dropdown in body to avoid clipping
+                )}
+            </>
+          );
+        },
+      }
+      
     ],
     []
   );
@@ -386,6 +572,13 @@ export function GetCompanyUsersList({
                   isOpen={isOpen}
                   onClose={() => setIsOpen(false)}
                 />
+                <div>
+          <EditCompanyUserModal
+              isOpen={isEditAccessModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              user={selectedUser}
+            />
+          </div>
               </div>
             ) : (
               <div>
@@ -408,14 +601,16 @@ export function GetCompanyUsersList({
                 defaultColDef={defaultColDef}
                 modules={[AllCommunityModule]}
               />
-              <div></div>
+              
             </div>
             <CompanyUserAccessManagementModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              isOpen={isAccessModalOpen}
+              onClose={() => setIsAccessModalOpen(false)}
               users={selectedUser}
             />
+
           </div>
+          
           <div className="flex items-center justify-end mt-1">
             <Pagination
               totalPages={paginationData.totalPages}

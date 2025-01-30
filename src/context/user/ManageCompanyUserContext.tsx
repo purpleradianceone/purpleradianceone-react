@@ -6,7 +6,7 @@ import React, {
     ReactNode,
     useEffect,
   } from "react";
-import { ManageCompanyProps, ManageCompanyUserContextProps } from "../../@types/ManageCompanyUserContextProps";
+import { ManageCompanyProps, ManageCompanyUserContextProps } from "../../@types/company-users/ManageCompanyUserContextProps";
 // import {LoggedInUserProps, LoggedInUserContextProps } from "../../@types/company-users/LoggedInUserProps";
 
   

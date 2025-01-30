@@ -55,6 +55,7 @@ function CompanyUserAccessManagementModal({
   useEffect(() => {
     if (isOpen) {
       setDataStatus(true);
+      console.log(users)
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: users.id,
