@@ -7,7 +7,7 @@ import { useAccessManagementContext } from "../../../../context/user/AccessManag
 
 const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
 
-
+  // const navigate= useNavigate();
   const {accessModules} = useAccessManagementContext();
   
   return accessModules.map((module) => {
@@ -58,6 +58,8 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
                 icon={Building2} 
                 label="Manage Company Users" 
                 isOpen={isOpen}
+                onClick={() => {window.location.href = "/home/manage-users/users" }}
+
               /></Link>
             )
             }

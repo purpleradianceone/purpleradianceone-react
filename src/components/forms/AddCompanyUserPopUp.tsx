@@ -48,7 +48,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
         if (!emailRegex.test(value)) return 'Invalid email format';
         break;
       case 'mobilenumber':
-        if (value && !mobileRegex.test(value)) return 'Invalid mobile number';
+        if ( value && !mobileRegex.test(value)) return 'Invalid mobile number';
         break;
       default:
         return '';
@@ -157,6 +157,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.mobilenumber}
+              maxLength={15}
             />
             <FormInput
               label="Email : "
