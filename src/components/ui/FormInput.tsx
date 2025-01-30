@@ -31,7 +31,7 @@ const FormInput = ({
   center,
   ref,
   defaultValue,
-  readonly
+  readonly,
   inputMode
 }: FormInputProps) => {
   return (

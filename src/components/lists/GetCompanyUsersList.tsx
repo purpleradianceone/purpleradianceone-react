@@ -4,7 +4,6 @@ import {
   Users,
   CheckCircle2,
   XCircle,
-  Search,
   UserPlus,
   UserCheck,
   Edit,
@@ -227,7 +226,8 @@ export function GetCompanyUsersList({
             if (accessModule.crm_module_id === 2) {
               if (accessModule.view) {
                 return (
-                  <div className="flex justify-center items-center" title="Access">
+                  <div  key={accessModule.id}
+                   className="flex  mt-2" title="Access">
                       <button
                     className="text-blue-600 text-center size-1"
                     onClick={() => {
@@ -277,9 +277,10 @@ export function GetCompanyUsersList({
             if (accessModule.crm_module_id === 1) {
               if (accessModule.view) {
                 return (
-                  <div className="flex justify-center items-center" title="Edit">
+                  <div key={accessModule.id}
+                  className="flex " title="Edit">
                   <button
-                    className="text-blue-600 text-center size-1"
+                    className="text-blue-600 text-center size-1 mt-2"
                     onClick={() => {
                       setSelectedUser({
                         company_id: params.data.company_id,
@@ -335,8 +336,8 @@ export function GetCompanyUsersList({
       
             const rect = event.currentTarget.getBoundingClientRect();
             setPosition({
-              top: rect.bottom + window.scrollY -15, // Position below button
-              left: rect.left + window.scrollX, // Align with button
+              top: rect.bottom + window.scrollY -10, // Position below button
+              left: rect.left + window.scrollX - 25, // Align with button
             });
           };
       
@@ -353,8 +354,9 @@ export function GetCompanyUsersList({
       
           return (
             <>
+            
               <button
-                className="text-blue-600 p-2"
+                className="text-blue-600"
                 onClick={handleButtonClick}
               >
                 Actions ▾
@@ -370,7 +372,7 @@ export function GetCompanyUsersList({
                     {userHasAccess ? (
                       <>
                         <button
-                          className="block w-full text-left text-blue-600 py-1 text-sm hover:bg-gray-100"
+                          className="block w-full text-blue-600 p-2 text-left text-sm hover:bg-gray-100"
                           onClick={() => {
                             setSelectedUser({
                               company_id: params.data.company_id,
@@ -390,7 +392,7 @@ export function GetCompanyUsersList({
                           <UserCheck className="inline mr-2 size-4" /> Access
                         </button>
                         <button
-                          className="block w-full text-blue-600 text-sm py-1 text-left hover:bg-gray-100"
+                          className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
                           onClick={() => {
                             setSelectedUser({
                               company_id: params.data.company_id,
@@ -444,7 +446,8 @@ export function GetCompanyUsersList({
   return accessModules.map((accessModule) => {
     if (accessModule.crm_module_id === 1) {
       return (
-        <div className="w-full pt-2 pl-5 pr-1 gap-1">
+        <div key={accessModule.id}
+        className="w-full pt-2 pl-5 pr-1 gap-1">
           <div className="sticky z-10 top-16 p-1.5 flex items-center  bg-gray-50 rounded-lg shadow-sm justify-between mb-1.5 w-full">
             <div className="flex items-center gap-2">
               <Users className="w-6 h-6 text-blue-600" />
@@ -575,7 +578,9 @@ export function GetCompanyUsersList({
                 <div>
           <EditCompanyUserModal
               isOpen={isEditAccessModalOpen}
-              onClose={() => setIsEditModalOpen(false)}
+              onClose={() => {
+                window.location.href = "/home/manage-users/users";
+                setIsEditModalOpen(false)}}
               user={selectedUser}
             />
           </div>

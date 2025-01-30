@@ -14,7 +14,8 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
 
 
     return(
-      <aside className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
+      <aside key={module.id}
+       className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
           ${isOpen ? 'w-64' : 'w-20'}`}
         >
           <div className="flex items-center border-b justify-between px-4 h-16">

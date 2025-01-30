@@ -182,6 +182,7 @@ function GetCompanyUsers() {
         if (module.crm_module_id === 1 && module.view) {
           return (
             <GetCompanyUsersList
+            key = {module.id}
               onSubmitButtonDateRangePickerClick={
                 onSubmitButtonDateRangePickerClick
               }
@@ -194,7 +195,6 @@ function GetCompanyUsers() {
                 handleSearchPageCriteriaIdChange:
                   handleSearchPageCriteriaIdChange,
               }}
-              key={module.id} // Ensure to add a unique key for each module
               paginationData={{
                 selectedPageSize: handlePageSizeChange,
                 currentPage: currentPage,
