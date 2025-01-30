@@ -14,6 +14,5 @@ export type AccessManagementProps = {
 export type AccessManagementContextProps = {
     accessModules :AccessManagementProps[] ;
     setAccessModules : (loginStatusState: AccessManagementProps[]) => void;
-
 };
 

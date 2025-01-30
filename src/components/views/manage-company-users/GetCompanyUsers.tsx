@@ -6,6 +6,8 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import {isTokenExpired} from "../../../config/validations/JwtTokenExpirationValidation";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+
+
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
@@ -20,21 +22,85 @@ function GetCompanyUsers() {
           setPageSize(size);
           setCurrentPage(1); // Reset to page 1 when page size changes
   };
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages,setTotalPages] = useState<number>(0);
+  const [dateRangeId, setDateRangeId]= useState(0);
+  const [searchParameter, setSearchParameter]=useState("");
+  const [criteriaId, setCriteriaId]= useState(0);
+
+  const [startDate,setStartDate]=useState("");
+  const [endDate,setEndDate]=useState("");
+  const [concatDate,setConcatDate]=useState("");
+  const [radioButtonClicked, setRadioButtonClicked]= useState<"Column"|"Date">();
+
+  const handleStartDateChange=(startDate:Date)=>{
+    const day = startDate.getDate().toString().padStart(2, "0");
+    const month = startDate.toLocaleString("en-US", { month: "long" });
+    const year = startDate.getFullYear();
+    // setStartDate(startDate.toLocaleDateString())
+    setStartDate(`${day}-${month}-${year}`)
+  }
+
+  const handleEndDateChange=(endDate:Date)=>{
+    // setEndDate(endDate.toLocaleDateString())
+    const day = endDate.getDate().toString().padStart(2, "0");
+    const month = endDate.toLocaleString("en-US", { month: "long" });
+    const year = endDate.getFullYear();
+    // setStartDate(startDate.toLocaleDateString())
+    setEndDate(`${day}-${month}-${year}`)
+  }
+
+  const onSubmitButtonDateRangePickerClick=()=>{
+    setConcatDate(startDate+"@"+endDate)
+    console.log(concatDate);
+    
+  }
+
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
+  
+  const handleDatePageIdChange=(dateRangeId?: number )=>{
+    setDateRangeId(dateRangeId || 0)
+  }
 
+  const handleSearchPageCriteriaIdChange=(criteriaId?:number)=>{
+    setCriteriaId(criteriaId || 0) ;
+  }
+
+  const handleSearchParameterChange=(inputSearchParam?:string)=>{
+    setSearchParameter(inputSearchParam || "") ;
+  }
   const getTotalPageNumberAsPerPageSize = (count : number) => {
       return Math.ceil(count / pageSize);
   }
-  useEffect(() => {
 
+  const handleRadioButtonClick=(radioButtonValue:string)=>{
+    if(radioButtonValue==="Column"){
+      setRadioButtonClicked(radioButtonValue)
+    }else if(radioButtonValue==="Date"){
+      setRadioButtonClicked(radioButtonValue)
+    }
+  }
+
+  // to go to forst page of ag-grid
+  useEffect(()=>{
+    setCurrentPage(1);
+  },[criteriaId,dateRangeId,concatDate])
+
+
+  useEffect(()=>{
+    if(radioButtonClicked==="Column"){
+      setDateRangeId(0);
+    }else{
+      setCriteriaId(0);
+    }
+  },[radioButtonClicked])
+
+  useEffect(() => {
     if(isTokenExpired(loginStatus.token)){
       window.location.href = '/signin';
       setLoginStatus({
@@ -51,6 +117,7 @@ function GetCompanyUsers() {
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: loginStatus.userId,
+        requestedby:loginStatus.userId
       };
 
       axios.defaults.headers.common["Authorization"] =
@@ -73,20 +140,25 @@ function GetCompanyUsers() {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.userId,
       limit: pageSize,
+      search_company_specific_date_range_id: dateRangeId  ,
+      search_parameter:searchParameter || concatDate ==="@" ?  searchParameter:  concatDate.charAt(concatDate.length-1)==="@"? searchParameter : concatDate,
+      search_company_specific_criteria_id:criteriaId,
       offset: (currentPage*pageSize)-pageSize,
     };
     axios
       .post("/api/main/purple-crm-api/getcompanyuser", postData)
       .then((response) => {
+
         setCompanyUsers(response.data);
         setTotalPages(Number(getTotalPageNumberAsPerPageSize(response.data[0].count)));
+        console.log(response.data);
         
       })
       .catch((error) => {
         console.log(error);
       });
     }
-  }, [pageSize,currentPage]);
+  }, [criteriaId,pageSize,currentPage,dateRangeId, searchParameter ,concatDate  ]);
 
   
   useEffect(() => {
@@ -101,6 +173,15 @@ function GetCompanyUsers() {
       if (module.crm_module_id === 1 && module.view) {
         return (
           <GetCompanyUsersList
+          onSubmitButtonDateRangePickerClick={onSubmitButtonDateRangePickerClick}
+          onRadioButtonClick={handleRadioButtonClick}
+          onEndDateChange={handleEndDateChange}
+          onStartDateChange={handleStartDateChange}
+          handleSearchOption={{
+            handleSearchParameterChange:handleSearchParameterChange,
+            handleDateIdChange :handleDatePageIdChange,
+            handleSearchPageCriteriaIdChange: handleSearchPageCriteriaIdChange
+          }}
             key={module.id} // Ensure to add a unique key for each module
             paginationData={{
               selectedPageSize: handlePageSizeChange,
