@@ -7,7 +7,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 const Navbar = ({children} : {children : React.ReactNode}) => {
   const [isOpen, setIsOpen] = useState<boolean>();
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
   const Navigate = useNavigate();

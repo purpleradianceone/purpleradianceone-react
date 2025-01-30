@@ -36,8 +36,8 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
   });
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const mobileRegex = /^[6-9]\d{9}$/;
-
+  // const mobileRegex = /^[6-9]\d{9}$/;
+  const mobileRegex = /^[0-9]{10,15}$/;
   const validateField = (name: keyof FormData, value: string): string => {
     switch (name) {
       case 'fullName':
@@ -48,7 +48,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
         if (!emailRegex.test(value)) return 'Invalid email format';
         break;
       case 'mobilenumber':
-        if (value && !mobileRegex.test(value)) return 'Invalid mobile number';
+        if ( value && !mobileRegex.test(value)) return 'Invalid mobile number';
         break;
       default:
         return '';
@@ -157,6 +157,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.mobilenumber}
+              maxLength={15}
             />
             <FormInput
               label="Email : "

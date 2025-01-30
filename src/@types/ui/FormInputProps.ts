@@ -14,16 +14,17 @@ type FormInputProps = {
     onChange? : (event: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur? : (event : React.FocusEvent<HTMLInputElement>) => void;
     error?:string;
-    readonly? : boolean
-    maxLength? :number 
-    minLength? :number 
+    readonly? : boolean,
+    maxLength? :number ,
+    minLength? :number ,
     size?:number | undefined,
     // required?: boolean | undefined,
-    defaultValue?: string | number | readonly string[] | undefined
+    defaultValue?: string | number | readonly string[] | undefined,
     pattern? : string, 
     className?: string,
-    center? : boolean
-    ref?:React.LegacyRef<HTMLInputElement> | undefined
+    center? : boolean,
+    ref?:React.LegacyRef<HTMLInputElement> | undefined,
+    inputMode?:"search" | "email" | "tel" | "text" | "url" | "none" | "numeric" | "decimal" | undefined,
   }
 
   /**

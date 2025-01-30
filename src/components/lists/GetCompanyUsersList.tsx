@@ -1,3 +1,4 @@
+
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
   Users,
@@ -9,6 +10,7 @@ import {
   Edit,
   
 } from "lucide-react";
+
 import companyUsersProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -24,35 +26,40 @@ import DropDownOption from "../../@types/ag-grid/SearchDropDownOptionProps";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
 import { createPortal } from "react-dom";
-
-// type DropDownOption = {
-//   id?:number,
-//   criteria?: string;
-//   company_id?: number;
-//   search_pages_criteria_id?: number;
-//   search_date_range_id?: number;
-//   createdby?: number;
-//   updatedby?: number;
-//   createdon?: string;
-//   updatedon?: string;
-//   date_range?: string;
-// };
+import HandleSearchOptionProps from "../../@types/HandleSearchOptionProps";
+import { DateRangePicker } from "../DateRangePicker";
 
 export function GetCompanyUsersList({
   users,
   paginationData,
+  handleSearchOption,
+  onStartDateChange, 
+  onEndDateChange ,
+  onRadioButtonClick,
+  onSubmitButtonDateRangePickerClick
 }: {
   users: companyUsersProps[];
   paginationData: PaginationDataProps;
+  handleSearchOption: HandleSearchOptionProps;
+  onStartDateChange: (date: Date) => void;
+  onEndDateChange: (date: Date) => void;
+  onRadioButtonClick:(radioValue:string)=>void;
+  onSubmitButtonDateRangePickerClick:()=>void;
 }) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
   const [isEditAccessModalOpen,setIsEditModalOpen]= useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { accessModules } = useAccessManagementContext();
+  const [isSearchBoxVisible, setIsSearchBoxVisible] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string>("");
+  const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =useState<boolean>(false);
+  // const [radioButton, setRadioButton]= useState("")
+  
+  
+
   const [dropdownOptions, setDropdownOptions] = useState<DropDownOption[]>([
     {
-      id:0,
+      id: 0,
       criteria: "",
       company_id: 0,
       search_pages_criteria_id: 0,
@@ -127,6 +134,22 @@ export function GetCompanyUsersList({
     requestedby: "",
     generate_password: "",
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // const handleOptionChange = (selectedValue:any) => {
+  //   const selectedOption = dropdownOptions.find(
+  //     (option) => option.criteria === selectedValue || option.date_range === selectedValue
+  //   );
+
+  //   if (selectedOption) {
+  //     if (selectedOption.search_date_range_id) {
+  //       handleSearchOption.handleDateIdChange(selectedOption.search_date_range_id);
+  //     }
+  //     if (selectedOption.search_pages_criteria_id) {
+  //       handleSearchOption.handleSearchPageCriteriaIdChange(selectedOption.search_pages_criteria_id);
+  //     }
+  //   }
+  // };
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -412,9 +435,6 @@ export function GetCompanyUsersList({
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
-      // floatingFilter:true,
-      // resizable: true,
-      // suppressSizeToFit: true
       minWidth: 150,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
@@ -424,80 +444,34 @@ export function GetCompanyUsersList({
   return accessModules.map((accessModule) => {
     if (accessModule.crm_module_id === 1) {
       return (
-        <div className="w-full pt-2 px-6 gap-1">
-          <div className="sticky z-10 top-16 p-4 flex items-center  bg-gray-50 rounded-lg shadow-sm justify-between mb-4 w-full">
+        <div className="w-full pt-2 pl-5 pr-1 gap-1">
+          <div className="sticky z-10 top-16 p-1.5 flex items-center  bg-gray-50 rounded-lg shadow-sm justify-between mb-1.5 w-full">
             <div className="flex items-center gap-2">
               <Users className="w-6 h-6 text-blue-600" />
               <span className="text-1xl font-bold">Company Members</span>
             </div>
-            {/*  */}
-            {/* 
-             <div className="flex-1 flex items-center gap-2 ml-4">
-              <div className="flex items-center gap-4">
-                <span className="text-gray-600 whitespace-nowrap">Search By :</span>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    checked={searchBy === 'column'}
-                    onChange={() => setSearchBy('column')}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span>Column</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    checked={searchBy === 'date'}
-                    onChange={() => setSearchBy('date')}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span>Date</span>
-                </label>
-              </div>
 
-              <div className="flex-1 relative">
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-auto flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <span className="text-gray-700">
-                    {selectedOption || `Select ${searchBy === 'column' ? 'a column' : 'a date'}`}
-                  </span>
-                  <ChevronDown size={20} className="text-gray-400" />
-                </button>
-                
-                {isDropdownOpen && (
-                  <div className="absolute z-10 w-40 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {dropdownOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setSelectedOption(option.label);
-                          setIsDropdownOpen(false);
-                        }}
-                        className="w-full  text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div> */}
-
-            {/*  */}
-
-            {/* new code */}
             <div className="flex-1 flex items-center gap-2 ml-4 w-auto">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600 whitespace-nowrap">Search By :</span>
+              <div className="flex items-center gap-2 text-gray-900">
+                <span className="text-gray-600 whitespace-nowrap">
+                  Search By :
+                </span>
                 <label>
                   <input
                     type="radio"
                     name="Column"
                     value="Column"
                     checked={selectedOption === "Column"}
-                    onChange={(e) => setSelectedOption(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedOption(e.target.value);
+                    }}
+                    onClick={() => {
+                      setIsSearchBoxVisible(true);
+                      setIsCustomDateOptionSelected(false);
+                      // setRadioButton("Column")
+                      onRadioButtonClick("Column")
+                    }}
+
                   />
                   Column
                 </label>
@@ -507,7 +481,14 @@ export function GetCompanyUsersList({
                     name="Date"
                     value="Date"
                     checked={selectedOption === "Date"}
-                    onChange={(e) => setSelectedOption(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedOption(e.target.value);
+                    }}
+                    onClick={() => {
+                      setIsSearchBoxVisible(false);
+                    //  setRadioButton("Date")
+                     onRadioButtonClick("Date")
+                    }}
                   />
                   Date
                 </label>
@@ -515,39 +496,71 @@ export function GetCompanyUsersList({
 
               <div className="mt-1">
                 <select
-                  className="border p-1 pl-3 pb-1 rounded-md w-full min-w-24"
+                  className="border p-1 pl-3 pb-1  rounded-md w-full min-w-24"
                   disabled={dropdownOptions.length === 0}
+                  onChange={(e) => {
+                    dropdownOptions.map((option) => {
+                      if (option.date_range === e.target.value) {
+                        if (e.target.value === "Custom") {
+                          setIsCustomDateOptionSelected(true);
+                        }
+                        if (e.target.value !== "Custom") {
+                          setIsCustomDateOptionSelected(false);
+                        }
+                        handleSearchOption.handleDateIdChange(
+                          option.search_date_range_id
+                        );
+                      }
+                      if (option.criteria === e.target.value) {
+                        handleSearchOption.handleSearchPageCriteriaIdChange(
+                          option.search_pages_criteria_id
+                        );
+                      }
+                    });
+                    // handleOptionChange(e.target.value)
+                  }}
                 >
+                  <option value=""> Select Option</option>
                   {dropdownOptions.map((item) => (
-                    <option key={item.id} value={item.criteria} className="text-gray-800">
-                      {item.criteria}
-                      {item.date_range}
+                    <option
+                      key={item.id}
+                      value={item.criteria || item.date_range}
+                      className="text-gray-800"
+                    >
+                      {item.criteria || item.date_range}
                     </option>
                   ))}
-                 
                 </select>
               </div>
             </div>
             {/* new end */}
 
-
             {/* search bar main div */}
-            <div className="relative w-60 mr-4">
-              <input
-                type="search"
-                className="w-full h-10 pl-10 pr-12 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                placeholder="Search..."
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <Search className="w-4 h-4 text-gray-400" />
+            {isSearchBoxVisible && (
+              <div className="relative w-60 mr-4">
+                <input
+                  type="search"
+                  className="w-full h-10 pl-2 pr-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="Search..."
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                />
               </div>
-              {/* <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-1 text-sm text-white bg-blue-600 rounded-r-lg hover:bg-blue-700 focus:outline-none"
-              >
-                Search
-              </button> */}
-            </div>
+            )}
+
+            {isCustomDateOptionSelected && (
+              <>
+                <DateRangePicker
+                onSubmitButtonClick={onSubmitButtonDateRangePickerClick}
+                onStartDateChange={onStartDateChange}
+                onEndDateChange={onEndDateChange}
+              />
+                
+              </>
+            )}
 
             {accessModule.add ? (
               <div>
@@ -580,7 +593,7 @@ export function GetCompanyUsersList({
           <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
             <div
               className="ag-theme-alpine w-full"
-              style={{ height: "400px", width: "100%" }}
+              style={{ height: "460px", width: "100%" }}
             >
               <AgGridReact
                 rowData={users}
