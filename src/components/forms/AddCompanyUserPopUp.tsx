@@ -36,8 +36,8 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
   });
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const mobileRegex = /^[6-9]\d{9}$/;
-
+  // const mobileRegex = /^[6-9]\d{9}$/;
+  const mobileRegex = /^[0-9]{10,15}$/;
   const validateField = (name: keyof FormData, value: string): string => {
     switch (name) {
       case 'fullName':
