@@ -6,24 +6,17 @@ import Button from '../ui/Button';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import MessageSnackBar from '../ui/MessageSnackbar';
+import User from '../../@types/company-users/User';
+
 
 type EditUserPopupProps = {
   isOpen: boolean;
   onClose: () => void;
-  user : {
-    company_id: number,
-    id : number,
-    fullname: string,
-    email: string,
-    mobilenumber: string,
-    createdby: string,
-    isactive: boolean,
-    requestedby: string,
-    generate_password: string,
-  }
+  user : User
+  handleCompanyUserChange : (users: User) => void;
 };
 
-export function EditCompanyUserModal({ isOpen, onClose,user }: EditUserPopupProps) {
+export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserChange }: EditUserPopupProps) {
 
   const [updateUserformData,setUpdateUserFormData] = useState({
     fullName: "",
@@ -48,8 +41,9 @@ export function EditCompanyUserModal({ isOpen, onClose,user }: EditUserPopupProp
       updatedby : loginStatus.userId,
       company_id : loginStatus.companyId,
       fullname : updateUserformData.fullName,
-      mobilenumber : updateUserformData.mobilenumber
+      mobilenumber : updateUserformData.mobilenumber,
     }
+    console.log(updateUserformData)
 
     axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
@@ -57,6 +51,7 @@ export function EditCompanyUserModal({ isOpen, onClose,user }: EditUserPopupProp
         .then(response => {
           console.log(response.data);
           showSnackbar(response.data.message,"success")
+          handleCompanyUserChange(user);
 
         })
         .catch(error => {
@@ -109,6 +104,7 @@ export function EditCompanyUserModal({ isOpen, onClose,user }: EditUserPopupProp
               name="mobilenumber"
               placeholder="Enter Mobile Number"
               defaultValue={user.mobilenumber} 
+              onChange={handleEditUserFormChange}
             />
             <FormInput
               label="Email : "
