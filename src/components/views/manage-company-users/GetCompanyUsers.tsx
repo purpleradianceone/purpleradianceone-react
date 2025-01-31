@@ -27,7 +27,9 @@ function GetCompanyUsers() {
   const [dateRangeId, setDateRangeId] = useState(0);
   const [searchParameter, setSearchParameter] = useState("");
   const [criteriaId, setCriteriaId] = useState(0);
+
   const [userUpdateCount,setUserUpdateCount] = useState(0);
+
 
   // const [isStartDateEmpty, setIsStartDateEmpty]= useState(false);
 
@@ -61,6 +63,10 @@ function GetCompanyUsers() {
   
     // setStartDate(startDate.toLocaleDateString())
    
+   if(startDate.toLocaleDateString().toString()==="Invalid Date"){
+    setStartDate("");
+    return;
+   } 
     if(startDate.toLocaleDateString().toString().length<1 || startDate.toLocaleDateString().toString()==="Invalid Date"){
       setStartDate(getDefaultStartDateOfYear());
     }else{
@@ -70,10 +76,14 @@ function GetCompanyUsers() {
 
       setStartDate(`${day}-${month}-${year}`);
     }
-   
   };
 
   const handleEndDateChange = (endDate: Date) => {
+    if(endDate.toLocaleDateString().toString()==="Invalid Date"){
+      setEndDate("");
+      return;
+     } 
+   
     if(endDate.toLocaleDateString().toString().length<1   || endDate.toLocaleDateString().toString()==="Invalid Date"){
       setEndDate(getCurrentDate());
     }else{
@@ -88,12 +98,13 @@ function GetCompanyUsers() {
     
   };
 
-  // const onSubmitButtonDateRangePickerClick = () => {
-   
-  // };
-
   useEffect(()=>{
-    if(startDate==""  && endDate.length>1 ){
+    if(endDate.toString()==="" && startDate.toString()===""){
+      setConcatDate("")
+      return
+    }
+   
+     if(startDate==""  && endDate.length>1 ){
       setConcatDate(getDefaultStartDateOfYear() +'@'+ endDate)
 
     }else if(startDate.length>1 && endDate==""){
@@ -104,6 +115,8 @@ function GetCompanyUsers() {
     console.log(concatDate);
   },[startDate,endDate])
 
+
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -111,6 +124,9 @@ function GetCompanyUsers() {
   };
 
   const handleDatePageIdChange = (dateRangeId?: number) => {
+    if (dateRangeId !==8) {
+      setSearchParameter("")
+    }
     setDateRangeId(dateRangeId || 0);
   };
 
@@ -136,7 +152,7 @@ function GetCompanyUsers() {
   // to go to first page of ag-grid
   useEffect(() => {
     setCurrentPage(1);
-  }, [criteriaId, dateRangeId, concatDate]);
+  }, [criteriaId, dateRangeId, concatDate,searchParameter]);
 
   useEffect(() => {
     if (radioButtonClicked === "Column") {
@@ -144,6 +160,7 @@ function GetCompanyUsers() {
       setConcatDate("");
      
     } else {
+      
       setCriteriaId(0);
     }
   }, [radioButtonClicked]);
@@ -185,7 +202,7 @@ function GetCompanyUsers() {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
       
-      if((dateRangeId ==8 && searchParameter == "") && (concatDate=="@")){
+      if((dateRangeId ==8 && searchParameter == "" && concatDate.length<11 )){
        const postData = {
           company_id: loginStatus.companyId,
           requestedby: loginStatus.userId,
@@ -214,6 +231,8 @@ function GetCompanyUsers() {
           console.log(concatDate);
         });
       }else {
+
+        
         const postData = {
           company_id: loginStatus.companyId,
           requestedby: loginStatus.userId,

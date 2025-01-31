@@ -1,6 +1,7 @@
 import  { useEffect } from "react";
 import { CheckCircle, XCircle, X } from "lucide-react";
 import MessageSnackbarProps from "../../@types/ui/MessageSnackbarProps";
+import { COLORS } from "../../constants/constant";
 
 function MessageSnackBar(props: MessageSnackbarProps) {
   useEffect(() => {
@@ -21,8 +22,8 @@ function MessageSnackBar(props: MessageSnackbarProps) {
       <div
         className={`flex items-center gap-2 rounded-lg px-2 py-2 shadow-lg ${
           props.type === "success"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
+            ? `bg-green-100  ${COLORS.PRIMARY_SNACKBAR_TEXT_GREEN_COLOR}`
+            :`bg-red-100 ${COLORS.PRIMARY_SNACKBAR_TEXT_RED_COLOR}`
         }`}
       >
         {props.type === "success" ? (
