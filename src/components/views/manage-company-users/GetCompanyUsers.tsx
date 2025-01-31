@@ -6,6 +6,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import { isTokenExpired } from "../../../config/validations/JwtTokenExpirationValidation";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+import User from "../../../@types/company-users/User";
 
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
@@ -26,7 +27,7 @@ function GetCompanyUsers() {
   const [dateRangeId, setDateRangeId] = useState(0);
   const [searchParameter, setSearchParameter] = useState("");
   const [criteriaId, setCriteriaId] = useState(0);
-
+  const [userUpdateCount,setUserUpdateCount] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [concatDate, setConcatDate] = useState("");
@@ -167,7 +168,18 @@ function GetCompanyUsers() {
     dateRangeId,
     searchParameter,
     concatDate,
+    userUpdateCount
   ]);
+
+  const handleCompanyUserChangeOnEdit = (user : User) => {
+    const userMatches = companyUsers.some(
+      (users) => users.id === user.id && users.company_id === user.company_id
+    );
+    if (userMatches) {
+      setUserUpdateCount(userUpdateCount+1);
+    }
+        
+  } 
 
   useEffect(() => {
     const hasAccess = accessModules.some(
@@ -182,6 +194,7 @@ function GetCompanyUsers() {
         if (module.crm_module_id === 1 && module.view) {
           return (
             <GetCompanyUsersList
+            handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
             key = {module.id}
               onSubmitButtonDateRangePickerClick={
                 onSubmitButtonDateRangePickerClick

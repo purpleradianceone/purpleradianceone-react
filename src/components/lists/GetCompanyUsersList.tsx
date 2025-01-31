@@ -27,6 +27,7 @@ import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
 import { createPortal } from "react-dom";
 import HandleSearchOptionProps from "../../@types/HandleSearchOptionProps";
 import { DateRangePicker } from "../DateRangePicker";
+import User from "../../@types/company-users/User";
 
 export function GetCompanyUsersList({
   users,
@@ -35,7 +36,8 @@ export function GetCompanyUsersList({
   onStartDateChange, 
   onEndDateChange ,
   onRadioButtonClick,
-  onSubmitButtonDateRangePickerClick
+  onSubmitButtonDateRangePickerClick,
+  handleCompanyUserChangeOnEdit
 }: {
   users: companyUsersProps[];
   paginationData: PaginationDataProps;
@@ -44,6 +46,8 @@ export function GetCompanyUsersList({
   onEndDateChange: (date: Date) => void;
   onRadioButtonClick:(radioValue:string)=>void;
   onSubmitButtonDateRangePickerClick:()=>void;
+  handleCompanyUserChangeOnEdit:(companyUser:User)=>void
+
 }) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
   const [isEditAccessModalOpen,setIsEditModalOpen]= useState(false);
@@ -577,10 +581,11 @@ export function GetCompanyUsersList({
                 />
                 <div>
           <EditCompanyUserModal
+          handleCompanyUserChange={handleCompanyUserChangeOnEdit}
               isOpen={isEditAccessModalOpen}
               onClose={() => {
-                window.location.href = "/home/manage-users/users";
-                setIsEditModalOpen(false)}}
+                setIsEditModalOpen(false)}
+              }
               user={selectedUser}
             />
           </div>
