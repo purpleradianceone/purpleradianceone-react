@@ -29,8 +29,6 @@ function CompanyUserAccessManagementModal({
 
   const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementProps[]>([]);
   const initialModulesRef = useRef<AccessManagementProps[]>([]);
-  const[accessUpdateCount,setAccessUpdateCount] = useState(0);
-
      const [spinnerAnimation,setSpinnerAnimation] = useState<{
         status: 'idle' | 'loading' | 'success' | 'error';
         message: string;
