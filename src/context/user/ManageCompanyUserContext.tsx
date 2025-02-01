@@ -16,7 +16,7 @@ const ManageCompanyUserContext = createContext<ManageCompanyUserContextProps | u
     children,
   }) => {
     const [companyUserAddedStatus, setcompanyUserAddedStatus] = useState<ManageCompanyProps>(() => {
-      const savedCompanyUserStatus = localStorage.getItem("companyUserAddedStatus");
+      const savedCompanyUserStatus = sessionStorage.getItem("companyUserAddedStatus");
       return savedCompanyUserStatus ? JSON.parse(savedCompanyUserStatus) : {
       message : '',
       status : false,
@@ -24,7 +24,7 @@ const ManageCompanyUserContext = createContext<ManageCompanyUserContextProps | u
     });
   
     useEffect(() => {
-      localStorage.setItem("loginStatus", JSON.stringify(companyUserAddedStatus));
+      sessionStorage.setItem("loginStatus", JSON.stringify(companyUserAddedStatus));
     }, [companyUserAddedStatus]);
   
     return (
