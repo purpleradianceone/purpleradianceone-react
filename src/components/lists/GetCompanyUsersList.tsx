@@ -7,7 +7,6 @@ import {
   UserPlus,
   UserCheck,
   Edit,
-  
 } from "lucide-react";
 
 import companyUsersProps from "../../@types/company-users/CompanyUserProps";
@@ -137,22 +136,6 @@ export function GetCompanyUsersList({
     requestedby: "",
     generate_password: "",
   });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // const handleOptionChange = (selectedValue:any) => {
-  //   const selectedOption = dropdownOptions.find(
-  //     (option) => option.criteria === selectedValue || option.date_range === selectedValue
-  //   );
-
-  //   if (selectedOption) {
-  //     if (selectedOption.search_date_range_id) {
-  //       handleSearchOption.handleDateIdChange(selectedOption.search_date_range_id);
-  //     }
-  //     if (selectedOption.search_pages_criteria_id) {
-  //       handleSearchOption.handleSearchPageCriteriaIdChange(selectedOption.search_pages_criteria_id);
-  //     }
-  //   }
-  // };
 
   const columnDefs = useMemo<ColDef[]>(
     () => [

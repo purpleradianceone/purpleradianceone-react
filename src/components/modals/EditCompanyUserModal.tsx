@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EditIcon, X } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import Button from '../ui/Button';
@@ -19,8 +19,8 @@ type EditUserPopupProps = {
 export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserChange }: EditUserPopupProps) {
 
   const [updateUserformData,setUpdateUserFormData] = useState({
-    fullName: "",
-    mobilenumber : ""
+    fullName: user.fullname,
+    mobilenumber : user.mobilenumber
   })
 
    const [snackbar, setSnackbar] = useState({
@@ -36,28 +36,40 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
   }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const postUpdateUserData = {
-      id : user.id,
-      updatedby : loginStatus.userId,
-      company_id : loginStatus.companyId,
-      fullname : updateUserformData.fullName,
-      mobilenumber : updateUserformData.mobilenumber,
-    }
-    console.log(updateUserformData)
 
-    axios.defaults.headers.common["Authorization"] =
+
+    if(user.fullname !== updateUserformData.fullName 
+      || 
+      user.mobilenumber !== updateUserformData.mobilenumber )
+      {
+      const postUpdateUserData = {
+        id : user.id,
+        updatedby : loginStatus.userId,
+        company_id : loginStatus.companyId,
+        fullname : updateUserformData.fullName,
+        mobilenumber : updateUserformData.mobilenumber,
+      }
+      axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
         axios.post("/api/main/purple-crm-api/update/company/users",postUpdateUserData)
         .then(response => {
-          console.log(response.data);
           showSnackbar(response.data.message,"success")
           handleCompanyUserChange(user);
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+          
 
         })
         .catch(error => {
           console.log(error);
           showSnackbar(error.message,"error")
         })
+    }
+    else{
+      showSnackbar("No changes made","error")
+    }
+    
 
   };
   const showSnackbar = (message: string, type: 'success' | 'error') => {
@@ -68,6 +80,10 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  useEffect(()=>{
+    setSnackbar((prev) => ({ ...prev, open: false }));
+
+  },[isOpen])
   if (!isOpen) return null;
 
   return (

@@ -194,6 +194,10 @@ if(!isOpen) return null;
             message: "",
           });
         }, 1000);
+
+        setTimeout(()=>{
+          onClose();
+        },2000)
       })
       .catch(error => {
         showSnackbar("Something went wrong", "error");
