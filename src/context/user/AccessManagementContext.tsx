@@ -14,7 +14,7 @@ const AccessManagementContext = createContext<AccessManagementContextProps | und
     children,
   }) => {
     const [accessModules, setAccessModules] = useState<AccessManagementProps[]>(() => {
-      const savedAccessModules = localStorage.getItem("AccessManagement");
+      const savedAccessModules = sessionStorage.getItem("AccessManagement");
       return savedAccessModules ? JSON.parse(savedAccessModules) : [{
         add : false,
         company_user_id : 0,
@@ -31,7 +31,7 @@ const AccessManagementContext = createContext<AccessManagementContextProps | und
 
   
     useEffect(() => {
-      localStorage.setItem("AccessManagement", JSON.stringify(accessModules));
+      sessionStorage.setItem("AccessManagement", JSON.stringify(accessModules));
     }, [accessModules]);
   
     return (

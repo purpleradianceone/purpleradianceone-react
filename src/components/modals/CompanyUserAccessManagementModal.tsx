@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Button from "../ui/Button";
 import AccessRightsModalProps from "../../@types/company-users/AccessRightsModalProps";
@@ -26,6 +26,10 @@ function CompanyUserAccessManagementModal({
       message: '',
       type: 'success'
     });
+
+  const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementProps[]>([]);
+  const initialModulesRef = useRef<AccessManagementProps[]>([]);
+  const[accessUpdateCount,setAccessUpdateCount] = useState(0);
 
      const [spinnerAnimation,setSpinnerAnimation] = useState<{
         status: 'idle' | 'loading' | 'success' | 'error';
@@ -55,7 +59,6 @@ function CompanyUserAccessManagementModal({
   useEffect(() => {
     if (isOpen) {
       setDataStatus(true);
-      console.log(users)
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: users.id,
@@ -72,26 +75,39 @@ function CompanyUserAccessManagementModal({
         .then((response) => {
           setModules(response.data);
           setDataStatus(false);
+          initialModulesRef.current = response.data;
+          setChangedAccessModules([]);
         })
         .catch((error) => {
           console.error(error);
         });
     } else {
       setModules([]);
+      setChangedAccessModules([]);
     }
-  }, [isOpen]);
+  }, [isOpen,accessUpdateCount]);
 
   if (!isOpen) return null;
 
-  const handleCheckboxChange = (
-    moduleId: number,
-    field: "add" | "view" | "update"
-  ) => {
-    setModules(
-      modules.map((module) =>
+
+  const handleCheckboxChange = (moduleId: number, field: "add" | "view" | "update") => {
+    setModules((prevModules) => {
+      const updatedModules = prevModules.map((module) =>
         module.id === moduleId ? { ...module, [field]: !module[field] } : module
-      )
-    );
+      );
+      const changedModules = updatedModules.filter((updatedModule) => {
+        const initialModule = initialModulesRef.current.find((m) => m.id === updatedModule.id);
+        return (
+          initialModule &&
+          (initialModule.add !== updatedModule.add ||
+            initialModule.view !== updatedModule.view ||
+            initialModule.update !== updatedModule.update)
+        );
+      });
+
+      setChangedAccessModules(changedModules);
+      return updatedModules;
+    });
   };
 
   const handleColumnSelectAll = (field: "add" | "view" | "update") => {
@@ -114,42 +130,60 @@ function CompanyUserAccessManagementModal({
   };
 
   const handleSaveAccessModule = () => {
-    setSpinnerAnimation({
-      status: "loading",
-      message: "Saving",
-    })
+    if(changedAccessModules.length > 0){
 
-    const saveCrmModuleAccessData = modules.map((module) => ({
-      company_id: loginStatus.companyId,
-      id: module.id,
-      add: module.add,
-      view: module.view,
-      update: module.update,
-      updatedby: loginStatus.userId
-  }));
-  
-  axios.defaults.headers.common["Authorization"] =
-  "Bearer " + loginStatus.token;
-
-  axios.post("/api/main/purple-crm-api/update/crmmodules/access", saveCrmModuleAccessData)
-  .then(response => {
-    showSnackbar(response.data.message,"success")
-    setSpinnerAnimation({
-      status: "success",
-      message: "Saved",
-    })
-
-    setTimeout(()=>{
       setSpinnerAnimation({
-        status: "idle",
-        message: "",
-      });
-    },1000)
-  })
-  .catch(error => {
-      showSnackbar("Something Went Wrong", "error");
-      console.error("Error saving data:", error);
-  });
+        status: "loading",
+        message: "Saving",
+      })
+  
+      const saveCrmModuleAccessData = changedAccessModules.map((module) => ({
+        company_id: loginStatus.companyId,
+        id: module.id,
+        add: module.add,
+        view: module.view,
+        update: module.update,
+        updatedby: loginStatus.userId
+    }));
+    
+    
+    axios.defaults.headers.common["Authorization"] =
+    "Bearer " + loginStatus.token;
+  
+    axios.post("/api/main/purple-crm-api/update/crmmodules/access", saveCrmModuleAccessData)
+    .then(response => {
+      showSnackbar(response.data.message,"success")
+      setSpinnerAnimation({
+        status: "success",
+        message: "Saved",
+      })
+      
+      
+      console.log(modules);
+      setChangedAccessModules([]);
+      setAccessUpdateCount(accessUpdateCount+1);
+      
+      setTimeout(()=>{
+        setSpinnerAnimation({
+          status: "idle",
+          message: "",
+        });
+      },1000)
+    })
+    .catch(error => {
+        showSnackbar("Something Went Wrong", "error");
+        console.error("Error saving data:", error);
+        setSpinnerAnimation({
+          status: "idle",
+          message: "",
+        });
+    });
+
+    }
+    else{
+      showSnackbar("Please select at least one module to save", "error");
+    }
+
     
   }
 
@@ -222,9 +256,11 @@ function CompanyUserAccessManagementModal({
               </thead>
               <tbody>
                 {
-                modules.map((module) => (
+                modules
+                .sort((a, b) => a.id - b.id)
+                .map((module) => (
                   <tr key={module.id} className="border-t">
-                    <td className="py-3">{module.id}</td>
+                    <td className="py-3">{module.crm_module_id}</td>
                     <td className="py-3">{module.module_name}</td>
                     <td className="py-3 text-center">
                       <input

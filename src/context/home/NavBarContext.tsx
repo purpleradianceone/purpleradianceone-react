@@ -14,12 +14,12 @@ export const NavBarContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const storedValue = localStorage.getItem("isLoggedIn");
+    const storedValue = sessionStorage.getItem("isLoggedIn");
     return storedValue === "true" ? true : false;
   });
 
   useEffect(() => {
-    localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
+    sessionStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
   }, [isLoggedIn]);
 
   return (

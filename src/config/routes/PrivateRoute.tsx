@@ -7,7 +7,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const storedLoginStatus = localStorage.getItem("loginStatus");
+  const storedLoginStatus = sessionStorage.getItem("loginStatus");
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
   return isLoggedIn.status ? <>{children}</> : <Navigate to="/signin" />;
