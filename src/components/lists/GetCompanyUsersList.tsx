@@ -36,7 +36,7 @@ export function GetCompanyUsersList({
   onStartDateChange, 
   onEndDateChange ,
   onRadioButtonClick,
-  onSubmitButtonDateRangePickerClick,
+  // onSubmitButtonDateRangePickerClick,
   handleCompanyUserChangeOnEdit
 
 }: {
@@ -46,7 +46,7 @@ export function GetCompanyUsersList({
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   onRadioButtonClick:(radioValue:string)=>void;
-  onSubmitButtonDateRangePickerClick:()=>void;
+  // onSubmitButtonDateRangePickerClick:()=>void;
   handleCompanyUserChangeOnEdit:(companyUser:User)=>void
 }) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
@@ -189,15 +189,12 @@ export function GetCompanyUsersList({
         headerName: "Mobile Number",
         sortable: true,
         filter: true,
-        flex: 0.8,
       },
       {
         field: "isactive",
         headerName: "Status",
         sortable: true,
         filter: true,
-        flex: 0.8,
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
@@ -321,7 +318,6 @@ export function GetCompanyUsersList({
       {
         headerName: "Actions",
         sortable: false,
-        flex: 0.8,
         maxWidth:100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -442,6 +438,7 @@ export function GetCompanyUsersList({
     return {
       filter: "agTextColumnFilter",
       minWidth: 150,
+      flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
     };

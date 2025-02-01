@@ -29,8 +29,6 @@ function CompanyUserAccessManagementModal({
 
   const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementProps[]>([]);
   const initialModulesRef = useRef<AccessManagementProps[]>([]);
-  const[accessUpdateCount,setAccessUpdateCount] = useState(0);
-
      const [spinnerAnimation,setSpinnerAnimation] = useState<{
         status: 'idle' | 'loading' | 'success' | 'error';
         message: string;
@@ -84,42 +82,68 @@ function CompanyUserAccessManagementModal({
     } else {
       setModules([]);
       setChangedAccessModules([]);
+      setSnackbar(prev => ({ ...prev, open: false }));
+
     }
-  }, [isOpen,accessUpdateCount]);
+  }, [isOpen]);
+  
 
-  if (!isOpen) return null;
-
+if(!isOpen) return null;
 
   const handleCheckboxChange = (moduleId: number, field: "add" | "view" | "update") => {
     setModules((prevModules) => {
       const updatedModules = prevModules.map((module) =>
         module.id === moduleId ? { ...module, [field]: !module[field] } : module
       );
-      const changedModules = updatedModules.filter((updatedModule) => {
-        const initialModule = initialModulesRef.current.find((m) => m.id === updatedModule.id);
-        return (
-          initialModule &&
-          (initialModule.add !== updatedModule.add ||
-            initialModule.view !== updatedModule.view ||
-            initialModule.update !== updatedModule.update)
-        );
+  
+      // Find initial state
+      const initialModule = initialModulesRef.current.find((m) => m.id === moduleId);
+      const updatedModule = updatedModules.find((m) => m.id === moduleId);
+  
+      if (!updatedModule || !initialModule) return updatedModules;
+  
+      // Check if the module state is different from its initial state
+      const hasChanged =
+        initialModule.add !== updatedModule.add ||
+        initialModule.view !== updatedModule.view ||
+        initialModule.update !== updatedModule.update;
+  
+      setChangedAccessModules((prevChanges) => {
+        // Remove if unchanged, add if changed
+        const filteredChanges = prevChanges.filter((m) => m.id !== moduleId);
+        return hasChanged ? [...filteredChanges, updatedModule] : filteredChanges;
       });
-
-      setChangedAccessModules(changedModules);
+  
       return updatedModules;
     });
   };
+  
 
   const handleColumnSelectAll = (field: "add" | "view" | "update") => {
-    const isAllChecked = modules.every((module) => module[field]);
-    setModules(
-      modules.map((module) => ({
+    setModules((prevModules) => {
+      const isAllChecked = prevModules.every((module) => module[field]);
+  
+      const updatedModules = prevModules.map((module) => ({
         ...module,
         [field]: !isAllChecked,
-      }))
-    );
+      }));
+  
+      setChangedAccessModules(() => {
+        return updatedModules.filter((updatedModule) => {
+          const initialModule = initialModulesRef.current.find((m) => m.id === updatedModule.id);
+          return (
+            initialModule &&
+            (initialModule.add !== updatedModule.add ||
+              initialModule.view !== updatedModule.view ||
+              initialModule.update !== updatedModule.update)
+          );
+        });
+      });
+  
+      return updatedModules;
+    });
   };
-
+  
 
   const showSnackbar = (message: string, type: 'success' | 'error') => {
     setSnackbar({ open: true, message, type });
@@ -130,62 +154,57 @@ function CompanyUserAccessManagementModal({
   };
 
   const handleSaveAccessModule = () => {
-    if(changedAccessModules.length > 0){
-
-      setSpinnerAnimation({
-        status: "loading",
-        message: "Saving",
-      })
+    if (changedAccessModules.length === 0) {
+      showSnackbar("No changes to save", "error");  // Updated message for clarity
+      return;
+    }
   
-      const saveCrmModuleAccessData = changedAccessModules.map((module) => ({
-        company_id: loginStatus.companyId,
-        id: module.id,
-        add: module.add,
-        view: module.view,
-        update: module.update,
-        updatedby: loginStatus.userId
+    setSpinnerAnimation({
+      status: "loading",
+      message: "Saving...",
+    });
+  
+    const saveCrmModuleAccessData = changedAccessModules.map((module) => ({
+      company_id: loginStatus.companyId,
+      id: module.id,
+      add: module.add,
+      view: module.view,
+      update: module.update,
+      updatedby: loginStatus.userId
     }));
-    
-    
-    axios.defaults.headers.common["Authorization"] =
-    "Bearer " + loginStatus.token;
+  
+    axios.defaults.headers.common["Authorization"] = "Bearer " + loginStatus.token;
   
     axios.post("/api/main/purple-crm-api/update/crmmodules/access", saveCrmModuleAccessData)
-    .then(response => {
-      showSnackbar(response.data.message,"success")
-      setSpinnerAnimation({
-        status: "success",
-        message: "Saved",
-      })
-      
-      
-      console.log(modules);
-      setChangedAccessModules([]);
-      setAccessUpdateCount(accessUpdateCount+1);
-      
-      setTimeout(()=>{
+      .then(response => {
+        showSnackbar(response.data.message, "success");
+  
         setSpinnerAnimation({
-          status: "idle",
-          message: "",
+          status: "success",
+          message: "Saved!",
         });
-      },1000)
-    })
-    .catch(error => {
-        showSnackbar("Something Went Wrong", "error");
+  
+        // Reset tracking of changes
+        setChangedAccessModules([]);
+        initialModulesRef.current = modules;  // Update reference state
+  
+        setTimeout(() => {
+          setSpinnerAnimation({
+            status: "idle",
+            message: "",
+          });
+        }, 1000);
+      })
+      .catch(error => {
+        showSnackbar("Something went wrong", "error");
         console.error("Error saving data:", error);
         setSpinnerAnimation({
           status: "idle",
           message: "",
         });
-    });
-
-    }
-    else{
-      showSnackbar("Please select at least one module to save", "error");
-    }
-
-    
-  }
+      });
+  };
+  
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
@@ -318,6 +337,7 @@ function CompanyUserAccessManagementModal({
         </div>
       );
     }
+
   })
 }
 
