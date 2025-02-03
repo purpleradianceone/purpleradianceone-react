@@ -90,7 +90,7 @@ export const router = createBrowserRouter([
     path: "/home",
     element: (
       <PrivateRoute>
-        <div className="min-h-screen">
+        <div className="min-h-95vh">
           <Navbar>
             <div className="flex items-center justify-center">Home Screen</div>
           </Navbar>

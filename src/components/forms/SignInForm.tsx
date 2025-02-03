@@ -189,6 +189,7 @@ const SignInForm = () => {
                 token: response.data.token,
                 email: response.data.email,
                 fullname:response.data.fullname,
+                companyName:response.data.company_name,
               });
               
               if (response.data.token && response.data.token !== "") {
@@ -239,7 +240,8 @@ const SignInForm = () => {
                 message: "",
                 token: "",
                 email: "",
-                fullname:""
+                fullname:"",
+                companyName:""
               });
             }
           } )

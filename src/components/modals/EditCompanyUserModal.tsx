@@ -29,46 +29,80 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
       type: 'success' as 'success' | 'error',
     });
 
+    const [fulNameErrorMessage,setFullNameErrorMessage] = useState("");
+
   const {loginStatus} = useLoggedInUserContext();
   const handleEditUserFormChange = (event : React.ChangeEvent<HTMLInputElement>) => {
       const {name,value} = event.target;
       setUpdateUserFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   }
+
+  useEffect(()=>{
+    if(isOpen){
+      setFullNameErrorMessage("");
+    }
+  },[isOpen])
+
+  const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {name,value} = event.target;
+
+    if(name==="fullName"){
+      if(!value){
+        setFullNameErrorMessage("Full name is required");
+      }else{
+        setFullNameErrorMessage("")
+      }
+    }
+    if(updateUserformData.fullName === "" && user.fullname === ""){
+      if (event.target.value == "") {
+        setFullNameErrorMessage("Name is required");
+      } else {
+        setFullNameErrorMessage("");
+      }
+    }
+  }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
 
-    if(user.fullname !== updateUserformData.fullName 
-      || 
-      user.mobilenumber !== updateUserformData.mobilenumber )
-      {
-      const postUpdateUserData = {
-        id : user.id,
-        updatedby : loginStatus.userId,
-        company_id : loginStatus.companyId,
-        fullname : updateUserformData.fullName,
-        mobilenumber : updateUserformData.mobilenumber,
+    if( updateUserformData.fullName !== ""){
+      if(user.fullname !== updateUserformData.fullName 
+        || 
+        user.mobilenumber !== updateUserformData.mobilenumber)
+        {
+        const postUpdateUserData = {
+          id : user.id,
+          updatedby : loginStatus.userId,
+          company_id : loginStatus.companyId,
+          fullname : updateUserformData.fullName,
+          mobilenumber : updateUserformData.mobilenumber,
+        }
+        axios.defaults.headers.common["Authorization"] =
+          "Bearer " + loginStatus.token;
+          axios.post("/api/main/purple-crm-api/update/company/users",postUpdateUserData)
+          .then(response => {
+            showSnackbar(response.data.message,"success")
+            handleCompanyUserChange(user);
+            setTimeout(() => {
+              onClose();
+            }, 2000);
+            
+  
+          })
+          .catch(error => {
+            console.log(error);
+            showSnackbar(error.message,"error")
+          })
       }
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + loginStatus.token;
-        axios.post("/api/main/purple-crm-api/update/company/users",postUpdateUserData)
-        .then(response => {
-          showSnackbar(response.data.message,"success")
-          handleCompanyUserChange(user);
-          setTimeout(() => {
-            onClose();
-          }, 2000);
-          
-
-        })
-        .catch(error => {
-          console.log(error);
-          showSnackbar(error.message,"error")
-        })
+      else{
+        showSnackbar("No changes made","error")
+      }
     }
     else{
-      showSnackbar("No changes made","error")
+      showSnackbar("Name is required","error")
+      setFullNameErrorMessage("Name is required");
     }
+    
     
 
   };
@@ -109,10 +143,13 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
               label="Name : "
               type="text"
               name="fullName"
+              value={updateUserformData.fullName}
               placeholder="Enter User Name"
               defaultValue={user.fullname}
               maxLength={256}
               onChange={handleEditUserFormChange}
+              error={fulNameErrorMessage}
+              onBlur={handleInputBlur}
             />
             <FormInput
               label="Mobile Number : "

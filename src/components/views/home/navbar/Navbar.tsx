@@ -61,6 +61,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
     status : false,
     email : "",
     fullname : "",
+     companyName:""
     });
   }
 
@@ -161,11 +162,14 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 <span className="text-xl font-semibold"></span>
               </div>
             </div>
-            <div className="flex justify-between lg:text-xl sm:hidden">
-              <h1>CRM</h1>
+            <div className="flex  ml-4 justify-between text-xl font-bold text-blue-700 cursor-pointer">
+              <Link to="/home">{loginStatus.companyName}</Link>
+                
             </div>
 
+            
             <div className="flex-1 max-w-xl ml-28 hidden lg:block">
+              
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input

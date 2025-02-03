@@ -146,7 +146,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.fullName}
-              maxLength={256}
+              maxLength={100}
             />
             <FormInput
               label="Mobile Number : "
@@ -168,6 +168,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.email}
+              maxLength={256 }
             />
             <Button type="submit">Create Company User</Button>
           </form>
