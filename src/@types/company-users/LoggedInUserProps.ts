@@ -5,6 +5,7 @@ export type LoggedInUserProps = {
     token : string;
     status : boolean;
     email : string;
+    companyName: string ;
     // name : string;
     fullname? :string
 };  

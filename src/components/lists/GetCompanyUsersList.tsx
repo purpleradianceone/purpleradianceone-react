@@ -57,6 +57,13 @@ export function GetCompanyUsersList({
   const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =useState<boolean>(false);
   // const [radioButton, setRadioButton]= useState("")
   
+
+  const userHasAccessToViewAccess = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 2 && accessModule.view
+  );
+  const userHasAccessToUpdateUser = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 1 && accessModule.update
+  );
   
 
   const [dropdownOptions, setDropdownOptions] = useState<DropDownOption[]>([
@@ -159,6 +166,12 @@ export function GetCompanyUsersList({
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
+        // 
+        comparator: (valueA, valueB) => {
+          if (!valueA) return -1;
+          if (!valueB) return 1;
+          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+        },
       },
       {
         field: "email",
@@ -238,7 +251,7 @@ export function GetCompanyUsersList({
               } else {
                 return (
                   <div>
-                    <Button disabled={true}>
+                    <Button className="disabled mt-2" disabled={true}>
                     <UserCheck></UserCheck>
                     </Button>
                   </div>
@@ -259,7 +272,7 @@ export function GetCompanyUsersList({
         cellRenderer: (params: any) => {
           return accessModules.map((accessModule) => {
             if (accessModule.crm_module_id === 1) {
-              if (accessModule.view) {
+              if (accessModule.update) {
                 return (
                   <div key={accessModule.id}
                   className="flex " title="Edit">
@@ -288,7 +301,8 @@ export function GetCompanyUsersList({
               } else {
                 return (
                   <div>
-                    <Button disabled={true}>
+                    <Button className="disabled mt-2"
+                    disabled={true}>
                     <Edit></Edit>
                     </Button>
                   </div>
@@ -309,9 +323,7 @@ export function GetCompanyUsersList({
           const [position, setPosition] = useState({ top: 0, left: 0 });
           const dropdownRef = useRef<HTMLDivElement | null>(null);
       
-          const userHasAccess = accessModules.some(
-            (accessModule) => accessModule.crm_module_id === 2 && accessModule.view
-          );
+          
       
           const handleButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
@@ -352,7 +364,7 @@ export function GetCompanyUsersList({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {userHasAccess ? (
+                    {userHasAccessToViewAccess ? (
                       <>
                         <button
                           className="block w-full text-blue-600 p-2 text-left text-sm hover:bg-gray-100"
@@ -374,7 +386,7 @@ export function GetCompanyUsersList({
                         >
                           <UserCheck className="inline mr-2 size-4" /> Access
                         </button>
-                        <button
+                        {userHasAccessToUpdateUser ? <button
                           className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
                           onClick={() => {
                             setSelectedUser({
@@ -393,16 +405,39 @@ export function GetCompanyUsersList({
                           }}
                         >
                           <Edit className="inline mr-2 size-4" /> Edit
-                        </button>
+                        </button>  : <button disabled className="disabled text-sm p-2 text-left"> 
+                          <Edit className="inline mr-2  size-4" /> Edit
+                        </button>}
+                        
                       </>
                     ) : (
                       <>
-                        <button disabled className="block w-full px-4 py-2 text-gray-400">
-                          <UserCheck className="inline mr-2" /> Access
-                        </button>
-                        <button disabled className="block w-full px-4 py-2 text-gray-400">
-                          <Edit className="inline mr-2" /> Edit
-                        </button>
+                        <Button disabled className="disabled text-sm p-2 text-lef">
+                          <UserCheck className="inline mr-2 size-4" /> Access
+                        </Button>
+                        {userHasAccessToUpdateUser ? <button
+                          className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedUser({
+                              company_id: params.data.company_id,
+                              id: params.data.id,
+                              fullname: params.data.fullname,
+                              email: params.data.email,
+                              mobilenumber: params.data.mobilenumber,
+                              createdby: "",
+                              isactive: params.data.isactive,
+                              requestedby: "",
+                              generate_password: "",
+                            });
+                            setIsEditModalOpen(true);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <Edit className="inline mr-2 size-4" /> Edit
+                        </button>  : <Button disabled className="disabled text-sm p-2 text-left"> 
+                          <Edit className="inline mr-2 size-4" /> Edit
+                        </Button>}
+                        
                       </>
                     )}
                   </div>,
@@ -424,6 +459,7 @@ export function GetCompanyUsersList({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+      
     };
   }, []);
 
