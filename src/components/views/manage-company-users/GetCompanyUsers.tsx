@@ -173,7 +173,9 @@ function GetCompanyUsers() {
         token: "",
         email: "",
         fullname: "",
+
         companyName:""
+
       });
       return;
     }
