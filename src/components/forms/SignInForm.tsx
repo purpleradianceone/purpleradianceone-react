@@ -20,18 +20,13 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
-// import { json } from "stream/consumers";
-
 
 /**
  * 
  * @returns JSX.Element for the login form
  */
 const SignInForm = () => {
-
-
   // const apiUrl=import.meta.env.VITE_API_URL
-
 
   const [spinnerAnimation,setSpinnerAnimation] = useState<{
     status: 'idle' | 'loading' | 'success' | 'error';
@@ -171,18 +166,22 @@ const SignInForm = () => {
       })
       axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       .then(response => {
+        console.log('response of captcha '+ response);
+        
         if(response.data.status){
           const user = {
             email: loginUserCredentials.email,
-            login_password : loginUserCredentials.password
+            password : loginUserCredentials.password
           }
-          axios.post(`/api/authentication/purple-crm-api/authenticate`,user)
+          axios.post(`/api/authentication/purple-crm-api/authenticate`,user ,{withCredentials:true})
 
           // axios.post(`${apiUrl}/api/authentication/purple-crm-api/authenticate`,user)
           .then( response => {
+            console.log(response.data);
+            
             if(response.data.status === true){
               setLoginStatus({
-                userId : response.data.user_id,
+                userId : response.data.id,
                 companyId : response.data.company_id,
                 status: response.data.status,
                 message: response.data.message,
@@ -192,13 +191,14 @@ const SignInForm = () => {
                 companyName:response.data.company_name,
               });
               
-              if (response.data.token && response.data.token !== "") {
-                axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
+              if (response.data) {
+                // axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
                
                 const getCrmModuleAccessData={
                   company_id :response.data.company_id,
-                  company_user_id: response.data.user_id,
-                  requestedby : response.data.user_id
+                  company_user_id: response.data.id,
+                  // id:response.data.id,
+                  requestedby : response.data.id
                 }
             
                 axios.post("/api/main/purple-crm-api/get/crmmodules/access",getCrmModuleAccessData)

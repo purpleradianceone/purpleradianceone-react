@@ -90,7 +90,7 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
   
           })
           .catch(error => {
-            console.log(error);
+    
             showSnackbar(error.message,"error")
           })
       }
@@ -102,9 +102,6 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
       showSnackbar("Name is required","error")
       setFullNameErrorMessage("Name is required");
     }
-    
-    
-
   };
   const showSnackbar = (message: string, type: 'success' | 'error') => {
     setSnackbar({ open: true, message, type });
