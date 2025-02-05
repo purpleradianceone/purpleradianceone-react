@@ -16,7 +16,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AddCompanyUserPopUp } from "../forms/AddCompanyUserPopUp";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
-import Pagination from "./Pagination";
+import Pagination from "../ag-grid/Pagination";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
 import axios from "axios";
@@ -25,8 +25,8 @@ import DropDownOption from "../../@types/ag-grid/SearchDropDownOptionProps";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
 import { createPortal } from "react-dom";
-import HandleSearchOptionProps from "../../@types/HandleSearchOptionProps";
-import { DateRangePicker } from "../DateRangePicker";
+import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
+import { DateRangePicker } from "../ui/DateRangePicker";
 import User from "../../@types/company-users/User";
 
 export function GetCompanyUsersList({
