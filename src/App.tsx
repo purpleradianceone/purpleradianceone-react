@@ -5,11 +5,8 @@
  */
 import { RouterProvider } from "react-router-dom";
 import { router } from "./config/routes/Route";
-import { NavBarContextProvider } from "./context/home/NavBarContext";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
-// import { UserContextProvider } from "./context/user/UserContextProvider";
-// import { ManageCompanyUserContextProvider } from './context/user/ManageCompanyUserContext';
 
 /**
  *
@@ -20,11 +17,7 @@ function App() {
 
     <AccessManagementContextProvider>
     <LoggedInUserContextProvider>
-      {/* <UserContextProvider> */}
-        <NavBarContextProvider>
           <RouterProvider router={router} />
-        </NavBarContextProvider>
-      {/* </UserContextProvider> */}
     </LoggedInUserContextProvider>
     </AccessManagementContextProvider>
   );

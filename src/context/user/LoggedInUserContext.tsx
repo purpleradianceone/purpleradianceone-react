@@ -14,7 +14,7 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
     children,
   }) => {
     const [loginStatus, setLoginStatus] = useState<LoggedInUserProps>(() => {
-      const savedLoginStatus = sessionStorage.getItem("loginStatus");
+      const savedLoginStatus = localStorage.getItem("loginStatus");
       return savedLoginStatus ? JSON.parse(savedLoginStatus) : {
       userId : 0,
       companyId : 0,
@@ -28,7 +28,7 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
     });
   
     useEffect(() => {
-      sessionStorage.setItem("loginStatus", JSON.stringify(loginStatus));
+      localStorage.setItem("loginStatus", JSON.stringify(loginStatus));
     }, [loginStatus]);
   
     return (
