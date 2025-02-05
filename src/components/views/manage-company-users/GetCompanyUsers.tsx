@@ -1,5 +1,4 @@
 
-
 import { useEffect, useState } from "react";
 import companyUsersProps from "../../../@types/company-users/CompanyUserProps";
 import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
@@ -10,25 +9,23 @@ import { useAccessManagementContext } from "../../../context/user/AccessManageme
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import User from "../../../@types/company-users/User";
 import MessageSnackBar from "../../ui/MessageSnackbar";
+import { PAGINATION } from "../../../constants/constant";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
   const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
-  const [pageSize, setPageSize] = useState<number>(15);
+  const [pageSize, setPageSize] = useState<number>(PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const { accessModules } = useAccessManagementContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [dateRangeId, setDateRangeId] = useState(0);
   const [searchParameter, setSearchParameter] = useState("");
-  const [criteriaId, setCriteriaId] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [concatDate, setConcatDate] = useState("");
-  const [radioButtonClicked, setRadioButtonClicked] = useState<"Column" | "Date">();
- 
-
+  
   // Snackbar state
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -82,51 +79,50 @@ function GetCompanyUsers() {
   };
 
   // Date range handlers
-  const handleStartDateChange = (date: Date) => {
+  const handleStartDateChange = (date: Date | null) => {
+    if (!date) {
+      setStartDate("");
+      if (!endDate) {
+        setDateRangeId(0);
+        setConcatDate("");
+      }
+      return;
+    }
     const formattedDate = formatDate(date);
-    setStartDate(formattedDate || getDefaultStartDateOfYear());
+    setStartDate(formattedDate);
+    setDateRangeId(8);
   };
 
-  const handleEndDateChange = (date: Date) => {
+  const handleEndDateChange = (date: Date | null) => {
+    if (!date) {
+      setEndDate("");
+      if (!startDate) {
+        setDateRangeId(0);
+        setConcatDate("");
+      }
+      return;
+    }
     const formattedDate = formatDate(date);
-    setEndDate(formattedDate || getCurrentDate());
+    setEndDate(formattedDate);
+    setDateRangeId(8);
   };
 
   // Search and filter handlers
   const handleDatePageIdChange = (newDateRangeId?: number) => {
-    // Reset page to 1 when date range changes
+    const id = newDateRangeId || 0;
     setCurrentPage(1);
+    setDateRangeId(id);
     
-    if (newDateRangeId !== 8) {
-      setSearchParameter("");
+    if (id !== 8) {
+      setStartDate("");
+      setEndDate("");
+      setConcatDate("");
     }
-    setDateRangeId(newDateRangeId || 0);
   };
-
-  const handleSearchPageCriteriaIdChange = (newCriteriaId?: number) => {
-    // Reset page to 1 when criteria changes
-    setCurrentPage(1);
-    setCriteriaId(newCriteriaId || 0);
-  };
-
-  useEffect(()=>{
-    if(dateRangeId<8 ){
-      setConcatDate("")
-    }
-  },[dateRangeId<8])
 
   const handleSearchParameterChange = (inputSearchParam?: string) => {
-    // Reset page to 1 when search parameter changes
     setCurrentPage(1);
     setSearchParameter(inputSearchParam || "");
-  };
-
-  const handleRadioButtonClick = (radioButtonValue: string) => {
-    if (radioButtonValue === "Column" || radioButtonValue === "Date") {
-      // Reset page to 1 when switching between Column and Date
-      setCurrentPage(1);
-      setRadioButtonClicked(radioButtonValue);
-    }
   };
 
   const handleCompanyUserChangeOnEdit = (user: User) => {
@@ -137,6 +133,33 @@ function GetCompanyUsers() {
       setUserUpdateCount(prev => prev + 1);
     }
   };
+
+  // Update concatenated date string
+  useEffect(() => {
+    if (dateRangeId === 8) {
+      if (!startDate && !endDate) {
+        setConcatDate("");
+        setDateRangeId(0);
+      } else {
+        let effectiveStartDate = startDate;
+        const effectiveEndDate = endDate || getCurrentDate();
+
+        // If only end date is provided, use January 1st of current year
+        if (!startDate && endDate) {
+          effectiveStartDate = getDefaultStartDateOfYear();
+        } else if (!endDate && startDate) {
+          // If only start date is provided, use current date as end date
+          effectiveStartDate = startDate;
+        }
+
+        setConcatDate(`${effectiveStartDate}@${effectiveEndDate}`);
+      }
+    }
+  }, [startDate, endDate, dateRangeId]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, []);
 
   // Fetch data function
   const fetchCompanyUsers = async () => {
@@ -150,24 +173,25 @@ function GetCompanyUsers() {
         token: "",
         email: "",
         fullname: "",
-        companyName : ""
+
+        companyName:""
+
       });
       return;
     }
 
-   
     const offset = (currentPage - 1) * pageSize;
 
-    const shouldSkipSearch = dateRangeId === 8 && !searchParameter && concatDate.length < 11;
-    
+    const effectiveDateRangeId = dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.userId,
       limit: pageSize,
       offset,
-      search_company_specific_date_range_id: shouldSkipSearch ? 0 : dateRangeId,
-      search_parameter: shouldSkipSearch ? "" : (searchParameter || concatDate),
-      search_company_specific_criteria_id: shouldSkipSearch ? 0 : criteriaId,
+      search_company_specific_date_range_id: effectiveDateRangeId,
+      search_parameter: searchParameter,
+      search_parameter_date: concatDate
     };
 
     try {
@@ -179,38 +203,37 @@ function GetCompanyUsers() {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
       handleClose();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      showSnackbar("", 'info');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    } catch (error:any) {
+      // showSnackbar("something went wrong ", 'info');
+      // handleClose();
+      if (error.response) {
+        // Server responded with a status code outside the 2xx range
+        console.error("Response Error:", error.response.data);
+        showSnackbar(
+          `Error: ${error.response.data.message || "Something went wrong"}`,
+          "error"
+        );
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("No Response from Server:", error.request);
+        showSnackbar("No response from server. Please try again later.", "error");
+      } else {
+        // Other unexpected errors
+        console.error("Error:", error.message);
+        showSnackbar("An unexpected error occurred. Please try again.", "error");
+      }
       handleClose();
     } 
   };
 
-  // Effects
   useEffect(() => {
-    if (!startDate && !endDate) {
-      setConcatDate("");
-      return;
-    }
+    const timeoutId = setTimeout(() => {
+      fetchCompanyUsers();
+    }, 100); // Small delay to allow state updates to settle
 
-    const effectiveStartDate = startDate || getDefaultStartDateOfYear();
-    const effectiveEndDate = endDate || getCurrentDate();
-    setConcatDate(`${effectiveStartDate}@${effectiveEndDate}`);
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    if (radioButtonClicked === "Column") {
-      setDateRangeId(0);
-      setConcatDate("");
-    } else {
-      setCriteriaId(0);
-    }
-  }, [radioButtonClicked]);
-
-  useEffect(() => {
-    fetchCompanyUsers();
+    return () => clearTimeout(timeoutId);
   }, [
-    criteriaId,
     pageSize,
     currentPage,
     dateRangeId,
@@ -234,13 +257,11 @@ function GetCompanyUsers() {
             <div key={module.id}>
               <GetCompanyUsersList
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
-                onRadioButtonClick={handleRadioButtonClick}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateIdChange: handleDatePageIdChange,
-                  handleSearchPageCriteriaIdChange,
                 }}
                 paginationData={{
                   selectedPageSize: handlePageSizeChange,
@@ -250,7 +271,6 @@ function GetCompanyUsers() {
                   pageSize,
                 }}
                 users={companyUsers}
-               
               />
               <MessageSnackBar
                 isOpen={snackbar.open}

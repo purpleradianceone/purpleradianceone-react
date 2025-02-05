@@ -1,5 +1,6 @@
 // import { useEffect } from "react";
 import PaginationProps from "../../@types/List/PaginationProps";
+import { PAGINATION } from "../../constants/constant";
 
 const Pagination: React.FC<PaginationProps> = ({
     totalPages,
@@ -11,11 +12,7 @@ const Pagination: React.FC<PaginationProps> = ({
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newSize = Number(e.target.value);
       onPageSizeChange(newSize);
-    };
-
-    // useEffect(()=>{
-    //   onPageSizeChange(sizeArray[0]);
-    // },[])
+    }
   
     const handlePreviousPage = () => {
       if (currentPage > 1) {
@@ -29,7 +26,8 @@ const Pagination: React.FC<PaginationProps> = ({
       }
     };
   
-    const sizeArray=[15,10,5];
+    // const sizeArray=[15,10,5];
+    const sizeArray=PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION;
 
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

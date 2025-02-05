@@ -28,7 +28,7 @@ export function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateR
     return today.toISOString().split('T')[0];
   };
   return (
-    <div className="flex flex-col mr-2 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+    <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
       <div className="relative">
         <label htmlFor="start-date" className="block text-xs font-medium text-gray-700 ">
           Start Date
