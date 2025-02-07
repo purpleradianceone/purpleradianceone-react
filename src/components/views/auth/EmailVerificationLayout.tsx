@@ -1,9 +1,10 @@
 import  { useState } from 'react';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import EmailVerificationProps from '../../../@types/auth/views/EmailVerificationProps';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-
+import POST_API from '../../../constants/PostApi';
+import ROUTES_URL from '../../../constants/Routes';
+import EmailVerificationType from '../../../@types/auth/views/EmailVerificationType';
 
 
 function EmailVerificationLayout() {
@@ -11,7 +12,7 @@ function EmailVerificationLayout() {
   const [searchParams] = useSearchParams();
     const email = searchParams.get('email');
     const verificationCode = searchParams.get('token');
-  const [verificationState, setVerificationState] = useState<EmailVerificationProps>({
+  const [verificationState, setVerificationState] = useState<EmailVerificationType>({
     status: 'idle',
     message: '',
   });
@@ -35,20 +36,20 @@ const decodeBase64 = (encodedString : string) => {
   const handleVerification = () => {
     setVerificationState({ status: 'loading', message: 'Verifying your email...' });
 
-    axios.get("http://localhost:8080/api/authentication/purple-crm-api/emailverfication/verify?token=" + verificationCode)
+    axios.get(POST_API.SIGN_UP_EMAIL_VERIFICATION + verificationCode)
     .then(response => {
       console.log(response);
       
       if (response.data.status === true) {
         setVerificationState({ status: 'success', message: 'Email verified successfully' });
         setTimeout(()=>{
-          window.location.href = "/signin";
+          window.location.href = ROUTES_URL.SIGN_IN;
         },2000)
       }
       else if (response.data.message === "User is already verified. Please log in.") {
         setVerificationState({ status: 'success', message: 'User Already Verified. Please Log in' });
         setTimeout(()=>{
-          window.location.href = "/signin";
+          window.location.href = ROUTES_URL.SIGN_IN;
         },2000)
       }
     })

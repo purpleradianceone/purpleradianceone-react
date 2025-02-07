@@ -6,14 +6,14 @@ import Button from '../ui/Button';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import MessageSnackBar from '../ui/MessageSnackbar';
-import User from '../../@types/company-users/User';
-
+import  POST_API  from "../../constants/PostApi";
+import CompanyUser from '../../@types/company-users/CompanyUser';
 
 type EditUserPopupProps = {
   isOpen: boolean;
   onClose: () => void;
-  user : User
-  handleCompanyUserChange : (users: User) => void;
+  user : CompanyUser
+  handleCompanyUserChange : (users: CompanyUser) => void;
 };
 
 export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserChange }: EditUserPopupProps) {
@@ -72,14 +72,14 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
         {
         const postUpdateUserData = {
           id : user.id,
-          updatedby : loginStatus.userId,
+          updatedby : loginStatus.id,
           company_id : loginStatus.companyId,
           fullname : updateUserformData.fullName,
           mobilenumber : updateUserformData.mobilenumber,
         }
         axios.defaults.headers.common["Authorization"] =
           "Bearer " + loginStatus.token;
-          axios.post("/api/main/purple-crm-api/update/company/users",postUpdateUserData)
+          axios.post(POST_API.UPDATE_COMPANY_USER,postUpdateUserData)
           .then(response => {
             showSnackbar(response.data.message,"success")
             handleCompanyUserChange(user);

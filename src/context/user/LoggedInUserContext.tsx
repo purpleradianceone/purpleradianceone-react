@@ -6,29 +6,32 @@ import React, {
     ReactNode,
     useEffect,
   } from "react";
-import {LoggedInUserProps, LoggedInUserContextProps } from "../../@types/company-users/LoggedInUserProps";
+import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
+import { LoggedInUserContextProps, LoggedInUserType } from "../../@types/company-users/LoggedInUserContextType";
   
 const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(undefined);
   
   export const LoggedInUserContextProvider: React.FC<{ children: ReactNode }> = ({
     children,
   }) => {
-    const [loginStatus, setLoginStatus] = useState<LoggedInUserProps>(() => {
-      const savedLoginStatus = localStorage.getItem("loginStatus");
+    const [loginStatus, setLoginStatus] = useState<LoggedInUserType>(() => {
+      const savedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
       return savedLoginStatus ? JSON.parse(savedLoginStatus) : {
-      userId : 0,
-      companyId : 0,
-      message : '',
-      token : '',
-      status : false,
-      email : '',
-      fullname : '',
-      companyName:"",
-  }
+        companyId : 0,
+        companyName : "",
+        createdOn : "",
+        email : "",
+        fullName : "",
+        id : 0,
+        message : "",
+        mobileNumber : "",
+        status : false,
+        token : "",
+        }
     });
   
     useEffect(() => {
-      localStorage.setItem("loginStatus", JSON.stringify(loginStatus));
+      localStorage.setItem(LOCALSTORAGE_KEYS.LOGIN_STATUS, JSON.stringify(loginStatus));
     }, [loginStatus]);
   
     return (

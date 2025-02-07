@@ -1,4 +1,4 @@
- type companyUsersProps = {
+ type companyUsersSearchProps = {
   fullname: string;
   email: string;
   mobilenumber: string;
@@ -8,4 +8,4 @@
   count? : number
 };
 
-export default companyUsersProps;
+export default companyUsersSearchProps;

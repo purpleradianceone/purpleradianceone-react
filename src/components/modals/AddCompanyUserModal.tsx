@@ -6,28 +6,19 @@ import Button from '../ui/Button';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import MessageSnackBar from '../ui/MessageSnackbar';
+import AddCompanyUserStateType from '../../@types/modal/AddCompanyUserStateType';
+import AddCompanyUserModalProps from '../../@types/modal/AddCompanyUserModalProps';
+import  POST_API  from "../../constants/PostApi";
 
-
-type FormData = {
-  fullName: string;
-  mobilenumber: string;
-  email: string;
-};
-
-type AddUserPopupProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
+function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
-  const [formData, setFormData] = useState<FormData>({
+  const [addCompanyUserFormData, setFormData] = useState<AddCompanyUserStateType>({
     fullName: '',
     mobilenumber: '',
     email: '',
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof AddCompanyUserStateType, string>>>({});
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -38,7 +29,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   // const mobileRegex = /^[6-9]\d{9}$/;
   const mobileRegex = /^[0-9]{10,15}$/;
-  const validateField = (name: keyof FormData, value: string): string => {
+  const validateField = (name: keyof AddCompanyUserStateType, value: string): string => {
     switch (name) {
       case 'fullName':
         if (!value) return 'Name is required';
@@ -57,13 +48,13 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
   };
 
   const handleBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target as { name: keyof FormData; value: string };
+    const { name, value } = event.target as { name: keyof AddCompanyUserStateType; value: string };
     const errorMessage = validateField(name, value);
     setErrors((prev) => ({ ...prev, [name]: errorMessage }));
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target as { name: keyof FormData; value: string };
+    const { name, value } = event.target as { name: keyof AddCompanyUserStateType; value: string };
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' })); // Clear errors on input
   };
@@ -79,9 +70,9 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
-    (Object.keys(formData) as (keyof FormData)[]).forEach((key) => {
-      const error = validateField(key, formData[key]);
+    const newErrors: Partial<Record<keyof AddCompanyUserStateType, string>> = {};
+    (Object.keys(addCompanyUserFormData) as (keyof AddCompanyUserStateType)[]).forEach((key) => {
+      const error = validateField(key, addCompanyUserFormData[key]);
       if (error) newErrors[key] = error;
     });
 
@@ -92,16 +83,19 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
     }
 
     const createCompanyUserData = {
-      fullname: formData.fullName.trim(),
-      mobilenumber: formData.mobilenumber.trim(),
-      email: formData.email.trim(),
-      createdby: loginStatus.userId,
+      fullname: addCompanyUserFormData.fullName.trim(),
+      mobilenumber: addCompanyUserFormData.mobilenumber.trim(),
+      email: addCompanyUserFormData.email.trim(),
+      createdby: loginStatus.id,
       company_id: loginStatus.companyId,
     };
 
     try {
-      const response = await axios.post('/api/main/purple-crm-api/createuser', createCompanyUserData);
+      const response = await axios.post(POST_API.CREATE_USER, createCompanyUserData ,{
+        withCredentials:true,
+      });
       if (response.data.status) {
+        console.log(response.data)
         showSnackbar(response.data.message, 'success');
         setFormData({ fullName: '', mobilenumber: '', email: '' });
         onClose();
@@ -132,7 +126,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
           <div className="flex items-center gap-3 mb-6">
             <UserPlus className="text-blue-500" size={24} />
             <h2 className="text-xl font-semibold text-gray-800">
-              Add New Company User
+              Add New Company CompanyUser
             </h2>
           </div>
 
@@ -142,7 +136,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               type="text"
               name="fullName"
               placeholder="Enter User Name"
-              value={formData.fullName}
+              value={addCompanyUserFormData.fullName}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.fullName}
@@ -153,7 +147,7 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               type="tel"
               name="mobilenumber"
               placeholder="Enter Mobile Number"
-              value={formData.mobilenumber}
+              value={addCompanyUserFormData.mobilenumber}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.mobilenumber}
@@ -164,13 +158,13 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
               type="email"
               name="email"
               placeholder="Enter Email Address"
-              value={formData.email}
+              value={addCompanyUserFormData.email}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.email}
               maxLength={256 }
             />
-            <Button type="submit">Create Company User</Button>
+            <Button type="submit">Create Company CompanyUser</Button>
           </form>
         </div>
       </div>
@@ -184,3 +178,5 @@ export function AddCompanyUserPopUp({ isOpen, onClose }: AddUserPopupProps) {
     </div>
   );
 }
+
+export default AddCompanyUserModal;

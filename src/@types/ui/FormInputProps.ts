@@ -4,9 +4,9 @@
  */
 type FormInputProps = {
     id?:string,
-    label: string;
-    type: string;
-    name: string;
+    label?: string;
+    type?: string;
+    name?: string;
     placeholder?: string;
     required?: boolean;
     value?:string ,

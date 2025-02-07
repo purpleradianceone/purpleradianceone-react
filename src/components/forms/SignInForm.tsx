@@ -20,6 +20,9 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
+import  POST_API  from "../../constants/PostApi";
+import ROUTES_URL from "../../constants/Routes";
+import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 
 /**
  * 
@@ -147,10 +150,10 @@ const SignInForm = () => {
       if (
         loginUserCredentials.email != "" &&
         loginUserCredentials.password != "" &&
-        localStorage.getItem("rememberMe") === "true"
+        localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME) === "true"
       ) {
         localStorage.setItem(
-          "loginUserCredentials",
+          LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
           JSON.stringify(loginUserCredentials)
         );
     }
@@ -159,61 +162,68 @@ const SignInForm = () => {
       const captchaRequest = {
         token : captchaToken
       }
-      // axios.post(`${apiUrl}/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
       setSpinnerAnimation({
         status: "loading",
         message: "Logging In",
       })
-      axios.post(`/api/authentication/purple-crm-api/cpatcha/verify`,captchaRequest)
+      axios.post(POST_API.VERIFIY_CAPTCHA,captchaRequest)
       .then(response => {
-        console.log('response of captcha '+ response);
-        
         if(response.data.status){
           const user = {
             email: loginUserCredentials.email,
             password : loginUserCredentials.password
           }
-          axios.post(`/api/authentication/purple-crm-api/authenticate`,user ,{withCredentials:true})
-
-          // axios.post(`${apiUrl}/api/authentication/purple-crm-api/authenticate`,user)
+          axios.post(POST_API.SIGN_IN,user ,{withCredentials:true})
           .then( response => {
-            console.log(response.data);
             
-            if(response.data.status === true){
+            if(response.data.status){
+
+              
               setLoginStatus({
-                userId : response.data.id,
+                id : response.data.id,
                 companyId : response.data.company_id,
-                status: response.data.status,
-                message: response.data.message,
-                token: response.data.token,
-                email: response.data.email,
-                fullname:response.data.fullname,
-                companyName:response.data.company_name,
+                companyName : response.data.company_name,
+                fullName : response.data.fullName,
+                email : response.data.email,
+                mobileNumber : response.data.mobilenumber,
+                message : response.data.message,
+                token : response.data.token,
+                status : response.data.status,
+                createdOn : response.data.createdon
               });
               
               if (response.data) {
-                // axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
                
                 const getCrmModuleAccessData={
                   company_id :response.data.company_id,
                   company_user_id: response.data.id,
-                  // id:response.data.id,
                   requestedby : response.data.id
                 }
             
-                axios.post("/api/main/purple-crm-api/get/crmmodules/access",getCrmModuleAccessData)
+                axios.post(POST_API.GET_CRM_MODULE_ACCESS,getCrmModuleAccessData)
                 .then(response => 
                 {
-                  setAccessModules(response.data)
+                  setAccessModules(response.data);
+                  
+                  console.log(response.data);
                   setSpinnerAnimation({
                     status: "success",
                     message:"Logged In"
                   })
                   showSnackbar('Login successful!', 'success');
+
                   setTimeout(() => {
-                    navigate("/home");
-                  }, 1000);
+                    try {
+                        console.log("Navigating to home...");
+                        navigate(ROUTES_URL.HOME) // or navigate(ROUTES_URL.HOME);
+                    } catch (error) {
+                        console.error("Error during navigation:", error);
+                    }
+                }, 1000);
+
+
                 }
+
                 )
                 .catch(error => {
                   console.error(error);
@@ -234,14 +244,16 @@ const SignInForm = () => {
                 message :""                 
               })
               setLoginStatus({
-                userId : 0,
                 companyId : 0,
-                status: false,
-                message: "",
-                token: "",
-                email: "",
-                fullname:"",
-                companyName:""
+                companyName : "",
+                createdOn : "",
+                email : "",
+                fullName : "",
+                id : 0,
+                message : "",
+                mobileNumber : "",
+                status : false,
+                token : ""
               });
             }
           } )
@@ -291,9 +303,9 @@ const SignInForm = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.checked) {
-      localStorage.setItem("rememberMe", "true");
+      localStorage.setItem(LOCALSTORAGE_KEYS.REMEMBER_ME, "true");
     } else {
-      localStorage.removeItem("rememberMe");
+      localStorage.removeItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
     }
   };
 
@@ -344,7 +356,7 @@ const SignInForm = () => {
               type="button"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              <Link to= "/forgotpassword">Forgot Password?</Link>
+              <Link to= {ROUTES_URL.FORGOT_PASSWORD}>Forgot Password?</Link>
             </button>
           </div>
             
@@ -366,7 +378,7 @@ const SignInForm = () => {
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                  {/* <Button type="submit">Sign up</Button> */}
-                <Link to="/signup">Sign Up</Link>
+                <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>
             </span>
           </div>

@@ -1,6 +1,7 @@
 // import { useEffect } from "react";
 import PaginationProps from "../../@types/List/PaginationProps";
-import { PAGINATION } from "../../constants/constant";
+import PAGINATION from "../../constants/pagination";
+
 
 const Pagination: React.FC<PaginationProps> = ({
     totalPages,

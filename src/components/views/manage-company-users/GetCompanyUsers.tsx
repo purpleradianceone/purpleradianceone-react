@@ -1,20 +1,22 @@
 
 import { useEffect, useState } from "react";
-import companyUsersProps from "../../../@types/company-users/CompanyUserProps";
-import { GetCompanyUsersList } from "../../lists/GetCompanyUsersList";
+import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import GetCompanyUsersList from "../../lists/GetCompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { isTokenExpired } from "../../../config/validations/JwtTokenExpirationValidation";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-import User from "../../../@types/company-users/User";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { PAGINATION } from "../../../constants/constant";
+import PAGINATION from "../../../constants/pagination";
+import POST_API from "../../../constants/PostApi";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
+
+
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
-  const [companyUsers, setCompanyUsers] = useState<companyUsersProps[]>([]);
-  const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>([]);
+  const { loginStatus } = useLoggedInUserContext();
   const [pageSize, setPageSize] = useState<number>(PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const { accessModules } = useAccessManagementContext();
@@ -24,8 +26,7 @@ function GetCompanyUsers() {
   const [searchParameter, setSearchParameter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [concatDate, setConcatDate] = useState("");
-  
+  const [concatDate, setConcatDate] = useState("");  
   // Snackbar state
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -41,7 +42,7 @@ function GetCompanyUsers() {
     setSnackbar({ open: true, message, type });
   };
 
-  const handleClose = () => {
+  const handleSnackbarClose = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
@@ -125,7 +126,7 @@ function GetCompanyUsers() {
     setSearchParameter(inputSearchParam || "");
   };
 
-  const handleCompanyUserChangeOnEdit = (user: User) => {
+  const handleCompanyUserChangeOnEdit = (user: CompanyUser) => {
     const userMatches = companyUsers.some(
       (users) => users.id === user.id && users.company_id === user.company_id
     );
@@ -163,22 +164,7 @@ function GetCompanyUsers() {
 
   // Fetch data function
   const fetchCompanyUsers = async () => {
-    if (isTokenExpired(loginStatus.token)) {
-      window.location.href = "/signin";
-      setLoginStatus({
-        userId: 0,
-        companyId: 0,
-        status: false,
-        message: "",
-        token: "",
-        email: "",
-        fullname: "",
 
-        companyName:""
-
-      });
-      return;
-    }
 
     const offset = (currentPage - 1) * pageSize;
 
@@ -186,7 +172,7 @@ function GetCompanyUsers() {
 
     const postData = {
       company_id: loginStatus.companyId,
-      requestedby: loginStatus.userId,
+      requestedby: loginStatus.id,
       limit: pageSize,
       offset,
       search_company_specific_date_range_id: effectiveDateRangeId,
@@ -195,20 +181,18 @@ function GetCompanyUsers() {
     };
 
     try {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${loginStatus.token}`;
-      const response = await axios.post("/api/main/purple-crm-api/getcompanyuser", postData);
+      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData);
       
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
-      handleClose();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      handleSnackbarClose();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error:any) {
-      // showSnackbar("something went wrong ", 'info');
-      // handleClose();
+
       if (error.response) {
-        // Server responded with a status code outside the 2xx range
+
         console.error("Response Error:", error.response.data);
         showSnackbar(
           `Error: ${error.response.data.message || "Something went wrong"}`,
@@ -223,7 +207,7 @@ function GetCompanyUsers() {
         console.error("Error:", error.message);
         showSnackbar("An unexpected error occurred. Please try again.", "error");
       }
-      handleClose();
+      handleSnackbarClose();
     } 
   };
 
@@ -233,6 +217,7 @@ function GetCompanyUsers() {
     }, 100); // Small delay to allow state updates to settle
 
     return () => clearTimeout(timeoutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,
     currentPage,
@@ -276,7 +261,7 @@ function GetCompanyUsers() {
                 isOpen={snackbar.open}
                 message={snackbar.message}
                 type={snackbar.type}
-                onClose={handleClose}
+                onClose={handleSnackbarClose}
                 duration={500}
               />
             </div>

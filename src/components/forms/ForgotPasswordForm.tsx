@@ -5,6 +5,9 @@ import { FormEvent, useState } from "react";
 import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
 import axios from "axios";
 import MessageSnackBar from "../ui/MessageSnackbar";
+import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
+import  POST_API  from "../../constants/PostApi";
+import ROUTES_URL from "../../constants/Routes";
 
 /**
  *
@@ -16,13 +19,12 @@ function ForgotPasswordForm() {
    */
   const navigate=useNavigate();
 
-  const [showAnimation, setShowAnimation] = useState(false);
-  const [formState, setFormState] = useState({ email: '' });
-  // const [showAnimation,setShowAnimation] = useState<boolean>(false);
+  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(false);
+  const [forgotPasswordFromState, setforgotPasswordFromState] = useState<{email:string}>({ email: '' });
     /**
      * State is declared for errors
      */
-    const [error, setError] = useState({
+    const [forgotPasswordError, setForgotPasswordError] = useState({
         email: "",
     });
 
@@ -41,7 +43,7 @@ function ForgotPasswordForm() {
         setSnackbar({open:true,message, type})
       }
     
-      const handleClose=()=>{
+      const handleSnackbarClose=()=>{
         setSnackbar(prev=>({...prev , open:false}))
       }
   /**
@@ -54,21 +56,21 @@ function ForgotPasswordForm() {
     return emailRegex.test(email);
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "email") {
       if (!value) {
-        setError((prev) => ({
+        setForgotPasswordError((prev) => ({
           ...prev,
           email: "Email is required",
         }));
       } else if (!validateEmail(value)) {
-        setError((prev) => ({
+        setForgotPasswordError((prev) => ({
           ...prev,
           email: "Invalid email address",
         }));
       } else {
-        setError((prev) => ({
+        setForgotPasswordError((prev) => ({
           ...prev,
           email: "",
         }));
@@ -82,42 +84,50 @@ function ForgotPasswordForm() {
   const handleResetPasswordClick = (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (!formState.email) {
-        setError((prev) => ({
+    if (!forgotPasswordFromState.email) {
+      setForgotPasswordError((prev) => ({
           ...prev,
           "email": "Email Address is required!" ,
         }));
         
-    }else if (!validateEmail(formState.email)){
-        setError((prev) => ({
+    }else if (!validateEmail(forgotPasswordFromState.email)){
+      setForgotPasswordError((prev) => ({
             ...prev,
             email: "Invalid email address",
           }));
     }else{
       const requestData={
-        email:formState.email
+        email:forgotPasswordFromState.email
       }
 
-      axios.post("/api/authentication/purple-crm-api/forgotpassword/otp", requestData)
+      axios.post(POST_API.CHANGE_FORGOT_PASSWORD, requestData)
       .then((response)=>{
         if(response.data[0].status){
-          setShowAnimation(!showAnimation);
-          showSnackbar(response.data[0].message, 'success')
-          localStorage.setItem("forgetPasswordEmail", formState.email);
-          setTimeout(() => {
-           navigate("/createpassword"); 
-          } , 5000);
+          
+          if(response.data.status){
+            setTimeout(() => {
+              navigate(ROUTES_URL.CREATE_PASSWORD); 
+             } , 5000);
+             setShowEmailSentAnimation(!showEmailSentAnimation);
+          showSnackbar(response.data[0].message, "success")
+          localStorage.setItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL, forgotPasswordFromState.email);
+          }
+          else{
+            showSnackbar("Unable to Send Otp ! something went wrong","error")
+          }
+          
+          
         }else{
-          showSnackbar(response.data[0].message,'error')
+          showSnackbar(response.data[0].message,"error")
         }
       })
     }  
   };
 
-    function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    function handleFormDataChange(event: React.ChangeEvent<HTMLInputElement>): void {
        const { name, value } = event.target;
        if (name === "email") {
-        setFormState((prev)=>({
+        setforgotPasswordFromState((prev)=>({
             ...prev, 
             [name]:value
         }))
@@ -133,18 +143,18 @@ function ForgotPasswordForm() {
           type="email"
           name="email"
           placeholder="Enter your Registered Email"
-          onBlur={handleBlur}
-          onChange={handleChange}
-          value={formState.email}
-          error={error.email}
+          onBlur={handleEmailBlur}
+          onChange={handleFormDataChange}
+          value={forgotPasswordFromState.email}
+          error={forgotPasswordError.email}
         />
-        <Link to="/forgotpasswordrequestpage">
+        <Link to={ROUTES_URL.FORGOT_PASSWORD_REQUEST_PAGE}>
           <Button type="submit" onClick={handleResetPasswordClick}>
             Reset Password
           </Button>
         </Link>
       </form>
-      {showAnimation && (
+      {showEmailSentAnimation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg animate-fade-in">
             <h2 className="text-lg font-semibold">Animation in Progress...</h2>
@@ -157,7 +167,7 @@ function ForgotPasswordForm() {
             isOpen={snackbar.open}
             message={snackbar.message}
             type={snackbar.type}
-            onClose={handleClose}
+            onClose={handleSnackbarClose}
             duration={2000}
           /> 
     </>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CredentialSignUp from "../../@types/auth/forms/SignUpFormProps";
+import SignUpFormDataType from "../../@types/auth/forms/SignUpFormDataType";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
 import { Link } from "react-router-dom";
@@ -8,16 +8,17 @@ import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
 import EmailSentAnimation from "../../assets/animations/EmailSentAnimation";
 import MessageSnackBar from "../ui/MessageSnackbar";
-
+import  POST_API  from "../../constants/PostApi";
+import ROUTES_URL from "../../constants/Routes";
 /**
  * created functional components for SignUp Form
  * @returns the xml for signUp form
  */
-const SignUpPage: React.FC = () => {
+const SignUpForm: React.FC = () => {
   /**
    * state is defined for getting values from the input fields.
    */
-  const [SignUpData, setSignUpData] = useState<CredentialSignUp>({
+  const [SignUpFormData, setSignUpFormData] = useState<SignUpFormDataType>({
     name: "",
     mobileNumber: "",
     email: "",
@@ -25,11 +26,10 @@ const SignUpPage: React.FC = () => {
     confirmPassword: "",
   });
 
-  const [showAnimation,setShowAnimation] = useState<boolean>(false);
+  const [showEmailSentAnimation,setShowEmailSentAnimation] = useState<boolean>(false);
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-  const [, setMessage] = useState<string>("");
 
   const onChange = (value: string | null) => {
     setCaptchaToken(value);
@@ -137,7 +137,7 @@ const SignUpPage: React.FC = () => {
         }))
       }
       
-      else if (value !== SignUpData.password) {
+      else if (value !== SignUpFormData.password) {
         setErrors((prev) => ({
           ...prev,
           confirmPassword: "Password and Confirm Password do not match",
@@ -155,7 +155,7 @@ const SignUpPage: React.FC = () => {
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSignUpData((prev) => ({
+    setSignUpFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -179,24 +179,24 @@ const SignUpPage: React.FC = () => {
     //Regex for password and confirm password length
    
     const passwordRegex = /^.{8,20}$/;
-    if (!SignUpData.email) {
+    if (!SignUpFormData.email) {
       setErrors((prev) => ({
         ...prev,
         email: "Email Address is required!",
       }));
-    } else if (!validateEmail(SignUpData.email)) {
+    } else if (!validateEmail(SignUpFormData.email)) {
       setErrors((prev) => ({
         ...prev,
         email: "Email Address must be valid!",
       }));
     }
 
-    if (!SignUpData.password) {
+    if (!SignUpFormData.password) {
       setErrors((prev) => ({
         ...prev,
         password: "Password is required!",
       }));
-    } else if (!passwordRegex.test(SignUpData.password)) {
+    } else if (!passwordRegex.test(SignUpFormData.password)) {
       setErrors((prev) => ({
         ...prev,
         password: "Password must be between 8 to 20 characters!",
@@ -204,12 +204,12 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    if (!SignUpData.confirmPassword) {
+    if (!SignUpFormData.confirmPassword) {
       setErrors((prev) => ({
         ...prev,
         confirmPassword: "Confirm Password is required!",
       }));
-    } else if (SignUpData.password !== SignUpData.confirmPassword) {
+    } else if (SignUpFormData.password !== SignUpFormData.confirmPassword) {
       setErrors((prev) => ({
         ...prev,
         confirmPassword: "Passwords do not match!",
@@ -217,23 +217,23 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    if (captchaToken) {
-      setMessage("CAPTCHA verified successfully!");
-    } else {
-      setMessage("Please complete the CAPTCHA.");
-    }
-
     const signupDataPost = {
-      name : SignUpData.name?.trim(),
-      mobilenumber: SignUpData.mobileNumber?.trim(),
-      email: SignUpData.email.trim(),
-      login_password: SignUpData.password.trim()
+      fullname : SignUpFormData.name?.trim(),
+      mobilenumber: SignUpFormData.mobileNumber?.trim(),
+      email: SignUpFormData.email.trim(),
+      password: SignUpFormData.password.trim()
     };
 
-    if(signupDataPost.email != ""  && signupDataPost.login_password  != "" && SignUpData.confirmPassword != ""){
+    if(signupDataPost.email != ""  && signupDataPost.password  != "" && SignUpFormData.confirmPassword != ""){
 
-      const signUpRequest="/api/authentication/purple-crm-api/signup";
-      axios.post(signUpRequest,signupDataPost)
+      if(captchaToken !== ""){
+        const captchaRequest = {
+          token : captchaToken
+        }
+      axios.post(POST_API.VERIFIY_CAPTCHA,captchaRequest)
+      .then(response => {
+        if(response.data.status){
+          axios.post(POST_API.SIGN_UP,signupDataPost)
       .then(respone => {
         console.log(respone);
 
@@ -244,10 +244,10 @@ const SignUpPage: React.FC = () => {
             showSnackbar(respone.data.message,'error');
           }else{
             showSnackbar(respone.data.message,'success');
-            setShowAnimation(!showAnimation);
+            setShowEmailSentAnimation(!showEmailSentAnimation);
           }
           setTimeout(()=>{
-            window.location.href = '/signin';
+            window.location.href = ROUTES_URL.SIGN_IN;
           },5000)
         }else{
           showSnackbar(respone.data.message,'error');
@@ -257,7 +257,20 @@ const SignUpPage: React.FC = () => {
       .catch(error => {
        console.log(error)
       })
-    }else{
+        }
+
+      })
+      .catch(error => {
+        console.log(error)
+        showSnackbar("Invalid Captcha","error");
+      })
+    }
+    else{
+      showSnackbar("Please complete the captcha","error");
+    }
+    
+    }
+    else{
       showSnackbar('Fill required fields','error');
     }
   };
@@ -275,7 +288,7 @@ const SignUpPage: React.FC = () => {
                 type="text"
                 name="name"
                 placeholder="Enter full name"
-                value={SignUpData.name}
+                value={SignUpFormData.name}
                 onChange={handleChange}
                 maxLength={100}
                 
@@ -286,7 +299,7 @@ const SignUpPage: React.FC = () => {
                 type="text"
                 name="mobileNumber"
                 placeholder="99xxxxxxxx"
-                value={SignUpData.mobileNumber}
+                value={SignUpFormData.mobileNumber}
                 onChange={handleChange}
                 maxLength={15}
                 onBlur={handleBlur}
@@ -303,7 +316,7 @@ const SignUpPage: React.FC = () => {
                 type="email"
                 name="email"
                 placeholder="Enter your email"
-                value={SignUpData.email}
+                value={SignUpFormData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.email}
@@ -315,7 +328,7 @@ const SignUpPage: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter password"
-                value={SignUpData.password}
+                value={SignUpFormData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 minLength={8}
@@ -342,7 +355,7 @@ const SignUpPage: React.FC = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm password"
-                value={SignUpData.password}
+                value={SignUpFormData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 minLength={8}
@@ -378,14 +391,14 @@ const SignUpPage: React.FC = () => {
                           type="button"
                           className="font-medium text-blue-600 hover:text-blue-500"
                         >
-                          <Link to="/signin">Log In</Link>
+                          <Link to={ROUTES_URL.SIGN_IN}>Log In</Link>
                         </button>
                       </span>
                     </div>
             
           </form>
 
-          {showAnimation && (
+          {showEmailSentAnimation && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-95">
                     <div className="bg-white p-6 h-auto w-auto rounded-2xl shadow-lg animate-fade-in">
                       <button></button>
@@ -408,4 +421,4 @@ const SignUpPage: React.FC = () => {
   );
 };
 
-export default SignUpPage;
+export default SignUpForm;
