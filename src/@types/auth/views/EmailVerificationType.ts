@@ -1,6 +1,6 @@
-type EmailVerificationProps =  {
+type EmailVerificationType =  {
     status: 'idle' | 'loading' | 'success' | 'error';
     message: string;
   }
 
-export default EmailVerificationProps;
+export default EmailVerificationType;

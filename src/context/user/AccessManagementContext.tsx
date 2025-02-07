@@ -6,15 +6,16 @@ import React, {
     ReactNode,
     useEffect,
   } from "react";
-import { AccessManagementContextProps, AccessManagementProps } from "../../@types/company-users/AccessManagementProps";
+import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
+import { AccessManagementContextProps, AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
   
 const AccessManagementContext = createContext<AccessManagementContextProps | undefined>(undefined);
   
   export const AccessManagementContextProvider: React.FC<{ children: ReactNode }> = ({
     children,
   }) => {
-    const [accessModules, setAccessModules] = useState<AccessManagementProps[]>(() => {
-      const savedAccessModules = localStorage.getItem("AccessManagement");
+    const [accessModules, setAccessModules] = useState<AccessManagementType[]>(() => {
+      const savedAccessModules = localStorage.getItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
       return savedAccessModules ? JSON.parse(savedAccessModules) : [{
         add : false,
         company_user_id : 0,

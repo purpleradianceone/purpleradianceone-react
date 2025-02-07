@@ -1,7 +1,8 @@
 import React from "react";
 import ButtonProps from "../../@types/ui/ButtonProps";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import {COLORS} from "../../constants/constant";
+import COLORS  from "../../constants/Colors";
+import useScreenSize from "../../config/hooks/useScreenSize";
 
 /**
  * 
@@ -11,13 +12,15 @@ import {COLORS} from "../../constants/constant";
  */
 const Button: React.FC<ButtonProps> = (prop) => {
 
-
+  const {isSmallScreen} = useScreenSize();
   if(prop.disabled){
+
+
     return (
       <button 
         type={prop.type}
         onClick={prop.onClick}
-      className = {prop.className ? "cursor-not-allowed opacity-50 "+prop.className: (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center py-2.5 px-4 cursor-not-allowed opacity-50  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.PRIMARY_BUTTON_BLUE_COLOR} ${COLORS.PRIMARY_BUTTON_BLUE_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500` } 
+      className = {prop.className ? "cursor-not-allowed opacity-50 "+prop.className: (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center ${isSmallScreen ? 'py-1.5 px-2.5' : 'py-2.5 px-4' } cursor-not-allowed opacity-50  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500` } 
         >
           {prop.children}
       </button>
@@ -28,7 +31,7 @@ const Button: React.FC<ButtonProps> = (prop) => {
       <button 
         type={prop.type}
         onClick={prop.onClick}
-      className = {prop.className ? prop.className : (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center py-2.5 px-4  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.PRIMARY_BUTTON_BLUE_COLOR}  ${COLORS.PRIMARY_BUTTON_BLUE_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`} 
+      className = {prop.className ? prop.className : (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center ${isSmallScreen ? 'py-1.5 px-2.5' : 'py-2.5 px-4' }  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.BG_BLUE_600_COLOR}  ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`} 
         >
               {prop.spinner ? (
                 prop.spinner.status === "loading" ? (

@@ -1,4 +1,3 @@
-
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
   Users,
@@ -8,12 +7,13 @@ import {
   UserCheck,
   Edit,
   Calendar,
+  Filter,
+  X,
 } from "lucide-react";
 
-import companyUsersProps from "../../@types/company-users/CompanyUserProps";
+import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AddCompanyUserPopUp } from "../forms/AddCompanyUserPopUp";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import Pagination from "../ag-grid/Pagination";
@@ -21,35 +21,47 @@ import { useAccessManagementContext } from "../../context/user/AccessManagementC
 import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import DropDownOption from "../../@types/ag-grid/SearchDropDownOptionProps";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
 import { createPortal } from "react-dom";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import { DateRangePicker } from "../ui/DateRangePicker";
-import User from "../../@types/company-users/User";
+import AddCompanyUserModal from "../modals/AddCompanyUserModal";
+import POST_API from "../../constants/PostApi";
+import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
+import CompanyUser from "../../@types/company-users/CompanyUser";
+import SearchInput from "../ui/SearchInput";
+import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
+import useScreenSize from "../../config/hooks/useScreenSize";
 
-export function GetCompanyUsersList({
+function GetCompanyUsersList({
   users,
   paginationData,
   handleSearchOption,
-  onStartDateChange, 
-  onEndDateChange ,
-  handleCompanyUserChangeOnEdit
-
+  onStartDateChange,
+  onEndDateChange,
+  handleCompanyUserChangeOnEdit,
 }: {
-  users: companyUsersProps[];
+  users: companyUsersSearchProps[];
   paginationData: PaginationDataProps;
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  handleCompanyUserChangeOnEdit:(companyUser:User)=>void
+  handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
 }) {
-  const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
-  const [isEditAccessModalOpen,setIsEditModalOpen]= useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
+  const [isEditAccessModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
+    useState<boolean>(false);
   const { accessModules } = useAccessManagementContext();
-  const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =useState<boolean>(false);
+  const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =
+    useState<boolean>(false);
+  const [isFiltersOpenInMobileView, setIsFilterOpenInMobileView] =
+    useState<boolean>(false);
+  const [isFiltersOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState<boolean>(false);
+
+  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const userHasAccessToViewAccess = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 2 && accessModule.view
@@ -57,9 +69,30 @@ export function GetCompanyUsersList({
   const userHasAccessToUpdateUser = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 1 && accessModule.update
   );
-  
 
-  const [dropdownOptions, setDropdownOptions] = useState<DropDownOption[]>([
+  const handleDateIdChange = (dateId: number) => {
+    console.log(dateId);
+    if (dateId === 0) {
+      handleSearchOption.handleDateIdChange(0);
+      setIsCustomDateOptionSelected(false);
+    }
+    dropdownOptions.map((option) => {
+      if (option.search_date_range_id === dateId) {
+        if (dateId === 8) {
+          setIsCustomDateOptionSelected(true);
+          setIsFilterOpenInTabletView(true);
+        }
+        if (dateId !== 8) {
+          setIsCustomDateOptionSelected(false);
+        }
+        handleSearchOption.handleDateIdChange(option.search_date_range_id);
+      }
+    });
+  };
+
+  const [dropdownOptions, setDropdownOptions] = useState<
+    SearchDropDownOptions[]
+  >([
     {
       id: 0,
       criteria: "",
@@ -75,35 +108,26 @@ export function GetCompanyUsersList({
   ]);
   const { loginStatus } = useLoggedInUserContext();
 
-
   const fetchData = () => {
-    
-
-   
-      const postData = {
-        requestedby: loginStatus.userId,
-        company_id: loginStatus.companyId,
-      };
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + loginStatus.token;
-      axios
-        .post(
-          `/api/main/purple-crm-api/get/companyspecificcriteria/daterange`,
-          postData
-        )
-        .then((response) => {
-          setDropdownOptions(response.data);
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-  
+    const postData = {
+      requestedby: loginStatus.id,
+      company_id: loginStatus.companyId,
+    };
+    axios
+      .post(POST_API.COMPANY_SPECIFIC_CRITERIA_DATE_RANGE, postData)
+      .then((response) => {
+        setDropdownOptions(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
- useEffect(()=>{
-  fetchData();
- },[])
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const [selectedUser, setSelectedUser] = useState({
     company_id: 0,
     id: 0,
@@ -118,14 +142,13 @@ export function GetCompanyUsersList({
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      
       {
         field: "fullname",
         headerName: "Name",
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
-        // 
+        //
         comparator: (valueA, valueB) => {
           if (!valueA) return -1;
           if (!valueB) return 1;
@@ -172,49 +195,57 @@ export function GetCompanyUsersList({
       {
         headerName: "Actions",
         sortable: false,
-        maxWidth:100,
+        maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
-          const [isOpen, setIsOpen] = useState(false);
+          const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
+            useState(false);
           const [position, setPosition] = useState({ top: 0, left: 0 });
           const dropdownRef = useRef<HTMLDivElement | null>(null);
-      
-          
-      
-          const handleButtonClick = (event: React.MouseEvent) => {
+
+          const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
-            setIsOpen((prev) => !prev);
-      
+            setIsActionsDropDownOpen((prev) => !prev);
+
             const rect = event.currentTarget.getBoundingClientRect();
             setPosition({
-              top: rect.bottom + window.scrollY -10, // Position below button
+              top: rect.bottom + window.scrollY - 10, // Position below button
               left: rect.left + window.scrollX - 25, // Align with button
             });
           };
-      
+
           useEffect(() => {
-            const handleClickOutside = (event: MouseEvent) => {
-              if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+            const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
+              if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+              ) {
+                setIsActionsDropDownOpen(false);
               }
             };
-      
-            document.addEventListener("mousedown", handleClickOutside);
-            return () => document.removeEventListener("mousedown", handleClickOutside);
+
+            document.addEventListener(
+              "mousedown",
+              handleClickOutsideActionsDropDown
+            );
+            return () =>
+              document.removeEventListener(
+                "mousedown",
+                handleClickOutsideActionsDropDown
+              );
           }, []);
-      
+
           return (
             <>
-            
               <button
                 className="text-blue-600"
-                onClick={handleButtonClick}
+                onClick={handleActionsButtonClick}
               >
                 Actions ▾
               </button>
-      
-              {isOpen &&
+
+              {isActionsDropDownOpen &&
                 createPortal(
                   <div
                     ref={dropdownRef}
@@ -238,63 +269,78 @@ export function GetCompanyUsersList({
                               generate_password: "",
                             });
                             setIsAccessModalOpen(true);
-                            setIsOpen(false);
+                            setIsActionsDropDownOpen(false);
                           }}
                         >
                           <UserCheck className="inline mr-2 size-4" /> Access
                         </button>
-                        {userHasAccessToUpdateUser ? <button
-                          className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedUser({
-                              company_id: params.data.company_id,
-                              id: params.data.id,
-                              fullname: params.data.fullname,
-                              email: params.data.email,
-                              mobilenumber: params.data.mobilenumber,
-                              createdby: "",
-                              isactive: params.data.isactive,
-                              requestedby: "",
-                              generate_password: "",
-                            });
-                            setIsEditModalOpen(true);
-                            setIsOpen(false);
-                          }}
-                        >
-                          <Edit className="inline mr-2 size-4" /> Edit
-                        </button>  : <button disabled className="disabled text-sm p-2 text-left"> 
-                          <Edit className="inline mr-2  size-4" /> Edit
-                        </button>}
-                        
+                        {userHasAccessToUpdateUser ? (
+                          <button
+                            className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                              setSelectedUser({
+                                company_id: params.data.company_id,
+                                id: params.data.id,
+                                fullname: params.data.fullname,
+                                email: params.data.email,
+                                mobilenumber: params.data.mobilenumber,
+                                createdby: "",
+                                isactive: params.data.isactive,
+                                requestedby: "",
+                                generate_password: "",
+                              });
+                              setIsEditModalOpen(true);
+                              setIsActionsDropDownOpen(false);
+                            }}
+                          >
+                            <Edit className="inline mr-2 size-4" /> Edit
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="disabled text-sm p-2 text-left"
+                          >
+                            <Edit className="inline mr-2  size-4" /> Edit
+                          </button>
+                        )}
                       </>
                     ) : (
                       <>
-                        <Button disabled className="disabled text-sm p-2 text-lef">
+                        <Button
+                          disabled
+                          className="disabled text-sm p-2 text-lef"
+                        >
                           <UserCheck className="inline mr-2 size-4" /> Access
                         </Button>
-                        {userHasAccessToUpdateUser ? <button
-                          className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedUser({
-                              company_id: params.data.company_id,
-                              id: params.data.id,
-                              fullname: params.data.fullname,
-                              email: params.data.email,
-                              mobilenumber: params.data.mobilenumber,
-                              createdby: "",
-                              isactive: params.data.isactive,
-                              requestedby: "",
-                              generate_password: "",
-                            });
-                            setIsEditModalOpen(true);
-                            setIsOpen(false);
-                          }}
-                        >
-                          <Edit className="inline mr-2 size-4" /> Edit
-                        </button>  : <Button disabled className="disabled text-sm p-2 text-left"> 
-                          <Edit className="inline mr-2 size-4" /> Edit
-                        </Button>}
-                        
+                        {userHasAccessToUpdateUser ? (
+                          <button
+                            className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                              setSelectedUser({
+                                company_id: params.data.company_id,
+                                id: params.data.id,
+                                fullname: params.data.fullname,
+                                email: params.data.email,
+                                mobilenumber: params.data.mobilenumber,
+                                createdby: "",
+                                isactive: params.data.isactive,
+                                requestedby: "",
+                                generate_password: "",
+                              });
+                              setIsEditModalOpen(true);
+                              setIsActionsDropDownOpen(false);
+                            }}
+                          >
+                            <Edit className="inline mr-2 size-4" /> Edit
+                          </button>
+                        ) : (
+                          <Button
+                            disabled
+                            className="disabled text-sm p-2 text-left"
+                          >
+                            <Edit className="inline mr-2 size-4" /> Edit
+                          </Button>
+                        )}
                       </>
                     )}
                   </div>,
@@ -303,9 +349,9 @@ export function GetCompanyUsersList({
             </>
           );
         },
-      }
-      
+      },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -316,117 +362,239 @@ export function GetCompanyUsersList({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
-      
     };
   }, []);
 
   return accessModules.map((accessModule) => {
     if (accessModule.crm_module_id === 1) {
       return (
-        <div key={accessModule.id}
-        className="w-full pt-2 pl-5 pr-1 gap-1">
+        <div key={accessModule.id} className="w-full pt-2 pl-5 pr-1 gap-1">
           <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
             <div className="flex  gap-2">
-              <Users className="w-6 h-6 text-blue-600" />
-              <span className="text-1xl font-bold">Company Members</span>
+              {!isSmallScreen && (
+                <Users className="w-6 h-6 text-blue-600" />
+              )}
+              
+              {(isMediumScreen || isLargeScreen) && (
+                <span className="text-1xl font-bold">Company Members</span>
+              )}
+              
             </div>
-            <div className="relative flex items-start w-80 ">
-                <input
-                  type="search"
-                  className="w-full h-10 pl-2 pr-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Search..."
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                />
-              </div>
-              <div style={isCustomDateOptionSelected ? {visibility: "visible"}: {visibility:"hidden"} }>
-                <DateRangePicker
-                onStartDateChange={onStartDateChange}
-                onEndDateChange={onEndDateChange}
-              />
-              </div>
-            <div className="flex relative  gap-2  ">
-              <div className="mt-1 flex ">
-              <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                  <Calendar/>
+
+            {isLargeScreen && (
+              <>
+                {/* search box flex div */}
+                <div className="relative flex items-start w-80 ">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value
+                      );
+                    }}
+                  ></SearchInput>
                 </div>
-                <select
-                  className="border p-1 w-auto  pb-1  rounded-md min-w-24"
-                  title="Date Filter"
-                  disabled={dropdownOptions.length === 0}
-                  onChange={(e) => {
-                    if(e.target.value==="0"){
-                      handleSearchOption.handleDateIdChange(0)
-                      setIsCustomDateOptionSelected(false)
-                    }
-                    dropdownOptions.map((option) => {
-                      if (option.date_range === e.target.value) {
-                        if (e.target.value === "Custom") {
-                          setIsCustomDateOptionSelected(true);
-                        }
-                        if (e.target.value !== "Custom") {
-                          setIsCustomDateOptionSelected(false);
-                        }
-                        handleSearchOption.handleDateIdChange(
-                          option.search_date_range_id
-                        );
-                      }
-                     
-                    });
-                   
-                  }}
+
+                {/* Custom Date Picker Div Flex Box*/}
+                <div
+                  style={
+                    isCustomDateOptionSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
                 >
-                  <option value={0} 
-                  onClick={()=>{
-                    handleSearchOption.handleDateIdChange(0)
-                  }} 
-                  >Custom Date Filter</option>
-                  {dropdownOptions.map((item) => (
-                    <option
-                      key={item.id}
-                     
-                      value={item.date_range}
-                      className="text-gray-800"
-                    >
-                      
-                      {item.date_range}
-                    </option>
-                  ))}
-                </select>
-               
-              </div>
-            </div>
+                  <DateRangePicker
+                    onStartDateChange={onStartDateChange}
+                    onEndDateChange={onEndDateChange}
+                  />
+                </div>
+
+                {/* Date FIlters Dropdown */}
+                <div className="flex relative  gap-2  ">
+                  <div className="mt-1 flex ">
+                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                      <Calendar />
+                    </div>
+
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dropdownOptions}
+                      handleDateIdChange={handleDateIdChange}
+                    ></DateRangeFilterDropdown>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {isMediumScreen && (
+              <>
+                <div className="relative flex items-start w-80 ">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value
+                      );
+                    }}
+                  ></SearchInput>
+                </div>
+                <div className="flex relative  gap-2  ">
+                  <div className="mt-1 flex ">
+                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                      <Calendar />
+                    </div>
+
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dropdownOptions}
+                      handleDateIdChange={handleDateIdChange}
+                    ></DateRangeFilterDropdown>
+                  </div>
+                </div>
+                {isFiltersOpenInTabletView && isCustomDateOptionSelected && (
+                  <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                      <button
+                        onClick={() => {
+                          setIsFilterOpenInTabletView(
+                            !isFiltersOpenInTabletView
+                          );
+                        }}
+                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                      >
+                        <X size={20} />
+                      </button>
+
+                      <div className="my-10 justify-items-center mb-5">
+                        <div className="mb-5">
+                          <DateRangePicker
+                            onStartDateChange={onStartDateChange}
+                            onEndDateChange={onEndDateChange}
+                          />
+                        </div>
+                        <div className="w-full justify-items-center">
+                          <div className="w-24">
+                            <Button>Done</Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {isSmallScreen && (
+              <>
+                <div className="relative flex items-start w-80 ">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value
+                      );
+                    }}
+                  ></SearchInput>
+                </div>
+                <div className="flex relative gap-2">
+                  <Button
+                    onClick={() => {
+                      setIsFilterOpenInMobileView(!isFiltersOpenInMobileView);
+                    }}
+                  >
+                    <Filter size={8} />
+                  </Button>
+                </div>
+                {isFiltersOpenInMobileView && (
+                  <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                      <button
+                        onClick={() => {
+                          setIsFilterOpenInMobileView(
+                            !isFiltersOpenInMobileView
+                          );
+                        }}
+                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                      >
+                        <X size={8} />
+                      </button>
+                      {/* Date FIlters Dropdown */}
+
+                      <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
+                        <div className="mt-1 flex ">
+                          <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                            <Calendar size={20} />
+                          </div>
+
+                          <DateRangeFilterDropdown
+                            dropdownOptions={dropdownOptions}
+                            handleDateIdChange={handleDateIdChange}
+                          ></DateRangeFilterDropdown>
+                        </div>
+                      </div>
+
+                      {/* Custom Date Picker Div Flex Box*/}
+                      <div
+                        className="mb-10 justify-items-center"
+                        style={
+                          isCustomDateOptionSelected
+                            ? { visibility: "visible" }
+                            : { visibility: "hidden" }
+                        }
+                      >
+                        <DateRangePicker
+                          onStartDateChange={onStartDateChange}
+                          onEndDateChange={onEndDateChange}
+                        />
+                      </div>
+
+                      {
+                        <div className="flex w-full justify-center items-center mb-5">
+                          <div className="w-28">
+                            <Button
+                              onClick={() => {
+                                setIsFilterOpenInMobileView(
+                                  !isFiltersOpenInMobileView
+                                );
+                              }}
+                            >
+                              Done
+                            </Button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             {/* new end */}
 
             {accessModule.add ? (
-              <div>
-                <Button onClick={() => setIsOpen(true)}>
-                  <UserPlus size={20} />
-                  Add Company User
+              <div className="flex gap-2">
+                <Button onClick={() => setIsAddCompanyUserModalOpen(true)}>
+                {!isSmallScreen && <UserPlus size={20} />}
+                {isSmallScreen && <UserPlus size={8} />}
+                  {isLargeScreen && "Add User"}
                 </Button>
-                <AddCompanyUserPopUp
-                  isOpen={isOpen}
-                  onClose={() => setIsOpen(false)}
+                <AddCompanyUserModal
+                  isOpen={isAddCompanyUserModalOpen}
+                  onClose={() => setIsAddCompanyUserModalOpen(false)}
                 />
                 <div>
-          <EditCompanyUserModal
-          handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-              isOpen={isEditAccessModalOpen}
-              onClose={() => {
-                setIsEditModalOpen(false)}
-              }
-              user={selectedUser}
-            />
-          </div>
+                  <EditCompanyUserModal
+                    handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+                    isOpen={isEditAccessModalOpen}
+                    onClose={() => {
+                      setIsEditModalOpen(false);
+                    }}
+                    user={selectedUser}
+                  />
+                </div>
               </div>
             ) : (
-              <div>
+              <div className="flex gap-2">
                 <Button disabled={true}>
-                  <UserPlus size={20} />
-                  Add Company User
+                  {!isSmallScreen && <UserPlus size={20} />}
+                  {isSmallScreen && <UserPlus size={8} />}
+                  
+                  {isLargeScreen && "Add User"}
                 </Button>
               </div>
             )}
@@ -443,16 +611,14 @@ export function GetCompanyUsersList({
                 defaultColDef={defaultColDef}
                 modules={[AllCommunityModule]}
               />
-              
             </div>
             <CompanyUserAccessManagementModal
               isOpen={isAccessModalOpen}
               onClose={() => setIsAccessModalOpen(false)}
               users={selectedUser}
             />
-
           </div>
-          
+
           <div className="flex items-center justify-end mt-1">
             <Pagination
               totalPages={paginationData.totalPages}
@@ -467,3 +633,5 @@ export function GetCompanyUsersList({
     }
   });
 }
+
+export default GetCompanyUsersList;

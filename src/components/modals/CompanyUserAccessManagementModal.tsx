@@ -3,12 +3,14 @@ import { X } from "lucide-react";
 import Button from "../ui/Button";
 import AccessRightsModalProps from "../../@types/company-users/AccessRightsModalProps";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import { AccessManagementProps } from "../../@types/company-users/AccessManagementProps";
 import axios from "axios";
 // import AccessDeniedPage from "../views/not-found/AccessDeniedPage";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import LoadingSpinner from "../../assets/animations/LoadingSpinner";
+import  POST_API  from "../../constants/PostApi";
+import { AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
+
 function CompanyUserAccessManagementModal({
   isOpen,
   onClose,
@@ -27,8 +29,8 @@ function CompanyUserAccessManagementModal({
       type: 'success'
     });
 
-  const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementProps[]>([]);
-  const initialModulesRef = useRef<AccessManagementProps[]>([]);
+  const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementType[]>([]);
+  const initialModulesRef = useRef<AccessManagementType[]>([]);
      const [spinnerAnimation,setSpinnerAnimation] = useState<{
         status: 'idle' | 'loading' | 'success' | 'error';
         message: string;
@@ -37,7 +39,7 @@ function CompanyUserAccessManagementModal({
         message : ""
       })
 
-  const [modules, setModules] = React.useState<AccessManagementProps[]>([
+  const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
       add: false,
       company_user_id: 0,
@@ -49,6 +51,9 @@ function CompanyUserAccessManagementModal({
       updatedby: 0,
       updatedby_user: "",
       view: false,
+      company_id : 0,
+      createdby : 0,
+      updatedon : "",
     },
   ]);
 
@@ -60,14 +65,14 @@ function CompanyUserAccessManagementModal({
       const getCrmModuleAccessData = {
         company_id : loginStatus.companyId,
         company_user_id: users.id,
-        requestedby : loginStatus.userId
+        requestedby : loginStatus.id
       };
 
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
       axios
         .post(
-          "/api/main/purple-crm-api/get/crmmodules/access",
+          POST_API.GET_CRM_MODULE_ACCESS,
           getCrmModuleAccessData
         )
         .then((response) => {
@@ -170,12 +175,12 @@ if(!isOpen) return null;
       add: module.add,
       view: module.view,
       update: module.update,
-      updatedby: loginStatus.userId
+      updatedby: loginStatus.id
     }));
   
     axios.defaults.headers.common["Authorization"] = "Bearer " + loginStatus.token;
   
-    axios.post("/api/main/purple-crm-api/update/crmmodules/access", saveCrmModuleAccessData)
+    axios.post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData)
       .then(response => {
         showSnackbar(response.data.message, "success");
   
@@ -323,7 +328,7 @@ if(!isOpen) return null;
               <div className="flex justify-end p-2 border-t gap-3">
                 <div className="min-w-24">
                   {accessModule.update ? 
-                  users.id === loginStatus.userId ?
+                  users.id === loginStatus.id ?
                   <Button disabled={true}>Save</Button>
                     :<Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>Save</Button>:
                      <Button disabled={true}>Save</Button>}

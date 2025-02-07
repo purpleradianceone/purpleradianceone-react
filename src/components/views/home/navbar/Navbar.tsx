@@ -3,12 +3,15 @@ import { Bell, Menu, Search, Settings, X } from "lucide-react";
 import { Link ,useNavigate } from "react-router-dom";
 import SideNavBar from "./SideNavBar";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import ROUTES_URL from "../../../../constants/Routes";
+import useScreenSize from "../../../../config/hooks/useScreenSize";
 
 const Navbar = ({children} : {children : React.ReactNode}) => {
   const [isOpen, setIsOpen] = useState<boolean>();
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const {isSmallScreen} = useScreenSize();
 
   const Navigate = useNavigate();
 
@@ -52,16 +55,18 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
   // }
 
   const handleLogout=()=>{
-    Navigate("/signin");
+    Navigate(ROUTES_URL.SIGN_IN);
     setLoginStatus({
-      userId : 0,
+      id : 0,
     companyId : 0,
     message : "",
     token : "",
     status : false,
     email : "",
-    fullname : "",
-     companyName:""
+    fullName : "",
+     companyName:"",
+     createdOn : "",
+     mobileNumber : "",
     });
   }
 
@@ -92,10 +97,10 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 Products
               </a>
               <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to="/signup">Get Started</Link>
+                <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
               </button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to="/signin">Login</Link>
+                <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
               </button>
             </div>
 
@@ -133,7 +138,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 Pricing
               </a>
               <button className="w-full mt-4 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to="/signup">Get Started</Link>
+                <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
               </button>
             </div>
           </div>
@@ -162,8 +167,8 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 <span className="text-xl font-semibold"></span>
               </div>
             </div>
-            <div className="flex  ml-4 justify-between text-xl font-bold text-blue-700 cursor-pointer">
-              <Link to="/home">{loginStatus.companyName}</Link>
+            <div className="flex ml-11 justify-between text-xl font-bold text-blue-700 cursor-pointer">
+              <Link to={ROUTES_URL.HOME}>{loginStatus.companyName}</Link>
                 
             </div>
 
@@ -182,12 +187,17 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
             </div>
 
             <div className=" flex items-center space-x-4">
-              <button className="p-2 rounded-lg hover:bg-gray-100">
+              {!isSmallScreen && (
+                <>
+                <button className="p-2 rounded-lg hover:bg-gray-100">
                 <Bell className="h-5 w-5" />
               </button>
               <button className="p-2 rounded-lg hover:bg-gray-100">
                 <Settings className="h-5 w-5" />
               </button>
+              </>
+              )}
+              
               <div
                 className="flex  items-center cursor-pointer "
                 onClick={toggleCard}
@@ -199,8 +209,13 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                 />
 
                 <div className=" ml-2 cursor-default grid gap-y-0.5">
-                  <span className="font-semibold text-sm text-gray-700 ">{loginStatus.fullname}</span>
-                  <span className="text-sm text-gray-500 break-all">{loginStatus.email}</span>
+                  {!isSmallScreen && (
+                    <>
+                    <span className="font-semibold text-sm text-gray-700 ">{loginStatus.fullName}</span>
+                    <span className="text-sm text-gray-500 break-all">{loginStatus.email}</span>
+                    </>
+                  )}
+                  
                   {/* Profile Card */}
                   {isCardVisible && (
                     <div
@@ -215,7 +230,7 @@ const Navbar = ({children} : {children : React.ReactNode}) => {
                         />
                         <div className="ml-3">
                         
-                          <span className="text-sm">{loginStatus.fullname}</span>
+                          <span className="text-sm">{loginStatus.fullName}</span>
                           <span className="grid text-xs break-all text-gray-500">
                             {loginStatus.email}
                           </span>

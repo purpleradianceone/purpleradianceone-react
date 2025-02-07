@@ -3,6 +3,7 @@ import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
 import { useAccessManagementContext } from "../../../../context/user/AccessManagementContext";
+import ROUTES_URL from "../../../../constants/Routes";
 
 
 const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
@@ -25,7 +26,7 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
             </button>
           </div>
           <nav className="p-3 space-y-1">
-            <Link to= "/home">
+            <Link to= {ROUTES_URL.HOME}>
             <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}/>
             </Link>
             <SideNavBarItem 
@@ -38,14 +39,14 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
 
             {module.crm_module_id === 1 ?
              module.view ? (
-                <Link to="/home/manage-users/users" onClick={() => {window.location.href = "/home/manage-users/users"}}>
+                <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 
                   icon={Building2} 
                   label="Manage Company Users" 
                   isOpen={isOpen}
                 /></Link>
             ) : (
-            <Link to="/home/manage-users/users">
+            <Link to={ROUTES_URL.GET_COMPANY_USERS}>
             <SideNavBarItem 
               icon={Building2} 
               label="Manage Company Users" 
@@ -54,12 +55,12 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
             />
             </Link>
             ) : (
-              <Link to="/home/manage-users/users">
+              <Link to={ROUTES_URL.GET_COMPANY_USERS}>
               <SideNavBarItem 
                 icon={Building2} 
                 label="Manage Company Users" 
                 isOpen={isOpen}
-                onClick={() => {window.location.href = "/home/manage-users/users" }}
+                onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS }}
 
               /></Link>
             )

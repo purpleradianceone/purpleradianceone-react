@@ -2,7 +2,7 @@
  * created type defination for credentialSingUp data , 
  * which will be used for validation.
  */
-type CredentialSignUp= {
+type SignUpFormDataType= {
     name? : string,
     email : string,
     mobileNumber?: string
@@ -10,4 +10,4 @@ type CredentialSignUp= {
     confirmPassword:string
 }
 
-export default CredentialSignUp;
+export default SignUpFormDataType;

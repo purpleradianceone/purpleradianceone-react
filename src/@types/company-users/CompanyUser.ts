@@ -1,4 +1,4 @@
-type  User = {
+type  CompanyUser = {
     company_id: number,
     id : number,
     fullname: string,
@@ -10,4 +10,4 @@ type  User = {
     generate_password: string,
   };
 
-  export default User;
+  export default CompanyUser;

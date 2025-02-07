@@ -15,16 +15,17 @@ import EmailVerificationLayout from "../../components/views/auth/EmailVerificati
 import GetCompanyUsers from "../../components/views/manage-company-users/GetCompanyUsers";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../../components/views/not-found/NotFoundPage";
+import ROUTES_URL from "../../constants/Routes";
 
 export const router = createBrowserRouter([
   {
-    path: "*",
+    path: ROUTES_URL.NOT_FOUND,
     element:(
         <NotFoundPage></NotFoundPage>
     ),
   },
   {
-    path: "/",
+    path: ROUTES_URL.LANDING_PAGE,
     element: (
       <div className="min-h-screen">
         <Navbar>
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/signin",
+    path: ROUTES_URL.SIGN_IN,
     element: (
       <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
         <SignInForm />
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/signup",
+    path: ROUTES_URL.SIGN_UP,
     element: (
       <AuthLayout title="Sign Up" subtitle="Create your account">
         <SignUpForm />
@@ -53,7 +54,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/forgotpassword",
+    path: ROUTES_URL.FORGOT_PASSWORD,
     element: (
       <AuthLayout
         title="Forgot Password"
@@ -64,7 +65,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/forgotpasswordrequestpage",
+    path: ROUTES_URL.FORGOT_PASSWORD_REQUEST_PAGE,
     element: (
       <AuthLayout
         title="Mail Sent"
@@ -75,7 +76,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/createpassword",
+    path: ROUTES_URL.CREATE_PASSWORD,
     element: (
       <AuthLayout title="Reset Password" subtitle="Create a new password">
         <CreatePasswordForm></CreatePasswordForm>
@@ -83,11 +84,11 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/emailverfication/verify",
+    path: ROUTES_URL.EMAIL_VERIFICATION,
     element: <EmailVerificationLayout />,
   },
   {
-    path: "/home",
+    path: ROUTES_URL.HOME,
     element: (
       <PrivateRoute>
         <div className="min-h-95vh">
@@ -100,7 +101,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path: "/home/manage-users/users",
+    path: ROUTES_URL.GET_COMPANY_USERS,
     element: (
       <PrivateRoute>
         <div>

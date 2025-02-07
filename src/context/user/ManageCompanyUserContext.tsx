@@ -6,8 +6,8 @@ import React, {
     ReactNode,
     useEffect,
   } from "react";
-import { ManageCompanyProps, ManageCompanyUserContextProps } from "../../@types/company-users/ManageCompanyUserContextProps";
-// import {LoggedInUserProps, LoggedInUserContextProps } from "../../@types/company-users/LoggedInUserProps";
+import { ManageCompanyType, ManageCompanyUserContextProps } from "../../@types/company-users/ManageCompanyUserContextType";
+// import {LoggedInUserType, LoggedInUserContextProps } from "../../@types/company-users/LoggedInUserType";
 
   
 const ManageCompanyUserContext = createContext<ManageCompanyUserContextProps | undefined>(undefined);
@@ -15,7 +15,7 @@ const ManageCompanyUserContext = createContext<ManageCompanyUserContextProps | u
   export const ManageCompanyUserContextProvider: React.FC<{ children: ReactNode }> = ({
     children,
   }) => {
-    const [companyUserAddedStatus, setcompanyUserAddedStatus] = useState<ManageCompanyProps>(() => {
+    const [companyUserAddedStatus, setcompanyUserAddedStatus] = useState<ManageCompanyType>(() => {
       const savedCompanyUserStatus = sessionStorage.getItem("companyUserAddedStatus");
       return savedCompanyUserStatus ? JSON.parse(savedCompanyUserStatus) : {
       message : '',

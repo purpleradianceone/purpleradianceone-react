@@ -1,7 +1,7 @@
 import  { useEffect } from "react";
 import { CheckCircle, XCircle, X } from "lucide-react";
 import MessageSnackbarProps from "../../@types/ui/MessageSnackbarProps";
-import { COLORS } from "../../constants/constant";
+import COLORS  from "../../constants/Colors";
 
 function MessageSnackBar(props: MessageSnackbarProps) {
   useEffect(() => {
