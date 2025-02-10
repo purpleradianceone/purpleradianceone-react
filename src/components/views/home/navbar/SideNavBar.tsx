@@ -4,11 +4,11 @@ import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
 import { useAccessManagementContext } from "../../../../context/user/AccessManagementContext";
 import ROUTES_URL from "../../../../constants/Routes";
+import { NUMBER_VALUES } from "../../../../constants/AppConstants";
 
 
-const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
+function SideNavBar({isOpen,onToggle} : SideBarProps){
 
-  // const navigate= useNavigate();
   const {accessModules} = useAccessManagementContext();
   
   return accessModules.map((module) => {
@@ -37,7 +37,7 @@ const SideNavBar = ({isOpen,onToggle} : SideBarProps) => {
               children={[<>Default</>, <>Analytics</>, <>Sales</>, <>CRM</>]}
             />
 
-            {module.crm_module_id === 1 ?
+            {module.crm_module_id === NUMBER_VALUES.ONE ?
              module.view ? (
                 <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 

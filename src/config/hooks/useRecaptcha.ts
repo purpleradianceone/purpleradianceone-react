@@ -7,7 +7,7 @@ const useRecaptcha = () => {
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   const handleRecaptcha = useCallback((token: string | null) => {
-    if(token !== "" || token !== null) {
+    if(token !=STRING_VALUES.EMPTY_STRING || token !== null) {
       setCaptchaToken(token || '');
     }
     

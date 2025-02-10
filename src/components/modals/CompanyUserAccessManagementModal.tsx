@@ -8,36 +8,39 @@ import axios from "axios";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import LoadingSpinner from "../../assets/animations/LoadingSpinner";
-import  POST_API  from "../../constants/PostApi";
+import POST_API from "../../constants/PostApi";
 import { AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import { NUMBER_VALUES } from "../../constants/AppConstants";
 
 function CompanyUserAccessManagementModal({
   isOpen,
   onClose,
   users,
 }: AccessRightsModalProps) {
-  const{accessModules}= useAccessManagementContext();
+  const { accessModules } = useAccessManagementContext();
 
-  const[dataStatus,setDataStatus] = useState(false);
-    const [snackbar, setSnackbar] = useState<{
-      open: boolean;
-      message: string;
-      type: 'success' | 'error';
-    }>({
-      open: false,
-      message: '',
-      type: 'success'
-    });
+  const [dataStatus, setDataStatus] = useState(false);
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
-  const[changedAccessModules,setChangedAccessModules] = useState<AccessManagementType[]>([]);
+  const [changedAccessModules, setChangedAccessModules] = useState<
+    AccessManagementType[]
+  >([]);
   const initialModulesRef = useRef<AccessManagementType[]>([]);
-     const [spinnerAnimation,setSpinnerAnimation] = useState<{
-        status: 'idle' | 'loading' | 'success' | 'error';
-        message: string;
-      }>({
-        status : "idle",
-        message : ""
-      })
+  const [spinnerAnimation, setSpinnerAnimation] = useState<{
+    status: "idle" | "loading" | "success" | "error";
+    message: string;
+  }>({
+    status: "idle",
+    message: "",
+  });
 
   const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
@@ -51,9 +54,9 @@ function CompanyUserAccessManagementModal({
       updatedby: 0,
       updatedby_user: "",
       view: false,
-      company_id : 0,
-      createdby : 0,
-      updatedon : "",
+      company_id: 0,
+      createdby: 0,
+      updatedon: "",
     },
   ]);
 
@@ -63,18 +66,15 @@ function CompanyUserAccessManagementModal({
     if (isOpen) {
       setDataStatus(true);
       const getCrmModuleAccessData = {
-        company_id : loginStatus.companyId,
+        company_id: loginStatus.companyId,
         company_user_id: users.id,
-        requestedby : loginStatus.id
+        requestedby: loginStatus.id,
       };
 
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + loginStatus.token;
       axios
-        .post(
-          POST_API.GET_CRM_MODULE_ACCESS,
-          getCrmModuleAccessData
-        )
+        .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData)
         .then((response) => {
           setModules(response.data);
           setDataStatus(false);
@@ -87,55 +87,62 @@ function CompanyUserAccessManagementModal({
     } else {
       setModules([]);
       setChangedAccessModules([]);
-      setSnackbar(prev => ({ ...prev, open: false }));
-
+      setMessageSnackbar((prev) => ({ ...prev, open: false }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
-  
 
-if(!isOpen) return null;
+  if (!isOpen) return null;
 
-  const handleCheckboxChange = (moduleId: number, field: "add" | "view" | "update") => {
+  const handleCheckboxChange = (
+    moduleId: number,
+    field: "add" | "view" | "update"
+  ) => {
     setModules((prevModules) => {
       const updatedModules = prevModules.map((module) =>
         module.id === moduleId ? { ...module, [field]: !module[field] } : module
       );
-  
+
       // Find initial state
-      const initialModule = initialModulesRef.current.find((m) => m.id === moduleId);
+      const initialModule = initialModulesRef.current.find(
+        (m) => m.id === moduleId
+      );
       const updatedModule = updatedModules.find((m) => m.id === moduleId);
-  
+
       if (!updatedModule || !initialModule) return updatedModules;
-  
+
       // Check if the module state is different from its initial state
       const hasChanged =
         initialModule.add !== updatedModule.add ||
         initialModule.view !== updatedModule.view ||
         initialModule.update !== updatedModule.update;
-  
+
       setChangedAccessModules((prevChanges) => {
         // Remove if unchanged, add if changed
         const filteredChanges = prevChanges.filter((m) => m.id !== moduleId);
-        return hasChanged ? [...filteredChanges, updatedModule] : filteredChanges;
+        return hasChanged
+          ? [...filteredChanges, updatedModule]
+          : filteredChanges;
       });
-  
+
       return updatedModules;
     });
   };
-  
 
   const handleColumnSelectAll = (field: "add" | "view" | "update") => {
     setModules((prevModules) => {
       const isAllChecked = prevModules.every((module) => module[field]);
-  
+
       const updatedModules = prevModules.map((module) => ({
         ...module,
         [field]: !isAllChecked,
       }));
-  
+
       setChangedAccessModules(() => {
         return updatedModules.filter((updatedModule) => {
-          const initialModule = initialModulesRef.current.find((m) => m.id === updatedModule.id);
+          const initialModule = initialModulesRef.current.find(
+            (m) => m.id === updatedModule.id
+          );
           return (
             initialModule &&
             (initialModule.add !== updatedModule.add ||
@@ -144,55 +151,59 @@ if(!isOpen) return null;
           );
         });
       });
-  
+
       return updatedModules;
     });
   };
-  
 
-  const showSnackbar = (message: string, type: 'success' | 'error') => {
-    setSnackbar({ open: true, message, type });
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
   };
 
-  const handleClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleSaveAccessModule = () => {
-    if (changedAccessModules.length === 0) {
-      showSnackbar("No changes to save", "error");  // Updated message for clarity
+    if (changedAccessModules.length === NUMBER_VALUES.ZERO) {
+      showMessageSnackbar({ message: "No changes to save", type: "error" }); // Updated message for clarity
       return;
     }
-  
+
     setSpinnerAnimation({
       status: "loading",
       message: "Saving...",
     });
-  
+
     const saveCrmModuleAccessData = changedAccessModules.map((module) => ({
       company_id: loginStatus.companyId,
       id: module.id,
       add: module.add,
       view: module.view,
       update: module.update,
-      updatedby: loginStatus.id
+      updatedby: loginStatus.id,
     }));
-  
-    axios.defaults.headers.common["Authorization"] = "Bearer " + loginStatus.token;
-  
-    axios.post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData)
-      .then(response => {
-        showSnackbar(response.data.message, "success");
-  
+
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + loginStatus.token;
+
+    axios
+      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData)
+      .then((response) => {
+        showMessageSnackbar({
+          message: response.data.message,
+          type: "success",
+        });
+
         setSpinnerAnimation({
           status: "success",
           message: "Saved!",
         });
-  
+
         // Reset tracking of changes
         setChangedAccessModules([]);
-        initialModulesRef.current = modules;  // Update reference state
-  
+        initialModulesRef.current = modules; // Update reference state
+
         setTimeout(() => {
           setSpinnerAnimation({
             status: "idle",
@@ -200,12 +211,12 @@ if(!isOpen) return null;
           });
         }, 1000);
 
-        setTimeout(()=>{
+        setTimeout(() => {
           onClose();
-        },2000)
+        }, 2000);
       })
-      .catch(error => {
-        showSnackbar("Something went wrong", "error");
+      .catch((error) => {
+        showMessageSnackbar({ message: "Something went wrong", type: "error" });
         console.error("Error saving data:", error);
         setSpinnerAnimation({
           status: "idle",
@@ -213,14 +224,12 @@ if(!isOpen) return null;
         });
       });
   };
-  
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
 
-
-  return accessModules.map(accessModule => {
-    if(accessModule.crm_module_id === 2 && accessModule.view){
+  return accessModules.map((accessModule) => {
+    if (accessModule.crm_module_id === NUMBER_VALUES.TWO && accessModule.view) {
       return (
         <div className="fixed z-10 inset-0  bg-black bg-opacity-10 flex items-center justify-center p-4 ">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
@@ -235,120 +244,126 @@ if(!isOpen) return null;
                 <X size={20} />
               </button>
             </div>
-            {dataStatus ? 
-          (<div className="flex w-full h-48 justify-center items-center">
-            <LoadingSpinner></LoadingSpinner>
-          </div>) 
-          :
-          (
-            <div className="p-6">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left">
-                  <th className="pb-4 w-16">Sr. No.</th>
-                  <th className="pb-4">Module Name</th>
-                  <th className="pb-4 text-center">
-                    <div className="flex flex-col items-center">
-                      <span>Add</span>
-                      <input
-                        type="checkbox"
-                        checked={isColumnSelected("add")}
-                        onChange={() => handleColumnSelectAll("add")}
-                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </div>
-                  </th>
-                  <th className="pb-4 text-center">
-                    <div className="flex flex-col items-center">
-                      <span>View</span>
-                      <input
-                        type="checkbox"
-                        checked={isColumnSelected("view")}
-                        onChange={() => handleColumnSelectAll("view")}
-                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </div>
-                  </th>
-                  <th className="pb-4 text-center">
-                    <div className="flex flex-col items-center">
-                      <span>Update</span>
-                      <input
-                        type="checkbox"
-                        checked={isColumnSelected("update")}
-                        onChange={() => handleColumnSelectAll("update")}
-                        className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                modules
-                .sort((a, b) => a.id - b.id)
-                .map((module) => (
-                  <tr key={module.id} className="border-t">
-                    <td className="py-3">{module.crm_module_id}</td>
-                    <td className="py-3">{module.module_name}</td>
-                    <td className="py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={module.add}
-                        onChange={() => handleCheckboxChange(module.id, "add")}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </td>
-                    <td className="py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={module.view}
-                        onChange={() => handleCheckboxChange(module.id, "view")}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </td>
-                    <td className="py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={module.update}
-                        onChange={() => handleCheckboxChange(module.id, "update")}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                    </td>
-                  </tr>
-                ))}
-               
-                
-                
-              </tbody>
-            </table>
-          </div>
-          ) 
-          }
-                
-              <div className="flex justify-end p-2 border-t gap-3">
-                <div className="min-w-24">
-                  {accessModule.update ? 
-                  users.id === loginStatus.id ?
-                  <Button disabled={true}>Save</Button>
-                    :<Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>Save</Button>:
-                     <Button disabled={true}>Save</Button>}
-                </div>
+            {dataStatus ? (
+              <div className="flex w-full h-48 justify-center items-center">
+                <LoadingSpinner></LoadingSpinner>
               </div>
-            
+            ) : (
+              <div className="p-6">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left">
+                      <th className="pb-4 w-16">Sr. No.</th>
+                      <th className="pb-4">Module Name</th>
+                      <th className="pb-4 text-center">
+                        <div className="flex flex-col items-center">
+                          <span>Add</span>
+                          <input
+                            type="checkbox"
+                            checked={isColumnSelected("add")}
+                            onChange={() => handleColumnSelectAll("add")}
+                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                        </div>
+                      </th>
+                      <th className="pb-4 text-center">
+                        <div className="flex flex-col items-center">
+                          <span>View</span>
+                          <input
+                            type="checkbox"
+                            checked={isColumnSelected("view")}
+                            onChange={() => handleColumnSelectAll("view")}
+                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                        </div>
+                      </th>
+                      <th className="pb-4 text-center">
+                        <div className="flex flex-col items-center">
+                          <span>Update</span>
+                          <input
+                            type="checkbox"
+                            checked={isColumnSelected("update")}
+                            onChange={() => handleColumnSelectAll("update")}
+                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modules
+                      .sort((a, b) => a.id - b.id)
+                      .map((module) => (
+                        <tr key={module.id} className="border-t">
+                          <td className="py-3">{module.crm_module_id}</td>
+                          <td className="py-3">{module.module_name}</td>
+                          <td className="py-3 text-center">
+                            <input
+                              type="checkbox"
+                              checked={module.add}
+                              onChange={() =>
+                                handleCheckboxChange(module.id, "add")
+                              }
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="py-3 text-center">
+                            <input
+                              type="checkbox"
+                              checked={module.view}
+                              onChange={() =>
+                                handleCheckboxChange(module.id, "view")
+                              }
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="py-3 text-center">
+                            <input
+                              type="checkbox"
+                              checked={module.update}
+                              onChange={() =>
+                                handleCheckboxChange(module.id, "update")
+                              }
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="flex justify-end p-2 border-t gap-3">
+              <div className="min-w-24">
+                {accessModule.update ? (
+                  users.id === loginStatus.id ? (
+                    <Button disabled={true}>Save</Button>
+                  ) : (
+                    <Button
+                      onClick={handleSaveAccessModule}
+                      spinner={spinnerAnimation}
+                    >
+                      Save
+                    </Button>
+                  )
+                ) : (
+                  <Button disabled={true}>Save</Button>
+                )}
+              </div>
+            </div>
           </div>
           <MessageSnackBar
-        isOpen={snackbar.open}
-        message={snackbar.message}
-        type={snackbar.type}
-        onClose={handleClose}
-        duration={2000}
-      />
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleMessageSnackbarClose}
+            duration={2000}
+          />
         </div>
       );
     }
-
-  })
+  });
 }
-
 
 export default CompanyUserAccessManagementModal;

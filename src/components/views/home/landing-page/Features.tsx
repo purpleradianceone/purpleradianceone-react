@@ -7,7 +7,7 @@ import {
   Settings
 } from 'lucide-react';
 
-const Features = () => {
+function Features(){
   const features = [
     {
       icon: <LineChart className="h-8 w-8 text-blue-600" />,

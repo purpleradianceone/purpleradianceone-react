@@ -6,7 +6,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import ROUTES_URL from "../../../../constants/Routes";
 import useScreenSize from "../../../../config/hooks/useScreenSize";
 
-const Navbar = ({children} : {children : React.ReactNode}) => {
+function Navbar({children} : {children : React.ReactNode}){
   const [isOpen, setIsOpen] = useState<boolean>();
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);

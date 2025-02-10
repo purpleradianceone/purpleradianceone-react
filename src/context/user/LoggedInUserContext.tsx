@@ -8,6 +8,7 @@ import React, {
   } from "react";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import { LoggedInUserContextProps, LoggedInUserType } from "../../@types/company-users/LoggedInUserContextType";
+import { DATA_TYPE } from "../../constants/AppConstants";
   
 const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(undefined);
   
@@ -43,7 +44,7 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
   
   export const useLoggedInUserContext = () => {
     const context = useContext(LoggedInUserContext);
-    if (context === undefined) {
+    if (context === DATA_TYPE.UNDEFINED) {
       throw new Error("useLoggedInUserContext must be used within an useLoggedInUserContextProvider");
     }
     return context;

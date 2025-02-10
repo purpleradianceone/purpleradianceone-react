@@ -1,15 +1,12 @@
 
 import React, { useState } from 'react';
+import DateRangePickerProps from '../../@types/ui/DateRangePickerProps';
 // import Button from './ui/Button';
 
 
-interface DateRangePickerProps {
-  onStartDateChange: (date: Date) => void;
-  onEndDateChange: (date: Date ) => void;
-  // onSubmitButtonClick:()=>void
-}
 
-export function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePickerProps) {
+
+function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePickerProps) {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
@@ -69,3 +66,5 @@ export function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateR
     </div>
   );
 }
+
+export default DateRangePicker;

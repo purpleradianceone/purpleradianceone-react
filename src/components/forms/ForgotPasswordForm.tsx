@@ -8,75 +8,47 @@ import MessageSnackBar from "../ui/MessageSnackbar";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import  POST_API  from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
+import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
+import { useFormValidation } from "../../config/hooks/useFormValidation";
+import { useFormChange } from "../../config/hooks/useFormChange";
+import { STRING_VALUES } from "../../constants/AppConstants";
 
 /**
  *
  * @returns JSX.Element of animation after mail sent for forgot password
  */
-function ForgotPasswordForm() {
+function ForgotPasswordForm(){
   /**
    * state to manage the visibility of animation
    */
   const navigate=useNavigate();
 
   const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(false);
-  const [forgotPasswordFromState, setforgotPasswordFromState] = useState<{email:string}>({ email: '' });
-    /**
-     * State is declared for errors
-     */
-    const [forgotPasswordError, setForgotPasswordError] = useState({
-        email: "",
-    });
+
+  const initialForgotPasswordState = {
+    email : "",
+  }
+    const{formData: forgotPasswordFromState , handleChange : handleForgotPasswordFormDataChange } = useFormChange(initialForgotPasswordState)
+    const { errors, handleBlur } = useFormValidation(forgotPasswordFromState,"registered");
 
 
-    const [snackbar , setSnackbar]= useState<{
-        open: boolean,
-        message: string,
-        type:'success'|'error',
-      }>({
+    const [messageSnackbar , setMessageSnackbar]= useState<MessageSnackbarState>({
         open: false,
         message: "",
         type: "success",
       })
     
-      const showSnackbar=(message:string , type:'success' | 'error')=>{
-        setSnackbar({open:true,message, type})
+      const showMessageSnackbar=({message, type} : ShowMessageSnackbarProps)=>{
+        setMessageSnackbar({open:true,message, type})
       }
     
-      const handleSnackbarClose=()=>{
-        setSnackbar(prev=>({...prev , open:false}))
+      const handleMessageSnackbarClose=()=>{
+        setMessageSnackbar(prev=>({...prev , open:false}))
       }
-  /**
-   * email regex for validation
-   * @param email 
-   * @returns 
-   */
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-  };
 
-  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "email") {
-      if (!value) {
-        setForgotPasswordError((prev) => ({
-          ...prev,
-          email: "Email is required",
-        }));
-      } else if (!validateEmail(value)) {
-        setForgotPasswordError((prev) => ({
-          ...prev,
-          email: "Invalid email address",
-        }));
-      } else {
-        setForgotPasswordError((prev) => ({
-          ...prev,
-          email: "",
-        }));
-      }
-    }
-  };
+
+
+
   /**
      * @function handleResetPasswordClick handles the click event of the reset password button 
      and redirect to login page on completion of setTimeout
@@ -84,18 +56,7 @@ function ForgotPasswordForm() {
   const handleResetPasswordClick = (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (!forgotPasswordFromState.email) {
-      setForgotPasswordError((prev) => ({
-          ...prev,
-          "email": "Email Address is required!" ,
-        }));
-        
-    }else if (!validateEmail(forgotPasswordFromState.email)){
-      setForgotPasswordError((prev) => ({
-            ...prev,
-            email: "Invalid email address",
-          }));
-    }else{
+    if(forgotPasswordFromState.email !== STRING_VALUES.EMPTY_STRING || forgotPasswordFromState.email=== null){
       const requestData={
         email:forgotPasswordFromState.email
       }
@@ -104,36 +65,35 @@ function ForgotPasswordForm() {
       .then((response)=>{
         if(response.data[0].status){
           
-          if(response.data.status){
+          if(response.data){
             setTimeout(() => {
               navigate(ROUTES_URL.CREATE_PASSWORD); 
-             } , 5000);
+             } , 8000);
              setShowEmailSentAnimation(!showEmailSentAnimation);
-          showSnackbar(response.data[0].message, "success")
+          showMessageSnackbar({message : response.data[0].message, type : "success"})
           localStorage.setItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL, forgotPasswordFromState.email);
           }
           else{
-            showSnackbar("Unable to Send Otp ! something went wrong","error")
+            showMessageSnackbar({message :"Unable to Send Otp ! something went wrong",type :"error"})
           }
           
           
         }else{
-          showSnackbar(response.data[0].message,"error")
+          showMessageSnackbar({message : response.data[0].message,type:"error"})
         }
       })
-    }  
+      .catch((error) => {
+        console.error(error);
+        showMessageSnackbar({message:error,type: "error"})
+      })
+      
+    }
+    else{
+      showMessageSnackbar({message:"Please Fill the Email First",type:"error"})
+    }
+ 
   };
 
-    function handleFormDataChange(event: React.ChangeEvent<HTMLInputElement>): void {
-       const { name, value } = event.target;
-       if (name === "email") {
-        setforgotPasswordFromState((prev)=>({
-            ...prev, 
-            [name]:value
-        }))
-       }
-        
-    }
 
   return (
     <>
@@ -143,10 +103,10 @@ function ForgotPasswordForm() {
           type="email"
           name="email"
           placeholder="Enter your Registered Email"
-          onBlur={handleEmailBlur}
-          onChange={handleFormDataChange}
+          onBlur={handleBlur}
+          onChange={handleForgotPasswordFormDataChange}
           value={forgotPasswordFromState.email}
-          error={forgotPasswordError.email}
+          error={errors.email}
         />
         <Link to={ROUTES_URL.FORGOT_PASSWORD_REQUEST_PAGE}>
           <Button type="submit" onClick={handleResetPasswordClick}>
@@ -164,10 +124,10 @@ function ForgotPasswordForm() {
       )}
 
 <MessageSnackBar
-            isOpen={snackbar.open}
-            message={snackbar.message}
-            type={snackbar.type}
-            onClose={handleSnackbarClose}
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleMessageSnackbarClose}
             duration={2000}
           /> 
     </>

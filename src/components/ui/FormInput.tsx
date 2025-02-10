@@ -18,7 +18,7 @@ import FormInputProps from "../../@types/ui/FormInputProps";
  * @param error error message to be displayed below the input element
  * @returns JSX.Element of custom Input Element
  */
-const FormInput = ({
+function FormInput({
   label,
   type,
   name,
@@ -33,7 +33,7 @@ const FormInput = ({
   defaultValue,
   readonly,
   inputMode
-}: FormInputProps) => {
+}: FormInputProps){
   return (
     <div>
       <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>

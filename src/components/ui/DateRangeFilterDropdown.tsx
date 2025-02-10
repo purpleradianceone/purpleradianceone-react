@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Delete,  } from 'lucide-react';
 import DateRangeFilterDropdownProps from '../../@types/ui/DateRangeFilterDropdown';
+import { NUMBER_VALUES } from '../../constants/AppConstants';
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +45,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             flex items-center justify-between
           `}
           onClick={() => setIsOpen(!isOpen)}
-          disabled={props.dropdownOptions.length === 0}
+          disabled={props.dropdownOptions.length === NUMBER_VALUES.ZERO}
         >
           <span className="truncate">{selectedOption}</span>
           <ChevronDown 

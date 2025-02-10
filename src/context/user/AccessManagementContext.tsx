@@ -1,19 +1,20 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, {
+import{
     createContext,
     useContext,
     useState,
-    ReactNode,
     useEffect,
+    ReactNode,
   } from "react";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import { AccessManagementContextProps, AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
+import { DATA_TYPE } from "../../constants/AppConstants";
   
 const AccessManagementContext = createContext<AccessManagementContextProps | undefined>(undefined);
   
   export const AccessManagementContextProvider: React.FC<{ children: ReactNode }> = ({
-    children,
-  }) => {
+      children,
+    }) => {
     const [accessModules, setAccessModules] = useState<AccessManagementType[]>(() => {
       const savedAccessModules = localStorage.getItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
       return savedAccessModules ? JSON.parse(savedAccessModules) : [{
@@ -32,7 +33,7 @@ const AccessManagementContext = createContext<AccessManagementContextProps | und
 
   
     useEffect(() => {
-      localStorage.setItem("AccessManagement", JSON.stringify(accessModules));
+      localStorage.setItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT, JSON.stringify(accessModules));
     }, [accessModules]);
   
     return (
@@ -44,7 +45,7 @@ const AccessManagementContext = createContext<AccessManagementContextProps | und
   
   export const useAccessManagementContext = () => {
     const context = useContext(AccessManagementContext);
-    if (context === undefined) {
+    if (context === DATA_TYPE.UNDEFINED) {
       throw new Error("useLoggedInUserContext must be used within an useLoggedInUserContextProvider");
     }
     return context;

@@ -1,6 +1,6 @@
 import { ArrowRight, BarChart2, Users, Calendar } from 'lucide-react';
 
-const Hero = () => {
+function Hero(){
   return (
     <div className="pt-20 bg-gradient-to-b from-blue-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

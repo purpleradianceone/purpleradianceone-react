@@ -1,15 +1,11 @@
 // PrivateRoute.tsx
-import React from "react";
 import { Navigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
+import RouteChildrenNode from "../../@types/config/RoutesChildrenNode";
 
 
-interface PrivateRouteProps {
-  children: React.ReactNode;
-}
-
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
+function PrivateRoute({ children }:RouteChildrenNode){
   const storedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
