@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import GetCompanyUsersList from "../../lists/GetCompanyUsersList";
@@ -7,17 +6,24 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import PAGINATION from "../../../constants/pagination";
+import PAGINATION from "../../../constants/Pagination";
 import POST_API from "../../../constants/PostApi";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
-
-
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import { NUMBER_VALUES, STRING_VALUES } from "../../../constants/AppConstants";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
-  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>([]);
+  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>(
+    []
+  );
   const { loginStatus } = useLoggedInUserContext();
-  const [pageSize, setPageSize] = useState<number>(PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE
+  );
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const { accessModules } = useAccessManagementContext();
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,24 +32,20 @@ function GetCompanyUsers() {
   const [searchParameter, setSearchParameter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [concatDate, setConcatDate] = useState("");  
+  const [concatDate, setConcatDate] = useState("");
   // Snackbar state
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
-    message: '',
-    type: 'success'
+    message: "",
+    type: "success",
   });
 
-  const showSnackbar = (message: string, type: 'success' | 'error' | 'info') => {
-    setSnackbar({ open: true, message, type });
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   // Date formatting helpers
@@ -60,7 +62,7 @@ function GetCompanyUsers() {
   };
 
   const formatDate = (date: Date): string => {
-    if (!date || date.toString() === "Invalid Date") return "";
+    if (!date || date.toString() === STRING_VALUES.INVALID_DATE) return "";
     const day = date.getDate().toString().padStart(2, "0");
     const month = date.toLocaleString("en-US", { month: "long" });
     const year = date.getFullYear();
@@ -113,7 +115,7 @@ function GetCompanyUsers() {
     const id = newDateRangeId || 0;
     setCurrentPage(1);
     setDateRangeId(id);
-    
+
     if (id !== 8) {
       setStartDate("");
       setEndDate("");
@@ -131,13 +133,13 @@ function GetCompanyUsers() {
       (users) => users.id === user.id && users.company_id === user.company_id
     );
     if (userMatches) {
-      setUserUpdateCount(prev => prev + 1);
+      setUserUpdateCount((prev) => prev + 1);
     }
   };
 
   // Update concatenated date string
   useEffect(() => {
-    if (dateRangeId === 8) {
+    if (dateRangeId === NUMBER_VALUES.EIGHT) {
       if (!startDate && !endDate) {
         setConcatDate("");
         setDateRangeId(0);
@@ -164,11 +166,10 @@ function GetCompanyUsers() {
 
   // Fetch data function
   const fetchCompanyUsers = async () => {
-
-
     const offset = (currentPage - 1) * pageSize;
 
-    const effectiveDateRangeId = dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+    const effectiveDateRangeId =
+      dateRangeId === NUMBER_VALUES.EIGHT && !concatDate ? NUMBER_VALUES.ZERO : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -177,38 +178,44 @@ function GetCompanyUsers() {
       offset,
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
-      search_parameter_date: concatDate
+      search_parameter_date: concatDate,
     };
 
     try {
       const response = await axios.post(POST_API.GET_COMPANY_USERS, postData);
-      
+
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
-      handleSnackbarClose();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error:any) {
-
+      handleMessageSnackbarClose();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       if (error.response) {
-
         console.error("Response Error:", error.response.data);
-        showSnackbar(
-          `Error: ${error.response.data.message || "Something went wrong"}`,
-          "error"
-        );
+        showMessageSnackbar({
+          message: `Error: ${
+            error.response.data.message || "Something went wrong"
+          }`,
+          type: "error",
+        });
       } else if (error.request) {
         // Request was made but no response received
         console.error("No Response from Server:", error.request);
-        showSnackbar("No response from server. Please try again later.", "error");
+        showMessageSnackbar({
+          message: "No response from server. Please try again later.",
+          type: "error",
+        });
       } else {
         // Other unexpected errors
         console.error("Error:", error.message);
-        showSnackbar("An unexpected error occurred. Please try again.", "error");
+        showMessageSnackbar({
+          message: "An unexpected error occurred. Please try again.",
+          type: "error",
+        });
       }
-      handleSnackbarClose();
-    } 
+      handleMessageSnackbarClose();
+    }
   };
 
   useEffect(() => {
@@ -217,19 +224,19 @@ function GetCompanyUsers() {
     }, 100); // Small delay to allow state updates to settle
 
     return () => clearTimeout(timeoutId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,
     currentPage,
     dateRangeId,
     searchParameter,
     concatDate,
-    userUpdateCount
+    userUpdateCount,
   ]);
 
   useEffect(() => {
     const hasAccess = accessModules.some(
-      (module) => module.crm_module_id === 1 && module.view
+      (module) => module.crm_module_id === NUMBER_VALUES.ONE && module.view
     );
     setAccessDeniedPopUpOpen(!hasAccess);
   }, [accessModules]);
@@ -237,7 +244,7 @@ function GetCompanyUsers() {
   return (
     <div className="w-full">
       {accessModules.map((module) => {
-        if (module.crm_module_id === 1 && module.view) {
+        if (module.crm_module_id === NUMBER_VALUES.ONE && module.view) {
           return (
             <div key={module.id}>
               <GetCompanyUsersList
@@ -258,10 +265,10 @@ function GetCompanyUsers() {
                 users={companyUsers}
               />
               <MessageSnackBar
-                isOpen={snackbar.open}
-                message={snackbar.message}
-                type={snackbar.type}
-                onClose={handleSnackbarClose}
+                isOpen={messageSnackbar.open}
+                message={messageSnackbar.message}
+                type={messageSnackbar.type}
+                onClose={handleMessageSnackbarClose}
                 duration={500}
               />
             </div>

@@ -5,6 +5,7 @@ import axios from 'axios';
 import POST_API from '../../../constants/PostApi';
 import ROUTES_URL from '../../../constants/Routes';
 import EmailVerificationType from '../../../@types/auth/views/EmailVerificationType';
+import { BOOLEAN_VALUES } from '../../../constants/AppConstants';
 
 
 function EmailVerificationLayout() {
@@ -40,7 +41,7 @@ const decodeBase64 = (encodedString : string) => {
     .then(response => {
       console.log(response);
       
-      if (response.data.status === true) {
+      if (response.data.status === BOOLEAN_VALUES.TRUE) {
         setVerificationState({ status: 'success', message: 'Email verified successfully' });
         setTimeout(()=>{
           window.location.href = ROUTES_URL.SIGN_IN;

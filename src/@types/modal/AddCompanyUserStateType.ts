@@ -1,5 +1,5 @@
 type AddCompanyUserStateType = {
-  fullName: string;
+  name: string;
   mobilenumber: string;
   email: string;
 };

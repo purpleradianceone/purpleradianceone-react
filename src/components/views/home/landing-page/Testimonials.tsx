@@ -1,7 +1,7 @@
 
 import { Star } from 'lucide-react';
 
-const Testimonials = () => {
+function Testimonials(){
   const testimonials = [
     {
       name: "Sarah Johnson",

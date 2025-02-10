@@ -16,6 +16,7 @@ import GetCompanyUsers from "../../components/views/manage-company-users/GetComp
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../../components/views/not-found/NotFoundPage";
 import ROUTES_URL from "../../constants/Routes";
+import LoggedInRoute from "./LoggedInRoute";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
   {
     path: ROUTES_URL.LANDING_PAGE,
     element: (
+      <LoggedInRoute>
       <div className="min-h-screen">
         <Navbar>
           <Hero />
@@ -35,6 +37,7 @@ export const router = createBrowserRouter([
           <CallToAction />
         </Navbar>
       </div>
+      </LoggedInRoute>
     ),
   },
   {

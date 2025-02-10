@@ -16,7 +16,7 @@ import "../../../assets/styles/AuthLayout.css";
     }
  * @returns Layout/Veiw for SignUpForm and signInForm components
  */
-const AuthLayout = (props: AuthLayoutProps) => {
+function AuthLayout(props: AuthLayoutProps){
   return (
     <div className="bg-gray-100 flex flex-col justify-center">
       {/* left side code */}

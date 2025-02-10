@@ -1,113 +1,103 @@
-
-import React, { useState } from 'react';
-import { UserPlus, X } from 'lucide-react';
-import FormInput from '../ui/FormInput';
-import Button from '../ui/Button';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import axios from 'axios';
-import MessageSnackBar from '../ui/MessageSnackbar';
-import AddCompanyUserStateType from '../../@types/modal/AddCompanyUserStateType';
-import AddCompanyUserModalProps from '../../@types/modal/AddCompanyUserModalProps';
-import  POST_API  from "../../constants/PostApi";
+import React, { useState } from "react";
+import { UserPlus, X } from "lucide-react";
+import FormInput from "../ui/FormInput";
+import Button from "../ui/Button";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import MessageSnackBar from "../ui/MessageSnackbar";
+import AddCompanyUserStateType from "../../@types/modal/AddCompanyUserStateType";
+import AddCompanyUserModalProps from "../../@types/modal/AddCompanyUserModalProps";
+import POST_API from "../../constants/PostApi";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import { useFormChange } from "../../config/hooks/useFormChange";
+import { useFormValidation } from "../../config/hooks/useFormValidation";
+import { STRING_VALUES } from "../../constants/AppConstants";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
-  const [addCompanyUserFormData, setFormData] = useState<AddCompanyUserStateType>({
-    fullName: '',
-    mobilenumber: '',
-    email: '',
-  });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof AddCompanyUserStateType, string>>>({});
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    type: 'success' as 'success' | 'error',
-  });
-
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  // const mobileRegex = /^[6-9]\d{9}$/;
-  const mobileRegex = /^[0-9]{10,15}$/;
-  const validateField = (name: keyof AddCompanyUserStateType, value: string): string => {
-    switch (name) {
-      case 'fullName':
-        if (!value) return 'Name is required';
-        break;
-      case 'email':
-        if (!value) return 'Email is required';
-        if (!emailRegex.test(value)) return 'Invalid email format';
-        break;
-      case 'mobilenumber':
-        if ( value && !mobileRegex.test(value)) return 'Invalid mobile number';
-        break;
-      default:
-        return '';
+    const initialAddCompanyUserFormData : AddCompanyUserStateType = {
+      name: "",
+      mobilenumber: "",
+      email: "",
     }
-    return '';
-  };
 
-  const handleBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target as { name: keyof AddCompanyUserStateType; value: string };
-    const errorMessage = validateField(name, value);
-    setErrors((prev) => ({ ...prev, [name]: errorMessage }));
-  };
+    const {formData:addCompanyUserFormData, handleChange:handleAddComapnyUserFormDataChange ,setFormData : setAddCompanyUserFormData} = useFormChange(initialAddCompanyUserFormData)
+    const {errors,handleBlur} = useFormValidation(addCompanyUserFormData,"registration")
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target as { name: keyof AddCompanyUserStateType; value: string };
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' })); // Clear errors on input
-  };
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
-  const showSnackbar = (message: string, type: 'success' | 'error') => {
-    setSnackbar({ open: true, message, type });
+
+
+
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const newErrors: Partial<Record<keyof AddCompanyUserStateType, string>> = {};
-    (Object.keys(addCompanyUserFormData) as (keyof AddCompanyUserStateType)[]).forEach((key) => {
-      const error = validateField(key, addCompanyUserFormData[key]);
-      if (error) newErrors[key] = error;
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      showSnackbar('Please fill the required fields correctly.', 'error');
-      return;
-    }
-
-    const createCompanyUserData = {
-      fullname: addCompanyUserFormData.fullName.trim(),
-      mobilenumber: addCompanyUserFormData.mobilenumber.trim(),
-      email: addCompanyUserFormData.email.trim(),
-      createdby: loginStatus.id,
-      company_id: loginStatus.companyId,
-    };
-
-    try {
-      const response = await axios.post(POST_API.CREATE_USER, createCompanyUserData ,{
-        withCredentials:true,
-      });
-      if (response.data.status) {
-        console.log(response.data)
-        showSnackbar(response.data.message, 'success');
-        setFormData({ fullName: '', mobilenumber: '', email: '' });
-        onClose();
-        window.location.href = '/home/manage-users/users';
-      } else {
-        showSnackbar(response.data.message, 'error');
+    if(addCompanyUserFormData.email !== STRING_VALUES.EMPTY_STRING && addCompanyUserFormData.name !=STRING_VALUES.EMPTY_STRING &&
+      addCompanyUserFormData.email !== null && addCompanyUserFormData.name !== null
+    ) {
+      const createCompanyUserData = {
+        fullname: addCompanyUserFormData.name.trim(),
+        mobilenumber: addCompanyUserFormData.mobilenumber.trim(),
+        email: addCompanyUserFormData.email.trim(),
+        createdby: loginStatus.id,
+        company_id: loginStatus.companyId,
+      };
+  
+      try {
+        const response = await axios.post(
+          POST_API.CREATE_USER,
+          createCompanyUserData,
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.data.status) {
+          
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
+          setAddCompanyUserFormData({
+            name: "",
+            mobilenumber: "",
+            email: "",
+          })
+          onClose();
+          window.location.href = "/home/manage-users/users";
+        } else {
+          showMessageSnackbar({ message: response.data.message, type: "error" });
+        }
+      } catch (error) {
+        showMessageSnackbar({
+          message: "Something went wrong. Please try again.",
+          type: "error",
+        });
+        console.log(error);
       }
-    } catch (error) {
-      showSnackbar('Something went wrong. Please try again.', 'error');
-      console.log(error);
-      
+
     }
+    else{
+      showMessageSnackbar({ message: "Please fill in required fields.", type: "error" });
+    }
+   
   };
 
   if (!isOpen) return null;
@@ -134,12 +124,12 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             <FormInput
               label="Name : "
               type="text"
-              name="fullName"
+              name="name"
               placeholder="Enter User Name"
-              value={addCompanyUserFormData.fullName}
-              onChange={handleChange}
+              value={addCompanyUserFormData.name}
+              onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
-              error={errors.fullName}
+              error={errors.name}
               maxLength={100}
             />
             <FormInput
@@ -148,9 +138,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               name="mobilenumber"
               placeholder="Enter Mobile Number"
               value={addCompanyUserFormData.mobilenumber}
-              onChange={handleChange}
+              onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
-              error={errors.mobilenumber}
+              error={errors.mobileNumber}
               maxLength={15}
             />
             <FormInput
@@ -159,19 +149,19 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               name="email"
               placeholder="Enter Email Address"
               value={addCompanyUserFormData.email}
-              onChange={handleChange}
+              onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
               error={errors.email}
-              maxLength={256 }
+              maxLength={256}
             />
             <Button type="submit">Create Company CompanyUser</Button>
           </form>
         </div>
       </div>
       <MessageSnackBar
-        isOpen={snackbar.open}
-        message={snackbar.message}
-        type={snackbar.type}
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={2000}
       />

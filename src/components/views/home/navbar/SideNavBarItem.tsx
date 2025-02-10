@@ -2,14 +2,14 @@ import { ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import SideNavBarItemProps from "../../../../@types/home/navbar/SideNavBarItemProps";
 
-const SideNavBarItem = ({
+function SideNavBarItem({
   icon: Icon,
   label,
   children,
   isOpen,
   onClick,
   disabled
-}: SideNavBarItemProps) => {
+}: SideNavBarItemProps){
   const [expanded, setExpanded] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);

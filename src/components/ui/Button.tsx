@@ -1,4 +1,3 @@
-import React from "react";
 import ButtonProps from "../../@types/ui/ButtonProps";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import COLORS  from "../../constants/Colors";
@@ -10,7 +9,7 @@ import useScreenSize from "../../config/hooks/useScreenSize";
  * @returns the button component which has given css below in the component
  * if you want to change the button style ,make the changes here.
  */
-const Button: React.FC<ButtonProps> = (prop) => {
+function Button(prop : ButtonProps){
 
   const {isSmallScreen} = useScreenSize();
   if(prop.disabled){

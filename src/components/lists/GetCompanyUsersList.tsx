@@ -1,11 +1,6 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import {
   Users,
-  CheckCircle2,
-  XCircle,
   UserPlus,
-  UserCheck,
-  Edit,
   Calendar,
   Filter,
   X,
@@ -13,19 +8,16 @@ import {
 
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ColDef } from "ag-grid-community";
+import { useEffect, useState } from "react";
 import Pagination from "../ag-grid/Pagination";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import CompanyUserAccessManagementModal from "../modals/CompanyUserAccessManagementModal";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
-import { EditCompanyUserModal } from "../modals/EditCompanyUserModal";
-import { createPortal } from "react-dom";
+import EditCompanyUserModal from "../modals/EditCompanyUserModal";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
-import { DateRangePicker } from "../ui/DateRangePicker";
+import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/AddCompanyUserModal";
 import POST_API from "../../constants/PostApi";
 import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
@@ -33,6 +25,8 @@ import CompanyUser from "../../@types/company-users/CompanyUser";
 import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import useScreenSize from "../../config/hooks/useScreenSize";
+import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
+import { NUMBER_VALUES } from "../../constants/AppConstants";
 
 function GetCompanyUsersList({
   users,
@@ -64,21 +58,21 @@ function GetCompanyUsersList({
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const userHasAccessToViewAccess = accessModules.some(
-    (accessModule) => accessModule.crm_module_id === 2 && accessModule.view
+    (accessModule) => accessModule.crm_module_id === NUMBER_VALUES.TWO && accessModule.view
   );
   const userHasAccessToUpdateUser = accessModules.some(
-    (accessModule) => accessModule.crm_module_id === 1 && accessModule.update
+    (accessModule) => accessModule.crm_module_id === NUMBER_VALUES.ONE && accessModule.update
   );
 
   const handleDateIdChange = (dateId: number) => {
     console.log(dateId);
-    if (dateId === 0) {
+    if (dateId === NUMBER_VALUES.ZERO) {
       handleSearchOption.handleDateIdChange(0);
       setIsCustomDateOptionSelected(false);
     }
     dropdownOptions.map((option) => {
       if (option.search_date_range_id === dateId) {
-        if (dateId === 8) {
+        if (dateId === NUMBER_VALUES.EIGHT) {
           setIsCustomDateOptionSelected(true);
           setIsFilterOpenInTabletView(true);
         }
@@ -126,9 +120,10 @@ function GetCompanyUsersList({
 
   useEffect(() => {
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [selectedUser, setSelectedUser] = useState({
+  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
     fullname: "",
@@ -140,245 +135,44 @@ function GetCompanyUsersList({
     generate_password: "",
   });
 
-  const columnDefs = useMemo<ColDef[]>(
-    () => [
-      {
-        field: "fullname",
-        headerName: "Name",
-        sortable: true,
-        filter: "agTextColumnFilter",
-        flex: 1,
-        //
-        comparator: (valueA, valueB) => {
-          if (!valueA) return -1;
-          if (!valueB) return 1;
-          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
-        },
-      },
-      {
-        field: "email",
-        headerName: "Email",
-        sortable: true,
-        filter: true,
-        flex: 1.5,
-      },
-      {
-        field: "mobilenumber",
-        headerName: "Mobile Number",
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: "isactive",
-        headerName: "Status",
-        sortable: true,
-        filter: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params: any) => {
-          return (
-            <div className="flex items-center gap-1 mt-3">
-              {params.value ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">Active</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">Inactive</span>
-                </>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        headerName: "Actions",
-        sortable: false,
-        maxWidth: 100,
-        pinned: "right",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params: any) => {
-          const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
-            useState(false);
-          const [position, setPosition] = useState({ top: 0, left: 0 });
-          const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const handleSelectedCompanyUserChange = (params: CompanyUser) => {
+    setSelectedCompanyUser({
+      company_id: params.company_id,
+      id: params.id,
+      fullname: params.fullname,
+      email: params.email,
+      mobilenumber: params.mobilenumber,
+      createdby: "",
+      isactive: params.isactive,
+      requestedby: "",
+      generate_password: "",
+    });
 
-          const handleActionsButtonClick = (event: React.MouseEvent) => {
-            event.stopPropagation();
-            setIsActionsDropDownOpen((prev) => !prev);
+    
+  };
 
-            const rect = event.currentTarget.getBoundingClientRect();
-            setPosition({
-              top: rect.bottom + window.scrollY - 10, // Position below button
-              left: rect.left + window.scrollX - 25, // Align with button
-            });
-          };
+  const handleIdIsEditModalOpen = (status : boolean) =>{ 
+    setIsEditModalOpen(status);
+    if(!status){
+      console.log(selectedCompanyUser)
+    }
+  }
 
-          useEffect(() => {
-            const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
-              if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
-              ) {
-                setIsActionsDropDownOpen(false);
-              }
-            };
-
-            document.addEventListener(
-              "mousedown",
-              handleClickOutsideActionsDropDown
-            );
-            return () =>
-              document.removeEventListener(
-                "mousedown",
-                handleClickOutsideActionsDropDown
-              );
-          }, []);
-
-          return (
-            <>
-              <button
-                className="text-blue-600"
-                onClick={handleActionsButtonClick}
-              >
-                Actions ▾
-              </button>
-
-              {isActionsDropDownOpen &&
-                createPortal(
-                  <div
-                    ref={dropdownRef}
-                    className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
-                    style={{ top: position.top, left: position.left }}
-                  >
-                    {userHasAccessToViewAccess ? (
-                      <>
-                        <button
-                          className="block w-full text-blue-600 p-2 text-left text-sm hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedUser({
-                              company_id: params.data.company_id,
-                              id: params.data.id,
-                              fullname: params.data.fullname,
-                              email: params.data.email,
-                              mobilenumber: params.data.mobilenumber,
-                              createdby: "",
-                              isactive: params.data.isactive,
-                              requestedby: "",
-                              generate_password: "",
-                            });
-                            setIsAccessModalOpen(true);
-                            setIsActionsDropDownOpen(false);
-                          }}
-                        >
-                          <UserCheck className="inline mr-2 size-4" /> Access
-                        </button>
-                        {userHasAccessToUpdateUser ? (
-                          <button
-                            className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
-                            onClick={() => {
-                              setSelectedUser({
-                                company_id: params.data.company_id,
-                                id: params.data.id,
-                                fullname: params.data.fullname,
-                                email: params.data.email,
-                                mobilenumber: params.data.mobilenumber,
-                                createdby: "",
-                                isactive: params.data.isactive,
-                                requestedby: "",
-                                generate_password: "",
-                              });
-                              setIsEditModalOpen(true);
-                              setIsActionsDropDownOpen(false);
-                            }}
-                          >
-                            <Edit className="inline mr-2 size-4" /> Edit
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="disabled text-sm p-2 text-left"
-                          >
-                            <Edit className="inline mr-2  size-4" /> Edit
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          disabled
-                          className="disabled text-sm p-2 text-lef"
-                        >
-                          <UserCheck className="inline mr-2 size-4" /> Access
-                        </Button>
-                        {userHasAccessToUpdateUser ? (
-                          <button
-                            className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
-                            onClick={() => {
-                              setSelectedUser({
-                                company_id: params.data.company_id,
-                                id: params.data.id,
-                                fullname: params.data.fullname,
-                                email: params.data.email,
-                                mobilenumber: params.data.mobilenumber,
-                                createdby: "",
-                                isactive: params.data.isactive,
-                                requestedby: "",
-                                generate_password: "",
-                              });
-                              setIsEditModalOpen(true);
-                              setIsActionsDropDownOpen(false);
-                            }}
-                          >
-                            <Edit className="inline mr-2 size-4" /> Edit
-                          </button>
-                        ) : (
-                          <Button
-                            disabled
-                            className="disabled text-sm p-2 text-left"
-                          >
-                            <Edit className="inline mr-2 size-4" /> Edit
-                          </Button>
-                        )}
-                      </>
-                    )}
-                  </div>,
-                  document.body // Render dropdown in body to avoid clipping
-                )}
-            </>
-          );
-        },
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  const defaultColDef = useMemo(() => {
-    return {
-      filter: "agTextColumnFilter",
-      minWidth: 150,
-      flex: 0.8,
-      suppressHeaderMenuButton: true,
-      suppressHeaderContextMenu: true,
-    };
-  }, []);
+  const handleIsAccessModalOpen = (status : boolean) => {
+    setIsAccessModalOpen(status);
+  }
 
   return accessModules.map((accessModule) => {
-    if (accessModule.crm_module_id === 1) {
+    if (accessModule.crm_module_id === NUMBER_VALUES.ONE) {
       return (
         <div key={accessModule.id} className="w-full pt-2 pl-5 pr-1 gap-1">
           <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
             <div className="flex  gap-2">
-              {!isSmallScreen && (
-                <Users className="w-6 h-6 text-blue-600" />
-              )}
-              
+              {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
+
               {(isMediumScreen || isLargeScreen) && (
                 <span className="text-1xl font-bold">Company Members</span>
               )}
-              
             </div>
 
             {isLargeScreen && (
@@ -569,8 +363,8 @@ function GetCompanyUsersList({
             {accessModule.add ? (
               <div className="flex gap-2">
                 <Button onClick={() => setIsAddCompanyUserModalOpen(true)}>
-                {!isSmallScreen && <UserPlus size={20} />}
-                {isSmallScreen && <UserPlus size={8} />}
+                  {!isSmallScreen && <UserPlus size={20} />}
+                  {isSmallScreen && <UserPlus size={8} />}
                   {isLargeScreen && "Add User"}
                 </Button>
                 <AddCompanyUserModal
@@ -584,7 +378,7 @@ function GetCompanyUsersList({
                     onClose={() => {
                       setIsEditModalOpen(false);
                     }}
-                    user={selectedUser}
+                    user={selectedCompanyUser}
                   />
                 </div>
               </div>
@@ -593,7 +387,7 @@ function GetCompanyUsersList({
                 <Button disabled={true}>
                   {!isSmallScreen && <UserPlus size={20} />}
                   {isSmallScreen && <UserPlus size={8} />}
-                  
+
                   {isLargeScreen && "Add User"}
                 </Button>
               </div>
@@ -605,17 +399,20 @@ function GetCompanyUsersList({
               className="ag-theme-alpine w-full"
               style={{ height: "460px", width: "100%" }}
             >
-              <AgGridReact
-                rowData={users}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                modules={[AllCommunityModule]}
-              />
+            
+            <CompanyUserAgGrid
+              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+              userHasAccessToUpdateUser = {userHasAccessToUpdateUser}
+              userHasAccessToViewAccess = {userHasAccessToViewAccess}
+              users={users}
+              handleIdIsEditModalOpen={handleIdIsEditModalOpen}
+              handleIsAccessModalOpen={handleIsAccessModalOpen}
+            />
             </div>
             <CompanyUserAccessManagementModal
               isOpen={isAccessModalOpen}
               onClose={() => setIsAccessModalOpen(false)}
-              users={selectedUser}
+              users={selectedCompanyUser}
             />
           </div>
 

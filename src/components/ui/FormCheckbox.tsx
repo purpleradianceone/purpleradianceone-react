@@ -10,7 +10,7 @@ import FormCheckboxProps from "../../@types/ui/FormCheckboxProps";
  * @param onChange event handler for change event
  * @returns JSX.Element of Input type checkbox
  */
-const FormCheckbox = ({ label, name,onChange }: FormCheckboxProps) => {
+function FormCheckbox({ label, name,onChange }: FormCheckboxProps){
   return (
     <div className="flex items-center">
       <input

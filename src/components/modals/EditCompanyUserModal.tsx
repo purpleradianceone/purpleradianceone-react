@@ -1,120 +1,114 @@
+import React, { useEffect, useState } from "react";
+import { EditIcon, X } from "lucide-react";
+import FormInput from "../ui/FormInput";
+import Button from "../ui/Button";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import MessageSnackBar from "../ui/MessageSnackbar";
+import POST_API from "../../constants/PostApi";
+import EditUserPopupProps from "../../@types/modal/EditCompanyUserProps";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import { useFormChange } from "../../config/hooks/useFormChange";
+import { useFormValidation } from "../../config/hooks/useFormValidation";
 
-import React, { useEffect, useState } from 'react';
-import { EditIcon, X } from 'lucide-react';
-import FormInput from '../ui/FormInput';
-import Button from '../ui/Button';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import axios from 'axios';
-import MessageSnackBar from '../ui/MessageSnackbar';
-import  POST_API  from "../../constants/PostApi";
-import CompanyUser from '../../@types/company-users/CompanyUser';
+function EditCompanyUserModal({
+  isOpen,
+  onClose,
+  user,
+  handleCompanyUserChange,
+}: EditUserPopupProps) {
+  const initialUpdateUserformData = {
+    name: user.fullname,
+    mobilenumber: user.mobilenumber,
+  };
 
-type EditUserPopupProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  user : CompanyUser
-  handleCompanyUserChange : (users: CompanyUser) => void;
-};
 
-export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserChange }: EditUserPopupProps) {
+  const {
+    formData: updateUserformData,
+    handleChange: handleEditUserFormChange,
+  } = useFormChange(initialUpdateUserformData);
+  const { errors, handleBlur, setErrors } = useFormValidation(
+    updateUserformData,
+    "registration"
+  );
 
-  const [updateUserformData,setUpdateUserFormData] = useState({
-    fullName: user.fullname,
-    mobilenumber : user.mobilenumber
-  })
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+  const { loginStatus } = useLoggedInUserContext();
 
-   const [snackbar, setSnackbar] = useState({
-      open: false,
-      message: '',
-      type: 'success' as 'success' | 'error',
-    });
-
-    const [fulNameErrorMessage,setFullNameErrorMessage] = useState("");
-
-  const {loginStatus} = useLoggedInUserContext();
-  const handleEditUserFormChange = (event : React.ChangeEvent<HTMLInputElement>) => {
-      const {name,value} = event.target;
-      setUpdateUserFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  }
-
-  useEffect(()=>{
-    if(isOpen){
-      setFullNameErrorMessage("");
+  useEffect(() => {
+    if (isOpen) {
+      setErrors({
+        name: "",
+      });
     }
-  },[isOpen])
+  }, [isOpen]);
 
-  const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name,value} = event.target;
-
-    if(name==="fullName"){
-      if(!value){
-        setFullNameErrorMessage("Full name is required");
-      }else{
-        setFullNameErrorMessage("")
-      }
-    }
-    if(updateUserformData.fullName === "" && user.fullname === ""){
-      if (event.target.value == "") {
-        setFullNameErrorMessage("Name is required");
-      } else {
-        setFullNameErrorMessage("");
-      }
-    }
-  }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-
-    if( updateUserformData.fullName !== ""){
-      if(user.fullname !== updateUserformData.fullName 
-        || 
-        user.mobilenumber !== updateUserformData.mobilenumber)
-        {
-        const postUpdateUserData = {
-          id : user.id,
-          updatedby : loginStatus.id,
-          company_id : loginStatus.companyId,
-          fullname : updateUserformData.fullName,
-          mobilenumber : updateUserformData.mobilenumber,
+    if(initialUpdateUserformData.name !== updateUserformData.name || updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber){
+      if (updateUserformData.name !=STRING_VALUES.EMPTY_STRING) {
+        if (
+          user.fullname !== updateUserformData.name ||
+          user.mobilenumber !== updateUserformData.mobilenumber
+        ) {
+          const postUpdateUserData = {
+            id: user.id,
+            updatedby: loginStatus.id,
+            company_id: loginStatus.companyId,
+            fullname: updateUserformData.name,
+            mobilenumber: updateUserformData.mobilenumber,
+          };
+          axios.defaults.headers.common["Authorization"] =
+            "Bearer " + loginStatus.token;
+          axios
+            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData)
+            .then((response) => {
+              showMessageSnackbar({
+                message: response.data.message,
+                type: "success",
+              });
+              handleCompanyUserChange(user);
+              setTimeout(() => {
+                onClose();
+              }, 2000);
+            })
+            .catch((error) => {
+              showMessageSnackbar({ message: error.message, type: "error" });
+            });
+        } else {
+          showMessageSnackbar({ message: "No changes made", type: "error" });
         }
-        axios.defaults.headers.common["Authorization"] =
-          "Bearer " + loginStatus.token;
-          axios.post(POST_API.UPDATE_COMPANY_USER,postUpdateUserData)
-          .then(response => {
-            showSnackbar(response.data.message,"success")
-            handleCompanyUserChange(user);
-            setTimeout(() => {
-              onClose();
-            }, 2000);
-            
-  
-          })
-          .catch(error => {
+      } else {
+        showMessageSnackbar({ message: "Name is required", type: "error" });
+        setErrors({
+          name: "Name is required",
+        });
+      }
+    }
+    else {
+      showMessageSnackbar({message:"Please Make Changes",type:"error"});
+    }
     
-            showSnackbar(error.message,"error")
-          })
-      }
-      else{
-        showSnackbar("No changes made","error")
-      }
-    }
-    else{
-      showSnackbar("Name is required","error")
-      setFullNameErrorMessage("Name is required");
-    }
   };
-  const showSnackbar = (message: string, type: 'success' | 'error') => {
-    setSnackbar({ open: true, message, type });
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  useEffect(()=>{
-    setSnackbar((prev) => ({ ...prev, open: false }));
-
-  },[isOpen])
+  useEffect(() => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  }, [isOpen]);
   if (!isOpen) return null;
 
   return (
@@ -139,21 +133,21 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
             <FormInput
               label="Name : "
               type="text"
-              name="fullName"
-              value={updateUserformData.fullName}
+              name="name"
+              value={updateUserformData.name}
               placeholder="Enter User Name"
-              defaultValue={user.fullname}
+              defaultValue={initialUpdateUserformData.name}
               maxLength={256}
               onChange={handleEditUserFormChange}
-              error={fulNameErrorMessage}
-              onBlur={handleInputBlur}
+              error={errors.name}
+              onBlur={handleBlur}
             />
             <FormInput
               label="Mobile Number : "
               type="tel"
               name="mobilenumber"
               placeholder="Enter Mobile Number"
-              defaultValue={user.mobilenumber} 
+              defaultValue={initialUpdateUserformData.mobilenumber}
               onChange={handleEditUserFormChange}
             />
             <FormInput
@@ -162,20 +156,21 @@ export function EditCompanyUserModal({ isOpen, onClose,user,handleCompanyUserCha
               name="email"
               placeholder="Enter Email Address"
               defaultValue={user.email}
-              readonly = {true}
-              
+              readonly={true}
             />
             <Button type="submit">Update Company User</Button>
           </form>
         </div>
       </div>
-       <MessageSnackBar
-        isOpen={snackbar.open}
-        message={snackbar.message}
-        type={snackbar.type}
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={2000}
-      /> 
+      />
     </div>
   );
 }
+
+export default EditCompanyUserModal;
