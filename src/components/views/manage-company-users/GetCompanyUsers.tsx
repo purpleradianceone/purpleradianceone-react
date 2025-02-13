@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
+import ROUTES_URL from "../../../constants/Routes";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -198,7 +199,7 @@ function GetCompanyUsers() {
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
     localStorage.clear();
-    navigate("/signin")
+    navigate(ROUTES_URL.SIGN_IN)
   }
 
   useEffect(() => {
