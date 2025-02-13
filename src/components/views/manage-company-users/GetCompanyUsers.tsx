@@ -13,7 +13,14 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
-import { NUMBER_VALUES, STRING_VALUES } from "../../../constants/AppConstants";
+import {
+  BOOLEAN_VALUES,
+  NUMBER_VALUES,
+  STATUS_CODE,
+  STRING_VALUES,
+} from "../../../constants/AppConstants";
+import { useNavigate } from "react-router-dom";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -24,7 +31,7 @@ function GetCompanyUsers() {
   const [pageSize, setPageSize] = useState<number>(
     PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE
   );
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(BOOLEAN_VALUES.FALSE);
   const { accessModules } = useAccessManagementContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -33,19 +40,24 @@ function GetCompanyUsers() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [concatDate, setConcatDate] = useState("");
+
+  const navigate = useNavigate();
+  const [isDialogueOpen,setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+
+
   // Snackbar state
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
+    open: BOOLEAN_VALUES.FALSE,
     message: "",
     type: "success",
   });
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   // Date formatting helpers
@@ -169,7 +181,9 @@ function GetCompanyUsers() {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === NUMBER_VALUES.EIGHT && !concatDate ? NUMBER_VALUES.ZERO : dateRangeId;
+      dateRangeId === NUMBER_VALUES.EIGHT && !concatDate
+        ? NUMBER_VALUES.ZERO
+        : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -182,7 +196,9 @@ function GetCompanyUsers() {
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData);
+      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+        withCredentials: BOOLEAN_VALUES.TRUE,
+      });
 
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
@@ -191,32 +207,22 @@ function GetCompanyUsers() {
       handleMessageSnackbarClose();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      if (error.response) {
-        console.error("Response Error:", error.response.data);
+      if (error.status === STATUS_CODE.UNATHORISED) {
         showMessageSnackbar({
-          message: `Error: ${
-            error.response.data.message || "Something went wrong"
-          }`,
+          message: "Session Expired Please login again",
           type: "error",
         });
-      } else if (error.request) {
-        // Request was made but no response received
-        console.error("No Response from Server:", error.request);
-        showMessageSnackbar({
-          message: "No response from server. Please try again later.",
-          type: "error",
-        });
-      } else {
-        // Other unexpected errors
-        console.error("Error:", error.message);
-        showMessageSnackbar({
-          message: "An unexpected error occurred. Please try again.",
-          type: "error",
-        });
+        setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
       }
       handleMessageSnackbarClose();
     }
   };
+
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    navigate("/signin");
+    
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -246,32 +252,43 @@ function GetCompanyUsers() {
       {accessModules.map((module) => {
         if (module.crm_module_id === NUMBER_VALUES.ONE && module.view) {
           return (
-            <div key={module.id}>
-              <GetCompanyUsersList
-                handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
-                onEndDateChange={handleEndDateChange}
-                onStartDateChange={handleStartDateChange}
-                handleSearchOption={{
-                  handleSearchParameterChange,
-                  handleDateIdChange: handleDatePageIdChange,
-                }}
-                paginationData={{
-                  selectedPageSize: handlePageSizeChange,
-                  currentPage,
-                  handlePageChange,
-                  totalPages,
-                  pageSize,
-                }}
-                users={companyUsers}
-              />
+            <>
+              <div key={module.id}>
+                <GetCompanyUsersList
+                  handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
+                  onEndDateChange={handleEndDateChange}
+                  onStartDateChange={handleStartDateChange}
+                  handleSearchOption={{
+                    handleSearchParameterChange,
+                    handleDateIdChange: handleDatePageIdChange,
+                  }}
+                  paginationData={{
+                    selectedPageSize: handlePageSizeChange,
+                    currentPage,
+                    handlePageChange,
+                    totalPages,
+                    pageSize,
+                  }}
+                  users={companyUsers}
+                />
+              </div>
+
               <MessageSnackBar
                 isOpen={messageSnackbar.open}
                 message={messageSnackbar.message}
                 type={messageSnackbar.type}
                 onClose={handleMessageSnackbarClose}
-                duration={500}
+                duration={NUMBER_VALUES.SNACKBAR_DURATION}
               />
-            </div>
+
+        <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
+            </>
           );
         }
         return null;
@@ -281,7 +298,7 @@ function GetCompanyUsers() {
           <AccessDeniedPopup
             isOpen={accessDeniedPopUpOpen}
             onClose={() => {
-              setAccessDeniedPopUpOpen(false);
+              setAccessDeniedPopUpOpen(BOOLEAN_VALUES.FALSE);
               window.history.back();
             }}
           />

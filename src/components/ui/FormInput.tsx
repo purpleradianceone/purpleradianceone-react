@@ -35,11 +35,11 @@ function FormInput({
   inputMode
 }: FormInputProps){
   return (
-    <div>
-      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
+    <div className="mt-4">
+      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
         {label}
       </label>
-      <div className="mt-1 relative">
+      <div className="mt-4 relative">
         <input
         ref ={ref}
         readOnly={readonly}
@@ -65,7 +65,7 @@ function FormInput({
           </div>
         )}
       </div>
-      {error && <div className="text-red-500 text-sm">{error}</div>}
+      {error && <div className="mt-3 ml-2 text-red-500 text-sm">{error}</div>}
     </div>
   );
 };

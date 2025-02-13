@@ -14,37 +14,34 @@ import {
 } from "../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { STRING_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STRING_VALUES } from "../../constants/AppConstants";
+import ROUTES_URL from "../../constants/Routes";
+import MESSAGE from "../../constants/Messages";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
 
-
     const initialAddCompanyUserFormData : AddCompanyUserStateType = {
-      name: "",
-      mobilenumber: "",
-      email: "",
+      name: STRING_VALUES.EMPTY_STRING,
+      mobilenumber: STRING_VALUES.EMPTY_STRING,
+      email: STRING_VALUES.EMPTY_STRING,
     }
 
     const {formData:addCompanyUserFormData, handleChange:handleAddComapnyUserFormDataChange ,setFormData : setAddCompanyUserFormData} = useFormChange(initialAddCompanyUserFormData)
     const {errors,handleBlur} = useFormValidation(addCompanyUserFormData,"registration")
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
     type: "success" as "success" | "error",
   });
 
-
-
-
-
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -66,7 +63,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           POST_API.CREATE_USER,
           createCompanyUserData,
           {
-            withCredentials: true,
+            withCredentials: BOOLEAN_VALUES.TRUE,
           }
         );
         if (response.data.status) {
@@ -76,26 +73,27 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             type: "success",
           });
           setAddCompanyUserFormData({
-            name: "",
-            mobilenumber: "",
-            email: "",
+            name: STRING_VALUES.EMPTY_STRING,
+            mobilenumber: STRING_VALUES.EMPTY_STRING,
+            email: STRING_VALUES.EMPTY_STRING,
           })
           onClose();
-          window.location.href = "/home/manage-users/users";
+          window.location.href = ROUTES_URL.GET_COMPANY_USERS;
         } else {
           showMessageSnackbar({ message: response.data.message, type: "error" });
         }
       } catch (error) {
         showMessageSnackbar({
-          message: "Something went wrong. Please try again.",
+          message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
           type: "error",
         });
         console.log(error);
+        
       }
 
     }
     else{
-      showMessageSnackbar({ message: "Please fill in required fields.", type: "error" });
+      showMessageSnackbar({ message: MESSAGE.ERROR.REQUIRED_FIELDS, type: "error" });
     }
    
   };
@@ -104,23 +102,24 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
+
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
         >
-          <X size={20} />
+          <X size={SIZE.TWENTY} />
         </button>
 
         <div className="p-6">
           <div className="flex items-center gap-3 mb-6">
-            <UserPlus className="text-blue-500" size={24} />
+            <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-xl font-semibold text-gray-800">
               Add New Company CompanyUser
             </h2>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             <FormInput
               label="Name : "
               type="text"
@@ -130,7 +129,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
               error={errors.name}
-              maxLength={100}
+              maxLength={NUMBER_VALUES.HUNDRED}
             />
             <FormInput
               label="Mobile Number : "
@@ -141,7 +140,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
               error={errors.mobileNumber}
-              maxLength={15}
+              maxLength={NUMBER_VALUES.FIFTEEN}
             />
             <FormInput
               label="Email : "
@@ -152,7 +151,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               onChange={handleAddComapnyUserFormDataChange}
               onBlur={handleBlur}
               error={errors.email}
-              maxLength={256}
+              maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
             />
             <Button type="submit">Create Company CompanyUser</Button>
           </form>
@@ -163,7 +162,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
-        duration={2000}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </div>
   );

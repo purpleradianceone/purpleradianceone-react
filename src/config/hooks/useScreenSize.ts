@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { BOOLEAN_VALUES } from "../../constants/AppConstants";
 
 const useScreenSize = () => {
-  const [isLargeScreen, setIsLaptopView] = useState<boolean>(false);
-  const [isMediumScreen, setIsTabletView] = useState<boolean>(false);
-  const [isSmallScreen, setIsMobileView] = useState<boolean>(false);
+  const [isLargeScreen, setIsLaptopView] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isMediumScreen, setIsTabletView] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isSmallScreen, setIsMobileView] = useState<boolean>(BOOLEAN_VALUES.FALSE);
 
   useEffect(() => {
     const handleScreenResize = () => {

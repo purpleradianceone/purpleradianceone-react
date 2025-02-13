@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,21 +19,23 @@ import {
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
-import { STRING_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES, SITE_KEY, STRING_VALUES } from "../../constants/AppConstants";
+import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
+import MESSAGE from "../../constants/Messages";
 
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
-  const sitekey = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
+
   
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(BOOLEAN_VALUES.FALSE);
 
   const initialSignInFormState:SignInFormDataType = {
-    email: "",
-    password: "",
+    email: STRING_VALUES.EMPTY_STRING,
+    password: STRING_VALUES.EMPTY_STRING,
 
   };
 
@@ -46,21 +47,21 @@ function SignInForm() {
     message: string;
   }>({
     status: "idle",
-    message: "",
+    message: STRING_VALUES.EMPTY_STRING,
   });
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
     type: "success",
   });
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   const handleLoginSubmit = (event: React.FormEvent) => {
@@ -68,11 +69,11 @@ function SignInForm() {
     
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
       if (!loginUserCredentials.email) {
-        showMessageSnackbar({ message: "Email is required", type: "error" });
+        showMessageSnackbar({ message: MESSAGE.ERROR.EMAIL_REQUIRED, type: "error" });
         return;
       }
       if (!loginUserCredentials.password) {
-        showMessageSnackbar({ message: "Password is required", type: "error" });
+        showMessageSnackbar({ message: MESSAGE.ERROR.PASSWORD_REQUIRED, type: "error" });
         return;
       }
     }
@@ -86,7 +87,7 @@ function SignInForm() {
 
     if (!captchaToken) {
       showMessageSnackbar({
-        message: "Please Complete The Captcha",
+        message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
         type: "error",
       });
       return;
@@ -94,22 +95,24 @@ function SignInForm() {
 
     setSpinnerAnimation({
       status: "loading",
-      message: "Logging In",
+      message: MESSAGE.INPROCESS.LOGGING_IN,
     });
 
     const captchaRequest = { token: captchaToken };
 
     axios
-      .post(POST_API.VERIFIY_CAPTCHA, captchaRequest)
+      .post(POST_API.VERIFIY_CAPTCHA, captchaRequest,{
+        withCredentials : BOOLEAN_VALUES.TRUE
+      })
       .then((response) => {
-        if (response.data.status) {
+        if (response) {
           const user = {
             email: loginUserCredentials.email,
             password: loginUserCredentials.password,
           };
           
           axios
-            .post(POST_API.SIGN_IN, user, { withCredentials: true })
+            .post(POST_API.SIGN_IN, user, { withCredentials: BOOLEAN_VALUES.TRUE })
             .then((response) => {
               if (response.data.status) {
                 setLoginStatus({
@@ -130,79 +133,79 @@ function SignInForm() {
                     company_id: response.data.company_id,
                     company_user_id: response.data.id,
                     requestedby: response.data.id,
+                    device_type : STRING_VALUES.EMPTY_STRING
                   };
 
                   axios
-                    .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData)
+                    .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
+                      withCredentials : BOOLEAN_VALUES.TRUE
+                    })
                     .then((response) => {
                       setAccessModules(response.data);
                       setSpinnerAnimation({
                         status: "success",
-                        message: "Logged In",
+                        message: MESSAGE.SUCCESS.LOGGED_IN,
                       });
                       showMessageSnackbar({
-                        message: "Login successful!",
+                        message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
                         type: "success",
                       });
 
                       setTimeout(() => {
-                        try {
                           navigate(ROUTES_URL.HOME);
-                        } catch (error) {
-                          console.error("Error during navigation:", error);
-                        }
                       }, 1000);
                     })
                     .catch((error) => {
                       console.error(error);
                       setSpinnerAnimation({
                         status: "idle",
-                        message: "",
+                        message: STRING_VALUES.EMPTY_STRING,
                       });
+
                     });
                 }
               } else {
                 showMessageSnackbar({
-                  message: "Wrong email and Password!",
+                  message: MESSAGE.ERROR.WRONG_CREDENTIALS,
                   type: "error",
                 });
                 setSpinnerAnimation({
                   status: "idle",
-                  message: "",
+                  message: STRING_VALUES.EMPTY_STRING,
                 });
                 setLoginStatus({
-                  companyId: 0,
-                  companyName: "",
-                  createdOn: "",
-                  email: "",
-                  fullName: "",
-                  id: 0,
-                  message: "",
-                  mobileNumber: "",
-                  status: false,
-                  token: "",
+                  companyId: NUMBER_VALUES.ZERO,
+                  companyName: STRING_VALUES.EMPTY_STRING,
+                  createdOn: STRING_VALUES.EMPTY_STRING,
+                  email: STRING_VALUES.EMPTY_STRING,
+                  fullName: STRING_VALUES.EMPTY_STRING,
+                  id: NUMBER_VALUES.ZERO,
+                  message: STRING_VALUES.EMPTY_STRING,
+                  mobileNumber: STRING_VALUES.EMPTY_STRING,
+                  status: BOOLEAN_VALUES.FALSE,
+                  token: STRING_VALUES.EMPTY_STRING,
                 });
               }
             })
             .catch((error) => {
               console.log(error);
               showMessageSnackbar({
-                message: "Something Went Wrong!",
+                message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
                 type: "error",
               });
               setSpinnerAnimation({
                 status: "idle",
-                message: "",
+                message: STRING_VALUES.EMPTY_STRING,
               });
             });
         }
       })
       .catch((error) => {
         console.log(error);
-        showMessageSnackbar({ message: "Captcha Invalid", type: "error" });
+        showMessageSnackbar({ message: MESSAGE.ERROR.INVALID_CAPTCHA, type: "error" });
         setSpinnerAnimation({
           status: "idle",
-          message: "",
+          message: STRING_VALUES.EMPTY_STRING,
         });
       });
   };
@@ -240,17 +243,9 @@ function SignInForm() {
           onBlur={handleBlur}
           error={errors.password}
           rightElement={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-gray-400 hover:text-gray-500"
-            >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
-              )}
-            </button>
+            <PasswordVisibilityToggle
+            setShowPassword={setShowPassword}
+            showPassword = {showPassword}/>
           }
         />
 
@@ -270,7 +265,7 @@ function SignInForm() {
 
         <ReCAPTCHA
           ref={recaptchaRef}
-          sitekey={sitekey}
+          sitekey= {SITE_KEY}
           onChange={handleRecaptcha}
         />
 
@@ -299,7 +294,7 @@ function SignInForm() {
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
-        duration={2000}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </>
   );

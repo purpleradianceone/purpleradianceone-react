@@ -14,7 +14,8 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
-import { NUMBER_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import MESSAGE from "../../constants/Messages";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -23,10 +24,10 @@ function CompanyUserAccessManagementModal({
 }: AccessRightsModalProps) {
   const { accessModules } = useAccessManagementContext();
 
-  const [dataStatus, setDataStatus] = useState(false);
+  const [dataStatus, setDataStatus] = useState(BOOLEAN_VALUES.FALSE);
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
     type: "success",
   });
 
@@ -39,24 +40,24 @@ function CompanyUserAccessManagementModal({
     message: string;
   }>({
     status: "idle",
-    message: "",
+    message: STRING_VALUES.EMPTY_STRING,
   });
 
   const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
-      add: false,
-      company_user_id: 0,
-      createdon: "",
-      crm_module_id: 0,
-      id: 0,
-      module_name: "",
-      update: false,
-      updatedby: 0,
-      updatedby_user: "",
-      view: false,
-      company_id: 0,
-      createdby: 0,
-      updatedon: "",
+      add: BOOLEAN_VALUES.FALSE,
+      company_user_id: NUMBER_VALUES.ZERO,
+      createdon: STRING_VALUES.EMPTY_STRING,
+      crm_module_id: NUMBER_VALUES.ZERO,
+      id: NUMBER_VALUES.ZERO,
+      module_name: STRING_VALUES.EMPTY_STRING,
+      update: BOOLEAN_VALUES.FALSE,
+      updatedby: NUMBER_VALUES.ZERO,
+      updatedby_user: STRING_VALUES.EMPTY_STRING,
+      view: BOOLEAN_VALUES.FALSE,
+      company_id: NUMBER_VALUES.ZERO,
+      createdby: NUMBER_VALUES.ZERO,
+      updatedon: STRING_VALUES.EMPTY_STRING,
     },
   ]);
 
@@ -64,20 +65,20 @@ function CompanyUserAccessManagementModal({
 
   useEffect(() => {
     if (isOpen) {
-      setDataStatus(true);
+      setDataStatus(BOOLEAN_VALUES.TRUE);
       const getCrmModuleAccessData = {
         company_id: loginStatus.companyId,
         company_user_id: users.id,
         requestedby: loginStatus.id,
       };
 
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + loginStatus.token;
       axios
-        .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData)
+        .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
+          withCredentials : BOOLEAN_VALUES.TRUE
+        })
         .then((response) => {
           setModules(response.data);
-          setDataStatus(false);
+          setDataStatus(BOOLEAN_VALUES.FALSE);
           initialModulesRef.current = response.data;
           setChangedAccessModules([]);
         })
@@ -87,7 +88,7 @@ function CompanyUserAccessManagementModal({
     } else {
       setModules([]);
       setChangedAccessModules([]);
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
+      setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -157,22 +158,22 @@ function CompanyUserAccessManagementModal({
   };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   const handleSaveAccessModule = () => {
     if (changedAccessModules.length === NUMBER_VALUES.ZERO) {
-      showMessageSnackbar({ message: "No changes to save", type: "error" }); // Updated message for clarity
+      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" }); // Updated message for clarity
       return;
     }
 
     setSpinnerAnimation({
       status: "loading",
-      message: "Saving...",
+      message: MESSAGE.INPROCESS.SAVING,
     });
 
     const saveCrmModuleAccessData = changedAccessModules.map((module) => ({
@@ -184,11 +185,11 @@ function CompanyUserAccessManagementModal({
       updatedby: loginStatus.id,
     }));
 
-    axios.defaults.headers.common["Authorization"] =
-      "Bearer " + loginStatus.token;
 
     axios
-      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData)
+      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData,{
+        withCredentials : BOOLEAN_VALUES.TRUE
+      })
       .then((response) => {
         showMessageSnackbar({
           message: response.data.message,
@@ -197,7 +198,7 @@ function CompanyUserAccessManagementModal({
 
         setSpinnerAnimation({
           status: "success",
-          message: "Saved!",
+          message: MESSAGE.SUCCESS.SAVED,
         });
 
         // Reset tracking of changes
@@ -207,7 +208,7 @@ function CompanyUserAccessManagementModal({
         setTimeout(() => {
           setSpinnerAnimation({
             status: "idle",
-            message: "",
+            message: STRING_VALUES.EMPTY_STRING,
           });
         }, 1000);
 
@@ -216,11 +217,11 @@ function CompanyUserAccessManagementModal({
         }, 2000);
       })
       .catch((error) => {
-        showMessageSnackbar({ message: "Something went wrong", type: "error" });
+        showMessageSnackbar({ message: MESSAGE.ERROR.SOMETHING_WENT_WRONG, type: "error" });
         console.error("Error saving data:", error);
         setSpinnerAnimation({
           status: "idle",
-          message: "",
+          message: STRING_VALUES.EMPTY_STRING,
         });
       });
   };
@@ -338,7 +339,7 @@ function CompanyUserAccessManagementModal({
               <div className="min-w-24">
                 {accessModule.update ? (
                   users.id === loginStatus.id ? (
-                    <Button disabled={true}>Save</Button>
+                    <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
                   ) : (
                     <Button
                       onClick={handleSaveAccessModule}
@@ -348,7 +349,7 @@ function CompanyUserAccessManagementModal({
                     </Button>
                   )
                 ) : (
-                  <Button disabled={true}>Save</Button>
+                  <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
                 )}
               </div>
             </div>
@@ -358,7 +359,7 @@ function CompanyUserAccessManagementModal({
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleMessageSnackbarClose}
-            duration={2000}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION}
           />
         </div>
       );

@@ -11,7 +11,8 @@ import ROUTES_URL from "../../constants/Routes";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import { useFormChange } from "../../config/hooks/useFormChange";
-import { STRING_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import MESSAGE from "../../constants/Messages";
 
 /**
  *
@@ -23,27 +24,27 @@ function ForgotPasswordForm(){
    */
   const navigate=useNavigate();
 
-  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(false);
+  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(BOOLEAN_VALUES.FALSE);
 
   const initialForgotPasswordState = {
-    email : "",
+    email : STRING_VALUES.EMPTY_STRING,
   }
     const{formData: forgotPasswordFromState , handleChange : handleForgotPasswordFormDataChange } = useFormChange(initialForgotPasswordState)
     const { errors, handleBlur } = useFormValidation(forgotPasswordFromState,"registered");
 
 
     const [messageSnackbar , setMessageSnackbar]= useState<MessageSnackbarState>({
-        open: false,
-        message: "",
+        open: BOOLEAN_VALUES.FALSE,
+        message: STRING_VALUES.EMPTY_STRING,
         type: "success",
       })
     
       const showMessageSnackbar=({message, type} : ShowMessageSnackbarProps)=>{
-        setMessageSnackbar({open:true,message, type})
+        setMessageSnackbar({open:BOOLEAN_VALUES.TRUE,message, type})
       }
     
       const handleMessageSnackbarClose=()=>{
-        setMessageSnackbar(prev=>({...prev , open:false}))
+        setMessageSnackbar(prev=>({...prev , open:BOOLEAN_VALUES.FALSE}))
       }
 
 
@@ -61,7 +62,9 @@ function ForgotPasswordForm(){
         email:forgotPasswordFromState.email
       }
 
-      axios.post(POST_API.CHANGE_FORGOT_PASSWORD, requestData)
+      axios.post(POST_API.CHANGE_FORGOT_PASSWORD, requestData,{
+        withCredentials:BOOLEAN_VALUES.TRUE
+      })
       .then((response)=>{
         if(response.data[0].status){
           
@@ -74,7 +77,7 @@ function ForgotPasswordForm(){
           localStorage.setItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL, forgotPasswordFromState.email);
           }
           else{
-            showMessageSnackbar({message :"Unable to Send Otp ! something went wrong",type :"error"})
+            showMessageSnackbar({message :MESSAGE.ERROR.UNABLE_TO_SEND_OTP,type :"error"})
           }
           
           
@@ -89,7 +92,7 @@ function ForgotPasswordForm(){
       
     }
     else{
-      showMessageSnackbar({message:"Please Fill the Email First",type:"error"})
+      showMessageSnackbar({message:MESSAGE.ERROR.EMAIL_REQUIRED,type:"error"})
     }
  
   };
@@ -117,7 +120,7 @@ function ForgotPasswordForm(){
       {showEmailSentAnimation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg animate-fade-in">
-            <h2 className="text-lg font-semibold">Animation in Progress...</h2>
+            <h2 className="text-lg font-semibold">Sending mail in Progress...</h2>
             <ForgotPasswordRequestPage />
           </div>
         </div>
@@ -128,7 +131,7 @@ function ForgotPasswordForm(){
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleMessageSnackbarClose}
-            duration={2000}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION}
           /> 
     </>
   );

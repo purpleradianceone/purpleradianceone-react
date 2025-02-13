@@ -8,7 +8,7 @@ import{
   } from "react";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import { AccessManagementContextProps, AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
-import { DATA_TYPE } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, DATA_TYPE } from "../../constants/AppConstants";
   
 const AccessManagementContext = createContext<AccessManagementContextProps | undefined>(undefined);
   
@@ -18,16 +18,16 @@ const AccessManagementContext = createContext<AccessManagementContextProps | und
     const [accessModules, setAccessModules] = useState<AccessManagementType[]>(() => {
       const savedAccessModules = localStorage.getItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
       return savedAccessModules ? JSON.parse(savedAccessModules) : [{
-        add : false,
+        add : BOOLEAN_VALUES.FALSE,
         company_user_id : 0,
         createdon : "",
         crm_module_id : 0,
         id : 0,
         module_name: "",
-        update : false,
+        update : BOOLEAN_VALUES.FALSE,
         updatedby : 0,
         updatedby_user : "",
-        view : false
+        view : BOOLEAN_VALUES.FALSE
   }]
     });
 

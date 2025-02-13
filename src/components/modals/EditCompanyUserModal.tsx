@@ -13,6 +13,8 @@ import {
 } from "../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
+import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STRING_VALUES } from "../../constants/AppConstants";
+import MESSAGE from "../../constants/Messages";
 
 function EditCompanyUserModal({
   isOpen,
@@ -36,8 +38,8 @@ function EditCompanyUserModal({
   );
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
     type: "success" as "success" | "error",
   });
   const { loginStatus } = useLoggedInUserContext();
@@ -48,6 +50,7 @@ function EditCompanyUserModal({
         name: "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -66,10 +69,10 @@ function EditCompanyUserModal({
             fullname: updateUserformData.name,
             mobilenumber: updateUserformData.mobilenumber,
           };
-          axios.defaults.headers.common["Authorization"] =
-            "Bearer " + loginStatus.token;
           axios
-            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData)
+            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData,{
+              withCredentials : BOOLEAN_VALUES.TRUE
+            })
             .then((response) => {
               showMessageSnackbar({
                 message: response.data.message,
@@ -84,52 +87,52 @@ function EditCompanyUserModal({
               showMessageSnackbar({ message: error.message, type: "error" });
             });
         } else {
-          showMessageSnackbar({ message: "No changes made", type: "error" });
+          showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
         }
       } else {
-        showMessageSnackbar({ message: "Name is required", type: "error" });
+        showMessageSnackbar({ message: MESSAGE.ERROR.NAME_REQUIRED, type: "error" });
         setErrors({
-          name: "Name is required",
+          name: MESSAGE.ERROR.NAME_REQUIRED,
         });
       }
     }
     else {
-      showMessageSnackbar({message:"Please Make Changes",type:"error"});
+      showMessageSnackbar({message:MESSAGE.ERROR.NO_CHANGES,type:"error"});
     }
     
   };
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   useEffect(() => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   }, [isOpen]);
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
         >
-          <X size={20} />
+          <X size={SIZE.TWENTY} />
         </button>
 
         <div className="p-6">
           <div className="flex items-center gap-3 mb-6">
-            <EditIcon className="text-blue-500" size={24} />
+            <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-xl font-semibold text-gray-800">
               Edit {user.fullname}
             </h2>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             <FormInput
               label="Name : "
               type="text"
@@ -137,7 +140,7 @@ function EditCompanyUserModal({
               value={updateUserformData.name}
               placeholder="Enter User Name"
               defaultValue={initialUpdateUserformData.name}
-              maxLength={256}
+              maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
               onChange={handleEditUserFormChange}
               error={errors.name}
               onBlur={handleBlur}
@@ -156,7 +159,7 @@ function EditCompanyUserModal({
               name="email"
               placeholder="Enter Email Address"
               defaultValue={user.email}
-              readonly={true}
+              readonly={BOOLEAN_VALUES.TRUE}
             />
             <Button type="submit">Update Company User</Button>
           </form>
@@ -167,7 +170,7 @@ function EditCompanyUserModal({
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
-        duration={2000}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </div>
   );
