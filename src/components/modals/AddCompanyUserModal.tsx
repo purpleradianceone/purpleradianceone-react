@@ -14,9 +14,13 @@ import {
 } from "../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STRING_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
 import ROUTES_URL from "../../constants/Routes";
 import MESSAGE from "../../constants/Messages";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ApiError from "../../@types/error/ApiError";
+import { useNavigate } from "react-router-dom";
+import { DialogueBox } from "../dialogue-box/Dialogue";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -26,6 +30,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       mobilenumber: STRING_VALUES.EMPTY_STRING,
       email: STRING_VALUES.EMPTY_STRING,
     }
+
+    const navigate = useNavigate();
+    const [isDialogueOpen,setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
 
     const {formData:addCompanyUserFormData, handleChange:handleAddComapnyUserFormDataChange ,setFormData : setAddCompanyUserFormData} = useFormChange(initialAddCompanyUserFormData)
     const {errors,handleBlur} = useFormValidation(addCompanyUserFormData,"registration")
@@ -82,12 +89,22 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         } else {
           showMessageSnackbar({ message: response.data.message, type: "error" });
         }
-      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error : ApiError | any) {
         showMessageSnackbar({
           message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
           type: "error",
         });
         console.log(error);
+        if(error){
+          if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
+            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          }
+          else{
+            showMessageSnackbar({message:MESSAGE.ERROR.SOMETHING_WENT_WRONG,type : "error"})
+          }
+        }
+
         
       }
 
@@ -98,10 +115,16 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
    
   };
 
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate("/signin")
+  }
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-10 mt-16 bg-black bg-opacity-45 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
 
         <button
@@ -164,6 +187,14 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
+
+      <DialogueBox
+              isOpen={isDialogueOpen}
+              onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+              onConfirm={handleDialogueConfirm}
+              title="Session Expired !"
+              message="Session Expired. Please login again."
+            />
     </div>
   );
 }

@@ -13,8 +13,18 @@ import {
 } from "../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STRING_VALUES } from "../../constants/AppConstants";
+import {
+  BOOLEAN_VALUES,
+  NUMBER_VALUES,
+  SIZE,
+  STATUS_CODE,
+  STRING_VALUES,
+} from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
+import ApiError from "../../@types/error/ApiError";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { DialogueBox } from "../dialogue-box/Dialogue";
 
 function EditCompanyUserModal({
   isOpen,
@@ -27,7 +37,6 @@ function EditCompanyUserModal({
     mobilenumber: user.mobilenumber,
   };
 
-
   const {
     formData: updateUserformData,
     handleChange: handleEditUserFormChange,
@@ -37,6 +46,10 @@ function EditCompanyUserModal({
     "registration"
   );
 
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: BOOLEAN_VALUES.FALSE,
     message: STRING_VALUES.EMPTY_STRING,
@@ -50,14 +63,23 @@ function EditCompanyUserModal({
         name: "",
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
+
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if(initialUpdateUserformData.name !== updateUserformData.name || updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber){
-      if (updateUserformData.name !=STRING_VALUES.EMPTY_STRING) {
+    if (
+      initialUpdateUserformData.name !== updateUserformData.name ||
+      updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber
+    ) {
+      if (updateUserformData.name != STRING_VALUES.EMPTY_STRING) {
         if (
           user.fullname !== updateUserformData.name ||
           user.mobilenumber !== updateUserformData.mobilenumber
@@ -70,8 +92,8 @@ function EditCompanyUserModal({
             mobilenumber: updateUserformData.mobilenumber,
           };
           axios
-            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData,{
-              withCredentials : BOOLEAN_VALUES.TRUE
+            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+              withCredentials: BOOLEAN_VALUES.TRUE,
             })
             .then((response) => {
               showMessageSnackbar({
@@ -83,23 +105,35 @@ function EditCompanyUserModal({
                 onClose();
               }, 2000);
             })
-            .catch((error) => {
-              showMessageSnackbar({ message: error.message, type: "error" });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch((error: ApiError | any) => {
+              if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
+                setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+              } else {
+                showMessageSnackbar({
+                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+                  type: "error",
+                });
+              }
             });
         } else {
-          showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+          showMessageSnackbar({
+            message: MESSAGE.ERROR.NO_CHANGES,
+            type: "error",
+          });
         }
       } else {
-        showMessageSnackbar({ message: MESSAGE.ERROR.NAME_REQUIRED, type: "error" });
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.NAME_REQUIRED,
+          type: "error",
+        });
         setErrors({
           name: MESSAGE.ERROR.NAME_REQUIRED,
         });
       }
+    } else {
+      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
     }
-    else {
-      showMessageSnackbar({message:MESSAGE.ERROR.NO_CHANGES,type:"error"});
-    }
-    
   };
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
@@ -115,64 +149,73 @@ function EditCompanyUserModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-        >
-          <X size={SIZE.TWENTY} />
-        </button>
+    <>
+      <div className="fixed inset-0 mt-16 bg-black bg-opacity-45 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+          >
+            <X size={SIZE.TWENTY} />
+          </button>
 
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-            <h2 className="text-xl font-semibold text-gray-800">
-              Edit {user.fullname}
-            </h2>
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Edit {user.fullname}
+              </h2>
+            </div>
+
+            <form className="space-y-8" onSubmit={handleSubmit}>
+              <FormInput
+                label="Name : "
+                type="text"
+                name="name"
+                value={updateUserformData.name}
+                placeholder="Enter User Name"
+                defaultValue={initialUpdateUserformData.name}
+                maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
+                onChange={handleEditUserFormChange}
+                error={errors.name}
+                onBlur={handleBlur}
+              />
+              <FormInput
+                label="Mobile Number : "
+                type="tel"
+                name="mobilenumber"
+                placeholder="Enter Mobile Number"
+                defaultValue={initialUpdateUserformData.mobilenumber}
+                onChange={handleEditUserFormChange}
+              />
+              <FormInput
+                label="Email : "
+                type="email"
+                name="email"
+                placeholder="Enter Email Address"
+                defaultValue={user.email}
+                readonly={BOOLEAN_VALUES.TRUE}
+              />
+              <Button type="submit">Update Company User</Button>
+            </form>
           </div>
-
-          <form className="space-y-8" onSubmit={handleSubmit}>
-            <FormInput
-              label="Name : "
-              type="text"
-              name="name"
-              value={updateUserformData.name}
-              placeholder="Enter User Name"
-              defaultValue={initialUpdateUserformData.name}
-              maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
-              onChange={handleEditUserFormChange}
-              error={errors.name}
-              onBlur={handleBlur}
-            />
-            <FormInput
-              label="Mobile Number : "
-              type="tel"
-              name="mobilenumber"
-              placeholder="Enter Mobile Number"
-              defaultValue={initialUpdateUserformData.mobilenumber}
-              onChange={handleEditUserFormChange}
-            />
-            <FormInput
-              label="Email : "
-              type="email"
-              name="email"
-              placeholder="Enter Email Address"
-              defaultValue={user.email}
-              readonly={BOOLEAN_VALUES.TRUE}
-            />
-            <Button type="submit">Update Company User</Button>
-          </form>
         </div>
+        <MessageSnackBar
+          isOpen={messageSnackbar.open}
+          message={messageSnackbar.message}
+          type={messageSnackbar.type}
+          onClose={handleCloseSnackbar}
+          duration={NUMBER_VALUES.SNACKBAR_DURATION}
+        />
       </div>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
       />
-    </div>
+    </>
   );
 }
 

@@ -5,14 +5,9 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import PAGINATION from "../../../constants/Pagination";
 import POST_API from "../../../constants/PostApi";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import {
   BOOLEAN_VALUES,
   NUMBER_VALUES,
@@ -21,6 +16,8 @@ import {
 } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ApiError from "../../../@types/error/ApiError";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -45,20 +42,6 @@ function GetCompanyUsers() {
   const [isDialogueOpen,setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
 
 
-  // Snackbar state
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
-  };
 
   // Date formatting helpers
   const getDefaultStartDateOfYear = (): string => {
@@ -204,24 +187,18 @@ function GetCompanyUsers() {
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
-      handleMessageSnackbarClose();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        showMessageSnackbar({
-          message: "Session Expired Please login again",
-          type: "error",
-        });
+    } catch (error: ApiError | any) {
+      if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
         setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
       }
-      handleMessageSnackbarClose();
     }
   };
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
-    navigate("/signin");
-    
+    localStorage.clear();
+    navigate("/signin")
   }
 
   useEffect(() => {
@@ -272,15 +249,6 @@ function GetCompanyUsers() {
                   users={companyUsers}
                 />
               </div>
-
-              <MessageSnackBar
-                isOpen={messageSnackbar.open}
-                message={messageSnackbar.message}
-                type={messageSnackbar.type}
-                onClose={handleMessageSnackbarClose}
-                duration={NUMBER_VALUES.SNACKBAR_DURATION}
-              />
-
         <DialogueBox
         isOpen={isDialogueOpen}
         onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}

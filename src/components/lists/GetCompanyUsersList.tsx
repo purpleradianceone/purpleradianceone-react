@@ -20,7 +20,19 @@ import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
-import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, NUMBER_VALUES, SIZE, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
+import {
+  BOOLEAN_VALUES,
+  JSX_CHILDREN_NAME,
+  NUMBER_VALUES,
+  SIZE,
+  STRING_VALUES,
+} from "../../constants/AppConstants";
+import MESSAGE from "../../constants/Messages";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../ui/MessageSnackbar";
 
 function GetCompanyUsersList({
   users,
@@ -37,8 +49,12 @@ function GetCompanyUsersList({
   onEndDateChange: (date: Date) => void;
   handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
 }) {
-  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const [isEditAccessModalOpen, setIsEditModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
+  const [isEditAccessModalOpen, setIsEditModalOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
     useState<boolean>(BOOLEAN_VALUES.FALSE);
   const { accessModules } = useAccessManagementContext();
@@ -59,6 +75,20 @@ function GetCompanyUsersList({
     (accessModule) =>
       accessModule.crm_module_id === NUMBER_VALUES.ONE && accessModule.update
   );
+
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
+    type: "success",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+  };
 
   const handleDateIdChange = (dateId: number) => {
     console.log(dateId);
@@ -110,13 +140,14 @@ function GetCompanyUsersList({
       .then((response) => {
         if (response.data) {
           setDropdownOptions(response.data);
-          
         }
       })
       .catch((error) => {
-        if(error.status === STATUS_CODE.UNATHORISED){
-          console.log(error.status);
-        }
+        console.error(error);
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+          type: "error",
+        });
       });
   };
 
@@ -174,36 +205,33 @@ function GetCompanyUsersList({
 
             {isLargeScreen && (
               <>
-                
                 <div className="flex gap-1">
                   {/* search box flex div */}
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
+                  <div className="relative flex items-start w-80 ">
+                    <SearchInput
+                      onChange={(e) => {
+                        handleSearchOption.handleSearchParameterChange(
+                          e.target.value
+                        );
+                      }}
+                    ></SearchInput>
+                  </div>
 
-                {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar className="mt-2" />
+                  {/* Date FIlters Dropdown */}
+                  <div className="flex mx-3">
+                    <div className="flex">
+                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                        <Calendar className="mt-2" />
+                      </div>
+
+                      <DateRangeFilterDropdown
+                        dropdownOptions={dropdownOptions}
+                        handleDateIdChange={handleDateIdChange}
+                      ></DateRangeFilterDropdown>
                     </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dropdownOptions}
-                      handleDateIdChange={handleDateIdChange}
-                    ></DateRangeFilterDropdown>
                   </div>
                 </div>
-                </div>
-                
 
-                
                 {/* Custom Date Picker Div Flex Box*/}
                 <div
                   style={
@@ -363,27 +391,34 @@ function GetCompanyUsersList({
             {/* new end */}
 
             {accessModule.add ? (
-              <div className="flex gap-1">
-                <Button onClick={() => setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)}>
-                  {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-                </Button>
-                <AddCompanyUserModal
-                  isOpen={isAddCompanyUserModalOpen}
-                  onClose={() => setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)}
-                />
-                <div>
-                  <EditCompanyUserModal
-                    handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-                    isOpen={isEditAccessModalOpen}
-                    onClose={() => {
-                      setIsEditModalOpen(BOOLEAN_VALUES.FALSE);
-                    }}
-                    user={selectedCompanyUser}
-                  />
+              <>
+                <div className="flex gap-1">
+                  <Button
+                    onClick={() =>
+                      setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
+                    }
+                  >
+                    {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+                    {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
+                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
+                  </Button>
+                  
                 </div>
-              </div>
+                <AddCompanyUserModal
+                    isOpen={isAddCompanyUserModalOpen}
+                    onClose={() =>
+                      setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
+                    }
+                  />
+                <EditCompanyUserModal
+                  handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+                  isOpen={isEditAccessModalOpen}
+                  onClose={() => {
+                    setIsEditModalOpen(BOOLEAN_VALUES.FALSE);
+                  }}
+                  user={selectedCompanyUser}
+                />
+              </>
             ) : (
               <div className="flex gap-1">
                 <Button disabled={BOOLEAN_VALUES.TRUE}>
@@ -417,6 +452,8 @@ function GetCompanyUsersList({
               onClose={() => setIsAccessModalOpen(BOOLEAN_VALUES.FALSE)}
               users={selectedCompanyUser}
             />
+
+            
           </div>
 
           <div className="flex items-center justify-end mt-1">
@@ -428,6 +465,13 @@ function GetCompanyUsersList({
               onPageSizeChange={paginationData.selectedPageSize}
             />
           </div>
+          <MessageSnackBar
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleMessageSnackbarClose}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION}
+          />
         </div>
       );
     }
