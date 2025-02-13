@@ -6,6 +6,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import ROUTES_URL from "../../../../constants/Routes";
 import useScreenSize from "../../../../config/hooks/useScreenSize";
 import { BOOLEAN_VALUES } from "../../../../constants/AppConstants";
+import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
 
 function Navbar({children} : {children : React.ReactNode}){
   const [isOpen, setIsOpen] = useState<boolean>();
@@ -80,7 +81,7 @@ function Navbar({children} : {children : React.ReactNode}){
           <div className="flex justify-between h-10">
             <div className="flex items-center">
               <div className="w-32 h-auto">
-                <img src="/images/logo/logo.png" alt="" />
+                <img src={IMAGE_SOURCE.PR_LOGO} alt="" />
               </div>
             </div>
 

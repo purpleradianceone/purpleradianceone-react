@@ -118,7 +118,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
     localStorage.clear();
-    navigate("/signin")
+    navigate(ROUTES_URL.SIGN_IN)
   }
 
   if (!isOpen) return null;

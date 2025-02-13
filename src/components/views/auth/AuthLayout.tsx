@@ -4,6 +4,7 @@
  */
 import AuthLayoutProps from "../../../@types/auth/views/AuthLayoutProps";
 import "../../../assets/styles/AuthLayout.css";
+import { IMAGE_SOURCE } from "../../../constants/ImageSource";
 // import Logo from "../../../assets/svg/Logo";
 
 /**
@@ -29,7 +30,7 @@ function AuthLayout(props: AuthLayoutProps){
           }}
         >
           <div className="logo flex justify-center">
-            <img src="/images/logo/logo.png" alt="" className="w-52 h-32"/>
+            <img src={IMAGE_SOURCE.PR_LOGO} alt="" className="w-52 h-32" />
 
             {/* <Logo></Logo> */}
           </div>
@@ -38,7 +39,7 @@ function AuthLayout(props: AuthLayoutProps){
               <span className="avatar avatar-circle avatar-md">
                 <img
                   className="w-16 h-16 rounded-full object-cover border-2"
-                  src="/images/avatars/thumb-1.jpg"
+                  src={IMAGE_SOURCE.AVATAR_THUMB_ONE}
                   
                 ></img>
               </span>

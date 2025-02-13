@@ -245,6 +245,9 @@ function GetCompanyUsersList({
                     onEndDateChange={onEndDateChange}
                   />
                 </div>
+
+                {/* space for future elements to be added */}
+                <div style={{width:"250px"}}></div>
               </>
             )}
 
@@ -272,7 +275,7 @@ function GetCompanyUsersList({
                   </div>
                 </div>
                 {isFiltersOpenInTabletView && isCustomDateOptionSelected && (
-                  <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                  <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
                       <button
                         onClick={() => {
@@ -301,6 +304,7 @@ function GetCompanyUsersList({
                     </div>
                   </div>
                 )}
+                
               </>
             )}
 

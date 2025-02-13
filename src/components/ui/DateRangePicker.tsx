@@ -26,8 +26,8 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
   };
   return (
     <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-      <div className="relative">
-        <label htmlFor="start-date" className="block text-xs font-medium text-gray-700 ">
+      <div className="relative flex gap-2 justify-center items-center">
+        <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 ">
           From :
         </label>
         <div className="relative">
@@ -44,8 +44,8 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
         </div>
       </div>
 
-      <div className="relative">
-        <label htmlFor="end-date" className="block text-xs font-medium text-gray-700 ">
+      <div className="relative flex gap-2 justify-center items-center">
+        <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 ">
            To :
         </label>
         <div className="relative">
