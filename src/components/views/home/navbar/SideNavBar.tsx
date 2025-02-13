@@ -4,7 +4,7 @@ import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
 import { useAccessManagementContext } from "../../../../context/user/AccessManagementContext";
 import ROUTES_URL from "../../../../constants/Routes";
-import { NUMBER_VALUES } from "../../../../constants/AppConstants";
+import { BOOLEAN_VALUES, NUMBER_VALUES } from "../../../../constants/AppConstants";
 
 
 function SideNavBar({isOpen,onToggle} : SideBarProps){
@@ -51,7 +51,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               icon={Building2} 
               label="Manage Company Users" 
               isOpen={isOpen}
-              disabled={true}
+              disabled={BOOLEAN_VALUES.TRUE}
             />
             </Link>
             ) : (

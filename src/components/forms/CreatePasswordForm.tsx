@@ -1,5 +1,4 @@
-import React, { useState, useRef, FormEvent } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import React, { useState, FormEvent } from "react";
 import axios from "axios";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import { useNavigate } from "react-router-dom";
@@ -16,80 +15,48 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
-import KEYS from "../../constants/Keys";
-import { NUMBER_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, DATA_TYPE, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import MESSAGE from "../../constants/Messages";
+import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
+import { OTPInput } from "../ui/OtpInput";
 
 function CreatePasswordForm() {
   const [createPasswordFormData, setCreatePasswordFormData] =
     useState<CreatePasswordFormData>({
       otp: Array(6).fill(""),
-      newPassword: "",
-      confirmPassword: "",
+      newPassword: STRING_VALUES.EMPTY_STRING,
+      confirmPassword: STRING_VALUES.EMPTY_STRING,
     });
   const [createPasswordFormError, setCreatePasswordFormError] =
     useState<CreatePasswordFormErrors>({});
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(BOOLEAN_VALUES.FALSE);
   const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(BOOLEAN_VALUES.FALSE);
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
+    open: BOOLEAN_VALUES.FALSE,
+    message: STRING_VALUES.EMPTY_STRING,
     type: "success",
   });
 
   const navigate = useNavigate();
-  // Create refs for OTP inputs
-  const otpRef1 = useRef<HTMLInputElement>(null);
-  const otpRef2 = useRef<HTMLInputElement>(null);
-  const otpRef3 = useRef<HTMLInputElement>(null);
-  const otpRef4 = useRef<HTMLInputElement>(null);
-  const otpRef5 = useRef<HTMLInputElement>(null);
-  const otpRef6 = useRef<HTMLInputElement>(null);
-
-  const otpRefs = [otpRef1, otpRef2, otpRef3, otpRef4, otpRef5, otpRef6];
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    // Only allow numbers
-    if (value && !/^\d+$/.test(value)) return;
-
-    const newOtp = [...createPasswordFormData.otp];
-    newOtp[index] = value;
+  const handleOtpChange = (newOtp: string[]) => {
     setCreatePasswordFormData((prev) => ({ ...prev, otp: newOtp }));
-
-    // Clear OTP error if exists
-    if (createPasswordFormError.otp) {
-      setCreatePasswordFormError((prev) => ({ ...prev, otp: undefined }));
-    }
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      otpRefs[index + 1].current?.focus();
+    console.log(createPasswordFormData.otp);
+    if(createPasswordFormError.otp){
+      setCreatePasswordFormError((prev) => ({...prev,otp:DATA_TYPE.UNDEFINED}))
     }
   };
-
-  const handleOtpKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    // Handle backspace
-    if (
-      e.key === KEYS.BACKSPACE &&
-      !createPasswordFormData.otp[index] &&
-      index > 0
-    ) {
-      otpRefs[index - 1].current?.focus();
-    }
-  };
-
+  
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCreatePasswordFormData((prev) => ({ ...prev, [name]: value }));
@@ -104,20 +71,20 @@ function CreatePasswordForm() {
     const newErrors: CreatePasswordFormErrors = {};
 
     // Validate OTP
-    if (createPasswordFormData.otp.some((digit) => !digit)) {
-      newErrors.otp = "Please enter the complete OTP";
+    if(createPasswordFormData.otp.length !== 6){
+        newErrors.otp = MESSAGE.ERROR.ENTER_COMPLETE_OTP;
     }
 
     // Validate Password
     if (!createPasswordFormData.newPassword) {
-      newErrors.password = "Please enter a new password";
-    } else if (createPasswordFormData.newPassword.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+      newErrors.password = MESSAGE.ERROR.ENTER_NEW_PAWSSWORD;
+    } else if (createPasswordFormData.newPassword.length < NUMBER_VALUES.EIGHT) {
+      newErrors.password = MESSAGE.ERROR.EIGHT_CHARACTER_PASSWORD;
     } else if (
       createPasswordFormData.newPassword !==
       createPasswordFormData.confirmPassword
     ) {
-      newErrors.password = "Passwords do not match";
+      newErrors.password = MESSAGE.ERROR.PASSWORD_NOT_MATCH;
     }
 
     setCreatePasswordFormError(newErrors);
@@ -138,11 +105,12 @@ function CreatePasswordForm() {
         otp: otpData,
         password: createPasswordFormData.newPassword,
         email: localStorage.getItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL),
+      },{
+        withCredentials : BOOLEAN_VALUES.TRUE
       })
       .then((response) => {
         if (response.data.status) {
-          console.log("inside if");
-          setIsSubmitting(true);
+          setIsSubmitting(BOOLEAN_VALUES.TRUE);
           console.log(response);
 
           localStorage.removeItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL);
@@ -159,7 +127,7 @@ function CreatePasswordForm() {
             message: response.data.message,
             type: "error",
           });
-          setIsSubmitting(false);
+          setIsSubmitting(BOOLEAN_VALUES.FALSE);
         }
       });
   };
@@ -167,39 +135,17 @@ function CreatePasswordForm() {
   return (
     <>
       <form onSubmit={handleCreatePasswordSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Enter your OTP :
-          </label>
-          <div className="flex gap-2 justify-between">
-            {createPasswordFormData.otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={otpRefs[index]}
-                type="text"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                className={`w-12 h-12 text-center border-2 rounded-lg text-lg font-semibold
-                    ${
-                      createPasswordFormError.otp
-                        ? "border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
-                    } focus:ring-4 outline-none transition-all`}
-              />
-            ))}
-          </div>
-          {createPasswordFormError.otp && (
-            <p className="mt-1 text-sm text-red-500">
-              {createPasswordFormError.otp}
-            </p>
-          )}
-        </div>
+      <OTPInput
+          length={6}
+          value={createPasswordFormData.otp}
+          onChange={handleOtpChange}
+          error={createPasswordFormError.otp}
+          autoFocus
+        />
         <FormInput
           type={showPassword ? "text" : "password"}
           label="Enter new password :"
-          placeholder="Confirm password"
+          placeholder="New password"
           value={createPasswordFormData.newPassword}
           name="newPassword"
           onChange={handlePasswordChange}
@@ -208,17 +154,10 @@ function CreatePasswordForm() {
           required
           error={createPasswordFormError.password}
           rightElement={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-gray-400 hover:text-gray-500"
-            >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
-              )}
-            </button>
+            <PasswordVisibilityToggle
+            setShowPassword={setShowPassword}
+            showPassword = {showPassword}
+            />
           }
         />
 
@@ -234,17 +173,10 @@ function CreatePasswordForm() {
           required
           error={createPasswordFormError.password}
           rightElement={
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="text-gray-400 hover:text-gray-500"
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
-              )}
-            </button>
+            <PasswordVisibilityToggle
+            setShowPassword={setShowConfirmPassword}
+            showPassword = {showConfirmPassword}
+            />
           }
         />
         <Button type="submit" disabled={isSubmitting}>
@@ -257,7 +189,7 @@ function CreatePasswordForm() {
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
-        duration={2000}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </>
   );

@@ -7,6 +7,9 @@ import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
 import Button from "../ui/Button";
 import CompanyUser from "../../@types/company-users/CompanyUser";
+import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, NUMBER_VALUES } from "../../constants/AppConstants";
+import { CLASS_NAMES } from "../../constants/ClassNames";
+import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 
 
 function CompanyUserAgGrid({
@@ -31,34 +34,34 @@ function CompanyUserAgGrid({
           {
             field: "fullname",
             headerName: "Name",
-            sortable: true,
+            sortable: BOOLEAN_VALUES.TRUE,
             filter: "agTextColumnFilter",
-            flex: 1,
+            flex: NUMBER_VALUES.ONE,
             
             comparator: (valueA, valueB) => {
-              if (!valueA) return -1;
-              if (!valueB) return 1;
+              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
+              if (!valueB) return NUMBER_VALUES.ONE;
               return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
             },
           },
           {
             field: "email",
             headerName: "Email",
-            sortable: true,
-            filter: true,
-            flex: 1.5,
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
+            flex: NUMBER_VALUES.ONEANDHALF,
           },
           {
             field: "mobilenumber",
             headerName: "Mobile Number",
-            sortable: true,
-            filter: true,
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
           },
           {
             field: "isactive",
             headerName: "Status",
-            sortable: true,
-            filter: true,
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             cellRenderer: (params: any) => {
               return (
@@ -80,14 +83,14 @@ function CompanyUserAgGrid({
           },
           {
             headerName: "Actions",
-            sortable: false,
-            maxWidth: 100,
+            sortable: BOOLEAN_VALUES.FALSE,
+            maxWidth: NUMBER_VALUES.HUNDRED,
             pinned: "right",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             cellRenderer: (params: any) => {
               const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
-                useState(false);
-              const [position, setPosition] = useState({ top: 0, left: 0 });
+                useState(BOOLEAN_VALUES.FALSE);
+              const [position, setPosition] = useState({ top: NUMBER_VALUES.ZERO, left: NUMBER_VALUES.ZERO });
               const dropdownRef = useRef<HTMLDivElement | null>(null);
     
               const handleActionsButtonClick = (event: React.MouseEvent) => {
@@ -96,8 +99,8 @@ function CompanyUserAgGrid({
     
                 const rect = event.currentTarget.getBoundingClientRect();
                 setPosition({
-                  top: rect.bottom + window.scrollY - 10, // Position below button
-                  left: rect.left + window.scrollX - 25, // Align with button
+                  top: rect.bottom + window.scrollY - NUMBER_VALUES.TEN, // Position below button
+                  left: rect.left + window.scrollX - NUMBER_VALUES.TWENTY_FIVE, // Align with button
                 });
               };
     
@@ -107,7 +110,7 @@ function CompanyUserAgGrid({
                     dropdownRef.current &&
                     !dropdownRef.current.contains(event.target as Node)
                   ) {
-                    setIsActionsDropDownOpen(false);
+                    setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
                   }
                 };
     
@@ -128,7 +131,7 @@ function CompanyUserAgGrid({
                     className="text-blue-600"
                     onClick={handleActionsButtonClick}
                   >
-                    Actions ▾
+                    {JSX_CHILDREN_NAME.ACTIONS}
                   </button>
     
                   {isActionsDropDownOpen &&
@@ -140,33 +143,31 @@ function CompanyUserAgGrid({
                       >
                         {userHasAccessToViewAccess ? (
                           <>
-                            <button
-                              className="block w-full text-blue-600 p-2 text-left text-sm hover:bg-gray-100"
+                            <ActionsDropdownButton
                               onClick={() => {
                                 handleSelectedCompanyUserChange(params.data);
-                                handleIsAccessModalOpen(true)
-                                setIsActionsDropDownOpen(false);
+                                handleIsAccessModalOpen(BOOLEAN_VALUES.TRUE)
+                                setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
                               }}
                             >
-                              <UserCheck className="inline mr-2 size-4" /> Access
-                            </button>
+                              <UserCheck className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.ACCESS}
+                            </ActionsDropdownButton>
                             {userHasAccessToUpdateUser ? (
-                              <button
-                                className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
+                              <ActionsDropdownButton
                                 onClick={() => {
                                 handleSelectedCompanyUserChange(params.data);
-                                handleIdIsEditModalOpen(true);
-                                  setIsActionsDropDownOpen(false);
+                                handleIdIsEditModalOpen(BOOLEAN_VALUES.TRUE);
+                                  setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
                                 }}
                               >
-                                <Edit className="inline mr-2 size-4" /> Edit
-                              </button>
+                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.EDIT}
+                              </ActionsDropdownButton>
                             ) : (
                               <button
                                 disabled
-                                className="disabled text-sm p-2 text-left"
+                                className={CLASS_NAMES.DISABLED_BUTTON}
                               >
-                                <Edit className="inline mr-2  size-4" /> Edit
+                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.EDIT}
                               </button>
                             )}
                           </>
@@ -174,27 +175,27 @@ function CompanyUserAgGrid({
                           <>
                             <Button
                               disabled
-                              className="disabled text-sm p-2 text-lef"
+                              className={CLASS_NAMES.DISABLED_BUTTON}
                             >
-                              <UserCheck className="inline mr-2 size-4" /> Access
+                              <UserCheck className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.ACCESS}
                             </Button>
                             {userHasAccessToUpdateUser ? (
                               <button
                                 className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
                                 onClick={() => {
                                 handleSelectedCompanyUserChange(params.data)
-                                handleIdIsEditModalOpen(true);
-                                  setIsActionsDropDownOpen(false);
+                                handleIdIsEditModalOpen(BOOLEAN_VALUES.TRUE);
+                                  setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
                                 }}
                               >
-                                <Edit className="inline mr-2 size-4" /> Edit
+                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> Edit
                               </button>
                             ) : (
                               <Button
                                 disabled
-                                className="disabled text-sm p-2 text-left"
+                                className={CLASS_NAMES.DISABLED_BUTTON}
                               >
-                                <Edit className="inline mr-2 size-4" /> Edit
+                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> Edit
                               </Button>
                             )}
                           </>
@@ -216,8 +217,8 @@ function CompanyUserAgGrid({
           filter: "agTextColumnFilter",
           minWidth: 150,
           flex: 0.8,
-          suppressHeaderMenuButton: true,
-          suppressHeaderContextMenu: true,
+          suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
+          suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
         };
       }, []);
 

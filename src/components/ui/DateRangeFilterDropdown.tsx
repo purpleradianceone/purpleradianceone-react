@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Delete,  } from 'lucide-react';
 import DateRangeFilterDropdownProps from '../../@types/ui/DateRangeFilterDropdown';
-import { NUMBER_VALUES } from '../../constants/AppConstants';
+import { BOOLEAN_VALUES, NUMBER_VALUES } from '../../constants/AppConstants';
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(BOOLEAN_VALUES.FALSE);
     const [selectedOption, setSelectedOption] = useState("Filter");
     const dropdownRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(false);
+          setIsOpen(BOOLEAN_VALUES.FALSE);
         }
       }
   
@@ -22,7 +22,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
     const handleOptionClick = (dateId : number, dateName : string) => {
       props.handleDateIdChange(dateId);
       setSelectedOption(dateName)
-      setIsOpen(false);
+      setIsOpen(BOOLEAN_VALUES.FALSE);
     };
   
     return (

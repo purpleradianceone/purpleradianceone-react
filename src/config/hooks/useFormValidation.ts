@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import validateEmail from '../validations/ValidateEmail';
 import validateMobileNumber from '../validations/ValidateMobileNumber';
-import { STRING_VALUES } from '../../constants/AppConstants';
+import { BOOLEAN_VALUES, STRING_VALUES } from '../../constants/AppConstants';
 
 
 export type ErrorType = {
@@ -90,46 +90,46 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
   };
 
   const validateForm = (): boolean => {
-    let isValid = true;
+    let isValid = BOOLEAN_VALUES.TRUE;
     const newErrors: ErrorType = {};
 
     // Common validations for both forms
     if (!formData.email) {
       newErrors.email = "Email Address is required";
-      isValid = false;
+      isValid = BOOLEAN_VALUES.FALSE;
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Email Address must be valid";
-      isValid = false;
+      isValid = BOOLEAN_VALUES.FALSE;
     }
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-      isValid = false;
+      isValid = BOOLEAN_VALUES.FALSE;
     }
 
     // SignUp specific validations
     if (formType === STRING_VALUES.REGISTRATION) {
       if (formData.password.length < 8 || formData.password.length > 20) {
         newErrors.password = "Password must be between 8 to 20 characters";
-        isValid = false;
+        isValid = BOOLEAN_VALUES.FALSE;
       }
 
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = "Confirm password is required";
-        isValid = false;
+        isValid = BOOLEAN_VALUES.FALSE;
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
-        isValid = false;
+        isValid = BOOLEAN_VALUES.FALSE;
       }
 
       if (formData.mobileNumber && !validateMobileNumber(formData.mobileNumber)) {
         newErrors.mobileNumber = "Please enter a valid mobile number";
-        isValid = false;
+        isValid = BOOLEAN_VALUES.FALSE;
       }
 
       if (!formData.name) {
         newErrors.name = "Name is required";
-        isValid = false;
+        isValid = BOOLEAN_VALUES.FALSE;
       }
     }
 
