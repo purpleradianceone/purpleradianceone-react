@@ -14,8 +14,17 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
-import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import {
+  BOOLEAN_VALUES,
+  NUMBER_VALUES,
+  STATUS_CODE,
+  STRING_VALUES,
+} from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
+import ApiError from "../../@types/error/ApiError";
+import { DialogueBox } from "../dialogue-box/Dialogue";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -42,6 +51,11 @@ function CompanyUserAccessManagementModal({
     status: "idle",
     message: STRING_VALUES.EMPTY_STRING,
   });
+
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
 
   const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
@@ -73,8 +87,8 @@ function CompanyUserAccessManagementModal({
       };
 
       axios
-        .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
-          withCredentials : BOOLEAN_VALUES.TRUE
+        .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
+          withCredentials: BOOLEAN_VALUES.TRUE,
         })
         .then((response) => {
           setModules(response.data);
@@ -82,8 +96,12 @@ function CompanyUserAccessManagementModal({
           initialModulesRef.current = response.data;
           setChangedAccessModules([]);
         })
-        .catch((error) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch((error: ApiError | any) => {
           console.error(error);
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          }
         });
     } else {
       setModules([]);
@@ -185,10 +203,9 @@ function CompanyUserAccessManagementModal({
       updatedby: loginStatus.id,
     }));
 
-
     axios
-      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData,{
-        withCredentials : BOOLEAN_VALUES.TRUE
+      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData, {
+        withCredentials: BOOLEAN_VALUES.TRUE,
       })
       .then((response) => {
         showMessageSnackbar({
@@ -216,14 +233,24 @@ function CompanyUserAccessManagementModal({
           onClose();
         }, 2000);
       })
-      .catch((error) => {
-        showMessageSnackbar({ message: MESSAGE.ERROR.SOMETHING_WENT_WRONG, type: "error" });
-        console.error("Error saving data:", error);
-        setSpinnerAnimation({
-          status: "idle",
-          message: STRING_VALUES.EMPTY_STRING,
-        });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: ApiError | any) => {
+        console.error(error);
+        if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
+          setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+        } else {
+          showMessageSnackbar({
+            message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+            type: "error",
+          });
+        }
       });
+  };
+
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
   };
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
@@ -232,136 +259,146 @@ function CompanyUserAccessManagementModal({
   return accessModules.map((accessModule) => {
     if (accessModule.crm_module_id === NUMBER_VALUES.TWO && accessModule.view) {
       return (
-        <div className="fixed z-10 inset-0  bg-black bg-opacity-10 flex items-center justify-center p-4 ">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-medium text-gray-700">
-                Update Access rights of {users.fullname}
-              </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            {dataStatus ? (
-              <div className="flex w-full h-48 justify-center items-center">
-                <LoadingSpinner></LoadingSpinner>
+        <>
+          <div className="fixed inset-0 z-10 bg-black bg-opacity-10 flex items-center justify-center p-4 ">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+              <div className="flex justify-between items-center p-4 border-b">
+                <h2 className="text-lg font-medium text-gray-700">
+                  Update Access rights of {users.fullname}
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
               </div>
-            ) : (
-              <div className="p-6">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left">
-                      <th className="pb-4 w-16">Sr. No.</th>
-                      <th className="pb-4">Module Name</th>
-                      <th className="pb-4 text-center">
-                        <div className="flex flex-col items-center">
-                          <span>Add</span>
-                          <input
-                            type="checkbox"
-                            checked={isColumnSelected("add")}
-                            onChange={() => handleColumnSelectAll("add")}
-                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                        </div>
-                      </th>
-                      <th className="pb-4 text-center">
-                        <div className="flex flex-col items-center">
-                          <span>View</span>
-                          <input
-                            type="checkbox"
-                            checked={isColumnSelected("view")}
-                            onChange={() => handleColumnSelectAll("view")}
-                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                        </div>
-                      </th>
-                      <th className="pb-4 text-center">
-                        <div className="flex flex-col items-center">
-                          <span>Update</span>
-                          <input
-                            type="checkbox"
-                            checked={isColumnSelected("update")}
-                            onChange={() => handleColumnSelectAll("update")}
-                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {modules
-                      .sort((a, b) => a.id - b.id)
-                      .map((module) => (
-                        <tr key={module.id} className="border-t">
-                          <td className="py-3">{module.crm_module_id}</td>
-                          <td className="py-3">{module.module_name}</td>
-                          <td className="py-3 text-center">
+              {dataStatus ? (
+                <div className="flex w-full h-48 justify-center items-center">
+                  <LoadingSpinner></LoadingSpinner>
+                </div>
+              ) : (
+                <div className="p-6">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left">
+                        <th className="pb-4 w-16">Sr. No.</th>
+                        <th className="pb-4">Module Name</th>
+                        <th className="pb-4 text-center">
+                          <div className="flex flex-col items-center">
+                            <span>Add</span>
                             <input
                               type="checkbox"
-                              checked={module.add}
-                              onChange={() =>
-                                handleCheckboxChange(module.id, "add")
-                              }
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              checked={isColumnSelected("add")}
+                              onChange={() => handleColumnSelectAll("add")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                             />
-                          </td>
-                          <td className="py-3 text-center">
+                          </div>
+                        </th>
+                        <th className="pb-4 text-center">
+                          <div className="flex flex-col items-center">
+                            <span>View</span>
                             <input
                               type="checkbox"
-                              checked={module.view}
-                              onChange={() =>
-                                handleCheckboxChange(module.id, "view")
-                              }
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              checked={isColumnSelected("view")}
+                              onChange={() => handleColumnSelectAll("view")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                             />
-                          </td>
-                          <td className="py-3 text-center">
+                          </div>
+                        </th>
+                        <th className="pb-4 text-center">
+                          <div className="flex flex-col items-center">
+                            <span>Update</span>
                             <input
                               type="checkbox"
-                              checked={module.update}
-                              onChange={() =>
-                                handleCheckboxChange(module.id, "update")
-                              }
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              checked={isColumnSelected("update")}
+                              onChange={() => handleColumnSelectAll("update")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                             />
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {modules
+                        .sort((a, b) => a.id - b.id)
+                        .map((module) => (
+                          <tr key={module.id} className="border-t">
+                            <td className="py-3">{module.crm_module_id}</td>
+                            <td className="py-3">{module.module_name}</td>
+                            <td className="py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={module.add}
+                                onChange={() =>
+                                  handleCheckboxChange(module.id, "add")
+                                }
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                            </td>
+                            <td className="py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={module.view}
+                                onChange={() =>
+                                  handleCheckboxChange(module.id, "view")
+                                }
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                            </td>
+                            <td className="py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={module.update}
+                                onChange={() =>
+                                  handleCheckboxChange(module.id, "update")
+                                }
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-            <div className="flex justify-end p-2 border-t gap-3">
-              <div className="min-w-24">
-                {accessModule.update ? (
-                  users.id === loginStatus.id ? (
-                    <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
+              <div className="flex justify-end p-2 border-t gap-3">
+                <div className="min-w-24">
+                  {accessModule.update ? (
+                    users.id === loginStatus.id ? (
+                      <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
+                    ) : (
+                      <Button
+                        onClick={handleSaveAccessModule}
+                        spinner={spinnerAnimation}
+                      >
+                        Save
+                      </Button>
+                    )
                   ) : (
-                    <Button
-                      onClick={handleSaveAccessModule}
-                      spinner={spinnerAnimation}
-                    >
-                      Save
-                    </Button>
-                  )
-                ) : (
-                  <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
-                )}
+                    <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
+                  )}
+                </div>
               </div>
             </div>
+            <MessageSnackBar
+              isOpen={messageSnackbar.open}
+              message={messageSnackbar.message}
+              type={messageSnackbar.type}
+              onClose={handleMessageSnackbarClose}
+              duration={NUMBER_VALUES.SNACKBAR_DURATION}
+            />
+            
           </div>
-          <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
+          <DialogueBox
+            isOpen={isDialogueOpen}
+            onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+            onConfirm={handleDialogueConfirm}
+            title="Session Expired !"
+            message="Session Expired. Please login again."
           />
-        </div>
+        </>
       );
     }
   });
