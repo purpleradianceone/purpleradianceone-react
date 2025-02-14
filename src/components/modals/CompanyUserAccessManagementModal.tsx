@@ -99,7 +99,7 @@ function CompanyUserAccessManagementModal({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((error: ApiError | any) => {
           console.error(error);
-          if (error.status === STATUS_CODE.UNATHORISED) {
+          if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
             setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
           }
         });
