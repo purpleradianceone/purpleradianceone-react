@@ -48,6 +48,7 @@ export const JSX_CHILDREN_NAME = {
     EDIT : "Edit",
     ACTIONS : "Actions ▾",
     ADD_USER : "Add User",
+    CREATE_LEAD : "Create Lead"
 }
 
 export const SIZE = {
