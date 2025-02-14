@@ -71,12 +71,16 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               icon={Handshake} 
               label="Pages" 
               isOpen={isOpen}
-              children={[<>Profile</>, <>Settings</>, <>Invoice</>]}
             />
             </Link>
+
+
             <SideNavBarItem icon={Mail} label="Mail" isOpen={isOpen} />
+
             <SideNavBarItem icon={MessageSquare} label="Chat" isOpen={isOpen} />
+
             <SideNavBarItem icon={Calendar} label="Calendar" isOpen={isOpen} />
+            
             <SideNavBarItem icon={Settings} label="Settings" isOpen={isOpen} />
           </nav>
         </aside>
