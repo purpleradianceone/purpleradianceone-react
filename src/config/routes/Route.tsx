@@ -17,6 +17,8 @@ import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../../components/views/not-found/NotFoundPage";
 import ROUTES_URL from "../../constants/Routes";
 import LoggedInRoute from "./LoggedInRoute";
+import ContactUs from "../../components/views/home/landing-page/ContactUs";
+import LeadManagement from "../../components/views/lead-management/LeadManagement";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +36,7 @@ export const router = createBrowserRouter([
           <Hero />
           <Features />
           <Testimonials />
+          <ContactUs/>
           <CallToAction />
         </Navbar>
       </div>
@@ -115,5 +118,18 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+
+  {
+    path : ROUTES_URL.GET_LEAD_MANAGEMENT,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <LeadManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    ),
+  }
 ]);
 export default router;

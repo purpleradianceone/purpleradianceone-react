@@ -1,4 +1,4 @@
-import { Building2, Calendar, FileText, Home, LayoutDashboard, Mail, Menu, MessageSquare, Settings, X } from "lucide-react";
+import { Building2, Calendar, Handshake, Home, LayoutDashboard, Mail, Menu, MessageSquare, Settings, X } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
@@ -66,12 +66,14 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             )
             }
             
+            <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             <SideNavBarItem 
-              icon={FileText} 
+              icon={Handshake} 
               label="Pages" 
               isOpen={isOpen}
               children={[<>Profile</>, <>Settings</>, <>Invoice</>]}
             />
+            </Link>
             <SideNavBarItem icon={Mail} label="Mail" isOpen={isOpen} />
             <SideNavBarItem icon={MessageSquare} label="Chat" isOpen={isOpen} />
             <SideNavBarItem icon={Calendar} label="Calendar" isOpen={isOpen} />
