@@ -5,7 +5,6 @@ import AccessRightsModalProps from "../../../@types/company-users/AccessRightsMo
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 // import AccessDeniedPage from "../views/not-found/AccessDeniedPage";
-import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import POST_API from "../../../constants/PostApi";
@@ -25,13 +24,13 @@ import ApiError from "../../../@types/error/ApiError";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 function CompanyUserAccessManagementModal({
   isOpen,
   onClose,
   users,
 }: AccessRightsModalProps) {
-  const { accessModules } = useAccessManagementContext();
 
   const [dataStatus, setDataStatus] = useState(BOOLEAN_VALUES.FALSE);
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -39,6 +38,8 @@ function CompanyUserAccessManagementModal({
     message: STRING_VALUES.EMPTY_STRING,
     type: "success",
   });
+
+  const {userHasAccessToUpdateAccess} = useUserAccessModules();
 
   const [changedAccessModules, setChangedAccessModules] = useState<
     AccessManagementType[]
@@ -256,8 +257,6 @@ function CompanyUserAccessManagementModal({
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
 
-  return accessModules.map((accessModule) => {
-    if (accessModule.crm_module_id === NUMBER_VALUES.TWO && accessModule.view) {
       return (
         <>
           <div className="fixed inset-0 z-10 bg-black bg-opacity-45 flex items-center justify-center p-4 ">
@@ -365,7 +364,7 @@ function CompanyUserAccessManagementModal({
 
               <div className="flex justify-end p-2 border-t gap-3">
                 <div className="min-w-24">
-                  {accessModule.update ? (
+                  {userHasAccessToUpdateAccess ? (
                     users.id === loginStatus.id ? (
                       <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
                     ) : (
@@ -400,8 +399,6 @@ function CompanyUserAccessManagementModal({
           />
         </>
       );
-    }
-  });
 }
 
 export default CompanyUserAccessManagementModal;

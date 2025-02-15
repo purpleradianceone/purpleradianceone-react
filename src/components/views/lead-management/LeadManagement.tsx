@@ -1,16 +1,11 @@
-import { NUMBER_VALUES } from "../../../constants/AppConstants";
-import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import LeadManagementList from "../../lists/LeadManagementList";
 
 
 function LeadManagement(){
-        const {accessModules} = useAccessManagementContext()
-        const userHasAccessToViewLeads = accessModules.some(
-            (accessModule) =>
-              accessModule.crm_module_id === NUMBER_VALUES.THREE && accessModule.view
-          );
-
-          if(userHasAccessToViewLeads){
+        
+    const {userHasAccessToViewLead} = useUserAccessModules()
+          if(userHasAccessToViewLead){
             return(
                 <div className="w-full">
                     <LeadManagementList/>

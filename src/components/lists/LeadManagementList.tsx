@@ -1,22 +1,17 @@
 import { Handshake } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, NUMBER_VALUES, SIZE, } from "../../constants/AppConstants";
-import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
+import { JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 function LeadManagementList() {
-  const { accessModules } = useAccessManagementContext();
 
   const {isLargeScreen,isMediumScreen,isSmallScreen} = useScreenSize();
-  const userHasAccessToViewLeads = accessModules.some(
-    (accessModule) =>
-      accessModule.crm_module_id === NUMBER_VALUES.THREE && accessModule.view
-  );
+  const {userHasAccessToViewLead} = useUserAccessModules();
 
-
-  if (userHasAccessToViewLeads) {
+  if (userHasAccessToViewLead) {
     return (
       <div className="w-full pt-2 pl-5 pr-1 gap-1">
         <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">

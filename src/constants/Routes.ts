@@ -10,7 +10,9 @@ const ROUTES_URL = {
     EMAIL_VERIFICATION : "/emailverfication/verify",
     HOME : "/home",
     GET_COMPANY_USERS : "/home/manage-users/users",
-    GET_LEAD_MANAGEMENT : "/home/manage-leads/leads"
+    GET_LEAD_MANAGEMENT : "/home/manage-leads/leads",
+    GET_LEAD_MANAGEMENT_DETAILS : "/home/manage-leads/leads",
+    PRODUCT_MANAGEMENT : "/home/manage-products/products"
 
 }
 export default ROUTES_URL;
