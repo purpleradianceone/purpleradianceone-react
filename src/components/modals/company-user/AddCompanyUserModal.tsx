@@ -21,6 +21,7 @@ import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import { useNavigate } from "react-router-dom";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -51,7 +52,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if(addCompanyUserFormData.email !== STRING_VALUES.EMPTY_STRING && addCompanyUserFormData.name !=STRING_VALUES.EMPTY_STRING &&
@@ -98,7 +99,14 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         console.log(error);
         if(error){
           if (error.status === STATUS_CODE.UNATHORISED) {
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleAddUserSubmit });
+        if(refreshTokenStatus){
+          setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+        }
+        else{
+          setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+        }
+            
           }
           else{
             showMessageSnackbar({message:MESSAGE.ERROR.SOMETHING_WENT_WRONG,type : "error"})
@@ -142,7 +150,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             </h2>
           </div>
 
-          <form className="space-y-8" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleAddUserSubmit}>
             <FormInput
               label="Name : "
               type="text"

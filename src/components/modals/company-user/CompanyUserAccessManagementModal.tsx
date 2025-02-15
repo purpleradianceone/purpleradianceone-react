@@ -25,6 +25,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -78,7 +79,7 @@ function CompanyUserAccessManagementModal({
 
   const { loginStatus } = useLoggedInUserContext();
 
-  useEffect(() => {
+  const fetchUserAccessModules = async () => {
     if (isOpen) {
       setDataStatus(BOOLEAN_VALUES.TRUE);
       const getCrmModuleAccessData = {
@@ -98,10 +99,16 @@ function CompanyUserAccessManagementModal({
           setChangedAccessModules([]);
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((error: ApiError | any) => {
+        .catch( async (error : ApiError|any) => {
           console.error(error);
-          if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus =  await RefreshToken({ callFunction: fetchUserAccessModules });
+            if (  refreshTokenStatus) {
+              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+            }
+            else{
+              setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            }
           }
         });
     } else {
@@ -109,6 +116,10 @@ function CompanyUserAccessManagementModal({
       setChangedAccessModules([]);
       setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
     }
+  }
+
+  useEffect(() => {
+    fetchUserAccessModules();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
@@ -184,7 +195,7 @@ function CompanyUserAccessManagementModal({
     setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
-  const handleSaveAccessModule = () => {
+  const handleSaveAccessModule = async () => {
     if (changedAccessModules.length === NUMBER_VALUES.ZERO) {
       showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" }); // Updated message for clarity
       return;
@@ -235,10 +246,16 @@ function CompanyUserAccessManagementModal({
         }, 2000);
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: ApiError | any) => {
+      .catch(async (error: ApiError | any) => {
         console.error(error);
-        if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
-          setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({callFunction : handleSaveAccessModule });
+          if(refreshTokenStatus){
+            setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+          }
+          else{
+            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          }
         } else {
           showMessageSnackbar({
             message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
