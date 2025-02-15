@@ -42,14 +42,14 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
                 <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 
                   icon={Building2} 
-                  label="Manage Company Users" 
+                  label="Company Users" 
                   isOpen={isOpen}
                 /></Link>
             ) : (
             <Link to={ROUTES_URL.GET_COMPANY_USERS}>
             <SideNavBarItem 
               icon={Building2} 
-              label="Manage Company Users" 
+              label="Company Users" 
               isOpen={isOpen}
               disabled={BOOLEAN_VALUES.TRUE}
             />
@@ -58,7 +58,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               <Link to={ROUTES_URL.GET_COMPANY_USERS}>
               <SideNavBarItem 
                 icon={Building2} 
-                label="Manage Company Users" 
+                label="Company Users" 
                 isOpen={isOpen}
                 onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS }}
 
@@ -69,7 +69,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             <SideNavBarItem 
               icon={Handshake} 
-              label="Pages" 
+              label="Lead" 
               isOpen={isOpen}
             />
             </Link>

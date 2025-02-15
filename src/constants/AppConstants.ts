@@ -40,9 +40,8 @@ export const SITE_KEY = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
 
 export const STATUS_CODE = {
     OK : 200,
-    UNATHORISED : "you are unothorized",
+    UNATHORISED : 401,
 }
-
 export const JSX_CHILDREN_NAME = {
     ACCESS : "Access",
     EDIT : "Edit",

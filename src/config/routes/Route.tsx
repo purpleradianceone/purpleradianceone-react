@@ -12,7 +12,7 @@ import CallToAction from "../../components/views/home/landing-page/CallToAction"
 import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
 // import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
-import GetCompanyUsers from "../../components/views/manage-company-users/GetCompanyUsers";
+import GetCompanyUsers from "../../components/views/manage-company-users/CompanyUsersManagement";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../../components/views/not-found/NotFoundPage";
 import ROUTES_URL from "../../constants/Routes";

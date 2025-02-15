@@ -14,7 +14,7 @@ function ContactUs() {
                 <div className="flex justify-center"> {/* Center the iframe */}
                     <div className="bg-white p-6 rounded-xl shadow-lg"> {/* Optional styling container */}
                         <iframe
-                            src="http://127.0.0.1:5500/contact-us-form.html?client_id=React"
+                            src="http://127.0.0.1:5500/web/contact-us-form.html?client_id=React"
                             title="Contact Us Form"
                             width="600px"
                             height="650px"
