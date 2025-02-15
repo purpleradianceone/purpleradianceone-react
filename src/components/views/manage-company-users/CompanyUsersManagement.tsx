@@ -3,7 +3,6 @@ import companyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import GetCompanyUsersList from "../../lists/CompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import PAGINATION from "../../../constants/Pagination";
 import POST_API from "../../../constants/PostApi";
@@ -19,6 +18,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import ROUTES_URL from "../../../constants/Routes";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -29,8 +29,9 @@ function GetCompanyUsers() {
   const [pageSize, setPageSize] = useState<number>(
     PAGINATION.PAGINATION_COMPANY_USER_DEFAULT_SIZE
   );
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(BOOLEAN_VALUES.FALSE);
-  const { accessModules } = useAccessManagementContext();
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
+    BOOLEAN_VALUES.FALSE
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [dateRangeId, setDateRangeId] = useState(0);
@@ -40,9 +41,11 @@ function GetCompanyUsers() {
   const [concatDate, setConcatDate] = useState("");
 
   const navigate = useNavigate();
-  const [isDialogueOpen,setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
 
-
+  const { userHasAccessToViewUser } = useUserAccessModules();
 
   // Date formatting helpers
   const getDefaultStartDateOfYear = (): string => {
@@ -186,41 +189,46 @@ function GetCompanyUsers() {
 
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize));
+        setTotalPages(
+          Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize)
+        );
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
-      console.log(error)
+      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
-        refreshToken() 
+        refreshToken();
       }
     }
   };
 
-  const refreshToken = async() => {
-    try{
-
-      const refreshResponse = await axios.post(POST_API.REFRESH_TOKEN,{},{
-        withCredentials:BOOLEAN_VALUES.TRUE
-      })
+  const refreshToken = async () => {
+    try {
+      const refreshResponse = await axios.post(
+        POST_API.REFRESH_TOKEN,
+        {},
+        {
+          withCredentials: BOOLEAN_VALUES.TRUE,
+        }
+      );
       console.log(refreshResponse);
-      console.log("response Refresh")
+      console.log("response Refresh");
       fetchCompanyUsers();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }catch (error : ApiError|any){
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: ApiError | any) {
       console.log(error);
       console.log("refresh");
-      if(error.status === STATUS_CODE.UNATHORISED){
-        setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
       }
     }
-  }
+  };
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
     localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN)
-  }
+    navigate(ROUTES_URL.SIGN_IN);
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -239,50 +247,43 @@ function GetCompanyUsers() {
   ]);
 
   useEffect(() => {
-    const hasAccess = accessModules.some(
-      (module) => module.crm_module_id === NUMBER_VALUES.ONE && module.view
-    );
-    setAccessDeniedPopUpOpen(!hasAccess);
-  }, [accessModules]);
+    if(userHasAccessToViewUser === BOOLEAN_VALUES.FALSE) {
+      setAccessDeniedPopUpOpen(BOOLEAN_VALUES.TRUE)
+    }
+  }, [userHasAccessToViewUser]);
 
   return (
     <div className="w-full">
-      {accessModules.map((module) => {
-        if (module.crm_module_id === NUMBER_VALUES.ONE && module.view) {
-          return (
-            <>
-              <div key={module.id}>
-                <GetCompanyUsersList
-                  handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
-                  onEndDateChange={handleEndDateChange}
-                  onStartDateChange={handleStartDateChange}
-                  handleSearchOption={{
-                    handleSearchParameterChange,
-                    handleDateIdChange: handleDatePageIdChange,
-                  }}
-                  paginationData={{
-                    selectedPageSize: handlePageSizeChange,
-                    currentPage,
-                    handlePageChange,
-                    totalPages,
-                    pageSize,
-                  }}
-                  users={companyUsers}
-                />
-              </div>
-        <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
-            </>
-          );
-        }
-        return null;
-      })}
-      {accessDeniedPopUpOpen && (
+      {userHasAccessToViewUser ? (
+        <>
+          <div>
+            <GetCompanyUsersList
+              handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
+              onEndDateChange={handleEndDateChange}
+              onStartDateChange={handleStartDateChange}
+              handleSearchOption={{
+                handleSearchParameterChange,
+                handleDateIdChange: handleDatePageIdChange,
+              }}
+              paginationData={{
+                selectedPageSize: handlePageSizeChange,
+                currentPage,
+                handlePageChange,
+                totalPages,
+                pageSize,
+              }}
+              users={companyUsers}
+            />
+          </div>
+          <DialogueBox
+            isOpen={isDialogueOpen}
+            onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+            onConfirm={handleDialogueConfirm}
+            title="Session Expired !"
+            message="Session Expired. Please login again."
+          />
+        </>
+      ) : (
         <div className="flex-none mx-96 mt-14">
           <AccessDeniedPopup
             isOpen={accessDeniedPopUpOpen}

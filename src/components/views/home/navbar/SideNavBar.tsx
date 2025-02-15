@@ -1,21 +1,19 @@
-import { Building2, Calendar, Handshake, Home, LayoutDashboard, Mail, Menu, MessageSquare, Settings, X } from "lucide-react";
+import { Building2, Handshake, Home, Menu, Store, X } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
-import { useAccessManagementContext } from "../../../../context/user/AccessManagementContext";
 import ROUTES_URL from "../../../../constants/Routes";
-import { BOOLEAN_VALUES, NUMBER_VALUES } from "../../../../constants/AppConstants";
+import { BOOLEAN_VALUES, } from "../../../../constants/AppConstants";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 
 function SideNavBar({isOpen,onToggle} : SideBarProps){
 
-  const {accessModules} = useAccessManagementContext();
-  
-  return accessModules.map((module) => {
+  const {userHasAccessToViewUser,userHasAccessToViewLead} = useUserAccessModules()
 
 
     return(
-      <aside key={module.id}
+      <aside
        className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
           ${isOpen ? 'w-64' : 'w-20'}`}
         >
@@ -29,23 +27,17 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             <Link to= {ROUTES_URL.HOME}>
             <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}/>
             </Link>
-            <SideNavBarItem 
-           
-              icon={LayoutDashboard} 
-              label="Dashboards" 
-              isOpen={isOpen}
-              children={[<>Default</>, <>Analytics</>, <>Sales</>, <>CRM</>]}
-            />
 
-            {module.crm_module_id === NUMBER_VALUES.ONE ?
-             module.view ? (
+             {userHasAccessToViewUser === BOOLEAN_VALUES.TRUE && 
                 <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 
                   icon={Building2} 
                   label="Company Users" 
                   isOpen={isOpen}
                 /></Link>
-            ) : (
+            }
+
+            {userHasAccessToViewUser === BOOLEAN_VALUES.FALSE &&
             <Link to={ROUTES_URL.GET_COMPANY_USERS}>
             <SideNavBarItem 
               icon={Building2} 
@@ -53,19 +45,10 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               isOpen={isOpen}
               disabled={BOOLEAN_VALUES.TRUE}
             />
-            </Link>
-            ) : (
-              <Link to={ROUTES_URL.GET_COMPANY_USERS}>
-              <SideNavBarItem 
-                icon={Building2} 
-                label="Company Users" 
-                isOpen={isOpen}
-                onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS }}
-
-              /></Link>
-            )
-            }
+            </Link>}
             
+            
+            {userHasAccessToViewLead === BOOLEAN_VALUES.TRUE && 
             <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             <SideNavBarItem 
               icon={Handshake} 
@@ -73,19 +56,29 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               isOpen={isOpen}
             />
             </Link>
+            }
 
+            {userHasAccessToViewLead === BOOLEAN_VALUES.FALSE &&
+                <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+                <SideNavBarItem 
+                  icon={Handshake} 
+                  label="Lead" 
+                  isOpen={isOpen}
+                  disabled={BOOLEAN_VALUES.TRUE}
+                />
+                </Link>
+            }
 
-            <SideNavBarItem icon={Mail} label="Mail" isOpen={isOpen} />
-
-            <SideNavBarItem icon={MessageSquare} label="Chat" isOpen={isOpen} />
-
-            <SideNavBarItem icon={Calendar} label="Calendar" isOpen={isOpen} />
-            
-            <SideNavBarItem icon={Settings} label="Settings" isOpen={isOpen} />
+            <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+              <SideNavBarItem
+              icon={Store}
+              label="Products"
+              isOpen={isOpen}
+              />
+            </Link>
           </nav>
         </aside>
   );
-  })
    
 
 };

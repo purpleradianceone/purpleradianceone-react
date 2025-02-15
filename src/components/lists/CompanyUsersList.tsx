@@ -4,7 +4,6 @@ import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps
 import Button from "../ui/Button";
 import { useEffect, useState } from "react";
 import Pagination from "../ag-grid/Pagination";
-import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
@@ -33,6 +32,7 @@ import {
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../ui/MessageSnackbar";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 function GetCompanyUsersList({
   users,
@@ -57,7 +57,6 @@ function GetCompanyUsersList({
   );
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
     useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const { accessModules } = useAccessManagementContext();
   const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =
     useState<boolean>(BOOLEAN_VALUES.FALSE);
   const [isFiltersOpenInMobileView, setIsFilterOpenInMobileView] =
@@ -67,14 +66,7 @@ function GetCompanyUsersList({
 
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const userHasAccessToViewAccess = accessModules.some(
-    (accessModule) =>
-      accessModule.crm_module_id === NUMBER_VALUES.TWO && accessModule.view
-  );
-  const userHasAccessToUpdateUser = accessModules.some(
-    (accessModule) =>
-      accessModule.crm_module_id === NUMBER_VALUES.ONE && accessModule.update
-  );
+  const {userHasAccessToViewAccess,userHasAccessToUpdateUser,userHasAccessToAddUser,userHasAccessToViewUser} = useUserAccessModules();
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: BOOLEAN_VALUES.FALSE,
@@ -190,10 +182,9 @@ function GetCompanyUsersList({
     setIsAccessModalOpen(status);
   };
 
-  return accessModules.map((accessModule) => {
-    if (accessModule.crm_module_id === NUMBER_VALUES.ONE) {
       return (
-        <div key={accessModule.id} className="w-full pt-2 pl-5 pr-1 gap-1">
+        userHasAccessToViewUser && 
+          <div className="w-full pt-2 pl-5 pr-1 gap-1">
           <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
             <div className="flex  gap-2">
               {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
@@ -394,7 +385,7 @@ function GetCompanyUsersList({
 
             {/* new end */}
 
-            {accessModule.add ? (
+            {userHasAccessToAddUser ? (
               <>
                 <div className="flex gap-1">
                   <Button
@@ -477,9 +468,11 @@ function GetCompanyUsersList({
             duration={NUMBER_VALUES.SNACKBAR_DURATION}
           />
         </div>
+        
+
+        
+
       );
-    }
-  });
 }
 
 export default GetCompanyUsersList;
