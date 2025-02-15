@@ -12,6 +12,7 @@ const POST_API = {
     COMPANY_SPECIFIC_CRITERIA_DATE_RANGE : "/api/main/purple-crm-api/get/companyspecificcriteria/daterange",
     CREATE_USER : "/api/main/purple-crm-api/createuser",
     SIGN_UP_EMAIL_VERIFICATION : "/api/authentication/purple-crm-api/emailverfication/verify?token=",
+    REFRESH_TOKEN : "/api/authentication/purple-crm-api/refresh-token",
 }
 
 export default POST_API;

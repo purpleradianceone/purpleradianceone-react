@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import GetCompanyUsersList from "../../lists/GetCompanyUsersList";
+import GetCompanyUsersList from "../../lists/CompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
@@ -186,15 +186,35 @@ function GetCompanyUsers() {
 
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        setTotalPages(Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize));
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
-      if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
-        setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+      console.log(error)
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        refreshToken() 
       }
     }
   };
+
+  const refreshToken = async() => {
+    try{
+
+      const refreshResponse = await axios.post(POST_API.REFRESH_TOKEN,{},{
+        withCredentials:BOOLEAN_VALUES.TRUE
+      })
+      console.log(refreshResponse);
+      console.log("response Refresh")
+      fetchCompanyUsers();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }catch (error : ApiError|any){
+      console.log(error);
+      console.log("refresh");
+      if(error.status === STATUS_CODE.UNATHORISED){
+        setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+      }
+    }
+  }
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);

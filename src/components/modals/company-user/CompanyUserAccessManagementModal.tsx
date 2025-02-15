@@ -1,30 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
-import Button from "../ui/Button";
-import AccessRightsModalProps from "../../@types/company-users/AccessRightsModalProps";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import Button from "../../ui/Button";
+import AccessRightsModalProps from "../../../@types/company-users/AccessRightsModalProps";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 // import AccessDeniedPage from "../views/not-found/AccessDeniedPage";
-import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import LoadingSpinner from "../../assets/animations/LoadingSpinner";
-import POST_API from "../../constants/PostApi";
-import { AccessManagementType } from "../../@types/company-users/AccessManagementContextType";
+import { useAccessManagementContext } from "../../../context/user/AccessManagementContext";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import POST_API from "../../../constants/PostApi";
+import { AccessManagementType } from "../../../@types/company-users/AccessManagementContextType";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
+} from "../../../@types/ui/MessageSnackbarProps";
 import {
   BOOLEAN_VALUES,
   NUMBER_VALUES,
   STATUS_CODE,
   STRING_VALUES,
-} from "../../constants/AppConstants";
-import MESSAGE from "../../constants/Messages";
-import ApiError from "../../@types/error/ApiError";
-import { DialogueBox } from "../dialogue-box/Dialogue";
+} from "../../../constants/AppConstants";
+import MESSAGE from "../../../constants/Messages";
+import ApiError from "../../../@types/error/ApiError";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
+import ROUTES_URL from "../../../constants/Routes";
 
 function CompanyUserAccessManagementModal({
   isOpen,

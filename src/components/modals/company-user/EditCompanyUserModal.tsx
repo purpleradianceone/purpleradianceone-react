@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { EditIcon, X } from "lucide-react";
-import FormInput from "../ui/FormInput";
-import Button from "../ui/Button";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import FormInput from "../../ui/FormInput";
+import Button from "../../ui/Button";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import POST_API from "../../constants/PostApi";
-import EditUserPopupProps from "../../@types/modal/EditCompanyUserProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import POST_API from "../../../constants/PostApi";
+import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import { useFormChange } from "../../config/hooks/useFormChange";
-import { useFormValidation } from "../../config/hooks/useFormValidation";
+} from "../../../@types/ui/MessageSnackbarProps";
+import { useFormChange } from "../../../config/hooks/useFormChange";
+import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
   BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
   STRING_VALUES,
-} from "../../constants/AppConstants";
-import MESSAGE from "../../constants/Messages";
-import ApiError from "../../@types/error/ApiError";
+} from "../../../constants/AppConstants";
+import MESSAGE from "../../../constants/Messages";
+import ApiError from "../../../@types/error/ApiError";
 import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
-import { DialogueBox } from "../dialogue-box/Dialogue";
+import ROUTES_URL from "../../../constants/Routes";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 function EditCompanyUserModal({
   isOpen,

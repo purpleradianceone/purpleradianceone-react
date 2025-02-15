@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import { UserPlus, X } from "lucide-react";
-import FormInput from "../ui/FormInput";
-import Button from "../ui/Button";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import FormInput from "../../ui/FormInput";
+import Button from "../../ui/Button";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import AddCompanyUserStateType from "../../@types/modal/AddCompanyUserStateType";
-import AddCompanyUserModalProps from "../../@types/modal/AddCompanyUserModalProps";
-import POST_API from "../../constants/PostApi";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import AddCompanyUserStateType from "../../../@types/modal/AddCompanyUserStateType";
+import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalProps";
+import POST_API from "../../../constants/PostApi";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import { useFormChange } from "../../config/hooks/useFormChange";
-import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
-import ROUTES_URL from "../../constants/Routes";
-import MESSAGE from "../../constants/Messages";
+} from "../../../@types/ui/MessageSnackbarProps";
+import { useFormChange } from "../../../config/hooks/useFormChange";
+import { useFormValidation } from "../../../config/hooks/useFormValidation";
+import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STATUS_CODE, STRING_VALUES } from "../../../constants/AppConstants";
+import ROUTES_URL from "../../../constants/Routes";
+import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import ApiError from "../../@types/error/ApiError";
+import ApiError from "../../../@types/error/ApiError";
 import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../dialogue-box/Dialogue";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -97,7 +97,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         });
         console.log(error);
         if(error){
-          if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
+          if (error.status === STATUS_CODE.UNATHORISED) {
             setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
           }
           else{
