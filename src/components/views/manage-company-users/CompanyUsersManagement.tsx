@@ -19,6 +19,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ApiError from "../../../@types/error/ApiError";
 import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 function GetCompanyUsers() {
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -197,32 +198,18 @@ function GetCompanyUsers() {
     } catch (error: ApiError | any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
-        refreshToken();
+        const refreshTokenStatus = await RefreshToken({callFunction : fetchCompanyUsers});
+        if(refreshTokenStatus){
+          setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+        }
+        else{
+          setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+        }
       }
     }
   };
 
-  const refreshToken = async () => {
-    try {
-      const refreshResponse = await axios.post(
-        POST_API.REFRESH_TOKEN,
-        {},
-        {
-          withCredentials: BOOLEAN_VALUES.TRUE,
-        }
-      );
-      console.log(refreshResponse);
-      console.log("response Refresh");
-      fetchCompanyUsers();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: ApiError | any) {
-      console.log(error);
-      console.log("refresh");
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
-      }
-    }
-  };
+  
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);

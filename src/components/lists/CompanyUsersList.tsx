@@ -24,15 +24,11 @@ import {
   JSX_CHILDREN_NAME,
   NUMBER_VALUES,
   SIZE,
+  STATUS_CODE,
   STRING_VALUES,
 } from "../../constants/AppConstants";
-import MESSAGE from "../../constants/Messages";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function GetCompanyUsersList({
   users,
@@ -67,20 +63,6 @@ function GetCompanyUsersList({
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const {userHasAccessToViewAccess,userHasAccessToUpdateUser,userHasAccessToAddUser,userHasAccessToViewUser} = useUserAccessModules();
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
-  };
 
   const handleDateIdChange = (dateId: number) => {
     console.log(dateId);
@@ -120,7 +102,7 @@ function GetCompanyUsersList({
   ]);
   const { loginStatus } = useLoggedInUserContext();
 
-  const fetchData = () => {
+  const fetchData = async () => {
     const postData = {
       requestedby: loginStatus.id,
       company_id: loginStatus.companyId,
@@ -136,12 +118,13 @@ function GetCompanyUsersList({
       })
       .catch((error) => {
         console.error(error);
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-          type: "error",
-        });
+        if(error.status === STATUS_CODE.UNATHORISED){
+           RefreshToken({callFunction: fetchData})
+        }
       });
   };
+
+  
 
   useEffect(() => {
     fetchData();
@@ -460,13 +443,6 @@ function GetCompanyUsersList({
               onPageSizeChange={paginationData.selectedPageSize}
             />
           </div>
-          <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
         </div>
         
 

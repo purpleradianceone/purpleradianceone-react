@@ -25,6 +25,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 function EditCompanyUserModal({
   isOpen,
@@ -72,7 +73,7 @@ function EditCompanyUserModal({
     navigate(ROUTES_URL.SIGN_IN);
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (
@@ -106,9 +107,15 @@ function EditCompanyUserModal({
               }, 2000);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: ApiError | any) => {
-              if (error.response.headers.error === STATUS_CODE.UNATHORISED) {
-                setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleEditUserSubmit });
+                if(refreshTokenStatus){
+                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                }
+                else{
+                  setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+                }
               } else {
                 showMessageSnackbar({
                   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
@@ -167,7 +174,7 @@ function EditCompanyUserModal({
               </h2>
             </div>
 
-            <form className="space-y-8" onSubmit={handleSubmit}>
+            <form className="space-y-8" onSubmit={handleEditUserSubmit}>
               <FormInput
                 label="Name : "
                 type="text"
