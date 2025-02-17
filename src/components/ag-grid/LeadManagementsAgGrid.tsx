@@ -17,11 +17,40 @@ function LeadManagementAgGrid({
     userHasAccessToViewLead
 }  : LeadManagementProps) {
 
+  useEffect(()=>{
+    console.log(leads);
+  },[]);
 
     const columnDefs = useMemo<ColDef[]>(
         () => [
           {
-            field: "customerName",
+            field: "id",
+            headerName: "Id",
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: "agTextColumnFilter",
+            flex: NUMBER_VALUES.ONE,
+            
+            comparator: (valueA, valueB) => {
+              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
+              if (!valueB) return NUMBER_VALUES.ONE;
+              return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+            },
+          },
+          {
+            field: "leadNo",
+            headerName: "LeadNo",
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: "agTextColumnFilter",
+            flex: NUMBER_VALUES.ONE,
+            
+            comparator: (valueA, valueB) => {
+              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
+              if (!valueB) return NUMBER_VALUES.ONE;
+              return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+            },
+          },
+          {
+            field: "name",
             headerName: "Name",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: "agTextColumnFilter",
@@ -41,7 +70,7 @@ function LeadManagementAgGrid({
             flex: NUMBER_VALUES.ONEANDHALF,
           },
           {
-            field: "mobilenumber",
+            field: "phone",
             headerName: "Mobile Number",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: BOOLEAN_VALUES.TRUE,
@@ -69,6 +98,36 @@ function LeadManagementAgGrid({
                 </div>
               );
             },
+          },
+          // {
+          //   field: "createdOn",
+          //   headerName: "Created On",
+          //   sortable: BOOLEAN_VALUES.TRUE,
+          //   filter: BOOLEAN_VALUES.TRUE,
+          // },
+          // {
+          //   field: "updatedOn",
+          //   headerName: "Updated On",
+          //   sortable: BOOLEAN_VALUES.TRUE,
+          //   filter: BOOLEAN_VALUES.TRUE,
+          // },
+          {
+            field: "createdBy",
+            headerName: "createdBy",
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
+          },
+          // {
+          //   field: "updatedBy",
+          //   headerName: "updatedBy",
+          //   sortable: BOOLEAN_VALUES.TRUE,
+          //   filter: BOOLEAN_VALUES.TRUE,
+          // },
+          {
+            field: "assignedTo",
+            headerName: "assignedTo",
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
           },
           {
             headerName: "Actions",

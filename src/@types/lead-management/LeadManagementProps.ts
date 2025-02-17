@@ -6,18 +6,20 @@ type LeadManagementProps = {
      handleIdIsEditModalOpen? : (isOpen : boolean)=> void ,
 }
 
-type Lead = {
+export type Lead = {
     id?: number,
+    leadNo?: string,
     name: string,
     email: string,
-    phone: string,
-    message : string,
+    phone?: string,
+    remark? : string,
     status: string,
     createdOn?: string,
     updatedOn?: string,
     createdBy? : string,
     updatedBy? : string,
-    platform? : string,
+    assignedTo?: string,
+    source? : string,
 }
 
 export default LeadManagementProps;
