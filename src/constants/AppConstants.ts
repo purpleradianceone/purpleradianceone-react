@@ -7,6 +7,13 @@ export const  STRING_VALUES = {
     EMPTY_STRING : "",
     CONFIRM : "Confirm",
     CANCEL : "Cancel",
+    
+}
+
+export const TAX_CODE = {
+    HSN : "HSN",
+    SAC : "SAC",
+    ALL : "All"
 }
 
 export const  BOOLEAN_VALUES = {
@@ -47,7 +54,8 @@ export const JSX_CHILDREN_NAME = {
     EDIT : "Edit",
     ACTIONS : "Actions ▾",
     ADD_USER : "Add User",
-    CREATE_LEAD : "Create Lead"
+    CREATE_LEAD : "Create Lead",
+    ADD_PRODUCTS : "Add Products",
 }
 
 export const SIZE = {
