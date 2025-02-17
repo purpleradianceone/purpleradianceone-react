@@ -11,9 +11,9 @@ export const  STRING_VALUES = {
 }
 
 export const TAX_CODE = {
-    HSN : "HSN",
-    SAC : "SAC",
-    ALL : "All"
+    HSN : "hsn",
+    SAC : "sac",
+    ALL : "all"
 }
 
 export const  BOOLEAN_VALUES = {
@@ -26,6 +26,7 @@ export const  NUMBER_VALUES = {
     ONE : 1,
     TWO : 2,
     THREE : 3,
+    FOUR : 4,
     FIVE : 5,
     EIGHT : 8,
     MINUS_ONE : -1,

@@ -12,7 +12,8 @@ type TextAreaInputProps = {
     readonly? : boolean,
     defaultValue?: string | number | readonly string[] | undefined,
     className?: string,
-    maxLength : number,
+    maxLength? : number,
+    error? : string;
 }
 
 export default TextAreaInputProps;
