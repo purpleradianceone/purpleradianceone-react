@@ -1,10 +1,10 @@
 export type Product = {
     name : string,
-    itemCode : string,
+    code : string,
     description : string,
-    price : number,
-    HSN : string,
-    SAC : string,
+    cost? : number,
+    hsn? : string,
+    sac? : string,
     
 }
 

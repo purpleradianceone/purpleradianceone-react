@@ -18,7 +18,7 @@ function ProductsManagementGrid({
     const columnDefs = useMemo<ColDef[]>(
         () => [
           {
-            field: "productName",
+            field: "name",
             headerName: "Product Name",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: "agTextColumnFilter",
@@ -32,15 +32,15 @@ function ProductsManagementGrid({
             },
           },
           {
-            field: "itemCode",
+            field: "code",
             headerName: "Item Code",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: BOOLEAN_VALUES.TRUE,
             flex: NUMBER_VALUES.ONE,
           },
           {
-            field: "price",
-            headerName: "price",
+            field: "cost",
+            headerName: "Basic Cost",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: BOOLEAN_VALUES.TRUE,
             flex: NUMBER_VALUES.ONE,
@@ -57,14 +57,14 @@ function ProductsManagementGrid({
 
           },
           {
-            field : "HSN" ,
+            field : "hsn" ,
             headerName : "HSN",
             sortable : BOOLEAN_VALUES.TRUE ,
             filter : BOOLEAN_VALUES.TRUE ,
             flex : NUMBER_VALUES.ONE ,
           },
           {
-            field: "SAC",
+            field: "sac",
             headerName: "SAC",
             sortable: BOOLEAN_VALUES.TRUE,
             filter: BOOLEAN_VALUES.TRUE,

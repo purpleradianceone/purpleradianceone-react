@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import validateEmail from '../validations/ValidateEmail';
 import validateMobileNumber from '../validations/ValidateMobileNumber';
-import { BOOLEAN_VALUES, STRING_VALUES } from '../../constants/AppConstants';
+import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from '../../constants/AppConstants';
 
 
 export type ErrorType = {
@@ -10,17 +10,20 @@ export type ErrorType = {
   confirmPassword?: string;
   mobileNumber?: string;
   name?: string;
+  code? : string;
+  description? : string;
+  cost? : string;
 };
 
 export type FormType = 'registered' | 'registration';
 
-export const useFormValidation = (formData: Record<string, string>, formType: FormType) => {
+export const useFormValidation = (formData: Record<string, string|number>, formType: FormType) => {
   const [errors, setErrors] = useState<ErrorType>({});
 
 
 
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>| React.FocusEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     switch (name) {
@@ -40,7 +43,7 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
       case "password":
         if (!value) {
           setErrors((prev) => ({ ...prev, password: "Password is required" }));
-        } else if (formType === STRING_VALUES.REGISTRATION && (value.length < 8 || value.length > 20)) {
+        } else if (formType === STRING_VALUES.REGISTRATION && (value.length < NUMBER_VALUES.EIGHT || value.length > NUMBER_VALUES.TWENTY)) {
           setErrors((prev) => ({
             ...prev,
             password: "Password must be between 8 to 20 characters",
@@ -72,6 +75,7 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
         
         if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value)) {
           
+
           setErrors((prev) => ({
             ...prev,
             mobileNumber: "Please enter a valid mobile number",
@@ -88,6 +92,30 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
           setErrors((prev) => ({ ...prev, name: "" }));
         }
         break;
+
+        case "code" :
+          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+            console.log("inside code");
+            setErrors((prev) => ({ ...prev, code: "Item Code is required"}));
+          }
+          else{
+            setErrors((prev) => ({ ...prev, code: "" }));
+          }
+          break;
+
+        case "description" :
+          if(formType === STRING_VALUES.REGISTRATION){
+            if(value === STRING_VALUES.EMPTY_STRING) {
+              setErrors((prev) => ({ ...prev, description: "Description is required"}));
+            }
+            else if(value.toString().length > NUMBER_VALUES.TWO_FIFTY_SIX || value.toString().length < NUMBER_VALUES.FIFTEEN) {
+              setErrors((prev) => ({ ...prev, description: "Description should be between 256 and 15 characters"}));
+            }
+            else{
+              setErrors((prev) => ({ ...prev, description: "" }));
+            }
+          }
+          break;
     }
   };
 
@@ -99,7 +127,7 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
     if (!formData.email) {
       newErrors.email = "Email Address is required";
       isValid = BOOLEAN_VALUES.FALSE;
-    } else if (!validateEmail(formData.email)) {
+    } else if (!validateEmail(formData.email.toString())) {
       newErrors.email = "Email Address must be valid";
       isValid = BOOLEAN_VALUES.FALSE;
     }
@@ -111,7 +139,7 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
 
     // SignUp specific validations
     if (formType === STRING_VALUES.REGISTRATION) {
-      if (formData.password.length < 8 || formData.password.length > 20) {
+      if (formData.password.toString().length <  NUMBER_VALUES.EIGHT || formData.password.toString().length > NUMBER_VALUES.TWENTY) {
         newErrors.password = "Password must be between 8 to 20 characters";
         isValid = BOOLEAN_VALUES.FALSE;
       }
@@ -124,7 +152,7 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
         isValid = BOOLEAN_VALUES.FALSE;
       }
 
-      if (formData.mobileNumber && !validateMobileNumber(formData.mobileNumber)) {
+      if (formData.mobileNumber && !validateMobileNumber(formData.mobileNumber.toString())) {
         newErrors.mobileNumber = "Please enter a valid mobile number";
         isValid = BOOLEAN_VALUES.FALSE;
       }

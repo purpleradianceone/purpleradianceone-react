@@ -52,6 +52,22 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === NUMBER_VALUES.THREE && accessModule.add
   );
 
+  //Product Management
+  const userHasAccessToViewProduct = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FOUR && accessModule.view
+  );
+
+  const userHasAccessToUpdateProduct = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FOUR && accessModule.update
+  );
+
+  const userHasAccessToAddProduct = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FOUR && accessModule.add
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -62,6 +78,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddLead,
     userHasAccessToViewLead,
     userHasAccessToUpdateLead,
+    userHasAccessToAddProduct,
+    userHasAccessToViewProduct,
+    userHasAccessToUpdateProduct,
 
   };
 };
