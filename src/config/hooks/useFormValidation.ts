@@ -69,7 +69,9 @@ export const useFormValidation = (formData: Record<string, string>, formType: Fo
         break;
 
       case "mobileNumber":
-        if (formType === STRING_VALUES.REGISTRATION && value && !validateMobileNumber(value)) {
+        
+        if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value)) {
+          
           setErrors((prev) => ({
             ...prev,
             mobileNumber: "Please enter a valid mobile number",

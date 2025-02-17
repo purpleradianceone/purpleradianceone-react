@@ -1,17 +1,25 @@
 import { Handshake } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import CreateLeadModal from "../modals/leads/CreateLeadModal";
+import { useState } from "react";
+import { leadsData } from "../../constants/TestData";
 
 function LeadManagementList() {
 
   const {isLargeScreen,isMediumScreen,isSmallScreen} = useScreenSize();
   const {userHasAccessToViewLead} = useUserAccessModules();
+  const [isCreateLeadModalOpen,setIsCreateLeadModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE)
 
   if (userHasAccessToViewLead) {
+    const handleCreateLeadModalClose =() => {
+      setIsCreateLeadModalOpen(BOOLEAN_VALUES.FALSE)
+    }
+
     return (
       <div className="w-full pt-2 pl-5 pr-1 gap-1">
         <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
@@ -41,6 +49,9 @@ function LeadManagementList() {
             )}
              <div className="flex gap-1">
                   <Button
+                  onClick={()=>{
+                    setIsCreateLeadModalOpen(BOOLEAN_VALUES.TRUE)
+                  }}
                   >
                     {!isSmallScreen && <Handshake size={SIZE.TWENTY} />}
                     {isSmallScreen && <Handshake size={SIZE.EIGHT} />}
@@ -59,8 +70,10 @@ function LeadManagementList() {
               style={{ height: "460px", width: "100%" }}
             >
               <LeadManagementAgGrid
+              leads={leadsData}
               />
-            </div>            
+            </div> 
+            <CreateLeadModal isOpen={isCreateLeadModalOpen} onClose={handleCreateLeadModalClose}></CreateLeadModal>           
           </div>
       </div>
     );

@@ -1,3 +1,4 @@
+import { Lead } from "../@types/lead-management/LeadManagementProps";
 
 export const productsData = [
     {
@@ -184,3 +185,162 @@ export const ProductsRadioButtonOptions = [
   }
 
 ]
+
+export const leadsData:Lead[] = [
+  {
+    id: 1,
+    leadNo: "Lead-9500",
+    name: "Mr. Ghorpade",
+    email: "ghorpade@example.com",
+    phone: "8624003552",
+    remark: "Information given, price pitched 18k. Client will let us know.",
+    status: "Open",
+    createdOn: "Feb 17, 2025 10:53:26",
+    updatedOn: "Feb 17, 2025 10:53:26",
+    createdBy: "Suraj Darade",
+    updatedBy: "Suraj Darade",
+    assignedTo: "Suraj Darade",
+    source: "Marketing"
+  },
+  {
+    id: 2,
+    leadNo: "Lead-9499",
+    name: "Mr. Samadhan Tonde",
+    email: "samadhan.tonde@example.com",
+    phone: "8956024594",
+    remark: "Client interested, discussing budget.",
+    status: "Open",
+    createdOn: "Feb 15, 2025 18:26:32",
+    updatedOn: "Feb 15, 2025 18:26:32",
+    createdBy: "Suraj Darade",
+    updatedBy: "Suraj Darade",
+    assignedTo: "Suraj Darade",
+    source: "Marketing"
+  },
+  {
+    id: 3,
+    leadNo: "Lead-9498",
+    name: "Mr. Ashok Rathi",
+    email: "ashok.rathi@example.com",
+    phone: "7791079777",
+    remark: "Information given, price pitched 28k 37k.",
+    status: "Open",
+    createdOn: "Feb 15, 2025 17:35:55",
+    updatedOn: "Feb 15, 2025 17:35:55",
+    createdBy: "Suraj Darade",
+    updatedBy: "Suraj Darade",
+    assignedTo: "Suraj Darade",
+    source: "Marketing"
+  },
+  {
+    id: 4,
+    leadNo: "Lead-9497",
+    name: "Mr. Tarun Chavda",
+    email: "tarun.chavda@example.com",
+    phone: "7984671703",
+    remark: "Client is not receiving the call.",
+    status: "Open",
+    createdOn: "Feb 17, 2025 10:35:54",
+    updatedOn: "Feb 17, 2025 10:35:54",
+    createdBy: "Suraj Darade",
+    updatedBy: "Suraj Darade",
+    assignedTo: "Suraj Darade",
+    source: "Marketing"
+  },
+  {
+    id: 5,
+    leadNo: "Lead-9496",
+    name: "Mr. Nilesh Gaikwad",
+    email: "nilesh.gaikwad@example.com",
+    phone: "9824850726",
+    remark: "Client said he will callback after speaking with his senior.",
+    status: "Open",
+    createdOn: "Feb 17, 2025 10:53:26",
+    updatedOn: "Feb 17, 2025 10:53:26",
+    createdBy: "Pravin Whatkar",
+    updatedBy: "Pravin Whatkar",
+    assignedTo: "Pravin Whatkar",
+    source: "Marketing"
+  },
+  {
+    id: 6,
+    leadNo: "Lead-9463",
+    name: "Mr. Vishal",
+    email: "vishal@example.com",
+    phone: "9960622953",
+    remark: "Information given, price pitched 18k. Client said he will let us know.",
+    status: "Open",
+    createdOn: "Feb 15, 2025 18:27:12",
+    updatedOn: "Feb 15, 2025 18:27:12",
+    createdBy: "Pravin Whatkar",
+    updatedBy: "Pravin Whatkar",
+    assignedTo: "Pravin Whatkar",
+    source: "Marketing"
+  },
+  {
+    id: 7,
+    leadNo: "Lead-9462",
+    name: "Mr. Vishal Sature",
+    email: "vishal.sature@example.com",
+    phone: "7304312332",
+    remark: "Information given, price pitched 28k.",
+    status: "Open",
+    createdOn: "Feb 14, 2025 13:39:41",
+    updatedOn: "Feb 14, 2025 13:39:41",
+    createdBy: "Pravin Whatkar",
+    updatedBy: "Pravin Whatkar",
+    assignedTo: "Pravin Whatkar",
+    source: "Marketing"
+  },
+  {
+    id: 8,
+    leadNo: "Lead-9461",
+    name: "Mr. Bharat Kumar",
+    email: "bharat.kumar@example.com",
+    phone: "8849362576",
+    remark: "Information given, price pitched 18k.",
+    status: "Open",
+    createdOn: "Feb 14, 2025 13:39:41",
+    updatedOn: "Feb 14, 2025 13:39:41",
+    createdBy: "Pravin Whatkar",
+    updatedBy: "Pravin Whatkar",
+    assignedTo: "Pravin Whatkar",
+    source: "Marketing"
+  },
+  {
+    id: 9,
+    leadNo: "Lead-9460",
+    name: "Mr. Vishal More",
+    email: "vishal.more@example.com",
+    phone: "8832032078",
+    remark: "Client requested follow-up next week.",
+    status: "Open",
+    createdOn: "Feb 12, 2025 18:37:18",
+    updatedOn: "Feb 12, 2025 18:37:18",
+    createdBy: "Pravin Whatkar",
+    updatedBy: "Pravin Whatkar",
+    assignedTo: "Pravin Whatkar",
+    source: "Marketing"
+  },
+  {
+    id: 10,
+    leadNo: "Lead-9517",
+    name: "Mr. Pankaj Yadav",
+    email: "pankaj.yadav@example.com",
+    phone: "9888776655",
+    remark: "Exploring options, requested price list.",
+    status: "Open",
+    createdOn: "Feb 16, 2025 18:00:50",
+    updatedOn: "Feb 16, 2025 18:00:50",
+    createdBy: "Sandeep Reddy",
+    updatedBy: "Sandeep Reddy",
+    assignedTo: "Sandeep Reddy",
+    source: "LinkedIn"
+  }
+]
+
+
+export const interest = []
+
+
+ 
