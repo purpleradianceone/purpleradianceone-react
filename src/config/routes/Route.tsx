@@ -19,6 +19,7 @@ import ROUTES_URL from "../../constants/Routes";
 import LoggedInRoute from "./LoggedInRoute";
 import ContactUs from "../../components/views/home/landing-page/ContactUs";
 import LeadManagement from "../../components/views/lead-management/LeadManagement";
+import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 
 export const router = createBrowserRouter([
   {
@@ -130,6 +131,19 @@ export const router = createBrowserRouter([
         </div>
       </PrivateRoute>
     ),
+  },
+
+  {
+    path : ROUTES_URL.PRODUCT_MANAGEMENT,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <ProductManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    )
   }
 ]);
 export default router;
