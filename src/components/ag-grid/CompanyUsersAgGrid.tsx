@@ -58,6 +58,18 @@ function CompanyUserAgGrid({
             filter: BOOLEAN_VALUES.TRUE,
           },
           {
+            field: "createdby",
+            headerName: "Created By",
+            sortable: BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
+          },
+          {
+            field: "createdon",
+            headerName: "Created On",
+            sortable : BOOLEAN_VALUES.TRUE,
+            filter: BOOLEAN_VALUES.TRUE,
+          },
+          {
             field: "isactive",
             headerName: "Status",
             sortable: BOOLEAN_VALUES.TRUE,
