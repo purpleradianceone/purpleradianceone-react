@@ -14,6 +14,7 @@ const MESSAGE = {
         REQUIRED_FIELDS : "Fill required fields",
         NO_CHANGES : "No changes to save",
         NAME_REQUIRED : "Name is required",
+        NOT_ATHORISED : "Your are not authorized",
     },
     SUCCESS : {
         LOGGED_IN : "Logged In",

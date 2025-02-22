@@ -2,18 +2,14 @@ import { Users, UserPlus, Calendar, Filter, X } from "lucide-react";
 
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Pagination from "../ag-grid/Pagination";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
-import axios from "axios";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
-import POST_API from "../../constants/PostApi";
-import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
 import CompanyUser from "../../@types/company-users/CompanyUser";
 import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
@@ -24,11 +20,11 @@ import {
   JSX_CHILDREN_NAME,
   NUMBER_VALUES,
   SIZE,
-  STATUS_CODE,
   STRING_VALUES,
 } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import RefreshToken from "../../config/validations/RefreshToken";
+import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
+import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 
 function GetCompanyUsersList({
   users,
@@ -48,88 +44,30 @@ function GetCompanyUsersList({
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
     BOOLEAN_VALUES.FALSE
   );
-  const [isEditAccessModalOpen, setIsEditModalOpen] = useState<boolean>(
+  const [isEditCompanyUserModalOpen, setIsEditModalOpen] = useState<boolean>(
     BOOLEAN_VALUES.FALSE
   );
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
     useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] =
+  const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
+
+  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
     useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const [isFiltersOpenInMobileView, setIsFilterOpenInMobileView] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const [isFiltersOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
+    BOOLEAN_VALUES.FALSE
+  );
+
+  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const {userHasAccessToViewAccess,userHasAccessToUpdateUser,userHasAccessToAddUser,userHasAccessToViewUser} = useUserAccessModules();
-
-  const handleDateIdChange = (dateId: number) => {
-    console.log(dateId);
-    if (dateId === NUMBER_VALUES.ZERO) {
-      handleSearchOption.handleDateIdChange(NUMBER_VALUES.ZERO);
-      setIsCustomDateOptionSelected(BOOLEAN_VALUES.FALSE);
-    }
-    dropdownOptions.map((option) => {
-      if (option.search_date_range_id === dateId) {
-        if (dateId === NUMBER_VALUES.EIGHT) {
-          setIsCustomDateOptionSelected(BOOLEAN_VALUES.TRUE);
-          setIsFilterOpenInTabletView(BOOLEAN_VALUES.TRUE);
-        }
-        if (dateId !== NUMBER_VALUES.EIGHT) {
-          setIsCustomDateOptionSelected(BOOLEAN_VALUES.FALSE);
-        }
-        handleSearchOption.handleDateIdChange(option.search_date_range_id);
-      }
-    });
-  };
-
-  const [dropdownOptions, setDropdownOptions] = useState<
-    SearchDropDownOptions[]
-  >([
-    {
-      id: NUMBER_VALUES.ZERO,
-      criteria: STRING_VALUES.EMPTY_STRING,
-      company_id: NUMBER_VALUES.ZERO,
-      search_pages_criteria_id: NUMBER_VALUES.ZERO,
-      search_date_range_id: NUMBER_VALUES.ZERO,
-      createdby: NUMBER_VALUES.ZERO,
-      updatedby: NUMBER_VALUES.ZERO,
-      createdon: STRING_VALUES.EMPTY_STRING,
-      updatedon: STRING_VALUES.EMPTY_STRING,
-      date_range: STRING_VALUES.EMPTY_STRING,
-    },
-  ]);
-  const { loginStatus } = useLoggedInUserContext();
-
-  const fetchData = async () => {
-    const postData = {
-      requestedby: loginStatus.id,
-      company_id: loginStatus.companyId,
-    };
-    axios
-      .post(POST_API.COMPANY_SPECIFIC_CRITERIA_DATE_RANGE, postData, {
-        withCredentials: BOOLEAN_VALUES.TRUE,
-      })
-      .then((response) => {
-        if (response.data) {
-          setDropdownOptions(response.data);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        if(error.status === STATUS_CODE.UNATHORISED){
-           RefreshToken({callFunction: fetchData})
-        }
-      });
-  };
-
-  
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    userHasAccessToViewAccess,
+    userHasAccessToUpdateUser,
+    userHasAccessToAddUser,
+    userHasAccessToViewUser,
+  } = useUserAccessModules();
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: NUMBER_VALUES.ZERO,
@@ -165,68 +103,22 @@ function GetCompanyUsersList({
     setIsAccessModalOpen(status);
   };
 
-      return (
-        userHasAccessToViewUser && 
-          <div className="w-full pt-2 pl-5 pr-1 gap-1">
-          <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-            <div className="flex  gap-2">
-              {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
+  return (
+    userHasAccessToViewUser && (
+      <div className="w-full pt-2 pl-5 pr-1 gap-1">
+        <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+          <div className="flex  gap-2">
+            {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
 
-              {(isMediumScreen || isLargeScreen) && (
-                <span className="text-1xl font-bold">Company Members</span>
-              )}
-            </div>
-
-            {isLargeScreen && (
-              <>
-                <div className="flex gap-1">
-                  {/* search box flex div */}
-                  <div className="relative flex items-start w-80 ">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
-
-                  {/* Date FIlters Dropdown */}
-                  <div className="flex mx-3">
-                    <div className="flex">
-                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                        <Calendar className="mt-2" />
-                      </div>
-
-                      <DateRangeFilterDropdown
-                        dropdownOptions={dropdownOptions}
-                        handleDateIdChange={handleDateIdChange}
-                      ></DateRangeFilterDropdown>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Custom Date Picker Div Flex Box*/}
-                <div
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
-                  />
-                </div>
-
-                {/* space for future elements to be added */}
-                <div style={{width:"250px"}}></div>
-              </>
+            {(isMediumScreen || isLargeScreen) && (
+              <span className="text-1xl font-bold">Company Members</span>
             )}
+          </div>
 
-            {isMediumScreen && (
-              <>
+          {isLargeScreen && (
+            <>
+              <div className="flex gap-1">
+                {/* search box flex div */}
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
                     onChange={(e) => {
@@ -236,219 +128,251 @@ function GetCompanyUsersList({
                     }}
                   ></SearchInput>
                 </div>
-                <div className="flex relative  gap-2  ">
-                  <div className="mt-1 flex ">
+
+                {/* Date FIlters Dropdown */}
+                <div className="flex mx-3">
+                  <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar />
+                      <Calendar className="mt-2" />
                     </div>
 
                     <DateRangeFilterDropdown
-                      dropdownOptions={dropdownOptions}
-                      handleDateIdChange={handleDateIdChange}
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
-                {isFiltersOpenInTabletView && isCustomDateOptionSelected && (
-                  <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                      <button
-                        onClick={() => {
-                          setIsFilterOpenInTabletView(
-                            !isFiltersOpenInTabletView
-                          );
-                        }}
-                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                      >
-                        <X size={SIZE.TWENTY} />
-                      </button>
+              </div>
 
-                      <div className="my-10 justify-items-center mb-5">
-                        <div className="mb-5">
-                          <DateRangePicker
-                            onStartDateChange={onStartDateChange}
-                            onEndDateChange={onEndDateChange}
-                          />
-                        </div>
-                        <div className="w-full justify-items-center">
-                          <div className="w-24">
-                            <Button>Done</Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {/* Custom Date Picker Div Flex Box*/}
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
+            </>
+          )}
+
+          {isMediumScreen && (
+            <>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                ></SearchInput>
+              </div>
+              <div className="flex relative  gap-2  ">
+                <div className="mt-1 flex ">
+                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                    <Calendar />
                   </div>
-                )}
-                
-              </>
-            )}
 
-            {isSmallScreen && (
-              <>
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
+                  <DateRangeFilterDropdown
+                    dropdownOptions={dateRangeDropdownOptions}
+                    handleDateIdChange={handleDateRangeIdChange}
+                  ></DateRangeFilterDropdown>
                 </div>
-                <div className="flex relative gap-2">
-                  <Button
-                    onClick={() => {
-                      setIsFilterOpenInMobileView(!isFiltersOpenInMobileView);
-                    }}
-                  >
-                    <Filter size={SIZE.EIGHT} />
-                  </Button>
-                </div>
-                {isFiltersOpenInMobileView && (
-                  <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                      <button
-                        onClick={() => {
-                          setIsFilterOpenInMobileView(
-                            !isFiltersOpenInMobileView
-                          );
-                        }}
-                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                      >
-                        <X size={SIZE.EIGHT} />
-                      </button>
-                      {/* Date FIlters Dropdown */}
+              </div>
+              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
+                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                    <button
+                      onClick={() => {
+                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
+                      }}
+                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={SIZE.TWENTY} />
+                    </button>
 
-                      <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                        <div className="mt-1 flex ">
-                          <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                            <Calendar size={SIZE.TWENTY} />
-                          </div>
-
-                          <DateRangeFilterDropdown
-                            dropdownOptions={dropdownOptions}
-                            handleDateIdChange={handleDateIdChange}
-                          ></DateRangeFilterDropdown>
-                        </div>
-                      </div>
-
-                      {/* Custom Date Picker Div Flex Box*/}
-                      <div
-                        className="mb-10 justify-items-center"
-                        style={
-                          isCustomDateOptionSelected
-                            ? { visibility: "visible" }
-                            : { visibility: "hidden" }
-                        }
-                      >
+                    <div className="my-10 justify-items-center mb-5">
+                      <div className="mb-5">
                         <DateRangePicker
                           onStartDateChange={onStartDateChange}
                           onEndDateChange={onEndDateChange}
                         />
                       </div>
-
-                      {
-                        <div className="flex w-full justify-center items-center mb-5">
-                          <div className="w-28">
-                            <Button
-                              onClick={() => {
-                                setIsFilterOpenInMobileView(
-                                  !isFiltersOpenInMobileView
-                                );
-                              }}
-                            >
-                              Done
-                            </Button>
-                          </div>
+                      <div className="w-full justify-items-center">
+                        <div className="w-24">
+                          <Button>Done</Button>
                         </div>
-                      }
+                      </div>
                     </div>
                   </div>
-                )}
-              </>
-            )}
-
-            {/* new end */}
-
-            {userHasAccessToAddUser ? (
-              <>
-                <div className="flex gap-1">
-                  <Button
-                    onClick={() =>
-                      setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
-                    }
-                  >
-                    {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                    {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-                  </Button>
-                  
                 </div>
-                <AddCompanyUserModal
-                    isOpen={isAddCompanyUserModalOpen}
-                    onClose={() =>
-                      setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
-                    }
-                  />
-                <EditCompanyUserModal
-                  handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-                  isOpen={isEditAccessModalOpen}
-                  onClose={() => {
-                    setIsEditModalOpen(BOOLEAN_VALUES.FALSE);
+              )}
+            </>
+          )}
+
+          {isSmallScreen && (
+            <>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
+                    );
                   }}
-                  user={selectedCompanyUser}
-                />
-              </>
-            ) : (
+                ></SearchInput>
+              </div>
+              <div className="flex relative gap-2">
+                <Button
+                  onClick={() => {
+                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
+                  }}
+                >
+                  <Filter size={SIZE.EIGHT} />
+                </Button>
+              </div>
+              {isFiltersOpenInMobileView && (
+                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                    <button
+                      onClick={() => {
+                        setIsFiltersOpenInMobileView(
+                          !isFiltersOpenInMobileView
+                        );
+                      }}
+                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={SIZE.EIGHT} />
+                    </button>
+                    {/* Date FIlters Dropdown */}
+
+                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
+                      <div className="mt-1 flex ">
+                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                          <Calendar size={SIZE.TWENTY} />
+                        </div>
+
+                        <DateRangeFilterDropdown
+                          dropdownOptions={dateRangeDropdownOptions}
+                          handleDateIdChange={handleDateRangeIdChange}
+                        ></DateRangeFilterDropdown>
+                      </div>
+                    </div>
+
+                    {/* Custom Date Picker Div Flex Box*/}
+                    <div
+                      className="mb-10 justify-items-center"
+                      style={
+                        isCustomDateOptionSelected
+                          ? { visibility: "visible" }
+                          : { visibility: "hidden" }
+                      }
+                    >
+                      <DateRangePicker
+                        onStartDateChange={onStartDateChange}
+                        onEndDateChange={onEndDateChange}
+                      />
+                    </div>
+
+                    {
+                      <div className="flex w-full justify-center items-center mb-5">
+                        <div className="w-28">
+                          <Button
+                            onClick={() => {
+                              setIsFiltersOpenInMobileView(
+                                !isFiltersOpenInMobileView
+                              );
+                            }}
+                          >
+                            Done
+                          </Button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* new end */}
+
+          {userHasAccessToAddUser ? (
+            <>
               <div className="flex gap-1">
-                <Button disabled={BOOLEAN_VALUES.TRUE}>
+                <Button
+                  onClick={() =>
+                    setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
+                  }
+                >
                   {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                   {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-
                   {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
                 </Button>
               </div>
-            )}
-          </div>
-
-          <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-            <div
-              className="ag-theme-alpine w-full"
-              style={{ height: "460px", width: "100%" }}
-            >
-              <CompanyUserAgGrid
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
+              <AddCompanyUserModal
+                isOpen={isAddCompanyUserModalOpen}
+                onClose={() =>
+                  setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
                 }
-                userHasAccessToUpdateUser={userHasAccessToUpdateUser}
-                userHasAccessToViewAccess={userHasAccessToViewAccess}
-                users={users}
-                handleIdIsEditModalOpen={handleIdIsEditModalOpen}
-                handleIsAccessModalOpen={handleIsAccessModalOpen}
               />
+              <EditCompanyUserModal
+                handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+                isOpen={isEditCompanyUserModalOpen}
+                onClose={() => {
+                  setIsEditModalOpen(BOOLEAN_VALUES.FALSE);
+                }}
+                user={selectedCompanyUser}
+              />
+            </>
+          ) : (
+            <div className="flex gap-1">
+              <Button disabled={BOOLEAN_VALUES.TRUE}>
+                {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+                {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
+
+                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
+              </Button>
             </div>
-            <CompanyUserAccessManagementModal
-              isOpen={isAccessModalOpen}
-              onClose={() => setIsAccessModalOpen(BOOLEAN_VALUES.FALSE)}
-              users={selectedCompanyUser}
-            />
-
-            
-          </div>
-
-          <div className="flex items-center justify-end mt-1">
-            <Pagination
-              totalPages={paginationData.totalPages}
-              currentPage={paginationData.currentPage}
-              pageSize={paginationData.pageSize}
-              onPageChange={paginationData.handlePageChange}
-              onPageSizeChange={paginationData.selectedPageSize}
-            />
-          </div>
+          )}
         </div>
-        
 
-        
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+          <div
+            className="ag-theme-alpine w-full"
+            style={{ height: "460px", width: "100%" }}
+          >
+            <CompanyUserAgGrid
+              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+              userHasAccessToUpdateUser={userHasAccessToUpdateUser}
+              userHasAccessToViewAccess={userHasAccessToViewAccess}
+              users={users}
+              handleIdIsEditModalOpen={handleIdIsEditModalOpen}
+              handleIsAccessModalOpen={handleIsAccessModalOpen}
+            />
+          </div>
+          <CompanyUserAccessManagementModal
+            isOpen={isAccessModalOpen}
+            onClose={() => setIsAccessModalOpen(BOOLEAN_VALUES.FALSE)}
+            users={selectedCompanyUser}
+          />
+        </div>
 
-      );
+        <div className="flex items-center justify-end mt-1">
+          <Pagination
+            totalPages={paginationData.totalPages}
+            currentPage={paginationData.currentPage}
+            pageSize={paginationData.pageSize}
+            onPageChange={paginationData.handlePageChange}
+            onPageSizeChange={paginationData.selectedPageSize}
+          />
+        </div>
+      </div>
+    )
+  );
 }
 
 export default GetCompanyUsersList;

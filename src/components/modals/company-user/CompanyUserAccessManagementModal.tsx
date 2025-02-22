@@ -276,8 +276,12 @@ function CompanyUserAccessManagementModal({
 
       return (
         <>
-          <div className="fixed inset-0 z-10 bg-black bg-opacity-45 flex items-center justify-center p-4 ">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div className="fixed inset-0 z-10 p-2 overflow-hidden bg-black bg-opacity-45">
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-400
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
               <div className="flex justify-between items-center p-4 border-b">
                 <h2 className="text-lg font-medium text-gray-700">
                   Update Access rights of {users.fullname}
@@ -379,7 +383,7 @@ function CompanyUserAccessManagementModal({
                 </div>
               )}
 
-              <div className="flex justify-end p-2 border-t gap-3">
+              <div className="flex justify-end p-2 pb-10 border-t gap-3">
                 <div className="min-w-24">
                   {userHasAccessToUpdateAccess ? (
                     users.id === loginStatus.id ? (
@@ -405,7 +409,7 @@ function CompanyUserAccessManagementModal({
               onClose={handleMessageSnackbarClose}
               duration={NUMBER_VALUES.SNACKBAR_DURATION}
             />
-            
+            </div>
           </div>
           <DialogueBox
             isOpen={isDialogueOpen}

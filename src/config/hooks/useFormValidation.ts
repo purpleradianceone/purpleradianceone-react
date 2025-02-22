@@ -13,11 +13,15 @@ export type ErrorType = {
   code? : string;
   description? : string;
   cost? : string;
+  taxRate? : string;
+  validFrom? :string;
+  hsn? :string;
+  sac? : string;
 };
 
 export type FormType = 'registered' | 'registration';
 
-export const useFormValidation = (formData: Record<string, string|number>, formType: FormType) => {
+export const useFormValidation = (formData: Record<string, string|number|boolean|undefined>, formType: FormType) => {
   const [errors, setErrors] = useState<ErrorType>({});
 
 
@@ -73,7 +77,7 @@ export const useFormValidation = (formData: Record<string, string|number>, formT
 
       case "mobileNumber":
         
-        if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value)) {
+        if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value) && value.length === NUMBER_VALUES.EIGHT) {
           
 
           setErrors((prev) => ({
@@ -116,6 +120,45 @@ export const useFormValidation = (formData: Record<string, string|number>, formT
             }
           }
           break;
+
+        case "taxRate" :
+          if(formType === STRING_VALUES.REGISTRATION){
+            if(value === STRING_VALUES.EMPTY_STRING) {
+              setErrors((prev) => ({ ...prev, taxRate: "Tax Rate is required"}));
+            }
+            else{
+              setErrors((prev) => ({ ...prev, taxRate: "" }));
+            }
+          }
+          break;
+
+        case "validFrom" : 
+        if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+          setErrors((prev) => ({ ...prev, validFrom: "Valid From is required"}));
+        }
+        else{
+          setErrors((prev) => ({...prev,validFrom : ""}));
+        }
+        break;
+
+        case "hsn" :
+          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+            setErrors((prev) => ({ ...prev, hsn: "HSN is required"}));
+          }
+          else{
+            setErrors((prev) => ({ ...prev, hsn: "" }));
+          }
+          break;
+
+        case "sac" :
+          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+            setErrors((prev) => ({ ...prev, sac: "SAC is required"}));
+          }
+          else{
+            setErrors((prev) => ({ ...prev, sac: "" }));
+            }
+            break;
+
     }
   };
 
@@ -138,7 +181,7 @@ export const useFormValidation = (formData: Record<string, string|number>, formT
     }
 
     // SignUp specific validations
-    if (formType === STRING_VALUES.REGISTRATION) {
+    if (formType === STRING_VALUES.REGISTRATION && formData.password) {
       if (formData.password.toString().length <  NUMBER_VALUES.EIGHT || formData.password.toString().length > NUMBER_VALUES.TWENTY) {
         newErrors.password = "Password must be between 8 to 20 characters";
         isValid = BOOLEAN_VALUES.FALSE;

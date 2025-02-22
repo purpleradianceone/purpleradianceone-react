@@ -3,12 +3,14 @@ type RadioButtonsOption = {
     value: string;
     name: string;
     id: string;
-    checked: boolean;
+    checked?: boolean;
   };
   type RadioButtonsProps = {
     options: RadioButtonsOption[];
-    onChange: (value : string) => void;
-
+    onChange: (event : React.ChangeEvent<HTMLInputElement>) => void;
+    name? : string;
+    label? : string;
+    center? : boolean
   };
 
   export default RadioButtonsProps;

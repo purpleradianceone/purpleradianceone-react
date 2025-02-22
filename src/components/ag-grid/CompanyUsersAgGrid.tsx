@@ -7,7 +7,7 @@ import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
 import Button from "../ui/Button";
 import CompanyUser from "../../@types/company-users/CompanyUser";
-import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, NUMBER_VALUES } from "../../constants/AppConstants";
+import { BOOLEAN_VALUES, INNERHTML, JSX_CHILDREN_NAME, NUMBER_VALUES } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 
@@ -27,7 +27,6 @@ function CompanyUserAgGrid({
     handleIdIsEditModalOpen : (params : boolean)=> void ,
     handleIsAccessModalOpen : (params : boolean)=> void ,
 }) {
-
 
     const columnDefs = useMemo<ColDef[]>(
         () => [
@@ -231,6 +230,7 @@ function CompanyUserAgGrid({
           flex: 0.8,
           suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
           suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
+          
         };
       }, []);
 
@@ -244,6 +244,7 @@ function CompanyUserAgGrid({
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         modules={[AllCommunityModule]}
+                        overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
                       />
                     </div>
     )

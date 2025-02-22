@@ -68,6 +68,22 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === NUMBER_VALUES.FOUR && accessModule.add
   );
 
+  //Product Tax Management
+  const userHasAccessToViewProductTax = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FIVE && accessModule.view
+  );
+
+  const userHasAccessToUpdateProductTax = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FIVE && accessModule.update
+  );
+
+  const userHasAccessToAddProductTax = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === NUMBER_VALUES.FIVE && accessModule.add
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -81,6 +97,8 @@ export const useUserAccessModules = () => {
     userHasAccessToAddProduct,
     userHasAccessToViewProduct,
     userHasAccessToUpdateProduct,
-
+    userHasAccessToAddProductTax,
+    userHasAccessToViewProductTax,
+    userHasAccessToUpdateProductTax,
   };
 };

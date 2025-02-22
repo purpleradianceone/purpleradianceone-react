@@ -13,6 +13,12 @@ const POST_API = {
     CREATE_USER : "/api/main/purple-crm-api/createuser",
     SIGN_UP_EMAIL_VERIFICATION : "/api/authentication/purple-crm-api/emailverfication/verify?token=",
     REFRESH_TOKEN : "/api/authentication/purple-crm-api/refresh-token",
+    ADD_PRODUCT : "/api/main/purple-crm-api/create/company-product",
+    GET_PRODUCTS : "/api/main/purple-crm-api/get/company-product",
+    UPDATE_PRODUCT : "/api/main/purple-crm-api/update/company-product",
+    CREATE_PRODUCT_TAX : "/api/main/purple-crm-api/create/company-product-tax",
+    GET_PRODUCT_TAX : "/api/main/purple-crm-api/get/company-product-tax",
+    DELETE_COMPANY_PRODUCT_TAX : "/api/main/purple-crm-api/delete/company-product-tax",
 }
 
 export default POST_API;
