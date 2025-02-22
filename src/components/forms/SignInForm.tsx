@@ -190,7 +190,7 @@ function SignInForm() {
             .catch((error) => {
               console.log(error);
               showMessageSnackbar({
-                message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+                message: MESSAGE.ERROR.WRONG_CREDENTIALS,
                 type: "error",
               });
               setSpinnerAnimation({

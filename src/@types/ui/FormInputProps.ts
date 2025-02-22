@@ -18,6 +18,7 @@ type FormInputProps = {
     maxLength? :number ,
     minLength? :number ,
     size?:number | undefined,
+    step? : string,
     // required?: boolean | undefined,
     defaultValue?: string | number | readonly string[] | undefined,
     pattern? : string, 

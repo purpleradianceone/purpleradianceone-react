@@ -49,6 +49,7 @@ export const SITE_KEY = "6LcLKaYqAAAAANtiPbLxFRpgPCS9oG4aecWlA-70";
 export const STATUS_CODE = {
     OK : 200,
     UNATHORISED : 401,
+    FORBIDDEN : 403,
 }
 export const JSX_CHILDREN_NAME = {
     ACCESS : "Access",
@@ -57,6 +58,8 @@ export const JSX_CHILDREN_NAME = {
     ADD_USER : "Add User",
     CREATE_LEAD : "Create Lead",
     ADD_PRODUCTS : "Add Products",
+    TAX : "Tax"
+
 }
 
 export const SIZE = {
@@ -65,6 +68,9 @@ export const SIZE = {
     TWENTY_FOUR : 24,
 }
 
+export const INNERHTML = {
+    OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div></div>',
+}
 
 
 

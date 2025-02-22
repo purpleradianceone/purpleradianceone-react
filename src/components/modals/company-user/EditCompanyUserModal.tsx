@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import RadioButtons from "../../ui/RadioButton";
 
 function EditCompanyUserModal({
   isOpen,
@@ -36,7 +37,25 @@ function EditCompanyUserModal({
   const initialUpdateUserformData = {
     name: user.fullname,
     mobilenumber: user.mobilenumber,
+    isActive : user.isactive,
   };
+  const CompanyUserIsActiveRadioButtonOptions = [
+    {
+      label : "Active",
+      value : "true",
+      id : "active",
+      name : "isActive",
+      checked : user.isactive 
+      },
+      {
+        label : "Inactive",
+        value : 'false',
+        id : "inActive",
+        name : "isActive",
+        checked : !user.isactive
+    }
+  ]
+
 
   const {
     formData: updateUserformData,
@@ -61,7 +80,7 @@ function EditCompanyUserModal({
   useEffect(() => {
     if (isOpen) {
       setErrors({
-        name: "",
+        name: STRING_VALUES.EMPTY_STRING,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,12 +97,14 @@ function EditCompanyUserModal({
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
-      updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber
+      updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber ||
+      updateUserformData.isActive !== initialUpdateUserformData.isActive
     ) {
       if (updateUserformData.name != STRING_VALUES.EMPTY_STRING) {
         if (
           user.fullname !== updateUserformData.name ||
-          user.mobilenumber !== updateUserformData.mobilenumber
+          user.mobilenumber !== updateUserformData.mobilenumber ||
+          updateUserformData.isActive
         ) {
           const postUpdateUserData = {
             id: user.id,
@@ -91,9 +112,9 @@ function EditCompanyUserModal({
             company_id: loginStatus.companyId,
             fullname: updateUserformData.name,
             mobilenumber: updateUserformData.mobilenumber,
+            isactive : updateUserformData.isActive
           };
-          axios
-            .post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+          await axios.post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
               withCredentials: BOOLEAN_VALUES.TRUE,
             })
             .then((response) => {
@@ -150,6 +171,8 @@ function EditCompanyUserModal({
     setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
+
+
   useEffect(() => {
     setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   }, [isOpen]);
@@ -157,8 +180,12 @@ function EditCompanyUserModal({
 
   return (
     <>
-      <div className="fixed inset-0 mt-16 bg-black bg-opacity-45 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn px-3 py-11">
+      <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-45">
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-400
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
           <button
             onClick={onClose}
             className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
@@ -195,6 +222,12 @@ function EditCompanyUserModal({
                 defaultValue={initialUpdateUserformData.mobilenumber}
                 onChange={handleEditUserFormChange}
               />
+
+              <RadioButtons
+              label="isActive"
+              onChange={handleEditUserFormChange}
+              options={CompanyUserIsActiveRadioButtonOptions}
+              />
               <FormInput
                 label="Email : "
                 type="email"
@@ -203,7 +236,9 @@ function EditCompanyUserModal({
                 defaultValue={user.email}
                 readonly={BOOLEAN_VALUES.TRUE}
               />
+              <div className="flex justify-self-center m-2 min-w-60 pb-10">
               <Button type="submit">Update Company User</Button>
+              </div>
             </form>
           </div>
         </div>
@@ -214,6 +249,7 @@ function EditCompanyUserModal({
           onClose={handleCloseSnackbar}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
+        </div>
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}

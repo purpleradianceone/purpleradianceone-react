@@ -177,15 +177,9 @@ export const ProductsRadioButtonOptions = [
     name : "taxCode",
     checked : false,
   },
-  {
-    label : "Both",
-    value : "all",
-    id : "all",
-    name : "taxCode",
-    checked : false,
-  }
 
 ]
+
 
 export const leadsData:Lead[] = [
   {

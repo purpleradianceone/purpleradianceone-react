@@ -11,7 +11,12 @@ import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SITE_KEY, STRING_VALUES } from "../../constants/AppConstants";
+import {
+  BOOLEAN_VALUES,
+  NUMBER_VALUES,
+  SITE_KEY,
+  STRING_VALUES,
+} from "../../constants/AppConstants";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
@@ -25,31 +30,39 @@ function SignUpForm() {
     confirmPassword: STRING_VALUES.EMPTY_STRING,
   };
 
-  const { formData: SignUpFormData, handleChange : handleSignUpFormDataChange } = useFormChange(initialSignUpFormState);
-  const { errors, handleBlur } = useFormValidation(SignUpFormData,"registration");
+  const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
+    useFormChange(initialSignUpFormState);
+  const { errors, handleBlur } = useFormValidation(
+    SignUpFormData,
+    "registration"
+  );
 
-  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
   const [showPassword, setShowPassword] = useState(BOOLEAN_VALUES.FALSE);
-  const [showConfirmPassword, setConfirmPassword] = useState(BOOLEAN_VALUES.FALSE);
+  const [showConfirmPassword, setConfirmPassword] = useState(
+    BOOLEAN_VALUES.FALSE
+  );
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
 
   const [messageSnackbar, setMessageSnackbar] = useState<{
     open: boolean;
     message: string;
-    type: 'success' | 'error';
+    type: "success" | "error";
   }>({
     open: BOOLEAN_VALUES.FALSE,
     message: STRING_VALUES.EMPTY_STRING,
     type: "success",
   });
 
-  const showMessageSnackbar = (message: string, type: 'success' | 'error') => {
+  const showMessageSnackbar = (message: string, type: "success" | "error") => {
     setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar(prev => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
@@ -59,45 +72,54 @@ function SignUpForm() {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
       email: SignUpFormData.email.trim(),
-      password: SignUpFormData.password.trim()
+      password: SignUpFormData.password.trim(),
     };
 
-    if (signupDataPost.email !== STRING_VALUES.EMPTY_STRING && signupDataPost.password ! == STRING_VALUES.EMPTY_STRING && SignUpFormData.confirmPassword ! == STRING_VALUES.EMPTY_STRING) {
+    if (
+      signupDataPost.email !== STRING_VALUES.EMPTY_STRING &&
+      signupDataPost.password !== STRING_VALUES.EMPTY_STRING &&
+      SignUpFormData.confirmPassword !== STRING_VALUES.EMPTY_STRING
+    ) {
       if (captchaToken !== STRING_VALUES.EMPTY_STRING) {
         const captchaRequest = {
-          token: captchaToken
+          token: captchaToken,
         };
-        axios.post(POST_API.VERIFIY_CAPTCHA, captchaRequest,{
-          withCredentials:BOOLEAN_VALUES.TRUE
-        })
-          .then(response => {
+        axios
+          .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {
+            withCredentials: BOOLEAN_VALUES.TRUE,
+          })
+          .then((response) => {
             if (response.data.status) {
-              axios.post(POST_API.SIGN_UP, signupDataPost,{
-                withCredentials:BOOLEAN_VALUES.TRUE
-              })
-                .then(respone => {
+              axios
+                .post(POST_API.SIGN_UP, signupDataPost, {
+                  withCredentials: BOOLEAN_VALUES.TRUE,
+                })
+                .then((respone) => {
                   console.log(respone);
 
                   if (respone.data.status) {
-                    if (respone.data.message == MESSAGE.SUCCESS.ACCOUNT_ALREADY_REGISTERED) {
-                      showMessageSnackbar(respone.data.message, 'error');
+                    if (
+                      respone.data.message ==
+                      MESSAGE.SUCCESS.ACCOUNT_ALREADY_REGISTERED
+                    ) {
+                      showMessageSnackbar(respone.data.message, "error");
                     } else {
-                      showMessageSnackbar(respone.data.message, 'success');
+                      showMessageSnackbar(respone.data.message, "success");
                       setShowEmailSentAnimation(!showEmailSentAnimation);
                     }
                     setTimeout(() => {
                       window.location.href = ROUTES_URL.SIGN_IN;
                     }, 5000);
                   } else {
-                    showMessageSnackbar(respone.data.message, 'error');
+                    showMessageSnackbar(respone.data.message, "error");
                   }
                 })
-                .catch(error => {
+                .catch((error) => {
                   console.log(error);
                 });
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
             showMessageSnackbar(MESSAGE.ERROR.INVALID_CAPTCHA, "error");
           });
@@ -105,7 +127,7 @@ function SignUpForm() {
         showMessageSnackbar(MESSAGE.ERROR.COMPLETE_CAPTCHA, "error");
       }
     } else {
-      showMessageSnackbar(MESSAGE.ERROR.REQUIRED_FIELDS, 'error');
+      showMessageSnackbar(MESSAGE.ERROR.REQUIRED_FIELDS, "error");
     }
   };
 
@@ -155,9 +177,9 @@ function SignUpForm() {
           required
           error={errors.password}
           rightElement={
-            <PasswordVisibilityToggle 
-            setShowPassword={setShowPassword}
-            showPassword = {showPassword}
+            <PasswordVisibilityToggle
+              setShowPassword={setShowPassword}
+              showPassword={showPassword}
             />
           }
         />
@@ -174,18 +196,20 @@ function SignUpForm() {
           required
           error={errors.confirmPassword}
           rightElement={
-            <PasswordVisibilityToggle 
-            setShowPassword = {setConfirmPassword}
-            showPassword = {showConfirmPassword}
+            <PasswordVisibilityToggle
+              setShowPassword={setConfirmPassword}
+              showPassword={showConfirmPassword}
             />
           }
         />
         <ReCAPTCHA
           ref={recaptchaRef}
-          sitekey= {SITE_KEY}
+          sitekey={SITE_KEY}
           onChange={handleRecaptcha}
         />
-        <Button type="submit" onClick={handleSignUpFormSubmit}>Sign Up</Button>
+        <Button type="submit" onClick={handleSignUpFormSubmit}>
+          Sign Up
+        </Button>
         <div className="text-center">
           <span className="text-gray-600 text-sm">
             Already Have an account?{" "}
@@ -203,7 +227,9 @@ function SignUpForm() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-95">
           <div className="bg-white p-6 h-auto w-auto rounded-2xl shadow-lg animate-fade-in">
             <button></button>
-            <h2 className="text-lg font-semibold text-center">Please Check Your Email</h2>
+            <h2 className="text-lg font-semibold text-center">
+              Please Check Your Email
+            </h2>
             <EmailSentAnimation />
           </div>
         </div>
