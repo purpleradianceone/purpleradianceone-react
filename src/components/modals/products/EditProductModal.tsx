@@ -32,6 +32,9 @@ import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
 import ProductTax from "../../../@types/products/ProductTaxManagementProps";
 import { Product } from "../../../@types/products/ProductsManagementProps";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../constants/Routes";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 function EditCompanyProductModal({
   isOpen,
@@ -47,6 +50,11 @@ function EditCompanyProductModal({
     code: product.code,
     isActive: product.isActive,
   };
+
+  useEffect(()=>{
+    console.log("Product Edit")
+    console.log(product)
+  },[isOpen])
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -81,6 +89,16 @@ function EditCompanyProductModal({
       checked: !intialEditCompanyProductFormData.isActive,
     },
   ];
+
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
 
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
@@ -133,7 +151,9 @@ function EditCompanyProductModal({
         updateCompanyProductFormData.description !==
           intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
-          intialEditCompanyProductFormData.cost
+          intialEditCompanyProductFormData.cost ||
+          updateCompanyProductFormData.isActive !== 
+          product.isActive
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -147,7 +167,7 @@ function EditCompanyProductModal({
             updatedby: loginStatus.id,
           };
           await axios
-            .patch(POST_API.UPDATE_PRODUCT, updateProductPostData, {
+            .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
               withCredentials: BOOLEAN_VALUES.TRUE,
             })
             .then((response) => {
@@ -161,6 +181,7 @@ function EditCompanyProductModal({
                   type: "success",
                 });
                 handleCompanyProductChange(product);
+                setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
                 setTimeout(() => {
                   onClose();
                   setIsCreateCompanyProductTaxModalOpen(BOOLEAN_VALUES.FALSE)
@@ -168,13 +189,21 @@ function EditCompanyProductModal({
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: ApiError | any) => {
+            .catch(async (error: ApiError | any) => {
               console.log(error);
               if (error.status === STATUS_CODE.UNATHORISED) {
-                const refreshTokenResponse = RefreshToken({
+                const refreshTokenResponse = await RefreshToken({
                   callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
                 });
-                console.log(refreshTokenResponse);
+                if(refreshTokenResponse){
+                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                }
+                else{
+                  setIsDialogueOpen(  BOOLEAN_VALUES.TRUE)
+                }
+              }
+              else if(error.status === STATUS_CODE.FORBIDDEN){
+                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
               }
             });
         }
@@ -198,7 +227,7 @@ function EditCompanyProductModal({
     if(isOpen){
       const getProductTaxPostData = {
         company_id : loginStatus.companyId,
-        company_product_id : 19,
+        company_product_id : product.id,
         requestedby : loginStatus.id,
       }
 
@@ -232,11 +261,19 @@ function EditCompanyProductModal({
           }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error : ApiError | any) => {
+      .catch(async (error : ApiError | any) => {
         console.log(error);
         if(error.status === STATUS_CODE.UNATHORISED){
-          const refreshTokenResponse = RefreshToken({callFunction :fetchCompanyroductTax})
-          console.log(refreshTokenResponse);
+          const refreshTokenResponse = await RefreshToken({callFunction :fetchCompanyroductTax})
+          if(refreshTokenResponse){
+            setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+          }
+          else{
+            setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+          }
+        }
+        else if(error.status === STATUS_CODE.FORBIDDEN){
+          setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
         }
       });
     }
@@ -406,6 +443,13 @@ function EditCompanyProductModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
+      <DialogueBox
+              isOpen={isDialogueOpen}
+              onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+              onConfirm={handleDialogueConfirm}
+              title="Session Expired !"
+              message="Session Expired. Please login again."
+            /> 
     </div>
   );
 }

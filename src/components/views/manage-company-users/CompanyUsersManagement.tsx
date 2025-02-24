@@ -103,6 +103,8 @@ function GetCompanyUsers() {
         } else {
           setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
         }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
       }
     }
   };
