@@ -112,9 +112,6 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
             if(value === STRING_VALUES.EMPTY_STRING) {
               setErrors((prev) => ({ ...prev, description: "Description is required"}));
             }
-            else if(value.toString().length > NUMBER_VALUES.TWO_FIFTY_SIX || value.toString().length < NUMBER_VALUES.FIFTEEN) {
-              setErrors((prev) => ({ ...prev, description: "Description should be between 256 and 15 characters"}));
-            }
             else{
               setErrors((prev) => ({ ...prev, description: "" }));
             }

@@ -4,6 +4,7 @@
  */
 import AuthLayoutProps from "../../../@types/auth/views/AuthLayoutProps";
 import "../../../assets/styles/AuthLayout.css";
+import AuthSideSvg from "../../../assets/svg/AuthSideSvg";
 import { IMAGE_SOURCE } from "../../../constants/ImageSource";
 // import Logo from "../../../assets/svg/Logo";
 
@@ -19,37 +20,26 @@ import { IMAGE_SOURCE } from "../../../constants/ImageSource";
  */
 function AuthLayout(props: AuthLayoutProps){
   return (
-    <div className="bg-gray-100 flex flex-col justify-center">
+    <div className="fixed bg-gray-100 flex flex-col justify-center">
       {/* left side code */}
       <div className="h-screen grid lg:grid-cols-3">
         <div
-          className="g-no-repeat py-6 px-16 flex-col justify-between hidden lg:flex col-span-1 h-screen sticky top-0"
-          style={{
-            backgroundImage: "url(/images/auth/auth-side-bg-dark.jpg)",
-            backgroundSize: "cover",
-          }}
+          className="g-no-repeat py-6 px-16 flex-col justify-between bg-blue-500 hidden lg:flex col-span-1 h-screen sticky top-0"
         >
-          <div className="logo flex justify-center">
-          <img src={IMAGE_SOURCE.PR_LOGO} alt="" className="w-52 h-32"/>
 
-            {/* <Logo></Logo> */}
+          <div className="logo flex justify-center">
+          <img src={IMAGE_SOURCE.PR_LOGO} alt="" className="w-52 h-32"/>  
+         
           </div>
+          <div className="flex justify-center">
+           <AuthSideSvg></AuthSideSvg>
+           </div>
           <div>
             <div className="mb-6 flex items-center gap-4">
               <span className="avatar avatar-circle avatar-md">
-                <img
-                  className="w-16 h-16 rounded-full object-cover border-2"
-                  src={IMAGE_SOURCE.AVATAR_THUMB_ONE}
-                  
-                ></img>
+                
               </span>
-              <div className="text-white">
-                <div className="font-semibold text-base">Radhika Apte</div>
-                <span className="opacity-80">CTO, Onward</span>
-              </div>
             </div>
-            <p className="text-lg text-white opacity-80">
-            Purple CRM has helped us achieve 4x ROI in just two years, allowing us to excel as one of the largest full-service stores for interiors in the real estate industry. Purple's 360-degree view has enabled us to offer great value and experiences to our customers.            </p>
           </div>
         </div>
 

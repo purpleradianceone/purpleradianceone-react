@@ -12,7 +12,7 @@ import {
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-// import { DialogueBox } from "../../dialogue-box/Dialogue";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useEffect, useState } from "react";
 import {
   MessageSnackbarState,
@@ -29,6 +29,8 @@ import CreateCompanyProductTaxProps from "../../../@types/modal/CreateCompanyPro
 import RadioButtons from "../../ui/RadioButton";
 import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../constants/Routes";
 
 function CreateCompanyProductTax({
   isOpen,
@@ -62,6 +64,17 @@ function CreateCompanyProductTax({
     createCompanyProductTaxFormData,
     "registration"
   );
+
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
+
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
@@ -121,17 +134,27 @@ function CreateCompanyProductTax({
             }
             else if(response.status === STATUS_CODE.OK && !response.data.status){
                   showMessageSnackbar({message:response.data.message,type : "error"});
+                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .catch((error: ApiError | any) => {
+          .catch(async (error: ApiError | any) => {
             console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
-              const refreshTokenResponse = RefreshToken({
+              const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
               });
-              console.log(refreshTokenResponse);
+              if(refreshTokenResponse){
+                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+              }
+              else{
+                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+              }
             }
+            else if(error.status === STATUS_CODE.FORBIDDEN){
+              setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+            }
+            
           });
       }
     } else {
@@ -247,13 +270,13 @@ function CreateCompanyProductTax({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
-      {/* <DialogueBox
+       <DialogueBox
         isOpen={isDialogueOpen}
         onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired !"
         message="Session Expired. Please login again."
-      /> */}
+      /> 
     </>
   );
 }

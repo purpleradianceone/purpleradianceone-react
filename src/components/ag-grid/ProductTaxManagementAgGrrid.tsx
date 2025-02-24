@@ -1,4 +1,4 @@
-import { AllCommunityModule, ColDef } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import {  useEffect, useMemo, useState } from "react";
 import { BOOLEAN_VALUES, INNERHTML, NUMBER_VALUES, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
@@ -15,6 +15,9 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import MESSAGE from "../../constants/Messages";
+import { DialogueBox } from "../dialogue-box/Dialogue";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 
 function ProductTaxManagementAgGrid({
@@ -24,6 +27,10 @@ function ProductTaxManagementAgGrid({
     productTax: ProductTax[]
     handleCompanyProductTaxChange : (status : boolean) => void,
 }) {
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
+    BOOLEAN_VALUES.FALSE
+  );
 
     useEffect(()=> {
         console.log(productTax);
@@ -46,7 +53,17 @@ const {loginStatus} = useLoggedInUserContext();
       setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
     };
 
+    
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
 
+  useEffect(()=> {
+    console.log("Product Tax");
+    console.log(productTax)
+  })
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -70,6 +87,7 @@ const {loginStatus} = useLoggedInUserContext();
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
         flex: NUMBER_VALUES.ONE,
+
       },
       {
         field: "validFrom",
@@ -84,21 +102,6 @@ const {loginStatus} = useLoggedInUserContext();
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
         flex: NUMBER_VALUES.ONEANDHALF,
-      },
-      {
-        field: "updatedBy",
-        headerName: "Updated By",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
-      },
-      {
-        field: "updatedOn",
-        headerName: "Updated By",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
-        
       },
       {
         headerName : "Delete",
@@ -132,12 +135,21 @@ const {loginStatus} = useLoggedInUserContext();
                        
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .catch((error : ApiError | any) => {
+                    .catch(async(error : ApiError | any) => {
                         console.log(error);
                         if(error.status === STATUS_CODE.UNATHORISED){
-                            const refreshTokenResponse = RefreshToken({callFunction:handleCompanyProductTaxDelete})
-                            console.log(refreshTokenResponse);
+                            const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
+                            if(refreshTokenResponse){
+                              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
                             }
+                            else {
+                                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                            }
+                            }
+                            else if(error.status === STATUS_CODE.FORBIDDEN){
+                              setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                            }
+                        
                     })
                 }
                 else{
@@ -180,13 +192,23 @@ const {loginStatus} = useLoggedInUserContext();
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               modules={[AllCommunityModule]} 
-              overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}/>
+              overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX}
+              theme={themeAlpine}
+              />
       </div><MessageSnackBar
               isOpen={messageSnackbar.open}
               message={messageSnackbar.message}
               type={messageSnackbar.type}
               onClose={handleCloseSnackbar}
               duration={NUMBER_VALUES.SNACKBAR_DURATION} />
+
+              <DialogueBox
+                      isOpen={isDialogueOpen}
+                      onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+                      onConfirm={handleDialogueConfirm}
+                      title="Session Expired !"
+                      message="Session Expired. Please login again."
+                    />
               </>
   );
 

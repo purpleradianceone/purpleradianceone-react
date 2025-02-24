@@ -63,8 +63,6 @@ function GetCompanyUsersList({
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const {
-    userHasAccessToViewAccess,
-    userHasAccessToUpdateUser,
     userHasAccessToAddUser,
     userHasAccessToViewUser,
   } = useUserAccessModules();
@@ -347,8 +345,6 @@ function GetCompanyUsersList({
           >
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-              userHasAccessToUpdateUser={userHasAccessToUpdateUser}
-              userHasAccessToViewAccess={userHasAccessToViewAccess}
               users={users}
               handleIdIsEditModalOpen={handleIdIsEditModalOpen}
               handleIsAccessModalOpen={handleIsAccessModalOpen}

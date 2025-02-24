@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +12,7 @@ import {
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Product } from "../../@types/products/ProductsManagementProps";
-import { ClipboardPlus, Edit } from "lucide-react";
+import { CheckCircle2, ClipboardPlus, Edit, XCircle } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import Button from "../ui/Button";
 
@@ -30,6 +30,12 @@ function ProductsManagementGrid({
     userHasAccessToAddProductTax,
     userHasAccessToUpdateProduct,
   } = useUserAccessModules();
+
+  useEffect(() => {
+    
+    console.log("Products In AGGRID")
+    console.log(products);
+  })
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -71,6 +77,30 @@ function ProductsManagementGrid({
         },
       },
       {
+        field : "isActive",
+        headerName: "Active",
+        sortable: BOOLEAN_VALUES.TRUE,
+        filter :  BOOLEAN_VALUES.TRUE,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center gap-1 mt-3">
+              {params.value ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-green-600">Active</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-4 h-4 text-red-500" />
+                  <span className="text-sm text-red-600">Inactive</span>
+                </>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         field: "hsn",
         headerName: "HSN",
         sortable: BOOLEAN_VALUES.TRUE,
@@ -87,15 +117,21 @@ function ProductsManagementGrid({
         hide: !userHasAccessToViewProductTax,
       },
       {
-        field: "tax_rate",
+        field: "taxRate",
         headerName: "TAX Rate",
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
         flex: NUMBER_VALUES.ONE,
         hide: !userHasAccessToViewProductTax,
+        valueFormatter: (params) => {
+          if (params.value === NUMBER_VALUES.ZERO) {
+            return ""; // Return an empty string if the value is 0
+          }
+          return params.value; // Otherwise, return the original value
+        },
       },
       {
-        field: "valid_from",
+        field: "validFrom",
         headerName: "Effective From",
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
@@ -104,14 +140,14 @@ function ProductsManagementGrid({
       },
 
       {
-        field: "createdby",
+        field: "createdBy",
         headerName: "Created By",
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
         flex: NUMBER_VALUES.ONE,
       },
       {
-        field: "createdon",
+        field: "createdOn",
         headerName: "Created On",
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
@@ -130,6 +166,7 @@ function ProductsManagementGrid({
           const [position, setPosition] = useState({
             top: NUMBER_VALUES.ZERO,
             left: NUMBER_VALUES.ZERO,
+            isUpward : BOOLEAN_VALUES.FALSE,
           });
           const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -137,10 +174,18 @@ function ProductsManagementGrid({
             event.stopPropagation();
             setIsActionsDropDownOpen((prev) => !prev);
 
-            const rect = event.currentTarget.getBoundingClientRect();
+            const rect = (event.currentTarget as HTMLButtonElement).getBoundingClientRect();
+            const dropdownHeight = 80; // Approximate height of dropdown
+            const windowHeight = window.innerHeight;
+            const spaceBelow = windowHeight - rect.bottom;
+            const isUpward = spaceBelow < dropdownHeight;
+        
             setPosition({
-              top: rect.bottom + window.scrollY - NUMBER_VALUES.TEN, // Position below button
-              left: rect.left + window.scrollX - NUMBER_VALUES.TWENTY_FIVE, // Align with button
+              top: isUpward 
+                ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
+                : rect.bottom + window.scrollY - 10, // Position below button
+              left: rect.left + window.scrollX - 25,
+              isUpward
             });
           };
 
@@ -188,6 +233,8 @@ function ProductsManagementGrid({
                           handleEditCompanyProductModalOpen(
                             BOOLEAN_VALUES.TRUE
                           );
+                          console.log("selected Product");
+                          console.log(params.data)
                           handleSelectedProductChange(params.data);
                         }}
                       >
@@ -240,6 +287,7 @@ function ProductsManagementGrid({
     };
   }, []);
 
+
   return (
     <div
       className="ag-theme-alpine w-full"
@@ -251,6 +299,7 @@ function ProductsManagementGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        theme={themeAlpine}
       />
     </div>
   );

@@ -110,6 +110,9 @@ function CompanyUserAccessManagementModal({
               setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
             }
           }
+          else if(error.status === STATUS_CODE.FORBIDDEN){
+                      setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                    }
         });
     } else {
       setModules([]);
@@ -216,7 +219,7 @@ function CompanyUserAccessManagementModal({
     }));
 
     axios
-      .post(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData, {
+      .put(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData, {
         withCredentials: BOOLEAN_VALUES.TRUE,
       })
       .then((response) => {
@@ -256,7 +259,11 @@ function CompanyUserAccessManagementModal({
           else{
             setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
           }
-        } else {
+        } 
+        else if(error.status === STATUS_CODE.FORBIDDEN){
+                    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                  }
+                  else {
           showMessageSnackbar({
             message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
             type: "error",

@@ -27,16 +27,12 @@ function ProductManagement() {
     BOOLEAN_VALUES.FALSE
   );
 
-  
-
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     BOOLEAN_VALUES.FALSE
   );
 
   const [productsData, setProductsData] = useState<Product[]>([]);
-  const [productUpdateCount, setProductUpdateCount] = useState<number>(
-    NUMBER_VALUES.ZERO
-  );
+  const [productUpdateCount, setProductUpdateCount] = useState<number>(NUMBER_VALUES.ZERO);
 
   const {
     currentPage,
@@ -58,6 +54,7 @@ function ProductManagement() {
       (products) =>
         products.name !== product.name && products.code !== product.code
     );
+    alert();
     if (userMatches) {
       setProductUpdateCount((prev) => prev + 1);
     }
@@ -66,22 +63,24 @@ function ProductManagement() {
   const handleEditProductChange = (product: Product) => {
     const userMatches = productsData.some(
       (products) =>
-        products.name === product.name && products.code === product.code
+        products.id === product.id
     );
+
     if (userMatches) {
       setProductUpdateCount((prev) => prev + 1);
     }
   };
 
-  const handleCreateCompanyProductTax = (product:Product) => {
+  const handleCreateCompanyProductTax = (product: Product) => {
     const userMatches = productsData.some(
       (products) =>
         products.name !== product.name && products.code !== product.code
     );
     if (userMatches) {
       setProductUpdateCount((prev) => prev + 1);
+      
     }
-  }
+  };
 
   const fetchCompanyProducts = async () => {
     if (userHasAccessToViewProduct) {
@@ -113,7 +112,28 @@ function ProductManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
-          setProductsData(response.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          response.data.map((res : any) => {
+            setProductsData((prev) => [
+              ...prev,
+              {
+                code: res.code,
+                companyId: res.company_id,
+                cost: res.cost,
+                count: res.count,
+                createdBy: res.createdby,
+                createdOn: res.createdon,
+                description: res.description,
+                hsn: res.hsn,
+                id: res.id,
+                isActive: res.isactive,
+                name: res.name,
+                sac: res.sac,
+                taxRate: res.tax_rate,
+                validFrom: res.valid_from,
+              },
+            ]);
+          });
 
           if (response.data[NUMBER_VALUES.ZERO]?.count) {
             setTotalPages(
@@ -121,7 +141,7 @@ function ProductManagement() {
             );
           }
         }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError | any) {
         console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -134,13 +154,12 @@ function ProductManagement() {
           } else {
             setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
           }
-        }
-        else if(error.status === STATUS_CODE.FORBIDDEN) {
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
           setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+        }
       }
     }
   };
-}
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
@@ -149,11 +168,10 @@ function ProductManagement() {
   };
 
   useEffect(() => {
-
-    setTimeout(()=>{
+    setTimeout(() => {
+      setProductsData([]);
       fetchCompanyProducts();
-
-    },200)
+    }, 200);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     productUpdateCount,
@@ -176,9 +194,9 @@ function ProductManagement() {
         <>
           <div>
             <ProductsManagementList
-            handleCreateCompanyProductTax={handleCreateCompanyProductTax}
-            handleEditProductChange={handleEditProductChange}
-            handleProductChangeOnAdd={handleProductChangeOnAdd}
+              handleCreateCompanyProductTax={handleCreateCompanyProductTax}
+              handleEditProductChange={handleEditProductChange}
+              handleProductChangeOnAdd={handleProductChangeOnAdd}
               onEndDateChange={handleEndDateChange}
               onStartDateChange={handleStartDateChange}
               handleSearchOption={{
@@ -193,7 +211,7 @@ function ProductManagement() {
                 pageSize,
               }}
               products={productsData}
-/>
+            />
           </div>
           <DialogueBox
             isOpen={isDialogueOpen}
@@ -216,7 +234,6 @@ function ProductManagement() {
       )}
     </div>
   );
-
-  }
+}
 
 export default ProductManagement;

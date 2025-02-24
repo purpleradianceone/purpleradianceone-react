@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserPlus, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
@@ -48,7 +48,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     handleChange: handleAddComapnyUserFormDataChange,
     setFormData: setAddCompanyUserFormData,
   } = useFormChange(initialAddCompanyUserFormData);
-  const { errors, handleBlur } = useFormValidation(
+  const { errors, handleBlur,setErrors } = useFormValidation(
     addCompanyUserFormData,
     "registration"
   );
@@ -127,7 +127,11 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             } else {
               setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
             }
-          } else {
+          } 
+          else if(error.status === STATUS_CODE.FORBIDDEN){
+            setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+          }
+          else {
             showMessageSnackbar({
               message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
               type: "error",
@@ -149,11 +153,20 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     navigate(ROUTES_URL.SIGN_IN);
   };
 
+  useEffect(()=>{
+    if(!isOpen){
+      setErrors({
+        name : STRING_VALUES.EMPTY_STRING,
+        email : STRING_VALUES.EMPTY_STRING,
+      })
+    }
+  },[])
+
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed inset-0 z-10 p-0.5 overflow-hidden bg-black bg-opacity-45">
+      <div className="fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45">
         <div className="flex min-h-screen items-center justify-center">
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50

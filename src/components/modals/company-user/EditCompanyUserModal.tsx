@@ -104,7 +104,7 @@ function EditCompanyUserModal({
         if (
           user.fullname !== updateUserformData.name ||
           user.mobilenumber !== updateUserformData.mobilenumber ||
-          updateUserformData.isActive
+          updateUserformData.isActive !== user.isactive
         ) {
           const postUpdateUserData = {
             id: user.id,
@@ -114,7 +114,7 @@ function EditCompanyUserModal({
             mobilenumber: updateUserformData.mobilenumber,
             isactive : updateUserformData.isActive
           };
-          await axios.post(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+          await axios.put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
               withCredentials: BOOLEAN_VALUES.TRUE,
             })
             .then((response) => {
@@ -137,7 +137,11 @@ function EditCompanyUserModal({
                 else{
                   setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
                 }
-              } else {
+              } 
+              else if(error.status === STATUS_CODE.FORBIDDEN){
+                          setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                        }
+                        else {
                 showMessageSnackbar({
                   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
                   type: "error",
@@ -182,7 +186,7 @@ function EditCompanyUserModal({
     <>
       <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-45">
       <div className="flex min-h-screen items-center justify-center">
-        <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+        <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
