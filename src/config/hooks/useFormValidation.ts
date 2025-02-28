@@ -77,9 +77,8 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
 
       case "mobileNumber":
         
-        if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value) && value.length === NUMBER_VALUES.EIGHT) {
+        if (formType === STRING_VALUES.REGISTRATION && !validateMobileNumber(value) && value.length) {
           
-
           setErrors((prev) => ({
             ...prev,
             mobileNumber: "Please enter a valid mobile number",

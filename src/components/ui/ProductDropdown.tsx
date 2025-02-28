@@ -1,16 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Delete,  } from 'lucide-react';
 import { BOOLEAN_VALUES, NUMBER_VALUES } from '../../constants/AppConstants';
+import { Product } from '../../@types/products/ProductsManagementProps';
 
-type Product = {
-  productName : string,
-  itemCode : string,
-  description : string,
-  price : number,
-  HSN : string,
-  SAC : string,
-  
-}
 
 type ProductDropdownList = {
 
@@ -39,6 +31,7 @@ function ProductDropdownList(props: ProductDropdownList ) {
      if(dateName!=null){
       setSelectedOption(dateName)
       setIsOpen(BOOLEAN_VALUES.FALSE);
+      console.log(productCode);
     }
   }
   
@@ -86,18 +79,18 @@ function ProductDropdownList(props: ProductDropdownList ) {
               </button>
               {props.product.map((option) => (
                 <button
-                  key={option.itemCode}
-                  id = {option.itemCode?.toString()}
+                  key={option.code}
+                  id = {option.id?.toString()}
                   className={`
                     w-full px-4 py-2 text-left
-                    ${selectedOption === option.productName
+                    ${selectedOption === option.code
                       ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-800 hover:bg-gray-50'}
                     focus:outline-none focus:bg-gray-50
                   `}
-                  onClick={() => handleOptionClick(option.itemCode,option.productName)}
+                  onClick={() => handleOptionClick(option.code,option.name)}
                 >
-                  {option.productName}
+                  {option.name}
                 </button>
               ))}
             </div>

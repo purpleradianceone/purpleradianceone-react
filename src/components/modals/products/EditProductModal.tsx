@@ -27,7 +27,7 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import RadioButtons from "../../ui/RadioButton";
-import CreateCompanyProductTax from "./CreateCompanyProductTax";
+import CreateCompanyProductTaxModal from "./CreateCompanyProductTaxModal";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
 import ProductTax from "../../../@types/products/ProductTaxManagementProps";
@@ -35,6 +35,8 @@ import { Product } from "../../../@types/products/ProductsManagementProps";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import useScreenSize from "../../../config/hooks/useScreenSize";
+import CreateCompanyProductCompanyUserModal from "./CreateCompanyProductCompanyUserModal";
 
 function EditCompanyProductModal({
   isOpen,
@@ -59,6 +61,8 @@ function EditCompanyProductModal({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
 
+  const {isSmallScreen} = useScreenSize();
+
   const [companyProductTax,setCompanyProductTax] = useState<ProductTax[]>([]);
   const [companyProductTaxChangeCount,setCompanyProductTaxChangeCount] = useState<number>(NUMBER_VALUES.ZERO);
 
@@ -66,6 +70,9 @@ function EditCompanyProductModal({
     isCreateCompanyProductTaxModalOpen,
     setIsCreateCompanyProductTaxModalOpen,
   ] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+
+  const [isCreateCompanyProductCompanyUserModalOpen,setIsCreateCompanyProductCompanyUserModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: BOOLEAN_VALUES.FALSE,
@@ -117,7 +124,7 @@ function EditCompanyProductModal({
     setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
   };
 
-  const handleCloseSnackbar = () => {
+  const handleMessageSnackbarClose = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
   };
 
@@ -286,7 +293,7 @@ function EditCompanyProductModal({
         description: STRING_VALUES.EMPTY_STRING,
         name: STRING_VALUES.EMPTY_STRING,
       });
-      handleCloseSnackbar();
+      handleMessageSnackbarClose();
       fetchCompanyroductTax();
     }
     else{
@@ -298,7 +305,7 @@ function EditCompanyProductModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45">
+    <div className={isSmallScreen ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"}>
       <div className="flex min-h-screen items-center justify-center">
         <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
@@ -382,8 +389,13 @@ function EditCompanyProductModal({
               />
               </div>
 
-              <div className="flex justify-self-center m-2 min-w-60">
+              <div className="flex justify-self-center m-2 min-w-80 gap-2">
                 <Button type="submit">Update Product</Button>
+                <Button
+                  type="button"
+                  onClick = {()=> {
+                    setIsCreateCompanyProductCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
+                  }}>Assign Users</Button>
               </div>
             </form>
 
@@ -393,7 +405,7 @@ function EditCompanyProductModal({
                 Product Tax
               </span>
             </div>
-            <div className="flex justify-self-end max-w-36 m-3">
+            <div className={isSmallScreen ? "flex justify-self-end max-w-full px-2 mb-2" : "flex justify-self-end max-w-36 m-3"}>
               <Button
                 type="button"
                 onClick={() => {
@@ -405,13 +417,14 @@ function EditCompanyProductModal({
                 ></ClipboardPlus>
                 Add TAX
               </Button>
+              
             </div>
 
             
 
             {isCreateCompanyProductTaxModalOpen && (
-              <div className="flex justify-center items-center min-w-fit">
-                <CreateCompanyProductTax
+              <div className={isSmallScreen ? "flex justify-center items-center min-w-full" : "flex justify-center items-center min-w-fit"}>
+                <CreateCompanyProductTaxModal
                   isOpen={isCreateCompanyProductTaxModalOpen}
                   handleCreateCompanyProductTax={handleCreateCompanyProductTax}
                   onClose={() => {
@@ -421,6 +434,15 @@ function EditCompanyProductModal({
                 />
               </div>
             )}
+
+            <CreateCompanyProductCompanyUserModal
+            isOpen={isCreateCompanyProductCompanyUserModalOpen}
+            onClose={()=> {
+              setIsCreateCompanyProductCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
+              
+            }}
+            product={product}
+            />
 
 
 <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
@@ -439,7 +461,7 @@ function EditCompanyProductModal({
           isOpen={messageSnackbar.open}
           message={messageSnackbar.message}
           type={messageSnackbar.type}
-          onClose={handleCloseSnackbar}
+          onClose={handleMessageSnackbarClose}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>

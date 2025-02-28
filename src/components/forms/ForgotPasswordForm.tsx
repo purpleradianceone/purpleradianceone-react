@@ -66,14 +66,14 @@ function ForgotPasswordForm(){
         withCredentials:BOOLEAN_VALUES.TRUE
       })
       .then((response)=>{
-        if(response.data[0].status){
+        if(response.data.status){
           
           if(response.data){
             setTimeout(() => {
               navigate(ROUTES_URL.CREATE_PASSWORD); 
              } , 8000);
              setShowEmailSentAnimation(!showEmailSentAnimation);
-          showMessageSnackbar({message : response.data[0].message, type : "success"})
+          showMessageSnackbar({message : response.data.message, type : "success"})
           localStorage.setItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL, forgotPasswordFromState.email);
           }
           else{
@@ -82,7 +82,7 @@ function ForgotPasswordForm(){
           
           
         }else{
-          showMessageSnackbar({message : response.data[0].message,type:"error"})
+          showMessageSnackbar({message : response.data.message,type:"error"})
         }
       })
       .catch((error) => {

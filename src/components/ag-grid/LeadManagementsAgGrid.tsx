@@ -19,6 +19,7 @@ function LeadManagementAgGrid({
 
   useEffect(()=>{
     console.log(leads);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
     const columnDefs = useMemo<ColDef[]>(
@@ -134,7 +135,7 @@ function LeadManagementAgGrid({
             sortable: BOOLEAN_VALUES.FALSE,
             maxWidth: NUMBER_VALUES.HUNDRED,
             pinned: "right",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any,
             cellRenderer: (params: any) => {
               const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
                 useState(BOOLEAN_VALUES.FALSE);
@@ -153,6 +154,7 @@ function LeadManagementAgGrid({
               };
     
               useEffect(() => {
+                console.log(params)
                 const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
                   if (
                     dropdownRef.current &&
@@ -171,6 +173,7 @@ function LeadManagementAgGrid({
                     "mousedown",
                     handleClickOutsideActionsDropDown
                   );
+              // eslint-disable-next-line react-hooks/exhaustive-deps
               }, []);
     
               return (

@@ -133,7 +133,6 @@ function SignInForm() {
                     company_id: response.data.company_id,
                     company_user_id: response.data.id,
                     requestedby: response.data.id,
-                    device_type : STRING_VALUES.EMPTY_STRING
                   };
 
                   axios

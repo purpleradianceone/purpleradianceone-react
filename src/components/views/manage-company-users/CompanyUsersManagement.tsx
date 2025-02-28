@@ -86,6 +86,7 @@ function GetCompanyUsers() {
       });
 
       setCompanyUsers(response.data);
+      console.log(response.data);
       if (response.data[NUMBER_VALUES.ZERO]?.count) {
         setTotalPages(
           Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize)
@@ -132,7 +133,7 @@ function GetCompanyUsers() {
   ]);
 
   useEffect(() => {
-    if (userHasAccessToViewUser === BOOLEAN_VALUES.FALSE) {
+    if (!userHasAccessToViewUser) {
       setAccessDeniedPopUpOpen(BOOLEAN_VALUES.TRUE);
     }
   }, [userHasAccessToViewUser]);

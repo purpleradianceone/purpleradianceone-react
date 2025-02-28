@@ -18,6 +18,7 @@ import MESSAGE from "../../constants/Messages";
 import { DialogueBox } from "../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
+import useScreenSize from "../../config/hooks/useScreenSize";
 
 
 function ProductTaxManagementAgGrid({
@@ -27,6 +28,9 @@ function ProductTaxManagementAgGrid({
     productTax: ProductTax[]
     handleCompanyProductTaxChange : (status : boolean) => void,
 }) {
+
+  const {isSmallScreen} = useScreenSize();
+
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
     BOOLEAN_VALUES.FALSE
@@ -72,7 +76,8 @@ const {loginStatus} = useLoggedInUserContext();
         headerName: "HSN",
         sortable: BOOLEAN_VALUES.TRUE,
         filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        flex: isSmallScreen ? NUMBER_VALUES.ONE : NUMBER_VALUES.ONEANDHALF,
+        
       },
       {
         field: "sac",
@@ -105,9 +110,11 @@ const {loginStatus} = useLoggedInUserContext();
       },
       {
         headerName : "Delete",
-        maxWidth : NUMBER_VALUES.HUNDRED,
+        maxWidth : isSmallScreen ? 50 : NUMBER_VALUES.HUNDRED,
         flex : NUMBER_VALUES.ONE,
         pinned : "right",
+        filter : BOOLEAN_VALUES.FALSE,
+        
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer : (params : any) => {
 
@@ -162,7 +169,7 @@ const {loginStatus} = useLoggedInUserContext();
                 <ActionsDropdownButton
                 onClick={handleCompanyProductTaxDelete}
                 >
-                    <Trash2 className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}/>
+                    <Trash2 className={isSmallScreen ? CLASS_NAMES.INLINE_ICON_SIZE_FOUR_SMALL_SCREEN :CLASS_NAMES.INLINE_ICON_SIZE_FOUR }/>
                 </ActionsDropdownButton>
             </div>
          )
@@ -175,7 +182,7 @@ const {loginStatus} = useLoggedInUserContext();
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
-      minWidth: 150,
+      minWidth: isSmallScreen ? 100 : 150,
       flex: 0.8,
       suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
       suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,

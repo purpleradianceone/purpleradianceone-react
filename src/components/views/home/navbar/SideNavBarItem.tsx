@@ -172,7 +172,7 @@ function SideNavBarItem({
               <div
                 onMouseLeave={() => setHoveredItem(BOOLEAN_VALUES.FALSE)}
                 onMouseEnter={()=> setIsTooltipVisible(BOOLEAN_VALUES.FALSE)}
-                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-48 z-50"
+                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36 z-50"
               >
                 {children.map((child, index) => (
                   <button

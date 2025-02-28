@@ -10,6 +10,7 @@ export const productsData : Product[] = [
       cost: 10.99,
       hsn: "xxCode1xx",
       sac: "xxCode1xx",
+      
     },
     {
       name : "Product 2",
