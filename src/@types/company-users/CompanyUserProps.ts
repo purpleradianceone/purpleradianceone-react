@@ -1,11 +1,16 @@
  type companyUsersSearchProps = {
+  company_id: number;
+  count? : number,
   fullname: string;
   email: string;
   mobilenumber: string;
   isactive: boolean;
-  company_id: number;
   id:number,
-  count? : number
+  createdby: string,
+  createdon : string,
+  updatedby : string,
+  updatedon : string,
+  password: string,
 };
 
 export default companyUsersSearchProps;

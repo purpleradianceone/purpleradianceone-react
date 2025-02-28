@@ -36,7 +36,7 @@ function EditCompanyUserModal({
 }: EditUserPopupProps) {
   const initialUpdateUserformData = {
     name: user.fullname,
-    mobilenumber: user.mobilenumber,
+    mobileNumber: user.mobilenumber,
     isActive : user.isactive,
   };
   const CompanyUserIsActiveRadioButtonOptions = [
@@ -97,13 +97,13 @@ function EditCompanyUserModal({
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
-      updateUserformData.mobilenumber !== initialUpdateUserformData.mobilenumber ||
+      updateUserformData.mobileNumber !== initialUpdateUserformData.mobileNumber ||
       updateUserformData.isActive !== initialUpdateUserformData.isActive
     ) {
       if (updateUserformData.name != STRING_VALUES.EMPTY_STRING) {
         if (
           user.fullname !== updateUserformData.name ||
-          user.mobilenumber !== updateUserformData.mobilenumber ||
+          user.mobilenumber !== updateUserformData.mobileNumber ||
           updateUserformData.isActive !== user.isactive
         ) {
           const postUpdateUserData = {
@@ -111,7 +111,7 @@ function EditCompanyUserModal({
             updatedby: loginStatus.id,
             company_id: loginStatus.companyId,
             fullname: updateUserformData.name,
-            mobilenumber: updateUserformData.mobilenumber,
+            mobileNumber: updateUserformData.mobileNumber,
             isactive : updateUserformData.isActive
           };
           await axios.put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
@@ -221,10 +221,12 @@ function EditCompanyUserModal({
               <FormInput
                 label="Mobile Number : "
                 type="tel"
-                name="mobilenumber"
+                name="mobileNumber"
                 placeholder="Enter Mobile Number"
-                defaultValue={initialUpdateUserformData.mobilenumber}
+                defaultValue={initialUpdateUserformData.mobileNumber}
                 onChange={handleEditUserFormChange}
+                onBlur={handleBlur}
+                error = {errors.mobileNumber}
               />
 
               <RadioButtons

@@ -5,6 +5,7 @@
 import AuthLayoutProps from "../../../@types/auth/views/AuthLayoutProps";
 import "../../../assets/styles/AuthLayout.css";
 import AuthSideSvg from "../../../assets/svg/AuthSideSvg";
+import useScreenSize from "../../../config/hooks/useScreenSize";
 import { IMAGE_SOURCE } from "../../../constants/ImageSource";
 // import Logo from "../../../assets/svg/Logo";
 
@@ -19,11 +20,14 @@ import { IMAGE_SOURCE } from "../../../constants/ImageSource";
  * @returns Layout/Veiw for SignUpForm and signInForm components
  */
 function AuthLayout(props: AuthLayoutProps){
+
+  const {isLargeScreen} =  useScreenSize();
   return (
-    <div className="fixed bg-gray-100 flex flex-col justify-center">
+    <div className={isLargeScreen ?"fixed bg-gray-100 flex flex-col justify-center" : "fixed bg-gray-100 flex flex-col justify-center min-w-full" }>
       {/* left side code */}
-      <div className="h-screen grid lg:grid-cols-3">
-        <div
+      <div className={isLargeScreen ? "h-screen grid lg:grid-cols-3" : "h-screen grid grid-cols-1"}>
+        {isLargeScreen &&
+          <div
           className="g-no-repeat py-6 px-16 flex-col justify-between bg-blue-500 hidden lg:flex col-span-1 h-screen sticky top-0"
         >
 
@@ -42,10 +46,12 @@ function AuthLayout(props: AuthLayoutProps){
             </div>
           </div>
         </div>
+        }
+        
 
         {/* right side code */}
-        <div className="lg:col-span-2 overflow-y-auto">
-          <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className={isLargeScreen ? "lg:col-span-2 overflow-y-auto" : "grid"}>
+          <div>
             <div className="flex justify-center"></div>
             <h2 className="mt-5 text-center text-3xl font-extrabold text-gray-900">
               {props.title}

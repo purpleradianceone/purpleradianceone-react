@@ -33,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ApiError from "../../../@types/error/ApiError";
+import useScreenSize from "../../../config/hooks/useScreenSize";
 
 function AddProductModal({
   isOpen,
@@ -46,10 +47,12 @@ function AddProductModal({
     type: "success",
   });
 
+
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
     BOOLEAN_VALUES.FALSE
   );
+  const {isSmallScreen} = useScreenSize()
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
     localStorage.clear();
@@ -80,6 +83,7 @@ function AddProductModal({
   });
 
   const { userHasAccessToAddProduct } = useUserAccessModules();
+  
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -205,7 +209,7 @@ function AddProductModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45">
+    <div className={isSmallScreen ?"fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45" }>
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
           className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
@@ -335,6 +339,7 @@ function AddProductModal({
                   >
                     Add Product
                   </Button>
+                  
                 </div>
               )}
             </form>

@@ -4,6 +4,7 @@
    {label,type,name,placeholder,required,rightElement,onChange,onBlur,error} validation from src/@types/FormInputProps
  */
 import FormInputProps from "../../@types/ui/FormInputProps";
+import useScreenSize from "../../config/hooks/useScreenSize";
 
 /**
  * 
@@ -34,12 +35,14 @@ function FormInput({
   readonly,
   inputMode
 }: FormInputProps){
+
+  const {isSmallScreen} = useScreenSize();
   return (
-    <div className="mt-4">
+    <div className={isSmallScreen ? "mt-1" : "mt-4"}>
       <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
         {label}
       </label>
-      <div className="mt-4 relative">
+      <div className={isSmallScreen ? "mt-1 relative" : "mt-4 relative"}>
         <input
         ref ={ref}
         readOnly={readonly}

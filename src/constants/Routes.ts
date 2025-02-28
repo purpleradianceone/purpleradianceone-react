@@ -12,7 +12,8 @@ const ROUTES_URL = {
     GET_COMPANY_USERS : "/home/manage-users/users",
     GET_LEAD_MANAGEMENT : "/home/manage-leads/leads",
     GET_LEAD_MANAGEMENT_DETAILS : "/home/manage-leads/leads",
-    PRODUCT_MANAGEMENT : "/home/manage-products/products"
+    PRODUCT_MANAGEMENT : "/home/manage-products/products",
+    LEAD_SETTINGS : "/settings/lead",
 
 }
 export default ROUTES_URL;

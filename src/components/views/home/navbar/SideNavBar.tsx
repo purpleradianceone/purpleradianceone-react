@@ -1,4 +1,4 @@
-import { Building2, Handshake, Home, Menu, Store, X } from "lucide-react";
+import { Building2, Handshake, Home, Menu, Settings, Store, X } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
@@ -28,7 +28,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             <SideNavBarItem icon={Home} label="Home" isOpen={isOpen}/>
             </Link>
 
-             {userHasAccessToViewUser === BOOLEAN_VALUES.TRUE && 
+             {userHasAccessToViewUser && 
                 <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 
                   icon={Building2} 
@@ -37,7 +37,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
                 /></Link>
             }
 
-            {userHasAccessToViewUser === BOOLEAN_VALUES.FALSE &&
+            {!userHasAccessToViewUser &&
             <Link to={ROUTES_URL.GET_COMPANY_USERS}>
             <SideNavBarItem 
               icon={Building2} 
@@ -48,7 +48,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             </Link>}
             
             
-            {userHasAccessToViewLead === BOOLEAN_VALUES.TRUE && 
+            {userHasAccessToViewLead && 
             <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             <SideNavBarItem 
               icon={Handshake} 
@@ -58,7 +58,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             </Link>
             }
 
-            {userHasAccessToViewLead === BOOLEAN_VALUES.FALSE &&
+            {!userHasAccessToViewLead &&
                 <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
                 <SideNavBarItem 
                   icon={Handshake} 
@@ -76,6 +76,16 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
               isOpen={isOpen}
               />
             </Link>
+
+            
+            <SideNavBarItem
+            icon={Settings}
+            label="Crm Settings"
+            isOpen={isOpen}
+            children={[<Link to={ROUTES_URL.LEAD_SETTINGS}>Lead</Link>,"Product"]}
+            ></SideNavBarItem>
+
+
           </nav>
         </aside>
   );

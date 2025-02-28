@@ -28,6 +28,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { useNavigate } from "react-router-dom";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import useScreenSize from "../../../config/hooks/useScreenSize";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -38,6 +39,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     email: STRING_VALUES.EMPTY_STRING,
   };
 
+  const {isSmallScreen} = useScreenSize()
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
     BOOLEAN_VALUES.FALSE
@@ -166,12 +168,12 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45">
+      <div className={isSmallScreen ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45" }>
         <div className="flex min-h-screen items-center justify-center">
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+   [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg">
             
 
             <div className="p-6">
@@ -222,7 +224,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   error={errors.email}
                   maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
                 />
-                <Button type="submit">Create Company CompanyUser</Button>
+                <Button type="submit">{isSmallScreen ? "Create" : "Create Company CompanyUser"}</Button>
               </form>
             </div>
           </div>

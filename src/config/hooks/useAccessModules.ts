@@ -1,11 +1,11 @@
 import { NUMBER_VALUES } from "../../constants/AppConstants";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 
+
 export const useUserAccessModules = () => {
-  const { accessModules } = useAccessManagementContext();
+  const { accessModules} = useAccessManagementContext();
 
   //User Management
-
   const userHasAccessToAddUser = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === NUMBER_VALUES.ONE && accessModule.add

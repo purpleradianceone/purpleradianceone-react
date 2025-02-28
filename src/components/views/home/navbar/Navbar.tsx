@@ -7,6 +7,7 @@ import ROUTES_URL from "../../../../constants/Routes";
 import useScreenSize from "../../../../config/hooks/useScreenSize";
 import { BOOLEAN_VALUES } from "../../../../constants/AppConstants";
 import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
+import Button from "../../../ui/Button";
 
 function Navbar({children} : {children : React.ReactNode}){
   const [isOpen, setIsOpen] = useState<boolean>();
@@ -75,82 +76,78 @@ function Navbar({children} : {children : React.ReactNode}){
   if (!loginStatus.status) {
     return (
       <div>
-        <header>
-      <nav className="fixed w-full bg-white shadow-sm z-50 py-3">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-10">
-            <div className="flex items-center">
-              <div className="w-32 h-auto">
-                <img src={IMAGE_SOURCE.PR_LOGO} alt="" />
+      <header>
+        <nav className="fixed w-full bg-white shadow-sm z-50 py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-10">
+              <div className="flex items-center">
+                <div className="w-32 h-auto">
+                  <img src={IMAGE_SOURCE.PR_LOGO} alt="Logo" />
+                </div>
+              </div>
+
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#features" className="text-gray-700 hover:text-blue-600">
+                  Features
+                </a>
+                <a href="#solutions" className="text-gray-700 hover:text-blue-600">
+                  Solutions
+                </a>
+                <a href="#pricing" className="text-gray-700 hover:text-blue-600">
+                  Products
+                </a>
+                <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                  <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
+                </button>
+                <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                  <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
+                </button>
+              </div>
+
+              <div className="md:hidden flex items-center">
+                <button onClick={() => setIsOpen(!isOpen)}>
+                  {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
               </div>
             </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-700 hover:text-blue-600">
-                Features
-              </a>
-              <a
-                href="#solutions"
-                className="text-gray-700 hover:text-blue-600"
-              >
-                Solutions
-              </a>
-              <a href="#pricing" className="text-gray-700 hover:text-blue-600">
-                Products
-              </a>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-              </button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
-              </button>
-            </div>
-
-            <div className="md:hidden flex items-center">
-              <button onClick={() => setIsOpen(!isOpen)}>
-                {isOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
           </div>
-        </div>
 
-        {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <a
-                href="#features"
-                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              >
-                Features
-              </a>
-              <a
-                href="#solutions"
-                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              >
-                Solutions
-              </a>
-              <a
-                href="#pricing"
-                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              >
-                Pricing
-              </a>
-              <button className="w-full mt-4 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-              </button>
+          {isOpen && (
+            <div className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a
+                  href="#features"
+                  className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                >
+                  Features
+                </a>
+                <a
+                  href="#solutions"
+                  className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                >
+                  Solutions
+                </a>
+                <a
+                  href="#pricing"
+                  className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                >
+                  Pricing
+                </a>
+                <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                  <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
+                </Button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                  <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </nav>
+          )}
+        </nav>
       </header>
-      <main>
+      <main className="min-h-screen overflow-x-hidden">
         {children}
       </main>
-      </div>
+    </div>
       
     );
   } else {
@@ -261,7 +258,7 @@ function Navbar({children} : {children : React.ReactNode}){
         </div>
       </nav>
       </header>
-      <main className={sidebarOpen?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
+      <main className={sidebarOpen ?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
           {children}
       </main>
       </div>

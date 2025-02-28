@@ -7,7 +7,7 @@ import {
   Settings
 } from 'lucide-react';
 
-function Features(){
+function Features() {
   const features = [
     {
       icon: <LineChart className="h-8 w-8 text-blue-600" />,
@@ -42,8 +42,8 @@ function Features(){
   ];
 
   return (
-    <div id="features" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div id="features" className="py-20 bg-white w-full">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Powerful Features for Modern Businesses
@@ -53,9 +53,9 @@ function Features(){
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {features.map((feature, index) => (
-            <div key={index} className="p-6 border rounded-xl hover:shadow-lg transition-shadow">
+            <div key={index} className="p-6 border rounded-xl hover:shadow-lg transition-shadow w-full">
               <div className="mb-4">
                 {feature.icon}
               </div>
@@ -67,6 +67,6 @@ function Features(){
       </div>
     </div>
   );
-};
+}
 
 export default Features;
