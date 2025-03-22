@@ -1,6 +1,6 @@
 import { Handshake } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
-import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
@@ -13,11 +13,11 @@ function LeadManagementList() {
 
   const {isLargeScreen,isMediumScreen,isSmallScreen} = useScreenSize();
   const {userHasAccessToViewLead} = useUserAccessModules();
-  const [isCreateLeadModalOpen,setIsCreateLeadModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE)
+  const [isCreateLeadModalOpen,setIsCreateLeadModalOpen] = useState<boolean>(false)
 
   if (userHasAccessToViewLead) {
     const handleCreateLeadModalClose =() => {
-      setIsCreateLeadModalOpen(BOOLEAN_VALUES.FALSE)
+      setIsCreateLeadModalOpen(false)
     }
 
     return (
@@ -50,7 +50,7 @@ function LeadManagementList() {
              <div className="flex gap-1">
                   <Button
                   onClick={()=>{
-                    setIsCreateLeadModalOpen(BOOLEAN_VALUES.TRUE)
+                    setIsCreateLeadModalOpen(true)
                   }}
                   >
                     {!isSmallScreen && <Handshake size={SIZE.TWENTY} />}

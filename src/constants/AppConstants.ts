@@ -1,10 +1,9 @@
 export const  STRING_VALUES = {
     TRUE : "true",
-    false : "false",
+    FALSE : "false",
     INVALID_DATE : "Invalid Date",
     REGISTRATION : "registration",
     REGISTERED : "registered",
-    EMPTY_STRING : "",
     CONFIRM : "Confirm",
     CANCEL : "Cancel",
     
@@ -16,28 +15,9 @@ export const TAX_CODE = {
     ALL : "all"
 }
 
-export const  BOOLEAN_VALUES = {
-    TRUE : true,
-    FALSE : false,
-}
 
 export const  NUMBER_VALUES = {
-    ZERO : 0,
-    ONE : 1,
-    TWO : 2,
-    THREE : 3,
-    FOUR : 4,
-    FIVE : 5,
-    EIGHT : 8,
-    MINUS_ONE : -1,
-    ONEANDHALF : 1.5,
-    HUNDRED : 100,
-    TEN : 10,
-    TWENTY_FIVE : 25,
     SNACKBAR_DURATION : 2000,
-    FIFTEEN : 15,
-    TWO_FIFTY_SIX : 256,
-    TWENTY : 20,
 }
 
 export const DATA_TYPE = {
@@ -58,7 +38,10 @@ export const JSX_CHILDREN_NAME = {
     ADD_USER : "Add User",
     CREATE_LEAD : "Create Lead",
     ADD_PRODUCTS : "Add Products",
-    TAX : "Tax"
+    TAX : "Tax",
+    ADD_TEAM: "Add Team",
+    TEAM : "Team",
+    USER : "User",
 
 }
 

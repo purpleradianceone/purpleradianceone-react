@@ -11,7 +11,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import { useFormChange } from "../../config/hooks/useFormChange";
-import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import {NUMBER_VALUES } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 
 /**
@@ -24,27 +24,27 @@ function ForgotPasswordForm(){
    */
   const navigate=useNavigate();
 
-  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(false);
 
   const initialForgotPasswordState = {
-    email : STRING_VALUES.EMPTY_STRING,
+    email : "",
   }
     const{formData: forgotPasswordFromState , handleChange : handleForgotPasswordFormDataChange } = useFormChange(initialForgotPasswordState)
     const { errors, handleBlur } = useFormValidation(forgotPasswordFromState,"registered");
 
 
     const [messageSnackbar , setMessageSnackbar]= useState<MessageSnackbarState>({
-        open: BOOLEAN_VALUES.FALSE,
-        message: STRING_VALUES.EMPTY_STRING,
+        open: false,
+        message: "",
         type: "success",
       })
     
       const showMessageSnackbar=({message, type} : ShowMessageSnackbarProps)=>{
-        setMessageSnackbar({open:BOOLEAN_VALUES.TRUE,message, type})
+        setMessageSnackbar({open:true,message, type})
       }
     
       const handleMessageSnackbarClose=()=>{
-        setMessageSnackbar(prev=>({...prev , open:BOOLEAN_VALUES.FALSE}))
+        setMessageSnackbar(prev=>({...prev , open:false}))
       }
 
 
@@ -57,13 +57,13 @@ function ForgotPasswordForm(){
   const handleResetPasswordClick = (e: FormEvent) => {
     e.preventDefault(); 
 
-    if(forgotPasswordFromState.email !== STRING_VALUES.EMPTY_STRING || forgotPasswordFromState.email=== null){
+    if(forgotPasswordFromState.email !== "" || forgotPasswordFromState.email=== null){
       const requestData={
         email:forgotPasswordFromState.email
       }
 
       axios.post(POST_API.CHANGE_FORGOT_PASSWORD, requestData,{
-        withCredentials:BOOLEAN_VALUES.TRUE
+        withCredentials:true
       })
       .then((response)=>{
         if(response.data.status){

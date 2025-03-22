@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NUMBER_VALUES, STRING_VALUES } from '../../constants/AppConstants';
+import { STRING_VALUES } from '../../constants/AppConstants';
 
 interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
@@ -115,7 +115,7 @@ export const useSearchFilterPaginationDateHandlers = (
   
   // Update concatenated date string
   useEffect(() => {
-    if (dateRangeId === NUMBER_VALUES.EIGHT) {
+    if (dateRangeId === 8) {
       if (!startDate && !endDate) {
         setConcatDate("");
         setDateRangeId(0);

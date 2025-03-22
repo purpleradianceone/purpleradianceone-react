@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import {  useEffect, useMemo, useState } from "react";
-import { BOOLEAN_VALUES, INNERHTML, NUMBER_VALUES, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
+import {  INNERHTML, NUMBER_VALUES, STATUS_CODE, } from "../../constants/AppConstants";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Trash2 } from "lucide-react";
 import { CLASS_NAMES } from "../../constants/ClassNames";
@@ -33,7 +34,7 @@ function ProductTaxManagementAgGrid({
 
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
     useEffect(()=> {
@@ -44,22 +45,22 @@ const {userHasAccessToUpdateProductTax} = useUserAccessModules();
 const {loginStatus} = useLoggedInUserContext();
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
     const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-      setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+      setMessageSnackbar({ open: true, message, type });
     };
   
     const handleCloseSnackbar = () => {
-      setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+      setMessageSnackbar((prev) => ({ ...prev, open: false }));
     };
 
     
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -74,46 +75,46 @@ const {loginStatus} = useLoggedInUserContext();
       {
         field: "hsn",
         headerName: "HSN",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: isSmallScreen ? NUMBER_VALUES.ONE : NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: isSmallScreen ? 1: 1.5,
         
       },
       {
         field: "sac",
         headerName: "SAC",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: 1.5,
       },
       {
         field: "taxRate",
         headerName: "TAX Rate",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
+        sortable: true,
+        filter: true,
+        flex: 1,
 
       },
       {
         field: "validFrom",
         headerName: "Effective From",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: 1.5,
       },
       {
         field: "createdBy",
         headerName: "Created By",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: 1.5,
       },
       {
         headerName : "Delete",
-        maxWidth : isSmallScreen ? 50 : NUMBER_VALUES.HUNDRED,
-        flex : NUMBER_VALUES.ONE,
+        maxWidth : isSmallScreen ? 50 : 100,
+        flex : 1,
         pinned : "right",
-        filter : BOOLEAN_VALUES.FALSE,
+        filter : false,
         
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer : (params : any) => {
@@ -133,7 +134,7 @@ const {loginStatus} = useLoggedInUserContext();
                     .then((response) => {
                        if(response.data.status){
                         showMessageSnackbar({message : response.data.message,type : "success"});
-                        handleCompanyProductTaxChange(BOOLEAN_VALUES.TRUE);
+                        handleCompanyProductTaxChange(true);
 
                        }
                        else if(!response.data.status){
@@ -147,14 +148,14 @@ const {loginStatus} = useLoggedInUserContext();
                         if(error.status === STATUS_CODE.UNATHORISED){
                             const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
                             if(refreshTokenResponse){
-                              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                              setIsDialogueOpen(false);
                             }
                             else {
-                                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                                setIsDialogueOpen(true)
                             }
                             }
                             else if(error.status === STATUS_CODE.FORBIDDEN){
-                              setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                              setIsDialogueOpen(true)
                             }
                         
                     })
@@ -184,8 +185,8 @@ const {loginStatus} = useLoggedInUserContext();
       filter: "agTextColumnFilter",
       minWidth: isSmallScreen ? 100 : 150,
       flex: 0.8,
-      suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
-      suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
+      suppressHeaderMenuButton: true,
+      suppressHeaderContextMenu: true,
     };
   }, []);
 
@@ -211,7 +212,7 @@ const {loginStatus} = useLoggedInUserContext();
 
               <DialogueBox
                       isOpen={isDialogueOpen}
-                      onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+                      onClose={() => setIsDialogueOpen(false)}
                       onConfirm={handleDialogueConfirm}
                       title="Session Expired !"
                       message="Session Expired. Please login again."

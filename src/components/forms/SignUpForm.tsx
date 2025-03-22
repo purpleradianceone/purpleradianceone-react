@@ -12,10 +12,8 @@ import ROUTES_URL from "../../constants/Routes";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SITE_KEY,
-  STRING_VALUES,
 } from "../../constants/AppConstants";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
@@ -23,11 +21,11 @@ import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
-    name: STRING_VALUES.EMPTY_STRING,
-    mobileNumber: STRING_VALUES.EMPTY_STRING,
-    email: STRING_VALUES.EMPTY_STRING,
-    password: STRING_VALUES.EMPTY_STRING,
-    confirmPassword: STRING_VALUES.EMPTY_STRING,
+    name: "",
+    mobileNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   };
 
   const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
@@ -38,11 +36,11 @@ function SignUpForm() {
   );
 
   const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
-  const [showPassword, setShowPassword] = useState(BOOLEAN_VALUES.FALSE);
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setConfirmPassword] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
@@ -52,17 +50,17 @@ function SignUpForm() {
     message: string;
     type: "success" | "error";
   }>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success",
   });
 
   const showMessageSnackbar = (message: string, type: "success" | "error") => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
@@ -76,23 +74,23 @@ function SignUpForm() {
     };
 
     if (
-      signupDataPost.email !== STRING_VALUES.EMPTY_STRING &&
-      signupDataPost.password !== STRING_VALUES.EMPTY_STRING &&
-      SignUpFormData.confirmPassword !== STRING_VALUES.EMPTY_STRING
+      signupDataPost.email !== "" &&
+      signupDataPost.password !== "" &&
+      SignUpFormData.confirmPassword !== ""
     ) {
-      if (captchaToken !== STRING_VALUES.EMPTY_STRING) {
+      if (captchaToken !== "") {
         const captchaRequest = {
           token: captchaToken,
         };
         axios
           .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {
-            withCredentials: BOOLEAN_VALUES.TRUE,
+            withCredentials: true,
           })
           .then((response) => {
             if (response.data.status) {
               axios
                 .post(POST_API.SIGN_UP, signupDataPost, {
-                  withCredentials: BOOLEAN_VALUES.TRUE,
+                  withCredentials: true,
                 })
                 .then((respone) => {
                   console.log(respone);
@@ -141,7 +139,7 @@ function SignUpForm() {
           placeholder="Enter full name"
           value={SignUpFormData.name}
           onChange={handleSignUpFormDataChange}
-          maxLength={NUMBER_VALUES.HUNDRED}
+          maxLength={100}
         />
         <FormInput
           label="Mobile Number"
@@ -150,7 +148,7 @@ function SignUpForm() {
           placeholder="99xxxxxxxx"
           value={SignUpFormData.mobileNumber}
           onChange={handleSignUpFormDataChange}
-          maxLength={NUMBER_VALUES.FIFTEEN}
+          maxLength={15}
           onBlur={handleBlur}
           error={errors.mobileNumber}
         />
@@ -172,8 +170,8 @@ function SignUpForm() {
           value={SignUpFormData.password}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
-          minLength={NUMBER_VALUES.EIGHT}
-          maxLength={NUMBER_VALUES.TWENTY}
+          minLength={8}
+          maxLength={15}
           required
           error={errors.password}
           rightElement={
@@ -191,8 +189,8 @@ function SignUpForm() {
           value={SignUpFormData.confirmPassword}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
-          minLength={NUMBER_VALUES.EIGHT}
-          maxLength={NUMBER_VALUES.TWENTY}
+          minLength={8}
+          maxLength={20}
           required
           error={errors.confirmPassword}
           rightElement={

@@ -2,11 +2,9 @@ import { EditIcon, X } from "lucide-react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
-  STRING_VALUES,
   TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
@@ -40,10 +38,10 @@ function CreateCompanyProductTaxModal({
   handleCreateCompanyProductTax,
 }: CreateCompanyProductTaxModalProps) {
   const intialCreateCompanyProductFormData = {
-    hsn: STRING_VALUES.EMPTY_STRING,
-    sac: STRING_VALUES.EMPTY_STRING,
-    taxRate: NUMBER_VALUES.ZERO,
-    validFrom: STRING_VALUES.EMPTY_STRING,
+    hsn: "",
+    sac: "",
+    taxRate: 0,
+    validFrom: "",
   };
 
   const { loginStatus } = useLoggedInUserContext();
@@ -53,8 +51,8 @@ function CreateCompanyProductTaxModal({
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
@@ -70,20 +68,20 @@ function CreateCompanyProductTaxModal({
 
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   function handleTaxRadioButtonChange(
@@ -97,11 +95,11 @@ function CreateCompanyProductTaxModal({
   ) => {
     event.preventDefault();
     if (
-      createCompanyProductTaxFormData.taxRate !== NUMBER_VALUES.ZERO &&
+      createCompanyProductTaxFormData.taxRate !== 0 &&
       createCompanyProductTaxFormData.validFrom !==
-        STRING_VALUES.EMPTY_STRING &&
-      (createCompanyProductTaxFormData.hsn !== STRING_VALUES.EMPTY_STRING ||
-        createCompanyProductTaxFormData.sac !== STRING_VALUES.EMPTY_STRING)
+        "" &&
+      (createCompanyProductTaxFormData.hsn !== "" ||
+        createCompanyProductTaxFormData.sac !== "")
     ) {
       if (userHasAccessToAddProductTax) {
         const updateProductPostData = {
@@ -116,12 +114,12 @@ function CreateCompanyProductTaxModal({
         console.log(updateProductPostData);
         await axios
           .post(POST_API.CREATE_PRODUCT_TAX, updateProductPostData, {
-            withCredentials: BOOLEAN_VALUES.TRUE,
+            withCredentials: true,
           })
           .then((response) => {
             console.log(response);
             if (
-              response.data.status === BOOLEAN_VALUES.TRUE &&
+              response.data.status === true &&
               response.status === STATUS_CODE.OK
             ) {
               showMessageSnackbar({
@@ -137,7 +135,7 @@ function CreateCompanyProductTaxModal({
             }
             else if(response.status === STATUS_CODE.OK && !response.data.status){
                   showMessageSnackbar({message:response.data.message,type : "error"});
-                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                  setIsDialogueOpen(false)
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,14 +146,14 @@ function CreateCompanyProductTaxModal({
                 callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
               });
               if(refreshTokenResponse){
-                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                  setIsDialogueOpen(false)
               }
               else{
-                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                setIsDialogueOpen(true)
               }
             }
             else if(error.status === STATUS_CODE.FORBIDDEN){
-              setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+              setIsDialogueOpen(true)
             }
             
           });
@@ -171,10 +169,10 @@ function CreateCompanyProductTaxModal({
   useEffect(() => {
     if (isOpen) {
       setErrors({
-        hsn: STRING_VALUES.EMPTY_STRING,
-        sac: STRING_VALUES.EMPTY_STRING,
-        taxRate: STRING_VALUES.EMPTY_STRING,
-        validFrom: STRING_VALUES.EMPTY_STRING,
+        hsn: "",
+        sac: "",
+        taxRate: "",
+        validFrom: "",
       });
       handleCloseSnackbar();
     }
@@ -211,7 +209,7 @@ function CreateCompanyProductTaxModal({
               />
 
               {(selectedTaxCode === TAX_CODE.HSN ||
-                selectedTaxCode === STRING_VALUES.EMPTY_STRING) && (
+                selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
                   type="text"
@@ -275,7 +273,7 @@ function CreateCompanyProductTaxModal({
       />
        <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired !"
         message="Session Expired. Please login again."

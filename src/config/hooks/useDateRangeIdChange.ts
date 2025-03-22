@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { NUMBER_VALUES, BOOLEAN_VALUES } from '../../constants/AppConstants'; // Adjust path as needed
 import SearchDropDownOptions from '../../@types/ag-grid/SearchDropDownOptions'; // Adjust path as needed
 
 type UseDateIdChangeProps = {
@@ -20,22 +19,22 @@ export const useDateRangeIdChange = ({
   handleSearchOption,
 }: UseDateIdChangeProps): UseDateIdChangeResult => {
   const [isCustomDateOptionSelected, setIsCustomDateOptionSelected] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
 
   const handleDateRangeIdChange = (dateId: number) => {
     console.log(dateId);
-    if (dateId === NUMBER_VALUES.ZERO) {
-      handleSearchOption.handleDateRangeIdChange(NUMBER_VALUES.ZERO);
-      setIsCustomDateOptionSelected(BOOLEAN_VALUES.FALSE);
+    if (dateId === 0) {
+      handleSearchOption.handleDateRangeIdChange(0);
+      setIsCustomDateOptionSelected(false);
     }
     dateRangeDropdownOptions.forEach((option) => {
       if (option.search_date_range_id === dateId) {
-        if (dateId === NUMBER_VALUES.EIGHT) {
-          setIsCustomDateOptionSelected(BOOLEAN_VALUES.TRUE);
+        if (dateId === 8) {
+          setIsCustomDateOptionSelected(true);
         } else {
-          setIsCustomDateOptionSelected(BOOLEAN_VALUES.FALSE);
+          setIsCustomDateOptionSelected(false);
         }
         handleSearchOption.handleDateRangeIdChange(option.search_date_range_id);
       }

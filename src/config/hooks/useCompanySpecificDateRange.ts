@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
-import { BOOLEAN_VALUES, NUMBER_VALUES, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
 import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
@@ -13,16 +13,16 @@ export const useComapanySpecificSearchDateRange = () => {
   SearchDropDownOptions[]
 >([
   {
-    id: NUMBER_VALUES.ZERO,
-    criteria: STRING_VALUES.EMPTY_STRING,
-    company_id: NUMBER_VALUES.ZERO,
-    search_pages_criteria_id: NUMBER_VALUES.ZERO,
-    search_date_range_id: NUMBER_VALUES.ZERO,
-    createdby: NUMBER_VALUES.ZERO,
-    updatedby: NUMBER_VALUES.ZERO,
-    createdon: STRING_VALUES.EMPTY_STRING,
-    updatedon: STRING_VALUES.EMPTY_STRING,
-    date_range: STRING_VALUES.EMPTY_STRING,
+    id: 0,
+    criteria: "",
+    company_id: 0,
+    search_pages_criteria_id: 0,
+    search_date_range_id: 0,
+    createdby: 0,
+    updatedby: 0,
+    createdon: "",
+    updatedon: "",
+    date_range: "",
   },
 ]);
 
@@ -35,7 +35,7 @@ const {loginStatus} = useLoggedInUserContext()
             company_id: loginStatus.companyId,
           };
          await axios.post(POST_API.COMPANY_SPECIFIC_CRITERIA_DATE_RANGE, postData, {
-              withCredentials: BOOLEAN_VALUES.TRUE,
+              withCredentials: true,
             })
             .then((response) => {
               if (response.data) {

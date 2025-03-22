@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { STRING_VALUES } from '../../constants/AppConstants';
 
 
 const useRecaptcha = () => {
@@ -8,7 +7,7 @@ const useRecaptcha = () => {
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   const handleRecaptcha = useCallback((token: string | null) => {
-    if(token !=STRING_VALUES.EMPTY_STRING || token !== null) {
+    if(token !="" || token !== null) {
       setCaptchaToken(token || '');
     }
     

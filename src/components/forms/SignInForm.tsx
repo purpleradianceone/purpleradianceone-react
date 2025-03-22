@@ -19,7 +19,7 @@ import {
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SITE_KEY, STRING_VALUES } from "../../constants/AppConstants";
+import { NUMBER_VALUES, SITE_KEY, STRING_VALUES } from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 
@@ -31,11 +31,11 @@ function SignInForm() {
 
   
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
-  const [showPassword, setShowPassword] = useState(BOOLEAN_VALUES.FALSE);
+  const [showPassword, setShowPassword] = useState(false);
 
   const initialSignInFormState:SignInFormDataType = {
-    email: STRING_VALUES.EMPTY_STRING,
-    password: STRING_VALUES.EMPTY_STRING,
+    email: "",
+    password: "",
 
   };
 
@@ -47,21 +47,21 @@ function SignInForm() {
     message: string;
   }>({
     status: "idle",
-    message: STRING_VALUES.EMPTY_STRING,
+    message: "",
   });
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success",
   });
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleLoginSubmit = (event: React.FormEvent) => {
@@ -102,7 +102,7 @@ function SignInForm() {
 
     axios
       .post(POST_API.VERIFIY_CAPTCHA, captchaRequest,{
-        withCredentials : BOOLEAN_VALUES.TRUE
+        withCredentials : true
       })
       .then((response) => {
         if (response) {
@@ -112,7 +112,7 @@ function SignInForm() {
           };
           
           axios
-            .post(POST_API.SIGN_IN, user, { withCredentials: BOOLEAN_VALUES.TRUE })
+            .post(POST_API.SIGN_IN, user, { withCredentials: true })
             .then((response) => {
               if (response.data.status) {
                 setLoginStatus({
@@ -137,7 +137,7 @@ function SignInForm() {
 
                   axios
                     .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
-                      withCredentials : BOOLEAN_VALUES.TRUE
+                      withCredentials : true
                     })
                     .then((response) => {
                       setAccessModules(response.data);
@@ -158,7 +158,7 @@ function SignInForm() {
                       console.error(error);
                       setSpinnerAnimation({
                         status: "idle",
-                        message: STRING_VALUES.EMPTY_STRING,
+                        message: "",
                       });
 
                     });
@@ -170,19 +170,19 @@ function SignInForm() {
                 });
                 setSpinnerAnimation({
                   status: "idle",
-                  message: STRING_VALUES.EMPTY_STRING,
+                  message: "",
                 });
                 setLoginStatus({
-                  companyId: NUMBER_VALUES.ZERO,
-                  companyName: STRING_VALUES.EMPTY_STRING,
-                  createdOn: STRING_VALUES.EMPTY_STRING,
-                  email: STRING_VALUES.EMPTY_STRING,
-                  fullName: STRING_VALUES.EMPTY_STRING,
-                  id: NUMBER_VALUES.ZERO,
-                  message: STRING_VALUES.EMPTY_STRING,
-                  mobileNumber: STRING_VALUES.EMPTY_STRING,
-                  status: BOOLEAN_VALUES.FALSE,
-                  token: STRING_VALUES.EMPTY_STRING,
+                  companyId: 0,
+                  companyName: "",
+                  createdOn: "",
+                  email: "",
+                  fullName: "",
+                  id: 0,
+                  message: "",
+                  mobileNumber: "",
+                  status: false,
+                  token: "",
                 });
               }
             })
@@ -194,7 +194,7 @@ function SignInForm() {
               });
               setSpinnerAnimation({
                 status: "idle",
-                message: STRING_VALUES.EMPTY_STRING,
+                message: "",
               });
             });
         }
@@ -204,7 +204,7 @@ function SignInForm() {
         showMessageSnackbar({ message: MESSAGE.ERROR.INVALID_CAPTCHA, type: "error" });
         setSpinnerAnimation({
           status: "idle",
-          message: STRING_VALUES.EMPTY_STRING,
+          message: "",
         });
       });
   };

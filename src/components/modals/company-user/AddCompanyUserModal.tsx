@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { UserPlus, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
@@ -15,11 +16,9 @@ import {
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
-  STRING_VALUES,
 } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
@@ -34,15 +33,15 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
 
   const initialAddCompanyUserFormData: AddCompanyUserStateType = {
-    name: STRING_VALUES.EMPTY_STRING,
-    mobilenumber: STRING_VALUES.EMPTY_STRING,
-    email: STRING_VALUES.EMPTY_STRING,
+    name: "",
+    mobilenumber: "",
+    email: "",
   };
 
   const {isSmallScreen} = useScreenSize()
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const {
@@ -56,25 +55,25 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   );
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (
-      addCompanyUserFormData.email !== STRING_VALUES.EMPTY_STRING &&
-      addCompanyUserFormData.name != STRING_VALUES.EMPTY_STRING &&
+      addCompanyUserFormData.email !== "" &&
+      addCompanyUserFormData.name != "" &&
       addCompanyUserFormData.email !== null &&
       addCompanyUserFormData.name !== null
     ) {
@@ -91,7 +90,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           POST_API.CREATE_USER,
           createCompanyUserData,
           {
-            withCredentials: BOOLEAN_VALUES.TRUE,
+            withCredentials: true,
           }
         );
         if (response.data.status) {
@@ -100,9 +99,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             type: "success",
           });
           setAddCompanyUserFormData({
-            name: STRING_VALUES.EMPTY_STRING,
-            mobilenumber: STRING_VALUES.EMPTY_STRING,
-            email: STRING_VALUES.EMPTY_STRING,
+            name: "",
+            mobilenumber: "",
+            email: "",
           });
           onClose();
           window.location.href = ROUTES_URL.GET_COMPANY_USERS;
@@ -125,13 +124,13 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               callFunctionWithEvent: handleAddUserSubmit,
             });
             if (refreshTokenStatus) {
-              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+              setIsDialogueOpen(false);
             } else {
-              setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+              setIsDialogueOpen(true);
             }
           } 
           else if(error.status === STATUS_CODE.FORBIDDEN){
-            setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+            setIsDialogueOpen(true);
           }
           else {
             showMessageSnackbar({
@@ -150,7 +149,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   };
 
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -158,8 +157,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   useEffect(()=>{
     if(!isOpen){
       setErrors({
-        name : STRING_VALUES.EMPTY_STRING,
-        email : STRING_VALUES.EMPTY_STRING,
+        name : "",
+        email : "",
       })
     }
   },[])
@@ -200,7 +199,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.name}
-                  maxLength={NUMBER_VALUES.HUNDRED}
+                  maxLength={100}
                 />
                 <FormInput
                   label="Mobile Number : "
@@ -211,7 +210,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.mobileNumber}
-                  maxLength={NUMBER_VALUES.FIFTEEN}
+                  maxLength={15}
                 />
                 <FormInput
                   label="Email : "
@@ -222,7 +221,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.email}
-                  maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
+                  maxLength={256}
                 />
                 <Button type="submit">{isSmallScreen ? "Create" : "Create Company CompanyUser"}</Button>
               </form>
@@ -239,7 +238,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired !"
         message="Session Expired. Please login again."

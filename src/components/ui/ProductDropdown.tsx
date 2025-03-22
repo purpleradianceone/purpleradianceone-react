@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Delete,  } from 'lucide-react';
-import { BOOLEAN_VALUES, NUMBER_VALUES } from '../../constants/AppConstants';
 import { Product } from '../../@types/products/ProductsManagementProps';
 
 
@@ -12,14 +11,14 @@ type ProductDropdownList = {
 }
 
 function ProductDropdownList(props: ProductDropdownList ) {
-    const [isOpen, setIsOpen] = useState(BOOLEAN_VALUES.FALSE);
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState("Select Product");
     const dropdownRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(BOOLEAN_VALUES.FALSE);
+          setIsOpen(false);
         }
       }
   
@@ -30,7 +29,7 @@ function ProductDropdownList(props: ProductDropdownList ) {
     const handleOptionClick = (productCode?: string, dateName? : string) => {
      if(dateName!=null){
       setSelectedOption(dateName)
-      setIsOpen(BOOLEAN_VALUES.FALSE);
+      setIsOpen(false);
       console.log(productCode);
     }
   }
@@ -55,7 +54,7 @@ function ProductDropdownList(props: ProductDropdownList ) {
             flex items-center justify-between
           `}
           onClick={() => setIsOpen(!isOpen)}
-          disabled={props.product.length === NUMBER_VALUES.ZERO}
+          disabled={props.product.length === 0}
         >
           <span className="truncate">{selectedOption}</span>
           <ChevronDown 

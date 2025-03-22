@@ -1,13 +1,10 @@
-import { Calendar, Filter, Plus, Store, X } from "lucide-react";
+import { BoxesIcon, Calendar, Filter, Plus, Store, X } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
 import {
-  BOOLEAN_VALUES,
   JSX_CHILDREN_NAME,
-  NUMBER_VALUES,
   SIZE,
-  STRING_VALUES,
 } from "../../constants/AppConstants";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import ProductsManagementGrid from "../ag-grid/ProductsManagementAgGrid";
@@ -22,6 +19,8 @@ import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import Pagination from "../ag-grid/Pagination";
 import EditCompanyProductModal from "../modals/products/EditProductModal";
+import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
+import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
 
 function ProductsManagementList({
   products,
@@ -31,45 +30,49 @@ function ProductsManagementList({
   onEndDateChange,
   handleProductChangeOnAdd,
   handleEditProductChange,
-  handleCreateCompanyProductTax
-}: {
+  handleCreateCompanyProductTax,
+  isListForProductUser,
+} : {
   products: Product[];
   paginationData: PaginationDataProps;
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  handleProductChangeOnAdd: (product: Product) => void;
-  handleEditProductChange : (product:Product) => void;
-  handleCreateCompanyProductTax : (product : Product) => void;
+  handleProductChangeOnAdd?: (product: Product) => void;
+  handleEditProductChange?: (product:Product) => void;
+  handleCreateCompanyProductTax? : (product : Product) => void;
+  isListForProductUser : boolean;
 }) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
-  const [isEditComapanyProductModalOpen,setIsEditCompanyProductModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE); 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isEditComapanyProductModalOpen,setIsEditCompanyProductModalOpen] = useState<boolean>(false); 
+  const [isCompanyProductUserModalOpen,setIsCompanyProductUserModalOpen] = useState<boolean>(false);
+  const [isCompanyProductTeamModalOpen,setIsCompanyProductTeamModalOpen] = useState<boolean>(false);
+
   
   const { userHasAccessToAddProduct, userHasAccessToViewProduct } =
     useUserAccessModules();
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
+    useState<boolean>(false);
   const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [selectedProduct,setSelectedProduct] = useState<Product>({
-    name : STRING_VALUES.EMPTY_STRING,
-    code : STRING_VALUES.EMPTY_STRING,
-    description : STRING_VALUES.EMPTY_STRING,
-    companyId : NUMBER_VALUES.ZERO,
-    cost : NUMBER_VALUES.ZERO,
-    count : NUMBER_VALUES.ZERO,
-    createdBy : STRING_VALUES.EMPTY_STRING,
-    createdOn : STRING_VALUES.EMPTY_STRING,
-    hsn : STRING_VALUES.EMPTY_STRING,
-    id : NUMBER_VALUES.ZERO,
-    isActive : BOOLEAN_VALUES.FALSE,
-    sac : STRING_VALUES.EMPTY_STRING,
-    taxRate : NUMBER_VALUES.ZERO,
-    validFrom : STRING_VALUES.EMPTY_STRING
+    name : "",
+    code : "",
+    description : "",
+    companyId : 0,
+    cost : 0,
+    count : 0,
+    createdBy : "",
+    createdOn : "",
+    hsn : "",
+    id : 0,
+    isActive : false,
+    sac : "",
+    taxRate : 0,
+    validFrom : ""
   });
 
   const handleSelectedProductChange = (product:Product) => {
@@ -81,13 +84,20 @@ function ProductsManagementList({
 
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   function handleAddProductModalClose() {
-    setIsAddProductModalOpen(BOOLEAN_VALUES.FALSE);
+    setIsAddProductModalOpen(false);
   }
 
   const handleEditCompanyProductModalOpen = (status: boolean) => {
     setIsEditCompanyProductModalOpen(status);
   };
 
+  const handleCompanyProductUserModalOpen = (status: boolean) => {
+    setIsCompanyProductUserModalOpen(status);
+  }
+
+  const handleCompanyProductTeamModalOpen = (status : boolean) =>{
+    setIsCompanyProductTeamModalOpen(status);
+  }
 
 
 
@@ -100,11 +110,19 @@ function ProductsManagementList({
           <div className="flex w-full gap-2">
             <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
               <div className="flex  gap-2">
-                {!isSmallScreen && <Store className="w-6 h-6 text-blue-600" />}
+                {!isSmallScreen && isListForProductUser ? <BoxesIcon className="w-6 h-6 text-blue-600" /> :<Store className="w-6 h-6 text-blue-600" />}
 
-                {(isMediumScreen || isLargeScreen) && (
-                  <span className="text-1xl font-bold">Product Management</span>
-                )}
+                {(isMediumScreen || isLargeScreen) && 
+                <>
+                  {!isListForProductUser && 
+                    <span className="text-1xl font-bold">Product Management</span>
+                  }
+                  {isListForProductUser &&
+                  <span className="text-1xl font-bold">Product Team/Users Management</span>
+                  }
+                  </>
+                  
+                }
               </div>
 
               {isLargeScreen && (
@@ -293,41 +311,61 @@ function ProductsManagementList({
                   )}
                 </>
               )}
+
+              {!isListForProductUser &&
               <div className="flex gap-1">
-                {userHasAccessToAddProduct ? (
-                  <Button
-                    onClick={() =>
-                      setIsAddProductModalOpen(BOOLEAN_VALUES.TRUE)
-                    }
-                  >
-                    {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
-                  </Button>
-                ) : (
-                  <Button disabled>
-                    {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
-                  </Button>
-                )}
-              </div>
+              {userHasAccessToAddProduct ? (
+                <Button
+                  onClick={() =>
+                    setIsAddProductModalOpen(true)
+                  }
+                >
+                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
+                  {isSmallScreen && <Plus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                </Button>
+              ) : (
+                <Button disabled>
+                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
+                  {isSmallScreen && <Plus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                </Button>
+              )}
+            </div>
+              }
+              
 
               <AddProductModal
                 isOpen={isAddProductModalOpen}
                 onClose={handleAddProductModalClose}
-                handleProductChangeOnAdd={handleProductChangeOnAdd}
+                handleProductChangeOnAdd={handleProductChangeOnAdd!}
               />
 
 
               <EditCompanyProductModal
-              handleCreateCompanyProductTaxAdd = {handleCreateCompanyProductTax}
-              handleCompanyProductChange={handleEditProductChange}
+              handleCreateCompanyProductTaxAdd = {handleCreateCompanyProductTax!}
+              handleCompanyProductChange={handleEditProductChange!}
               isOpen= {isEditComapanyProductModalOpen}
               onClose={ ()=> {
-                setIsEditCompanyProductModalOpen(BOOLEAN_VALUES.FALSE)
+                setIsEditCompanyProductModalOpen(false)
               }}
               product={selectedProduct}
+              />
+
+              <CompanyProductUsersModal
+               isOpen= {isCompanyProductUserModalOpen}
+               onClose={()=>{
+                setIsCompanyProductUserModalOpen(false);
+               }}
+               companyProduct={selectedProduct}
+              ></CompanyProductUsersModal>
+
+              <CompanyProductTeamsModal
+              isOpen={isCompanyProductTeamModalOpen}
+              onClose={()=> {
+                setIsCompanyProductTeamModalOpen(false);
+              }}
+              companyProduct={selectedProduct}
               />
 
               
@@ -339,10 +377,13 @@ function ProductsManagementList({
             className="ag-theme-alpine w-full"
             style={{ height: "440px", width: "100%" }}
           >
-            <ProductsManagementGrid products={products}
-            
+            <ProductsManagementGrid 
+            products={products}
+            isGridForProductUser = {isListForProductUser}
+            handleCompanyProductUserModalOpen={handleCompanyProductUserModalOpen}
             handleSelectedProductChange={handleSelectedProductChange}
-            handleEditCompanyProductModalOpen={handleEditCompanyProductModalOpen} />
+            handleEditCompanyProductModalOpen={handleEditCompanyProductModalOpen}
+            handleCompanyProductTeamModalOpen={handleCompanyProductTeamModalOpen} />
           </div>
         </div>
         <div className="flex items-center justify-end mt-1">

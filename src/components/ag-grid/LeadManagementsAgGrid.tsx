@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
 import Button from "../ui/Button";
-import { BOOLEAN_VALUES, JSX_CHILDREN_NAME, NUMBER_VALUES } from "../../constants/AppConstants";
+import {  JSX_CHILDREN_NAME, } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import LeadManagementProps from "../../@types/lead-management/LeadManagementProps";
@@ -27,60 +27,60 @@ function LeadManagementAgGrid({
           {
             field: "id",
             headerName: "Id",
-            sortable: BOOLEAN_VALUES.TRUE,
+            sortable: true,
             filter: "agTextColumnFilter",
-            flex: NUMBER_VALUES.ONE,
+            flex: 1,
             
             comparator: (valueA, valueB) => {
-              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
-              if (!valueB) return NUMBER_VALUES.ONE;
+              if (!valueA) return -1;
+              if (!valueB) return 1;
               return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
             },
           },
           {
             field: "leadNo",
             headerName: "LeadNo",
-            sortable: BOOLEAN_VALUES.TRUE,
+            sortable: true,
             filter: "agTextColumnFilter",
-            flex: NUMBER_VALUES.ONE,
+            flex: 1,
             
             comparator: (valueA, valueB) => {
-              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
-              if (!valueB) return NUMBER_VALUES.ONE;
+              if (!valueA) return -1;
+              if (!valueB) return 1;
               return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
             },
           },
           {
             field: "name",
             headerName: "Name",
-            sortable: BOOLEAN_VALUES.TRUE,
+            sortable: true,
             filter: "agTextColumnFilter",
-            flex: NUMBER_VALUES.ONE,
+            flex: 1,
             
             comparator: (valueA, valueB) => {
-              if (!valueA) return NUMBER_VALUES.MINUS_ONE;
-              if (!valueB) return NUMBER_VALUES.ONE;
+              if (!valueA) return -1;
+              if (!valueB) return 1;
               return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
             },
           },
           {
             field: "email",
             headerName: "Email",
-            sortable: BOOLEAN_VALUES.TRUE,
-            filter: BOOLEAN_VALUES.TRUE,
-            flex: NUMBER_VALUES.ONEANDHALF,
+            sortable: true,
+            filter: true,
+            flex: 1.5,
           },
           {
             field: "phone",
             headerName: "Mobile Number",
-            sortable: BOOLEAN_VALUES.TRUE,
-            filter: BOOLEAN_VALUES.TRUE,
+            sortable: true,
+            filter: true,
           },
           {
             field: "status",
             headerName: "Status",
-            sortable: BOOLEAN_VALUES.TRUE,
-            filter: BOOLEAN_VALUES.TRUE,
+            sortable: true,
+            filter: true,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             cellRenderer: (params: any) => {
               return (
@@ -103,43 +103,43 @@ function LeadManagementAgGrid({
           // {
           //   field: "createdOn",
           //   headerName: "Created On",
-          //   sortable: BOOLEAN_VALUES.TRUE,
-          //   filter: BOOLEAN_VALUES.TRUE,
+          //   sortable: true,
+          //   filter: true,
           // },
           // {
           //   field: "updatedOn",
           //   headerName: "Updated On",
-          //   sortable: BOOLEAN_VALUES.TRUE,
-          //   filter: BOOLEAN_VALUES.TRUE,
+          //   sortable: true,
+          //   filter: true,
           // },
           {
             field: "createdBy",
             headerName: "createdBy",
-            sortable: BOOLEAN_VALUES.TRUE,
-            filter: BOOLEAN_VALUES.TRUE,
+            sortable: true,
+            filter: true,
           },
           // {
           //   field: "updatedBy",
           //   headerName: "updatedBy",
-          //   sortable: BOOLEAN_VALUES.TRUE,
-          //   filter: BOOLEAN_VALUES.TRUE,
+          //   sortable: true,
+          //   filter: true,
           // },
           {
             field: "assignedTo",
             headerName: "assignedTo",
-            sortable: BOOLEAN_VALUES.TRUE,
-            filter: BOOLEAN_VALUES.TRUE,
+            sortable: true,
+            filter: true,
           },
           {
             headerName: "Actions",
-            sortable: BOOLEAN_VALUES.FALSE,
-            maxWidth: NUMBER_VALUES.HUNDRED,
+            sortable: false,
+            maxWidth: 100,
             pinned: "right",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any,
             cellRenderer: (params: any) => {
               const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
-                useState(BOOLEAN_VALUES.FALSE);
-              const [position, setPosition] = useState({ top: NUMBER_VALUES.ZERO, left: NUMBER_VALUES.ZERO });
+                useState(false);
+              const [position, setPosition] = useState({ top: 0, left: 0 });
               const dropdownRef = useRef<HTMLDivElement | null>(null);
     
               const handleActionsButtonClick = (event: React.MouseEvent) => {
@@ -148,8 +148,8 @@ function LeadManagementAgGrid({
     
                 const rect = event.currentTarget.getBoundingClientRect();
                 setPosition({
-                  top: rect.bottom + window.scrollY - NUMBER_VALUES.TEN, // Position below button
-                  left: rect.left + window.scrollX - NUMBER_VALUES.TWENTY_FIVE, // Align with button
+                  top: rect.bottom + window.scrollY - 10, // Position below button
+                  left: rect.left + window.scrollX - 25, // Align with button
                 });
               };
     
@@ -160,7 +160,7 @@ function LeadManagementAgGrid({
                     dropdownRef.current &&
                     !dropdownRef.current.contains(event.target as Node)
                   ) {
-                    setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                    setIsActionsDropDownOpen(false);
                   }
                 };
     
@@ -197,7 +197,7 @@ function LeadManagementAgGrid({
                             {userHasAccessToUpdateLead ? (
                               <ActionsDropdownButton
                                 onClick={() => {
-                                  setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                                  setIsActionsDropDownOpen(false);
                                 }}
                               >
                                 <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.EDIT}
@@ -223,7 +223,7 @@ function LeadManagementAgGrid({
                               <button
                                 className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
                                 onClick={() => {
-                                  setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                                  setIsActionsDropDownOpen(false);
                                 }}
                               >
                                 <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> Edit
@@ -255,8 +255,8 @@ function LeadManagementAgGrid({
           filter: "agTextColumnFilter",
           minWidth: 150,
           flex: 0.8,
-          suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
-          suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
+          suppressHeaderMenuButton: true,
+          suppressHeaderContextMenu: true,
         };
       }, []);
 

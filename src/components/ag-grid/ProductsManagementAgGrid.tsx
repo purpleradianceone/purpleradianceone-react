@@ -3,16 +3,11 @@ import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  BOOLEAN_VALUES,
-  INNERHTML,
-  JSX_CHILDREN_NAME,
-  NUMBER_VALUES,
-} from "../../constants/AppConstants";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Product } from "../../@types/products/ProductsManagementProps";
-import { CheckCircle2, ClipboardPlus, Edit, XCircle } from "lucide-react";
+import { CheckCircle2, Edit, Network, UserPlus, XCircle } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import Button from "../ui/Button";
 
@@ -20,67 +15,67 @@ function ProductsManagementGrid({
   products,
   handleEditCompanyProductModalOpen,
   handleSelectedProductChange,
+  isGridForProductUser,
+  handleCompanyProductUserModalOpen,
+  handleCompanyProductTeamModalOpen,
 }: {
   products: Product[];
   handleEditCompanyProductModalOpen: (status: boolean) => void;
   handleSelectedProductChange: (product: Product) => void;
+  isGridForProductUser: boolean;
+  handleCompanyProductUserModalOpen : (status : boolean) => void;
+  handleCompanyProductTeamModalOpen : (status : boolean) => void;
 }) {
   const {
     userHasAccessToViewProductTax,
-    userHasAccessToAddProductTax,
     userHasAccessToUpdateProduct,
+    userHasAccessToUpdateProductTeam,
   } = useUserAccessModules();
-
-  useEffect(() => {
-    
-    console.log("Products In AGGRID")
-    console.log(products);
-  })
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
         field: "name",
         headerName: "Product Name",
-        sortable: BOOLEAN_VALUES.TRUE,
+        sortable: true,
         filter: "agTextColumnFilter",
-        flex: NUMBER_VALUES.ONE,
+        flex: 1,
 
         comparator: (valueA, valueB) => {
-          if (!valueA) return NUMBER_VALUES.MINUS_ONE;
-          if (!valueB) return NUMBER_VALUES.ONE;
+          if (!valueA) return -1;
+          if (!valueB) return 1;
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
       },
       {
         field: "code",
         headerName: "Item Code",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
+        sortable: true,
+        filter: true,
+        flex: 1,
       },
       {
         field: "cost",
         headerName: "Basic Cost",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
+        sortable: true,
+        filter: true,
+        flex: 1,
       },
       {
         field: "description",
         headerName: "Description",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: 1.5,
         tooltipValueGetter(params) {
           return params.data.description;
         },
       },
       {
-        field : "isActive",
+        field: "isActive",
         headerName: "Active",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter :  BOOLEAN_VALUES.TRUE,
+        sortable: true,
+        filter: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
@@ -103,28 +98,29 @@ function ProductsManagementGrid({
       {
         field: "hsn",
         headerName: "HSN",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
-        hide: !userHasAccessToViewProductTax,
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        
       },
       {
         field: "sac",
         headerName: "SAC",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
-        hide: !userHasAccessToViewProductTax,
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
       },
       {
         field: "taxRate",
         headerName: "TAX Rate",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
-        hide: !userHasAccessToViewProductTax,
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
         valueFormatter: (params) => {
-          if (params.value === NUMBER_VALUES.ZERO) {
+          if (params.value === 0) {
             return ""; // Return an empty string if the value is 0
           }
           return params.value; // Otherwise, return the original value
@@ -133,40 +129,39 @@ function ProductsManagementGrid({
       {
         field: "validFrom",
         headerName: "Effective From",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
-        hide: !userHasAccessToViewProductTax,
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
       },
 
       {
         field: "createdBy",
         headerName: "Created By",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
+        sortable: true,
+        filter: true,
+        flex: 1,
       },
       {
         field: "createdOn",
         headerName: "Created On",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONE,
+        sortable: true,
+        filter: true,
+        flex: 1,
       },
       {
         headerName: "Actions",
-        sortable: BOOLEAN_VALUES.FALSE,
-        maxWidth: NUMBER_VALUES.HUNDRED,
+        sortable: false,
+        maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
-          const [isActionsDropDownOpen, setIsActionsDropDownOpen] = useState(
-            BOOLEAN_VALUES.FALSE
-          );
+          const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
+            useState(false);
           const [position, setPosition] = useState({
-            top: NUMBER_VALUES.ZERO,
-            left: NUMBER_VALUES.ZERO,
-            isUpward : BOOLEAN_VALUES.FALSE,
+            top: 0,
+            left: 0,
+            isUpward: false,
           });
           const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -174,18 +169,20 @@ function ProductsManagementGrid({
             event.stopPropagation();
             setIsActionsDropDownOpen((prev) => !prev);
 
-            const rect = (event.currentTarget as HTMLButtonElement).getBoundingClientRect();
+            const rect = (
+              event.currentTarget as HTMLButtonElement
+            ).getBoundingClientRect();
             const dropdownHeight = 80; // Approximate height of dropdown
             const windowHeight = window.innerHeight;
             const spaceBelow = windowHeight - rect.bottom;
             const isUpward = spaceBelow < dropdownHeight;
-        
+
             setPosition({
-              top: isUpward 
+              top: isUpward
                 ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
                 : rect.bottom + window.scrollY - 10, // Position below button
               left: rect.left + window.scrollX - 25,
-              isUpward
+              isUpward,
             });
           };
 
@@ -195,7 +192,7 @@ function ProductsManagementGrid({
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target as Node)
               ) {
-                setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                setIsActionsDropDownOpen(false);
               }
             };
 
@@ -226,45 +223,94 @@ function ProductsManagementGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {userHasAccessToUpdateProduct && (
-                      <ActionsDropdownButton
-                        onClick={() => {
-                          setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
-                          handleEditCompanyProductModalOpen(
-                            BOOLEAN_VALUES.TRUE
-                          );
-                          console.log("selected Product");
-                          console.log(params.data)
-                          handleSelectedProductChange(params.data);
-                        }}
-                      >
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
-                      </ActionsDropdownButton>
+                    {!isGridForProductUser && (
+                      <>
+                        {userHasAccessToUpdateProduct && (
+                          <ActionsDropdownButton
+                            onClick={() => {
+                              setIsActionsDropDownOpen(false);
+                              handleEditCompanyProductModalOpen(true);
+                              console.log("selected Product");
+                              console.log(params.data);
+                              handleSelectedProductChange(params.data);
+                            }}
+                          >
+                            <Edit
+                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                            />{" "}
+                            {JSX_CHILDREN_NAME.EDIT}
+                          </ActionsDropdownButton>
+                        )}
+
+                        {!userHasAccessToUpdateProduct && (
+                          <Button
+                            disabled
+                            className={CLASS_NAMES.DISABLED_BUTTON}
+                          >
+                            <Edit
+                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                            />{" "}
+                            {JSX_CHILDREN_NAME.EDIT}
+                          </Button>
+                        )}
+                      </>
                     )}
-                    
 
-                    {!userHasAccessToUpdateProduct && 
-                    <Button
-                    disabled
-                    className={CLASS_NAMES.DISABLED_BUTTON}
-                    >
-                      <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                      {JSX_CHILDREN_NAME.EDIT}
-                    </Button>
-                    }
+                    {isGridForProductUser && (
+                      <>
+                        {userHasAccessToUpdateProductTeam && (
+                          <>
+                            <ActionsDropdownButton
+                            onClick={()=>{
+                              setIsActionsDropDownOpen(false);
+                              handleCompanyProductUserModalOpen(true);
+                              handleSelectedProductChange(params.data);
+                            }
+                            }
+                            >
+                              <UserPlus
+                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                              />
+                              {JSX_CHILDREN_NAME.USER}
+                            </ActionsDropdownButton>
+                            <ActionsDropdownButton
+                            onClick={(()=> {
+                              setIsActionsDropDownOpen(false);
+                              handleCompanyProductTeamModalOpen(true);
+                              handleSelectedProductChange(params.data);
+                            })}
+                            >
+                              <Network
+                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                                
+                              />
+                              {JSX_CHILDREN_NAME.TEAM}
+                            </ActionsDropdownButton>
+                          </>
+                        )}
 
-                    {!userHasAccessToAddProductTax && 
-                    <Button
-                    disabled
-                    className={CLASS_NAMES.DISABLED_BUTTON}
-                    >
-                      <ClipboardPlus
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />{" "}
-                        {JSX_CHILDREN_NAME.TAX}
-                    </Button>
-                    }
+                        {!userHasAccessToUpdateProductTeam && (
+                          <>
+                            <Button
+                             disabled
+                             className={CLASS_NAMES.DISABLED_BUTTON}>
+                              <UserPlus
+                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                              />
+                              {JSX_CHILDREN_NAME.USER}
+                            </Button>
+                            <Button
+                             disabled
+                             className={CLASS_NAMES.DISABLED_BUTTON}>
+                              <Network
+                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                              />
+                              {JSX_CHILDREN_NAME.TEAM}
+                            </Button>
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>,
                   document.body // Render dropdown in body to avoid clipping
                 )}
@@ -282,11 +328,10 @@ function ProductsManagementGrid({
       filter: "agTextColumnFilter",
       minWidth: 150,
       flex: 0.8,
-      suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
-      suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
+      suppressHeaderMenuButton: true,
+      suppressHeaderContextMenu: true,
     };
   }, []);
-
 
   return (
     <div
@@ -298,7 +343,7 @@ function ProductsManagementGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeAlpine}
       />
     </div>
