@@ -1,10 +1,8 @@
 import { Store, X } from "lucide-react";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
-  STRING_VALUES,
   TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
@@ -39,22 +37,22 @@ function AddProductModal({
   isOpen,
   onClose,
   handleProductChangeOnAdd,
-}: AddProductModalProps) {
+} : AddProductModalProps) {
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success",
   });
 
 
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const {isSmallScreen} = useScreenSize()
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -65,21 +63,21 @@ function AddProductModal({
   }
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const [intialAddProductFormData,setInitialAddProductFormData] =  useState<Product>({
-    name: STRING_VALUES.EMPTY_STRING,
-    code: STRING_VALUES.EMPTY_STRING,
-    description: STRING_VALUES.EMPTY_STRING,
-    cost: NUMBER_VALUES.ZERO,
-    hsn: STRING_VALUES.EMPTY_STRING,
-    sac: STRING_VALUES.EMPTY_STRING,
-    validFrom: STRING_VALUES.EMPTY_STRING,
+    name: "",
+    code: "",
+    description: "",
+    cost: 0,
+    hsn: "",
+    sac: "",
+    validFrom: "",
   });
 
   const { userHasAccessToAddProduct } = useUserAccessModules();
@@ -101,25 +99,21 @@ function AddProductModal({
     handleMessageSnackbarClose();
   }, []);
 
-  // const handleAddProductFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-
-  // }
 
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
     if (
-      addProductFormData.name !== STRING_VALUES.EMPTY_STRING ||
-      addProductFormData.code !== STRING_VALUES.EMPTY_STRING ||
-      addProductFormData.description !== STRING_VALUES.EMPTY_STRING
+      addProductFormData.name !== "" ||
+      addProductFormData.code !== "" ||
+      addProductFormData.description !== ""
     ) {
       if (
-        (addProductFormData.hsn !== STRING_VALUES.EMPTY_STRING ||
-          addProductFormData.sac !== STRING_VALUES.EMPTY_STRING) &&
-        (addProductFormData.taxRate === NUMBER_VALUES.ZERO ||
-          addProductFormData.validFrom === STRING_VALUES.EMPTY_STRING)
+        (addProductFormData.hsn !== "" ||
+          addProductFormData.sac !== "") &&
+        (addProductFormData.taxRate === 0 ||
+          addProductFormData.validFrom === "")
       ) {
         showMessageSnackbar({
           message: "Please insert Tax Rate and Valid From",
@@ -127,7 +121,7 @@ function AddProductModal({
         });
         return;
       } else {
-        let formattedDate: string = STRING_VALUES.EMPTY_STRING;
+        let formattedDate: string = "";
         if (addProductFormData.validFrom) {
           const dateObj = new Date(addProductFormData.validFrom);
           const day = dateObj.getDate();
@@ -137,7 +131,7 @@ function AddProductModal({
           const year = dateObj.getFullYear();
           formattedDate = `${day}-${month}-${year}`;
         }
-        let taxRateDecimal: number = NUMBER_VALUES.ZERO;
+        let taxRateDecimal: number = 0;
         if (addProductFormData.taxRate) {
           taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
         }
@@ -155,7 +149,7 @@ function AddProductModal({
         };
         await axios
           .post(POST_API.ADD_PRODUCT, addProductPostData, {
-            withCredentials: BOOLEAN_VALUES.TRUE,
+            withCredentials: true,
           })
           .then((response) => {
             console.log(response.data);
@@ -179,14 +173,14 @@ function AddProductModal({
                 callFunctionWithEvent: handleAddProductFormSubmit,
               });
               if(refreshTokenResponse){
-                setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                setIsDialogueOpen(false);
               }
               else{
-                setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+                setIsDialogueOpen(true);
               }
             }
             else if(error.status === STATUS_CODE.FORBIDDEN){
-              setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+              setIsDialogueOpen(true);
             }
           });
       }
@@ -195,13 +189,13 @@ function AddProductModal({
   useEffect(()=>{
     if(!isOpen){
       setInitialAddProductFormData({
-        name: STRING_VALUES.EMPTY_STRING,
-        code: STRING_VALUES.EMPTY_STRING,
-        description: STRING_VALUES.EMPTY_STRING,
-        cost: NUMBER_VALUES.ZERO,
-        hsn: STRING_VALUES.EMPTY_STRING,
-        sac: STRING_VALUES.EMPTY_STRING,
-        validFrom: STRING_VALUES.EMPTY_STRING,
+        name: "",
+        code: "",
+        description: "",
+        cost: 0,
+        hsn: "",
+        sac: "",
+        validFrom: "",
       })
     }
   },[isOpen])
@@ -217,7 +211,7 @@ function AddProductModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
+          <div className="py-3 px-9">
             <div className="flex items-center gap-3 mb-6">
               <Store className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
@@ -231,7 +225,7 @@ function AddProductModal({
               </button>
             </div>
 
-            <form className="space-y-8" onSubmit={handleAddProductFormSubmit}>
+            <form className="space-y-1 " onSubmit={handleAddProductFormSubmit}>
               <FormInput
                 label="Product Name : "
                 type="text"
@@ -265,9 +259,9 @@ function AddProductModal({
                 name="description"
                 placeholder="Product Description"
                 value={addProductFormData.description}
-                cols={NUMBER_VALUES.FIVE}
-                rows={NUMBER_VALUES.THREE}
-                maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
+                cols={5}
+                rows={3}
+                maxLength={256}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
                 error={errors.description}
@@ -279,7 +273,7 @@ function AddProductModal({
               />
 
               {(selectedTaxCode === TAX_CODE.HSN ||
-                selectedTaxCode === STRING_VALUES.EMPTY_STRING) && (
+                selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
                   type="text"
@@ -322,7 +316,7 @@ function AddProductModal({
               />
 
               {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-center max-w-60 m-3 pb-14">
+                <div className="flex justify-self-center max-w-60 m-3 pb-5">
                   <Button type="submit">Add Product</Button>
                 </div>
               ) : (
@@ -355,7 +349,7 @@ function AddProductModal({
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired !"
         message="Session Expired. Please login again."

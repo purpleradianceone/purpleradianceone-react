@@ -8,7 +8,7 @@ import React, {
   } from "react";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import { LoggedInUserContextProps, LoggedInUserType } from "../../@types/company-users/LoggedInUserContextType";
-import { BOOLEAN_VALUES, DATA_TYPE, NUMBER_VALUES } from "../../constants/AppConstants";
+import {  DATA_TYPE } from "../../constants/AppConstants";
   
 const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(undefined);
   
@@ -18,15 +18,15 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
     const [loginStatus, setLoginStatus] = useState<LoggedInUserType>(() => {
       const savedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
       return savedLoginStatus ? JSON.parse(savedLoginStatus) : {
-        companyId : NUMBER_VALUES.ZERO,
+        companyId : 0,
         companyName : "",
         createdOn : "",
         email : "",
         fullName : "",
-        id : NUMBER_VALUES.ZERO,
+        id : 0,
         message : "",
         mobileNumber : "",
-        status : BOOLEAN_VALUES.FALSE,
+        status : false,
         token : "",
         }
     });

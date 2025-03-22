@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PaginationProps from "../../@types/List/PaginationProps";
-import { NUMBER_VALUES } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import PAGINATION from "../../constants/Pagination";
 
@@ -52,13 +51,13 @@ function Pagination({
       </select>
       <button
         onClick={handlePreviousPage}
-        disabled={currentPage === NUMBER_VALUES.ONE}
+        disabled={currentPage === 1}
         style={{
           padding: "5px 10px",
           border: "1px solid #ccc",
           borderRadius: "5px",
-          backgroundColor: currentPage === NUMBER_VALUES.ONE ? COLORS.WHITE_SMOKE : COLORS.WHITE,
-          cursor: currentPage === NUMBER_VALUES.ONE ? "not-allowed" : "pointer",
+          backgroundColor: currentPage === 1? COLORS.WHITE_SMOKE : COLORS.WHITE,
+          cursor: currentPage === 1? "not-allowed" : "pointer",
         }}
       >
         <ChevronLeft/>

@@ -5,21 +5,20 @@ import SideNavBar from "./SideNavBar";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import ROUTES_URL from "../../../../constants/Routes";
 import useScreenSize from "../../../../config/hooks/useScreenSize";
-import { BOOLEAN_VALUES } from "../../../../constants/AppConstants";
 import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
 import Button from "../../../ui/Button";
 
 function Navbar({children} : {children : React.ReactNode}){
   const [isOpen, setIsOpen] = useState<boolean>();
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
-  const [sidebarOpen, setSidebarOpen] = useState(BOOLEAN_VALUES.FALSE);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const {isSmallScreen} = useScreenSize();
 
   const Navigate = useNavigate();
 
 
-  const [isCardVisible, setIsCardVisible] = useState(BOOLEAN_VALUES.FALSE);
+  const [isCardVisible, setIsCardVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   // Toggle visibility of the profile card
@@ -30,7 +29,7 @@ function Navbar({children} : {children : React.ReactNode}){
   // Close the card when clicking outside
   const handleClickOutside = (event: MouseEvent) => {
     if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-      setIsCardVisible(BOOLEAN_VALUES.FALSE);
+      setIsCardVisible(false);
     }
   };
 
@@ -64,7 +63,7 @@ function Navbar({children} : {children : React.ReactNode}){
     companyId : 0,
     message : "",
     token : "",
-    status : BOOLEAN_VALUES.FALSE,
+    status : false,
     email : "",
     fullName : "",
      companyName:"",

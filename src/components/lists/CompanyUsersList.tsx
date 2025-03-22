@@ -16,11 +16,8 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
 import {
-  BOOLEAN_VALUES,
   JSX_CHILDREN_NAME,
-  NUMBER_VALUES,
   SIZE,
-  STRING_VALUES,
 } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -42,19 +39,19 @@ function GetCompanyUsersList({
   handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
 }) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const [isEditCompanyUserModalOpen, setIsEditModalOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
+    useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
+    useState<boolean>(false);
   const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
@@ -68,15 +65,15 @@ function GetCompanyUsersList({
   } = useUserAccessModules();
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
-    company_id: NUMBER_VALUES.ZERO,
-    id: NUMBER_VALUES.ZERO,
-    fullname: STRING_VALUES.EMPTY_STRING,
-    email: STRING_VALUES.EMPTY_STRING,
-    mobilenumber: STRING_VALUES.EMPTY_STRING,
-    createdby: STRING_VALUES.EMPTY_STRING,
-    isactive: BOOLEAN_VALUES.FALSE,
-    requestedby: STRING_VALUES.EMPTY_STRING,
-    generate_password: STRING_VALUES.EMPTY_STRING,
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password: "",
   });
 
   const handleSelectedCompanyUserChange = (params: CompanyUser) => {
@@ -86,10 +83,10 @@ function GetCompanyUsersList({
       fullname: params.fullname,
       email: params.email,
       mobilenumber: params.mobilenumber,
-      createdby: STRING_VALUES.EMPTY_STRING,
+      createdby: "",
       isactive: params.isactive,
-      requestedby: STRING_VALUES.EMPTY_STRING,
-      generate_password: STRING_VALUES.EMPTY_STRING,
+      requestedby: "",
+      generate_password: "",
     });
   };
 
@@ -303,7 +300,7 @@ function GetCompanyUsersList({
               <div className="flex gap-1">
                 <Button
                   onClick={() =>
-                    setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
+                    setIsAddCompanyUserModalOpen(true)
                   }
                 >
                   {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
@@ -314,21 +311,21 @@ function GetCompanyUsersList({
               <AddCompanyUserModal
                 isOpen={isAddCompanyUserModalOpen}
                 onClose={() =>
-                  setIsAddCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
+                  setIsAddCompanyUserModalOpen(false)
                 }
               />
               <EditCompanyUserModal
                 handleCompanyUserChange={handleCompanyUserChangeOnEdit}
                 isOpen={isEditCompanyUserModalOpen}
                 onClose={() => {
-                  setIsEditModalOpen(BOOLEAN_VALUES.FALSE);
+                  setIsEditModalOpen(false);
                 }}
                 user={selectedCompanyUser}
               />
             </>
           ) : (
             <div className="flex gap-1">
-              <Button disabled={BOOLEAN_VALUES.TRUE}>
+              <Button disabled={true}>
                 {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
 
@@ -352,7 +349,7 @@ function GetCompanyUsersList({
           </div>
           <CompanyUserAccessManagementModal
             isOpen={isAccessModalOpen}
-            onClose={() => setIsAccessModalOpen(BOOLEAN_VALUES.FALSE)}
+            onClose={() => setIsAccessModalOpen(false)}
             users={selectedCompanyUser}
           />
         </div>

@@ -1,15 +1,14 @@
-import { Building2, Handshake, Home, Menu, Settings, Store, X } from "lucide-react";
+import { BoxesIcon, Building2, Handshake, Home, Menu, Network, Settings, Store, X } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
-import { BOOLEAN_VALUES, } from "../../../../constants/AppConstants";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 
 function SideNavBar({isOpen,onToggle} : SideBarProps){
 
-  const {userHasAccessToViewUser,userHasAccessToViewLead} = useUserAccessModules()
+  const {userHasAccessToViewUser,userHasAccessToViewLead,userHasAccessToViewProduct,userHasAccessToViewTeamManagement,userHasAccessToViewProductTeam} = useUserAccessModules()
 
 
     return(
@@ -32,7 +31,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
                 <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
                 <SideNavBarItem 
                   icon={Building2} 
-                  label="Company Users" 
+                  label="Manage Users" 
                   isOpen={isOpen}
                 /></Link>
             }
@@ -41,9 +40,9 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             <Link to={ROUTES_URL.GET_COMPANY_USERS}>
             <SideNavBarItem 
               icon={Building2} 
-              label="Company Users" 
+              label="Manage Users" 
               isOpen={isOpen}
-              disabled={BOOLEAN_VALUES.TRUE}
+              disabled={true}
             />
             </Link>}
             
@@ -52,7 +51,7 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             <SideNavBarItem 
               icon={Handshake} 
-              label="Lead" 
+              label="Leads" 
               isOpen={isOpen}
             />
             </Link>
@@ -62,20 +61,74 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
                 <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
                 <SideNavBarItem 
                   icon={Handshake} 
-                  label="Lead" 
+                  label="Leads" 
                   isOpen={isOpen}
-                  disabled={BOOLEAN_VALUES.TRUE}
+                  disabled={true}
                 />
                 </Link>
             }
 
-            <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
-              <SideNavBarItem
-              icon={Store}
-              label="Products"
-              isOpen={isOpen}
+            {userHasAccessToViewProduct &&
+                <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+                <SideNavBarItem
+                icon={Store}
+                label="Products"
+                isOpen={isOpen}
+                />
+              </Link>
+            }
+
+            {!userHasAccessToViewProduct &&
+              <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+                <SideNavBarItem
+                icon={Store}
+                label="Products"
+                isOpen={isOpen}
+                disabled={true}
+                />
+              </Link>
+            }
+
+            {userHasAccessToViewTeamManagement &&
+            <Link to={ROUTES_URL.TEAM_MANAGEMENT}>
+              <SideNavBarItem 
+              icon = {Network}
+              isOpen = {isOpen}
+              label = "Teams"
               />
             </Link>
+            }
+            {!userHasAccessToViewTeamManagement &&
+            <Link to={ROUTES_URL.TEAM_MANAGEMENT}>
+              <SideNavBarItem 
+              icon = {Network}
+              isOpen = {isOpen}
+              label = "Teams"
+              disabled={true}
+              />
+            </Link>
+            }
+
+            {userHasAccessToViewProductTeam &&
+            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}> 
+            <SideNavBarItem
+            icon={BoxesIcon}
+              isOpen = {isOpen}
+              label = " Product Teams/Users"
+             ></SideNavBarItem>
+            </Link>
+            }
+            {!userHasAccessToViewProductTeam &&
+            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}> 
+            <SideNavBarItem
+            icon={BoxesIcon}
+              isOpen = {isOpen}
+              label = " Product Teams/Users"
+              disabled={true}
+             ></SideNavBarItem>
+            </Link>
+            }
+            
 
             
             <SideNavBarItem

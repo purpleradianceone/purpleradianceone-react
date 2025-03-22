@@ -14,11 +14,9 @@ import {
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
-  STRING_VALUES,
 } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
@@ -68,11 +66,11 @@ function EditCompanyUserModal({
 
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
   const { loginStatus } = useLoggedInUserContext();
@@ -80,14 +78,14 @@ function EditCompanyUserModal({
   useEffect(() => {
     if (isOpen) {
       setErrors({
-        name: STRING_VALUES.EMPTY_STRING,
+        name: "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -100,7 +98,7 @@ function EditCompanyUserModal({
       updateUserformData.mobileNumber !== initialUpdateUserformData.mobileNumber ||
       updateUserformData.isActive !== initialUpdateUserformData.isActive
     ) {
-      if (updateUserformData.name != STRING_VALUES.EMPTY_STRING) {
+      if (updateUserformData.name != "") {
         if (
           user.fullname !== updateUserformData.name ||
           user.mobilenumber !== updateUserformData.mobileNumber ||
@@ -115,31 +113,41 @@ function EditCompanyUserModal({
             isactive : updateUserformData.isActive
           };
           await axios.put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
-              withCredentials: BOOLEAN_VALUES.TRUE,
+              withCredentials: true,
             })
             .then((response) => {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
+              if(response.data.status){
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "success",
+                });
+              }
+              else if(!response.data.status){
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "error",
+                });
+              }
               handleCompanyUserChange(user);
-              setTimeout(() => {
-                onClose();
-              }, 2000);
+                setTimeout(() => {
+                  onClose();
+                }, 2000);
+             
+             
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (error: ApiError | any) => {
               if (error.status === STATUS_CODE.UNATHORISED) {
                 const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleEditUserSubmit });
                 if(refreshTokenStatus){
-                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                  setIsDialogueOpen(false)
                 }
                 else{
-                  setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+                  setIsDialogueOpen(true);
                 }
               } 
               else if(error.status === STATUS_CODE.FORBIDDEN){
-                          setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                          setIsDialogueOpen(false);
                         }
                         else {
                 showMessageSnackbar({
@@ -168,17 +176,17 @@ function EditCompanyUserModal({
     }
   };
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
 
 
   useEffect(() => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   }, [isOpen]);
   if (!isOpen) return null;
 
@@ -213,7 +221,7 @@ function EditCompanyUserModal({
                 value={updateUserformData.name}
                 placeholder="Enter User Name"
                 defaultValue={initialUpdateUserformData.name}
-                maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
+                maxLength={256}
                 onChange={handleEditUserFormChange}
                 error={errors.name}
                 onBlur={handleBlur}
@@ -240,7 +248,7 @@ function EditCompanyUserModal({
                 name="email"
                 placeholder="Enter Email Address"
                 defaultValue={user.email}
-                readonly={BOOLEAN_VALUES.TRUE}
+                readonly={true}
               />
               <div className="flex justify-self-center m-2 min-w-60 pb-10">
               <Button type="submit">Update Company User</Button>
@@ -259,7 +267,7 @@ function EditCompanyUserModal({
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired !"
         message="Session Expired. Please login again."

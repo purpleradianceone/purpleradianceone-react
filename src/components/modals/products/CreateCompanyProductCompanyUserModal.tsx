@@ -1,6 +1,6 @@
 import { UserPlus, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STATUS_CODE, STRING_VALUES } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import CreateCompanyProductCompanyUserModalProps from "../../../@types/modal/CreateCompanyProductCompanyUserModalProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
@@ -24,8 +24,8 @@ function CreateCompanyProductCompanyUserModal({
 }: CreateCompanyProductCompanyUserModalProps) {
   const { isSmallScreen } = useScreenSize();
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
@@ -35,19 +35,19 @@ function CreateCompanyProductCompanyUserModal({
 
   const navigate = useNavigate();
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const fetchCompanyUsers = async () => {
@@ -56,11 +56,11 @@ function CreateCompanyProductCompanyUserModal({
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        limit: NUMBER_VALUES.ZERO,
-        offset: NUMBER_VALUES.ZERO,
-        search_company_specific_date_range_id: NUMBER_VALUES.ZERO,
-        search_parameter: STRING_VALUES.EMPTY_STRING,
-        search_parameter_date: STRING_VALUES.EMPTY_STRING,
+        limit: 0,
+        offset: 0,
+        search_company_specific_date_range_id: 0,
+        search_parameter: "",
+        search_parameter_date: "",
       };
 
       axios
@@ -83,12 +83,12 @@ function CreateCompanyProductCompanyUserModal({
           if (error.status == STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({ callFunction: fetchCompanyUsers });
             if (refreshTokenResponse) {
-              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+              setIsDialogueOpen(false);
             } else {
-              setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+              setIsDialogueOpen(true);
             }
           } else if (error.status === STATUS_CODE.FORBIDDEN) {
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            setIsDialogueOpen(true);
           }
         });
     }
@@ -161,7 +161,7 @@ function CreateCompanyProductCompanyUserModal({
                 <tbody>
                   {compnayUsers.map((user, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="py-2 px-4 whitespace-nowrap w-[5%]">{index + NUMBER_VALUES.ONE}</td>
+                      <td className="py-2 px-4 whitespace-nowrap w-[5%]">{index + 1}</td>
                       <td className="py-2 px-4 whitespace-nowrap w-[30%]">{user.fullname}</td>
                       <td className="py-2 px-4 whitespace-nowrap w-[55%]">{user.email}</td>
                       <td className="py-2 px-4 text-center whitespace-nowrap w-[10%]">
@@ -199,7 +199,7 @@ function CreateCompanyProductCompanyUserModal({
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired!"
         message="Session Expired. Please login again."

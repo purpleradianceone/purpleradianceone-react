@@ -11,7 +11,6 @@ import Features from "../../components/views/home/landing-page/Features";
 import CallToAction from "../../components/views/home/landing-page/CallToAction";
 import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
-// import AddCompanyUser from "../../components/views/manage-company-users/AddCompanyUser";
 import GetCompanyUsers from "../../components/views/manage-company-users/CompanyUsersManagement";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../../components/views/not-found/NotFoundPage";
@@ -21,6 +20,8 @@ import ContactUs from "../../components/views/home/landing-page/ContactUs";
 import LeadManagement from "../../components/views/lead-management/LeadManagement";
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 import LeadSettingsPage from "../../components/views/settings/lead-settings/LeadSettingsPage";
+import TeamManagement from "../../components/views/team-management/TeamManagement";
+import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
 
 export const router = createBrowserRouter([
   {
@@ -153,6 +154,30 @@ export const router = createBrowserRouter([
         <div>
           <Navbar>
             <LeadSettingsPage/>
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    )
+  },
+  {
+    path : ROUTES_URL.TEAM_MANAGEMENT,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <TeamManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    )
+  },
+  {
+    path : ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <ProductTeamManagement/>
           </Navbar>
         </div>
       </PrivateRoute>

@@ -1,6 +1,6 @@
 
 import { Handshake, X } from "lucide-react";
-import { BOOLEAN_VALUES, NUMBER_VALUES, SIZE, STRING_VALUES } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
 import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalProps";
 import FormInput from "../../ui/FormInput";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -28,15 +28,15 @@ type CreateLeadFormDataType = {
 function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
     const initialCreatLeadFormData: CreateLeadFormDataType = {
-        name: STRING_VALUES.EMPTY_STRING,
-        email: STRING_VALUES.EMPTY_STRING,
-        mobileNumber: STRING_VALUES.EMPTY_STRING,
-        address: STRING_VALUES.EMPTY_STRING,
-        circle: STRING_VALUES.EMPTY_STRING,
-        interest: STRING_VALUES.EMPTY_STRING,
-        referenceBy: STRING_VALUES.EMPTY_STRING,
-        remark: STRING_VALUES.EMPTY_STRING,
-        status:STRING_VALUES.EMPTY_STRING,
+        name: "",
+        email: "",
+        mobileNumber: "",
+        address: "",
+        circle: "",
+        interest: "",
+        referenceBy: "",
+        remark: "",
+        status:"",
     }
 
     const { errors, handleBlur } = useFormValidation(initialCreatLeadFormData, "registration")
@@ -44,17 +44,17 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
 
@@ -65,9 +65,9 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     // Handle Submit
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (createLeadModalFormData.name !== STRING_VALUES.EMPTY_STRING 
-            || createLeadModalFormData.email !== STRING_VALUES.EMPTY_STRING
-        || createLeadModalFormData.mobileNumber !== STRING_VALUES.EMPTY_STRING){
+        if (createLeadModalFormData.name !== "" 
+            || createLeadModalFormData.email !== ""
+        || createLeadModalFormData.mobileNumber !== ""){
             leadsData.push(createLeadModalFormData);
             showMessageSnackbar({
                 message: "Lead Created Successfully",

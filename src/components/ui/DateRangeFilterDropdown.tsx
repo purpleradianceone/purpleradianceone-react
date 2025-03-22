@@ -1,17 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Delete,  } from 'lucide-react';
 import DateRangeFilterDropdownProps from '../../@types/ui/DateRangeFilterDropdown';
-import { BOOLEAN_VALUES, NUMBER_VALUES } from '../../constants/AppConstants';
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
-    const [isOpen, setIsOpen] = useState(BOOLEAN_VALUES.FALSE);
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState("Filter");
     const dropdownRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(BOOLEAN_VALUES.FALSE);
+          setIsOpen(false);
         }
       }
   
@@ -22,7 +21,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
     const handleOptionClick = (dateId : number, dateName : string) => {
       props.handleDateIdChange(dateId);
       setSelectedOption(dateName)
-      setIsOpen(BOOLEAN_VALUES.FALSE);
+      setIsOpen(false);
     };
   
     return (
@@ -45,7 +44,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             flex items-center justify-between
           `}
           onClick={() => setIsOpen(!isOpen)}
-          disabled={props.dropdownOptions.length === NUMBER_VALUES.ZERO}
+          disabled={props.dropdownOptions.length === 0}
         >
           <span className="truncate">{selectedOption}</span>
           <ChevronDown 

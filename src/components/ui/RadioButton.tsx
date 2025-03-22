@@ -2,7 +2,7 @@ import RadioButtonsProps from "../../@types/ui/RadioButtonProps";
 
 function RadioButtons(props: RadioButtonsProps) {
   return (
-    <div className="mt-4">
+    <div className="mt-2">
       <label htmlFor={props.options.at(0)?.name} className={( props.center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
         {props.label}
       </label>

@@ -15,7 +15,7 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
-import { BOOLEAN_VALUES, DATA_TYPE, NUMBER_VALUES, STRING_VALUES } from "../../constants/AppConstants";
+import { DATA_TYPE, NUMBER_VALUES, } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import { OTPInput } from "../ui/OtpInput";
@@ -24,29 +24,29 @@ function CreatePasswordForm() {
   const [createPasswordFormData, setCreatePasswordFormData] =
     useState<CreatePasswordFormData>({
       otp: Array(6).fill(""),
-      newPassword: STRING_VALUES.EMPTY_STRING,
-      confirmPassword: STRING_VALUES.EMPTY_STRING,
+      newPassword: "",
+      confirmPassword: "",
     });
   const [createPasswordFormError, setCreatePasswordFormError] =
     useState<CreatePasswordFormErrors>({});
-  const [showPassword, setShowPassword] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(BOOLEAN_VALUES.FALSE);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+    useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success",
   });
 
   const navigate = useNavigate();
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleOtpChange = (newOtp: string[]) => {
@@ -78,7 +78,7 @@ function CreatePasswordForm() {
     // Validate Password
     if (!createPasswordFormData.newPassword) {
       newErrors.password = MESSAGE.ERROR.ENTER_NEW_PAWSSWORD;
-    } else if (createPasswordFormData.newPassword.length < NUMBER_VALUES.EIGHT) {
+    } else if (createPasswordFormData.newPassword.length < 8) {
       newErrors.password = MESSAGE.ERROR.EIGHT_CHARACTER_PASSWORD;
     } else if (
       createPasswordFormData.newPassword !==
@@ -88,7 +88,7 @@ function CreatePasswordForm() {
     }
 
     setCreatePasswordFormError(newErrors);
-    return Object.keys(newErrors).length === NUMBER_VALUES.ZERO;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleCreatePasswordSubmit = (e: FormEvent) => {
@@ -106,11 +106,11 @@ function CreatePasswordForm() {
         password: createPasswordFormData.newPassword,
         email: localStorage.getItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL),
       },{
-        withCredentials : BOOLEAN_VALUES.TRUE
+        withCredentials : true
       })
       .then((response) => {
         if (response.data.status) {
-          setIsSubmitting(BOOLEAN_VALUES.TRUE);
+          setIsSubmitting(true);
           console.log(response);
 
           localStorage.removeItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL);
@@ -127,7 +127,7 @@ function CreatePasswordForm() {
             message: response.data.message,
             type: "error",
           });
-          setIsSubmitting(BOOLEAN_VALUES.FALSE);
+          setIsSubmitting(false);
         }
       });
   };

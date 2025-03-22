@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
@@ -14,10 +15,8 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   STATUS_CODE,
-  STRING_VALUES,
 } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
@@ -32,10 +31,10 @@ function CompanyUserAccessManagementModal({
   onClose,
   users,
 }: AccessRightsModalProps) {
-  const [dataStatus, setDataStatus] = useState(BOOLEAN_VALUES.FALSE);
+  const [dataStatus, setDataStatus] = useState(false);
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success",
   });
 
@@ -48,27 +47,27 @@ function CompanyUserAccessManagementModal({
     message: string;
   }>({
     status: "idle",
-    message: STRING_VALUES.EMPTY_STRING,
+    message: "",
   });
 
   const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
-      add: BOOLEAN_VALUES.FALSE,
-      company_user_id: NUMBER_VALUES.ZERO,
-      createdon: STRING_VALUES.EMPTY_STRING,
-      crm_module_id: NUMBER_VALUES.ZERO,
-      id: NUMBER_VALUES.ZERO,
-      module_name: STRING_VALUES.EMPTY_STRING,
-      update: BOOLEAN_VALUES.FALSE,
-      updatedby: NUMBER_VALUES.ZERO,
-      updatedby_user: STRING_VALUES.EMPTY_STRING,
-      view: BOOLEAN_VALUES.FALSE,
-      company_id: NUMBER_VALUES.ZERO,
-      createdby: NUMBER_VALUES.ZERO,
-      updatedon: STRING_VALUES.EMPTY_STRING,
+      add: false,
+      company_user_id: 0,
+      createdon: "",
+      crm_module_id: 0,
+      id: 0,
+      module_name: "",
+      update: false,
+      updatedby: 0,
+      updatedby_user: "",
+      view: false,
+      company_id: 0,
+      createdby: 0,
+      updatedon: "",
     },
   ]);
 
@@ -76,7 +75,7 @@ function CompanyUserAccessManagementModal({
 
   const fetchUserAccessModules = async () => {
     if (isOpen) {
-      setDataStatus(BOOLEAN_VALUES.TRUE);
+      setDataStatus(true);
       const getCrmModuleAccessData = {
         company_id: loginStatus.companyId,
         company_user_id: users.id,
@@ -85,32 +84,31 @@ function CompanyUserAccessManagementModal({
 
       axios
         .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
-          withCredentials: BOOLEAN_VALUES.TRUE,
+          withCredentials: true,
         })
         .then((response) => {
           setModules(response.data);
-          setDataStatus(BOOLEAN_VALUES.FALSE);
+          setDataStatus(false);
           initialModulesRef.current = response.data;
           setChangedAccessModules([]);
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch(async (error: ApiError | any) => {
           console.error(error);
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({ callFunction: fetchUserAccessModules });
             if (refreshTokenStatus) {
-              setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+              setIsDialogueOpen(false);
             } else {
-              setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+              setIsDialogueOpen(true);
             }
           } else if (error.status === STATUS_CODE.FORBIDDEN) {
-            setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+            setIsDialogueOpen(true);
           }
         });
     } else {
       setModules([]);
       setChangedAccessModules([]);
-      setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+      setMessageSnackbar((prev) => ({ ...prev, open: false }));
     }
   };
 
@@ -173,15 +171,15 @@ function CompanyUserAccessManagementModal({
   };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleSaveAccessModule = async () => {
-    if (changedAccessModules.length === NUMBER_VALUES.ZERO) {
+    if (changedAccessModules.length === 0) {
       showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
       return;
     }
@@ -202,7 +200,7 @@ function CompanyUserAccessManagementModal({
 
     axios
       .put(POST_API.UPDATE_CRM_MODULE_ACCESS, saveCrmModuleAccessData, {
-        withCredentials: BOOLEAN_VALUES.TRUE,
+        withCredentials: true,
       })
       .then((response) => {
         showMessageSnackbar({
@@ -221,7 +219,7 @@ function CompanyUserAccessManagementModal({
         setTimeout(() => {
           setSpinnerAnimation({
             status: "idle",
-            message: STRING_VALUES.EMPTY_STRING,
+            message: "",
           });
         }, 1000);
 
@@ -234,12 +232,12 @@ function CompanyUserAccessManagementModal({
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({ callFunction: handleSaveAccessModule });
           if (refreshTokenStatus) {
-            setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+            setIsDialogueOpen(false);
           } else {
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            setIsDialogueOpen(true);
           }
         } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+          setIsDialogueOpen(true);
         } else {
           showMessageSnackbar({
             message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
@@ -250,7 +248,7 @@ function CompanyUserAccessManagementModal({
   };
 
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -403,14 +401,14 @@ function CompanyUserAccessManagementModal({
               <div className="flex justify-self-end min-w-36 max-w-44">
                 {userHasAccessToUpdateAccess ? (
                   users.id === loginStatus.id ? (
-                    <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
+                    <Button disabled={true}>Save</Button>
                   ) : (
                     <Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>
                       Save
                     </Button>
                   )
                 ) : (
-                  <Button disabled={BOOLEAN_VALUES.TRUE}>Save</Button>
+                  <Button disabled={true}>Save</Button>
                 )}
               </div>
             </div>
@@ -427,7 +425,7 @@ function CompanyUserAccessManagementModal({
       </div>
       <DialogueBox
         isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+        onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired!"
         message="Session Expired. Please login again."

@@ -7,10 +7,8 @@ import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
 import CompanyUser from "../../@types/company-users/CompanyUser";
 import {
-  BOOLEAN_VALUES,
   INNERHTML,
   JSX_CHILDREN_NAME,
-  NUMBER_VALUES,
 } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
@@ -34,46 +32,46 @@ function CompanyUserAgGrid({
       {
         field: "fullname",
         headerName: "Name",
-        sortable: BOOLEAN_VALUES.TRUE,
+        sortable: true,
         filter: "agTextColumnFilter",
-        flex: NUMBER_VALUES.ONE,
+        flex: 1,
 
         comparator: (valueA, valueB) => {
-          if (!valueA) return NUMBER_VALUES.MINUS_ONE;
-          if (!valueB) return NUMBER_VALUES.ONE;
+          if (!valueA) return -1;
+          if (!valueB) return 1;
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
       },
       {
         field: "email",
         headerName: "Email",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
-        flex: NUMBER_VALUES.ONEANDHALF,
+        sortable: true,
+        filter: true,
+        flex: 1.5,
       },
       {
         field: "mobilenumber",
         headerName: "Mobile Number",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
+        sortable: true,
+        filter: true,
       },
       {
         field: "createdby",
         headerName: "Created By",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
+        sortable: true,
+        filter: true,
       },
       {
         field: "createdon",
         headerName: "Created On",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
+        sortable: true,
+        filter: true,
       },
       {
         field: "isactive",
         headerName: "Status",
-        sortable: BOOLEAN_VALUES.TRUE,
-        filter: BOOLEAN_VALUES.TRUE,
+        sortable: true,
+        filter: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
@@ -95,18 +93,18 @@ function CompanyUserAgGrid({
       },
       {
         headerName: "Actions",
-        sortable: BOOLEAN_VALUES.FALSE,
-        maxWidth: NUMBER_VALUES.HUNDRED,
+        sortable: false,
+        maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] = useState(
-            BOOLEAN_VALUES.FALSE
+            false
           );
           const [position, setPosition] = useState({
-            top: NUMBER_VALUES.ZERO,
-            left: NUMBER_VALUES.ZERO,
-            isUpward : BOOLEAN_VALUES.FALSE,
+            top: 0,
+            left: 0,
+            isUpward : false,
           });
 
           
@@ -130,11 +128,7 @@ function CompanyUserAgGrid({
               isUpward
             });
 
-            // const rect = event.currentTarget.getBoundingClientRect();
-            // setPosition({
-            //   top: rect.bottom + window.scrollY - NUMBER_VALUES.TEN, // Position below button
-            //   left: rect.left + window.scrollX - NUMBER_VALUES.TWENTY_FIVE, // Align with button
-            // });
+           
           };
 
           useEffect(() => {
@@ -143,7 +137,7 @@ function CompanyUserAgGrid({
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target as Node)
               ) {
-                setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                setIsActionsDropDownOpen(false);
               }
             };
 
@@ -178,8 +172,8 @@ function CompanyUserAgGrid({
                       <ActionsDropdownButton
                         onClick={() => {
                           handleSelectedCompanyUserChange(params.data);
-                          handleIsAccessModalOpen(BOOLEAN_VALUES.TRUE);
-                          setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                          handleIsAccessModalOpen(true);
+                          setIsActionsDropDownOpen(false);
                         }}
                       >
                         <UserCheck
@@ -193,8 +187,8 @@ function CompanyUserAgGrid({
                       <ActionsDropdownButton
                         onClick={() => {
                           handleSelectedCompanyUserChange(params.data);
-                          handleIdIsEditModalOpen(BOOLEAN_VALUES.TRUE);
-                          setIsActionsDropDownOpen(BOOLEAN_VALUES.FALSE);
+                          handleIdIsEditModalOpen(true);
+                          setIsActionsDropDownOpen(false);
                         }}
                       >
                         <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
@@ -233,8 +227,8 @@ function CompanyUserAgGrid({
       filter: "agTextColumnFilter",
       minWidth: 150,
       flex: 0.8,
-      suppressHeaderMenuButton: BOOLEAN_VALUES.TRUE,
-      suppressHeaderContextMenu: BOOLEAN_VALUES.TRUE,
+      suppressHeaderMenuButton: true,
+      suppressHeaderContextMenu: true,
     };
   }, []);
 

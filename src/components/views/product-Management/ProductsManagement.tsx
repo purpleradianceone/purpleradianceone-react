@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import {
-  BOOLEAN_VALUES,
-  NUMBER_VALUES,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
@@ -24,15 +22,15 @@ function ProductManagement() {
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const [productsData, setProductsData] = useState<Product[]>([]);
-  const [productUpdateCount, setProductUpdateCount] = useState<number>(NUMBER_VALUES.ZERO);
+  const [productUpdateCount, setProductUpdateCount] = useState<number>(0);
 
   const {
     currentPage,
@@ -54,7 +52,6 @@ function ProductManagement() {
       (products) =>
         products.name !== product.name && products.code !== product.code
     );
-    alert();
     if (userMatches) {
       setProductUpdateCount((prev) => prev + 1);
     }
@@ -84,14 +81,14 @@ function ProductManagement() {
 
   const fetchCompanyProducts = async () => {
     if (userHasAccessToViewProduct) {
-      const offset = (currentPage - NUMBER_VALUES.ONE) * pageSize;
+      const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
-        dateRangeId === NUMBER_VALUES.EIGHT && !concatDate
-          ? NUMBER_VALUES.ZERO
+        dateRangeId === 8 && !concatDate
+          ? 0
           : dateRangeId;
 
-      setAccessDeniedPopUpOpen(BOOLEAN_VALUES.FALSE);
+      setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
@@ -135,9 +132,9 @@ function ProductManagement() {
             ]);
           });
 
-          if (response.data[NUMBER_VALUES.ZERO]?.count) {
+          if (response.data[0]?.count) {
             setTotalPages(
-              Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize)
+              Math.ceil(response.data[0].count / pageSize)
             );
           }
         }
@@ -150,19 +147,19 @@ function ProductManagement() {
           });
 
           if (refreshTokenStatus) {
-            setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+            setIsDialogueOpen(false);
           } else {
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+            setIsDialogueOpen(true);
           }
         } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          setIsDialogueOpen(true);
         }
       }
     }
   };
 
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -184,7 +181,7 @@ function ProductManagement() {
 
   useEffect(() => {
     if (!userHasAccessToViewProduct) {
-      setAccessDeniedPopUpOpen(BOOLEAN_VALUES.TRUE);
+      setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewProduct]);
 
@@ -193,7 +190,7 @@ function ProductManagement() {
       {userHasAccessToViewProduct ? (
         <>
           <div>
-            <ProductsManagementList
+             <ProductsManagementList
               handleCreateCompanyProductTax={handleCreateCompanyProductTax}
               handleEditProductChange={handleEditProductChange}
               handleProductChangeOnAdd={handleProductChangeOnAdd}
@@ -211,11 +208,12 @@ function ProductManagement() {
                 pageSize,
               }}
               products={productsData}
-            />
+              isListForProductUser={false}
+            />                      
           </div>
           <DialogueBox
             isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+            onClose={() => setIsDialogueOpen(false)}
             onConfirm={handleDialogueConfirm}
             title="Session Expired !"
             message="Session Expired. Please login again."
@@ -226,7 +224,7 @@ function ProductManagement() {
           <AccessDeniedPopup
             isOpen={accessDeniedPopUpOpen}
             onClose={() => {
-              setAccessDeniedPopUpOpen(BOOLEAN_VALUES.FALSE);
+              setAccessDeniedPopUpOpen(false);
               window.history.back();
             }}
           />

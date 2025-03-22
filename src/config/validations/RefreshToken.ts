@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BOOLEAN_VALUES, STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import POST_API from "../../constants/PostApi";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
@@ -14,7 +14,7 @@ const RefreshToken = async (props : {
         POST_API.REFRESH_TOKEN,
         {},
         {
-          withCredentials: BOOLEAN_VALUES.TRUE,
+          withCredentials: true,
         }
       );
       console.log(refreshResponse);
@@ -31,14 +31,14 @@ const RefreshToken = async (props : {
     }
 
       
-      return BOOLEAN_VALUES.TRUE;
+      return true;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       console.log(error);
       console.log("refresh");
       if (error.status === STATUS_CODE.UNATHORISED) {
-        return BOOLEAN_VALUES.FALSE;
+        return false;
       }
     }
   };

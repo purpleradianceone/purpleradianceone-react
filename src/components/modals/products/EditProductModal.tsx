@@ -1,13 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ClipboardPlus, EditIcon, X } from "lucide-react";
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  BOOLEAN_VALUES,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
-  STRING_VALUES,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
@@ -53,30 +52,25 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  useEffect(()=>{
-    console.log("Product Edit")
-    console.log(product)
-  },[isOpen])
-
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
 
   const {isSmallScreen} = useScreenSize();
 
   const [companyProductTax,setCompanyProductTax] = useState<ProductTax[]>([]);
-  const [companyProductTaxChangeCount,setCompanyProductTaxChangeCount] = useState<number>(NUMBER_VALUES.ZERO);
+  const [companyProductTaxChangeCount,setCompanyProductTaxChangeCount] = useState<number>(0);
 
   const [
     isCreateCompanyProductTaxModalOpen,
     setIsCreateCompanyProductTaxModalOpen,
-  ] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  ] = useState<boolean>(false);
 
-  const [isCreateCompanyProductCompanyUserModalOpen,setIsCreateCompanyProductCompanyUserModalOpen] = useState<boolean>(BOOLEAN_VALUES.FALSE);
+  const [isCreateCompanyProductCompanyUserModalOpen,setIsCreateCompanyProductCompanyUserModalOpen] = useState<boolean>(false);
 
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: BOOLEAN_VALUES.FALSE,
-    message: STRING_VALUES.EMPTY_STRING,
+    open: false,
+    message: "",
     type: "success" as "success" | "error",
   });
 
@@ -99,10 +93,10 @@ function EditCompanyProductModal({
 
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -121,22 +115,22 @@ function EditCompanyProductModal({
     "registration"
   );
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: BOOLEAN_VALUES.TRUE, message, type });
+    setMessageSnackbar({ open: true, message, type });
   };
 
   const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: BOOLEAN_VALUES.FALSE }));
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleCompanyProductTaxChange = (status : boolean) => {
     if(status){
-      setCompanyProductTaxChangeCount((prev) => prev + NUMBER_VALUES.ONE);
+      setCompanyProductTaxChangeCount((prev) => prev + 1);
     }
   }
 
   const handleCreateCompanyProductTax = (product : Product) => {
     handleCreateCompanyProductTaxAdd(product)
-    setCompanyProductTaxChangeCount((prev) => prev + NUMBER_VALUES.ONE);
+    setCompanyProductTaxChangeCount((prev) => prev + 1);
   }
 
 
@@ -146,9 +140,9 @@ function EditCompanyProductModal({
     event.preventDefault();
 
     if (
-      updateCompanyProductFormData.name !== STRING_VALUES.EMPTY_STRING &&
-      updateCompanyProductFormData.description !== STRING_VALUES.EMPTY_STRING &&
-      updateCompanyProductFormData.code !== STRING_VALUES.EMPTY_STRING
+      updateCompanyProductFormData.name !== "" &&
+      updateCompanyProductFormData.description !== "" &&
+      updateCompanyProductFormData.code !== ""
     ) {
       if (
         updateCompanyProductFormData.code !==
@@ -175,12 +169,11 @@ function EditCompanyProductModal({
           };
           await axios
             .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
-              withCredentials: BOOLEAN_VALUES.TRUE,
+              withCredentials: true,
             })
             .then((response) => {
-              console.log(response);
               if (
-                response.data.status === BOOLEAN_VALUES.TRUE &&
+                response.data.status === true &&
                 response.status === STATUS_CODE.OK
               ) {
                 showMessageSnackbar({
@@ -188,29 +181,28 @@ function EditCompanyProductModal({
                   type: "success",
                 });
                 handleCompanyProductChange(product);
-                setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+                setIsDialogueOpen(false);
                 setTimeout(() => {
                   onClose();
-                  setIsCreateCompanyProductTaxModalOpen(BOOLEAN_VALUES.FALSE)
+                  setIsCreateCompanyProductTaxModalOpen(false)
                 }, 2000);
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (error: ApiError | any) => {
-              console.log(error);
               if (error.status === STATUS_CODE.UNATHORISED) {
                 const refreshTokenResponse = await RefreshToken({
                   callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
                 });
                 if(refreshTokenResponse){
-                  setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+                  setIsDialogueOpen(false)
                 }
                 else{
-                  setIsDialogueOpen(  BOOLEAN_VALUES.TRUE)
+                  setIsDialogueOpen(  true)
                 }
               }
               else if(error.status === STATUS_CODE.FORBIDDEN){
-                setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+                setIsDialogueOpen(true)
               }
             });
         }
@@ -239,10 +231,9 @@ function EditCompanyProductModal({
       }
 
       await axios.post(POST_API.GET_PRODUCT_TAX,getProductTaxPostData , {
-        withCredentials : BOOLEAN_VALUES.TRUE
+        withCredentials : true
       })
       .then((response) => {
-        console.log(response);
         setCompanyProductTax([]);
         if(response.data &&
           response.status === STATUS_CODE.OK){
@@ -269,18 +260,17 @@ function EditCompanyProductModal({
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(async (error : ApiError | any) => {
-        console.log(error);
         if(error.status === STATUS_CODE.UNATHORISED){
           const refreshTokenResponse = await RefreshToken({callFunction :fetchCompanyroductTax})
           if(refreshTokenResponse){
-            setIsDialogueOpen(BOOLEAN_VALUES.FALSE)
+            setIsDialogueOpen(false)
           }
           else{
-            setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+            setIsDialogueOpen(true)
           }
         }
         else if(error.status === STATUS_CODE.FORBIDDEN){
-          setIsDialogueOpen(BOOLEAN_VALUES.TRUE)
+          setIsDialogueOpen(true)
         }
       });
     }
@@ -289,9 +279,9 @@ function EditCompanyProductModal({
   useEffect(() => {
     if (isOpen) {
       setErrors({
-        code: STRING_VALUES.EMPTY_STRING,
-        description: STRING_VALUES.EMPTY_STRING,
-        name: STRING_VALUES.EMPTY_STRING,
+        code: "",
+        description: "",
+        name: "",
       });
       handleMessageSnackbarClose();
       fetchCompanyroductTax();
@@ -299,7 +289,6 @@ function EditCompanyProductModal({
     else{
       setCompanyProductTax([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyProductTaxChangeCount,isOpen]);
 
   if (!isOpen) return null;
@@ -322,7 +311,7 @@ function EditCompanyProductModal({
               <button
             onClick={() => {
               onClose();
-              setIsCreateCompanyProductTaxModalOpen(BOOLEAN_VALUES.FALSE)
+              setIsCreateCompanyProductTaxModalOpen(false)
             }}
             className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 z-10"
           >
@@ -342,7 +331,7 @@ function EditCompanyProductModal({
                   value={updateCompanyProductFormData.name}
                   placeholder="Enter Product Name"
                   defaultValue={intialEditCompanyProductFormData.name}
-                  maxLength={NUMBER_VALUES.TWO_FIFTY_SIX}
+                  maxLength={256}
                   onChange={handleEditCompanyProductFormDataChange}
                   error={errors.name}
                   onBlur={handleBlur}
@@ -378,8 +367,8 @@ function EditCompanyProductModal({
               <div className="grid gap-4">
               <TextAreaInput
                 label="Description : "
-                cols={NUMBER_VALUES.FIVE}
-                rows={NUMBER_VALUES.THREE}
+                cols={5}
+                rows={3}
                 name="description"
                 placeholder="Enter Product Description"
                 defaultValue={intialEditCompanyProductFormData.description}
@@ -391,11 +380,7 @@ function EditCompanyProductModal({
 
               <div className="flex justify-self-center m-2 min-w-80 gap-2">
                 <Button type="submit">Update Product</Button>
-                <Button
-                  type="button"
-                  onClick = {()=> {
-                    setIsCreateCompanyProductCompanyUserModalOpen(BOOLEAN_VALUES.TRUE)
-                  }}>Assign Users</Button>
+               
               </div>
             </form>
 
@@ -409,7 +394,7 @@ function EditCompanyProductModal({
               <Button
                 type="button"
                 onClick={() => {
-                  handleCreateCompanyProductTaxModalOpen(BOOLEAN_VALUES.TRUE);
+                  handleCreateCompanyProductTaxModalOpen(true);
                 }}
               >
                 <ClipboardPlus
@@ -428,7 +413,7 @@ function EditCompanyProductModal({
                   isOpen={isCreateCompanyProductTaxModalOpen}
                   handleCreateCompanyProductTax={handleCreateCompanyProductTax}
                   onClose={() => {
-                    setIsCreateCompanyProductTaxModalOpen(BOOLEAN_VALUES.FALSE);
+                    setIsCreateCompanyProductTaxModalOpen(false);
                   }}
                   product={product}
                 />
@@ -438,7 +423,7 @@ function EditCompanyProductModal({
             <CreateCompanyProductCompanyUserModal
             isOpen={isCreateCompanyProductCompanyUserModalOpen}
             onClose={()=> {
-              setIsCreateCompanyProductCompanyUserModalOpen(BOOLEAN_VALUES.FALSE)
+              setIsCreateCompanyProductCompanyUserModalOpen(false)
               
             }}
             product={product}
@@ -467,7 +452,7 @@ function EditCompanyProductModal({
       </div>
       <DialogueBox
               isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+              onClose={() => setIsDialogueOpen(false)}
               onConfirm={handleDialogueConfirm}
               title="Session Expired !"
               message="Session Expired. Please login again."

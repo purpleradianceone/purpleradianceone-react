@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  useEffect, useState } from 'react';
 import { STRING_VALUES } from '../../constants/AppConstants';
 
-export const useFormChange = <T extends Record<string, string|number|boolean|undefined>>(initialState: T) => {
+export const useFormChange = <T extends Record<string, string|number|boolean|number[]|undefined>>(initialState: T) => {
   const [formData, setFormData] = useState<T>(initialState);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export const useFormChange = <T extends Record<string, string|number|boolean|und
     switch (value.toLowerCase()) {
       case STRING_VALUES.TRUE:
         return true;
-      case STRING_VALUES.false
+      case STRING_VALUES.FALSE
       : return false;
     }
   }

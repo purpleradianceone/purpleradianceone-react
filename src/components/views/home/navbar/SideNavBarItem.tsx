@@ -1,7 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import SideNavBarItemProps from "../../../../@types/home/navbar/SideNavBarItemProps";
-import { BOOLEAN_VALUES } from "../../../../constants/AppConstants";
 
 function SideNavBarItem({
   icon: Icon,
@@ -11,9 +10,9 @@ function SideNavBarItem({
   onClick,
   disabled
 }: SideNavBarItemProps){
-  const [expanded, setExpanded] = useState(BOOLEAN_VALUES.FALSE);
-  const [hoveredItem, setHoveredItem] = useState(BOOLEAN_VALUES.FALSE);
-  const [isTooltipVisible, setIsTooltipVisible] = useState(BOOLEAN_VALUES.FALSE);
+  const [expanded, setExpanded] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -73,14 +72,14 @@ function SideNavBarItem({
         ) : (
           <div
             className="relative"
-            onClick={() => setHoveredItem(BOOLEAN_VALUES.TRUE)}
-            onMouseLeave={() => setIsTooltipVisible(BOOLEAN_VALUES.FALSE)}
+            onClick={() => setHoveredItem(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
           >
             <button
               ref={buttonRef}
               onClick={onClick}
               onMouseEnter={() => {
-                setIsTooltipVisible(BOOLEAN_VALUES.TRUE);
+                setIsTooltipVisible(true);
                 updateTooltipPosition();
               }}
               onMouseMove={updateTooltipPosition}
@@ -141,14 +140,14 @@ function SideNavBarItem({
         ) : (
           <div
             className="relative"
-            onClick={() => setHoveredItem(BOOLEAN_VALUES.TRUE)}
-            onMouseLeave={() => setIsTooltipVisible(BOOLEAN_VALUES.FALSE)}
+            onClick={() => setHoveredItem(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
           >
             <button
               ref={buttonRef}
               onClick={onClick}
               onMouseEnter={() => {
-                setIsTooltipVisible(BOOLEAN_VALUES.TRUE);
+                setIsTooltipVisible(true);
                 updateTooltipPosition();
               }}
               onMouseMove={updateTooltipPosition}
@@ -170,8 +169,8 @@ function SideNavBarItem({
             )}
             {children && hoveredItem && (
               <div
-                onMouseLeave={() => setHoveredItem(BOOLEAN_VALUES.FALSE)}
-                onMouseEnter={()=> setIsTooltipVisible(BOOLEAN_VALUES.FALSE)}
+                onMouseLeave={() => setHoveredItem(false)}
+                onMouseEnter={()=> setIsTooltipVisible(false)}
                 className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36 z-50"
               >
                 {children.map((child, index) => (

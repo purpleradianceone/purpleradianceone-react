@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import validateEmail from '../validations/ValidateEmail';
 import validateMobileNumber from '../validations/ValidateMobileNumber';
-import { BOOLEAN_VALUES, NUMBER_VALUES, STRING_VALUES } from '../../constants/AppConstants';
+import {  STRING_VALUES } from '../../constants/AppConstants';
 
 
 export type ErrorType = {
@@ -21,7 +21,7 @@ export type ErrorType = {
 
 export type FormType = 'registered' | 'registration';
 
-export const useFormValidation = (formData: Record<string, string|number|boolean|undefined>, formType: FormType) => {
+export const useFormValidation = (formData: Record<string, string|number|boolean|number[]|undefined>, formType: FormType) => {
   const [errors, setErrors] = useState<ErrorType>({});
 
 
@@ -47,7 +47,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
       case "password":
         if (!value) {
           setErrors((prev) => ({ ...prev, password: "Password is required" }));
-        } else if (formType === STRING_VALUES.REGISTRATION && (value.length < NUMBER_VALUES.EIGHT || value.length > NUMBER_VALUES.TWENTY)) {
+        } else if (formType === STRING_VALUES.REGISTRATION && (value.length < 8 || value.length > 20)) {
           setErrors((prev) => ({
             ...prev,
             password: "Password must be between 8 to 20 characters",
@@ -89,7 +89,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
         break;
 
       case "name":
-        if (formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, name: "Name is required" }));
         } else {
           setErrors((prev) => ({ ...prev, name: "" }));
@@ -97,7 +97,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
         break;
 
         case "code" :
-          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
             console.log("inside code");
             setErrors((prev) => ({ ...prev, code: "Item Code is required"}));
           }
@@ -108,7 +108,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
 
         case "description" :
           if(formType === STRING_VALUES.REGISTRATION){
-            if(value === STRING_VALUES.EMPTY_STRING) {
+            if(value === "") {
               setErrors((prev) => ({ ...prev, description: "Description is required"}));
             }
             else{
@@ -119,7 +119,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
 
         case "taxRate" :
           if(formType === STRING_VALUES.REGISTRATION){
-            if(value === STRING_VALUES.EMPTY_STRING) {
+            if(value === "") {
               setErrors((prev) => ({ ...prev, taxRate: "Tax Rate is required"}));
             }
             else{
@@ -129,7 +129,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
           break;
 
         case "validFrom" : 
-        if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+        if(formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, validFrom: "Valid From is required"}));
         }
         else{
@@ -138,7 +138,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
         break;
 
         case "hsn" :
-          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
             setErrors((prev) => ({ ...prev, hsn: "HSN is required"}));
           }
           else{
@@ -147,7 +147,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
           break;
 
         case "sac" :
-          if(formType === STRING_VALUES.REGISTRATION && value === STRING_VALUES.EMPTY_STRING) {
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
             setErrors((prev) => ({ ...prev, sac: "SAC is required"}));
           }
           else{
@@ -159,46 +159,46 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
   };
 
   const validateForm = (): boolean => {
-    let isValid = BOOLEAN_VALUES.TRUE;
+    let isValid = true;
     const newErrors: ErrorType = {};
 
     // Common validations for both forms
     if (!formData.email) {
       newErrors.email = "Email Address is required";
-      isValid = BOOLEAN_VALUES.FALSE;
+      isValid = false;
     } else if (!validateEmail(formData.email.toString())) {
       newErrors.email = "Email Address must be valid";
-      isValid = BOOLEAN_VALUES.FALSE;
+      isValid = false;
     }
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-      isValid = BOOLEAN_VALUES.FALSE;
+      isValid = false;
     }
 
     // SignUp specific validations
     if (formType === STRING_VALUES.REGISTRATION && formData.password) {
-      if (formData.password.toString().length <  NUMBER_VALUES.EIGHT || formData.password.toString().length > NUMBER_VALUES.TWENTY) {
+      if (formData.password.toString().length <  8 || formData.password.toString().length > 20) {
         newErrors.password = "Password must be between 8 to 20 characters";
-        isValid = BOOLEAN_VALUES.FALSE;
+        isValid = false;
       }
 
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = "Confirm password is required";
-        isValid = BOOLEAN_VALUES.FALSE;
+        isValid = false;
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
-        isValid = BOOLEAN_VALUES.FALSE;
+        isValid = false;
       }
 
       if (formData.mobileNumber && !validateMobileNumber(formData.mobileNumber.toString())) {
         newErrors.mobileNumber = "Please enter a valid mobile number";
-        isValid = BOOLEAN_VALUES.FALSE;
+        isValid = false;
       }
 
       if (!formData.name) {
         newErrors.name = "Name is required";
-        isValid = BOOLEAN_VALUES.FALSE;
+        isValid = false;
       }
     }
 

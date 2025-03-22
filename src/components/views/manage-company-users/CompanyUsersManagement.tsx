@@ -6,8 +6,6 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
 import {
-  BOOLEAN_VALUES,
-  NUMBER_VALUES,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
@@ -26,11 +24,11 @@ function GetCompanyUsers() {
   );
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
   const navigate = useNavigate();
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
   const { userHasAccessToViewUser } = useUserAccessModules();
@@ -63,11 +61,11 @@ function GetCompanyUsers() {
 
   // Fetch data function
   const fetchCompanyUsers = async () => {
-    const offset = (currentPage - NUMBER_VALUES.ONE) * pageSize;
+    const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === NUMBER_VALUES.EIGHT && !concatDate
-        ? NUMBER_VALUES.ZERO
+      dateRangeId === 8 && !concatDate
+        ? 0
         : dateRangeId;
 
     const postData = {
@@ -82,14 +80,14 @@ function GetCompanyUsers() {
 
     try {
       const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
-        withCredentials: BOOLEAN_VALUES.TRUE,
+        withCredentials: true,
       });
 
       setCompanyUsers(response.data);
       console.log(response.data);
-      if (response.data[NUMBER_VALUES.ZERO]?.count) {
+      if (response.data[0]?.count) {
         setTotalPages(
-          Math.ceil(response.data[NUMBER_VALUES.ZERO].count / pageSize)
+          Math.ceil(response.data[0].count / pageSize)
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,18 +98,18 @@ function GetCompanyUsers() {
           callFunction: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+          setIsDialogueOpen(false);
         } else {
-          setIsDialogueOpen(BOOLEAN_VALUES.TRUE);
+          setIsDialogueOpen(true);
         }
       } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+        setIsDialogueOpen(true);
       }
     }
   };
 
   const handleDialogueConfirm = () => {
-    setIsDialogueOpen(BOOLEAN_VALUES.FALSE);
+    setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
@@ -134,7 +132,7 @@ function GetCompanyUsers() {
 
   useEffect(() => {
     if (!userHasAccessToViewUser) {
-      setAccessDeniedPopUpOpen(BOOLEAN_VALUES.TRUE);
+      setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewUser]);
 
@@ -163,7 +161,7 @@ function GetCompanyUsers() {
           </div>
           <DialogueBox
             isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(BOOLEAN_VALUES.FALSE)}
+            onClose={() => setIsDialogueOpen(false)}
             onConfirm={handleDialogueConfirm}
             title="Session Expired !"
             message="Session Expired. Please login again."
@@ -174,7 +172,7 @@ function GetCompanyUsers() {
           <AccessDeniedPopup
             isOpen={accessDeniedPopUpOpen}
             onClose={() => {
-              setAccessDeniedPopUpOpen(BOOLEAN_VALUES.FALSE);
+              setAccessDeniedPopUpOpen(false);
               window.history.back();
             }}
           />

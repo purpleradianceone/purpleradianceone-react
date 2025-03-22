@@ -2,19 +2,17 @@ import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import LeadManagementList from "../../lists/LeadManagementList";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-import { BOOLEAN_VALUES } from "../../../constants/AppConstants";
-
 
 function LeadManagement(){
         
     const {userHasAccessToViewLead} = useUserAccessModules()
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    BOOLEAN_VALUES.FALSE
+    false
   );
 
     useEffect(() => {
       if (!userHasAccessToViewLead) {
-        setAccessDeniedPopUpOpen(BOOLEAN_VALUES.TRUE);
+        setAccessDeniedPopUpOpen(true);
       }
     }, [userHasAccessToViewLead]);
 
@@ -33,7 +31,7 @@ function LeadManagement(){
           <AccessDeniedPopup
             isOpen={accessDeniedPopUpOpen}
             onClose={() => {
-              setAccessDeniedPopUpOpen(BOOLEAN_VALUES.FALSE);
+              setAccessDeniedPopUpOpen(false);
               window.history.back();
             }}
           />
