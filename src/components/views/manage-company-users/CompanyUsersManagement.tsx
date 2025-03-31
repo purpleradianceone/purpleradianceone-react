@@ -84,7 +84,7 @@ function GetCompanyUsers() {
       });
 
       setCompanyUsers(response.data);
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data[0]?.count) {
         setTotalPages(
           Math.ceil(response.data[0].count / pageSize)
