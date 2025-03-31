@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,6 +42,9 @@ function SignInForm() {
   const { formData: loginUserCredentials, handleChange: handleSignInFormDatachange } = useFormChange(initialSignInFormState);
   const { errors, handleBlur } = useFormValidation(loginUserCredentials,"registered");
 
+  //NOTE : NEED TO 
+  const [showSubscriptionOrInActivePopUp ,setShowSubscriptionOrInActivePopUp]= useState<boolean>(false);
+
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
     message: string;
@@ -49,6 +52,7 @@ function SignInForm() {
     status: "idle",
     message: "",
   });
+
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -119,49 +123,72 @@ function SignInForm() {
                   id: response.data.id,
                   companyId: response.data.company_id,
                   companyName: response.data.company_name,
-                  fullName: response.data.fullName,
+                  fullName: response.data.fullname,
                   email: response.data.email,
                   mobileNumber: response.data.mobilenumber,
                   message: response.data.message,
                   token: response.data.token,
                   status: response.data.status,
                   createdOn: response.data.createdon,
+                  isActiveSubscription:response.data.isactive_subscription,
+                  subscriptionAllowedUsers: response.data.subscription_allowed_users,
+                  activeUsersInCompany: response.data.active_users_in_company
                 });
 
-                if (response.data) {
-                  const getCrmModuleAccessData = {
-                    company_id: response.data.company_id,
-                    company_user_id: response.data.id,
-                    requestedby: response.data.id,
-                  };
+                if(!response.data.isactive_subscription){
+                  navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
+                  return
+                }else{
+                  if (response.data) {
 
-                  axios
-                    .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
-                      withCredentials : true
-                    })
-                    .then((response) => {
-                      setAccessModules(response.data);
-                      setSpinnerAnimation({
-                        status: "success",
-                        message: MESSAGE.SUCCESS.LOGGED_IN,
-                      });
-                      showMessageSnackbar({
-                        message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-                        type: "success",
-                      });
-
+                    //NOTE : CHANGES REQUIRED
+                    console.log(response.data);
+                    if(response.data.active_users_in_company > response.data.subscription_allowed_users){ 
                       setTimeout(() => {
-                          navigate(ROUTES_URL.HOME);
-                      }, 1000);
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      setSpinnerAnimation({
-                        status: "idle",
-                        message: "",
-                      });
+                        showMessageSnackbar({
+                          message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+                          type: "error",
+                        });
+                        navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
+                      return ;
+                      }, 4000);
+                      
+                    }
 
-                    });
+
+                    const getCrmModuleAccessData = {
+                      company_id: response.data.company_id,
+                      company_user_id: response.data.id,
+                      requestedby: response.data.id,
+                    };
+  
+                    axios
+                      .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
+                        withCredentials : true
+                      })
+                      .then((response) => {
+                        setAccessModules(response.data);
+                        setSpinnerAnimation({
+                          status: "success",
+                          message: MESSAGE.SUCCESS.LOGGED_IN,
+                        });
+                        showMessageSnackbar({
+                          message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+                          type: "success",
+                        });
+  
+                        setTimeout(() => {
+                            navigate(ROUTES_URL.HOME);
+                        }, 1000);
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                        setSpinnerAnimation({
+                          status: "idle",
+                          message: "",
+                        });
+                      });
+                  }
                 }
               } else {
                 showMessageSnackbar({
@@ -183,6 +210,9 @@ function SignInForm() {
                   mobileNumber: "",
                   status: false,
                   token: "",
+                  isActiveSubscription:false,
+                  subscriptionAllowedUsers:0,
+                  activeUsersInCompany:0
                 });
               }
             })
@@ -197,7 +227,9 @@ function SignInForm() {
                 message: "",
               });
             });
+          
         }
+      
       })
       .catch((error) => {
         console.log(error);
@@ -207,8 +239,33 @@ function SignInForm() {
           message: "",
         });
       });
+      
   };
 
+  //when sign in page loads resets the contexts and local storage
+  useEffect(()=>{
+    setLoginStatus({
+      companyId: 0,
+      companyName: "",
+      createdOn: "",
+      email: "",
+      fullName: "",
+      id: 0,
+      message: "",
+      mobileNumber: "",
+      status: false,
+      token: "",
+      isActiveSubscription:false,
+      subscriptionAllowedUsers:0,
+      activeUsersInCompany:0
+    });
+
+    setAccessModules(
+      []
+    )
+    localStorage.clear();
+
+  },[])
   const handleRememberMeCheckBoxChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

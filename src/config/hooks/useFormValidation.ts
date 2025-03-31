@@ -17,6 +17,10 @@ export type ErrorType = {
   validFrom? :string;
   hsn? :string;
   sac? : string;
+  companyUserCount?: string;
+  monthsToPurchase?: string;
+  companyUserCountForUpdateSubscription?:string
+
 };
 
 export type FormType = 'registered' | 'registration';
@@ -154,7 +158,29 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
             setErrors((prev) => ({ ...prev, sac: "" }));
             }
             break;
+        case "numberOfUsers" :
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
+            setErrors((prev) => ({ ...prev, companyUserCount: "minimum 1 user required"}));
+          }
+          else{
+            setErrors((prev) => ({ ...prev, companyUserCount: "" }));
+          }
+          break;
+        case "monthsToPurchase" :
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
+            setErrors((prev) => ({ ...prev, monthsToPurchase: "minimum 1 month subscription is required"}));
+          }else{
+            setErrors((prev) => ({ ...prev, monthsToPurchase: "" }));
+          }
+          break;
 
+          case "companyUserCountForUpdateSubscription" :
+          if(formType === STRING_VALUES.REGISTRATION && value === "") {
+            setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "minimum 1 user is required"}));
+          }else{
+            setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "" }));
+          }
+          break;
     }
   };
 

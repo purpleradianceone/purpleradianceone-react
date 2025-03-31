@@ -22,27 +22,27 @@ import ProductManagement from "../../components/views/product-Management/Product
 import LeadSettingsPage from "../../components/views/settings/lead-settings/LeadSettingsPage";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
 import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
+import CreateSubscription from "../../components/subscription-module/CreateSubscription";
+import SubscriptionManagement from "../../components/subscription-module/Subscription";
 
 export const router = createBrowserRouter([
   {
     path: ROUTES_URL.NOT_FOUND,
-    element:(
-        <NotFoundPage></NotFoundPage>
-    ),
+    element: <NotFoundPage></NotFoundPage>,
   },
   {
     path: ROUTES_URL.LANDING_PAGE,
     element: (
       <LoggedInRoute>
-      <div className="min-h-screen">
-        <Navbar>
-          <Hero />
-          <Features />
-          <Testimonials />
-          <ContactUs/>
-          <CallToAction />
-        </Navbar>
-      </div>
+        <div className="min-h-screen">
+          <Navbar>
+            <Hero />
+            <Features />
+            <Testimonials />
+            <ContactUs />
+            <CallToAction />
+          </Navbar>
+        </div>
       </LoggedInRoute>
     ),
   },
@@ -123,7 +123,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path : ROUTES_URL.GET_LEAD_MANAGEMENT,
+    path: ROUTES_URL.GET_LEAD_MANAGEMENT,
     element: (
       <PrivateRoute>
         <div>
@@ -136,7 +136,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path : ROUTES_URL.PRODUCT_MANAGEMENT,
+    path: ROUTES_URL.PRODUCT_MANAGEMENT,
     element: (
       <PrivateRoute>
         <div>
@@ -145,7 +145,7 @@ export const router = createBrowserRouter([
           </Navbar>
         </div>
       </PrivateRoute>
-    )
+    ),
   },
   {
     path: ROUTES_URL.LEAD_SETTINGS,
@@ -153,14 +153,14 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <div>
           <Navbar>
-            <LeadSettingsPage/>
+            <LeadSettingsPage />
           </Navbar>
         </div>
       </PrivateRoute>
-    )
+    ),
   },
   {
-    path : ROUTES_URL.TEAM_MANAGEMENT,
+    path: ROUTES_URL.TEAM_MANAGEMENT,
     element: (
       <PrivateRoute>
         <div>
@@ -169,15 +169,44 @@ export const router = createBrowserRouter([
           </Navbar>
         </div>
       </PrivateRoute>
-    )
+    ),
   },
   {
-    path : ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
+    path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
     element: (
       <PrivateRoute>
         <div>
           <Navbar>
-            <ProductTeamManagement/>
+            <ProductTeamManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.CREATE_SUBSCRIPTION,
+    element: (
+      <PrivateRoute>
+        <div>
+          <AuthLayout
+            title="Activate Subscription!"
+            subtitle="Enter the number of users and subscription duration to proceed">
+            <CreateSubscription
+            isOpen = {true}
+            isSubscrptionFromLoginPage= {true}
+            />
+          </AuthLayout>
+        </div>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.GET_SUBSCRIPTION,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <SubscriptionManagement />
           </Navbar>
         </div>
       </PrivateRoute>
