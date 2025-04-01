@@ -9,7 +9,7 @@ import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
 import Button from "../../../ui/Button";
 
 function Navbar({children} : {children : React.ReactNode}){
-  const [isOpen, setIsOpen] = useState<boolean>();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
    const {loginStatus,setLoginStatus} = useLoggedInUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -160,6 +160,9 @@ function Navbar({children} : {children : React.ReactNode}){
               <SideNavBar
                 isOpen={sidebarOpen}
                 onToggle={() => setSidebarOpen(!sidebarOpen)}
+                onNextTab ={()=>{
+                  setSidebarOpen(false)
+                }}
               />
               <div className="ml-4">
                 <span className="text-xl font-semibold"></span>
@@ -257,7 +260,7 @@ function Navbar({children} : {children : React.ReactNode}){
         </div>
       </nav>
       </header>
-      <main className={sidebarOpen ?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
+      <main className={sidebarOpen && !isSmallScreen?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
           {children}
       </main>
       </div>

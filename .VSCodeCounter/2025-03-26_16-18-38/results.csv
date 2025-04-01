@@ -1,0 +1,168 @@
+"filename", "language", "TypeScript", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"d:\CRM Purple\React\purple-crm-react\src\@types\List\GetCompanyUsersListProps.ts", "TypeScript", 13, 0, 0, 0, 2, 15
+"d:\CRM Purple\React\purple-crm-react\src\@types\List\PaginationProps.ts", "TypeScript", 8, 0, 0, 0, 0, 8
+"d:\CRM Purple\React\purple-crm-react\src\@types\List\ProductsManagementListProps.ts", "TypeScript", 15, 0, 0, 0, 3, 18
+"d:\CRM Purple\React\purple-crm-react\src\@types\List\TeamManagementListProps.ts", "TypeScript", 13, 0, 0, 0, 2, 15
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\AddCompanyTeamUsersAgGridProps.ts", "TypeScript", 9, 0, 0, 0, 4, 13
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyProductTeamsAgGridProps.ts", "TypeScript", 9, 0, 0, 0, 2, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyTeamUsersAgGridProps.ts", "TypeScript", 9, 0, 0, 0, 2, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyUserAgGridProps.ts", "TypeScript", 9, 0, 0, 0, 3, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\LeadManagementAgGridProps.ts", "TypeScript", 9, 0, 0, 0, 2, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\PaginationDataProps.ts", "TypeScript", 8, 0, 0, 0, 1, 9
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\ProductTaxManagementAgGridProps.ts", "TypeScript", 6, 0, 0, 0, 2, 8
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\ProductsManagementGridProps.ts", "TypeScript", 10, 0, 0, 0, 2, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\SearchDropDownOptions.ts", "TypeScript", 13, 0, 0, 0, 2, 15
+"d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\TeamManagementAgGridProps.ts", "TypeScript", 15, 0, 0, 0, 2, 17
+"d:\CRM Purple\React\purple-crm-react\src\@types\auth\forms\SignInFormDataType.ts", "TypeScript", 5, 0, 0, 6, 2, 13
+"d:\CRM Purple\React\purple-crm-react\src\@types\auth\forms\SignUpFormDataType.ts", "TypeScript", 8, 0, 0, 4, 1, 13
+"d:\CRM Purple\React\purple-crm-react\src\@types\auth\views\AuthLayoutProps.ts", "TypeScript", 6, 0, 0, 6, 2, 14
+"d:\CRM Purple\React\purple-crm-react\src\@types\auth\views\EmailVerificationType.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\AccessManagementContextType.ts", "TypeScript", 19, 0, 0, 13, 4, 36
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\AccessRightsModalProps.ts", "TypeScript", 16, 0, 0, 0, 1, 17
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\CompanyUser.ts", "TypeScript", 12, 0, 0, 0, 1, 13
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\CompanyUserProps.ts", "TypeScript", 15, 0, 0, 9, 3, 27
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\HandleSearchOptionProps.ts", "TypeScript", 6, 0, 0, 0, 0, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\LoggedInUserContextType.ts", "TypeScript", 16, 0, 0, 10, 3, 29
+"d:\CRM Purple\React\purple-crm-react\src\@types\company-users\ManageCompanyUserContextType.ts", "TypeScript", 8, 0, 0, 0, 4, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\config\RoutesChildrenNode.ts", "TypeScript", 4, 0, 0, 0, 1, 5
+"d:\CRM Purple\React\purple-crm-react\src\@types\dialogue\DialogueProps.ts", "TypeScript", 10, 0, 0, 0, 1, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\error\ApiError.ts", "TypeScript", 11, 0, 0, 0, 1, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\forms\CreatePasswordFormTypes.ts", "TypeScript", 9, 0, 0, 0, 3, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\home\loading-page\LoadingPageProps.ts", "TypeScript", 4, 0, 0, 0, 1, 5
+"d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\NavBarProps.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\SideBarProps.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\SideNavBarItemProps.ts", "TypeScript", 9, 0, 0, 0, 1, 10
+"d:\CRM Purple\React\purple-crm-react\src\@types\lead-management\LeadManagementProps.ts", "TypeScript", 16, 0, 0, 0, 2, 18
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddCompanyUserModalProps.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddCompanyUserStateType.ts", "TypeScript", 6, 0, 0, 0, 0, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddProductModalProps.ts", "TypeScript", 7, 0, 0, 0, 2, 9
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddTeamModalProps.ts", "TypeScript", 6, 0, 0, 0, 1, 7
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\CompanyProductTeamsModalProps.ts", "TypeScript", 7, 0, 0, 0, 3, 10
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\CompanyProductUsersModalProps.ts", "TypeScript", 7, 0, 0, 0, 2, 9
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\CreateCompanyProductCompanyUserModalProps.ts", "TypeScript", 9, 0, 0, 0, 2, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\CreateCompanyProductTaxModalProps.ts", "TypeScript", 8, 0, 0, 0, 2, 10
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyProductModal.ts", "TypeScript", 9, 0, 0, 0, 2, 11
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyTeamModalProps.ts", "TypeScript", 8, 0, 0, 0, 4, 12
+"d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyUserProps.ts", "TypeScript", 8, 0, 0, 0, 2, 10
+"d:\CRM Purple\React\purple-crm-react\src\@types\product-teams-management\CompanyProductTeam.ts", "TypeScript", 13, 0, 0, 9, 11, 33
+"d:\CRM Purple\React\purple-crm-react\src\@types\product-users-management\CompanyProductUser.ts", "TypeScript", 13, 0, 0, 27, 5, 45
+"d:\CRM Purple\React\purple-crm-react\src\@types\product-users-management\CompanyProductUserNotAssigned.ts", "TypeScript", 12, 0, 0, 27, 4, 43
+"d:\CRM Purple\React\purple-crm-react\src\@types\products\ProductTaxManagementProps.ts", "TypeScript", 13, 0, 0, 0, 1, 14
+"d:\CRM Purple\React\purple-crm-react\src\@types\products\ProductsManagementProps.ts", "TypeScript", 19, 0, 0, 14, 4, 37
+"d:\CRM Purple\React\purple-crm-react\src\@types\team-management\AddTeamFormDataState.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\team-management\CompanyTeamListProps.ts", "TypeScript", 11, 0, 0, 8, 2, 21
+"d:\CRM Purple\React\purple-crm-react\src\@types\team-management\CompanyTeamUsers.ts", "TypeScript", 12, 0, 0, 0, 1, 13
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\ButtonProps.ts", "TypeScript", 16, 0, 0, 3, 3, 22
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\DateRangeFilterDropdown.tsx", "TypeScript JSX", 0, 6, 0, 0, 2, 8
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\DateRangePickerProps.ts", "TypeScript", 5, 0, 0, 1, 1, 7
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\FormCheckboxProps.ts", "TypeScript", 6, 0, 0, 6, 2, 14
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\FormInputProps.ts", "TypeScript", 25, 0, 0, 7, 2, 34
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\MessageSnackbarProps.ts", "TypeScript", 17, 0, 0, 0, 4, 21
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\PasswordVisibilityToggleProps.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\RadioButtonProps.ts", "TypeScript", 15, 0, 0, 0, 1, 16
+"d:\CRM Purple\React\purple-crm-react\src\@types\ui\textAreaInputProps.ts", "TypeScript", 18, 0, 0, 0, 1, 19
+"d:\CRM Purple\React\purple-crm-react\src\App.tsx", "TypeScript JSX", 0, 14, 0, 12, 4, 30
+"d:\CRM Purple\React\purple-crm-react\src\assets\animations\EmailSentAnimation.tsx", "TypeScript JSX", 0, 10, 0, 7, 5, 22
+"d:\CRM Purple\React\purple-crm-react\src\assets\animations\LoadingSpinner.tsx", "TypeScript JSX", 0, 9, 0, 0, 5, 14
+"d:\CRM Purple\React\purple-crm-react\src\assets\styles\AuthLayout.css", "CSS", 0, 0, 17, 0, 1, 18
+"d:\CRM Purple\React\purple-crm-react\src\assets\svg\AuthSideSvg.tsx", "TypeScript JSX", 0, 308, 0, 0, 3, 311
+"d:\CRM Purple\React\purple-crm-react\src\assets\svg\Logo.tsx", "TypeScript JSX", 0, 43, 0, 0, 4, 47
+"d:\CRM Purple\React\purple-crm-react\src\assets\svg\Logo2.tsx", "TypeScript JSX", 0, 407, 0, 0, 2, 409
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\AddCompanyTeamUsersAgGrid.tsx", "TypeScript JSX", 0, 85, 0, 2, 12, 99
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyProductTeamsAgGrid.tsx", "TypeScript JSX", 0, 109, 0, 2, 10, 121
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyTeamUsersAgGrid.tsx", "TypeScript JSX", 0, 869, 0, 27, 77, 973
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyUsersAgGrid.tsx", "TypeScript JSX", 0, 224, 0, 4, 19, 247
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\LeadManagementsAgGrid.tsx", "TypeScript JSX", 0, 238, 0, 24, 16, 278
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\Pagination.tsx", "TypeScript JSX", 0, 93, 0, 2, 7, 102
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\ProductTaxManagementAgGrrid.tsx", "TypeScript JSX", 0, 191, 0, 3, 30, 224
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\ProductsManagementAgGrid.tsx", "TypeScript JSX", 0, 323, 0, 4, 20, 347
+"d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\TeamManagementAgGrid.tsx", "TypeScript JSX", 0, 226, 0, 4, 17, 247
+"d:\CRM Purple\React\purple-crm-react\src\components\dialogue-box\Dialogue.tsx", "TypeScript JSX", 0, 57, 0, 0, 11, 68
+"d:\CRM Purple\React\purple-crm-react\src\components\forms\CreatePasswordForm.tsx", "TypeScript JSX", 0, 175, 0, 3, 21, 199
+"d:\CRM Purple\React\purple-crm-react\src\components\forms\ForgotPasswordForm.tsx", "TypeScript JSX", 0, 107, 0, 14, 23, 144
+"d:\CRM Purple\React\purple-crm-react\src\components\forms\SignInForm.tsx", "TypeScript JSX", 0, 272, 0, 0, 30, 302
+"d:\CRM Purple\React\purple-crm-react\src\components\forms\SignUpForm.tsx", "TypeScript JSX", 0, 232, 0, 0, 16, 248
+"d:\CRM Purple\React\purple-crm-react\src\components\lists\CompanyUsersList.tsx", "TypeScript JSX", 0, 326, 0, 6, 30, 362
+"d:\CRM Purple\React\purple-crm-react\src\components\lists\LeadManagementList.tsx", "TypeScript JSX", 0, 69, 0, 1, 14, 84
+"d:\CRM Purple\React\purple-crm-react\src\components\lists\ProductsManagementsList.tsx", "TypeScript JSX", 0, 348, 0, 5, 40, 393
+"d:\CRM Purple\React\purple-crm-react\src\components\lists\TeamManagementList.tsx", "TypeScript JSX", 0, 287, 0, 7, 33, 327
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-team\CompanyProductTeamsModal.tsx", "TypeScript JSX", 0, 526, 0, 18, 52, 596
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-user\CompanyProductUsersModal.tsx", "TypeScript JSX", 0, 46, 0, 1, 8, 55
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\AddCompanyUserModal.tsx", "TypeScript JSX", 0, 229, 0, 3, 19, 251
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\CompanyUserAccessManagementModal.tsx", "TypeScript JSX", 0, 391, 0, 7, 39, 437
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\EditCompanyUserModal.tsx", "TypeScript JSX", 0, 258, 0, 2, 20, 280
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\leads\CreateLeadModal.tsx", "TypeScript JSX", 0, 181, 0, 11, 35, 227
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\products\AddProductModal.tsx", "TypeScript JSX", 0, 335, 0, 1, 26, 362
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\products\CreateCompanyProductCompanyUserModal.tsx", "TypeScript JSX", 0, 189, 0, 6, 16, 211
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\products\CreateCompanyProductTaxModal.tsx", "TypeScript JSX", 0, 260, 0, 2, 24, 286
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\products\EditProductModal.tsx", "TypeScript JSX", 0, 416, 0, 5, 44, 465
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\teams\AddTeamModal.tsx", "TypeScript JSX", 0, 363, 0, 8, 43, 414
+"d:\CRM Purple\React\purple-crm-react\src\components\modals\teams\EditCompanyTeamModal.tsx", "TypeScript JSX", 0, 240, 0, 2, 24, 266
+"d:\CRM Purple\React\purple-crm-react\src\components\tabs\LeadSettingsTabs.tsx", "TypeScript JSX", 0, 168, 0, 5, 14, 187
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\ActionsDropdownButton.tsx", "TypeScript JSX", 0, 13, 0, 0, 2, 15
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\Button.tsx", "TypeScript JSX", 0, 46, 0, 6, 6, 58
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\DatePickerInput.tsx", "TypeScript JSX", 0, 32, 0, 0, 5, 37
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\DateRangeFilterDropdown.tsx", "TypeScript JSX", 0, 84, 0, 0, 8, 92
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\DateRangePicker.tsx", "TypeScript JSX", 0, 54, 0, 3, 13, 70
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\FormCheckbox.tsx", "TypeScript JSX", 0, 18, 0, 12, 3, 33
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\FormInput.tsx", "TypeScript JSX", 0, 54, 0, 20, 5, 79
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\Link.tsx", "TypeScript JSX", 0, 13, 0, 0, 3, 16
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\MessageSnackbar.tsx", "TypeScript JSX", 0, 40, 0, 1, 6, 47
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\OtpInput.tsx", "TypeScript JSX", 0, 86, 0, 5, 9, 100
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\PasswordVisibilityToggle.tsx", "TypeScript JSX", 0, 18, 0, 0, 4, 22
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\ProductDropdown.tsx", "TypeScript JSX", 0, 89, 0, 0, 13, 102
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\RadioButton.tsx", "TypeScript JSX", 0, 34, 0, 0, 5, 39
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\SearchInput.tsx", "TypeScript JSX", 0, 14, 0, 0, 5, 19
+"d:\CRM Purple\React\purple-crm-react\src\components\ui\TextAreaInput.tsx", "TypeScript JSX", 0, 33, 0, 0, 3, 36
+"d:\CRM Purple\React\purple-crm-react\src\components\views\auth\AuthLayout.tsx", "TypeScript JSX", 0, 47, 0, 25, 9, 81
+"d:\CRM Purple\React\purple-crm-react\src\components\views\auth\EmailVerificationLayout.tsx", "TypeScript JSX", 0, 114, 0, 3, 18, 135
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\CallToAction.tsx", "TypeScript JSX", 0, 24, 0, 0, 2, 26
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\ContactUs.tsx", "TypeScript JSX", 0, 26, 0, 0, 3, 29
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Features.tsx", "TypeScript JSX", 0, 68, 0, 0, 4, 72
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Hero.tsx", "TypeScript JSX", 0, 44, 0, 0, 3, 47
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Testimonials.tsx", "TypeScript JSX", 0, 65, 0, 0, 5, 70
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\Navbar.tsx", "TypeScript JSX", 0, 224, 0, 18, 27, 269
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\SideNavBar.tsx", "TypeScript JSX", 0, 127, 0, 0, 22, 149
+"d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\SideNavBarItem.tsx", "TypeScript JSX", 0, 186, 0, 0, 9, 195
+"d:\CRM Purple\React\purple-crm-react\src\components\views\lead-management\LeadManagement.tsx", "TypeScript JSX", 0, 34, 0, 0, 13, 47
+"d:\CRM Purple\React\purple-crm-react\src\components\views\manage-company-users\CompanyUsersManagement.tsx", "TypeScript JSX", 0, 166, 0, 4, 16, 186
+"d:\CRM Purple\React\purple-crm-react\src\components\views\not-found\AccessDeniedPage.tsx", "TypeScript JSX", 0, 47, 0, 0, 8, 55
+"d:\CRM Purple\React\purple-crm-react\src\components\views\not-found\NotFoundPage.tsx", "TypeScript JSX", 0, 41, 0, 0, 9, 50
+"d:\CRM Purple\React\purple-crm-react\src\components\views\product-Management\ProductsManagement.tsx", "TypeScript JSX", 0, 213, 0, 4, 21, 238
+"d:\CRM Purple\React\purple-crm-react\src\components\views\product-team-management\ProductTeamManagement.tsx", "TypeScript JSX", 0, 181, 0, 5, 19, 205
+"d:\CRM Purple\React\purple-crm-react\src\components\views\settings\lead-settings\LeadSettingsPage.tsx", "TypeScript JSX", 0, 20, 0, 0, 7, 27
+"d:\CRM Purple\React\purple-crm-react\src\components\views\team-management\TeamManagement.tsx", "TypeScript JSX", 0, 175, 0, 3, 21, 199
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useAccessModules.ts", "TypeScript", 126, 0, 0, 8, 28, 162
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useCompanySpecificDateRange.ts", "TypeScript", 57, 0, 0, 2, 10, 69
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useDateRangeIdChange.ts", "TypeScript", 43, 0, 0, 0, 6, 49
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useFormChange.ts", "TypeScript", 37, 0, 0, 1, 8, 46
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useFormValidation.ts", "TypeScript", 182, 0, 0, 2, 31, 215
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\usePaginationHandler.ts", "TypeScript", 133, 0, 0, 4, 24, 161
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useRecaptcha.ts", "TypeScript", 30, 0, 0, 0, 10, 40
+"d:\CRM Purple\React\purple-crm-react\src\config\hooks\useScreenSize.ts", "TypeScript", 18, 0, 0, 0, 7, 25
+"d:\CRM Purple\React\purple-crm-react\src\config\routes\LoggedInRoute.tsx", "TypeScript JSX", 0, 10, 0, 0, 5, 15
+"d:\CRM Purple\React\purple-crm-react\src\config\routes\PrivateRoute.tsx", "TypeScript JSX", 0, 10, 0, 1, 5, 16
+"d:\CRM Purple\React\purple-crm-react\src\config\routes\Route.tsx", "TypeScript JSX", 0, 183, 0, 0, 5, 188
+"d:\CRM Purple\React\purple-crm-react\src\config\validations\RefreshToken.ts", "TypeScript", 36, 0, 0, 4, 6, 46
+"d:\CRM Purple\React\purple-crm-react\src\config\validations\ValidateEmail.ts", "TypeScript", 6, 0, 0, 0, 2, 8
+"d:\CRM Purple\React\purple-crm-react\src\config\validations\ValidateMobileNumber.ts", "TypeScript", 6, 0, 0, 0, 2, 8
+"d:\CRM Purple\React\purple-crm-react\src\constants\AppConstants.ts", "TypeScript", 47, 0, 0, 0, 15, 62
+"d:\CRM Purple\React\purple-crm-react\src\constants\AppModules.ts", "TypeScript", 10, 0, 0, 0, 1, 11
+"d:\CRM Purple\React\purple-crm-react\src\constants\ClassNames.ts", "TypeScript", 5, 0, 0, 0, 0, 5
+"d:\CRM Purple\React\purple-crm-react\src\constants\Colors.ts", "TypeScript", 9, 0, 0, 0, 3, 12
+"d:\CRM Purple\React\purple-crm-react\src\constants\Events.ts", "TypeScript", 4, 0, 0, 0, 1, 5
+"d:\CRM Purple\React\purple-crm-react\src\constants\ImageSource.ts", "TypeScript", 4, 0, 0, 0, 2, 6
+"d:\CRM Purple\React\purple-crm-react\src\constants\Keys.ts", "TypeScript", 4, 0, 0, 0, 1, 5
+"d:\CRM Purple\React\purple-crm-react\src\constants\LocalStorage.ts", "TypeScript", 8, 0, 0, 0, 0, 8
+"d:\CRM Purple\React\purple-crm-react\src\constants\Messages.ts", "TypeScript", 30, 0, 0, 0, 2, 32
+"d:\CRM Purple\React\purple-crm-react\src\constants\Pagination.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"d:\CRM Purple\React\purple-crm-react\src\constants\PostApi.ts", "TypeScript", 37, 0, 0, 0, 1, 38
+"d:\CRM Purple\React\purple-crm-react\src\constants\Regex.ts", "TypeScript", 6, 0, 0, 0, 1, 7
+"d:\CRM Purple\React\purple-crm-react\src\constants\Routes.ts", "TypeScript", 19, 0, 0, 0, 2, 21
+"d:\CRM Purple\React\purple-crm-react\src\constants\TestData.ts", "TypeScript", 329, 0, 0, 0, 13, 342
+"d:\CRM Purple\React\purple-crm-react\src\context\user\AccessManagementContext.tsx", "TypeScript JSX", 0, 46, 0, 1, 7, 54
+"d:\CRM Purple\React\purple-crm-react\src\context\user\LoggedInUserContext.tsx", "TypeScript JSX", 0, 46, 0, 1, 6, 53
+"d:\CRM Purple\React\purple-crm-react\src\index.css", "CSS", 0, 0, 35, 0, 7, 42
+"d:\CRM Purple\React\purple-crm-react\src\main.tsx", "TypeScript JSX", 0, 6, 0, 5, 7, 18
+"d:\CRM Purple\React\purple-crm-react\src\vite-env.d.ts", "TypeScript", 7, 0, 0, 1, 4, 12
+"Total", "-", 1818, 11361, 52, 487, 1473, 15191

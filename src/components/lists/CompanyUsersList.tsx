@@ -1,13 +1,9 @@
 import { Users, UserPlus, Calendar, Filter, X } from "lucide-react";
-
-import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import Button from "../ui/Button";
 import { useState } from "react";
 import Pagination from "../ag-grid/Pagination";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
-import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
 import CompanyUser from "../../@types/company-users/CompanyUser";
@@ -22,6 +18,7 @@ import {
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
 
 function GetCompanyUsersList({
   users,
@@ -30,14 +27,7 @@ function GetCompanyUsersList({
   onStartDateChange,
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
-}: {
-  users: companyUsersSearchProps[];
-  paginationData: PaginationDataProps;
-  handleSearchOption: HandleSearchOptionProps;
-  onStartDateChange: (date: Date) => void;
-  onEndDateChange: (date: Date) => void;
-  handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
-}) {
+}: GetCompanyUsersListProps) {
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
     false
   );
@@ -117,6 +107,7 @@ function GetCompanyUsersList({
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
                     onChange={(e) => {
+                      
                       handleSearchOption.handleSearchParameterChange(
                         e.target.value
                       );
@@ -160,6 +151,7 @@ function GetCompanyUsersList({
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
+                    
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value
                     );

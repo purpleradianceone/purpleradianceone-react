@@ -6,7 +6,6 @@ import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Trash2 } from "lucide-react";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import { AgGridReact } from "ag-grid-react";
-import ProductTax from "../../@types/products/ProductTaxManagementProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
@@ -20,15 +19,13 @@ import { DialogueBox } from "../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import useScreenSize from "../../config/hooks/useScreenSize";
+import ProductTaxManagementAgGridProps from "../../@types/ag-grid/ProductTaxManagementAgGridProps";
 
 
 function ProductTaxManagementAgGrid({
     productTax,
     handleCompanyProductTaxChange,
-} : {
-    productTax: ProductTax[]
-    handleCompanyProductTaxChange : (status : boolean) => void,
-}) {
+} : ProductTaxManagementAgGridProps) {
 
   const {isSmallScreen} = useScreenSize();
 

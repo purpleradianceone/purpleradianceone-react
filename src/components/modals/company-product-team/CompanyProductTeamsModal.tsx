@@ -2,8 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditIcon, Network, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../constants/AppConstants";
-import { Product } from "../../../@types/products/ProductsManagementProps";
+import {
+  NUMBER_VALUES,
+  SIZE,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import CompanyProductTeamsAgGrid from "../../ag-grid/CompanyProductTeamsAgGrid";
 import TeamManagementAgGrid from "../../ag-grid/TeamManagementAgGrid";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -16,63 +19,100 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyTeamSearchProps from "../../../@types/team-management/CompanyTeamListProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import Button from "../../ui/Button";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
-
+import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductTeamsModalProps";
+import SearchInput from "../../ui/SearchInput";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
   companyProduct,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  companyProduct: Product;
-}) {
+}: CompanyProductTeamsModalProps) {
   const { isSmallScreen } = useScreenSize();
-  const { userHasAccessToViewProductTeam, userHasAccessToViewTeamManagement ,userHasAccessToAddProductTeam} =
-    useUserAccessModules();
+  const {
+    userHasAccessToViewProductTeam,
+    userHasAccessToViewTeamManagement,
+    userHasAccessToAddProductTeam,
+  } = useUserAccessModules();
 
   const [companyProductTeamsList, setCompanyProductsTeamsList] = useState<
     CompanyProductTeam[]
   >([]);
-  const [companyTeamList, setCompanyTeamList] = useState<
-    CompanyTeamSearchProps[]
-  >([]);
-  const [isCompanyTeamsReadyToFetch, setIsCompanyTeamsReadyToFetch] =
-    useState<boolean>(false);
-      const [isLoading, setIsLoading] = useState(false);
-        const [hasMore, setHasMore] = useState(true);
-        const fetchingRef = useRef(false);
-        const gridApiRef = useRef<GridApi | null>(null);
-        const lastScrollPositionRef = useRef<number>(0);
 
-        const [companyTeamsFetchedCount,setCompanyTeamsFetchedCount] = useState<number>(0);
+  const [companyTeamsNotAssignedList, setCompanyTeamsNotAssignedList] =
+    useState<CompanyTeamSearchProps[]>([]);
+  const [
+    isCompanyTeamsNotAssignedReadyToFetch,
+    setIsCompanyTeamsNotAssignedReadyToFetch,
+  ] = useState<boolean>(false);
+  const [
+    isCompanyTeamsNotAssignedLoading,
+    setIsCompanyTeamsNotAssignedLoading,
+  ] = useState(false);
+  const [companyTeamsNotAssignedHasMore, setCompanyTeamsNotAssignedHasMore] =
+    useState(true);
+  const companyTeamsNotAssignedFetchingRef = useRef(false);
+  const companyTeamsNotAssignedGridApiRef = useRef<GridApi | null>(null);
+  const companyTeamsNotAssignedLastScrollPositionRef = useRef<number>(0);
+  const companyTeamsNotassignedSearchParameterRef = useRef<string>("");
+
+  const [
+    isCompanyProductTeamsFetchedForFirstTime,
+    setIsCompanyProductTeamsFetchedForFirstTime,
+  ] = useState<boolean>(true);
+
+  const [
+    companyTeamsNotAssignedFetchedCount,
+    setCompanyTeamsNotAssignedFetchedCount,
+  ] = useState<number>(0);
+  const [companyProductTeamsFetchedCount, setCompanyProductTeamsFetchedCount] =
+    useState<number>(0);
+
+  const [isCompanyProductTeamsLoading, setIsCompanyProductTeamsLoading] =
+    useState<boolean>(false);
+  const [companyProductTeamsHasMore, setCompanyProductTeamsHasMore] =
+    useState<boolean>(true);
+  const companyProductTeamsFetchingRef = useRef(false);
+  const companyProductTeamsGridApiRef = useRef<GridApi | null>(null);
+  const companyProductTeamsLastScrollPositionRef = useRef<number>(0);
+  const companyProductTeamsSearchParamterRef = useRef<string>("");
 
   const { loginStatus } = useLoggedInUserContext();
 
   const [addCompanyProductTeamArray, setAddCompanyProductTeamArray] = useState<
     number[]
   >([]);
+  const [companyProductTeamAddCount, setCompanyProductTeamAddCount] =
+    useState<number>(0);
 
-  const [companyProductTeamUpdateCount,setCompanyProductTeamUpdateCount] = useState<number>(0);
-  const [companyProdustTeamAddCount,setCompanyProductTeamAddCount] = useState<number>(0);
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
-  
-      const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-        open: false,
-        message: "",
-        type: "success",
-      });
-    
-      const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-        setMessageSnackbar({ open: true, message, type });
-      };
-    
-      const handleMessageSnackbarClose = () => {
-        setMessageSnackbar((prev) => ({ ...prev, open: false }));
-      };
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
+  const handleCompanyProductTeamUpdate = (message: string) => {
+    showMessageSnackbar({ message: message, type: "success" });
+  };
+
+  const handleAddCompanyProductTeamChange = () => {
+    setCompanyProductTeamAddCount(companyProductTeamAddCount + 1);
+    setCompanyProductTeamsFetchedCount(0);
+    setCompanyProductTeamsHasMore(true);
+    setCompanyProductsTeamsList([]);
+  };
 
   const handleCompanyTeamCheckboxChange = (
     params: CompanyTeamSearchProps,
@@ -89,218 +129,468 @@ function CompanyProductTeamsModal({
     }
   };
 
-const handleAddCompanyProductTeam = async() => {
-  if(userHasAccessToAddProductTeam){
-    const createCompanyProductTeamPostData = {
-      company_id : loginStatus.companyId,
-      company_product_id : companyProduct.id,
-      company_team_array : addCompanyProductTeamArray,
-      createdby : loginStatus.id,
-    }
-    await axios.post(POST_API.CREATE_COMPANY_PRODUCT_TEAM,createCompanyProductTeamPostData,{
-      withCredentials : true
-    })
-    .then((response) => {
-      if(response.data.status && response.data){
-        setCompanyProductTeamAddCount(companyProdustTeamAddCount + 1);
-        showMessageSnackbar({message : response.data.message,type : "success"});
-        const updatedCompanyTeams = companyTeamList.filter((team) => !addCompanyProductTeamArray.includes(team.id));
-        setCompanyTeamList(updatedCompanyTeams);
-      }
-    })
-    .catch(async (error : ApiError | any) => {
-      if(error.status === STATUS_CODE.UNATHORISED){
-        const refreshTokenResponse = await RefreshToken({callFunction:handleAddCompanyProductTeam});
-
-        if(refreshTokenResponse){
-          handleAddCompanyProductTeam();
-        }
-      }
-    })
-  }
-}
-
-  const fetchCompanyProductTeams = async () => {
-    if (userHasAccessToViewProductTeam) {
-      setCompanyProductsTeamsList([]);
-      const getCompanyProductTeamsPostData = {
+  const handleAddCompanyProductTeam = async () => {
+    if (userHasAccessToAddProductTeam) {
+      const createCompanyProductTeamPostData = {
         company_id: loginStatus.companyId,
         company_product_id: companyProduct.id,
-        requestedby: loginStatus.id,
+        company_team_array: addCompanyProductTeamArray,
+        createdby: loginStatus.id,
       };
-      axios
+      await axios
         .post(
-          POST_API.GET_COMPANY_PRODUCT_TEAMS,
-          getCompanyProductTeamsPostData,
+          POST_API.CREATE_COMPANY_PRODUCT_TEAM,
+          createCompanyProductTeamPostData,
           {
             withCredentials: true,
           }
         )
         .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            setIsCompanyTeamsReadyToFetch(true);
-            response.data.map((res: any) => {
-              setCompanyProductsTeamsList((prev) => [
-                ...prev,
-                {
-                  id: res.id,
-                  companyProductId: res.company_product_id,
-                  productName: res["Product Name"],
-                  productCode: res["Product Code"],
-                  companyTeamId: res.company_team_id,
-                  teamName: res["Team Name"],
-                  isActive: res.isactive,
-                  createdBy: res.createdby,
-                  createdOn: res.createdon,
-                },
-              ]);
+          if (response.data.status && response.data) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "success",
+            });
+            const updatedCompanyTeams = companyTeamsNotAssignedList.filter(
+              (team) => !addCompanyProductTeamArray.includes(team.id)
+            );
+            setCompanyTeamsNotAssignedList(updatedCompanyTeams);
+            setCompanyProductsTeamsList([]);
+            handleAddCompanyProductTeamChange();
+            setCompanyProductTeamsFetchedCount(0);
+            setIsCompanyProductTeamsLoading(false);
+            setAddCompanyProductTeamArray([]);
+          } else if (!response.data.status) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "error",
             });
           }
         })
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
-              callFunction: fetchCompanyProductTeams,
+              callFunction: handleAddCompanyProductTeam,
             });
+
             if (refreshTokenResponse) {
-              fetchCompanyProductTeams();
+              handleAddCompanyProductTeam();
             }
           }
         });
     }
   };
 
-  const fetchCompanyTeams = async () => {
-    if (!userHasAccessToViewTeamManagement || isLoading || !hasMore || fetchingRef.current) return;
+  const fetchCompanyProductTeams = async (
+    companyProductTeamsSearchParameter: string
+  ) => {
+    if (
+      !userHasAccessToViewProductTeam ||
+      isCompanyProductTeamsLoading ||
+      (!companyProductTeamsHasMore &&
+        companyProductTeamsSearchParameter.length === 0) ||
+      companyProductTeamsFetchingRef.current
+    )
+      return;
 
     try {
-      fetchingRef.current = true;
-      setIsLoading(true);
+      companyProductTeamsSearchParamterRef.current =
+        companyProductTeamsSearchParameter;
+      companyProductTeamsFetchingRef.current = true;
+      setIsCompanyProductTeamsLoading(true);
 
       // Save current scroll position before fetching
-      if (gridApiRef.current) {
-        const rowIndex = gridApiRef.current.getLastDisplayedRowIndex();
+      if (companyProductTeamsGridApiRef.current) {
+        const rowIndex =
+          companyProductTeamsGridApiRef.current.getLastDisplayedRowIndex();
         if (rowIndex !== null) {
-          lastScrollPositionRef.current = rowIndex ;
+          companyProductTeamsLastScrollPositionRef.current = rowIndex;
         }
       }
 
-   
+      const getCompanyProductTeamsPostData = {
+        company_id: loginStatus.companyId,
+        company_product_id: companyProduct.id,
+        company_team_id: 0,
+        isactive: null,
+        search_company_specific_date_range_id: 0,
+        search_parameter: companyProductTeamsSearchParameter,
+        search_parameter_date: "",
+        offset:
+          companyProductTeamsSearchParameter.length > 0
+            ? 0
+            : 40 * companyProductTeamsFetchedCount,
+        limit: companyProductTeamsSearchParameter.length > 0 ? 0 : 40,
+        requestedby: loginStatus.id,
+      };
+      const response = await axios.post(
+        POST_API.GET_COMPANY_PRODUCT_TEAMS,
+        getCompanyProductTeamsPostData,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === STATUS_CODE.OK) {
+        const newCompanyProductTeams = response.data;
+        if (isCompanyProductTeamsFetchedForFirstTime) {
+          setIsCompanyTeamsNotAssignedReadyToFetch(true);
+        }
+        if (companyProductTeamsSearchParameter.length === 0) {
+          setCompanyProductTeamsFetchedCount(
+            companyProductTeamsFetchedCount + 1
+          );
+        }
+        setIsCompanyProductTeamsFetchedForFirstTime(false);
+
+        if (newCompanyProductTeams.length === 0) {
+          console.log("condition 1");
+          setCompanyProductTeamsHasMore(false);
+        }
+        if(companyProductTeamsSearchParameter.length === 0){
+          newCompanyProductTeams.map((res: any) => {
+            setCompanyProductsTeamsList((prev) => [
+              ...prev,
+              {
+                count: res.count,
+                id: res.id,
+                companyProductId: res.company_product_id,
+                productName: res["Product Name"],
+                productCode: res["Product Code"],
+                companyTeamId: res.company_team_id,
+                teamName: res["Team Name"],
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                createdOn: res.createdon,
+              },
+            ]);
+          });
+        }
+        else if(companyProductTeamsSearchParameter.length > 0){
+          const transformedData = newCompanyProductTeams.map((res: any) => ({
+            count: res.count,
+                id: res.id,
+                companyProductId: res.company_product_id,
+                productName: res["Product Name"],
+                productCode: res["Product Code"],
+                companyTeamId: res.company_team_id,
+                teamName: res["Team Name"],
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                createdOn: res.createdon,
+          }));
+          setCompanyProductsTeamsList(transformedData);
+        }
+        
+
+        if (
+          companyProductTeamsGridApiRef.current &&
+          companyProductTeamsLastScrollPositionRef.current > 0
+        ) {
+          setTimeout(() => {
+            if (companyProductTeamsGridApiRef.current) {
+              companyProductTeamsGridApiRef.current.ensureIndexVisible(
+                companyProductTeamsLastScrollPositionRef.current - 11
+              );
+            }
+          }, 150);
+        }
+
+        if (
+          newCompanyProductTeams[0]?.count &&
+          companyProductTeamsList.length + newCompanyProductTeams.length >=
+            newCompanyProductTeams[0].count
+        ) {
+          console.log("condition 2");
+          // add flag to set has more like company users
+          setCompanyProductTeamsHasMore(false);
+        }
+      }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchCompanyProductTeams,
+        });
+        if (refreshTokenResponse) {
+          fetchCompanyProductTeams("");
+        }
+      }
+    } finally {
+      if (companyProductTeamsSearchParameter.length > 0) {
+        setCompanyProductTeamsHasMore(true);
+        setIsCompanyProductTeamsLoading(false);
+        companyProductTeamsFetchingRef.current = false;
+        if (companyProductTeamsSearchParamterRef.current.length === 1) {
+          companyProductTeamsGridApiRef.current = null;
+          companyProductTeamsLastScrollPositionRef.current = 0;
+          setCompanyProductTeamsFetchedCount(0);
+        }
+      } else if (companyProductTeamsSearchParameter.length === 0) {
+        setIsCompanyProductTeamsLoading(false);
+        companyProductTeamsFetchingRef.current = false;
+      }
+    }
+  };
+
+  const fetchCompanyTeamsNotAssigned = async (companyTeamsNotAssignedSearchParameter : string) => {
+    if (
+      !userHasAccessToViewTeamManagement ||
+      isCompanyTeamsNotAssignedLoading ||
+      !companyTeamsNotAssignedHasMore ||
+      companyTeamsNotAssignedFetchingRef.current
+    )
+      return;
+
+    try {
+      companyTeamsNotassignedSearchParameterRef.current = companyTeamsNotAssignedSearchParameter;
+      companyTeamsNotAssignedFetchingRef.current = true;
+      setIsCompanyTeamsNotAssignedLoading(true);
+
+      // Save current scroll position before fetching
+      if (companyTeamsNotAssignedGridApiRef.current) {
+        const rowIndex =
+          companyTeamsNotAssignedGridApiRef.current.getLastDisplayedRowIndex();
+        if (rowIndex !== null) {
+          companyTeamsNotAssignedLastScrollPositionRef.current = rowIndex;
+        }
+      }
+
       const getCompanyTeamsPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        limit: 20,
-        offset : 20 * companyTeamsFetchedCount,
+        company_product_id: companyProduct.id,
+        isactive: null,
+        limit: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40,
+        offset: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40 * companyTeamsNotAssignedFetchedCount,
         searcsearch_company_specific_date_range_id: 0,
-        search_parameter: "",
+        search_parameter: companyTeamsNotAssignedSearchParameter,
         search_parameter_date: "",
       };
-      const response = await axios.post(POST_API.GET_COMPANY_TEAM, getCompanyTeamsPostData, {
+      const response = await axios.post(
+        POST_API.GET_COMPANY_PRODUCT_TEAMS_NOT_ASSIGNED,
+        getCompanyTeamsPostData,
+        {
           withCredentials: true,
-        })
-        if(response.data) {
-          setCompanyTeamsFetchedCount(companyTeamsFetchedCount+1);
-          const newcompanyTeams = response.data;
-
-          if (newcompanyTeams.length === 0) {
-              setHasMore(false);
-              return;
-          }
-          
-          const uniqueCompanyTeams = [...companyTeamList, ...newcompanyTeams]; // Corrected concatenation
-          const filteredCompanyTeams = uniqueCompanyTeams.filter(
-              (team) => {
-                  return companyProductTeamsList.every(
-                      (productTeam) => productTeam.companyTeamId !== team.id
-                  );
-              }
+        }
+      );
+      if (response.data) {
+        if(companyTeamsNotAssignedSearchParameter.length === 0){
+          setCompanyTeamsNotAssignedFetchedCount(
+            companyTeamsNotAssignedFetchedCount + 1
           );
-          setCompanyTeamList(filteredCompanyTeams);
-            
-          
-
-                // Restore scroll position after data update
-        if (gridApiRef.current && lastScrollPositionRef.current > 0) {
-          
-          setTimeout(() => {
-           
-              if(gridApiRef.current){
-                  gridApiRef.current.ensureIndexVisible(lastScrollPositionRef.current-11);
-              }
-          }, 150);
-      }
-      if (newcompanyTeams[0]?.count && companyTeamList.length + newcompanyTeams.length >= newcompanyTeams[0].count) {
-        setHasMore(false);
-      }
         }
-       
-    }
-    catch(error : ApiError | any){
-      if(error.status === STATUS_CODE.UNATHORISED){
-        const refreshTokenResponse = await RefreshToken({callFunction:fetchCompanyTeams});
-
-        if(refreshTokenResponse){
-          fetchCompanyTeams();
-        }
-      }
-    }
-    finally {
-      setIsLoading(false);
-      fetchingRef.current = false;
-    }
-  };
-
-   const handleViewPortChanged = (params: ViewportChangedEvent) => {
-        if (!companyTeamList.length || !hasMore) return;
-    
-        // Store the grid API reference
-        if (!gridApiRef.current && params.api) {
-          gridApiRef.current = params.api;
-        }
-    
-        const lastVisibleRow = params.lastRow;
-        const totalRowCount = companyTeamList[0]?.count;
         
-        if (totalRowCount && lastVisibleRow >= companyTeamList.length -1) {
-          
-          fetchCompanyTeams();
+        const newcompanyTeams = response.data;
+
+        if (newcompanyTeams.length === 0) {
+          setCompanyTeamsNotAssignedHasMore(false);
+          return;
         }
-      };
- const onGridReady = (params: { api: GridApi }) => {
-      gridApiRef.current = params.api;
+        if(companyTeamsNotAssignedSearchParameter.length === 0){
+          newcompanyTeams.map((team: any) => {
+            setCompanyTeamsNotAssignedList((prev) => [
+              ...prev,
+              {
+                count: team.count,
+                id: team.id,
+                companyId: team.company_id,
+                name: team.name,
+                description: team.description,
+                isActive: team.isactive,
+                createdBy: team.createdby,
+                createdOn: team.createdon,
+              },
+            ]);
+          });
+        }
+        else if(companyTeamsNotAssignedSearchParameter.length > 0){
+          const transformedData : CompanyTeamSearchProps[]  = newcompanyTeams.map((team: any) => ({
+                count: team.count,
+                id: team.id,
+                companyId: team.company_id,
+                name: team.name,
+                description: team.description,
+                isActive: team.isactive,
+                createdBy: team.createdby,
+                createdOn: team.createdon,
+          }));
+
+          setCompanyTeamsNotAssignedList(transformedData);
+        }
+        
+        // "count": 25,
+        // "id": 36,
+        // "company_id": 1,
+        // "name": "Thirty Seven",
+        // "description": "This IS thirty seven team",
+        // "isactive": true,
+        // "createdby": "PurpleRadiance Pvt LTD",
+        // "createdon": "Mar 17, 2025"
+
+        // Restore scroll position after data update
+        if (
+          companyTeamsNotAssignedGridApiRef.current &&
+          companyTeamsNotAssignedLastScrollPositionRef.current > 0
+        ) {
+          setTimeout(() => {
+            if (companyTeamsNotAssignedGridApiRef.current) {
+              companyTeamsNotAssignedGridApiRef.current.ensureIndexVisible(
+                companyTeamsNotAssignedLastScrollPositionRef.current - 11
+              );
+            }
+          }, 150);
+        }
+        if (
+          newcompanyTeams[0]?.count &&
+          companyTeamsNotAssignedList.length + newcompanyTeams.length >=
+            newcompanyTeams[0].count
+        ) {
+          setCompanyTeamsNotAssignedHasMore(false);
+        }
+      }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchCompanyTeamsNotAssigned,
+        });
+
+        if (refreshTokenResponse) {
+          fetchCompanyTeamsNotAssigned("");
+        }
+      }
+    } finally {
+      if(companyTeamsNotAssignedSearchParameter.length > 0){
+        setIsCompanyTeamsNotAssignedLoading(false);
+        companyTeamsNotAssignedFetchingRef.current = false;
+        setCompanyTeamsNotAssignedHasMore(true);
+        if(companyTeamsNotassignedSearchParameterRef.current.length === 1){
+          setCompanyTeamsNotAssignedFetchedCount(0);
+          companyProductTeamsGridApiRef.current = null;
+      companyProductTeamsLastScrollPositionRef.current = 0;
+        }
+      }
+      else if(companyTeamsNotAssignedSearchParameter.length === 0){
+        setIsCompanyTeamsNotAssignedLoading(false);
+        companyTeamsNotAssignedFetchingRef.current = false;
+      }
+      
+    }
   };
 
-  const handleCompanyProductTeamUpdate = (message : string) => {
-    setCompanyProductTeamUpdateCount(companyProductTeamUpdateCount + 1);
-    showMessageSnackbar({message : message,type:"success"});
-  }
+  const handleCompanyTeamsNotAssignedViewPortChanged = (
+    params: ViewportChangedEvent
+  ) => {
+    if (!companyTeamsNotAssignedList.length || !companyTeamsNotAssignedHasMore)
+      return;
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchCompanyProductTeams();
-    } 
-  }, [isOpen,companyProductTeamUpdateCount,companyProdustTeamAddCount]);
-
-  useEffect(() => {
-    if (
-      isOpen &&
-      companyTeamList.length === 0 &&
-      (companyProductTeamsList.length > 0 || isCompanyTeamsReadyToFetch)
-    ) {
-      fetchCompanyTeams();
-    }else if (!isOpen) {
-      setCompanyTeamList([]);
-      setAddCompanyProductTeamArray([]);
-      setHasMore(true);
-      fetchingRef.current = false;
-      gridApiRef.current = null;
-      lastScrollPositionRef.current = 0;
-      setCompanyTeamsFetchedCount(0);
-      setIsCompanyTeamsReadyToFetch(false);
-      handleMessageSnackbarClose();
-      // setIsLoading(false);
+    // Store the grid API reference
+    if (!companyTeamsNotAssignedGridApiRef.current && params.api) {
+      companyTeamsNotAssignedGridApiRef.current = params.api;
     }
-  }, [isCompanyTeamsReadyToFetch, companyProductTeamsList.length, isOpen]);
+
+    const lastVisibleRow = params.lastRow;
+    const totalRowCount = companyTeamsNotAssignedList[0]?.count;
+
+    if (
+      totalRowCount &&
+      lastVisibleRow >= companyTeamsNotAssignedList.length - 1 && 
+      companyTeamsNotassignedSearchParameterRef.current.length === 0
+    ) {
+      fetchCompanyTeamsNotAssigned("");
+    }
+  };
+  const companyTeamsNotAssignedOnGridReady = (params: { api: GridApi }) => {
+    companyTeamsNotAssignedGridApiRef.current = params.api;
+  };
+
+  const handleCompanyProductTeamsViewPortChanged = (
+    params: ViewportChangedEvent
+  ) => {
+    if (!companyProductTeamsList.length || !companyProductTeamsHasMore) return;
+
+    if (!companyProductTeamsGridApiRef.current && params.api) {
+      companyProductTeamsGridApiRef.current = params.api;
+    }
+
+    const lastVisibleRow = params.lastRow;
+    const totalRowCount =
+      companyProductTeamsList[companyProductTeamsList.length - 1]?.count;
+
+    if (
+      totalRowCount &&
+      lastVisibleRow >= companyProductTeamsList.length - 5 &&
+      companyProductTeamsSearchParamterRef.current.length === 0
+    ) {
+      fetchCompanyProductTeams("");
+    }
+  };
+
+  const companyProductTeamsOnGridReady = (params: { api: GridApi }) => {
+    companyProductTeamsGridApiRef.current = params.api;
+  };
+  const handleCompanyProductTeamsSearchParameterChange = (
+    searchValue: string
+  ) => {
+    if (searchValue.length % 2 === 0) {
+      setCompanyProductsTeamsList([]);
+      setCompanyProductTeamsHasMore(true);
+      setCompanyProductTeamsFetchedCount(0);
+      setIsCompanyProductTeamsLoading(false);
+      companyProductTeamsFetchingRef.current = false;
+      companyProductTeamsGridApiRef.current = null;
+      companyProductTeamsLastScrollPositionRef.current = 0;
+      fetchCompanyProductTeams(searchValue);
+    }
+  };
+
+  const handleCompanyTeamsNotAssignedSearchParameterCgange = (
+    searchValue: string
+  ) => {
+    if (searchValue.length % 2 === 0) {
+      setCompanyTeamsNotAssignedList([]);
+      setCompanyTeamsNotAssignedHasMore(true);
+      setCompanyTeamsNotAssignedFetchedCount(0);
+      setIsCompanyTeamsNotAssignedLoading(false);
+      companyTeamsNotAssignedFetchingRef.current = false;
+      companyTeamsNotAssignedGridApiRef.current = null;
+      companyTeamsNotAssignedLastScrollPositionRef.current = 0;
+      fetchCompanyTeamsNotAssigned(searchValue);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && !isCompanyProductTeamsLoading) {
+      fetchCompanyProductTeams("");
+    }
+  }, [isOpen, companyProductTeamAddCount]);
+
+  useEffect(() => {
+    if (isOpen && isCompanyTeamsNotAssignedReadyToFetch) {
+      fetchCompanyTeamsNotAssigned("");
+    } else if (!isOpen) {
+      setCompanyTeamsNotAssignedList([]);
+      setAddCompanyProductTeamArray([]);
+      setCompanyProductsTeamsList([]);
+
+      setCompanyTeamsNotAssignedHasMore(true);
+      setIsCompanyProductTeamsLoading(false);
+      companyTeamsNotAssignedFetchingRef.current = false;
+      companyTeamsNotAssignedGridApiRef.current = null;
+      companyTeamsNotAssignedLastScrollPositionRef.current = 0;
+
+      setCompanyProductTeamsHasMore(true);
+      setIsCompanyProductTeamsLoading(false);
+      companyProductTeamsFetchingRef.current = false;
+      companyProductTeamsGridApiRef.current = null;
+      companyProductTeamsLastScrollPositionRef.current = 0;
+
+      setCompanyTeamsNotAssignedFetchedCount(0);
+      setCompanyProductTeamsFetchedCount(0);
+      setIsCompanyProductTeamsFetchedForFirstTime(true);
+      setIsCompanyTeamsNotAssignedReadyToFetch(false);
+      handleMessageSnackbarClose();
+      // setIsCompanyTeamsNotAssignedLoading(false);
+    }
+  }, [isCompanyTeamsNotAssignedReadyToFetch, isOpen]);
 
   if (!isOpen) return null;
   return (
@@ -339,16 +629,32 @@ const handleAddCompanyProductTeam = async() => {
                 className="ag-theme-alpine"
                 style={{ height: "300px", width: "45%" }}
               >
-                <div className="flex gap-2 mb-10 justify-between">
-                  <div className="place-content-center">
-                    <span className="text-lg font-semibold text-gray-700">
-                      Assigned Teams for {companyProduct.name}
-                    </span>
+                <div className="flex gap-2 mb-1 mt-2 justify-between">
+                  <div>
+                    <SearchInput
+                      // readonly = {isCompanyProductTeamsLoading}
+                      // inputMode="numeric"
+                      onChange={(event) => {
+                        const searchValue = event.target.value;
+                        handleCompanyProductTeamsSearchParameterChange(
+                          searchValue
+                        );
+                      }}
+                    ></SearchInput>
+                  </div>
+                  <div className="text-lg font-semibold text-gray-700">
+                    Assigned Teams
                   </div>
                 </div>
                 <CompanyProductTeamsAgGrid
                   companyProductTeams={companyProductTeamsList}
-                  handleCompanyProductTeamUpdate={handleCompanyProductTeamUpdate}
+                  handleCompanyProductTeamUpdate={
+                    handleCompanyProductTeamUpdate
+                  }
+                  handleViewPortChanged={
+                    handleCompanyProductTeamsViewPortChanged
+                  }
+                  onGridReady={companyProductTeamsOnGridReady}
                 ></CompanyProductTeamsAgGrid>
               </div>
 
@@ -356,27 +662,41 @@ const handleAddCompanyProductTeam = async() => {
                 className="ag-theme-alpine"
                 style={{ height: "300px", width: "45%" }}
               >
-                <div className="flex gap-2 mb-6 justify-between">
-                  <div className="place-content-center">
-                    <span className="text-lg font-semibold text-gray-700">
-                      Unassigned Teams for {companyProduct.name}
-                    </span>
-                   
+                <div className="flex gap-2 mb-1 mt-2 justify-between">
+                  <div>
+                    <SearchInput
+                      // readonly = {isCompanyProductTeamsLoading}
+                      // inputMode="numeric"
+                      onChange={(event) => {
+                        const searchValue = event.target.value;
+                        handleCompanyTeamsNotAssignedSearchParameterCgange(
+                          searchValue
+                        );
+                      }}
+                    ></SearchInput>
                   </div>
-                  <div> <Button
-                  onClick={handleAddCompanyProductTeam}>
-                    <Network className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}></Network>
-                    Assign Teams</Button></div>
+                  <div>
+                    {" "}
+                    <Button onClick={handleAddCompanyProductTeam}>
+                      <Network
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      ></Network>
+                      Assign Teams
+                    </Button>
+                  </div>
                 </div>
+
                 <TeamManagementAgGrid
-                  companyTeamList={companyTeamList}
+                  companyTeamList={companyTeamsNotAssignedList}
                   isGridForProductTeam={true}
                   handleCompanyTeamCheckboxChange={
                     handleCompanyTeamCheckboxChange
                   }
                   addCompanyProductTeamArray={addCompanyProductTeamArray}
-                  handleViewPortChanged={handleViewPortChanged}
-                  onGridReady={onGridReady}
+                  handleViewPortChanged={
+                    handleCompanyTeamsNotAssignedViewPortChanged
+                  }
+                  onGridReady={companyTeamsNotAssignedOnGridReady}
                 />
               </div>
             </div>
@@ -384,12 +704,12 @@ const handleAddCompanyProductTeam = async() => {
         </div>
       </div>
       <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </div>
   );
 }

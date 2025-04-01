@@ -1,0 +1,252 @@
+Date : 2025-03-28 14:08:54
+Directory : d:\CRM Purple\React\purple-crm-react\src
+Total : 166 files,  13389 codes, 501 comments, 1458 blanks, all 15348 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| TypeScript JSX |         77 |     11,505 |        329 |      1,138 |     12,972 |
+| TypeScript     |         87 |      1,832 |        172 |        312 |      2,316 |
+| CSS            |          2 |         52 |          0 |          8 |         60 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                         | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                            |        166 |     13,389 |        501 |      1,458 |     15,348 |
+| . (Files)                                                                                                    |          4 |         62 |         18 |         22 |        102 |
+| @types                                                                                                       |         62 |        639 |        150 |        133 |        922 |
+| @types\List                                                                                                  |          4 |         49 |          0 |          7 |         56 |
+| @types\ag-grid                                                                                               |         10 |        110 |          0 |         25 |        135 |
+| @types\auth                                                                                                  |          4 |         24 |         16 |          6 |         46 |
+| @types\auth\forms                                                                                            |          2 |         13 |         10 |          3 |         26 |
+| @types\auth\views                                                                                            |          2 |         11 |          6 |          3 |         20 |
+| @types\company-users                                                                                         |          7 |         92 |         32 |         16 |        140 |
+| @types\config                                                                                                |          1 |          4 |          0 |          1 |          5 |
+| @types\dialogue                                                                                              |          1 |         10 |          0 |          1 |         11 |
+| @types\error                                                                                                 |          1 |         11 |          0 |          1 |         12 |
+| @types\forms                                                                                                 |          1 |          9 |          0 |          3 |         12 |
+| @types\home                                                                                                  |          4 |         23 |          0 |          4 |         27 |
+| @types\home\loading-page                                                                                     |          1 |          4 |          0 |          1 |          5 |
+| @types\home\navbar                                                                                           |          3 |         19 |          0 |          3 |         22 |
+| @types\lead-management                                                                                       |          1 |         16 |          0 |          2 |         18 |
+| @types\modal                                                                                                 |         11 |         80 |          0 |         21 |        101 |
+| @types\product-teams-management                                                                              |          1 |         13 |          9 |         11 |         33 |
+| @types\product-users-management                                                                              |          2 |         25 |         54 |          9 |         88 |
+| @types\products                                                                                              |          2 |         32 |         14 |          5 |         51 |
+| @types\team-management                                                                                       |          3 |         28 |          8 |          4 |         40 |
+| @types\ui                                                                                                    |          9 |        113 |         17 |         17 |        147 |
+| assets                                                                                                       |          6 |        794 |          7 |         20 |        821 |
+| assets\animations                                                                                            |          2 |         19 |          7 |         10 |         36 |
+| assets\styles                                                                                                |          1 |         17 |          0 |          1 |         18 |
+| assets\svg                                                                                                   |          3 |        758 |          0 |          9 |        767 |
+| components                                                                                                   |         64 |     10,407 |        302 |      1,078 |     11,787 |
+| components\ag-grid                                                                                           |          9 |      2,005 |         64 |        162 |      2,231 |
+| components\dialogue-box                                                                                      |          1 |         57 |          0 |         11 |         68 |
+| components\forms                                                                                             |          4 |        786 |         17 |         90 |        893 |
+| components\lists                                                                                             |          4 |      1,033 |         18 |        119 |      1,170 |
+| components\modals                                                                                            |         12 |      3,928 |         89 |        376 |      4,393 |
+| components\modals\company-product-team                                                                       |          1 |        516 |         18 |         52 |        586 |
+| components\modals\company-product-user                                                                       |          1 |        295 |         16 |         24 |        335 |
+| components\modals\company-user                                                                               |          3 |        878 |         12 |         78 |        968 |
+| components\modals\leads                                                                                      |          1 |        181 |         11 |         35 |        227 |
+| components\modals\products                                                                                   |          4 |      1,200 |         14 |        110 |      1,324 |
+| components\modals\teams                                                                                      |          2 |        858 |         18 |         77 |        953 |
+| components\tabs                                                                                              |          1 |        168 |          5 |         14 |        187 |
+| components\ui                                                                                                |         15 |        628 |         47 |         90 |        765 |
+| components\views                                                                                             |         18 |      1,802 |         62 |        216 |      2,080 |
+| components\views\auth                                                                                        |          2 |        161 |         28 |         27 |        216 |
+| components\views\home                                                                                        |          8 |        764 |         18 |         75 |        857 |
+| components\views\home\landing-page                                                                           |          5 |        227 |          0 |         17 |        244 |
+| components\views\home\navbar                                                                                 |          3 |        537 |         18 |         58 |        613 |
+| components\views\lead-management                                                                             |          1 |         34 |          0 |         13 |         47 |
+| components\views\manage-company-users                                                                        |          1 |        166 |          4 |         16 |        186 |
+| components\views\not-found                                                                                   |          2 |         88 |          0 |         17 |        105 |
+| components\views\product-Management                                                                          |          1 |        213 |          4 |         21 |        238 |
+| components\views\product-team-management                                                                     |          1 |        181 |          5 |         19 |        205 |
+| components\views\settings                                                                                    |          1 |         20 |          0 |          7 |         27 |
+| components\views\settings\lead-settings                                                                      |          1 |         20 |          0 |          7 |         27 |
+| components\views\team-management                                                                             |          1 |        175 |          3 |         21 |        199 |
+| config                                                                                                       |         14 |        878 |         22 |        149 |      1,049 |
+| config\hooks                                                                                                 |          8 |        626 |         17 |        124 |        767 |
+| config\routes                                                                                                |          3 |        203 |          1 |         15 |        219 |
+| config\validations                                                                                           |          3 |         49 |          4 |         10 |         63 |
+| constants                                                                                                    |         14 |        517 |          0 |         43 |        560 |
+| context                                                                                                      |          2 |         92 |          2 |         13 |        107 |
+| context\user                                                                                                 |          2 |         92 |          2 |         13 |        107 |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                                     | language       | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| d:\CRM Purple\React\purple-crm-react\src\@types\List\GetCompanyUsersListProps.ts                             | TypeScript     |         13 |          0 |          2 |         15 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\List\PaginationProps.ts                                      | TypeScript     |          8 |          0 |          0 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\List\ProductsManagementListProps.ts                          | TypeScript     |         15 |          0 |          3 |         18 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\List\TeamManagementListProps.ts                              | TypeScript     |         13 |          0 |          2 |         15 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\AddCompanyTeamUsersAgGridProps.ts                    | TypeScript     |         10 |          0 |          6 |         16 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyProductTeamsAgGridProps.ts                    | TypeScript     |          9 |          0 |          2 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyTeamUsersAgGridProps.ts                       | TypeScript     |         21 |          0 |          3 |         24 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyUserAgGridProps.ts                            | TypeScript     |          9 |          0 |          3 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\LeadManagementAgGridProps.ts                         | TypeScript     |          9 |          0 |          2 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\PaginationDataProps.ts                               | TypeScript     |          8 |          0 |          1 |          9 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\ProductTaxManagementAgGridProps.ts                   | TypeScript     |          6 |          0 |          2 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\ProductsManagementGridProps.ts                       | TypeScript     |         10 |          0 |          2 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\SearchDropDownOptions.ts                             | TypeScript     |         13 |          0 |          2 |         15 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\TeamManagementAgGridProps.ts                         | TypeScript     |         15 |          0 |          2 |         17 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\auth\forms\SignInFormDataType.ts                             | TypeScript     |          5 |          6 |          2 |         13 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\auth\forms\SignUpFormDataType.ts                             | TypeScript     |          8 |          4 |          1 |         13 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\auth\views\AuthLayoutProps.ts                                | TypeScript     |          6 |          6 |          2 |         14 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\auth\views\EmailVerificationType.ts                          | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\AccessManagementContextType.ts                 | TypeScript     |         19 |         13 |          4 |         36 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\AccessRightsModalProps.ts                      | TypeScript     |         16 |          0 |          1 |         17 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\CompanyUser.ts                                 | TypeScript     |         12 |          0 |          1 |         13 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\CompanyUserProps.ts                            | TypeScript     |         15 |          9 |          3 |         27 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\HandleSearchOptionProps.ts                     | TypeScript     |          6 |          0 |          0 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\LoggedInUserContextType.ts                     | TypeScript     |         16 |         10 |          3 |         29 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\company-users\ManageCompanyUserContextType.ts                | TypeScript     |          8 |          0 |          4 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\config\RoutesChildrenNode.ts                                 | TypeScript     |          4 |          0 |          1 |          5 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\dialogue\DialogueProps.ts                                    | TypeScript     |         10 |          0 |          1 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\error\ApiError.ts                                            | TypeScript     |         11 |          0 |          1 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\forms\CreatePasswordFormTypes.ts                             | TypeScript     |          9 |          0 |          3 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\home\loading-page\LoadingPageProps.ts                        | TypeScript     |          4 |          0 |          1 |          5 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\NavBarProps.ts                                   | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\SideBarProps.ts                                  | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\home\navbar\SideNavBarItemProps.ts                           | TypeScript     |          9 |          0 |          1 |         10 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\lead-management\LeadManagementProps.ts                       | TypeScript     |         16 |          0 |          2 |         18 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddCompanyUserModalProps.ts                            | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddCompanyUserStateType.ts                             | TypeScript     |          6 |          0 |          0 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddProductModalProps.ts                                | TypeScript     |          7 |          0 |          2 |          9 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\AddTeamModalProps.ts                                   | TypeScript     |          6 |          0 |          1 |          7 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\CompanyProductTeamsModalProps.ts                       | TypeScript     |          7 |          0 |          3 |         10 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\CompanyProductUsersModalProps.ts                       | TypeScript     |          7 |          0 |          2 |          9 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\CreateCompanyProductCompanyUserModalProps.ts           | TypeScript     |          9 |          0 |          2 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\CreateCompanyProductTaxModalProps.ts                   | TypeScript     |          8 |          0 |          2 |         10 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyProductModal.ts                             | TypeScript     |          9 |          0 |          2 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyTeamModalProps.ts                           | TypeScript     |          8 |          0 |          4 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\modal\EditCompanyUserProps.ts                                | TypeScript     |          8 |          0 |          2 |         10 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\product-teams-management\CompanyProductTeam.ts               | TypeScript     |         13 |          9 |         11 |         33 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\product-users-management\CompanyProductUser.ts               | TypeScript     |         13 |         27 |          5 |         45 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\product-users-management\CompanyProductUserNotAssigned.ts    | TypeScript     |         12 |         27 |          4 |         43 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\products\ProductTaxManagementProps.ts                        | TypeScript     |         13 |          0 |          1 |         14 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\products\ProductsManagementProps.ts                          | TypeScript     |         19 |         14 |          4 |         37 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\team-management\AddTeamFormDataState.ts                      | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\team-management\CompanyTeamListProps.ts                      | TypeScript     |         11 |          8 |          2 |         21 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\team-management\CompanyTeamUsers.ts                          | TypeScript     |         12 |          0 |          1 |         13 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\ButtonProps.ts                                            | TypeScript     |         16 |          3 |          3 |         22 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\DateRangeFilterDropdown.tsx                               | TypeScript JSX |          6 |          0 |          2 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\DateRangePickerProps.ts                                   | TypeScript     |          5 |          1 |          1 |          7 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\FormCheckboxProps.ts                                      | TypeScript     |          6 |          6 |          2 |         14 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\FormInputProps.ts                                         | TypeScript     |         25 |          7 |          2 |         34 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\MessageSnackbarProps.ts                                   | TypeScript     |         17 |          0 |          4 |         21 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\PasswordVisibilityToggleProps.ts                          | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\RadioButtonProps.ts                                       | TypeScript     |         15 |          0 |          1 |         16 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ui\textAreaInputProps.ts                                     | TypeScript     |         18 |          0 |          1 |         19 |
+| d:\CRM Purple\React\purple-crm-react\src\App.tsx                                                             | TypeScript JSX |         14 |         12 |          4 |         30 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\animations\EmailSentAnimation.tsx                            | TypeScript JSX |         10 |          7 |          5 |         22 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\animations\LoadingSpinner.tsx                                | TypeScript JSX |          9 |          0 |          5 |         14 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\styles\AuthLayout.css                                        | CSS            |         17 |          0 |          1 |         18 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\svg\AuthSideSvg.tsx                                          | TypeScript JSX |        308 |          0 |          3 |        311 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\svg\Logo.tsx                                                 | TypeScript JSX |         43 |          0 |          4 |         47 |
+| d:\CRM Purple\React\purple-crm-react\src\assets\svg\Logo2.tsx                                                | TypeScript JSX |        407 |          0 |          2 |        409 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\AddCompanyTeamUsersAgGrid.tsx                    | TypeScript JSX |         85 |          2 |         12 |         99 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyProductTeamsAgGrid.tsx                    | TypeScript JSX |        110 |          3 |         10 |        123 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyTeamUsersAgGrid.tsx                       | TypeScript JSX |        515 |         18 |         31 |        564 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyUsersAgGrid.tsx                           | TypeScript JSX |        224 |          4 |         19 |        247 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\LeadManagementsAgGrid.tsx                        | TypeScript JSX |        238 |         24 |         16 |        278 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\Pagination.tsx                                   | TypeScript JSX |         93 |          2 |          7 |        102 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\ProductTaxManagementAgGrrid.tsx                  | TypeScript JSX |        191 |          3 |         30 |        224 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\ProductsManagementAgGrid.tsx                     | TypeScript JSX |        323 |          4 |         20 |        347 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\TeamManagementAgGrid.tsx                         | TypeScript JSX |        226 |          4 |         17 |        247 |
+| d:\CRM Purple\React\purple-crm-react\src\components\dialogue-box\Dialogue.tsx                                | TypeScript JSX |         57 |          0 |         11 |         68 |
+| d:\CRM Purple\React\purple-crm-react\src\components\forms\CreatePasswordForm.tsx                             | TypeScript JSX |        175 |          3 |         21 |        199 |
+| d:\CRM Purple\React\purple-crm-react\src\components\forms\ForgotPasswordForm.tsx                             | TypeScript JSX |        107 |         14 |         23 |        144 |
+| d:\CRM Purple\React\purple-crm-react\src\components\forms\SignInForm.tsx                                     | TypeScript JSX |        272 |          0 |         30 |        302 |
+| d:\CRM Purple\React\purple-crm-react\src\components\forms\SignUpForm.tsx                                     | TypeScript JSX |        232 |          0 |         16 |        248 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\CompanyUsersList.tsx                               | TypeScript JSX |        326 |          6 |         32 |        364 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\LeadManagementList.tsx                             | TypeScript JSX |         69 |          1 |         14 |         84 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\ProductsManagementsList.tsx                        | TypeScript JSX |        348 |          5 |         40 |        393 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\TeamManagementList.tsx                             | TypeScript JSX |        290 |          6 |         33 |        329 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-team\CompanyProductTeamsModal.tsx | TypeScript JSX |        516 |         18 |         52 |        586 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-user\CompanyProductUsersModal.tsx | TypeScript JSX |        295 |         16 |         24 |        335 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\AddCompanyUserModal.tsx              | TypeScript JSX |        229 |          3 |         19 |        251 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\CompanyUserAccessManagementModal.tsx | TypeScript JSX |        391 |          7 |         39 |        437 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-user\EditCompanyUserModal.tsx             | TypeScript JSX |        258 |          2 |         20 |        280 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\leads\CreateLeadModal.tsx                         | TypeScript JSX |        181 |         11 |         35 |        227 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\products\AddProductModal.tsx                      | TypeScript JSX |        335 |          1 |         26 |        362 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\products\CreateCompanyProductCompanyUserModal.tsx | TypeScript JSX |        189 |          6 |         16 |        211 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\products\CreateCompanyProductTaxModal.tsx         | TypeScript JSX |        260 |          2 |         24 |        286 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\products\EditProductModal.tsx                     | TypeScript JSX |        416 |          5 |         44 |        465 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\teams\AddTeamModal.tsx                            | TypeScript JSX |        363 |          8 |         43 |        414 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\teams\EditCompanyTeamModal.tsx                    | TypeScript JSX |        495 |         10 |         34 |        539 |
+| d:\CRM Purple\React\purple-crm-react\src\components\tabs\LeadSettingsTabs.tsx                                | TypeScript JSX |        168 |          5 |         14 |        187 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\ActionsDropdownButton.tsx                             | TypeScript JSX |         13 |          0 |          2 |         15 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\Button.tsx                                            | TypeScript JSX |         46 |          6 |          6 |         58 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\DatePickerInput.tsx                                   | TypeScript JSX |         32 |          0 |          5 |         37 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\DateRangeFilterDropdown.tsx                           | TypeScript JSX |         84 |          0 |          8 |         92 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\DateRangePicker.tsx                                   | TypeScript JSX |         54 |          3 |         13 |         70 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\FormCheckbox.tsx                                      | TypeScript JSX |         18 |         12 |          3 |         33 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\FormInput.tsx                                         | TypeScript JSX |         54 |         20 |          5 |         79 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\Link.tsx                                              | TypeScript JSX |         13 |          0 |          3 |         16 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\MessageSnackbar.tsx                                   | TypeScript JSX |         40 |          1 |          6 |         47 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\OtpInput.tsx                                          | TypeScript JSX |         86 |          5 |          9 |        100 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\PasswordVisibilityToggle.tsx                          | TypeScript JSX |         18 |          0 |          4 |         22 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\ProductDropdown.tsx                                   | TypeScript JSX |         89 |          0 |         13 |        102 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\RadioButton.tsx                                       | TypeScript JSX |         34 |          0 |          5 |         39 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\SearchInput.tsx                                       | TypeScript JSX |         14 |          0 |          5 |         19 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ui\TextAreaInput.tsx                                     | TypeScript JSX |         33 |          0 |          3 |         36 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\auth\AuthLayout.tsx                                | TypeScript JSX |         47 |         25 |          9 |         81 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\auth\EmailVerificationLayout.tsx                   | TypeScript JSX |        114 |          3 |         18 |        135 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\CallToAction.tsx                 | TypeScript JSX |         24 |          0 |          2 |         26 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\ContactUs.tsx                    | TypeScript JSX |         26 |          0 |          3 |         29 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Features.tsx                     | TypeScript JSX |         68 |          0 |          4 |         72 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Hero.tsx                         | TypeScript JSX |         44 |          0 |          3 |         47 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\landing-page\Testimonials.tsx                 | TypeScript JSX |         65 |          0 |          5 |         70 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\Navbar.tsx                             | TypeScript JSX |        224 |         18 |         27 |        269 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\SideNavBar.tsx                         | TypeScript JSX |        127 |          0 |         22 |        149 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\home\navbar\SideNavBarItem.tsx                     | TypeScript JSX |        186 |          0 |          9 |        195 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\lead-management\LeadManagement.tsx                 | TypeScript JSX |         34 |          0 |         13 |         47 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\manage-company-users\CompanyUsersManagement.tsx    | TypeScript JSX |        166 |          4 |         16 |        186 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\not-found\AccessDeniedPage.tsx                     | TypeScript JSX |         47 |          0 |          8 |         55 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\not-found\NotFoundPage.tsx                         | TypeScript JSX |         41 |          0 |          9 |         50 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\product-Management\ProductsManagement.tsx          | TypeScript JSX |        213 |          4 |         21 |        238 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\product-team-management\ProductTeamManagement.tsx  | TypeScript JSX |        181 |          5 |         19 |        205 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\settings\lead-settings\LeadSettingsPage.tsx        | TypeScript JSX |         20 |          0 |          7 |         27 |
+| d:\CRM Purple\React\purple-crm-react\src\components\views\team-management\TeamManagement.tsx                 | TypeScript JSX |        175 |          3 |         21 |        199 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useAccessModules.ts                                    | TypeScript     |        126 |          8 |         28 |        162 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useCompanySpecificDateRange.ts                         | TypeScript     |         57 |          2 |         10 |         69 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useDateRangeIdChange.ts                                | TypeScript     |         43 |          0 |          6 |         49 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useFormChange.ts                                       | TypeScript     |         37 |          1 |          8 |         46 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useFormValidation.ts                                   | TypeScript     |        182 |          2 |         31 |        215 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\usePaginationHandler.ts                                | TypeScript     |        133 |          4 |         24 |        161 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useRecaptcha.ts                                        | TypeScript     |         30 |          0 |         10 |         40 |
+| d:\CRM Purple\React\purple-crm-react\src\config\hooks\useScreenSize.ts                                       | TypeScript     |         18 |          0 |          7 |         25 |
+| d:\CRM Purple\React\purple-crm-react\src\config\routes\LoggedInRoute.tsx                                     | TypeScript JSX |         10 |          0 |          5 |         15 |
+| d:\CRM Purple\React\purple-crm-react\src\config\routes\PrivateRoute.tsx                                      | TypeScript JSX |         10 |          1 |          5 |         16 |
+| d:\CRM Purple\React\purple-crm-react\src\config\routes\Route.tsx                                             | TypeScript JSX |        183 |          0 |          5 |        188 |
+| d:\CRM Purple\React\purple-crm-react\src\config\validations\RefreshToken.ts                                  | TypeScript     |         37 |          4 |          6 |         47 |
+| d:\CRM Purple\React\purple-crm-react\src\config\validations\ValidateEmail.ts                                 | TypeScript     |          6 |          0 |          2 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\config\validations\ValidateMobileNumber.ts                          | TypeScript     |          6 |          0 |          2 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\AppConstants.ts                                           | TypeScript     |         47 |          0 |         15 |         62 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\AppModules.ts                                             | TypeScript     |         10 |          0 |          1 |         11 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\ClassNames.ts                                             | TypeScript     |          5 |          0 |          0 |          5 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Colors.ts                                                 | TypeScript     |          9 |          0 |          3 |         12 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Events.ts                                                 | TypeScript     |          4 |          0 |          1 |          5 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\ImageSource.ts                                            | TypeScript     |          4 |          0 |          2 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Keys.ts                                                   | TypeScript     |          4 |          0 |          1 |          5 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\LocalStorage.ts                                           | TypeScript     |          8 |          0 |          0 |          8 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Messages.ts                                               | TypeScript     |         30 |          0 |          2 |         32 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Pagination.ts                                             | TypeScript     |          5 |          0 |          1 |          6 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\PostApi.ts                                                | TypeScript     |         37 |          0 |          1 |         38 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Regex.ts                                                  | TypeScript     |          6 |          0 |          1 |          7 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\Routes.ts                                                 | TypeScript     |         19 |          0 |          2 |         21 |
+| d:\CRM Purple\React\purple-crm-react\src\constants\TestData.ts                                               | TypeScript     |        329 |          0 |         13 |        342 |
+| d:\CRM Purple\React\purple-crm-react\src\context\user\AccessManagementContext.tsx                            | TypeScript JSX |         46 |          1 |          7 |         54 |
+| d:\CRM Purple\React\purple-crm-react\src\context\user\LoggedInUserContext.tsx                                | TypeScript JSX |         46 |          1 |          6 |         53 |
+| d:\CRM Purple\React\purple-crm-react\src\index.css                                                           | CSS            |         35 |          0 |          7 |         42 |
+| d:\CRM Purple\React\purple-crm-react\src\main.tsx                                                            | TypeScript JSX |          6 |          5 |          7 |         18 |
+| d:\CRM Purple\React\purple-crm-react\src\vite-env.d.ts                                                       | TypeScript     |          7 |          1 |          4 |         12 |
+| Total                                                                                                        |                |     13,389 |        501 |      1,458 |     15,348 |
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

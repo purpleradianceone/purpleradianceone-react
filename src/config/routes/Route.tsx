@@ -22,6 +22,7 @@ import ProductManagement from "../../components/views/product-Management/Product
 import LeadSettingsPage from "../../components/views/settings/lead-settings/LeadSettingsPage";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
 import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
+import Dashboard from "../../components/views/home/dashboard/Dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -102,7 +103,7 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <div className="min-h-95vh">
           <Navbar>
-            <div className="flex items-center justify-center">Home Screen</div>
+           <Dashboard></Dashboard>
           </Navbar>
         </div>
       </PrivateRoute>

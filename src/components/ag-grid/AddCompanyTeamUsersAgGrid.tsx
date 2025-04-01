@@ -1,8 +1,8 @@
-import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
-import { useMemo } from "react";
+import { AllCommunityModule, ColDef, themeAlpine, } from "ag-grid-community";
+import { useEffect, useMemo } from "react";
 import { INNERHTML } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
-import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
+import AddCompanyTeamUsersAgGridProps from "../../@types/ag-grid/AddCompanyTeamUsersAgGridProps";
 
 
 function AddCompanyTeamUsersAgGrid({
@@ -11,14 +11,13 @@ function AddCompanyTeamUsersAgGrid({
     onGridReady,
     handleCompanyUserCheckBoxChange,
     addCompanyTeamUserArray,
-} : {
-    companyUsers : companyUsersSearchProps[];
-    handleViewPortChanged : (params : ViewportChangedEvent) => void;
-    onGridReady : (params : {api :GridApi}) => void;
-    handleCompanyUserCheckBoxChange : (params : companyUsersSearchProps,event :React.ChangeEvent<HTMLInputElement>) => void
-    addCompanyTeamUserArray : number[];
-}){
+} : AddCompanyTeamUsersAgGridProps){
 
+
+  useEffect(()=> {
+    console.log("In Grid");
+    console.log(companyUsers)
+  },[companyUsers]);
 
     const companyUserColDefs = useMemo<ColDef[]>(
         () => [
@@ -70,7 +69,7 @@ function AddCompanyTeamUsersAgGrid({
           },
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [addCompanyTeamUserArray,companyUsers]
+        [addCompanyTeamUserArray]
       );
     
       const defaultColDef = useMemo(() => {

@@ -4,7 +4,6 @@ import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useState } from "react";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
@@ -14,8 +13,8 @@ import AddTeamModal from "../modals/teams/AddTeamModal";
 import CompanyTeamSearchProps from "../../@types/team-management/CompanyTeamListProps";
 import TeamManagementAgGrid from "../ag-grid/TeamManagementAgGrid";
 import Pagination from "../ag-grid/Pagination";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import EditCompanyTeamModal from "../modals/teams/EditCompanyTeamModal";
+import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
 
 
 function TeamManagementList({
@@ -26,15 +25,7 @@ function TeamManagementList({
     paginationData,
     handleCompanyTeamChangeOnUpdate,
     handleCompanyTeamChangeOnAdd,
-}:{
-  companyTeamList: CompanyTeamSearchProps[];
-    handleSearchOption: HandleSearchOptionProps;
-    onStartDateChange: (date: Date) => void;
-  onEndDateChange: (date: Date) => void;
-  paginationData : PaginationDataProps;
-  handleCompanyTeamChangeOnUpdate : (teamId : number) => void;
-  handleCompanyTeamChangeOnAdd : ()=> void;
-}){
+}: TeamManagementListProps){
     const {isLargeScreen,isMediumScreen,isSmallScreen} = useScreenSize();
     const {userHasAccessToAddTeamManagement} = useUserAccessModules();
 
@@ -91,7 +82,9 @@ function TeamManagementList({
                 {/* search box flex div */}
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
-                    // onChange={}
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(e.target.value)
+                    }}
                   ></SearchInput>
                 </div>
 

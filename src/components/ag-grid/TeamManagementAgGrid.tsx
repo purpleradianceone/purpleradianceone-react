@@ -3,19 +3,17 @@
 import {
   AllCommunityModule,
   ColDef,
-  GridApi,
   themeAlpine,
-  ViewportChangedEvent,
 } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CheckCircle2, Edit, XCircle } from "lucide-react";
-import CompanyTeamSearchProps from "../../@types/team-management/CompanyTeamListProps";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
+import TeamManagementAgGridProps from "../../@types/ag-grid/TeamManagementAgGridProps";
 
 function TeamManagementAgGrid({
   companyTeamList,
@@ -25,18 +23,7 @@ function TeamManagementAgGrid({
   handleCompanyTeamCheckboxChange,
   handleViewPortChanged,
   onGridReady,
-}: {
-  companyTeamList: CompanyTeamSearchProps[];
-  isUpdateCompanyTeamModalOpen?: (params: CompanyTeamSearchProps) => void;
-  isGridForProductTeam: boolean;
-  addCompanyProductTeamArray?: number[];
-  handleCompanyTeamCheckboxChange?: (
-    params: CompanyTeamSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => void;
-  handleViewPortChanged?: (params: ViewportChangedEvent) => void;
-  onGridReady?: (params: { api: GridApi }) => void;
-}) {
+}: TeamManagementAgGridProps) {
   const { userHasAccessToUpdateTeamManagement } = useUserAccessModules();
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 type CompanyProductTeam = {
+  count : number;
   id: number;
   companyProductId: number;
   productName: string;

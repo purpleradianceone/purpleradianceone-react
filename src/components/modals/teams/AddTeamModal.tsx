@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Network, X } from "lucide-react";
@@ -31,18 +32,16 @@ import {
 import MESSAGE from "../../../constants/Messages";
 import SearchInput from "../../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
-import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
+import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
+
 
 function AddTeamModal({
   isOpen,
   onClose,
   handleCompanyTeamChangeOnAdd
-} : {
-  isOpen: boolean;
-  onClose: () => void;
-  handleCompanyTeamChangeOnAdd : ()=> void;
-}){
+} : AddTeamModalProps){
   const { userHasAccessToAddTeamManagement, userHasAccessToViewUser } = useUserAccessModules();
   const { isSmallScreen } = useScreenSize();
 
@@ -55,6 +54,7 @@ function AddTeamModal({
   const {
     formData: AddTeamFormData,
     handleChange: handleAddTeamFormDataChange,
+    setFormData : setAddTeamFormData
   } = useFormChange(intialAddTeamFormData);
 
   const { errors, handleBlur, setErrors } = useFormValidation(
@@ -63,15 +63,17 @@ function AddTeamModal({
   );
 
   const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<number[]>([]);
-  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const fetchingRef = useRef(false);
-  const gridApiRef = useRef<GridApi | null>(null);
-  const lastScrollPositionRef = useRef<number>(0);
+  const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>([]);
+  const [isCompanyUsersLoading, setIsCompanyUsersLoading] = useState(false);
+  const [companyUsersHasMore, setCompanyUsersHasMore] = useState(true);
+  const [isCompanyUsersFetchedCount,setIsCompanyUsersFetchedCount] = useState<number>(0);
+  const companyUsersFetchingRef = useRef(false);
+  const companyUsersGridApiRef = useRef<GridApi | null>(null);
+  const companyUsersLastScrollPositionRef = useRef<number>(0);
+  const companyUserSearchParameterRef = useRef<string>("");
 
   const onGridReady = (params: { api: GridApi }) => {
-    gridApiRef.current = params.api;
+    companyUsersGridApiRef.current = params.api;
 };
 
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ function AddTeamModal({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const handleCompanyUserCheckBoxChange = (params : companyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
+  const handleCompanyUserCheckBoxChange = (params : CompanyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.checked){
       
       setAddCompanyTeamUserArray((prev) => [...prev, params.id]);
@@ -108,10 +110,6 @@ function AddTeamModal({
     }
 
   }
-
-  useEffect(()=>{
-    console.log(addCompanyTeamUserArray)
-  },[addCompanyTeamUserArray]);
 
   const handleAddTeamFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -144,6 +142,12 @@ function AddTeamModal({
               onClose();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           }
+          else if(!response.data.status){
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "error",
+            });
+          }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: ApiError | any) {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -173,28 +177,32 @@ function AddTeamModal({
     }
   };
 
-  const fetchCompanyUsers = async () => {
-    if (!userHasAccessToViewUser || isLoading || !hasMore || fetchingRef.current) return;
+  const fetchCompanyUsers = async (companyUsersSearchParameter : string) => {
+    if (!userHasAccessToViewUser || isCompanyUsersLoading || (!companyUsersHasMore && companyUsersSearchParameter.length === 0) || companyUsersFetchingRef.current) return;
      
     try {
-      fetchingRef.current = true;
-      setIsLoading(true);
+      if(companyUsersSearchParameter.length > 0){
+        setCompanyUsers([]);
+      }
+      companyUserSearchParameterRef.current = companyUsersSearchParameter;
+      companyUsersFetchingRef.current = true;
+      setIsCompanyUsersLoading(true);
 
       // Save current scroll position before fetching
-      if (gridApiRef.current) {
-        const rowIndex = gridApiRef.current.getLastDisplayedRowIndex();
+      if (companyUsersGridApiRef.current) {
+        const rowIndex = companyUsersGridApiRef.current.getLastDisplayedRowIndex();
         if (rowIndex !== null) {
-          lastScrollPositionRef.current = rowIndex ;
+          companyUsersLastScrollPositionRef.current = rowIndex ;
         }
       }
 
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        limit: 25,
-        offset: companyUsers.length,
+        limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
+        offset: companyUsersSearchParameter.length > 0 ? 0 : 50 * isCompanyUsersFetchedCount,
         search_company_specific_date_range_id: 0,
-        search_parameter: "",
+        search_parameter: companyUsersSearchParameter,
         search_parameter_date: "",
       };
 
@@ -205,30 +213,33 @@ function AddTeamModal({
       if (response.data) {
         const newUsers = response.data;
         if (newUsers.length === 0) {
-          setHasMore(false);
+          setCompanyUsersHasMore(false);
           return;
         }
 
-        setCompanyUsers(prev => {
-          const uniqueUsers = [...prev, ...newUsers].filter((user, index, self) =>
-            index === self.findIndex(t => t.id === user.id)
-          );
-          return uniqueUsers;
-        });
+        if(companyUsersSearchParameter.length === 0){
+          newUsers.map((user : any) => {
+            setCompanyUsers((prev) => [...prev,user])
+          })
+          setIsCompanyUsersFetchedCount(isCompanyUsersFetchedCount + 1);
+        }
+        else if(companyUsersSearchParameter.length > 0){
+          setCompanyUsers(newUsers);
+        }
 
         // Restore scroll position after data update
-        if (gridApiRef.current && lastScrollPositionRef.current > 0) {
+        if (companyUsersGridApiRef.current && companyUsersLastScrollPositionRef.current > 0) {
           setTimeout(() => {
-              if(gridApiRef.current){
-                  gridApiRef.current.ensureIndexVisible(lastScrollPositionRef.current-11);
-                  //gridApiRef.current.setFirstDisplayedRow(lastScrollPositionRef.current); Removed this line.
+              if(companyUsersGridApiRef.current){
+                  companyUsersGridApiRef.current.ensureIndexVisible(companyUsersLastScrollPositionRef.current-11);
+                  //companyUsersGridApiRef.current.setFirstDisplayedRow(companyUsersLastScrollPositionRef.current); Removed this line.
               }
           }, 150);
       }
 
 
-        if (newUsers[0]?.count && companyUsers.length + newUsers.length >= newUsers[0].count) {
-          setHasMore(false);
+        if (newUsers[0]?.count && companyUsers.length + newUsers.length >= newUsers[0].count && companyUsersSearchParameter.length === 0) {
+          setCompanyUsersHasMore(false);
         }
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -236,37 +247,73 @@ function AddTeamModal({
       console.error(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
-          callFunction: fetchCompanyUsers,
+          callFunctionWithParamsNotEvent: fetchCompanyUsers,
         });
         if (!refreshTokenResponse) {
           setIsDialogueOpen(true);
         }
         else{
           setIsDialogueOpen(false);
-          fetchCompanyUsers();
+          fetchCompanyUsers(companyUsersSearchParameter);
         }
       }
     } finally {
-      setIsLoading(false);
-      fetchingRef.current = false;
+      if(companyUsersSearchParameter.length === 0){
+        setIsCompanyUsersLoading(false);
+        companyUsersFetchingRef.current = false;
+      }
+      else if(companyUsersSearchParameter.length > 0){
+        setIsCompanyUsersLoading(false);
+        companyUsersFetchingRef.current = false;
+        setCompanyUsersHasMore(true)
+        if(companyUserSearchParameterRef.current.length === 1){
+          companyUsersGridApiRef.current = null;
+          companyUsersLastScrollPositionRef.current = 0;
+          setIsCompanyUsersFetchedCount(0);
+        }
+      }
+      
     }
   };
 
   const handleViewPortChanged = (params: ViewportChangedEvent) => {
-    if (!companyUsers.length || !hasMore) return;
+    if (!companyUsers.length || !companyUsersHasMore) return;
 
     // Store the grid API reference
-    if (!gridApiRef.current && params.api) {
-      gridApiRef.current = params.api;
+    if (!companyUsersGridApiRef.current && params.api) {
+      companyUsersGridApiRef.current = params.api;
     }
 
     const lastVisibleRow = params.lastRow;
     const totalRowCount = companyUsers[0]?.count;
     
-    if (totalRowCount && lastVisibleRow >= companyUsers.length - 5) {
-      fetchCompanyUsers();
+    if (totalRowCount && lastVisibleRow >= companyUsers.length - 5 && companyUserSearchParameterRef.current.length === 0) {
+      fetchCompanyUsers("");
     }
   };
+
+  const handleCompanyUsersSearchBoxChange = (searchValue : string) => {
+    if(searchValue.length > 0){
+      setCompanyUsers([]);
+      setIsCompanyUsersLoading(false);
+      setIsCompanyUsersFetchedCount(0);
+      setCompanyUsersHasMore(true)
+      companyUsersGridApiRef.current = null;
+      companyUsersLastScrollPositionRef.current = 0;
+      companyUsersFetchingRef.current = false;
+      fetchCompanyUsers(searchValue);
+    }
+    else if(searchValue.length === 0){
+      setCompanyUsers([]);
+      setIsCompanyUsersLoading(false);
+      setIsCompanyUsersFetchedCount(0);
+      setCompanyUsersHasMore(true)
+      companyUsersGridApiRef.current = null;
+      companyUsersLastScrollPositionRef.current = 0;
+      companyUsersFetchingRef.current = false;
+      fetchCompanyUsers(searchValue);
+    }
+  }
 
   useEffect(() => {
     if (!isOpen) {
@@ -280,12 +327,20 @@ function AddTeamModal({
       });
       setAddCompanyTeamUserArray([]);
       setCompanyUsers([]);
-      setHasMore(true);
-      fetchingRef.current = false;
-      gridApiRef.current = null;
-      lastScrollPositionRef.current = 0;
+      setCompanyUsersHasMore(true);
+      companyUsersFetchingRef.current = false;
+      companyUsersGridApiRef.current = null;
+      companyUsersLastScrollPositionRef.current = 0;
+      companyUserSearchParameterRef.current = "";
+      setIsCompanyUsersFetchedCount(0);
+      setAddTeamFormData({
+        name : "",
+        description : "",
+      })
+      handleMessageSnackbarClose();
+
     } else if (isOpen && companyUsers.length === 0) {
-      fetchCompanyUsers();
+      fetchCompanyUsers("");
     }
   }, [isOpen]);
 
@@ -355,7 +410,11 @@ function AddTeamModal({
                     </span>
                   </div>
                   <div>
-                    <SearchInput />
+                    <SearchInput 
+                    onChange={(event) => {
+                      handleCompanyUsersSearchBoxChange(event.target.value)
+                    }}
+                    />
                   </div>
                 </div>
                 <AddCompanyTeamUsersAgGrid

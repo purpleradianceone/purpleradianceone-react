@@ -1,4 +1,5 @@
 type CompanyTeamUsers = {
+    count : number,
     id : number,
     companyTeamId : number,
     teamName : string,

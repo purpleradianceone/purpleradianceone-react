@@ -1,5 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
+import {
+  AllCommunityModule,
+  ColDef,
+  GridApi,
+  themeAlpine,
+  ViewportChangedEvent,
+} from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   INNERHTML,
@@ -11,10 +18,8 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
-import CompanyTeamSearchProps from "../../@types/team-management/CompanyTeamListProps";
-import CompanyTeamUsers from "../../@types/team-management/CompanyTeamUsers";
 import { AgGridReact } from "ag-grid-react";
-import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
+import CompanyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import Button from "../ui/Button";
@@ -22,423 +27,360 @@ import { CLASS_NAMES } from "../../constants/ClassNames";
 import SearchInput from "../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
 import MessageSnackBar from "../ui/MessageSnackbar";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
-import { Product } from "../../@types/products/ProductsManagementProps";
-import CompanyProductUser from "../../@types/product-users-management/CompanyProductUser";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
 
-function CompanyUserCompanyTeamAgGrid({
+function CompanyTeamUsersAgGrid({
   companyTeam,
   isOpen,
   companyProduct,
-  isGridForProductUser
-}: {
-  companyTeam?: CompanyTeamSearchProps;
-  isOpen: boolean;
-  companyProduct?: Product;
-  isGridForProductUser : boolean;
-}) {
-  const { userHasAccessToViewTeamManagement, userHasAccessToViewUser,userHasAccessToUpdateTeamManagement,userHasAccessToViewProductTeam,userHasAccessToUpdateProductTeam } =
-    useUserAccessModules();
+  isGridForProductUser,
+  companyTeamUsersList,
+  handleViewPortChanged,
+  onGridReady,
+  handleAddCompanyTeamUsers,
+  handleCompanyUserCheckBoxChange,
+  isCompanyUserNotAssignedReadyToFetch,
+  addCompanyTeamAndProductUserArray,
+  companyProductUsersList,
+  handleSearchParameterChange,
+  isAddUsersCompleted,
+  usersUpdateCount,
+}: CompanyTeamUsersAgGridProps) {
+  const {
+    userHasAccessToViewUser,
+    userHasAccessToUpdateTeamManagement,
+    userHasAccessToUpdateProductTeam,
+  } = useUserAccessModules();
 
-  const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
-    CompanyTeamUsers[]
+  const [companyUsersNotAssigned, setCompanyUsersNotAssigned] = useState<
+    CompanyUsersSearchProps[]
   >([]);
 
-  const [companyProductUsersList,setCompanyProductUsersList] = useState<CompanyProductUser[]>([])
-  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>(
-    []
-  );
-
-  const [isCompanyUsersFetchedCount,setIsCompanyUsersFetched] = useState<number>(0);
+  const [isCompanyUsersFetchedCount, setIsCompanyUsersFetched] =
+    useState<number>(0);
   const { loginStatus } = useLoggedInUserContext();
 
-  const [companyTeamUpdateCount,setCompanyTeamUpdateCount] = useState<number>(0);
-  const [companyProductUserUpdateCount,setCompanyProductUserUpdateCount] = useState<number>(0);
-  const [companyUserReadyToFetch,setCompanyUserReadyToFetch] = useState<boolean>(false);
+  //states for infinite scroll AG grid
+  const [isCompanyUsersLoading, setIsCompanyUsersLoading] =
+    useState<boolean>(false);
+  const [companyUserHasMore, setCompanyUserHasMore] = useState<boolean>(true);
+  const companyUserFetchingRef = useRef<boolean>(false);
+  const companyUserGridApiRef = useRef<GridApi | null>(null);
+  const companyUserLastScrollPositionRef = useRef<number>(0);
+  const companyUsersNotAssignedSearchParameterRef = useRef<string>("");
 
-  const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<number[]>([]);
-   const [isLoading, setIsLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
-    const fetchingRef = useRef(false);
-    const gridApiRef = useRef<GridApi | null>(null);
-    const lastScrollPositionRef = useRef<number>(0);
-  
-    const onGridReady = (params: { api: GridApi }) => {
-      gridApiRef.current = params.api;
-  };
-  const {searchParameter,handleSearchParameterChange} = useSearchFilterPaginationDateHandlers();
+  const [
+    companyUsersToAddToTeamsOrProduct,
+    setCompanyUsersToAddToTeamsOrProduct,
+  ] = useState<number[]>([]);
 
-  
-    const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-      open: false,
-      message: "",
-      type: "success",
-    });
-  
-    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-      setMessageSnackbar({ open: true, message, type });
-    };
-  
-    const handleMessageSnackbarClose = () => {
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
-    };
-
-  const handleCompanyUserCheckBoxChange = (params : companyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
-
-    if(event.target.checked){
-      // alert("added " + params.id)
-      setAddCompanyTeamUserArray((prev) => [...prev, params.id]);
-    }
-    else if(!event.target.checked){
-      // alert("removed " + params.id)
-      setAddCompanyTeamUserArray((prev) => prev.filter((id) => id !== params.id));
-    }
-
-  }
-
-  const handleCompanyProductUserUpdateChange = () => {
-    setCompanyProductUserUpdateCount(companyProductUserUpdateCount + 1);
-  }
-  const handleCompanyTeamUserUpdate = ()=> {
-    setCompanyTeamUpdateCount(companyTeamUpdateCount+1);
-  }
-
-  const handleAddCompanyTeamUsers = async()=>{
-    if(userHasAccessToUpdateTeamManagement){
-
-      const createCompanyTeamCompanyUser = {
-        company_id : loginStatus.companyId,
-        company_team_id : companyTeam!.id,
-        company_user_array : addCompanyTeamUserArray,
-        createdby : loginStatus.id,
-      }
-      axios.post(POST_API.CREATE_COMPANY_TEAM_USERS,createCompanyTeamCompanyUser,{
-        withCredentials:true
-      })
-      .then((response) => {
-        if(response.data.status){
-          showMessageSnackbar({message : response.data.message,type : "success"});
-          handleCompanyTeamUserUpdate();
-          const updatedCompanyUsers = companyUsers.filter((user) => !addCompanyTeamUserArray.includes(user.id));
-          setCompanyUsers(updatedCompanyUsers);
-        }
-        setAddCompanyTeamUserArray([]);
-      })
-      .catch(async(error : ApiError | any) => {
-        console.log(error);
-        if(error.status === STATUS_CODE.UNATHORISED){
-              const refreshTokenResponse = await RefreshToken({callFunction: handleAddCompanyTeamUsers})
-              if(refreshTokenResponse){
-                handleAddCompanyTeamUsers();
-              }
-        }
-      })
-    }
-  }
-
-  const handleAddCompanyProductUsers = async() => {
-      if(userHasAccessToUpdateProductTeam){
-        const createCompanyProductUserPostData = {
-          company_id : loginStatus.companyId,
-          company_product_id : companyProduct!.id,
-          company_user_array : addCompanyTeamUserArray,
-          createdby : loginStatus.id,
-        }
-        axios.post(POST_API.CREATE_COMPANY_PRODUCT_USERS,createCompanyProductUserPostData,{
-          withCredentials:true
-        })
-        .then((response) => {
-          if(response.data.status){
-            showMessageSnackbar({message:response.data.message,type:"success"})
-            setCompanyProductUserUpdateCount(companyProductUserUpdateCount + 1);
-            const updatedCompanyUsers = companyUsers.filter((user) => !addCompanyTeamUserArray.includes(user.id));
-            setCompanyUsers(updatedCompanyUsers);
-          }
-          setAddCompanyTeamUserArray([]);
-        })
-        .catch(async(error : ApiError | any) => {
-          console.log(error);
-          if(error.status === STATUS_CODE.UNATHORISED){
-                const refreshTokenResponse = await RefreshToken({callFunction: handleAddCompanyProductUsers})
-                if(refreshTokenResponse){
-                  handleAddCompanyProductUsers();
-                }
-          }
-        })
-      }
-  }
-
-
-  const fetchCompanyTeamUsers = async () => {
-    
-    if (userHasAccessToViewTeamManagement && !isGridForProductUser) {
-    setCompanyTeamUsersList([]);
-      const getCompanyTeamUserPostData = {
-        company_id: loginStatus.companyId,
-        company_team_id: companyTeam!.id,
-        company_user_id: 0,
-        requestedby: loginStatus.id,
-      };
-      await axios
-        .post(POST_API.GET_COMPANY_TEAM_USERS, getCompanyTeamUserPostData, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.data && response.status === STATUS_CODE.OK) {
-            setCompanyUserReadyToFetch(true);
-           // @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-            response.data.map((res: any) => {
-              setCompanyTeamUsersList((prev) => [
-                ...prev,
-                {
-                  companyTeamId: res.company_team_id,
-                  companyUserId: res.company_user_id,
-                  id: res.id,
-                  createdBy: res.createdby,
-                  createdOn: res.createdon,
-                  teamName: res["Team Name"],
-                  isActive: res.isactive,
-                  userName: res["User Name"],
-                },
-              ]);
-            });
-            
-          }
-        })
-        .catch(async(error : ApiError | any) => {
-          console.log(error)
-          if(error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({callFunction:fetchCompanyTeamUsers});
-            if(refreshTokenResponse){
-              fetchCompanyTeamUsers();
-            }
-          }
-        })
-        
-    }
-
+  const companyUserNotAssignedOnGridReady = (params: { api: GridApi }) => {
+    companyUserGridApiRef.current = params.api;
   };
 
-  const fetchCompanyProductUsers = async() => {
-    if(userHasAccessToViewProductTeam &&  isGridForProductUser){
-      setCompanyProductUsersList([]);
-        const getCompanyProductUsersPostData = {
-            company_id : loginStatus.companyId,
-            company_product_id : companyProduct!.id,
-            company_user_id : 0,
-            requestedby : loginStatus.id,
-        }
-        axios.post(POST_API.GET_COMPANY_PRODUCT_USERS,getCompanyProductUsersPostData,{
-            withCredentials:true
-        })
-        .then((response) => {
-          if (response.data && response.status === STATUS_CODE.OK) {
-            setCompanyUserReadyToFetch(true);
-            response.data.map((res : any) => {
-              setCompanyProductUsersList((prev) => [
-                ...prev,
-                {
-                    productCode : res["Product Code"],
-                    productName : res["Product Name"],
-                    userName : res["User Name"],
-                    companyProductId : res.company_product_id,
-                    companyUserId : res.company_user_id,
-                    createdBy : res.createdby,
-                    createdOn : res.createdon,
-                    id : res.id,
-                    isActive : res.isactive,
-                }
-                  ]
-                )
-                }
-              )
-            }
-            })
-        .catch(async(error : ApiError | any) => {
-            console.log(error);
-            if(error.status === STATUS_CODE.UNATHORISED){
-                const refreshTokenResponse = await RefreshToken({callFunction: fetchCompanyProductUsers})
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
-                if(refreshTokenResponse){
-                    fetchCompanyProductUsers();
-                }
-            }
-        })
-    }
-}
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
 
-  const fetchCompanyUsers = async () => {
-    if (!userHasAccessToViewUser || isLoading || !hasMore || fetchingRef.current) return;
-      
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
+  const [isCompanyUserSearchCleared, setIsCompanyUserSearchCleared] =
+    useState<boolean>(true);
+
+    const fetchCompanyUsersNotAssigned = async (
+    companyUserNotAssignedSearchParameter: string
+  ) => {
+    console.log("inside users if : 1");
+    if (
+      !userHasAccessToViewUser ||
+      isCompanyUsersLoading ||
+      (!companyUserHasMore &&
+        companyUserNotAssignedSearchParameter.length === 0) ||
+      companyUserFetchingRef.current
+    )
+      return console.log("inside users if : 2");
     try {
-      fetchingRef.current = true;
-      setIsLoading(true);
+      
+      console.log("inside users if : 3");
+      companyUsersNotAssignedSearchParameterRef.current =
+        companyUserNotAssignedSearchParameter;
+      companyUserFetchingRef.current = true;
+      setIsCompanyUsersLoading(true);
 
       // Save current scroll position before fetching
-      if (gridApiRef.current) {
-        const rowIndex = gridApiRef.current.getLastDisplayedRowIndex();
+      if (companyUserGridApiRef.current) {
+        console.log("inside users if : 4");
+        const rowIndex =
+          companyUserGridApiRef.current.getLastDisplayedRowIndex();
         if (rowIndex !== null) {
-          lastScrollPositionRef.current = rowIndex ;
+          console.log("inside users if : 5");
+          companyUserLastScrollPositionRef.current = rowIndex;
         }
       }
 
-      const getCompanyUserPostData = {
+      const getCompanyProductUserNotAssignedPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        limit: 50,
-        offset:   50 * isCompanyUsersFetchedCount,
+        company_product_id: companyProduct?.id,
+        limit: companyUserNotAssignedSearchParameter.length > 0 ? 0 : 50,
+        offset:
+          companyUserNotAssignedSearchParameter.length > 0
+            ? 0
+            : 50 * isCompanyUsersFetchedCount,
         search_company_specific_date_range_id: 0,
-        search_parameter: "",
+        search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
-      }
+      };
+      const getCompanyTeamUserNotAssignedPostData = {
+        company_id: loginStatus.companyId,
+        requestedby: loginStatus.id,
+        company_team_id: companyTeam?.id,
+        limit: companyUserNotAssignedSearchParameter.length > 0 ? 0 : 50,
+        offset:
+          companyUserNotAssignedSearchParameter.length > 0
+            ? 0
+            : 50 * isCompanyUsersFetchedCount,
+        search_company_specific_date_range_id: 0,
+        search_parameter: companyUserNotAssignedSearchParameter,
+        search_parameter_date: "",
+      };
 
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
-        withCredentials: true,
-      });
+      const response = isGridForProductUser
+        ? await axios.post(
+            POST_API.GET_COMPANY_PRODUCT_USERS_NOT_ASSIGNED,
+            getCompanyProductUserNotAssignedPostData,
+            {
+              withCredentials: true,
+            }
+          )
+        : await axios.post(
+            POST_API.GET_COMPANY_TEAM_USERS_NOT_ASSIGNED,
+            getCompanyTeamUserNotAssignedPostData,
+            {
+              withCredentials: true,
+            }
+          );
 
       if (response.data) {
-        setIsCompanyUsersFetched(isCompanyUsersFetchedCount+1);
+        console.log("inside users if : 6");
+       
+
         const newUsers = response.data;
-                if (newUsers.length === 0) {
-                  setHasMore(false);
-                  
-                  return;
-                }
-                if(!isGridForProductUser){
-                  setCompanyUsers(prev => {
-                    const uniqueUsers = [...prev, ...newUsers]
-                      const companyTeamFilteredUsers = uniqueUsers.filter(user => {
-                        return !companyTeamUsersList.some(teamMember => teamMember.companyUserId === user.id)
-                      });
-                      return companyTeamFilteredUsers;
-                  });
-                }
-                
-                else if(isGridForProductUser){
-                  setCompanyUsers(prev => {
-                    const uniqueUsers = [...prev, ...newUsers]
-                      const companyProductfilteredUsers = uniqueUsers.filter(user => {
-                        return !companyProductUsersList.some(teamMember => teamMember.companyUserId === user.id);
-                      });
-                      return companyProductfilteredUsers;
-                  });
-                }
+        if (newUsers.length === 0) {
+          console.log("inside users if : 7");
+          setCompanyUserHasMore(false);
 
-               // Restore scroll position after data update
-        if (gridApiRef.current && lastScrollPositionRef.current > 0) {
-          
+          return;
+        }
+        if (
+          newUsers.length > 0 &&
+          newUsers?.count > companyUsersNotAssigned.length + newUsers.length
+        ) {
+          console.log("inside users if : 8");
+          setCompanyUserHasMore(true); // Explicitly set to true after clearing search
+        }
+        if (companyUserNotAssignedSearchParameter.length === 0) {
+          setIsCompanyUsersFetched(isCompanyUsersFetchedCount + 1);
+        }
+        if (companyUserNotAssignedSearchParameter.length === 0) {
+          newUsers.map((user: any) => {
+            setCompanyUsersNotAssigned((prev) => [
+              ...prev,
+              {
+                company_id: user.company_id,
+                count: user.count,
+                createdby: user.createdby,
+                createdon: user.createdon,
+                email: user.email,
+                fullname: user.fullname,
+                isactive: user.isactive,
+                mobilenumber: user.mobilenumber,
+                id: user.id,
+              },
+            ]);
+          });
+        } else if (companyUserNotAssignedSearchParameter.length > 0 || isCompanyUsersFetchedCount === 0) {
+          const transformedData = newUsers.map((user: any) => ({
+            company_id: user.company_id,
+            count: user.count,
+            createdby: user.createdby,
+            createdon: user.createdon,
+            email: user.email,
+            fullname: user.fullname,
+            isactive: user.isactive,
+            mobilenumber: user.mobilenumber,
+            id: user.id,
+          }));
+          setCompanyUsersNotAssigned(transformedData);
+        }
+
+        // Restore scroll position after data update
+        if (
+          companyUserGridApiRef.current &&
+          companyUserLastScrollPositionRef.current > 0
+        ) {
+          console.log("inside users if : 9");
           setTimeout(() => {
-           
-              if(gridApiRef.current){
-                  gridApiRef.current.ensureIndexVisible(lastScrollPositionRef.current-11);
-              }
+            if (companyUserGridApiRef.current) {
+              companyUserGridApiRef.current.ensureIndexVisible(
+                companyUserLastScrollPositionRef.current - 11
+              );
+            }
           }, 150);
-      }
-
-
-      if(!isGridForProductUser){
-        if (newUsers[0]?.count && companyUsers.length + newUsers.length >= newUsers[0].count) {
-          setHasMore(false);
         }
-      }
-      else if(isGridForProductUser){
-        if (newUsers[0]?.count && companyUsers.length + newUsers.length >= newUsers[0].count) {
-          setHasMore(false);
-        }
-      }
-        
-          
-        
-        
 
-        
+        if (companyUserNotAssignedSearchParameter.length === 0) {
+          if (
+            newUsers[0]?.count &&
+            companyUsersNotAssigned.length + newUsers.length >=
+              newUsers[0]?.count &&
+            isCompanyUserSearchCleared
+          ) {
+            console.log("inside users if : 10");
+            setCompanyUserHasMore(false);
+          }
+        }
       }
     } catch (error: ApiError | any) {
+      console.log("inside users if : 11");
       console.error(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
-          callFunction: fetchCompanyUsers,
+          callFunctionWithParamsNotEvent: fetchCompanyUsersNotAssigned,
         });
         if (!refreshTokenResponse) {
           // setIsDialogueOpen(true);
-        }
-        else{
+        } else {
           // setIsDialogueOpen(false);
-          fetchCompanyUsers();
+          fetchCompanyUsersNotAssigned("");
         }
       }
     } finally {
-      setIsLoading(false);
-      fetchingRef.current = false;
+      if (companyUserNotAssignedSearchParameter.length > 0) {
+        console.log("inside users if : 12");
+        setIsCompanyUsersLoading(false);
+        companyUserFetchingRef.current = false;
+        if (companyUsersNotAssignedSearchParameterRef.current.length === 1) {
+          console.log("inside users if : 13");
+          setCompanyUserHasMore(true);
+          companyUserGridApiRef.current = null;
+          companyUserLastScrollPositionRef.current = 0;
+          setIsCompanyUsersFetched(0);
+        }
+      } else if (companyUserNotAssignedSearchParameter.length === 0) {
+        console.log("inside users if : 14");
+        setIsCompanyUsersLoading(false);
+        companyUserFetchingRef.current = false;
+      }
     }
   };
 
-  const handleViewPortChanged = (params: ViewportChangedEvent) => {
-      if (!companyUsers.length || !hasMore) return;
-  
-      // Store the grid API reference
-      if (!gridApiRef.current && params.api) {
-        gridApiRef.current = params.api;
-      }
-  
-      const lastVisibleRow = params.lastRow;
-      const totalRowCount = companyUsers[0]?.count;
-      
-      if (totalRowCount && lastVisibleRow >= companyUsers.length - 5) {
-        
-        fetchCompanyUsers();
-      }
-    };
+  const handleCompanyUserNotAssignedViewPortChanged = (
+    params: ViewportChangedEvent
+  ) => {
+    if (!companyUsersNotAssigned.length || !companyUserHasMore)
+      return console.log(
+        "return from viewport changed : " +
+          companyUsersNotAssigned.length +
+          " has more : " +
+          companyUserHasMore
+      );
 
-
- 
-    useEffect(() => {
-      if (!isOpen) {
-        setAddCompanyTeamUserArray([]);
-        setCompanyUsers([]);
-        setHasMore(true);
-        fetchingRef.current = false;
-        gridApiRef.current = null;
-        lastScrollPositionRef.current = 0;
-        setCompanyTeamUsersList([]);
-        setCompanyProductUsersList([]);
-        setCompanyUserReadyToFetch(false);
-      } else if (isOpen && companyUsers.length === 0 && (companyTeamUsersList.length > 0 || companyUserReadyToFetch) && !isGridForProductUser) {
-          fetchCompanyUsers(); 
-      }
-      else if (isOpen && companyUsers.length === 0 && (companyProductUsersList.length > 0 || companyUserReadyToFetch) && isGridForProductUser) {
-          fetchCompanyUsers();
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[isOpen,companyTeamUsersList.length,searchParameter,companyProductUsersList.length,companyUserReadyToFetch]);
-  
+    // Store the grid API reference
+    if (!companyUserGridApiRef.current && params.api) {
+      companyUserGridApiRef.current = params.api;
+    }
+    const lastVisibleRow = params.lastRow;
+    const totalRowCount =
+      companyUsersNotAssigned[companyUsersNotAssigned.length - 1]?.count;
+    if (
+      totalRowCount &&
+      lastVisibleRow >= companyUsersNotAssigned.length - 5 &&
+      companyUsersNotAssignedSearchParameterRef.current.length === 0
+    ) {
+      fetchCompanyUsersNotAssigned("");
+    }
+  };
+  const handleCompanyUserSearchParameterChange = async(searchValue: string) => {
+    if (searchValue.length === 0) {
+      setCompanyUsersNotAssigned([]);
+      setIsCompanyUsersFetched(0);
+      setIsCompanyUsersLoading(false);
+      setCompanyUserHasMore(true);
+      companyUserFetchingRef.current = false;
+      companyUserGridApiRef.current = null;
+      companyUserLastScrollPositionRef.current = 0;
+      fetchCompanyUsersNotAssigned("");
+      setIsCompanyUserSearchCleared(true);
+    } else if (searchValue.length > 0) {
+      setCompanyUsersNotAssigned([]);
+      setIsCompanyUsersFetched(0);
+      // setIsCompanyUsersLoading(false);
+      setCompanyUserHasMore(true);
+      // companyUserFetchingRef.current = false;
+      companyUserGridApiRef.current = null;
+      companyUserLastScrollPositionRef.current = 0;
+      setIsCompanyUserSearchCleared(false);
+      fetchCompanyUsersNotAssigned(searchValue);
+    }
+  };
+  const handleAddCompanyUserCheckBoxChange = (
+    params: CompanyUsersSearchProps,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      setCompanyUsersToAddToTeamsOrProduct((prev) => [...prev, params.id]);
+    } else if (!event.target.checked) {
+      setCompanyUsersToAddToTeamsOrProduct((prev) =>
+        prev.filter((id) => id !== params.id)
+      );
+    }
+    handleCompanyUserCheckBoxChange(params, event);
+  };
 
   useEffect(() => {
-    if(!isGridForProductUser ){
-      fetchCompanyTeamUsers();
+    if (!isOpen) {
+      setCompanyUsersNotAssigned([]);
+      setIsCompanyUsersFetched(0);
+      setIsCompanyUsersLoading(false);
+      setCompanyUserHasMore(true);
+      companyUserFetchingRef.current = false;
+      companyUserGridApiRef.current = null;
+      companyUserLastScrollPositionRef.current = 0;
+      companyUsersNotAssignedSearchParameterRef.current = "";
+      setCompanyUsersToAddToTeamsOrProduct([]);
+      handleMessageSnackbarClose();
+      setIsCompanyUserSearchCleared(true);
+    } else if (isOpen && isCompanyUserNotAssignedReadyToFetch && companyUsersNotAssignedSearchParameterRef.current.length === 0) {
+      fetchCompanyUsersNotAssigned("");
     }
-    else if(isGridForProductUser){
-      fetchCompanyProductUsers()
-    }
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen,companyTeamUpdateCount,companyProductUserUpdateCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, isCompanyUserNotAssignedReadyToFetch]);
 
   const companyTeamColumnDefs = useMemo<ColDef[]>(
     () => [
       {
-        filed : "id",
-        sortable : true,
-        hide : true,
+        filed: "id",
+        sortable: true,
+        hide: true,
       },
       {
         headerName: "name",
         field: "userName",
-        flex:1,
+        flex: 1,
         sortable: true,
         filter: true,
-        
       },
       {
         headerName: "Action",
@@ -448,100 +390,125 @@ function CompanyUserCompanyTeamAgGrid({
         width: 100,
         cellRenderer: (params: any) => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          const [isActive,setIsActive] = useState<boolean>(params.data.isActive);
-        
-          
-          const handleCompanyTeamUsersToggle = async (event : React.FormEvent<HTMLButtonElement>) => {
+          const [isActive, setIsActive] = useState<boolean>(
+            params.data.isActive
+          );
+
+          const handleCompanyTeamUsersToggle = async (
+            event: React.FormEvent<HTMLButtonElement>
+          ) => {
             setIsActive(params.data.isActive);
-            if(userHasAccessToUpdateTeamManagement){
+            if (userHasAccessToUpdateTeamManagement) {
               const updateCompanyTeamUserPostData = {
-                company_id : loginStatus.companyId,
-                id:parseInt(event.currentTarget.id),
-                isactive : !isActive,
-                updatedby : loginStatus.id
-
-              }
-              await axios.post(POST_API.UPDATE_COMPANY_TEAM_USERS,updateCompanyTeamUserPostData,{
-                withCredentials:true
-              })
-              .then((response) => {
-                
-                if(response.data.status){
-                    setIsActive(!isActive)
-                    showMessageSnackbar({message:response.data.message,type:"success"})
-                }
-                handleCompanyTeamUserUpdate();
-              })
-              .catch(async(error : ApiError | any) => {
-                console.log(error);
-                if(error.status === STATUS_CODE.UNATHORISED){
-                      const refreshTokenResponse = await RefreshToken({callFunctionWithEvent : handleCompanyTeamUsersToggle})
-                      if(refreshTokenResponse){
-                       handleCompanyTeamUsersToggle(event);
-                      }
-                }
-              })
-            }
-
-          }
-
-          const handleCompanyProductUsersToggle = async (event : React.FormEvent<HTMLButtonElement>) => {
-            setIsActive(params.data.isActive);
-            if(userHasAccessToUpdateProductTeam){
-              const updateCompanyProductUserPostData = {
-                company_id : loginStatus.companyId,
-                id:parseInt(event.currentTarget.id),
-                isactive : !isActive,
-                updatedby : loginStatus.id
-              }
-
-              axios.post(POST_API.UPDATE_COMPANY_PRODUCT_USERS,updateCompanyProductUserPostData,{
-                withCredentials:true
-              })
-              .then((response) => {
-                if(response.data.status){
-                  setIsActive(!isActive)
-                    showMessageSnackbar({message:response.data.message,type:"success"})
-                }
-                handleCompanyProductUserUpdateChange();
-              })
-              .catch(async(error : ApiError | any) => {
-                if(error.status === STATUS_CODE.UNATHORISED){
-                  const refreshTokenResponse = await RefreshToken({callFunctionWithEvent : handleCompanyProductUsersToggle});
-                  if(refreshTokenResponse){
-                    handleCompanyProductUsersToggle(event);
+                company_id: loginStatus.companyId,
+                id: parseInt(event.currentTarget.id),
+                isactive: !isActive,
+                updatedby: loginStatus.id,
+              };
+              await axios
+                .post(
+                  POST_API.UPDATE_COMPANY_TEAM_USERS,
+                  updateCompanyTeamUserPostData,
+                  {
+                    withCredentials: true,
                   }
-                }
-                
-              })
+                )
+                .then((response) => {
+                  if (response.data.status) {
+                    setIsActive(!isActive);
+                    showMessageSnackbar({
+                      message: response.data.message,
+                      type: "success",
+                    });
+                  }
+                  params.data.isActive = !isActive;
+                })
+                .catch(async (error: ApiError | any) => {
+                  console.log(error);
+                  if (error.status === STATUS_CODE.UNATHORISED) {
+                    const refreshTokenResponse = await RefreshToken({
+                      callFunctionWithEvent: handleCompanyTeamUsersToggle,
+                    });
+                    if (refreshTokenResponse) {
+                      handleCompanyTeamUsersToggle(event);
+                    }
+                  }
+                });
             }
-          }
+          };
+
+          const handleCompanyProductUsersToggle = async (
+            event: React.FormEvent<HTMLButtonElement>
+          ) => {
+            setIsActive(params.data.isActive);
+            if (userHasAccessToUpdateProductTeam) {
+              const updateCompanyProductUserPostData = {
+                company_id: loginStatus.companyId,
+                id: parseInt(event.currentTarget.id),
+                isactive: !isActive,
+                updatedby: loginStatus.id,
+              };
+
+              axios
+                .post(
+                  POST_API.UPDATE_COMPANY_PRODUCT_USERS,
+                  updateCompanyProductUserPostData,
+                  {
+                    withCredentials: true,
+                  }
+                )
+                .then((response) => {
+                  if (response.data.status) {
+                    setIsActive(!isActive);
+                    showMessageSnackbar({
+                      message: response.data.message,
+                      type: "success",
+                    });
+                  }
+                  params.data.isActive = !isActive;
+                })
+                .catch(async (error: ApiError | any) => {
+                  if (error.status === STATUS_CODE.UNATHORISED) {
+                    const refreshTokenResponse = await RefreshToken({
+                      callFunctionWithEvent: handleCompanyProductUsersToggle,
+                    });
+                    if (refreshTokenResponse) {
+                      handleCompanyProductUsersToggle(event);
+                    }
+                  }
+                });
+            }
+          };
           return (
             <div className="flex flex-col items-center mt-3">
               <button
-              id={params.data.id.toString()}
-      className={`w-6 h-3 rounded-md transition-colors duration-200 ${
-      isActive  ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-500'
-      } text-white font-semibold`}
-      onClick={(event) => {
-        if(!isGridForProductUser){
-          handleCompanyTeamUsersToggle(event);
-        }
-        else if(isGridForProductUser){
-          handleCompanyProductUsersToggle(event);
-        }
-        
-      }}
-    >
-      <div className={`bg-gray-200 h-2 w-2 transition-opacity rounded-full ${isActive ? 'float-end' : 'float-start'}`}></div>
-    </button>
+                id={params.data.id.toString()}
+                className={`w-6 h-3 rounded-md transition-colors duration-200 ${
+                  isActive
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-red-500 hover:bg-red-500"
+                } text-white font-semibold`}
+                onClick={(event) => {
+                  if (!isGridForProductUser) {
+                    handleCompanyTeamUsersToggle(event);
+                  } else if (isGridForProductUser) {
+                    handleCompanyProductUsersToggle(event);
+                  }
+                }}
+              >
+                <div
+                  className={`bg-gray-200 h-2 w-2 transition-opacity rounded-full ${
+                    isActive ? "float-end" : "float-start"
+                  }`}
+                ></div>
+              </button>
             </div>
           );
         },
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [companyTeamUpdateCount,companyProductUserUpdateCount]
+    [usersUpdateCount, companyTeamUsersList, companyProductUsersList]
   );
   const defaultColDef = useMemo(() => {
     return {
@@ -550,88 +517,104 @@ function CompanyUserCompanyTeamAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
-      
     };
   }, []);
 
+  useEffect(() => {
+    if (isAddUsersCompleted) {
+      const updatedCompanyUsers = companyUsersNotAssigned.filter(
+        (user) => !companyUsersToAddToTeamsOrProduct.includes(user.id)
+      );
+      setCompanyUsersNotAssigned(updatedCompanyUsers);
+    }
+  }, [isAddUsersCompleted]);
+
   return (
-    <div className="flex justify-around gap-3 mb-16 pb-4">
+    <div className="flex justify-around gap-2 mb-16 pb-6">
       <div
         className="ag-theme-alpine"
         style={{ height: "300px", width: "45%" }}
       >
-        <div className="flex gap-2 mb-6 justify-between">
-        <div className="place-content-center">
-          <span className="text-lg font-semibold text-gray-700">
+        <div className="flex gap-2 mb-2 justify-between">
+          <div>
+            <SearchInput
+              onChange={(event) => {
+                const searchValue = event.target.value;
+                handleSearchParameterChange(searchValue);
+              }}
+            ></SearchInput>
+          </div>
+          <div className="text-lg font-semibold text-gray-700">
             Team Members
-          </span>
+          </div>
         </div>
-        
-        </div>
-        
+
         <AgGridReact
-        rowData={isGridForProductUser ? companyProductUsersList : companyTeamUsersList}
-        columnDefs={companyTeamColumnDefs}
-        defaultColDef={defaultColDef}
-        modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
-      />
-        
-        
-        
-        
+          rowData={
+            isGridForProductUser
+              ? companyProductUsersList!
+              : companyTeamUsersList!
+          }
+          columnDefs={companyTeamColumnDefs}
+          defaultColDef={defaultColDef}
+          modules={[AllCommunityModule]}
+          overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          theme={themeAlpine}
+          onViewportChanged={handleViewPortChanged}
+          onGridReady={onGridReady}
+        />
       </div>
       <div
         className="ag-theme-alpine"
         style={{ height: "300px", width: "45%" }}
       >
         <div className="flex gap-2 mb-2 justify-between">
-        {/* <div className="place-content-center">
-          <span className="text-lg font-semibold text-gray-700">
-            
-          </span>
-          
-        </div> */}
-        <div>
-          <SearchInput onChange={(event)=> {
-            handleSearchParameterChange(event.target.value)
-            }}></SearchInput>
-        </div>
-        <div className="justify-self-end">
-            {!isGridForProductUser && 
-            <Button onClick={handleAddCompanyTeamUsers}>
-            <UserPlus2 className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}></UserPlus2>
-            {" "} Add To Team
-          </Button>
-            }
-
-            {isGridForProductUser &&
-              <Button
-              onClick={handleAddCompanyProductUsers}
-              > <UserPlus2 className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}></UserPlus2>
-              {" "} Assign Users
+          <div>
+            <SearchInput
+              onChange={(event) => {
+                const searchValue = event.target.value;
+                handleCompanyUserSearchParameterChange(searchValue);
+              }}
+            ></SearchInput>
+          </div>
+          <div className="justify-self-end">
+            {!isGridForProductUser && (
+              <Button onClick={handleAddCompanyTeamUsers}>
+                <UserPlus2
+                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                ></UserPlus2>{" "}
+                Add To Team
               </Button>
-            }
+            )}
+
+            {isGridForProductUser && (
+              <Button onClick={handleAddCompanyTeamUsers}>
+                {" "}
+                <UserPlus2
+                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                ></UserPlus2>{" "}
+                Assign Users
+              </Button>
+            )}
           </div>
         </div>
         <AddCompanyTeamUsersAgGrid
-        companyUsers={companyUsers}
-        handleViewPortChanged ={handleViewPortChanged}
-        onGridReady={onGridReady}
-        addCompanyTeamUserArray={addCompanyTeamUserArray}
-        handleCompanyUserCheckBoxChange={handleCompanyUserCheckBoxChange}
+          companyUsers={companyUsersNotAssigned}
+          handleViewPortChanged={handleCompanyUserNotAssignedViewPortChanged}
+          onGridReady={companyUserNotAssignedOnGridReady}
+          addCompanyTeamUserArray={addCompanyTeamAndProductUserArray}
+          handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange}
         />
       </div>
       <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </div>
   );
 }
 
-export default CompanyUserCompanyTeamAgGrid;
+export default CompanyTeamUsersAgGrid;
