@@ -18,7 +18,7 @@ const MESSAGE = {
         SUBSCRIPTION_MIN_ONE_USER_REQUIRED:"Minimum 1 user required.",
         SUBSCRIPTION_MONTH: "Minimum 1 or Max 48 month .",
         SUBSCRIPTION_CREATION_ERROR: "Error creating subscription",
-        SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade",
+        SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade/inActive Users.",
         
     },
     SUCCESS : {

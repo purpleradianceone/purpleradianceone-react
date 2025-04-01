@@ -6,7 +6,7 @@ const PaymentSuccess = () => {
   const [show, setShow] = useState<boolean>(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 4000);
+    const timer = setTimeout(() => setShow(false), 3000);
     return () => clearTimeout(timer);
   }, []);
 
