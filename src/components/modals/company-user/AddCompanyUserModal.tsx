@@ -79,7 +79,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),
-        mobilenumber: addCompanyUserFormData.mobilenumber.trim(),
+        //NOTE : CHAGES NEEDED
+
+        mobilenumber: "+91-"+ addCompanyUserFormData.mobilenumber.trim(),
         email: addCompanyUserFormData.email.trim(),
         createdby: loginStatus.id,
         company_id: loginStatus.companyId,
@@ -179,9 +181,11 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               <div className="flex items-center gap-3 mb-6">
                 <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                 <h2 className="text-xl font-semibold text-gray-800">
-                  Add New Company CompanyUser
+                  Add New Company User
                 </h2>
                 <button
+                //  note : this is logic will not work dynamically CHANGES NEEDED
+                disabled={loginStatus.activeUsersInCompany> loginStatus.subscriptionAllowedUsers}
               onClick={onClose}
               className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
             >

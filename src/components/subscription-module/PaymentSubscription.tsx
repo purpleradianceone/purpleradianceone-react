@@ -134,7 +134,7 @@ export default function PaymentSubscription({
                     onClose();
                     setIsPaymentSuccessfull(false);
                     handleSubscriptionListChange();
-                  }, 4000);
+                  }, 2000);
                 }
               }
             });

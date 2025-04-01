@@ -27,7 +27,7 @@ export default function UpdateSubscription({
   endDate: string;
   existingUserCount: number;
   subscriptionId: number;
-  handleSubscriptionListChange: () => void;
+  handleSubscriptionListChange?: () => void;
 }) {
   const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
@@ -116,7 +116,10 @@ export default function UpdateSubscription({
       setUpdateSubscriptionErrors({
         companyUserCountForUpdateSubscription: "",
       });
+      console.log(existingUserCount);
+      
     }
+    
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -156,7 +159,7 @@ export default function UpdateSubscription({
 
             {/* Information Section - Two Column Layout */}
             <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-gray-700 mb-3">
-              <span className="font-medium">Existing User Count</span>{" "}
+              <span className="font-medium">Subscription allowed users</span>{" "}
               <span>: {existingUserCount}</span>
               <span className="font-medium">Start Date</span>{" "}
               <span>: {startDate}</span>

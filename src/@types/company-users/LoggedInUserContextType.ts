@@ -12,7 +12,11 @@ export type LoggedInUserType = {
     //subscription fields
     activeUsersInCompany:number,
     subscriptionAllowedUsers:number,
-    isActiveSubscription:boolean
+    isActiveSubscription:boolean,
+    subscriptionId: number,
+    startDateSubscription: string,
+    endDateSubscription: string,
+    
 };  
 
 export type LoggedInUserContextProps = {
