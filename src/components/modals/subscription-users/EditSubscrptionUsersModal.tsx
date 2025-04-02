@@ -340,6 +340,7 @@ function EditSubscriptionUsersModal({
                 onGridReady={onCompanyUserGridReady}
                 isGridForUpdateCompanyUser={true}
                 handleCompanyUserStatusChange={handleCompanyUserStatusChange}
+                isGridForSubscription={true}
               />
             </div>
           </div>

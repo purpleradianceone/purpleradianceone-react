@@ -423,6 +423,7 @@ function AddTeamModal({
                   onGridReady = {onGridReady}
                   handleCompanyUserCheckBoxChange={handleCompanyUserCheckBoxChange}
                   addCompanyTeamUserArray={addCompanyTeamUserArray}
+                  isGridForSubscription={false}
                 />
               </div>
 

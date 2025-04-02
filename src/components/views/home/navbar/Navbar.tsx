@@ -77,6 +77,9 @@ function Navbar({children} : {children : React.ReactNode}){
       activeUsersInCompany: 0,
       isActiveSubscription: false,
       subscriptionAllowedUsers: 0,
+      endDateSubscription:"",
+      startDateSubscription:"",
+      subscriptionId:0
     });
   };
 
@@ -304,8 +307,6 @@ function Navbar({children} : {children : React.ReactNode}){
                 </div>
               </div>
             </div>
-          </div>
-        </div>
       </nav>
       </header>
       <main className={sidebarOpen && !isSmallScreen?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
