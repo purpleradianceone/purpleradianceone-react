@@ -603,8 +603,12 @@ function CompanyTeamUsersAgGrid({
           handleViewPortChanged={handleCompanyUserNotAssignedViewPortChanged}
           onGridReady={companyUserNotAssignedOnGridReady}
           addCompanyTeamUserArray={addCompanyTeamAndProductUserArray}
-          handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange}
+          handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange
+          
+          }
+          isGridForSubscription={false}
         />
+
       </div>
       <MessageSnackBar
         isOpen={messageSnackbar.open}
