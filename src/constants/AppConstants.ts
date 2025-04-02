@@ -15,6 +15,11 @@ export const TAX_CODE = {
     ALL : "all"
 }
 
+export const  SUBSCRIPTION = {
+    RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
+    COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",
+    RAZORPAY_CURRENCY : "INR",
+}
 
 export const  NUMBER_VALUES = {
     SNACKBAR_DURATION : 2000,
@@ -32,6 +37,7 @@ export const STATUS_CODE = {
     FORBIDDEN : 403,
 }
 export const JSX_CHILDREN_NAME = {
+    ADD_SUBSCRIPTION: "Upfront Purchase",
     ACCESS : "Access",
     EDIT : "Edit",
     ACTIONS : "Actions ▾",
@@ -42,6 +48,7 @@ export const JSX_CHILDREN_NAME = {
     ADD_TEAM: "Add Team",
     TEAM : "Team",
     USER : "User",
+    UPDATE : "Update Plan"
 
 }
 

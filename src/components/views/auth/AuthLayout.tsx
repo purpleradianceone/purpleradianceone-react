@@ -50,7 +50,7 @@ function AuthLayout(props: AuthLayoutProps){
         
 
         {/* right side code */}
-        <div className={isLargeScreen ? "lg:col-span-2 overflow-y-auto" : "grid"}>
+        <div className={isLargeScreen ? "lg:col-span-2 overflow-y-auto " : "grid"}>
           <div>
             <div className="flex justify-center"></div>
             <h2 className="mt-5 text-center text-3xl font-extrabold text-gray-900">
@@ -66,7 +66,7 @@ function AuthLayout(props: AuthLayoutProps){
             make chages here below.
           */}
           <div className="mt-0 sm:mx-auto sm:w-full sm:max-w-md lg:px-3">
-            <div className="py-8 px-1  sm:px-10">{props.children}</div>
+            <div className="py-8 px-1 jus sm:px-10">{props.children}</div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { STRING_VALUES } from '../../constants/AppConstants';
+import PAGINATION from '../../constants/Pagination';
 
 interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
@@ -21,7 +22,8 @@ interface UseSearchFilterPaginationDateHandlersResult {
 
 export const useSearchFilterPaginationDateHandlers = (
 ): UseSearchFilterPaginationDateHandlersResult => {
-  const [pageSize, setPageSize] = useState(10);
+  const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
+  const [pageSize, setPageSize] = useState(firstValue);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Initialize totalPages
   const [startDate, setStartDate] = useState('');

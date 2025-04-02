@@ -28,6 +28,9 @@ const LoggedInUserContext = createContext<LoggedInUserContextProps | undefined>(
         mobileNumber : "",
         status : false,
         token : "",
+        isActiveSubscription:false,
+        subscriptionAllowedUsers:0,
+        activeUsersInCompany:0
         }
     });
   

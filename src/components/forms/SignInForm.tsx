@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useRef, useState } from "react";
 import FormInput from "../ui/FormInput";
 import FormCheckbox from "../ui/FormCheckbox";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,28 +20,42 @@ import {
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
-import { NUMBER_VALUES, SITE_KEY, STRING_VALUES } from "../../constants/AppConstants";
+import {
+  NUMBER_VALUES,
+  SITE_KEY,
+  STRING_VALUES,
+} from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
-
+import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
 
-  
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
 
-  const initialSignInFormState:SignInFormDataType = {
+  const initialSignInFormState: SignInFormDataType = {
     email: "",
     password: "",
-
   };
 
-  const { formData: loginUserCredentials, handleChange: handleSignInFormDatachange } = useFormChange(initialSignInFormState);
-  const { errors, handleBlur } = useFormValidation(loginUserCredentials,"registered");
+  const loginStatusRef = useRef<any>();
+
+  const {
+    formData: loginUserCredentials,
+    handleChange: handleSignInFormDatachange,
+  } = useFormChange(initialSignInFormState);
+  const { errors, handleBlur } = useFormValidation(
+    loginUserCredentials,
+    "registered"
+  );
+
+  //NOTE : NEED TO HANDLE THIS FUNCTIONALITY
+  const [showSubscriptionOrInActivePopUp, setShowSubscriptionOrInActivePopUp] =
+    useState<boolean>(false);
 
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
@@ -64,21 +79,31 @@ function SignInForm() {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  // const isActiveSubscriptionUseRef =useRef<boolean>(false);
+
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
       if (!loginUserCredentials.email) {
-        showMessageSnackbar({ message: MESSAGE.ERROR.EMAIL_REQUIRED, type: "error" });
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.EMAIL_REQUIRED,
+          type: "error",
+        });
         return;
       }
       if (!loginUserCredentials.password) {
-        showMessageSnackbar({ message: MESSAGE.ERROR.PASSWORD_REQUIRED, type: "error" });
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.PASSWORD_REQUIRED,
+          type: "error",
+        });
         return;
       }
     }
 
-    if (localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME) === STRING_VALUES.TRUE) {
+    if (
+      localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME) === STRING_VALUES.TRUE
+    ) {
       localStorage.setItem(
         LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
         JSON.stringify(loginUserCredentials)
@@ -101,8 +126,8 @@ function SignInForm() {
     const captchaRequest = { token: captchaToken };
 
     axios
-      .post(POST_API.VERIFIY_CAPTCHA, captchaRequest,{
-        withCredentials : true
+      .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {
+        withCredentials: true,
       })
       .then((response) => {
         if (response) {
@@ -110,59 +135,93 @@ function SignInForm() {
             email: loginUserCredentials.email,
             password: loginUserCredentials.password,
           };
-          
           axios
             .post(POST_API.SIGN_IN, user, { withCredentials: true })
             .then((response) => {
               if (response.data.status) {
+
+                loginStatusRef.current = response.data;
                 setLoginStatus({
                   id: response.data.id,
                   companyId: response.data.company_id,
                   companyName: response.data.company_name,
-                  fullName: response.data.fullName,
+                  fullName: response.data.fullname,
                   email: response.data.email,
                   mobileNumber: response.data.mobilenumber,
                   message: response.data.message,
                   token: response.data.token,
                   status: response.data.status,
                   createdOn: response.data.createdon,
+                  isActiveSubscription: response.data.isactive_subscription,
+                  subscriptionAllowedUsers:
+                    response.data.subscription_allowed_users,
+                  activeUsersInCompany: response.data.active_users_in_company,
+                  subscriptionId: response.data.subscription_id,
+                  startDateSubscription: response.data.start_date_subscription,
+                  endDateSubscription: response.data.end_date_subscription,
                 });
 
-                if (response.data) {
-                  const getCrmModuleAccessData = {
-                    company_id: response.data.company_id,
-                    company_user_id: response.data.id,
-                    requestedby: response.data.id,
-                  };
-
-                  axios
-                    .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
-                      withCredentials : true
-                    })
-                    .then((response) => {
-                      setAccessModules(response.data);
-                      setSpinnerAnimation({
-                        status: "success",
-                        message: MESSAGE.SUCCESS.LOGGED_IN,
-                      });
-                      showMessageSnackbar({
-                        message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-                        type: "success",
-                      });
-
-                      setTimeout(() => {
-                          navigate(ROUTES_URL.HOME);
-                      }, 1000);
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      setSpinnerAnimation({
-                        status: "idle",
-                        message: "",
-                      });
-
+                // note: is status false , then it will navigate to create subscription page 
+                if (!response.data.isactive_subscription) {
+                  setTimeout(() => {
+                    showMessageSnackbar({
+                      message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+                      type: "error",
                     });
+                    navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+                  }, 1500);
+                  return; // ⬅️ Stops further execution
                 }
+                 //note : temporary fix
+                 if ((response.data.active_users_in_company > response.data.subscription_allowed_users)) {
+                  setShowSubscriptionOrInActivePopUp(true);
+                  // return;
+                }
+
+                const getCrmModuleAccessData = {
+                  company_id: response.data.company_id,
+                  company_user_id: response.data.id,
+                  requestedby: response.data.id,
+                };
+
+                axios
+                  .post(
+                    POST_API.GET_CRM_MODULE_ACCESS,
+                    getCrmModuleAccessData,
+                    { withCredentials: true }
+                  )
+                  .then((response) => {
+                    setAccessModules(response.data);
+                    setSpinnerAnimation({
+                      status: "success",
+                      message: MESSAGE.SUCCESS.LOGGED_IN,
+                    });
+                    showMessageSnackbar({
+                      message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+                      type: "success",
+                    });
+
+                    // //note : temporary fix
+                    // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
+                    //   setShowSubscriptionOrInActivePopUp(true);
+                    //   return;
+                    // }
+                    if (!loginStatusRef.current.isactive_subscription) {
+                      navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+                      return;
+                    } else if (loginStatusRef.current.isactive_subscription && loginStatusRef.current.active_users_in_company <= loginStatusRef.current.subscription_allowed_users) {
+                      setTimeout(() => {
+                        navigate(ROUTES_URL.HOME); // ⬅️ Navigates ONLY if subscription checks pass
+                      }, 1000);
+                    }
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                    setSpinnerAnimation({
+                      status: "idle",
+                      message: "",
+                    });
+                  });
               } else {
                 showMessageSnackbar({
                   message: MESSAGE.ERROR.WRONG_CREDENTIALS,
@@ -183,6 +242,12 @@ function SignInForm() {
                   mobileNumber: "",
                   status: false,
                   token: "",
+                  isActiveSubscription: false,
+                  subscriptionAllowedUsers: 0,
+                  activeUsersInCompany: 0,
+                  subscriptionId: 0,
+                  startDateSubscription: "",
+                  endDateSubscription: "",
                 });
               }
             })
@@ -197,17 +262,160 @@ function SignInForm() {
                 message: "",
               });
             });
+
+          // axios
+          //   .post(POST_API.SIGN_IN, user, { withCredentials: true })
+          //   .then((response) => {
+          //     if (response.data.status) {
+          //       setLoginStatus({
+          //         id: response.data.id,
+          //         companyId: response.data.company_id,
+          //         companyName: response.data.company_name,
+          //         fullName: response.data.fullname,
+          //         email: response.data.email,
+          //         mobileNumber: response.data.mobilenumber,
+          //         message: response.data.message,
+          //         token: response.data.token,
+          //         status: response.data.status,
+          //         createdOn: response.data.createdon,
+          //         isActiveSubscription:response.data.isactive_subscription,
+          //         // isActiveSubscription:false,
+          //         subscriptionAllowedUsers: response.data.subscription_allowed_users,
+          //         activeUsersInCompany: response.data.active_users_in_company
+          //       });
+
+          //       if(response.data.isactive_subscription){
+          //         setShowSubscriptionOrInActivePopUp(true);
+          //         // navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
+          //         return
+          //       }else{
+
+          //         if (response.data) {
+
+          //           //NOTE : CHANGES REQUIRED
+          //           console.log(response.data);
+          //           if(response.data.active_users_in_company > response.data.subscription_allowed_users){
+          //             setTimeout(() => {
+          //               showMessageSnackbar({
+          //                 message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+          //                 type: "error",
+          //               });
+          //               navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
+          //             return ;
+          //             }, 4000);
+
+          //           }
+
+          //           const getCrmModuleAccessData = {
+          //             company_id: response.data.company_id,
+          //             company_user_id: response.data.id,
+          //             requestedby: response.data.id,
+          //           };
+
+          //           axios
+          //             .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
+          //               withCredentials : true
+          //             })
+          //             .then((response) => {
+          //               setAccessModules(response.data);
+          //               setSpinnerAnimation({
+          //                 status: "success",
+          //                 message: MESSAGE.SUCCESS.LOGGED_IN,
+          //               });
+          //               showMessageSnackbar({
+          //                 message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+          //                 type: "success",
+          //               });
+
+          //               setTimeout(() => {
+          //                   navigate(ROUTES_URL.HOME);
+          //               }, 1000);
+          //             })
+          //             .catch((error) => {
+          //               console.error(error);
+          //               setSpinnerAnimation({
+          //                 status: "idle",
+          //                 message: "",
+          //               });
+          //             });
+          //         }
+          //       }
+          //     } else {
+          //       showMessageSnackbar({
+          //         message: MESSAGE.ERROR.WRONG_CREDENTIALS,
+          //         type: "error",
+          //       });
+          //       setSpinnerAnimation({
+          //         status: "idle",
+          //         message: "",
+          //       });
+          //       setLoginStatus({
+          //         companyId: 0,
+          //         companyName: "",
+          //         createdOn: "",
+          //         email: "",
+          //         fullName: "",
+          //         id: 0,
+          //         message: "",
+          //         mobileNumber: "",
+          //         status: false,
+          //         token: "",
+          //         isActiveSubscription:false,
+          //         subscriptionAllowedUsers:0,
+          //         activeUsersInCompany:0
+          //       });
+          //     }
+          //   })
+          //   .catch((error) => {
+          //     console.log(error);
+          //     showMessageSnackbar({
+          //       message: MESSAGE.ERROR.WRONG_CREDENTIALS,
+          //       type: "error",
+          //     });
+          //     setSpinnerAnimation({
+          //       status: "idle",
+          //       message: "",
+          //     });
+          //   });
         }
       })
       .catch((error) => {
         console.log(error);
-        showMessageSnackbar({ message: MESSAGE.ERROR.INVALID_CAPTCHA, type: "error" });
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.INVALID_CAPTCHA,
+          type: "error",
+        });
         setSpinnerAnimation({
           status: "idle",
           message: "",
         });
       });
   };
+
+  //when sign in page loads resets the contexts and local storage
+  useEffect(() => {
+    setLoginStatus({
+      companyId: 0,
+      companyName: "",
+      createdOn: "",
+      email: "",
+      fullName: "",
+      id: 0,
+      message: "",
+      mobileNumber: "",
+      status: false,
+      token: "",
+      isActiveSubscription: false,
+      subscriptionAllowedUsers: 0,
+      activeUsersInCompany: 0,
+      subscriptionId: 0,
+      startDateSubscription: "",
+      endDateSubscription: "",
+    });
+
+    setAccessModules([]);
+    localStorage.clear();
+  }, []);
 
   const handleRememberMeCheckBoxChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -221,73 +429,92 @@ function SignInForm() {
 
   return (
     <>
-      <form className="space-y-5">
-        <FormInput
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          value={loginUserCredentials.email}
-          onChange={handleSignInFormDatachange}
-          onBlur={handleBlur}
-          error={errors.email}
-        />
-        <FormInput
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          name="password"
-          placeholder="Enter your password"
-          value={loginUserCredentials.password}
-          onChange={handleSignInFormDatachange}
-          onBlur={handleBlur}
-          error={errors.password}
-          rightElement={
-            <PasswordVisibilityToggle
-            setShowPassword={setShowPassword}
-            showPassword = {showPassword}/>
-          }
-        />
-
-        <div className="flex items-center justify-between">
-          <FormCheckbox
-            label="Remember me"
-            name="remember"
-            onChange={handleRememberMeCheckBoxChange}
+      <div>
+        <form className="space-y-5">
+          <FormInput
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={loginUserCredentials.email}
+            onChange={handleSignInFormDatachange}
+            onBlur={handleBlur}
+            error={errors.email}
           />
-          <button
-            type="button"
-            className="text-sm font-medium text-blue-600 hover:text-blue-500"
-          >
-            <Link to={ROUTES_URL.FORGOT_PASSWORD}>Forgot Password?</Link>
-          </button>
-        </div>
+          <FormInput
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Enter your password"
+            value={loginUserCredentials.password}
+            onChange={handleSignInFormDatachange}
+            onBlur={handleBlur}
+            error={errors.password}
+            rightElement={
+              <PasswordVisibilityToggle
+                setShowPassword={setShowPassword}
+                showPassword={showPassword}
+              />
+            }
+          />
 
-        <ReCAPTCHA
-          ref={recaptchaRef}
-          sitekey= {SITE_KEY}
-          onChange={handleRecaptcha}
-        />
-
-        <Button
-          type="submit"
-          onClick={handleLoginSubmit}
-          spinner={spinnerAnimation}
-        >
-          Log In
-        </Button>
-
-        <div className="text-center">
-          <span className="text-gray-600 text-sm">
-            Don't have an account yet?{" "}
+          <div className="flex items-center justify-between">
+            <FormCheckbox
+              label="Remember me"
+              name="remember"
+              onChange={handleRememberMeCheckBoxChange}
+            />
             <button
               type="button"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
+              <Link to={ROUTES_URL.FORGOT_PASSWORD}>Forgot Password?</Link>
             </button>
-          </span>
-        </div>
-      </form>
+          </div>
+
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={SITE_KEY}
+            onChange={handleRecaptcha}
+          />
+
+          <Button
+            type="submit"
+            onClick={handleLoginSubmit}
+            spinner={spinnerAnimation}
+          >
+            Log In
+          </Button>
+
+          <div className="text-center">
+            <span className="text-gray-600 text-sm">
+              Don't have an account yet?{" "}
+              <button
+                type="button"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
+              </button>
+            </span>
+          </div>
+        </form>
+        <SubscriptionDialogueBox
+          isOpen={showSubscriptionOrInActivePopUp}
+          cardTitle="Title of this card"
+          message="message for this card will display here."
+          onClose={() => {
+
+            setShowSubscriptionOrInActivePopUp(false);
+            localStorage.clear();
+            navigate(ROUTES_URL.SIGN_IN);
+            setSpinnerAnimation({
+              status: "idle",
+              message: "",
+            });
+          }}
+        />
+      </div>
+
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}

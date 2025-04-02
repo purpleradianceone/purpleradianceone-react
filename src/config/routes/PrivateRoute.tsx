@@ -9,7 +9,9 @@ function PrivateRoute({ children }:RouteChildrenNode){
   const storedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
-  return isLoggedIn.status ? <>{children}</> : <Navigate to={ROUTES_URL.SIGN_IN} />;
+  // note : this condtion is changed
+  // && (isLoggedIn.subscriptionAllowedUsers >= isLoggedIn.activeUsersInCompany  || !isLoggedIn.isActiveSubscription)
+  return isLoggedIn.status   ? <>{children}</> : <Navigate to={ROUTES_URL.SIGN_IN} />;
 };
 
 export default PrivateRoute;

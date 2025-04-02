@@ -13,10 +13,13 @@ type FormInputProps = {
     rightElement?: React.ReactNode;
     onChange? : (event: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur? : (event : React.FocusEvent<HTMLInputElement>) => void;
+    onFocus? : (event :React.FocusEvent<HTMLInputElement>) => void;
     error?:string;
     readonly? : boolean,
     maxLength? :number ,
     minLength? :number ,
+    min?:number,
+    max?:number,
     size?:number | undefined,
     step? : string,
     // required?: boolean | undefined,

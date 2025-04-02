@@ -9,6 +9,14 @@ export type LoggedInUserType = {
     mobileNumber : string,
     status : boolean,
     token : string
+    //subscription fields
+    activeUsersInCompany:number,
+    subscriptionAllowedUsers:number,
+    isActiveSubscription:boolean,
+    subscriptionId: number,
+    startDateSubscription: string,
+    endDateSubscription: string,
+    
 };  
 
 export type LoggedInUserContextProps = {

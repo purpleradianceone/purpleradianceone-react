@@ -33,18 +33,22 @@ function FormInput({
   ref,
   defaultValue,
   readonly,
-  inputMode
+  inputMode,
+  onFocus,
+  min,
+  max
 }: FormInputProps){
 
   const {isSmallScreen} = useScreenSize();
   return (
     <div className={isSmallScreen ? "mt-1" : "mt-2"}>
-      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
+      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-base font-medium text-gray-700'}>
         {label}
       </label>
       <div className={isSmallScreen ? "mt-1 relative" : "mt-0 relative"}>
-        <input
+        <input 
         ref ={ref}
+        onFocus={onFocus}
         readOnly={readonly}
           type={type}
           defaultValue={defaultValue}
@@ -60,6 +64,8 @@ function FormInput({
             "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
            }
           inputMode={inputMode}
+          min={min}
+          max={max}
         />
         
         {rightElement && (
@@ -68,7 +74,7 @@ function FormInput({
           </div>
         )}
       </div>
-      {error && <div className="mt-3 ml-2 text-red-500 text-sm">{error}</div>}
+      {error && <div className="mt-0 ml-0.5 text-red-500 text-sm">{error}</div>}
     </div>
   );
 };
