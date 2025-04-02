@@ -1,5 +1,6 @@
 
 type CompanyProductUser = {
+    count : number,
     productCode : string,
     productName : string,
     userName : string,

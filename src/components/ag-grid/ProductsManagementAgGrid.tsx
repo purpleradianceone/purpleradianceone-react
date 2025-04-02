@@ -6,10 +6,10 @@ import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import { Product } from "../../@types/products/ProductsManagementProps";
 import { CheckCircle2, Edit, Network, UserPlus, XCircle } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import Button from "../ui/Button";
+import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
 
 function ProductsManagementGrid({
   products,
@@ -18,14 +18,7 @@ function ProductsManagementGrid({
   isGridForProductUser,
   handleCompanyProductUserModalOpen,
   handleCompanyProductTeamModalOpen,
-}: {
-  products: Product[];
-  handleEditCompanyProductModalOpen: (status: boolean) => void;
-  handleSelectedProductChange: (product: Product) => void;
-  isGridForProductUser: boolean;
-  handleCompanyProductUserModalOpen : (status : boolean) => void;
-  handleCompanyProductTeamModalOpen : (status : boolean) => void;
-}) {
+}: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,

@@ -8,14 +8,14 @@ import Button from "../ui/Button";
 import {  JSX_CHILDREN_NAME, } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import LeadManagementProps from "../../@types/lead-management/LeadManagementProps";
+import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGridProps";
 
 
 function LeadManagementAgGrid({
     leads,
     userHasAccessToUpdateLead,
     userHasAccessToViewLead
-}  : LeadManagementProps) {
+}  : LeadManagementAgGridProps) {
 
   useEffect(()=>{
     console.log(leads);

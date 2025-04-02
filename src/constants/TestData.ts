@@ -1,4 +1,4 @@
-import { Lead } from "../@types/lead-management/LeadManagementProps";
+import  Lead from "../@types/lead-management/LeadManagementProps";
 import { Product } from "../@types/products/ProductsManagementProps";
 
 export const productsData : Product[] = [

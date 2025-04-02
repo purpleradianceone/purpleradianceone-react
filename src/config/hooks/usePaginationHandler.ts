@@ -106,8 +106,8 @@ export const useSearchFilterPaginationDateHandlers = (
   };
 
   const handleSearchParameterChange = (inputSearchParam?: string) => {
-    setCurrentPage(1);
     setSearchParameter(inputSearchParam || '');
+    setCurrentPage(1);
   };
 
   

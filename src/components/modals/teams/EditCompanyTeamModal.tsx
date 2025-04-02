@@ -7,13 +7,12 @@ import {
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
-import CompanyTeamSearchProps from "../../../@types/team-management/CompanyTeamListProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import Button from "../../ui/Button";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
@@ -22,7 +21,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import CompanyUserCompanyTeamAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
+import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import RadioButtons from "../../ui/RadioButton";
 import MESSAGE from "../../../constants/Messages";
 import axios from "axios";
@@ -30,24 +29,26 @@ import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import EditCompanyTeamModalProps from "../../../@types/modal/EditCompanyTeamModalProps";
+import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
+import { GridApi, ViewportChangedEvent } from "ag-grid-community";
+import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 
 function EditCompanyTeamModal({
   isOpen,
   onClose,
   companyTeam,
-  handleCompanyTeamChangeOnUpdate
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  companyTeam: CompanyTeamSearchProps;
-  handleCompanyTeamChangeOnUpdate : (teamId : number) => void;
-}) {
-  const { userHasAccessToUpdateTeamManagement } = useUserAccessModules();
+  handleCompanyTeamChangeOnUpdate,
+}: EditCompanyTeamModalProps) {
+  const {
+    userHasAccessToUpdateTeamManagement,
+    userHasAccessToViewTeamManagement,
+  } = useUserAccessModules();
 
   const intialUpdateCompanyTeamFormData = {
     name: companyTeam.name,
     description: companyTeam.description,
-    isActive : companyTeam.isActive
+    isActive: companyTeam.isActive,
   };
 
   const CompanyTeamIsActiveRadioButtonOptions = [
@@ -67,8 +68,7 @@ function EditCompanyTeamModal({
     },
   ];
 
-  const {loginStatus} = useLoggedInUserContext();
-
+  const { loginStatus } = useLoggedInUserContext();
 
   const {
     formData: updateCompanyTeamFormData,
@@ -94,66 +94,363 @@ function EditCompanyTeamModal({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
   const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
+    CompanyTeamUsers[]
+  >([]);
 
+  const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<
+    number[]
+  >([]);
+
+  const [
+    isCompanyTeamUsersFetchedForFirstTime,
+    setssCompanyTeamUsersFetchedForFirstTime,
+  ] = useState<boolean>(true);
+
+  const [isCompanyTeamUsersFetchedCount, setIsCompanyTeamUsersFetchedCount] =
+    useState<number>(0);
+  const [companyTeamUsersUpdateCount, setCompanyTeamUsersUpdateCount] =
+    useState<number>(0);
+  const [
+    isCompanyUserNotAssignedReadyToFetch,
+    setIsCompanyUserNotAssignedReadyToFetch,
+  ] = useState<boolean>(false);
+  const [isCompanyTeamUsersAddCompleted, setIsCompanyTeamUsersAddCompleted] =
+    useState<boolean>(false);
+
+  const [isCompanyTeamUsersLoading, setIsCompanyTeamUsersLoading] =
+    useState<boolean>(false);
+  const [companyTeamUserHasMore, setCompanyTeamUserHasMore] =
+    useState<boolean>(true);
+  const companyTeamUsersFetchingRef = useRef<boolean>(false);
+  const companyTeamUsersGridApiRef = useRef<GridApi | null>(null);
+  const companyTeamUsersLastScrollPositionRef = useRef<number>(0);
+  const companyTeamUsersSearchParameterRef = useRef<string>("");
+
+  const handleCompanyTeamUsersSearchParmaterChange = (searchValue: string) => {
+    if(searchValue.length > 0){
+      setCompanyTeamUsersList([]);
+      setCompanyTeamUserHasMore(true);
+      setIsCompanyTeamUsersFetchedCount(0);
+      setIsCompanyTeamUsersLoading(false);
+      companyTeamUsersFetchingRef.current = false;
+      companyTeamUsersGridApiRef.current = null;
+      companyTeamUsersLastScrollPositionRef.current = 0;
+      fetchCompanyTeamUsers(searchValue);
+    }
+    else if (searchValue.length === 0) {
+      setCompanyTeamUsersList([]);
+      setCompanyTeamUserHasMore(true);
+      setIsCompanyTeamUsersFetchedCount(0);
+      setIsCompanyTeamUsersLoading(false);
+      companyTeamUsersFetchingRef.current = false;
+      companyTeamUsersGridApiRef.current = null;
+      companyTeamUsersLastScrollPositionRef.current = 0;
+      fetchCompanyTeamUsers("");
+    }
+  };
+  const handleCompanyUserCheckBoxChange = (
+    params: CompanyUsersSearchProps,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      // alert("added " + params.id)
+      setAddCompanyTeamUserArray((prev) => [...prev, params.id]);
+    } else if (!event.target.checked) {
+      // alert("removed " + params.id)
+      setAddCompanyTeamUserArray((prev) =>
+        prev.filter((id) => id !== params.id)
+      );
+    }
+  };
+  const companyTeamUserOnGridReady = (params: { api: GridApi }) => {
+    companyTeamUsersGridApiRef.current = params.api;
+  };
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
 
-  const { isSmallScreen } = useScreenSize();
-  const handleUpdateCompanyTeam = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if(userHasAccessToUpdateTeamManagement){
-        if(intialUpdateCompanyTeamFormData.description !== updateCompanyTeamFormData.description
-          || intialUpdateCompanyTeamFormData.name !== updateCompanyTeamFormData.name
-          || updateCompanyTeamFormData.isActive !== intialUpdateCompanyTeamFormData.isActive
-        ){
+  const handleCompanyTeamUsersUpdateChange = () => {
+    setCompanyTeamUsersUpdateCount(companyTeamUsersUpdateCount + 1);
+  };
 
-          const updateCompanyTeamPostData = {
-            id : companyTeam.id,
-            company_id : loginStatus.companyId,
-            name : updateCompanyTeamFormData.name,
-            description : updateCompanyTeamFormData.description,
-            isactive : updateCompanyTeamFormData.isActive,
-            updatedby : loginStatus.id
-
+  const handleAddCompanyTeamUsers = async () => {
+    if (userHasAccessToUpdateTeamManagement) {
+      const createCompanyTeamCompanyUser = {
+        company_id: loginStatus.companyId,
+        company_team_id: companyTeam!.id,
+        company_user_array: addCompanyTeamUserArray,
+        createdby: loginStatus.id,
+      };
+      axios
+        .post(
+          POST_API.CREATE_COMPANY_TEAM_USERS,
+          createCompanyTeamCompanyUser,
+          {
+            withCredentials: true,
           }
-          axios.post(POST_API.UPDATE_COMPANY_TEAM,updateCompanyTeamPostData,{
-            withCredentials : true
+        )
+        .then((response) => {
+          if (response.data.status) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "success",
+            });
+            setIsCompanyTeamUsersAddCompleted(true);
+            handleCompanyTeamUsersUpdateChange();
+            setCompanyTeamUsersList([]);
+            setCompanyTeamUserHasMore(true);
+            setIsCompanyTeamUsersLoading(false);
+            companyTeamUsersFetchingRef.current = false;
+            companyTeamUsersGridApiRef.current = null;
+            companyTeamUsersLastScrollPositionRef.current = 0;
+            setIsCompanyTeamUsersFetchedCount(0);
+            setAddCompanyTeamUserArray([]);
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          console.log(error);
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: handleAddCompanyTeamUsers,
+            });
+            if (refreshTokenResponse) {
+              handleAddCompanyTeamUsers();
+            }
+          }
+        });
+    }
+  };
+
+  const fetchCompanyTeamUsers = async (
+    companyTeamsUserSearchParameter: string
+  ) => {
+    if (
+      !userHasAccessToViewTeamManagement ||
+      isCompanyTeamUsersLoading ||
+      (!companyTeamUserHasMore &&
+        companyTeamsUserSearchParameter.length === 0) ||
+      companyTeamUsersFetchingRef.current
+    )
+      return;
+    try {
+      companyTeamUsersSearchParameterRef.current =
+        companyTeamsUserSearchParameter;
+      companyTeamUsersFetchingRef.current = true;
+      setIsCompanyTeamUsersLoading(true);
+
+      // Save current scroll position before fetching
+      if (companyTeamUsersGridApiRef.current) {
+        const rowIndex =
+          companyTeamUsersGridApiRef.current.getLastDisplayedRowIndex();
+        if (rowIndex !== null) {
+          companyTeamUsersLastScrollPositionRef.current = rowIndex;
+        }
+      }
+
+      const getCompanyTeamUserPostData = {
+        company_id: loginStatus.companyId,
+        company_team_id: companyTeam!.id,
+        company_user_id: 0,
+        isactive: null,
+        search_company_specific_date_range_id: 0,
+        search_parameter: companyTeamsUserSearchParameter,
+        search_parameter_date: "",
+        offset:
+          companyTeamsUserSearchParameter.length > 0
+            ? 0
+            : 40 * isCompanyTeamUsersFetchedCount,
+        limit: companyTeamsUserSearchParameter.length > 0 ? 0 : 40,
+        requestedby: loginStatus.id,
+      };
+      const response = await axios.post(
+        POST_API.GET_COMPANY_TEAM_USERS,
+        getCompanyTeamUserPostData,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data && response.status === STATUS_CODE.OK) {
+        const newCompanyTeamUsers = response.data;
+        if (isCompanyTeamUsersFetchedForFirstTime) {
+          setIsCompanyUserNotAssignedReadyToFetch(true);
+        }
+        if (companyTeamsUserSearchParameter.length === 0) {
+          setIsCompanyTeamUsersFetchedCount(isCompanyTeamUsersFetchedCount + 1);
+        }
+        setssCompanyTeamUsersFetchedForFirstTime(false);
+        setIsCompanyTeamUsersAddCompleted(false);
+        if (response.data.length === 0) {
+          setCompanyTeamUserHasMore(false);
+
+          return;
+        }
+        if (companyTeamsUserSearchParameter.length === 0) {
+          newCompanyTeamUsers.map((res: any) => {
+            setCompanyTeamUsersList((prev) => [
+              ...prev,
+              {
+                count: res.count,
+                companyTeamId: res.company_team_id,
+                companyUserId: res.company_user_id,
+                id: res.id,
+                createdBy: res.createdby,
+                createdOn: res.createdon,
+                teamName: res["Team Name"],
+                isActive: res.isactive,
+                userName: res["User Name"],
+              },
+            ]);
+          });
+        } else if (companyTeamsUserSearchParameter.length > 0) {
+          const transformedData: CompanyTeamUsers[] = newCompanyTeamUsers.map(
+            (item: any) => ({
+              count: item.count,
+              id: item.id,
+              companyTeamId: item.company_team_id,
+              teamName: item["Team Name"],
+              companyUserId: item.company_user_id,
+              userName: item["User Name"],
+              isActive: item.isactive,
+              createdBy: item.createdby,
+              createdOn: item.createdon,
+            })
+          );
+
+          setCompanyTeamUsersList(transformedData);
+        }
+
+        if (
+          companyTeamUsersGridApiRef.current &&
+          companyTeamUsersLastScrollPositionRef.current > 0
+        ) {
+          setTimeout(() => {
+            if (companyTeamUsersGridApiRef.current) {
+              companyTeamUsersGridApiRef.current.ensureIndexVisible(
+                companyTeamUsersLastScrollPositionRef.current - 11
+              );
+            }
+          }, 150);
+        }
+        if (
+          newCompanyTeamUsers[0]?.count &&
+          companyTeamUsersList.length + response.data.length >=
+            newCompanyTeamUsers[0].count
+        ) {
+          setCompanyTeamUserHasMore(false);
+        }
+      }
+    } catch (error: ApiError | any) {
+      console.log(error);
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchCompanyTeamUsers,
+        });
+        if (refreshTokenResponse) {
+          fetchCompanyTeamUsers("");
+        }
+      }
+    } finally {
+      if (companyTeamsUserSearchParameter.length > 0) {
+        setCompanyTeamUserHasMore(true);
+        setIsCompanyTeamUsersLoading(false);
+        companyTeamUsersFetchingRef.current = false;
+        if (companyTeamUsersSearchParameterRef.current.length === 1) {
+          companyTeamUsersGridApiRef.current = null;
+          companyTeamUsersLastScrollPositionRef.current = 0;
+          setIsCompanyTeamUsersFetchedCount(0);
+        }
+      } else if (companyTeamsUserSearchParameter.length === 0) {
+        setIsCompanyTeamUsersLoading(false);
+        companyTeamUsersFetchingRef.current = false;
+      }
+    }
+  };
+
+  const handleCompanyTeamUserViewPortChange = (
+    params: ViewportChangedEvent
+  ) => {
+    if (!companyTeamUsersList.length || !companyTeamUserHasMore) return;
+
+    if (!companyTeamUsersGridApiRef.current && params.api) {
+      companyTeamUsersGridApiRef.current = params.api;
+    }
+
+    const lastVisibleRow = params.lastRow;
+    const totalRowCount =
+      companyTeamUsersList[companyTeamUsersList.length - 1]?.count;
+    if (
+      totalRowCount &&
+      lastVisibleRow >= companyTeamUsersList.length - 5 &&
+      companyTeamUsersSearchParameterRef.current.length === 0
+    ) {
+      fetchCompanyTeamUsers("");
+    }
+  };
+
+  const { isSmallScreen } = useScreenSize();
+  const handleUpdateCompanyTeam = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    if (userHasAccessToUpdateTeamManagement) {
+      if (
+        intialUpdateCompanyTeamFormData.description !==
+          updateCompanyTeamFormData.description ||
+        intialUpdateCompanyTeamFormData.name !==
+          updateCompanyTeamFormData.name ||
+        updateCompanyTeamFormData.isActive !==
+          intialUpdateCompanyTeamFormData.isActive
+      ) {
+        const updateCompanyTeamPostData = {
+          id: companyTeam.id,
+          company_id: loginStatus.companyId,
+          name: updateCompanyTeamFormData.name,
+          description: updateCompanyTeamFormData.description,
+          isactive: updateCompanyTeamFormData.isActive,
+          updatedby: loginStatus.id,
+        };
+        axios
+          .post(POST_API.UPDATE_COMPANY_TEAM, updateCompanyTeamPostData, {
+            withCredentials: true,
           })
           .then((response) => {
-            if(response.data.status){
-              showMessageSnackbar({message: response.data.message, type: "success"})
+            if (response.data.status) {
+              showMessageSnackbar({
+                message: response.data.message,
+                type: "success",
+              });
               handleCompanyTeamChangeOnUpdate(companyTeam.id);
-              setTimeout(()=>{
+              setTimeout(() => {
                 onClose();
-              },3000)
+              }, 3000);
             }
           })
-          .catch(async(error : ApiError |any) => {
+          .catch(async (error: ApiError | any) => {
             console.log(error);
-            if(error.status === STATUS_CODE.UNATHORISED){
-              const refreshTokenResponse = await RefreshToken({callFunctionWithEvent:handleUpdateCompanyTeam})
-              if(refreshTokenResponse){
+            if (error.status === STATUS_CODE.UNATHORISED) {
+              const refreshTokenResponse = await RefreshToken({
+                callFunctionWithEvent: handleUpdateCompanyTeam,
+              });
+              if (refreshTokenResponse) {
                 handleUpdateCompanyTeam(event);
-                setIsDialogueOpen(false);                
+                setIsDialogueOpen(false);
               }
-            }
-            else if(error.status === STATUS_CODE.FORBIDDEN){
+            } else if (error.status === STATUS_CODE.FORBIDDEN) {
               setIsDialogueOpen(true);
             }
-          })
+          });
+      } else {
+        showMessageSnackbar({
+          message: MESSAGE.ERROR.NO_CHANGES,
+          type: "error",
+        });
+      }
     }
-    else{
-      showMessageSnackbar({message : MESSAGE.ERROR.NO_CHANGES,type: "error"})
-    }
-  }
-
-  }
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -161,9 +458,25 @@ function EditCompanyTeamModal({
         name: "",
         description: "",
       });
+      handleMessageSnackbarClose();
+      setIsDialogueOpen(false);
+      setCompanyTeamUsersList([]);
+      setAddCompanyTeamUserArray([]);
+      setssCompanyTeamUsersFetchedForFirstTime(true);
+      setIsCompanyTeamUsersFetchedCount(0);
+      setCompanyTeamUsersUpdateCount(0);
+      setIsCompanyUserNotAssignedReadyToFetch(false);
+      setIsCompanyTeamUsersAddCompleted(false);
+      setIsCompanyTeamUsersLoading(false);
+      setCompanyTeamUserHasMore(true);
+      companyTeamUsersFetchingRef.current = false;
+      companyTeamUsersGridApiRef.current = null;
+      companyTeamUsersLastScrollPositionRef.current = 0;
+    } else if (isOpen) {
+      fetchCompanyTeamUsers("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isOpen, companyTeamUsersUpdateCount]);
 
   if (!isOpen) return null;
   return (
@@ -240,14 +553,26 @@ function EditCompanyTeamModal({
                 </div>
               )}
             </form>
-            <CompanyUserCompanyTeamAgGrid
+            <CompanyTeamUsersAgGrid
               companyTeam={companyTeam}
               isOpen={isOpen}
               isGridForProductUser={false}
-            ></CompanyUserCompanyTeamAgGrid>
+              companyTeamUsersList={companyTeamUsersList}
+              handleAddCompanyTeamUsers={handleAddCompanyTeamUsers}
+              handleViewPortChanged={handleCompanyTeamUserViewPortChange}
+              onGridReady={companyTeamUserOnGridReady}
+              handleCompanyUserCheckBoxChange={handleCompanyUserCheckBoxChange}
+              isCompanyUserNotAssignedReadyToFetch={
+                isCompanyUserNotAssignedReadyToFetch
+              }
+              addCompanyTeamAndProductUserArray={addCompanyTeamUserArray}
+              handleSearchParameterChange={
+                handleCompanyTeamUsersSearchParmaterChange
+              }
+              isAddUsersCompleted={isCompanyTeamUsersAddCompleted}
+              usersUpdateCount={companyTeamUsersUpdateCount}
+            ></CompanyTeamUsersAgGrid>
           </div>
-
-
         </div>
         <MessageSnackBar
           isOpen={messageSnackbar.open}

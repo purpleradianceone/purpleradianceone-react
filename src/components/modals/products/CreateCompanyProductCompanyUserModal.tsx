@@ -9,7 +9,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -31,7 +31,7 @@ function CreateCompanyProductCompanyUserModal({
 
   const { userHasAccessToAddProduct, userHasAccessToViewUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
-  const [compnayUsers, setCompnayUsers] = useState<companyUsersSearchProps[]>([]);
+  const [compnayUsers, setCompnayUsers] = useState<CompanyUsersSearchProps[]>([]);
 
   const navigate = useNavigate();
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {

@@ -65,10 +65,13 @@ function TeamManagement(){
     const fetchCompanyTeam = async () => {
       const offset = (currentPage - 1) * pageSize;
       if(userHasAccessToViewTeamManagement){
-        setCompanyTeamList([]);
+        setTimeout(()=>{
+          setCompanyTeamList([]);
+        },100)
+        
 
         const getCompanyTeamPostData = {
-          company_id: loginStatus.companyId,
+      company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
       limit: pageSize,
       offset,
@@ -77,7 +80,7 @@ function TeamManagement(){
       search_parameter_date: concatDate, 
         };
 
-        axios.post(POST_API.GET_COMPANY_TEAM,getCompanyTeamPostData,{
+       await axios.post(POST_API.GET_COMPANY_TEAM,getCompanyTeamPostData,{
           withCredentials:true
         })
         .then(response => {

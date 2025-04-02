@@ -15,12 +15,11 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
-import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import Pagination from "../ag-grid/Pagination";
 import EditCompanyProductModal from "../modals/products/EditProductModal";
 import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
+import ProductsManagementListProps from "../../@types/List/ProductsManagementListProps";
 
 function ProductsManagementList({
   products,
@@ -32,17 +31,7 @@ function ProductsManagementList({
   handleEditProductChange,
   handleCreateCompanyProductTax,
   isListForProductUser,
-} : {
-  products: Product[];
-  paginationData: PaginationDataProps;
-  handleSearchOption: HandleSearchOptionProps;
-  onStartDateChange: (date: Date) => void;
-  onEndDateChange: (date: Date) => void;
-  handleProductChangeOnAdd?: (product: Product) => void;
-  handleEditProductChange?: (product:Product) => void;
-  handleCreateCompanyProductTax? : (product : Product) => void;
-  isListForProductUser : boolean;
-}) {
+} : ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const [isEditComapanyProductModalOpen,setIsEditCompanyProductModalOpen] = useState<boolean>(false); 
   const [isCompanyProductUserModalOpen,setIsCompanyProductUserModalOpen] = useState<boolean>(false);

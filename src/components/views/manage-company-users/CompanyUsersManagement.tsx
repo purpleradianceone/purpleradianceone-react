@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import GetCompanyUsersList from "../../lists/CompanyUsersList";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -19,7 +19,7 @@ import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/use
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 
 function GetCompanyUsers() {
-  const [companyUsers, setCompanyUsers] = useState<companyUsersSearchProps[]>(
+  const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
   const { loginStatus } = useLoggedInUserContext();

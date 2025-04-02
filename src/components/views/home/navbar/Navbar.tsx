@@ -10,9 +10,10 @@ import Button from "../../../ui/Button";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
 
-function Navbar({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState<boolean>();
-  const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+function Navbar({children} : {children : React.ReactNode}){
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+   const {loginStatus,setLoginStatus} = useLoggedInUserContext();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
     useState<boolean>(false);
@@ -180,9 +181,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between">
                 <div className="flex justify-between">
                   <SideNavBar
-                    isOpen={sidebarOpen}
-                    onToggle={() => setSidebarOpen(!sidebarOpen)}
-                  />
+                isOpen={sidebarOpen}
+                onToggle={() => setSidebarOpen(!sidebarOpen)}
+                onNextTab ={()=>{
+                  setSidebarOpen(false)
+                }}
+              />
                   <div className="ml-4">
                     <span className="text-xl font-semibold"></span>
                   </div>
@@ -190,7 +194,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                 <div className="flex ml-11 justify-between text-xl font-bold text-blue-700 cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>{loginStatus.companyName}</Link>
                 </div>
-
                 <div className="flex-1 max-w-xl ml-28 hidden lg:block">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -301,15 +304,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
             </div>
-          </nav>
-        </header>
-        <main
-          className={
-            sidebarOpen
-              ? "mt-16 ml-60 flex justify-center items-center"
-              : "mt-16 ml-16 flex justify-center items-center"
-          }
-        >
+          </div>
+        </div>
+      </nav>
+      </header>
+      <main className={sidebarOpen && !isSmallScreen?  "mt-16 ml-60 flex justify-center items-center" : "mt-16 ml-16 flex justify-center items-center"}>
           {children}
         </main>
         {accessDeniedPopUpView && (

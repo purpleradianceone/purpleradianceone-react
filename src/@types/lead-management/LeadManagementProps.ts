@@ -1,12 +1,5 @@
-type LeadManagementProps = {
-    leads?: Lead[],
-    userHasAccessToViewLead? : boolean,
-    userHasAccessToUpdateLead? : boolean,
-    handleSelectedLeadChange? : (lead: Lead) => void,
-     handleIdIsEditModalOpen? : (isOpen : boolean)=> void ,
-}
 
-export type Lead = {
+type Lead = {
     id?: number,
     leadNo?: string,
     name: string,
@@ -22,4 +15,4 @@ export type Lead = {
     source? : string,
 }
 
-export default LeadManagementProps;
+export default Lead;

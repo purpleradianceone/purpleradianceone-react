@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
-import CompanyUser from "../../@types/company-users/CompanyUser";
 import {
   INNERHTML,
   JSX_CHILDREN_NAME,
@@ -13,18 +11,14 @@ import {
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
 
 function CompanyUserAgGrid({
   users,
   handleSelectedCompanyUserChange,
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
-}: {
-  users: companyUsersSearchProps[];
-  handleSelectedCompanyUserChange: (params: CompanyUser) => void;
-  handleIdIsEditModalOpen: (params: boolean) => void;
-  handleIsAccessModalOpen: (params: boolean) => void;
-}) {
+}: CompanyUserAgGridProps) {
   const { userHasAccessToViewAccess, userHasAccessToUpdateUser } =
     useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
