@@ -1,22 +1,22 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useState } from "react";
-import CompanyProductTeam from "../../@types/product-teams-management/CompanyProductTeam";
 import { INNERHTML } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
+import CompanyProductTeamsAgGridProps from "../../@types/ag-grid/CompanyProductTeamsAgGridProps";
 
 function CompanyProductTeamsAgGrid({
   companyProductTeams,
   handleCompanyProductTeamUpdate,
-}: {
-  companyProductTeams: CompanyProductTeam[];
-  handleCompanyProductTeamUpdate : (message : string) => void;
-}) {
+  handleViewPortChanged,
+  onGridReady,
+}: CompanyProductTeamsAgGridProps) {
 
   const {userHasAccessToUpdateProductTeam} = useUserAccessModules();
   const {loginStatus} = useLoggedInUserContext();
@@ -61,6 +61,7 @@ function CompanyProductTeamsAgGrid({
               .then((response) => {
                 if(response.data.status){
                   setIsActive(!isActive)
+                  params.data.isActive = !isActive;
                   handleCompanyProductTeamUpdate(response.data.message)
               }
               })
@@ -112,6 +113,8 @@ function CompanyProductTeamsAgGrid({
       modules={[AllCommunityModule]}
       overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
       theme={themeAlpine}
+      onViewportChanged={handleViewPortChanged}
+      onGridReady={onGridReady}
     />
   );
 }

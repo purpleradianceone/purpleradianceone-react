@@ -1,0 +1,46 @@
+Date : 2025-03-28 14:08:54
+Directory : d:\CRM Purple\React\purple-crm-react\src
+Total : 10 files,  158 codes, 14 comments, -15 blanks, all 157 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| TypeScript JSX |          7 |        144 |         14 |        -18 |        140 |
+| TypeScript     |          3 |         14 |          0 |          3 |         17 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                         | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                            |         10 |        158 |         14 |        -15 |        157 |
+| @types                                                                                                       |          2 |         13 |          0 |          3 |         16 |
+| @types\ag-grid                                                                                               |          2 |         13 |          0 |          3 |         16 |
+| components                                                                                                   |          7 |        144 |         14 |        -18 |        140 |
+| components\ag-grid                                                                                           |          2 |       -353 |         -8 |        -46 |       -407 |
+| components\lists                                                                                             |          2 |          3 |         -1 |          2 |          4 |
+| components\modals                                                                                            |          3 |        494 |         23 |         26 |        543 |
+| components\modals\company-product-team                                                                       |          1 |        -10 |          0 |          0 |        -10 |
+| components\modals\company-product-user                                                                       |          1 |        249 |         15 |         16 |        280 |
+| components\modals\teams                                                                                      |          1 |        255 |          8 |         10 |        273 |
+| config                                                                                                       |          1 |          1 |          0 |          0 |          1 |
+| config\validations                                                                                           |          1 |          1 |          0 |          0 |          1 |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                                     | language       | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\AddCompanyTeamUsersAgGridProps.ts                    | TypeScript     |          1 |          0 |          2 |          3 |
+| d:\CRM Purple\React\purple-crm-react\src\@types\ag-grid\CompanyTeamUsersAgGridProps.ts                       | TypeScript     |         12 |          0 |          1 |         13 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyProductTeamsAgGrid.tsx                    | TypeScript JSX |          1 |          1 |          0 |          2 |
+| d:\CRM Purple\React\purple-crm-react\src\components\ag-grid\CompanyTeamUsersAgGrid.tsx                       | TypeScript JSX |       -354 |         -9 |        -46 |       -409 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\CompanyUsersList.tsx                               | TypeScript JSX |          0 |          0 |          2 |          2 |
+| d:\CRM Purple\React\purple-crm-react\src\components\lists\TeamManagementList.tsx                             | TypeScript JSX |          3 |         -1 |          0 |          2 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-team\CompanyProductTeamsModal.tsx | TypeScript JSX |        -10 |          0 |          0 |        -10 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\company-product-user\CompanyProductUsersModal.tsx | TypeScript JSX |        249 |         15 |         16 |        280 |
+| d:\CRM Purple\React\purple-crm-react\src\components\modals\teams\EditCompanyTeamModal.tsx                    | TypeScript JSX |        255 |          8 |         10 |        273 |
+| d:\CRM Purple\React\purple-crm-react\src\config\validations\RefreshToken.ts                                  | TypeScript     |          1 |          0 |          0 |          1 |
+| Total                                                                                                        |                |        158 |         14 |        -15 |        157 |
++--------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

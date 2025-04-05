@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import POST_API from "../../constants/PostApi";
@@ -6,8 +7,8 @@ import ApiError from "../../@types/error/ApiError";
 
 const RefreshToken = async (props : {
     callFunction? : () => Promise<void>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callFunctionWithEvent? : (event : any) => Promise<void>
+    callFunctionWithEvent? : (event : any) => Promise<void>,
+    callFunctionWithParamsNotEvent?: (params : any) => Promise<void>,
 }) => {
     try {
       const refreshResponse = await axios.post(

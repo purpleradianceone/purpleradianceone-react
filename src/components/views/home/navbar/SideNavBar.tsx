@@ -4,12 +4,13 @@ import SideNavBarItem from "./SideNavBarItem";
 import { Link } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import useScreenSize from "../../../../config/hooks/useScreenSize";
 
 
-function SideNavBar({isOpen,onToggle} : SideBarProps){
+function SideNavBar({isOpen,onToggle,onNextTab} : SideBarProps){
 
   const {userHasAccessToViewUser,userHasAccessToViewLead,userHasAccessToViewProduct,userHasAccessToViewTeamManagement,userHasAccessToViewProductTeam} = useUserAccessModules()
-
+  const {isSmallScreen} = useScreenSize();
 
     return(
       <aside
@@ -28,7 +29,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             </Link>
 
              {userHasAccessToViewUser && 
-                <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={() => {window.location.href = ROUTES_URL.GET_COMPANY_USERS}}>
+                <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={()=>{
+                  if(isSmallScreen){
+                    onNextTab();
+                  }
+                }}>
                 <SideNavBarItem 
                   icon={Building2} 
                   label="Manage Users" 
@@ -37,7 +42,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {!userHasAccessToViewUser &&
-            <Link to={ROUTES_URL.GET_COMPANY_USERS}>
+            <Link to={ROUTES_URL.GET_COMPANY_USERS} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}>
             <SideNavBarItem 
               icon={Building2} 
               label="Manage Users" 
@@ -48,7 +57,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             
             
             {userHasAccessToViewLead && 
-            <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+            <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}>
             <SideNavBarItem 
               icon={Handshake} 
               label="Leads" 
@@ -58,7 +71,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {!userHasAccessToViewLead &&
-                <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+                <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT} onClick={()=>{
+                  if(isSmallScreen){
+                    onNextTab();
+                  }
+                }}>
                 <SideNavBarItem 
                   icon={Handshake} 
                   label="Leads" 
@@ -69,7 +86,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {userHasAccessToViewProduct &&
-                <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+                <Link to={ROUTES_URL.PRODUCT_MANAGEMENT} onClick={()=>{
+                  if(isSmallScreen){
+                    onNextTab();
+                  }
+                }}>
                 <SideNavBarItem
                 icon={Store}
                 label="Products"
@@ -79,7 +100,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {!userHasAccessToViewProduct &&
-              <Link to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+              <Link to={ROUTES_URL.PRODUCT_MANAGEMENT} onClick={()=>{
+                if(isSmallScreen){
+                  onNextTab();
+                }
+              }}>
                 <SideNavBarItem
                 icon={Store}
                 label="Products"
@@ -90,7 +115,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {userHasAccessToViewTeamManagement &&
-            <Link to={ROUTES_URL.TEAM_MANAGEMENT}>
+            <Link to={ROUTES_URL.TEAM_MANAGEMENT} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}>
               <SideNavBarItem 
               icon = {Network}
               isOpen = {isOpen}
@@ -99,7 +128,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             </Link>
             }
             {!userHasAccessToViewTeamManagement &&
-            <Link to={ROUTES_URL.TEAM_MANAGEMENT}>
+            <Link to={ROUTES_URL.TEAM_MANAGEMENT} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}>
               <SideNavBarItem 
               icon = {Network}
               isOpen = {isOpen}
@@ -110,7 +143,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             }
 
             {userHasAccessToViewProductTeam &&
-            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}> 
+            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}> 
             <SideNavBarItem
             icon={BoxesIcon}
               isOpen = {isOpen}
@@ -119,7 +156,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             </Link>
             }
             {!userHasAccessToViewProductTeam &&
-            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}> 
+            <Link to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}> 
             <SideNavBarItem
             icon={BoxesIcon}
               isOpen = {isOpen}
@@ -135,7 +176,11 @@ function SideNavBar({isOpen,onToggle} : SideBarProps){
             icon={Settings}
             label="Crm Settings"
             isOpen={isOpen}
-            children={[<Link to={ROUTES_URL.LEAD_SETTINGS}>Lead</Link>,"Product"]}
+            children={[<Link to={ROUTES_URL.LEAD_SETTINGS} onClick={()=>{
+              if(isSmallScreen){
+                onNextTab();
+              }
+            }}>Lead</Link>,"Product"]}
             ></SideNavBarItem>
 
 

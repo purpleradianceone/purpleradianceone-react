@@ -1,6 +1,6 @@
- type companyUsersSearchProps = {
+ type CompanyUsersSearchProps = {
   company_id: number;
-  count? : number,
+  count : number,
   fullname: string;
   email: string;
   mobilenumber: string;
@@ -8,9 +8,20 @@
   id:number,
   createdby: string,
   createdon : string,
-  updatedby : string,
-  updatedon : string,
-  password: string,
+  updatedby ?: string,
+  updatedon? : string,
+  password?: string,
 };
 
-export default companyUsersSearchProps;
+export default CompanyUsersSearchProps;
+
+
+// "count": 99,
+// "id": 105,
+// "company_id": 1,
+// "fullname": "Krishna Bajaj",
+// "email": "krishna.bajaj@example.com",
+// "mobilenumber": "+918877665552",
+// "isactive": true,
+// "createdby": "PurpleRadiance Pvt LTD",
+// "createdon": "Mar 07, 2025"

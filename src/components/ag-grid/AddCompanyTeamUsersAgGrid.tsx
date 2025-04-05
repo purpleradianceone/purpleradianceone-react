@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
+
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
@@ -23,6 +24,7 @@ function AddCompanyTeamUsersAgGrid({
   isGridForUpdateCompanyUser,
   // You can still call this if needed
   handleCompanyUserStatusChange,
+  isGridForSubscription
 }: {
   companyUsers: companyUsersSearchProps[];
   handleViewPortChanged: (params: ViewportChangedEvent) => void;
@@ -31,6 +33,7 @@ function AddCompanyTeamUsersAgGrid({
   addCompanyTeamUserArray?: number[];
   isGridForUpdateCompanyUser?: boolean;
   handleCompanyUserStatusChange?: (statusChangeCount: number) => void;
+  isGridForSubscription: boolean;
 }) {
   const { userHasAccessToUpdateUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -115,7 +118,7 @@ function AddCompanyTeamUsersAgGrid({
                   checked={isChecked}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   onChange={(event) => {
-                    handleCompanyUserCheckBoxChange && handleCompanyUserCheckBoxChange(params.data, event);
+                       handleCompanyUserCheckBoxChange!(params.data, event);
                   }}
                 />
               </div>
@@ -195,7 +198,10 @@ function AddCompanyTeamUsersAgGrid({
       },
     ],
     // Include dependencies that affect the rendering.
+
     [addCompanyTeamUserArray, companyUsers, isGridForUpdateCompanyUser, handleCompanyUserCheckBoxChange, userHasAccessToUpdateUser, loginStatus,  ]
+    //[addCompanyTeamUserArray, companyUsers]
+    //need to check the above code 
   );
 
   const defaultColDef = useMemo(() => {
@@ -212,8 +218,12 @@ function AddCompanyTeamUsersAgGrid({
     <>
       {/* Optional: display the global change count */}
       <div className="mb-2">
-        <span className="font-semibold">Net Status Change Count: </span>
-        <span>{statusChangeCount}</span>
+        {isGridForSubscription &&
+        (
+          <><span className="font-semibold">Net Status Change Count: </span><span>{statusChangeCount}</span></>
+        )
+        }
+        
       </div>
       <AgGridReact
         rowData={companyUsers}
@@ -224,6 +234,7 @@ function AddCompanyTeamUsersAgGrid({
         theme={themeAlpine}
         onViewportChanged={handleViewPortChanged}
         onGridReady={onGridReady}
+
       />
     </>
   );
