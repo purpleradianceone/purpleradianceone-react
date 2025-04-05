@@ -5,7 +5,7 @@ function TextAreaInput(props: TextAreaInputProps) {
     <div className="mt-4">
       <label
         htmlFor={props.name}
-        className="block text-base font-medium text-gray-500"
+        className="block text-sm font-semibold text-gray-700"
       >
         {props.label}
       </label>

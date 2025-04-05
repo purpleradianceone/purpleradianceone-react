@@ -22,12 +22,12 @@ import ROUTES_URL from "../../../constants/Routes";
 function EditSubscriptionUsersModal({
   isOpen,
   onClose,
-  onRedirectToLoginPage
-  // handleCompanyUserStatusChange,
-}: {
+  onRedirectToLoginPage,
+}: // handleCompanyUserStatusChange,
+{
   isOpen: boolean;
   onClose: () => void;
-  onRedirectToLoginPage : () => void;
+  onRedirectToLoginPage: () => void;
   // handleCompanyUserStatusChange: (status: boolean) => void;
   // handleCompanyUserStatusChange : (statusChangeCount: number) => void;
 }) {
@@ -40,13 +40,18 @@ function EditSubscriptionUsersModal({
     companyUsersSearchProps[]
   >([]);
 
-  const [ statusChangeOfCompanyUserCountFromAggrid , setStatusChangeOfCompanyUserCountFromAggrid] = useState<number>(loginStatus.activeUsersInCompany);
+  const [
+    statusChangeOfCompanyUserCountFromAggrid,
+    setStatusChangeOfCompanyUserCountFromAggrid,
+  ] = useState<number>(loginStatus.activeUsersInCompany);
   const [companyUsersFetchedCount, setCompanyUsersFetchedCount] =
     useState<number>(0);
 
-    const handleCompanyUserStatusChange=( statusChangeCount: number) => {
-      setStatusChangeOfCompanyUserCountFromAggrid(statusChangeOfCompanyUserCountFromAggrid + statusChangeCount);
-    }
+  const handleCompanyUserStatusChange = (statusChangeCount: number) => {
+    setStatusChangeOfCompanyUserCountFromAggrid(
+      statusChangeOfCompanyUserCountFromAggrid + statusChangeCount
+    );
+  };
   const [
     isCompanyUsersSearchParameterCleared,
     setIsCompanyUsersSearchParameterCleared,
@@ -62,22 +67,14 @@ function EditSubscriptionUsersModal({
   const companyUserSearchParameterRef = useRef<string>("");
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
-    console.log(
-      "access : " +
-        userHasAccessToViewUser +
-        " Loading : " +
-        isCompanyUsersLoading +
-        " hasmore : " +
-        companyUsersHasMore
+    console.log("access : " +userHasAccessToViewUser +" Loading : " + isCompanyUsersLoading +" hasmore : " +companyUsersHasMore
     );
     console.log("fetch Ref : " + companyUsersFetchingRef.current);
     if (
-      !userHasAccessToViewUser ||
-      isCompanyUsersLoading ||
-      (!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
+      !userHasAccessToViewUser ||isCompanyUsersLoading ||(!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
       companyUsersFetchingRef.current
     )
-      return;
+      // return;
 
     try {
       companyUserSearchParameterRef.current = comapnyUserSearchParameter;
@@ -105,6 +102,7 @@ function EditSubscriptionUsersModal({
         search_parameter_date: "",
       };
 
+      // alert("called from here ");
       const response = await axios.post(
         POST_API.GET_COMPANY_USERS,
         getCompanyUserPostData,
@@ -123,7 +121,6 @@ function EditSubscriptionUsersModal({
         if (comapnyUserSearchParameter.length === 0) {
           setCompanyUsersFetchedCount(companyUsersFetchedCount + 1);
         }
-
         newUsers.map((user: any) => {
           setCompanyUsersList((prev) => [
             ...prev,
@@ -287,32 +284,30 @@ function EditSubscriptionUsersModal({
               <span className="text-sm font-semibold text-gray-800">
                 Subscription Allowed Users:{" "}
                 <span className="text-sm font-normal text-gray-600">
-                {loginStatus.subscriptionAllowedUsers}
-                  </span>
-               
+                  {loginStatus.subscriptionAllowedUsers}
+                </span>
               </span>
               <span className="text-sm font-semibold text-gray-800">
-                Active users in company : {" "}
+                Active users in company :{" "}
                 <span className="text-sm font-normal text-gray-600">
-                {/* {loginStatus.activeUsersInCompany} */}
-                {statusChangeOfCompanyUserCountFromAggrid}
-                  </span>
-                
+                  {/* {loginStatus.activeUsersInCompany} */}
+                  {statusChangeOfCompanyUserCountFromAggrid}
+                </span>
               </span>
               <button
-                onClick={()=>{
-                  //NOTE : WHEN X IS CLICKED IT WILL CHECK , ACTIVE USER CONDITION SATISFIES THEN , IT WILL NAVIGATE TO LOGIN PAGE 
-                  if(loginStatus.activeUsersInCompany  >= statusChangeOfCompanyUserCountFromAggrid){
+                onClick={() => {
+                  //NOTE : WHEN X IS CLICKED IT WILL CHECK , ACTIVE USER CONDITION SATISFIES THEN , IT WILL NAVIGATE TO LOGIN PAGE
+                  if (
+                    loginStatus.activeUsersInCompany >=
+                    statusChangeOfCompanyUserCountFromAggrid
+                  ) {
                     localStorage.clear();
                     onRedirectToLoginPage();
                     navigate(ROUTES_URL.SIGN_IN);
-                    
-                  }
-                  else{
-                    alert()
+                  } else {
+                    alert();
                     onClose();
                   }
-                 
                 }}
                 className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
               >

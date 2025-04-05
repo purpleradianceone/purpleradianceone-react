@@ -1,5 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
 import { INNERHTML } from "../../constants/AppConstants";
@@ -97,7 +101,7 @@ function AddCompanyTeamUsersAgGrid({
       },
       {
         headerName: "Action",
-        sortable: false,
+        sortable: true,
         filter: false,
         pinned: "right",
         width: 100,
@@ -119,7 +123,7 @@ function AddCompanyTeamUsersAgGrid({
                 />
               </div>
             );
-          } else {
+          } else  {
             // When updating, manage a toggle button that updates status.
             // Each row remembers its original status.
             const originalStatusRef = useRef<boolean>(params.data.isactive);
@@ -129,7 +133,10 @@ function AddCompanyTeamUsersAgGrid({
             const [localDelta, setLocalDelta] = useState<number>(0);
 
             const handleCompanyUserUpdateToggle = async (event: React.FormEvent<HTMLButtonElement>) => {
-              if (userHasAccessToUpdateUser) {
+              //NOTE CHANGES ARE DONE HERE
+              // alert("called from here1")
+              // if (userHasAccessToUpdateUser) {
+
                 const userId = parseInt(event.currentTarget.id);
                 const updateCompanyUserPostData = {
                   company_id: loginStatus.companyId,
@@ -138,7 +145,7 @@ function AddCompanyTeamUsersAgGrid({
                   isactive: !isActive,
                   updatedby: loginStatus.id,
                 };
-
+                // alert("called from here")
                 try {
                   const res = await axios.put(POST_API.UPDATE_COMPANY_USER, updateCompanyUserPostData, {
                     withCredentials: true,
@@ -159,11 +166,12 @@ function AddCompanyTeamUsersAgGrid({
                     updateGlobalCount(newDelta - localDelta);
                     // Save the new delta locally.
                     setLocalDelta(newDelta);
+                  
                   }
                 } catch (error) {
                   console.error("Error updating user status:", error);
                 }
-              }
+              // }
             };
 
             return (
@@ -190,7 +198,10 @@ function AddCompanyTeamUsersAgGrid({
       },
     ],
     // Include dependencies that affect the rendering.
-    [addCompanyTeamUserArray, companyUsers]
+
+    [addCompanyTeamUserArray, companyUsers, isGridForUpdateCompanyUser, handleCompanyUserCheckBoxChange, userHasAccessToUpdateUser, loginStatus,  ]
+    //[addCompanyTeamUserArray, companyUsers]
+    //need to check the above code 
   );
 
   const defaultColDef = useMemo(() => {

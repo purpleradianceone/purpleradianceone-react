@@ -1,7 +1,6 @@
-import { Handshake } from "lucide-react";
+import {  ClipboardPlus, Handshake } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE, } from "../../constants/AppConstants";
-import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -38,11 +37,14 @@ function LeadManagementList() {
                 <div className="flex gap-1">
                   {/* search box flex div */}
                   <div className="relative flex items-start w-80 ">
-                    <SearchInput
+
+
+                    {/* NOTE : search box input */}
+                    {/* NOTE : IF WANT TO ADD SEARCH FUNCTIONALITY THEN UNCOMMMENT THE BELOW CODE AND USE IT */}
+                    {/* <SearchInput
                       onChange={() => {
-                        
                       }}
-                    ></SearchInput>
+                    ></SearchInput> */}
                   </div>
                 </div>
               
@@ -50,11 +52,11 @@ function LeadManagementList() {
              <div className="flex gap-1">
                   <Button
                   onClick={()=>{
-                    setIsCreateLeadModalOpen(true)
+                    // setIsCreateLeadModalOpen(true)
                   }}
                   >
-                    {!isSmallScreen && <Handshake size={SIZE.TWENTY} />}
-                    {isSmallScreen && <Handshake size={SIZE.EIGHT} />}
+                    {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
+                    {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                     {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                   </Button>
                   
@@ -73,7 +75,10 @@ function LeadManagementList() {
               leads={leadsData}
               />
             </div> 
-            <CreateLeadModal isOpen={isCreateLeadModalOpen} onClose={handleCreateLeadModalClose}></CreateLeadModal>           
+            <CreateLeadModal 
+            isOpen={isCreateLeadModalOpen} 
+            onClose={handleCreateLeadModalClose}>
+            </CreateLeadModal>           
           </div>
       </div>
     );

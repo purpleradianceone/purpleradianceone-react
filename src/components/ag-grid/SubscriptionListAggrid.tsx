@@ -10,6 +10,7 @@ import SubscriptionListProps from "../../@types/subscription/SubscriptionListPro
 import { createPortal } from "react-dom";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 function SubscriptionListAggrid({
   subscriptionList,
@@ -34,6 +35,11 @@ function SubscriptionListAggrid({
       return "Expired"; // Event has ended
     }
   }
+
+  //note : access module context
+  const {userHasAccessToUpdateSubscription}= useUserAccessModules();
+
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -197,7 +203,11 @@ function SubscriptionListAggrid({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 mr-4 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    <ActionsDropdownButton
+
+
+                    {
+                      userHasAccessToUpdateSubscription &&
+                      <ActionsDropdownButton
                       onClick={() => {
                         setIsActionsDropDownOpen(false);
                         handleUpdateSubscriptionModalOpen(true);
@@ -211,6 +221,26 @@ function SubscriptionListAggrid({
                       <FilePen className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
                       {JSX_CHILDREN_NAME.UPDATE}
                     </ActionsDropdownButton>
+                    }
+                    {
+                      !userHasAccessToUpdateSubscription &&
+                      <ActionsDropdownButton
+                      disabled={true}
+                      onClick={() => {
+                        setIsActionsDropDownOpen(false);
+                        // handleUpdateSubscriptionModalOpen(true);
+                        // handleSelectedSubscription(params.data);
+                        
+                        
+                        // handleCompanyProductTeamModalOpen(true);
+                        // handleSelectedProductChange(params.data);
+                      }}
+                    >
+                      <FilePen className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                      {JSX_CHILDREN_NAME.UPDATE}
+                    </ActionsDropdownButton>
+                    }
+                    
 
                     
                   </div>,
