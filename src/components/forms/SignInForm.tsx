@@ -173,9 +173,10 @@ function SignInForm() {
                   return; // ⬅️ Stops further execution
                 }
                  //note : temporary fix
+                 //note : changes are made here
                  if ((response.data.active_users_in_company > response.data.subscription_allowed_users)) {
                   setShowSubscriptionOrInActivePopUp(true);
-                  // return;
+                  return;
                 }
 
                 const getCrmModuleAccessData = {

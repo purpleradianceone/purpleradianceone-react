@@ -100,6 +100,7 @@ function SubscriptionDialogueBox({
             subscriptionId={loginStatus.subscriptionId}
             onClose={()=>{
               setIsUpgradeSubscriptionModalOpen(false);
+              onClose();
             }}
             // handleSubscriptionListChange={onClose}
             // handleSubscriptionListChange={}

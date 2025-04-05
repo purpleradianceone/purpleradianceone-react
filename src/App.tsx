@@ -15,7 +15,7 @@ import { AccessManagementContextProvider } from "./context/user/AccessManagement
 function App() {
   return (
 
-    <AccessManagementContextProvider>
+    <AccessManagementContextProvider> 
     <LoggedInUserContextProvider>
           <RouterProvider router={router} />
     </LoggedInUserContextProvider>
