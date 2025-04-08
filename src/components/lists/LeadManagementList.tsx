@@ -14,6 +14,7 @@ function LeadManagementList() {
   const {userHasAccessToViewLead} = useUserAccessModules();
   const [isCreateLeadModalOpen,setIsCreateLeadModalOpen] = useState<boolean>(false)
 
+  
   if (userHasAccessToViewLead) {
     const handleCreateLeadModalClose =() => {
       setIsCreateLeadModalOpen(false)
@@ -52,7 +53,7 @@ function LeadManagementList() {
              <div className="flex gap-1">
                   <Button
                   onClick={()=>{
-                    // setIsCreateLeadModalOpen(true)
+                     setIsCreateLeadModalOpen(true)
                   }}
                   >
                     {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}

@@ -174,7 +174,7 @@ function SignInForm() {
                 }
                  //note : temporary fix
                  //note : changes are made here
-                 if ((response.data.active_users_in_company > response.data.subscription_allowed_users)) {
+                 if ((response.data.active_users_in_company <= response.data.subscription_allowed_users)) {
                   setShowSubscriptionOrInActivePopUp(true);
                   return;
                 }
