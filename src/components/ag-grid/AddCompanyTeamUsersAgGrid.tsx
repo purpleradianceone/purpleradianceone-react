@@ -24,7 +24,8 @@ function AddCompanyTeamUsersAgGrid({
   isGridForUpdateCompanyUser,
   // You can still call this if needed
   handleCompanyUserStatusChange,
-  isGridForSubscription
+  isGridForSubscription,
+  handleCompanyUserToggleChange
 }: {
   companyUsers: companyUsersSearchProps[];
   handleViewPortChanged: (params: ViewportChangedEvent) => void;
@@ -34,6 +35,7 @@ function AddCompanyTeamUsersAgGrid({
   isGridForUpdateCompanyUser?: boolean;
   handleCompanyUserStatusChange?: (statusChangeCount: number) => void;
   isGridForSubscription: boolean;
+  handleCompanyUserToggleChange? : (message : string , status : boolean)=> void;
 }) {
   const { userHasAccessToUpdateUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -155,6 +157,7 @@ function AddCompanyTeamUsersAgGrid({
                     const newStatus = !isActive;
                     setIsActive(newStatus);
                     params.node.setDataValue("isactive", newStatus);
+                    
 
                     // Determine what the new delta should be.
                     // If the new status is the same as the original, delta is 0.
@@ -168,6 +171,7 @@ function AddCompanyTeamUsersAgGrid({
                     setLocalDelta(newDelta);
                   
                   }
+                  handleCompanyUserToggleChange!(res.data.message, res.data.status)
                 } catch (error) {
                   console.error("Error updating user status:", error);
                 }

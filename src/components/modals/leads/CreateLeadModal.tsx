@@ -16,6 +16,8 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
+import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
+import CustomDropdown from "./CustomDropdown";
 
 type CreateLeadFormDataType = {
   name: string;
@@ -29,12 +31,7 @@ type CreateLeadFormDataType = {
   status: string;
 };
 
-type PostDataForLeadSourceAndStatus = {
-  id: number | null;
-  name: string | null;
-  description: string | null;
-  isactive: boolean;
-};
+
 
 function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const initialCreatLeadFormData: CreateLeadFormDataType = {
@@ -60,12 +57,21 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   //states for lead status and source
   const [leadSource, setLeadSource] = useState<
-    PostDataForLeadSourceAndStatus[] | null
+    PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
 
   const [leadStatus, setLeadStatus] = useState<
-    PostDataForLeadSourceAndStatus[] | null
+    PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
+
+  const [leadStates, setLeadStates] = useState<
+  PostDataTypeForLeadSourceAndStatusAndStates[] | null
+>(null);
+  const [selectedStatus, setSelectedStatus] = useState<number | undefined>(undefined);
+  const [selectedSource, setSelectedSource] = useState<number | undefined>(undefined);
+  const [selectedState, setSelectedState] = useState<number | undefined>(undefined);
+
+
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -81,9 +87,24 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  const handleLeadSelectedStatus =  (value: number | undefined) => {
+    setSelectedStatus(value);
+
+  };
+
+  const handleLeadSelectedSource= (value: number | undefined) => {
+    setSelectedSource(value);
+
+  };
+  const handleSelectedStateOption = (value: number | undefined) => {
+    setSelectedState(value);
+
+  };
+
+
   //   NOTE : TP GET THE DATA FROM BACKEND
   const getLeadSourceOptions = () => {
-    const postDataForLeadSource: PostDataForLeadSourceAndStatus = {
+    const postDataForLeadSource: PostDataTypeForLeadSourceAndStatusAndStates = {
       id: null,
       name: null,
       description: null,
@@ -96,6 +117,7 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       .then((response) => {
         console.log(response.data);
         setLeadSource(response.data);
+        getLeadStatusOptions();
       })
       .catch((error) => {
         console.log(error);
@@ -103,7 +125,7 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   };
 
   const getLeadStatusOptions = () => {
-    const postDataForLeadStatus: PostDataForLeadSourceAndStatus = {
+    const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
       id: null,
       name: null,
       description: null,
@@ -116,6 +138,27 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       .then((response) => {
         console.log(response.data);
         setLeadStatus(response.data);
+        getLeadStatesOptions();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getLeadStatesOptions = () => {
+    const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
+      id: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+    axios
+      .post(POST_API.GET_LEAD_STATES, postDataForLeadStatus, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        // console.log(response.data);
+        setLeadStates(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -125,7 +168,8 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   //called the function in here
   useEffect(() => {
     getLeadSourceOptions();
-    getLeadStatusOptions();
+    
+    
   }, []);
 
   // Handle Submit
@@ -222,7 +266,7 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
           {/* Circle and Interest Dropdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700">
                 Circle :
               </label>
@@ -236,8 +280,16 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                 <option value="Karnataka">Karnataka</option>
                 <option value="Maharashtra">Maharashtra</option>
               </select>
-            </div>
+            </div> */}
 
+              <div>
+                <CustomDropdown
+                  labelName="States"
+                  options={leadStates!}
+                  onSelect={handleSelectedStateOption}
+                />
+                <span>{selectedState}</span>
+              </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Interest :
@@ -257,7 +309,7 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
           {/* Reference By Dropdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[90vh]">
-            <div>
+            {/* <div>
               <label
                 //   className="block text-sm font-medium text-gray-700"
                 className="block mb-1 text-sm font-medium text-gray-700"
@@ -286,10 +338,18 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                     <option value="" className="text-gray-700">please refresh page</option>
                 )}
               </select>
-            </div>
+            </div> */}
 
-            {/* lead-source Dropdown */}
             <div>
+              <CustomDropdown 
+                labelName="Lead Status"
+                options={leadStatus!}
+                onSelect={handleLeadSelectedStatus}
+              />
+              <span>{selectedStatus}</span>
+            </div>
+            {/* lead-source Dropdown */}
+            {/* <div>
               <label
                 //   className="block text-sm font-medium text-gray-700"
                 className="block mb-1 text-sm font-medium text-gray-700"
@@ -315,6 +375,15 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   </option>
                 ))}
               </select>
+            </div> */}
+
+            <div>
+              <CustomDropdown
+                labelName="Lead Source"
+                options={leadSource!}
+                onSelect={handleLeadSelectedSource}
+              />
+              <span>{selectedSource}</span>
             </div>
           </div>
 

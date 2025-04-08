@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, UserPlus2, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { SIZE } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
 import Button from "../../ui/Button";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
@@ -18,6 +18,8 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { Navigate, useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -66,15 +68,27 @@ function EditSubscriptionUsersModal({
 
   const companyUserSearchParameterRef = useRef<string>("");
 
+
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+      open: false,
+      message: "",
+      type: "success",
+    });
+  
+    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+      setMessageSnackbar({ open: true, message, type });
+    };
+  
+    const handleMessageSnackbarClose = () => {
+      setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    };
+
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
-    console.log("access : " +userHasAccessToViewUser +" Loading : " + isCompanyUsersLoading +" hasmore : " +companyUsersHasMore
-    );
-    console.log("fetch Ref : " + companyUsersFetchingRef.current);
-    if (
-      !userHasAccessToViewUser ||isCompanyUsersLoading ||(!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
+   
+    if (isCompanyUsersLoading ||(!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
       companyUsersFetchingRef.current
     )
-      // return;
+      return;
 
     try {
       companyUserSearchParameterRef.current = comapnyUserSearchParameter;
@@ -228,6 +242,13 @@ function EditSubscriptionUsersModal({
     }
   };
 
+  const handleCompanyUserToggleChange =(message :string, status : boolean)=>{
+    showMessageSnackbar({
+      message: message,
+      type : status ? 'success' : 'error',
+    })
+  }
+
   useEffect(() => {
     if (isOpen) {
       fetchCompanyUsers("");
@@ -305,7 +326,6 @@ function EditSubscriptionUsersModal({
                     onRedirectToLoginPage();
                     navigate(ROUTES_URL.SIGN_IN);
                   } else {
-                    alert();
                     onClose();
                   }
                 }}
@@ -336,11 +356,19 @@ function EditSubscriptionUsersModal({
                 isGridForUpdateCompanyUser={true}
                 handleCompanyUserStatusChange={handleCompanyUserStatusChange}
                 isGridForSubscription={true}
+                handleCompanyUserToggleChange={handleCompanyUserToggleChange}
               />
             </div>
           </div>
         </div>
       </div>
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </div>
   );
 }
