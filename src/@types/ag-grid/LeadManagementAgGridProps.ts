@@ -1,7 +1,8 @@
 import Lead from "../lead-management/LeadManagementProps";
+import LeadDataProps from "../lead-management/LeadProps";
 
 type LeadManagementAgGridProps = {
-    leads?: Lead[],
+    leads?: LeadDataProps[],
         userHasAccessToViewLead? : boolean,
         userHasAccessToUpdateLead? : boolean,
         handleSelectedLeadChange? : (lead: Lead) => void,

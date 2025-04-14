@@ -1,11 +1,12 @@
-import { Handshake, X } from "lucide-react";
-import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
-import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalProps";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Handshake, UserRoundPlus, X } from "lucide-react";
+import {
+  NUMBER_VALUES,
+  SIZE,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
-import TextAreaInput from "../../ui/TextAreaInput";
 import Button from "../../ui/Button";
-import ProductDropdownList from "../../ui/ProductDropdown";
-import { leadsData, productsData } from "../../../constants/TestData";
 import { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
@@ -18,35 +19,32 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import CustomDropdown from "./CustomDropdown";
+import CreateManualLead from "../../../@types/lead-management/CreateManualLead";
+import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
+import ROUTES_URL from "../../../constants/Routes";
+import { useNavigate } from "react-router-dom";
+import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
 
-type CreateLeadFormDataType = {
-  name: string;
-  email: string;
-  mobileNumber: string;
-  address: string;
-  circle: string;
-  interest: string;
-  referenceBy: string;
-  remark: string;
-  status: string;
-};
+function CreateLeadModal({
+  isOpen,
+  onClose,
+  onCreateLeadRefreshLeadData,
+}: CreateLeadModalProps) {
+  const navigate = useNavigate();
 
-
-
-function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
-  const initialCreatLeadFormData: CreateLeadFormDataType = {
+  const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
     mobileNumber: "",
-    address: "",
-    circle: "",
-    interest: "",
-    referenceBy: "",
-    remark: "",
-    status: "",
   };
 
-  const { errors, handleBlur } = useFormValidation(
+  const { loginStatus } = useLoggedInUserContext();
+  const { errors } = useFormValidation(
     initialCreatLeadFormData,
     "registration"
   );
@@ -55,7 +53,7 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     handleChange: handleCreateLeadModalFormDataChange,
   } = useFormChange(initialCreatLeadFormData);
 
-  //states for lead status and source
+  //states for lead status and source and state
   const [leadSource, setLeadSource] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
@@ -64,15 +62,24 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
 
-  const [leadStates, setLeadStates] = useState<
-  PostDataTypeForLeadSourceAndStatusAndStates[] | null
->(null);
-  const [selectedStatus, setSelectedStatus] = useState<number | undefined>(undefined);
-  const [selectedSource, setSelectedSource] = useState<number | undefined>(undefined);
-  const [selectedState, setSelectedState] = useState<number | undefined>(undefined);
+  //note : states to set the data from dropdown
 
+  // NOTE : ADD THIS selectedStatus
+  const [selectedStatus, setSelectedStatus] = useState<number | undefined>(
+    undefined
+  );
+  // NOTE : ADD THIS selectedSource
+  const [selectedSource, setSelectedSource] = useState<number | undefined>(
+    undefined
+  );
 
+  const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
+    useState(false);
 
+  const handleCompanyUserPopUp = () => {
+    setOpenPopUpOfCompanyUserModal(true);
+  };
+  //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
     message: "",
@@ -87,22 +94,71 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const handleLeadSelectedStatus =  (value: number | undefined) => {
+  //note : these 3 functions that handles changed values from dropdown
+  const handleLeadSelectedStatus = (value: number | undefined) => {
     setSelectedStatus(value);
-
   };
-
-  const handleLeadSelectedSource= (value: number | undefined) => {
+  const handleLeadSelectedSource = (value: number | undefined) => {
     setSelectedSource(value);
-
-  };
-  const handleSelectedStateOption = (value: number | undefined) => {
-    setSelectedState(value);
-
   };
 
+  // note : to show errors in form
+  const [showErrorAtLeadStatus, setShowErrorAtLeadStatus] =
+    useState<boolean>(false);
+  const [showErrorAtLeadSource, setshowErrorAtLeadSource] =
+    useState<boolean>(false);
+  //note : this is the selected company user data
 
-  //   NOTE : TP GET THE DATA FROM BACKEND
+  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+    number | null
+  >(null);
+
+  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password: "",
+  });
+
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
+    if (params) {
+      setPersistedSelectedUserId(params.id);
+
+      setSelectedCompanyUser({
+        company_id: params.company_id,
+        id: params.id,
+        fullname: params.fullname,
+        email: params.email,
+        mobilenumber: params.mobilenumber,
+        createdby: "",
+        isactive: params.isactive,
+        requestedby: "",
+        generate_password: "",
+      });
+    } else {
+      setPersistedSelectedUserId(null);
+      // Reset selectedCompanyUser to its initial state when null is received
+      setSelectedCompanyUser({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
+    }
+  };
+
+  //   NOTE : FUNCTIONS GET THE DATA FROM BACKEND
   const getLeadSourceOptions = () => {
     const postDataForLeadSource: PostDataTypeForLeadSourceAndStatusAndStates = {
       id: null,
@@ -115,92 +171,191 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         withCredentials: true,
       })
       .then((response) => {
-        console.log(response.data);
         setLeadSource(response.data);
         getLeadStatusOptions();
       })
       .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const getLeadStatusOptions = () => {
-    const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
-      id: null,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-    axios
-      .post(POST_API.GET_LEAD_STATUS, postDataForLeadStatus, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        console.log(response.data);
-        setLeadStatus(response.data);
-        getLeadStatesOptions();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const getLeadStatesOptions = () => {
-    const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
-      id: null,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-    axios
-      .post(POST_API.GET_LEAD_STATES, postDataForLeadStatus, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        // console.log(response.data);
-        setLeadStates(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
+        showMessageSnackbar({
+          message: error,
+          type: "error",
+        });
       });
   };
 
   //called the function in here
-  useEffect(() => {
-    getLeadSourceOptions();
-    
-    
-  }, []);
 
-  // Handle Submit
+  const getLeadStatusOptions = async () => {
+    const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
+      id: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+    try {
+      const response = await axios.post(
+        POST_API.GET_LEAD_STATUS,
+        postDataForLeadStatus,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setLeadStatus(response.data);
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getLeadStatusOptions,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      getLeadSourceOptions();
+    }
+  }, [isOpen]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      createLeadModalFormData.name !== "" ||
-      createLeadModalFormData.email !== "" ||
-      createLeadModalFormData.mobileNumber !== ""
-    ) {
-      leadsData.push(createLeadModalFormData);
-      showMessageSnackbar({
-        message: "Lead Created Successfully",
-        type: "success",
-      });
-      setTimeout(() => {
-        onClose();
-      }, NUMBER_VALUES.SNACKBAR_DURATION);
+    const isEmailFilled = createLeadModalFormData.email !== "";
+    const isMobileNumberFilled = createLeadModalFormData.mobileNumber !== "";
+    if (selectedSource === undefined) {
+      setshowErrorAtLeadSource(true);
     }
+    if (selectedStatus === undefined) {
+      setShowErrorAtLeadStatus(true);
+    }
+    if (!isEmailFilled && !isMobileNumberFilled) {
+      showMessageSnackbar({
+        message: "Please fill either Email or Mobile Number.",
+        type: "error",
+      });
+      return;
+    }
+    if (selectedSource === undefined || selectedStatus === undefined) {
+      showMessageSnackbar({
+        message: "please select source and status",
+        type: "error",
+      });
+      return;
+    }
+    if (
+      createLeadModalFormData.email !== "" ||
+      createLeadModalFormData.mobileNumber !== "" ||
+      selectedSource !== undefined ||
+      selectedStatus !== undefined
+    ) {
+      const PostDataForCreateLead: PostDataForCreateLead = {
+        company_id: loginStatus.companyId,
+        company_user_id:
+          selectedCompanyUser.id === 0
+            ? loginStatus.id
+            : selectedCompanyUser.id,
+        name:
+          createLeadModalFormData.name === ""
+            ? null
+            : createLeadModalFormData.name,
+        email:
+          createLeadModalFormData.email === ""
+            ? null
+            : createLeadModalFormData.email,
+        createdby: loginStatus.id,
+        lead_source_id: selectedSource!,
+        lead_status_id: selectedStatus!,
+        mobilenumber:
+          createLeadModalFormData.mobileNumber === ""
+            ? null
+            : createLeadModalFormData.mobileNumber,
+      };
+
+      axios
+        .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data.status === true) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "success",
+            });
+            // note : this callback will run to refresh the list of aggrid
+            onCreateLeadRefreshLeadData();
+            setTimeout(() => {
+              onClose();
+            }, NUMBER_VALUES.SNACKBAR_DURATION);
+          } else if (response.data.status == false) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "warning",
+            });
+            // setTimeout(() => {
+            //   onClose();
+            // }, NUMBER_VALUES.SNACKBAR_DURATION);
+          }
+          console.log(response.data);
+        });
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      errors.email = "";
+      errors.name = "";
+      setOpenPopUpOfCompanyUserModal(false);
+      setPersistedSelectedUserId(null);
+      setSelectedCompanyUser({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
+
+      // setLeadSource(null);
+      // setLeadStatus(null);
+
+      handleCloseSnackbar();
+      setShowErrorAtLeadStatus(false);
+      setshowErrorAtLeadSource(false);
+      //resetting the form data
+      createLeadModalFormData.email = "";
+      createLeadModalFormData.name = "";
+      createLeadModalFormData.mobileNumber = "";
+      setSelectedSource(undefined);
+      setSelectedStatus(undefined);
+    }
+  }, [isOpen]);
+
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
   };
 
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-20 bg-black bg-opacity-45 flex items-center justify-center p-4 overflow-y-auto">
-      {/* <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative animate-fadeIn px-6 py-6 max-h-[90vh] overflow-y-auto"> */}
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl relative animate-fadeIn px-6 py-6 max-h-[90vh] overflow-y-auto">
-        {/* Header: Title + Close Button */}
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn px-6 py-4 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <Handshake className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800">
               Create New Opportunity
             </h2>
           </div>
@@ -212,14 +367,12 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           </button>
         </div>
 
-        {/* Scrollable Form */}
-        <form className="space-y-3" onSubmit={handleSubmit}>
-          {/* Product Dropdown */}
-          {/* NOTE : THIS IS THE DROPDOWN SHOW PRODUCTS HERE , GET THE PRODUCTS AND PASS AS A PROPS */}
-          <ProductDropdownList product={productsData} />
+        {/* Divider */}
+        <div className="border-t border-gray-300"></div>
 
-          {/* Name and Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Form */}
+        <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
+          <div className="flex flex-col space-y-3">
             <FormInput
               label="Name : "
               type="text"
@@ -227,9 +380,9 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               placeholder="Enter Name"
               value={createLeadModalFormData.name}
               onChange={handleCreateLeadModalFormDataChange}
-              onBlur={handleBlur}
-              error={errors.name}
             />
+
+            {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
             <FormInput
               label="Email : "
               type="email"
@@ -237,13 +390,9 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               placeholder="Enter Email"
               value={createLeadModalFormData.email}
               onChange={handleCreateLeadModalFormDataChange}
-              onBlur={handleBlur}
               error={errors.email}
             />
-          </div>
 
-          {/* Phone and Address */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               label="Mobile Number : "
               type="text"
@@ -251,172 +400,110 @@ function CreateLeadModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               placeholder="Enter Phone Number"
               value={createLeadModalFormData.mobileNumber}
               onChange={handleCreateLeadModalFormDataChange}
-              onBlur={handleBlur}
+              // onBlur={handleBlur}
               error={errors.mobileNumber}
             />
-            <FormInput
-              label="Address : "
-              type="text"
-              name="address"
-              placeholder="Enter Address"
-              value={createLeadModalFormData.address}
-              onChange={handleCreateLeadModalFormDataChange}
-            />
-          </div>
+            <div>
+              <div className="flex items-center justify-between pr-60 gap-1 w-full">
+                <Button onClick={handleCompanyUserPopUp} type="button">
+                  <div className="flex gap-2 items-center whitespace-nowrap">
+                    <UserRoundPlus size={18} />
+                    <span>Assign Lead Owner</span>
+                  </div>
+                </Button>
 
-          {/* Circle and Interest Dropdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Circle :
-              </label>
-              <select
-                name="circle"
-                value={createLeadModalFormData.circle}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                <option value="Telangana">Telangana</option>
-                <option value="Karnataka">Karnataka</option>
-                <option value="Maharashtra">Maharashtra</option>
-              </select>
-            </div> */}
-
-              <div>
-                <CustomDropdown
-                  labelName="States"
-                  options={leadStates!}
-                  onSelect={handleSelectedStateOption}
-                />
-                <span>{selectedState}</span>
+                <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
+                  <span className="text-xs font-normal ">Lead Owner :</span>{" "}
+                  {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
+                  {selectedCompanyUser.fullname || loginStatus.fullName}
+                </span>
               </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Interest :
-              </label>
-              <select
-                name="interest"
-                value={createLeadModalFormData.interest}
-                // onChange={handleCreateLeadModalFormDataChange}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
+
+              <span className=" text-xs text-gray-700 ">
+                <span className="font-medium">Note :</span> If a lead owner is
+                not selected, then lead will be assigned to the lead
+                <span className="font-medium"> Creator</span> by default.
+              </span>
             </div>
-          </div>
 
-          {/* Reference By Dropdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[90vh]">
-            {/* <div>
-              <label
-                //   className="block text-sm font-medium text-gray-700"
-                className="block mb-1 text-sm font-medium text-gray-700"
-              >
-                Lead Status :
-              </label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                //   NOTE : NEED TO MAKE CHANGES HERE
-                //   value={}
-                //    onChange={handleChange}
-              >
-                <option value="" className="text-gray-700">
-                  Lead Status{" "}
-                </option>
-
-                {leadStatus && leadStatus.length>0 ? ( leadStatus!.map((source) => (
-                  <option
-                    key={source.id}
-                    value={source.id!}
-                    className="text-gray-800"
-                  >
-                    <span className="text-gray-600">{source.name}</span>
-                  </option>
-                ))):(
-                    <option value="" className="text-gray-700">please refresh page</option>
-                )}
-              </select>
-            </div> */}
-
-            <div>
-              <CustomDropdown 
-                labelName="Lead Status"
+            {/* Lead Status */}
+            <div className="space-y-1">
+              <CustomDropdown
+                labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
               />
-              <span>{selectedStatus}</span>
+              {showErrorAtLeadStatus && !selectedStatus && (
+                <div className="text-red-500 text-xs">
+                  Please select Lead Status
+                </div>
+              )}
             </div>
-            {/* lead-source Dropdown */}
-            {/* <div>
-              <label
-                //   className="block text-sm font-medium text-gray-700"
-                className="block mb-1 text-sm font-medium text-gray-700"
-              >
-                Lead Source :
-              </label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                //   NOTE : NEED TO MAKE CHANGES HERE
-                //   value={}
-                //    onChange={handleChange}
-              >
-                <option value="" className="text-gray-700">
-                  Lead Source{" "}
-                </option>
-                {leadSource!.map((source) => (
-                  <option
-                    key={source.id}
-                    value={source.id!}
-                    className="text-gray-800"
-                  >
-                    {source.name}
-                  </option>
-                ))}
-              </select>
-            </div> */}
 
-            <div>
+            {/* Lead Source */}
+            <div className="space-y-1">
               <CustomDropdown
-                labelName="Lead Source"
+                labelName="Lead Source :"
                 options={leadSource!}
                 onSelect={handleLeadSelectedSource}
               />
-              <span>{selectedSource}</span>
+              {showErrorAtLeadSource && !selectedSource && (
+                <div className="text-red-500 text-xs">
+                  Please select Lead Source
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Remark Text Area */}
-          <TextAreaInput
-            label="Remark : "
-            name="remark"
-            cols={5}
-            rows={3}
-            maxLength={256}
-            value={createLeadModalFormData.remark}
-            onChange={handleCreateLeadModalFormDataChange}
-          />
-
-          {/* Buttons */}
-          {/* <div className="flex justify-start gap-4 mx-80">
-            <Button type="submit">Create Lead</Button>
-          </div> */}
-          <div className="flex justify-start gap-4  ">
-            <Button type="submit" >
-              Create Lead
+          <div className="flex justify-center px-36 ">
+            <Button type="submit">
+              <span>Create Lead</span>
             </Button>
           </div>
         </form>
       </div>
 
-      {/* Snackbar Message */}
+      {/* Snackbar */}
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+      {openPopUpOfCompanyUserModal && (
+        <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+            {/* Header with Close Button */}
+            <div className="flex justify-between items-center p-3 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Select Company User
+              </h3>
+              <button
+                onClick={() => setOpenPopUpOfCompanyUserModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {/* NOTE : CALL TO THE MODAL COMPONENT */}
+            <div className="p-1">
+              <GetCompanyUsersForLead
+                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                handleSelectedCompanyUserChange={
+                  handleSelectedCompanyUserChange
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
       />
     </div>
   );

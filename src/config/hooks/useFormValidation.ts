@@ -25,7 +25,7 @@ export type ErrorType = {
 
 export type FormType = 'registered' | 'registration';
 
-export const useFormValidation = (formData: Record<string, string|number|boolean|number[]|undefined>, formType: FormType) => {
+export const useFormValidation = (formData: Record<string, string|number|boolean|number[]|undefined >, formType: FormType) => {
   const [errors, setErrors] = useState<ErrorType>({});
 
 

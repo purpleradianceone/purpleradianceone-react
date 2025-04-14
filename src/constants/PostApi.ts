@@ -42,6 +42,8 @@ const POST_API = {
     GET_LEAD_SOURCE: import.meta.env.VITE_GET_LEAD_SOURCE!,
     GET_LEAD_STATUS: import.meta.env.VITE_GET_LEAD_STATUS!,
     GET_LEAD_STATES: import.meta.env.VITE_GET_LEAD_STATES!,
+    CREATE_LEAD : import.meta.env.VITE_CREATE_LEAD!,
+    GET_LEAD : import.meta.env.VITE_GET_LEAD!,
 }
 
 export default POST_API;
