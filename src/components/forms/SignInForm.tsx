@@ -142,7 +142,8 @@ function SignInForm() {
 
                 loginStatusRef.current = response.data;
                 setLoginStatus({
-                  id: response.data.id,
+                
+                   id: response.data.id,
                   companyId: response.data.company_id,
                   companyName: response.data.company_name,
                   fullName: response.data.fullname,
@@ -172,9 +173,8 @@ function SignInForm() {
                   }, 1500);
                   return; // ⬅️ Stops further execution
                 }
-                 //note : temporary fix
                  //note : changes are made here
-                 if ((response.data.active_users_in_company <= response.data.subscription_allowed_users)) {
+                 if ((response.data.active_users_in_company > response.data.subscription_allowed_users)) {
                   setShowSubscriptionOrInActivePopUp(true);
                   return;
                 }

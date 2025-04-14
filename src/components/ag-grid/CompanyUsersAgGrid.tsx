@@ -46,6 +46,7 @@ function CompanyUserAgGrid({
       {
         field: "mobilenumber",
         headerName: "Mobile Number",
+        
         sortable: true,
         filter: true,
       },

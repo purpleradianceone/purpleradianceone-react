@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PostDataTypeForLeadSourceAndStatusAndStates from '../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates';
+import { ChevronDown, ChevronUp, Delete } from 'lucide-react';
 
 
 interface DropdownProps {
@@ -9,7 +10,7 @@ interface DropdownProps {
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
-  options,
+  options = [],
   onSelect,
   labelName,
 }) => {
@@ -18,12 +19,12 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (options.length > 0) {
+    if (Array.isArray(options) && options.length > 0) {
       setSelectedOption(undefined); // Initially unselected
     }
   }, [options]);
 
-  // 📌 Close dropdown if clicking outside
+  // Close dropdown if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -43,26 +44,29 @@ const CustomDropdown: React.FC<DropdownProps> = ({
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      <label className="block mb-1 text-sm font-medium text-gray-700">{labelName}</label>
+      <label className="block  text-sm font-medium text-gray-700">{labelName}</label>
 
       <div
-        className="w-full py-2 px-3 border-2 border-gray-300 bg-green-50 rounded-md cursor-pointer text-gray-700 focus:outline-none"
+        className="w-full flex justify-between py-2 px-3 border-2 border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
         onClick={() => setShowDropdown((prev) => !prev)}
       >
+        <div>
         {selectedOption === undefined
-          ? '-- Select Option --'
+          ? 'select option'
           : options.find((o) => o.id === selectedOption)?.name}
+        </div>
+        {showDropdown ?  <ChevronUp size={18}/> : <ChevronDown size={18}/>}
       </div>
 
       {showDropdown && (
-        <div className="absolute z-20 mt-1 w-full max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white shadow-md">
+        <div className="absolute z-20 mt-1 mb-10 w-full max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white shadow-md"> 
           <div
             onClick={() => handleSelect(undefined)}
-            className="px-4 py-0.5 hover:bg-red-600 hover:text-white cursor-pointer text-gray-800 border-b"
+            className="px-4 py-0.5 flex gap-2 items-center hover:bg-red-600 hover:text-white cursor-pointer text-gray-800 border-b"
           >
-            Clear Selection
+           <Delete size={18}/> <span> Clear Selection</span>
           </div>
-          {options.map((option) => (
+          {Array.isArray(options) && options.map((option) => (
             <div
               key={option.id}
               onClick={() => handleSelect(option.id!)}

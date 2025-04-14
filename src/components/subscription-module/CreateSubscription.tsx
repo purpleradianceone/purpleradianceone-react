@@ -74,53 +74,6 @@ function CreateSubscription({
   };
 
   //API REQUEST LOGIC
-
-  // const handleCreateSubscription = (event: React.FormEvent) => {
-  //   event.preventDefault();
-
-  //   if (
-  //     createSubscriptionFormData.monthsToPurchase <= 0 ||
-  //     createSubscriptionFormData.numberOfUsers <= 0
-  //   ) {
-  //     if (createSubscriptionFormData.monthsToPurchase <= 0) {
-  //       showMessageSnackbar({
-  //         message: MESSAGE.ERROR.SUBSCRIPTION_MONTH,
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //     if (createSubscriptionFormData.numberOfUsers <= 0) {
-  //       showMessageSnackbar({
-  //         message: MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED,
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //   }
-  //   setIsLoading(true);
-  //   const requestData = {
-  //     no_of_users: createSubscriptionFormData.numberOfUsers,
-  //     no_of_months: createSubscriptionFormData.monthsToPurchase,
-  //     email: loginStatus.email,
-  //     company_id: loginStatus.companyId,
-  //     requestedby: loginStatus.id,
-  //     subscription_id: null,
-  //   };
-  //    axios
-  //     .post(POST_API.CREATE_SUBSCRIPTION_API, requestData, {
-  //       withCredentials: true,
-  //     })
-  //     .then((response) => {
-  //       setIsLoading(false);
-  //       if (response.status === STATUS_CODE.OK) {
-  //         setReponseState({
-  //           amount: response.data.subscription_amount,
-  //           orderId: response.data.order_id,
-  //         });
-  //         setIsPaymentSubscriptionOpen(true);
-  //       }
-  //     });
-  // };
   const handleCreateSubscription = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -208,11 +161,7 @@ function CreateSubscription({
   if (!isOpen) return null;
   return (
     <>
-      {/* <h2 className="font-semibold">
-        Active users in company :{" "}
-        <span className="text-red-600">{loginStatus.activeUsersInCompany}</span>{" "}
-        users
-      </h2> */}
+    <div className="border-t border-gray-300 "></div>
       <h2 className="font-semibold text-sm sm:text-base flex flex-wrap">
         <span>Active Users in the Company:</span>
         <span className="text-red-600 font-bold ml-1">

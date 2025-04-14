@@ -5,8 +5,7 @@ import { Edit, UserPlus2, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
-import Button from "../../ui/Button";
-import { CLASS_NAMES } from "../../../constants/ClassNames";
+
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -16,7 +15,7 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import ApiError from "../../../@types/error/ApiError";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { Navigate, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";

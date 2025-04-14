@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
+import {  Edit, UserCheck } from "lucide-react";
 import { createPortal } from "react-dom";
 import Button from "../ui/Button";
 import {  JSX_CHILDREN_NAME, } from "../../constants/AppConstants";
@@ -17,33 +18,29 @@ function LeadManagementAgGrid({
     userHasAccessToViewLead
 }  : LeadManagementAgGridProps) {
 
+  //NOTE : NEED TO MAKE CHANGES HERE
   useEffect(()=>{
-    console.log(leads);
+    // console.log(leads);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
-    const columnDefs = useMemo<ColDef[]>(
+    const columnDefs  = useMemo<ColDef[]>(
         () => [
           {
             field: "id",
-            headerName: "Id",
+            headerName: "Lead No",
             sortable: true,
             filter: "agTextColumnFilter",
             flex: 1,
-            
-            comparator: (valueA, valueB) => {
-              if (!valueA) return -1;
-              if (!valueB) return 1;
-              return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
-            },
+            maxWidth:120,
           },
           {
-            field: "leadNo",
-            headerName: "LeadNo",
+            field: "leadOwner",
+            headerName: "Lead Owner",
             sortable: true,
             filter: "agTextColumnFilter",
             flex: 1,
-            
+            minWidth : 180,
             comparator: (valueA, valueB) => {
               if (!valueA) return -1;
               if (!valueB) return 1;
@@ -52,11 +49,11 @@ function LeadManagementAgGrid({
           },
           {
             field: "name",
-            headerName: "Name",
+            headerName: "Lead Name",
             sortable: true,
             filter: "agTextColumnFilter",
             flex: 1,
-            
+            minWidth: 160,
             comparator: (valueA, valueB) => {
               if (!valueA) return -1;
               if (!valueB) return 1;
@@ -69,64 +66,34 @@ function LeadManagementAgGrid({
             sortable: true,
             filter: true,
             flex: 1.5,
+            minWidth: 200,
           },
           {
-            field: "phone",
+            field: "mobileNumber",
             headerName: "Mobile Number",
             sortable: true,
             filter: true,
           },
           {
-            field: "status",
-            headerName: "Status",
-            sortable: true,
-            filter: true,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            cellRenderer: (params: any) => {
-              return (
-                <div className="flex items-center gap-1 mt-3">
-                  {params.value ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-green-600">Active</span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="w-4 h-4 text-red-500" />
-                      <span className="text-sm text-red-600">Inactive</span>
-                    </>
-                  )}
-                </div>
-              );
-            },
+            field : "leadStatus",
+            headerName : "Lead Status",
+            sortable : true,
+            filter : true,
           },
-          // {
-          //   field: "createdOn",
-          //   headerName: "Created On",
-          //   sortable: true,
-          //   filter: true,
-          // },
-          // {
-          //   field: "updatedOn",
-          //   headerName: "Updated On",
-          //   sortable: true,
-          //   filter: true,
-          // },
+          {
+            field : "leadSource",
+            headerName : "Lead Source",
+            sortable : true,
+            filter : true,
+          },
           {
             field: "createdBy",
-            headerName: "createdBy",
-            sortable: true,
+            headerName: "Created By",
             filter: true,
           },
-          // {
-          //   field: "updatedBy",
-          //   headerName: "updatedBy",
-          //   sortable: true,
-          //   filter: true,
-          // },
           {
-            field: "assignedTo",
-            headerName: "assignedTo",
+            field: "createdOn",
+            headerName: "Created On",
             sortable: true,
             filter: true,
           },
@@ -154,7 +121,6 @@ function LeadManagementAgGrid({
               };
     
               useEffect(() => {
-                console.log(params)
                 const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
                   if (
                     dropdownRef.current &&
