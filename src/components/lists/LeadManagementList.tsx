@@ -106,7 +106,7 @@ const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     //NOTE : need to work on this 
     const postDataToGetLeads : PostDataToGetLeadData= {
       company_id: loginStatus.companyId,
-      company_user_id: null,
+      ownerid: null,
       lead_source_id : null,
       lead_status_id : null,
       search_company_specific_date_range_id: null,
@@ -127,7 +127,7 @@ const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
         email: item.email,
         mobileNumber: item.mobilenumber,
         companyId: item.companyid,
-        companyUserId: item.company_user_id,
+        companyUserId: item.ownerid,
         count: item.count,
         createdBy: item.createdby,
         createdOn: item.createdon,

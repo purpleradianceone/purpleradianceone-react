@@ -258,7 +258,7 @@ function CreateLeadModal({
     ) {
       const PostDataForCreateLead: PostDataForCreateLead = {
         company_id: loginStatus.companyId,
-        company_user_id:
+        ownerid:
           selectedCompanyUser.id === 0
             ? loginStatus.id
             : selectedCompanyUser.id,
