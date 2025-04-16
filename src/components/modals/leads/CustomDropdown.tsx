@@ -18,11 +18,11 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (Array.isArray(options) && options.length > 0) {
-      setSelectedOption(undefined); // Initially unselected
-    }
-  }, [options]);
+  // useEffect(() => {
+  //   if (Array.isArray(options) && options.length > 0) {
+  //     setSelectedOption(undefined); // Initially unselected
+  //   }
+  // }, [options]);
 
   // Close dropdown if clicking outside
   useEffect(() => {
@@ -42,18 +42,29 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     setShowDropdown(false);
   };
 
+  useEffect(()=> {
+    console.log(selectedOption);
+  },[selectedOption])
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      <label className="block  text-sm font-medium text-gray-700">{labelName}</label>
+      <label className="block  text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" ? "": labelName}</label>
 
       <div
-        className="w-full flex justify-between py-2 px-3 border-2 border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
+        className="w-full flex justify-between py-2 px-3 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
         onClick={() => setShowDropdown((prev) => !prev)}
       >
-        <div>
-        {selectedOption === undefined
+        <div className='text-xs'>
+          {labelName === "status" || labelName === "source" ?  
+          selectedOption === undefined
+          ? labelName === "status" ? 'Status' : 'Source'
+          : options.find((o) => o.id === selectedOption)?.name
+          :
+          selectedOption === undefined
           ? 'select option'
-          : options.find((o) => o.id === selectedOption)?.name}
+          : options.find((o) => o.id === selectedOption)?.name
+          }
+          
+        
         </div>
         {showDropdown ?  <ChevronUp size={18}/> : <ChevronDown size={18}/>}
       </div>
@@ -64,13 +75,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             onClick={() => handleSelect(undefined)}
             className="px-4 py-0.5 flex gap-2 items-center hover:bg-red-600 hover:text-white cursor-pointer text-gray-800 border-b"
           >
-           <Delete size={18}/> <span> Clear Selection</span>
+           <Delete size={18}/> <span className='text-xs'> Clear Selection</span>
           </div>
           {Array.isArray(options) && options.map((option) => (
             <div
               key={option.id}
               onClick={() => handleSelect(option.id!)}
-              className="px-4 py-0.5 hover:bg-blue-700 hover:text-white cursor-pointer text-gray-800"
+              className="px-4 py-0.5 text-xs hover:bg-blue-700 hover:text-white cursor-pointer text-gray-800"
             >
               {option.name}
             </div>

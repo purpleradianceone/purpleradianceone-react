@@ -19,7 +19,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
     }, []);
   
     const handleOptionClick = (dateId : number, dateName : string) => {
-      props.handleDateIdChange(dateId);
+      props.handleDateIdChange!(dateId);
       setSelectedOption(dateName)
       setIsOpen(false);
     };

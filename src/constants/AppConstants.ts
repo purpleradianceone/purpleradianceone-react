@@ -42,13 +42,14 @@ export const JSX_CHILDREN_NAME = {
     EDIT : "Edit",
     ACTIONS : "Actions ▾",
     ADD_USER : "Add User",
-    CREATE_LEAD : "Create Lead",
+    CREATE_LEAD : "Create",
     ADD_PRODUCTS : "Add Products",
     TAX : "Tax",
     ADD_TEAM: "Add Team",
     TEAM : "Team",
     USER : "User",
-    UPDATE : "Update Plan"
+    UPDATE : "Update Plan",
+    MEETINGS : "Meetings",
 
 }
 

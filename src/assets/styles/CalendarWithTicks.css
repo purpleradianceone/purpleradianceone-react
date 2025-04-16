@@ -1,0 +1,19 @@
+.day-with-event {
+    position: relative; /* Needed for absolute positioning of the tick */
+}
+
+.day-with-event::after {
+    content: '';
+    position: absolute;
+    top: 2px; /* Adjust as needed */
+    right: 130px; /* Adjust as needed */
+    width: 5px; /* Adjust tick size */
+    height: 5px; /* Adjust tick size */
+    border-radius: 50%;
+    background-color: darkgreen;
+    
+}
+
+.rbc-date-cell{
+    padding: 3px;
+}
