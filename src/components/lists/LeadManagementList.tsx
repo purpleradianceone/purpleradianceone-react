@@ -1,33 +1,51 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ClipboardPlus, Handshake, Search, X } from "lucide-react";
+import {
+  Calendar,
+  ClipboardPlus,
+  Filter,
+  Handshake,
+  User,
+  X,
+} from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, SIZE, STATUS_CODE } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CreateLeadModal from "../modals/leads/CreateLeadModal";
-import { useEffect, useState } from "react";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import axios from "axios";
-import POST_API from "../../constants/PostApi";
-import PostDataToGetLeadData from "../../@types/lead-management/PostDataToGetLeadData";
-import LeadDataProps from "../../@types/lead-management/LeadProps";
-import RefreshToken from "../../config/validations/RefreshToken";
-import { DialogueBox } from "../dialogue-box/Dialogue";
-import ROUTES_URL from "../../constants/Routes";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
-import CompanyUser from "../../@types/company-users/CompanyUser";
 import SearchInput from "../ui/SearchInput";
+import DateRangePicker from "../ui/DateRangePicker";
+import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
+import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import LeadManagementListProps from "../../@types/List/LeadManagementListProps";
+import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
+import Pagination from "../ag-grid/Pagination";
+import CustomDropdown from "../modals/leads/CustomDropdown";
+import LeadMeetingsModal from "../modals/meetings/LeadMeetingsModal";
 
-function LeadManagementList() {
-
-  const navigate = useNavigate();
+function LeadManagementList({
+  handleSearchOption,
+  onStartDateChange,
+  onEndDateChange,
+  handleAddLead,
+  leadData,
+  paginationData,
+  handleSelectedCompanyUserCheckBoxChange,
+  persistedSelectedUserId,
+  selectedLeadOwner,
+  leadStatus,
+  handleLeadSelectedStatus,
+  leadSource,
+  handleLeadSelectedSource
+}: LeadManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
-  const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] =useState<boolean>(false);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] =
+    useState<boolean>(false);
+
+  const [isMeetingdModalOpen,setIsMeetingsModalOpen] = useState<boolean>(false);
 
   const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
     useState(false);
@@ -35,141 +53,21 @@ function LeadManagementList() {
   const handleCompanyUserPopUp = () => {
     setOpenPopUpOfCompanyUserModal(true);
   };
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-  number | null
->(null);
 
-const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
-  company_id: 0,
-  id: 0,
-  fullname: "",
-  email: "",
-  mobilenumber: "",
-  createdby: "",
-  isactive: false,
-  requestedby: "",
-  generate_password: "",
-});
-const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-  if (params) {
-    setPersistedSelectedUserId(params.id);
+  const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-    setSelectedCompanyUser({
-      company_id: params.company_id,
-      id: params.id,
-      fullname: params.fullname,
-      email: params.email,
-      mobilenumber: params.mobilenumber,
-      createdby: "",
-      isactive: params.isactive,
-      requestedby: "",
-      generate_password: "",
-    });
-  } else {
-    setPersistedSelectedUserId(null);
-    // Reset selectedCompanyUser to its initial state when null is received
-    setSelectedCompanyUser({
-      company_id: 0,
-      id: 0,
-      fullname: "",
-      email: "",
-      mobilenumber: "",
-      createdby: "",
-      isactive: false,
-      requestedby: "",
-      generate_password: "",
-    });
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState(false);
+
+  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
+    useState<boolean>(false);
+
+  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+
+  const handleMeetingsModalOpen = (status : boolean) => {
+    setIsMeetingsModalOpen(status);
   }
-
-}
-
-
-  const [leadData , setLeadData] = useState<LeadDataProps[]>([{
-    id : 0,
-    name : null,
-    email : null,
-    mobileNumber : "",
-    companyId : 0,
-    companyUserId : 0,
-    count : 0,
-    createdBy : "",
-    createdOn : "",
-    leadOwner : "",
-    leadSource : "",
-    leadSourceId : 0,
-    leadStatus : "",
-    leadStatusId : 0,
-  }]);
-  const {loginStatus}= useLoggedInUserContext();
-
-  const  getLeadsData = async () =>{
-    //NOTE : need to work on this 
-    const postDataToGetLeads : PostDataToGetLeadData= {
-      company_id: loginStatus.companyId,
-      ownerid: null,
-      lead_source_id : null,
-      lead_status_id : null,
-      search_company_specific_date_range_id: null,
-      limit: null,
-      offset : null,
-      search_parameter: null,
-      search_parameter_date: null,
-      requestedby: loginStatus.id,
-    }
-    try{
-      const response = await axios.post(POST_API.GET_LEAD, postDataToGetLeads, {withCredentials : true})
-      if(response.status=== STATUS_CODE.OK){
-       const responseData = response.data;
-
-       const formattedData  : LeadDataProps[] = responseData.map((item : any ) => ({
-        id: item.id,
-        name: item.name,
-        email: item.email,
-        mobileNumber: item.mobilenumber,
-        companyId: item.companyid,
-        companyUserId: item.ownerid,
-        count: item.count,
-        createdBy: item.createdby,
-        createdOn: item.createdon,
-        leadOwner: item["Lead Owner"],
-        leadSource: item["Lead Source"],
-        leadSourceId: item.lead_source_id,
-        leadStatus: item["Lead Status"],
-        leadStatusId: item.lead_status_id,
-       }))
-       setLeadData(formattedData);
-
-    }}
-    //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
-    catch(error :  any ){
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunction: getLeadsData,
-        });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
-        }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
-      }
-    }
-  }
-
-  //NOTE : NEED TO ADD PAGINATION FUNCTIONALITY HERE
-  useEffect(()=>{
-    getLeadsData();
-  }, [])
-
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   if (userHasAccessToViewLead) {
     const handleCreateLeadModalClose = () => {
@@ -177,13 +75,12 @@ const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     };
 
     return (
-      <div className="w-full pt-2 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex w-full gap-2">
-            <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-              <div className="flex  gap-2">
+      <div className="w-full pl-5 pr-1 gap-1">
+        <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+         
+              <div className="flex">
                 {!isSmallScreen && (
-                  <Handshake className="w-6 h-6 text-blue-600" />
+                  <Handshake className="w-6= h-6 text-blue-600" />
                 )}
 
                 {(isMediumScreen || isLargeScreen) && (
@@ -192,101 +89,317 @@ const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
               </div>
 
               {isLargeScreen && (
-                <div className="flex gap-1">
-                  {/* search box flex div */}
+                <>
+                   <div className="flex">
+                    {/* search box flex div */}
+                    <div className="relative flex items-start w-44">
+                      <div className="grid w-full">
+                      <SearchInput
+                        onChange={(e) => {
+                          handleSearchOption.handleSearchParameterChange(
+                            e.target.value
+                          );
+                        }}
+                        
+                      ></SearchInput>
+                      <div className={selectedLeadOwner.id === 0 ? 'bg-transparent': 'relative rounded-lg bg-blue-600 text-white text-center px-1 mt-1 w-fit'}>
+                        {selectedLeadOwner.fullname} 
+                        {selectedLeadOwner.id !== 0 && (
+                          <button onClick={()=>{
+                          handleSelectedCompanyUserCheckBoxChange(null);
+                        }} className="border-transparent ml-1 float-end">
+                        <X size={18} className="self-center"></X>
+                        </button>
+                        )
+                        }
+                      </div>
+                      </div>
+                      
+                      
+                    </div>
+
+                    {/* Date FIlters Dropdown */}
+                    <div className="flex mx-1">
+                      <div className="flex">
+                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                          <Calendar className="mt-2" />
+                        </div>
+                        <DateRangeFilterDropdown
+                          dropdownOptions={dateRangeDropdownOptions}
+                          handleDateIdChange={handleDateRangeIdChange}
+                        ></DateRangeFilterDropdown>
+                       
+                      </div>
+                    </div>
+                    <div className="ml-0.5 min-w-[120px] max-h-[40px]">
+                <CustomDropdown
+                labelName="source"
+                options={leadSource!}
+                onSelect={handleLeadSelectedSource}
+              />
+                </div>
+                <div className="ml-0.5 min-w-[120px]">
+                <CustomDropdown
+                labelName="status"
+                options={leadStatus!}
+                onSelect={handleLeadSelectedStatus}
+              />
+                </div>
+                
+                <Button className="flex ml-0.5 h-9 w-fit justify-between text-sm py-2 px-3 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none" onClick={handleCompanyUserPopUp} type="button">
+                    <User size={14} className="self-center ml-2" />
+                    <span className="self-center">Owner</span>
+                </Button>
+                  </div>
+                  {/* Custom Date Picker Div Flex Box*/}
+                  <div
+                    style={
+                      isCustomDateOptionSelected
+                        ? { visibility: "visible" }
+                        : { visibility: "hidden" }
+                    }
+                  >
+                    <DateRangePicker
+                      onStartDateChange={onStartDateChange}
+                      onEndDateChange={onEndDateChange}
+                    />
+                  </div>
+                </>
+              )}
+
+              {isMediumScreen && (
+                <>
                   <div className="relative flex items-start w-80 ">
-                    {/* NOTE : search box input */}
-                    {/* NOTE : IF WANT TO ADD SEARCH FUNCTIONALITY THEN UNCOMMMENT THE BELOW CODE AND USE IT */}
                     <SearchInput
-                      onChange={() => {
+                      onChange={(e) => {
+                        handleSearchOption.handleSearchParameterChange(
+                          e.target.value
+                        );
                       }}
                     ></SearchInput>
                   </div>
-                </div>
+                  <div className="flex relative  gap-2  ">
+                    <div className="mt-1 flex ">
+                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                        <Calendar />
+                      </div>
+
+                      <DateRangeFilterDropdown
+                        dropdownOptions={dateRangeDropdownOptions}
+                        handleDateIdChange={handleDateRangeIdChange}
+                      ></DateRangeFilterDropdown>
+                    </div>
+                  </div>
+                  {isFilterOpenInTabletView && isCustomDateOptionSelected && (
+                    <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
+                      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                        <button
+                          onClick={() => {
+                            setIsFilterOpenInTabletView(
+                              !isFilterOpenInTabletView
+                            );
+                          }}
+                          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                        >
+                          <X size={SIZE.TWENTY} />
+                        </button>
+
+                        <div className="my-10 justify-items-center mb-5">
+                          <div className="mb-5">
+                            <DateRangePicker
+                              onStartDateChange={onStartDateChange}
+                              onEndDateChange={onEndDateChange}
+                            />
+                          </div>
+                          <div className="w-full justify-items-center">
+                            <div className="w-24">
+                              <Button>Done</Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {isSmallScreen && (
+                <>
+                  <div className="relative flex items-start w-80 ">
+                    <SearchInput
+                      onChange={(e) => {
+                        handleSearchOption.handleSearchParameterChange(
+                          e.target.value
+                        );
+                      }}
+                    ></SearchInput>
+                  </div>
+                  <div className="flex relative gap-2">
+                    <Button
+                      onClick={() => {
+                        setIsFiltersOpenInMobileView(
+                          !isFiltersOpenInMobileView
+                        );
+                      }}
+                    >
+                      <Filter size={SIZE.EIGHT} />
+                    </Button>
+                  </div>
+                  {isFiltersOpenInMobileView && (
+                    <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                        <button
+                          onClick={() => {
+                            setIsFiltersOpenInMobileView(
+                              !isFiltersOpenInMobileView
+                            );
+                          }}
+                          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                        >
+                          <X size={SIZE.EIGHT} />
+                        </button>
+                        {/* Date FIlters Dropdown */}
+
+                        <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
+                          <div className="mt-1 flex ">
+                            <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                              <Calendar size={SIZE.TWENTY} />
+                            </div>
+
+                            <DateRangeFilterDropdown
+                              dropdownOptions={dateRangeDropdownOptions}
+                              handleDateIdChange={handleDateRangeIdChange}
+                            ></DateRangeFilterDropdown>
+                          </div>
+                        </div>
+
+                        {/* Custom Date Picker Div Flex Box*/}
+                        <div
+                          className="mb-10 justify-items-center"
+                          style={
+                            isCustomDateOptionSelected
+                              ? { visibility: "visible" }
+                              : { visibility: "hidden" }
+                          }
+                        >
+                          <DateRangePicker
+                            onStartDateChange={onStartDateChange}
+                            onEndDateChange={onEndDateChange}
+                          />
+                        </div>
+
+                        {
+                          <div className="flex w-full justify-center items-center mb-5">
+                            <div className="w-28">
+                              <Button
+                                onClick={() => {
+                                  setIsFiltersOpenInMobileView(
+                                    !isFiltersOpenInMobileView
+                                  );
+                                }}
+                              >
+                                Done
+                              </Button>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
               <div className="flex gap-1">
-
-              <Button onClick={handleCompanyUserPopUp} type="button">
-                  <div className="flex gap-2 items-center whitespace-nowrap">
-                    <Search size={18} />
-                    <span>Lead Owner</span>
-                  </div>
-                  
-                </Button>
-                {userHasAccessToAddLead && <Button
-                  onClick={() => {
-                    setIsCreateLeadModalOpen(true);
-                  }}
-                >
-                  {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
-                </Button>}
-                  {!userHasAccessToAddLead && 
-                    <Button
-                    disabled={true}
-                    
+                {/* <Button onClick={handleCompanyUserPopUp} type="button">
+                    <LocateFixedIcon size={14} className="self-center ml-1" />
+                    <span className="self-center text-sm">Source</span>
+                </Button> */}
+                {/* <Button onClick={handleCompanyUserPopUp} type="button">
+                    <FolderClock size={14} className="self-center ml-1" />
+                    <span className="self-center text-sm">Status</span>
+                </Button> */}
+               
+                
+                {userHasAccessToAddLead && (
+                  <Button
+                    onClick={() => {
+                      setIsCreateLeadModalOpen(true);
+                    }}
                   >
                     {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
                     {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                     {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                   </Button>
+                )}
+                {!userHasAccessToAddLead && (
+                  <Button disabled={true}>
+                    {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
+                    {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                    {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                  </Button>
+                )}
+              </div>
+            </div>
+  
+  
+
+        <div className="flex bg-white rounded-lg shadow-sm p-0">
+          <div
+            className="ag-theme-alpine overflow-y-auto w-full"
+          >
+            <LeadManagementAgGrid 
+            leads={leadData} 
+            handleIdIsMeetingsModalOpen={handleMeetingsModalOpen}
+            />
+          </div>
+          <CreateLeadModal
+            isOpen={isCreateLeadModalOpen}
+            onClose={handleCreateLeadModalClose}
+            onCreateLeadRefreshLeadData={handleAddLead}
+          ></CreateLeadModal>
+          <LeadMeetingsModal
+          isOpen = {isMeetingdModalOpen}
+          onClose={()=> {
+            setIsMeetingsModalOpen(false);
+          }}
+          />
+        </div>
+
+        <div className="flex items-center justify-end mt-1">
+          <Pagination
+            totalPages={paginationData.totalPages}
+            currentPage={paginationData.currentPage}
+            pageSize={paginationData.pageSize}
+            onPageChange={paginationData.handlePageChange}
+            onPageSizeChange={paginationData.selectedPageSize}
+          />
+        </div>
+        {openPopUpOfCompanyUserModal && (
+          <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+              {/* Header with Close Button */}
+              <div className="flex justify-between items-center p-3 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Select Company User
+                </h3>
+                <button
+                  onClick={() => setOpenPopUpOfCompanyUserModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              {/* NOTE : CALL TO THE MODAL COMPONENT */}
+              <div className="p-1">
+                <GetCompanyUsersForLead
+                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                  handleSelectedCompanyUserChange={
+                    handleSelectedCompanyUserCheckBoxChange
                   }
+                />
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "460px", width: "100%" }}
-          >
-            <LeadManagementAgGrid   leads={leadData} />
-          </div>
-          <CreateLeadModal 
-            isOpen={isCreateLeadModalOpen}
-            onClose={handleCreateLeadModalClose}
-            onCreateLeadRefreshLeadData={getLeadsData}
-          ></CreateLeadModal>
-        </div>
-        {/* NOTE : NEED TO TALK ABOUT THIS */}
-        <DialogueBox
-                isOpen={isDialogueOpen}
-                onClose={() => setIsDialogueOpen(false)}
-                onConfirm={handleDialogueConfirm}
-                title="Session Expired !"
-                message="Session Expired. Please login again."
-              />
-
-
-        {openPopUpOfCompanyUserModal && (
-        <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-            {/* Header with Close Button */}
-            <div className="flex justify-between items-center p-3 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Select Company User
-              </h3>
-              <button
-                onClick={() => setOpenPopUpOfCompanyUserModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            {/* NOTE : CALL TO THE MODAL COMPONENT */}
-            <div className="p-1">
-              <GetCompanyUsersForLead
-                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
-                }
-              />
-            </div>
-          </div>
-        </div>
-      )}
+        )}
       </div>
     );
   }

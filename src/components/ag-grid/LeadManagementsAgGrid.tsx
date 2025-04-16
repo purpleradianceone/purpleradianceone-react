@@ -3,9 +3,8 @@
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {  Edit, UserCheck } from "lucide-react";
+import {  Edit, Headset } from "lucide-react";
 import { createPortal } from "react-dom";
-import Button from "../ui/Button";
 import {  JSX_CHILDREN_NAME, } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
@@ -14,15 +13,8 @@ import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGrid
 
 function LeadManagementAgGrid({
     leads,
-    userHasAccessToUpdateLead,
-    userHasAccessToViewLead
+    handleIdIsMeetingsModalOpen,
 }  : LeadManagementAgGridProps) {
-
-  //NOTE : NEED TO MAKE CHANGES HERE
-  useEffect(()=>{
-    // console.log(leads);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
 
     const columnDefs  = useMemo<ColDef[]>(
         () => [
@@ -100,7 +92,7 @@ function LeadManagementAgGrid({
           {
             headerName: "Actions",
             sortable: false,
-            maxWidth: 100,
+            maxWidth: 110,
             pinned: "right",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any,
             cellRenderer: (params: any) => {
@@ -139,7 +131,6 @@ function LeadManagementAgGrid({
                     "mousedown",
                     handleClickOutsideActionsDropDown
                   );
-              // eslint-disable-next-line react-hooks/exhaustive-deps
               }, []);
     
               return (
@@ -155,55 +146,17 @@ function LeadManagementAgGrid({
                     createPortal(
                       <div
                         ref={dropdownRef}
-                        className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
+                        className="absolute bg-white border rounded-md shadow-lg w-28 ml-2 z-50"
                         style={{ top: position.top, left: position.left }}
                       >
-                        {userHasAccessToViewLead ? (
-                          <>
-                            {userHasAccessToUpdateLead ? (
                               <ActionsDropdownButton
                                 onClick={() => {
                                   setIsActionsDropDownOpen(false);
+                                  handleIdIsMeetingsModalOpen(true);
                                 }}
                               >
-                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.EDIT}
+                                <Headset className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR_MARGIN_RIGHT} /> {JSX_CHILDREN_NAME.MEETINGS}
                               </ActionsDropdownButton>
-                            ) : (
-                              <button
-                                disabled
-                                className={CLASS_NAMES.DISABLED_BUTTON}
-                              >
-                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.EDIT}
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <Button
-                              disabled
-                              className={CLASS_NAMES.DISABLED_BUTTON}
-                            >
-                              <UserCheck className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> {JSX_CHILDREN_NAME.ACCESS}
-                            </Button>
-                            {userHasAccessToUpdateLead ? (
-                              <button
-                                className="block w-full text-blue-600 text-sm p-2 text-left hover:bg-gray-100"
-                                onClick={() => {
-                                  setIsActionsDropDownOpen(false);
-                                }}
-                              >
-                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> Edit
-                              </button>
-                            ) : (
-                              <Button
-                                disabled
-                                className={CLASS_NAMES.DISABLED_BUTTON}
-                              >
-                                <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} /> Edit
-                              </Button>
-                            )}
-                          </>
-                        )}
                       </div>,
                       document.body // Render dropdown in body to avoid clipping
                     )}
@@ -212,7 +165,6 @@ function LeadManagementAgGrid({
             },
           },
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         []
       );
 
