@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { CheckCircle2, FilePen, XCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -18,12 +18,10 @@ function SubscriptionListAggrid({
   handleSelectedSubscription,
 }: {
   subscriptionList: SubscriptionListProps[];
-  handleUpdateSubscriptionModalOpen:(status :boolean) => void;
-  handleSelectedSubscription: (params :SubscriptionListProps )=>void;
-}) 
-
-{
- const  isCurrentDateInRange = (startDateStr: string, endDateStr: string) => {
+  handleUpdateSubscriptionModalOpen: (status: boolean) => void;
+  handleSelectedSubscription: (params: SubscriptionListProps) => void;
+}) {
+  const isCurrentDateInRange = (startDateStr: string, endDateStr: string) => {
     const startDate = new Date(startDateStr);
     const endDate = new Date(endDateStr);
     const currentDate = new Date(); // Gets today's date
@@ -34,34 +32,72 @@ function SubscriptionListAggrid({
     } else {
       return "Expired"; // Event has ended
     }
-  }
+  };
 
   //note : access module context
-  const {userHasAccessToUpdateSubscription}= useUserAccessModules();
-
+  const { userHasAccessToUpdateSubscription } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
         field: "id",
         headerName: "Id",
-        hide: true,  
+        hide: true,
+        sortable: true,
+        filter: true,
+      },
+
+      {
+        field: "subscriptionStatus",
+        headerName: "Status",
+        cellRenderer: (params: any) => {
+          if (params.value === "Ongoing") {
+            return (
+              <div className="flex items-center gap-1 mt-1">
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <span className="text-xs text-green-600">
+                  Ongoing <span className="text-xs">✅</span>
+                </span>
+              </div>
+            );
+          } else if (params.value === "Upcoming") {
+            return (
+              <div className="flex items-center gap-1 mt-1">
+                <XCircle className="w-4 h-4 text-yellow-500" />
+                <span className="text-xs text-yellow-600">
+                  Upcoming <span className="text-xs">⏳</span>
+                </span>
+              </div>
+            );
+          } else {
+            return (
+              <div className="flex items-center gap-1 mt-1">
+                <XCircle className="w-4 h-4 text-red-500" />
+                <span className="text-xs text-red-600">
+                  Expired <span className="text-xs">❌</span>
+                </span>
+              </div>
+            );
+          }
+
+          return null;
+        },
         sortable: true,
         filter: true,
       },
       {
+        hide:true,
         field: "isActive",
         headerName: "Status",
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
-          const [statusOfSubscription] =
-            useState<string>(() => {
-              return isCurrentDateInRange(
-                params.data.startDate,
-                params.data.endDate
-              );
-            });
+          const [statusOfSubscription] = useState<string>(() => {
+            return isCurrentDateInRange(
+              params.data.startDate,
+              params.data.endDate
+            );
+          });
 
           return (
             <div className="flex items-center gap-1 mt-3">
@@ -94,6 +130,7 @@ function SubscriptionListAggrid({
         sortable: true,
         filter: true,
         flex: 1.5,
+        maxWidth : 140
       },
       {
         field: "totalCost",
@@ -101,6 +138,7 @@ function SubscriptionListAggrid({
         valueFormatter: (params) => `₹ ${params.value}`,
         sortable: true,
         filter: true,
+        maxWidth : 150
       },
 
       {
@@ -109,6 +147,7 @@ function SubscriptionListAggrid({
         sortable: true,
         filter: true,
         flex: 1.5,
+        maxWidth :150
       },
       {
         field: "endDate",
@@ -134,7 +173,7 @@ function SubscriptionListAggrid({
         sortable: false,
         maxWidth: 100,
         pinned: "right",
-        
+
         cellRenderer: (params: any) => {
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
@@ -203,46 +242,41 @@ function SubscriptionListAggrid({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 mr-4 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-
-
-                    {
-                      userHasAccessToUpdateSubscription &&
+                    {userHasAccessToUpdateSubscription && (
                       <ActionsDropdownButton
-                      onClick={() => {
-                        setIsActionsDropDownOpen(false);
-                        handleUpdateSubscriptionModalOpen(true);
-                        handleSelectedSubscription(params.data);
-                        
-                        
-                        // handleCompanyProductTeamModalOpen(true);
-                        // handleSelectedProductChange(params.data);
-                      }}
-                    >
-                      <FilePen className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                      {JSX_CHILDREN_NAME.UPDATE}
-                    </ActionsDropdownButton>
-                    }
-                    {
-                      !userHasAccessToUpdateSubscription &&
-                      <ActionsDropdownButton
-                      disabled={true}
-                      onClick={() => {
-                        setIsActionsDropDownOpen(false);
-                        // handleUpdateSubscriptionModalOpen(true);
-                        // handleSelectedSubscription(params.data);
-                        
-                        
-                        // handleCompanyProductTeamModalOpen(true);
-                        // handleSelectedProductChange(params.data);
-                      }}
-                    >
-                      <FilePen className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                      {JSX_CHILDREN_NAME.UPDATE}
-                    </ActionsDropdownButton>
-                    }
-                    
+                        onClick={() => {
+                          setIsActionsDropDownOpen(false);
+                          handleUpdateSubscriptionModalOpen(true);
+                          handleSelectedSubscription(params.data);
 
-                    
+                          // handleCompanyProductTeamModalOpen(true);
+                          // handleSelectedProductChange(params.data);
+                        }}
+                      >
+                        <FilePen
+                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        />
+                        {JSX_CHILDREN_NAME.UPDATE}
+                      </ActionsDropdownButton>
+                    )}
+                    {!userHasAccessToUpdateSubscription && (
+                      <ActionsDropdownButton
+                        disabled={true}
+                        onClick={() => {
+                          setIsActionsDropDownOpen(false);
+                          // handleUpdateSubscriptionModalOpen(true);
+                          // handleSelectedSubscription(params.data);
+
+                          // handleCompanyProductTeamModalOpen(true);
+                          // handleSelectedProductChange(params.data);
+                        }}
+                      >
+                        <FilePen
+                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        />
+                        {JSX_CHILDREN_NAME.UPDATE}
+                      </ActionsDropdownButton>
+                    )}
                   </div>,
                   document.body
                 )}
@@ -260,13 +294,14 @@ function SubscriptionListAggrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+      enablePivot: true,
     };
   }, []);
   return (
     <>
       <div
         className="ag-theme-alpine w-full"
-        style={{ height: "460px", width: "100%" }}
+        style={{ height: 505, width: "100%" }}
       >
         <AgGridReact
           rowData={subscriptionList}
@@ -274,7 +309,7 @@ function SubscriptionListAggrid({
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
           overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-          theme={themeAlpine}
+          theme={themeBalham}
         />
       </div>
       {}

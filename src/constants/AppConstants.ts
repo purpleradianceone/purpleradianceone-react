@@ -1,3 +1,5 @@
+
+
 export const  STRING_VALUES = {
     TRUE : "true",
     FALSE : "false",
@@ -62,6 +64,11 @@ export const SIZE = {
 export const INNERHTML = {
     OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div></div>',
     OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX : '<div class = "flex justify-center items-center h-full text-blue-600" >No tax Records to Show! Please Add Tax</div>'
+}
+
+
+export  const AGGRID = {
+    THEME_ALPINE : 'themeAlpine', 
 }
 
 

@@ -19,6 +19,8 @@ const ROUTES_URL = {
     //for subscription
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
+    PANEL_CUSTOMIZER : "/panel-customizer",
+    LEAD_DETAILS : "/lead/view"
     
 }
 export default ROUTES_URL;

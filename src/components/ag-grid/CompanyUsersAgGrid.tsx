@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
@@ -12,7 +12,7 @@ import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
-
+// import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
   handleSelectedCompanyUserChange,
@@ -70,16 +70,16 @@ function CompanyUserAgGrid({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-3">
+            <div className="flex items-center text-sm gap-1 mt-1">
               {params.value ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">Active</span>
+                  <span className="text-xs text-green-600">Active</span>
                 </>
               ) : (
                 <>
                   <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">Inactive</span>
+                  <span className="text-xs text-red-600">Inactive</span>
                 </>
               )}
             </div>
@@ -229,8 +229,8 @@ function CompanyUserAgGrid({
 
   return (
     <div
-      className="ag-theme-alpine w-full"
-      style={{ height: "460px", width: "100%" }}
+      className="ag-theme-balham w-full"
+      style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         rowData={users}
@@ -238,7 +238,7 @@ function CompanyUserAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
+        theme={themeBalham}
       />
     </div>
   );

@@ -83,7 +83,7 @@ function SideNavBarItem({
                 updateTooltipPosition();
               }}
               onMouseMove={updateTooltipPosition}
-              className="w-full cursor-not-allowed opacity-50 flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+              className="w-full cursor-not-allowed opacity-50 flex items-center justify-center px-0 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
             >
               <Icon size={20} />
             </button>
@@ -119,7 +119,7 @@ function SideNavBarItem({
               </div>
               {children && (
                 <ChevronDown
-                  size={16}
+                  size={20}
                   className={`transition-transform ${expanded ? "rotate-180" : ""}`}
                 />
               )}
@@ -151,7 +151,7 @@ function SideNavBarItem({
                 updateTooltipPosition();
               }}
               onMouseMove={updateTooltipPosition}
-              className="w-full cursor-pointer flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+              className="w-full cursor-pointer flex items-center justify-center px-0 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
             >
               <Icon size={20} />
             </button>

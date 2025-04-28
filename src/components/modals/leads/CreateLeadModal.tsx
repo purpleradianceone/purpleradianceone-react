@@ -159,27 +159,39 @@ function CreateLeadModal({
   };
 
   //   NOTE : FUNCTIONS GET THE DATA FROM BACKEND
-  const getLeadSourceOptions = () => {
+  const getLeadSourceOptions = async () => {
     const postDataForLeadSource: PostDataTypeForLeadSourceAndStatusAndStates = {
       id: null,
       name: null,
       description: null,
       isactive: true,
     };
-    axios
+    try{
+     const response =await axios
       .post(POST_API.GET_LEAD_SOURCE, postDataForLeadSource, {
         withCredentials: true,
       })
-      .then((response) => {
+      if(response.status === STATUS_CODE.OK){
         setLeadSource(response.data);
         getLeadStatusOptions();
-      })
-      .catch((error) => {
-        showMessageSnackbar({
-          message: error,
-          type: "error",
+      }
+    }
+    catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getLeadStatusOptions,
         });
-      });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
   };
 
   //called the function in here
@@ -299,9 +311,6 @@ function CreateLeadModal({
               message: response.data.message,
               type: "warning",
             });
-            // setTimeout(() => {
-            //   onClose();
-            // }, NUMBER_VALUES.SNACKBAR_DURATION);
           }
           console.log(response.data);
         });
@@ -325,9 +334,6 @@ function CreateLeadModal({
         requestedby: "",
         generate_password: "",
       });
-
-      // setLeadSource(null);
-      // setLeadStatus(null);
 
       handleCloseSnackbar();
       setShowErrorAtLeadStatus(false);
@@ -395,8 +401,9 @@ function CreateLeadModal({
 
             <FormInput
               label="Mobile Number : "
-              type="text"
+              type="tel"
               name="mobileNumber"
+              pattern="[0-9]{10}"
               placeholder="Enter Phone Number"
               value={createLeadModalFormData.mobileNumber}
               onChange={handleCreateLeadModalFormDataChange}

@@ -42,9 +42,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     setShowDropdown(false);
   };
 
-  useEffect(()=> {
-    console.log(selectedOption);
-  },[selectedOption])
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <label className="block  text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" ? "": labelName}</label>

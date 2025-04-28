@@ -120,7 +120,7 @@ function LeadManagement() {
             name: item.name,
             email: item.email,
             mobileNumber: item.mobilenumber,
-            companyId: item.companyid,
+            companyId: item.company_id,
             companyUserId: item.ownerid,
             count: item.count,
             createdBy: item.createdby,

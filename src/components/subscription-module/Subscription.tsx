@@ -76,6 +76,7 @@ function SubscriptionManagement() {
                 isActive: res.isactive,
                 totalCost: res.total_cost,
                 allowedUserCount: res.company_user_count,
+                subscriptionStatus : res["Subscription Status"]
               },
             ]);
           });
