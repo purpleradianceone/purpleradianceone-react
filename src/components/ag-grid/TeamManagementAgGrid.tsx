@@ -3,7 +3,7 @@
 import {
   AllCommunityModule,
   ColDef,
-  themeAlpine,
+  themeBalham,
 } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
@@ -58,7 +58,7 @@ function TeamManagementAgGrid({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-3">
+            <div className="flex items-center gap-1 mt-1">
               {params.value ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -226,7 +226,7 @@ function TeamManagementAgGrid({
       style={
         isGridForProductTeam
           ? { height: "300px", width: "100%" }
-          : { height: "460px", width: "100%" }
+          : { height: 505, width: "100%" }
       }
     >
       <AgGridReact
@@ -235,7 +235,7 @@ function TeamManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
+        theme={themeBalham}
         onViewportChanged={handleViewPortChanged!}
         onGridReady={onGridReady!}
       />

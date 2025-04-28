@@ -7,6 +7,7 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
+import { PanelProvider } from "./context/panel/usePanel";
 
 /**
  *
@@ -14,12 +15,13 @@ import { AccessManagementContextProvider } from "./context/user/AccessManagement
  */
 function App() {
   return (
-
-    <AccessManagementContextProvider> 
-    <LoggedInUserContextProvider>
+    <PanelProvider>
+      <AccessManagementContextProvider>
+        <LoggedInUserContextProvider>
           <RouterProvider router={router} />
-    </LoggedInUserContextProvider>
-    </AccessManagementContextProvider>
+        </LoggedInUserContextProvider>
+      </AccessManagementContextProvider>
+    </PanelProvider>
   );
 }
 

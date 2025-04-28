@@ -25,6 +25,8 @@ import ProductTeamManagement from "../../components/views/product-team-managemen
 import Dashboard from "../../components/views/home/dashboard/Dashboard";
 import CreateSubscription from "../../components/subscription-module/CreateSubscription";
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
+import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
+import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
 
 
 export const router = createBrowserRouter([
@@ -104,7 +106,7 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <div className="min-h-95vh">
           <Navbar>
-           <Dashboard></Dashboard>
+            <Dashboard></Dashboard>
           </Navbar>
         </div>
       </PrivateRoute>
@@ -192,10 +194,11 @@ export const router = createBrowserRouter([
         <div>
           <AuthLayout
             title="Activate Subscription!"
-            subtitle="Enter the number of users and subscription duration to proceed">
+            subtitle="Enter the number of users and subscription duration to proceed"
+          >
             <CreateSubscription
-            isOpen = {true}
-            isSubscrptionFromLoginPage= {true}
+              isOpen={true}
+              isSubscrptionFromLoginPage={true}
             />
           </AuthLayout>
         </div>
@@ -212,7 +215,31 @@ export const router = createBrowserRouter([
           </Navbar>
         </div>
       </PrivateRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.PANEL_CUSTOMIZER,
+    element: (
+      <PrivateRoute>
+        <div>
+          <Navbar>
+            <PanelCustomizer />
+          </Navbar>
+        </div>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path :ROUTES_URL.LEAD_DETAILS,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          
+          {/* <LeadDetails/> */}
+          <ViewLeadManagement/>
+        </Navbar>
+      </PrivateRoute>
     )
-  }
+  },
 ]);
 export default router;

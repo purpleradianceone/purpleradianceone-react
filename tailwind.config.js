@@ -5,6 +5,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sora: ['Sora', 'sans-serif'],
+      },
       animation: {
         'fade-in': 'fadeIn 1s ease-in-out forwards',
       },

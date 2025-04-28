@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -72,7 +72,7 @@ function ProductsManagementGrid({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-3">
+            <div className="flex items-center gap-1 mt-1">
               {params.value ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -328,8 +328,8 @@ function ProductsManagementGrid({
 
   return (
     <div
-      className="ag-theme-alpine w-full"
-      style={{ height: "440px", width: "100%" }}
+      className="ag-theme-balham w-full"
+      style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         rowData={products}
@@ -337,7 +337,7 @@ function ProductsManagementGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
+        theme={themeBalham}
       />
     </div>
   );

@@ -8,6 +8,7 @@ type SubscriptionListProps ={
     isActive: boolean,
     createdOn : string,
     allowedUserCount: number,
+    subscriptionStatus : string,
 
 }
 

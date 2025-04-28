@@ -29,18 +29,18 @@ function Pagination({
 
   // const sizeArray=[15,10,5];
   const sizeArray = PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION;
-
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <label htmlFor="pageSize">Page Size</label>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <label htmlFor="pageSize" className="text-sm">Page Size</label>
       <select
         id="pageSize"
         value={pageSize}
         onChange={handlePageSizeChange}
         style={{
-          padding: "5px",
+          padding: "3px 6px",
           border: "1px solid #ccc",
-          borderRadius: "5px",
+          borderRadius: "4px",
+          fontSize: "0.85rem",
         }}
       >
         {sizeArray.map((size) => (
@@ -53,16 +53,17 @@ function Pagination({
         onClick={handlePreviousPage}
         disabled={currentPage === 1}
         style={{
-          padding: "5px 10px",
+          padding: "2px 2px",
           border: "1px solid #ccc",
-          borderRadius: "5px",
-          backgroundColor: currentPage === 1? COLORS.WHITE_SMOKE : COLORS.WHITE,
-          cursor: currentPage === 1? "not-allowed" : "pointer",
+          borderRadius: "6px",
+          backgroundColor: currentPage === 1 ? COLORS.WHITE_SMOKE : COLORS.WHITE,
+          cursor: currentPage === 1 ? "not-allowed" : "pointer",
+          fontSize: "0.85rem",
         }}
       >
-        <ChevronLeft/>
+        <ChevronLeft />
       </button>
-      <span>
+      <span style={{ fontSize: "0.85rem" }}>
         Page{" "}
         <input
           type="number"
@@ -71,11 +72,12 @@ function Pagination({
             onPageChange(Number(e.target.value));
           }}
           style={{
-            width: "50px",
+            width: "40px",
             textAlign: "center",
-            padding: "5px",
+            padding: "3px",
             border: "1px solid #ccc",
-            borderRadius: "5px",
+            borderRadius: "4px",
+            fontSize: "0.85rem",
           }}
         />{" "}
         of {Number(totalPages)}
@@ -84,18 +86,85 @@ function Pagination({
         onClick={handleNextPage}
         disabled={currentPage === totalPages}
         style={{
-          // background:"none",
-          padding: "5px 10px",
+          padding: "2px 2px",
           border: "1px solid #ccc",
-          borderRadius: "5px",
-          backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE: COLORS.WHITE,
+          borderRadius: "6px",
+          backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE : COLORS.WHITE,
           cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+          fontSize: "0.85rem",
         }}
       >
-        <ChevronRight/>
+        <ChevronRight />
       </button>
     </div>
   );
+  
+  // return (
+  //   <div  style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  //     <label htmlFor="pageSize" className="text-sm">Page Size</label>
+  //     <select
+  //       id="pageSize"
+  //       value={pageSize}
+  //       onChange={handlePageSizeChange}
+  //       style={{
+  //         padding: "5px",
+  //         border: "1px solid #ccc",
+  //         borderRadius: "5px",
+  //       }}
+  //     >
+  //       {sizeArray.map((size) => (
+  //         <option key={size} value={size}>
+  //           {size}
+  //         </option>
+  //       ))}
+  //     </select>
+  //     <button
+  //       onClick={handlePreviousPage}
+  //       disabled={currentPage === 1}
+  //       style={{
+  //         padding: "5px 10px",
+  //         border: "1px solid #ccc",
+  //         borderRadius: "5px",
+  //         backgroundColor: currentPage === 1? COLORS.WHITE_SMOKE : COLORS.WHITE,
+  //         cursor: currentPage === 1 ? "not-allowed" : "pointer",
+  //       }}
+  //     >
+  //       <ChevronLeft/>
+  //     </button>
+  //     <span>
+  //       Page{" "}
+  //       <input
+  //         type="number"
+  //         value={currentPage}
+  //         onChange={(e) => {
+  //           onPageChange(Number(e.target.value));
+  //         }}
+  //         style={{
+  //           width: "50px",
+  //           textAlign: "center",
+  //           padding: "5px",
+  //           border: "1px solid #ccc",
+  //           borderRadius: "5px",
+  //         }}
+  //       />{" "}
+  //       of {Number(totalPages)}
+  //     </span>
+  //     <button
+  //       onClick={handleNextPage}
+  //       disabled={currentPage === totalPages}
+  //       style={{
+  //         // background:"none",
+  //         padding: "5px 10px",
+  //         border: "1px solid #ccc",
+  //         borderRadius: "5px",
+  //         backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE: COLORS.WHITE,
+  //         cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+  //       }}
+  //     >
+  //       <ChevronRight/>
+  //     </button>
+  //   </div>
+  // );
 }
 
 export default Pagination;

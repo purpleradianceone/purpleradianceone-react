@@ -9,9 +9,9 @@ type LeadDataProps = {
     leadSource : string ,
     leadSourceId : number,
     leadStatusId : number ,
-    name : string | null ,
-    email : string | null, 
-    mobileNumber : string | null,
+    name? : string  ,
+    email? : string , 
+    mobileNumber? : string ,
     createdBy : string ,
     createdOn : string ,
 

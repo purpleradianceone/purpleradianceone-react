@@ -36,7 +36,8 @@ function FormInput({
   inputMode,
   onFocus,
   min,
-  max
+  max,
+  pattern
 }: FormInputProps){
 
   const {isSmallScreen} = useScreenSize();
@@ -66,6 +67,7 @@ function FormInput({
           inputMode={inputMode}
           min={min}
           max={max}
+          pattern={pattern}
         />
         
         {rightElement && (

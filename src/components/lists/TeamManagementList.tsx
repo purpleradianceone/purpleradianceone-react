@@ -66,8 +66,8 @@ function TeamManagementList({
       }
 
     return (
-        <div className="w-full pt-2 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+        <div className="w-full pt-1 pl-5 pr-1 gap-1">
+        <div className="sticky z-10 top-9 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Network className="w-6 h-6 text-blue-600" />}
 
@@ -304,7 +304,7 @@ function TeamManagementList({
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
             className="ag-theme-alpine w-full"
-            style={{ height: "460px", width: "100%" }}
+            style={{ height: "100%", width: "100%" }}
           >
             <TeamManagementAgGrid
             companyTeamList={companyTeamList}
@@ -313,7 +313,7 @@ function TeamManagementList({
             />
           </div>
           </div>
-          <div className="flex items-center justify-end mt-1">
+          <div className="flex items-center justify-end ">
           <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}
