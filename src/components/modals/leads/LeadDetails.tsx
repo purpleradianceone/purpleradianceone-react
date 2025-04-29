@@ -55,7 +55,7 @@ const LeadDetails = ({
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!leadDetailsData.additional_contact_number?.match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN)) {
+    if (leadDetailsData.additional_contact_number!=="" && leadDetailsData.additional_contact_number!==null&& !leadDetailsData.additional_contact_number?.match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN)) {
       setMessageSnackbar({
         open: true,
         message:
@@ -66,7 +66,6 @@ const LeadDetails = ({
     }
     let createNewDetail = false;
     if (leadDetailsData.id === null || leadDetailsData.id === 0) {
-      // setIsRequestForCreate(true);
       createNewDetail = true;
     }
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
@@ -223,6 +222,7 @@ const LeadDetails = ({
               ...leadDetailsData,
               country_id: parseInt(e.target.value),
             });
+
           }}
         />
           
