@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -29,6 +29,9 @@ const ViewLeadManagement = () => {
   const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState(false);
   const [reasonText, setReasonText] = useState("");
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
+  const countryChangeRef = useRef<number>(0);
+  const stateChangeRef = useRef<number>(0);
+  // const districtChangeRef = useRef<number>(0);
 
   const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
     useState<boolean>(false);
@@ -221,6 +224,9 @@ const ViewLeadManagement = () => {
           updatedby: data.updatedby,
           updatedon: data.updatedon,
         });
+          countryChangeRef.current = data.country_id;
+          stateChangeRef.current = data.state_id;
+        // districtChangeRef.current = data.district_id;
       } else {
         throw new Error("Failed to fetch lead details");
       }
@@ -233,10 +239,11 @@ const ViewLeadManagement = () => {
       alert("Unable to fetch Lead Details. Please try again later.");
     }
   };
-  const getAllState = async () => {
+  const getAllState = async (countryId : number | null) => {
+    if(!countryId) return;
     const PostDataForState: State = {
       id: null,
-      country_id: null,
+      country_id: countryId,
       name: null,
       description: null,
       isactive: true,
@@ -264,15 +271,17 @@ const ViewLeadManagement = () => {
     }
   };
 
-  const getAllDistrict = async () => {
+  const getAllDistrict = async (stateId : number | null) => {
+    if(!stateId) return;
     const PostDataForDistrict: District = {
       id: null,
-      state_id: null,
+      state_id: stateId,
       name: null,
       description: null,
       isactive: true,
     };
 
+   
     const fetchDistricts = async () => {
       const response = await axios.post(
         POST_API.GET_DISTRICT,
@@ -300,15 +309,35 @@ const ViewLeadManagement = () => {
 
   useEffect(() => {
     const apisCalls = async () => {
+      await getLeadDetails();
       await fetchLeadStatus();
       await getAllCountries();
       await getIndustryType();
-      await getAllState();
-      await getAllDistrict();
-      await getLeadDetails();
+      await getAllState(countryChangeRef.current);
+      await getAllDistrict(stateChangeRef.current);
+     
     };
-    apisCalls();
-  }, []);
+   
+    const apiCallsWhenCountryChanged = async (countryId : number | null ) => {
+      await getAllState(countryId);
+      
+    }
+
+    const apiCallWhenStateChanged = async (stateId : number | null) => {
+      await getAllDistrict(stateId)
+    }
+    if(countryChangeRef.current !==leadDetailsData.country_id && countryChangeRef.current !== 0 ){
+      countryChangeRef.current  = leadDetailsData.country_id;
+      apiCallsWhenCountryChanged(countryChangeRef.current)
+    }
+    else if(stateChangeRef.current !==leadDetailsData.state_id && stateChangeRef.current !== 0 ){
+      stateChangeRef.current = leadDetailsData.state_id;
+      apiCallWhenStateChanged(stateChangeRef.current)
+    }
+    else if(stateChangeRef.current === 0 && countryChangeRef.current === 0 ){
+      apisCalls();
+    }
+  }, [leadDetailsData]);
 
   return (
     <div
