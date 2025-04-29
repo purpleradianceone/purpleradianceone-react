@@ -71,6 +71,10 @@ export  const AGGRID = {
     THEME_ALPINE : 'themeAlpine', 
 }
 
+export const  MOBILE_NUMBER_VALIDATION ={
+    MOBILE_NUMBER_PATTERN_INDIAN : /^[6-9][0-9]{9}$/,
+    ERROR_MESSAGE_MOBILE_NUMBER_INDIAN : "Invalid contact number (must start with 6-9 and be 10 digits)"  
+}
 
 
 
