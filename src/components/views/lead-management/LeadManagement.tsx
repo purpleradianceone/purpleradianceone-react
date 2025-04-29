@@ -91,6 +91,7 @@ function LeadManagement() {
     //NOTE : need to work on this
     const postDataToGetLeads: PostDataToGetLeadData = {
       company_id: loginStatus.companyId,
+      id : null,
       ownerid: selectedCompanyUser.id,
       lead_source_id: selectedLeadSource,
       lead_status_id: selectedLeadStatus,

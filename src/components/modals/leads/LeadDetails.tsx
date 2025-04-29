@@ -1,182 +1,146 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
-import axios from "axios";
-import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
 import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
 import industryType from "../../../@types/general/industryType";
+import CreateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../../constants/PostApi";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
+import { log } from "console";
 
 const LeadDetails = ({
   leadDetailsData,
   setLeadDetailsData,
   countries,
   industryType,
+  stateData,
+  district,
+  selectedLeadData,
 }: {
   leadDetailsData: LeadDetailsData;
   setLeadDetailsData: React.Dispatch<React.SetStateAction<LeadDetailsData>>;
   selectedLeadData: any;
   countries: Country[];
   industryType: industryType[];
+  stateData: State[];
+  district: District[];
 }) => {
-  const [stateData, setStateData] = useState<State[]>([]);
-  const [district, setDistrict] = useState<District[]>([]);
+  const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
 
-  const handleSave = () => {
-    alert();
-  };
-  // NOTE : GET COMPANY DETAILS
-  const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
-    while (retries > 0) {
-      try {
-        await fn();
-        return;
-      } catch (error) {
-        console.error(`Retry failed. Retries left: ${retries - 1}`, error);
-        retries--;
-        if (retries === 0) {
-          throw error;
-        }
-      }
-    }
-  };
-  
-//   const getAllState = async () => {
+  //note : Message Snackbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
-//     const PostData: State = {
-//       id: null,
-//       country_id: null,
-//       name: null,
-//       description: null,
-//       isactive: true,
-//     };
-
-//     try {
-//       const response = await axios.post(POST_API.GET_STATE, PostData, {
-//         withCredentials: true,
-//       });
-//       if (response.status == STATUS_CODE.OK) {
-//         setStateData(response.data);
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-//   const getAllDistrict = async () => {
-//     const PostData: District = {
-//       id: null,
-//       state_id: null,
-//       name: null,
-//       description: null,
-//       isactive: true,
-//     };
-
-//     try {
-//       const response = await axios.post(POST_API.GET_DISTRICT, PostData, {
-//         withCredentials: true,
-//       });
-//       if (response.status == STATUS_CODE.OK) {
-//         setDistrict(response.data);
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-const getAllState = async () => {
-    const PostData: State = {
-      id: null,
-      country_id: null,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-  
-    const fetchStates = async () => {
-      const response = await axios.post(POST_API.GET_STATE, PostData, {
-        withCredentials: true,
-      });
-      if (response.status === STATUS_CODE.OK) {
-        setStateData(response.data);
-      } else {
-        throw new Error("Failed to fetch states");
-      }
-    };
-  
-    try {
-      await retryRequest(fetchStates, 4);
-    } catch (error) {
-      console.error("Failed to fetch states after retries:", error);
-      alert("Unable to fetch States. Please try again later.");
-    }
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
   };
-  
-  const getAllDistrict = async () => {
-    const PostData: District = {
-      id: null,
-      state_id: null,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-  
-    const fetchDistricts = async () => {
-      const response = await axios.post(POST_API.GET_DISTRICT, PostData, {
-        withCredentials: true,
-      });
-      if (response.status === STATUS_CODE.OK) {
-        setDistrict(response.data);
-      } else {
-        throw new Error("Failed to fetch districts");
-      }
-    };
-  
-    try {
-      await retryRequest(fetchDistricts, 4);
-    } catch (error) {
-      console.error("Failed to fetch districts after retries:", error);
-      alert("Unable to fetch Districts. Please try again later.");
-    }
+
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
-  
+
   useEffect(() => {
-    const apiCalls = async () => {
-      await getAllState();
-      await getAllDistrict();
+    console.log("this is selected lead data");
+
+    console.log(selectedLeadData);
+  });
+  const { loginStatus } = useLoggedInUserContext();
+  const handleSave = async () => {
+    let createNewDetail = false;
+    if (leadDetailsData.id === null || leadDetailsData.id === 0) {
+      setIsRequestForCreate(true);
+      createNewDetail = true;
+    }
+    const PostDataCreateLead: CreateOrUpdateLeadDetails = {
+      ...(createNewDetail ? {lead_id: selectedLeadData.id,} : {id: leadDetailsData.id,}),
+      company_id: loginStatus.companyId,
+      country_id: leadDetailsData.country_id,
+      address: leadDetailsData.address,
+      additional_contact_number: leadDetailsData.additional_contact_number,
+      district_id: leadDetailsData.district_id,
+      industry_name: leadDetailsData.industry_name,
+      industry_type_id: leadDetailsData.industry_type_id,
+      job_title: leadDetailsData.job_title,
+      state_id: leadDetailsData.state_id,
+      website: leadDetailsData.website,
+      ...(createNewDetail? {createdby: loginStatus.id,}:{updatedby: loginStatus.id,}),
     };
-    apiCalls();
-  },[]);
 
-const districtOptions = Array.isArray(district)
-  ? district.map((val) => ({
-      label: val.name,
-      value: val.id,
-    }))
-  : [];
+    const url = createNewDetail
+      ? POST_API.CREATE_LEAD_DETAILS
+      : POST_API.UPDATE_LEAD_DETAILS;
 
-const stateOptions = Array.isArray(stateData)
-  ? stateData.map((state) => ({
-      label: state.name,
-      value: state.id,
-    }))
-  : [];
+    const response = await axios.post(url, PostDataCreateLead, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-const countryOptions = Array.isArray(countries)
-  ? countries.map((country) => ({
-      label: country.name,
-      value: country.id,
-    }))
-  : [];
+    if (response.status === STATUS_CODE.OK) {
+      if (response.data.status) {
+        showMessageSnackbar({
+          message: response.data.message,
+          type: "success",
+        });
+        return;
+      }
+      if (response.data.status === false) {
+        showMessageSnackbar({
+          message: response.data.message,
+          type: "warning",
+        });
+        return;
+      }
+    }
+  };
 
-const industryOptions = Array.isArray(industryType)
-  ? industryType.map((val) => ({
-      label: val.name,
-      value: val.id,
-    }))
-  : [];
+  useEffect(() => {
+    console.log(leadDetailsData);
+  }, [leadDetailsData]);
 
-  
+  const districtOptions = Array.isArray(district)
+    ? district.map((val) => ({
+        label: val.name,
+        value: val.id,
+      }))
+    : [];
+
+  const stateOptions = Array.isArray(stateData)
+    ? stateData.map((state) => ({
+        label: state.name,
+        value: state.id,
+      }))
+    : [];
+
+  const countryOptions = Array.isArray(countries)
+    ? countries.map((country) => ({
+        label: country.name,
+        value: country.id,
+      }))
+    : [];
+
+  const industryOptions = Array.isArray(industryType)
+    ? industryType.map((val) => ({
+        label: val.name,
+        value: val.id,
+      }))
+    : [];
+
   return (
     <div>
       <div className="w-auto flex justify-between bg-slate-100 px-2 mb-1  ">
@@ -291,6 +255,13 @@ const industryOptions = Array.isArray(industryType)
           }}
         />
       </div>
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </div>
   );
 };
