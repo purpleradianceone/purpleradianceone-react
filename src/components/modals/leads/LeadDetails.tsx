@@ -1,23 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
 import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
 import industryType from "../../../@types/general/industryType";
-import CreateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { MOBILE_NUMBER_VALIDATION, NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
-import { log } from "console";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -36,7 +34,7 @@ const LeadDetails = ({
   stateData: State[];
   district: District[];
 }) => {
-  const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
+  // const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
 
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -53,20 +51,28 @@ const LeadDetails = ({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  useEffect(() => {
-    console.log("this is selected lead data");
-
-    console.log(selectedLeadData);
-  });
   const { loginStatus } = useLoggedInUserContext();
-  const handleSave = async () => {
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!leadDetailsData.additional_contact_number?.match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN)) {
+      setMessageSnackbar({
+        open: true,
+        message:
+        MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
+        type: "error",
+      });
+      return;
+    }
     let createNewDetail = false;
     if (leadDetailsData.id === null || leadDetailsData.id === 0) {
-      setIsRequestForCreate(true);
+      // setIsRequestForCreate(true);
       createNewDetail = true;
     }
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
-      ...(createNewDetail ? {lead_id: selectedLeadData.id,} : {id: leadDetailsData.id,}),
+      ...(createNewDetail
+        ? { lead_id: selectedLeadData.id }
+        : { id: leadDetailsData.id }),
       company_id: loginStatus.companyId,
       country_id: leadDetailsData.country_id,
       address: leadDetailsData.address,
@@ -77,7 +83,9 @@ const LeadDetails = ({
       job_title: leadDetailsData.job_title,
       state_id: leadDetailsData.state_id,
       website: leadDetailsData.website,
-      ...(createNewDetail? {createdby: loginStatus.id,}:{updatedby: loginStatus.id,}),
+      ...(createNewDetail
+        ? { createdby: loginStatus.id }
+        : { updatedby: loginStatus.id }),
     };
 
     const url = createNewDetail
@@ -109,7 +117,7 @@ const LeadDetails = ({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     console.log(leadDetailsData);
   }, [leadDetailsData]);
 
@@ -143,85 +151,69 @@ const LeadDetails = ({
 
   return (
     <div>
-      <div className="w-auto flex justify-between bg-slate-100 px-2 mb-1  ">
-        <span className="text-sm text-gray-800">Details</span>
-        <button
-          className="text-xs text-gray-500 mb-1  hover:text-black hover:underline"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-2">
-        <FormField
-          type="select"
-          label="Industry"
-          selectOptions={industryOptions}
-          value={leadDetailsData.industry_type_id}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              industry_type_id: parseInt(e.target.value),
-            });
-          }}
-        />
-        <FormField
-          type="text"
-          label="Address"
-          value={leadDetailsData.address}
-          onChange={(e) => {
-            setLeadDetailsData({ ...leadDetailsData, address: e.target.value });
-          }}
-        />
-        <FormField
-          type="text"
-          label=" Job title"
-          value={leadDetailsData.job_title}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              job_title: e.target.value,
-            });
-          }}
-        />
+      <form>
+        <div className="w-auto flex justify-between bg-slate-100 px-2 mb-1  ">
+          <span className="text-sm text-gray-800">Details</span>
 
+          <button
+            className="text-xs text-gray-500 mb-1  hover:text-black hover:underline"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-2">
         <FormField
-          type="text"
-          label="Additional contact number"
-          value={leadDetailsData.additional_contact_number}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              additional_contact_number: e.target.value,
-            });
-          }}
-        />
-        <FormField
-          type="select"
-          label="District"
-          selectOptions={districtOptions}
-          value={leadDetailsData.district_id}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              district_id: parseInt(e.target.value),
-            });
-          }}
-        />
-        <FormField
-          type="select"
-          label="State"
-          selectOptions={stateOptions}
-          value={leadDetailsData.state_id}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              state_id: parseInt(e.target.value),
-            });
-          }}
-        />
-        {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
-        <FormField
+            type="text"
+            label="Job title"
+            value={leadDetailsData.job_title}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                job_title: e.target.value,
+              });
+            }}
+          />
+           <FormField
+            type="text"
+            label="Address"
+            value={leadDetailsData.address}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                address: e.target.value,
+              });
+            }}
+          />  
+          <FormField
+            type="select"
+            label="Industry"
+            selectOptions={industryOptions}
+            value={leadDetailsData.industry_type_id}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                industry_type_id: parseInt(e.target.value),
+              });
+            }}
+          />
+         
+         
+
+          <FormField
+            type="text"
+            label="Additional contact number"
+            value={leadDetailsData.additional_contact_number}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                additional_contact_number: e.target.value,
+              });
+            }}
+          />
+          
+          
+          <FormField
           type="select"
           label="Country"
           selectOptions={countryOptions}
@@ -233,28 +225,62 @@ const LeadDetails = ({
             });
           }}
         />
+          
+          {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
+          
+          <FormField
+            type="text"
+            label="Industry Name"
+            value={leadDetailsData.industry_name}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                industry_name: e.target.value,
+              });
+            }}
+          />
+          <FormField
+            type="select"
+            label="State"
+            selectOptions={stateOptions}
+            value={leadDetailsData.state_id}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                state_id: parseInt(e.target.value),
+              });
+            }}
+          />
+          
         {/* <p className="text-xs">Selected coutry: {countryOptions.find(opt => opt.value === leadDetailsData.country_id)?.label || 'None'}</p> */}
 
-        <FormField
-          type="text"
-          label="Industry Name"
-          value={leadDetailsData.industry_name}
+
+          <FormField
+            type="text"
+            label="Website"
+            value={leadDetailsData.website}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                website: e.target.value,
+              });
+            }}
+          />
+          <FormField
+          type="select"
+          label="District"
+          selectOptions={districtOptions}
+          value={leadDetailsData.district_id}
           onChange={(e) => {
             setLeadDetailsData({
               ...leadDetailsData,
-              industry_name: e.target.value,
+              district_id: parseInt(e.target.value),
             });
           }}
         />
-        <FormField
-          type="text"
-          label="Website"
-          value={leadDetailsData.website}
-          onChange={(e) => {
-            setLeadDetailsData({ ...leadDetailsData, website: e.target.value });
-          }}
-        />
-      </div>
+          
+        </div>
+      </form>
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
@@ -302,7 +328,7 @@ const FormField = ({
         onClick={() => setIsEditing(true)}
       >
         {!isEditing ? (
-          <span className="text-gray-900 cursor-pointer">
+          <span className="text-gray-900 font-medium text-xs cursor-pointer">
             {type === "select"
               ? selectOptions?.find((opt) => opt.value === value)?.label || "_"
               : value || (
@@ -315,7 +341,7 @@ const FormField = ({
             value={value}
             onBlur={handleBlur}
             onChange={onChange}
-            className="text-gray-900 border border-gray-300 rounded p-1 text-xs focus:outline-none"
+            className="text-gray-900 font-semibold border border-gray-300 rounded p-1 text-xs focus:outline-none"
           >
             <option value="">Select {label}</option>
             {selectOptions?.map((opt) => (
@@ -331,7 +357,7 @@ const FormField = ({
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
-            className="text-gray-900 border-none border-gray-300 focus:outline-none"
+            className="text-gray-900  border-none border-gray-300 focus:outline-none"
           />
         )}
       </div>
