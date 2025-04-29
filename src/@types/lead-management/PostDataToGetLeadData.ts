@@ -1,5 +1,6 @@
 type PostDataToGetLeadData ={
     company_id: number,
+    id : number | null,
     ownerid : number | null,
     lead_source_id : number | null,
     lead_status_id : number | null,

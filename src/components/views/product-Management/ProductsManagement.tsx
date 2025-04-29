@@ -91,6 +91,7 @@ function ProductManagement() {
       setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
+        id : null,
         requestedby: loginStatus.id,
         limit: pageSize,
         offset: offset,

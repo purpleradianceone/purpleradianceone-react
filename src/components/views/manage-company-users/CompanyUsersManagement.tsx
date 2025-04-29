@@ -70,6 +70,7 @@ function GetCompanyUsers() {
 
     const postData = {
       company_id: loginStatus.companyId,
+      id: null,
       requestedby: loginStatus.id,
       limit: pageSize,
       offset,

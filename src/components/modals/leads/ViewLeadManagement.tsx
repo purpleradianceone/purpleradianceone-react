@@ -16,6 +16,8 @@ import LeadDetails from "./LeadDetails";
 import Country from "../../../@types/general/Country";
 import industryType from "../../../@types/general/industryType";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
+import State from "../../../@types/general/State";
+import District from "../../../@types/general/District";
 // import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 
 const ViewLeadManagement = () => {
@@ -33,12 +35,14 @@ const ViewLeadManagement = () => {
   const [selectedLeadData, setSelectedLeadData] = useState(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
-
+   
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [industryType , setIndustryType] = useState<industryType[]>([])
+  const [industryType, setIndustryType] = useState<industryType[]>([]);
+  const [stateData, setStateData] = useState<State[]>([]);
+  const [district, setDistrict] = useState<District[]>([]);
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -57,7 +61,6 @@ const ViewLeadManagement = () => {
         if (Array.isArray(data)) {
           setLeadStatus(data);
         } else {
-          console.warn("leadStatus is not an array", data);
           setLeadStatus([]);
         }
       }
@@ -100,48 +103,32 @@ const ViewLeadManagement = () => {
     }
   };
 
-  const getAllCountries =async ()=>{
-    const PostData : Country  = {
-      id : null,
-      dailcode : null,
-      name : null,
-      description : null,
-      isactive : true
-    }
+  const getAllCountries = async () => {
+    const PostData: Country = {
+      id: null,
+      dailcode: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
 
     try {
-      const response =await axios.post(POST_API.GET_COUNTRY , PostData , {withCredentials : true})
-      if( response.status ==STATUS_CODE.OK){
+      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+        withCredentials: true,
+      });
+      if (response.status == STATUS_CODE.OK) {
         setCountries(response.data);
       }
-    }catch ( error){
-      console.log(error);    
+    } catch (error) {
+      console.log(error);
     }
-  }
-
-  // const getIndustryType =async ()=>{
-  //   const PostData   = {
-  //     id : null,
-  //     name : null,
-  //     isactive : true
-  //   }
-
-  //   try {
-  //     const response =await axios.post(POST_API.GET_INDUSTRY_TYPE , PostData , {withCredentials : true})
-  //     if( response.status ==STATUS_CODE.OK){
-  //       setIndustryType(response.data);
-  //     }
-  //   }catch ( error){
-  //     console.log(error);    
-  //   }
-  // }
+  };
   const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
     while (retries > 0) {
       try {
         await fn();
         return;
       } catch (error) {
-        console.error(`Retry failed. Retries left: ${retries - 1}`, error);
         retries--;
         if (retries === 0) {
           throw error;
@@ -149,35 +136,31 @@ const ViewLeadManagement = () => {
       }
     }
   };
-  
+
   const fetchIndustryType = async () => {
     const postData = {
       id: null,
       name: null,
       isactive: true,
     };
-    const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, { withCredentials: true });
-  
+    const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+      withCredentials: true,
+    });
+
     if (response.status === STATUS_CODE.OK) {
       setIndustryType(response.data);
     } else {
       throw new Error("Failed to fetch industry type");
     }
   };
-  
+
   const getIndustryType = async () => {
     try {
       await retryRequest(fetchIndustryType, 3);
     } catch (error) {
       console.error("Failed after retries:", error);
-      alert("Unable to fetch Industry Type. Please try again later.");
     }
   };
-  
-  
-
-
-
 
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
     id: 0,
@@ -201,46 +184,6 @@ const ViewLeadManagement = () => {
     website: "",
   });
 
-  // const getLeadDetails = async() =>{
-  //   const PostData = {
-  //       company_id : loginStatus.companyId,
-  //       lead_id : selectedLeadData.id,
-  //       requestedby : loginStatus.id, 
-  //   }
-  //   try{
-  //       const response=await  axios.post(POST_API.GET_LEAD_DETAILS, PostData, {withCredentials : true ,headers: {
-  //         'Content-Type': 'application/json',
-  //       },})
-  //       if(response.status ===STATUS_CODE.OK){
-  //           const data = response.data;
-            
-  //           setLeadDetailsData({
-  //             id: data.id,
-  //             lead_id: data.lead_id,
-  //             country_id: data.country_id,
-  //             country_name: data["Country Name"],
-  //             district_id: data.district_id,
-  //             district_name: data["District Name"],
-  //             state_id: data.state_id,
-  //             state_name: data["State Name"],
-  //             address: data.address,
-  //             industry_type_id: data.industry_type_id,
-  //             industry_type: data["Industry Type"],
-  //             industry_name: data.industry_name,
-  //             job_title: data.job_title,
-  //             website: data.website,
-  //             additional_contact_number: data.additional_contact_number,
-  //             createdby: data.createdby,
-  //             createdon: data.createdon,
-  //             updatedby: data.updatedby,
-  //             updatedon: data.updatedon
-  //           });
-  //       }
-  //   }catch(error){
-  //       console.log(error);
-        
-  //   }
-  // }
 
   const getLeadDetails = async () => {
     const PostData = {
@@ -248,13 +191,13 @@ const ViewLeadManagement = () => {
       lead_id: selectedLeadData.id,
       requestedby: loginStatus.id,
     };
-  
+
     const fetchDetails = async () => {
       const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
         withCredentials: true,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       });
-  
+
       if (response.status === STATUS_CODE.OK) {
         const data = response.data;
         setLeadDetailsData({
@@ -282,7 +225,7 @@ const ViewLeadManagement = () => {
         throw new Error("Failed to fetch lead details");
       }
     };
-  
+
     try {
       await retryRequest(fetchDetails, 3);
     } catch (error) {
@@ -290,25 +233,82 @@ const ViewLeadManagement = () => {
       alert("Unable to fetch Lead Details. Please try again later.");
     }
   };
-  
-  useEffect(()=>{
-    const apisCalls = async ()=>{
-      await getLeadDetails();
+  const getAllState = async () => {
+    const PostDataForState: State = {
+      id: null,
+      country_id: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+    const fetchStates = async () => {
+      const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === STATUS_CODE.OK) {
+        setStateData(response.data);
+      } else {
+        throw new Error("Failed to fetch states");
+      }
+    };
+
+    try {
+      await retryRequest(fetchStates, 4);
+    } catch (error) {
+      console.error("Failed to fetch states after retries:", error);
+      alert("Unable to fetch States. Please try again later.");
+    }
+  };
+
+  const getAllDistrict = async () => {
+    const PostDataForDistrict: District = {
+      id: null,
+      state_id: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+    const fetchDistricts = async () => {
+      const response = await axios.post(
+        POST_API.GET_DISTRICT,
+        PostDataForDistrict,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === STATUS_CODE.OK) {
+        setDistrict(response.data);
+      } else {
+        throw new Error("Failed to fetch districts");
+      }
+    };
+
+    try {
+      await retryRequest(fetchDistricts, 4);
+    } catch (error) {
+      console.error("Failed to fetch districts after retries:", error);
+    }
+  };
+
+  useEffect(() => {
+    const apisCalls = async () => {
+      await fetchLeadStatus();
       await getAllCountries();
       await getIndustryType();
-    }
+      await getAllState();
+      await getAllDistrict();
+      await getLeadDetails();
+    };
     apisCalls();
-  }, [])
-
-  useEffect(() =>{
-  const apiCalls =async ()=>{
-    await fetchLeadStatus();
-  }   
-  apiCalls();
-  },[])
-  useEffect(()=>{
-    console.log(leadDetailsData);
-  },[leadDetailsData])
+  }, []);
 
   return (
     <div
@@ -381,7 +381,7 @@ const ViewLeadManagement = () => {
         </div>
         <div className="flex border rounded-r-full mb-0.5  bg-white">
           {leadStatus!.map((item: any) => (
-            <button 
+            <button
               key={item.id}
               className={`flex-1 text-xs ${
                 selectedLeadData.leadStatus === item.name
@@ -428,9 +428,11 @@ const ViewLeadManagement = () => {
         {/* First child: 70% width */}
         <div className="w-[65%] h-full overflow-auto   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
-          leadDetailsData={leadDetailsData}
-          setLeadDetailsData={setLeadDetailsData}
-          countries={countries}
+            district={district}
+            stateData={stateData}
+            leadDetailsData={leadDetailsData}
+            setLeadDetailsData={setLeadDetailsData}
+            countries={countries}
             selectedLeadData={selectedLeadData}
             industryType={industryType}
           />
@@ -472,5 +474,3 @@ const Detail = ({ label, value }: { label: string; value: string }) => (
     </p>
   </div>
 );
-
-
