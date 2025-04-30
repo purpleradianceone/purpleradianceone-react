@@ -321,18 +321,18 @@ const FormField = ({
   };
 
   return (
-    <div className="flex justify-between items-center border-b text-sm ">
+    <div className="flex justify-between items-center border-b  ">
       <div className="text-gray-700 text-xs">{label}</div>
       <div
-        className="flex items-center  min-w-[150px]"
+        className="flex items-center whitespace-nowrap  min-w-[150px]"
         onClick={() => setIsEditing(true)}
       >
         {!isEditing ? (
-          <span className="text-gray-900 font-medium text-xs cursor-pointer">
+          <span className="text-gray-900 font-medium text-xs cursor-pointer " title={selectOptions?.find((opt) => opt.value === value)?.label?.toLocaleString() || value?.toLocaleString()}>
             {type === "select"
-              ? selectOptions?.find((opt) => opt.value === value)?.label || "_"
+              ? selectOptions?.find((opt) => opt.value === value)?.label || <span className="text-xs text-gray-500">Select {label.toLowerCase()}</span>
               : value || (
-                  <span className="text-xs text-gray-500">type here...</span>
+                  <span className="text-xs text-gray-500">Add here...</span>
                 )}
           </span>
         ) : type === "select" ? (
@@ -357,7 +357,7 @@ const FormField = ({
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
-            className="text-gray-900  border-none border-gray-300 focus:outline-none"
+            className="text-gray-900 text-xs  border-none border-gray-300 focus:outline-none"
           />
         )}
       </div>
