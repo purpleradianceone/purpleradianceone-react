@@ -1,9 +1,9 @@
 type PostDataLeadUpdate = {
     company_id : number
     id : number,
-    name?: string,
-    email?: string,
-    mobilenumber?: string,
+    name?: string |null,
+    email?: string | null,
+    mobilenumber?: string | null,
     updatedby:number
 }
 export default PostDataLeadUpdate;

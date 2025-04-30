@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { MOBILE_NUMBER_VALIDATION, NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
@@ -18,6 +18,15 @@ import industryType from "../../../@types/general/industryType";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
+import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import qs from "query-string";
 // import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 
 const ViewLeadManagement = () => {
@@ -31,14 +40,13 @@ const ViewLeadManagement = () => {
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
   const countryChangeRef = useRef<number>(0);
   const stateChangeRef = useRef<number>(0);
-  // const districtChangeRef = useRef<number>(0);
 
   const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
     useState<boolean>(false);
   const [selectedLeadData, setSelectedLeadData] = useState(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
-   
+
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
@@ -46,6 +54,27 @@ const ViewLeadManagement = () => {
   const [industryType, setIndustryType] = useState<industryType[]>([]);
   const [stateData, setStateData] = useState<State[]>([]);
   const [district, setDistrict] = useState<District[]>([]);
+
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
+  //note : Message Snackbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -93,6 +122,14 @@ const ViewLeadManagement = () => {
         const updatedStatusName = leadStatus?.find(
           (item) => item.id === selectedStatusId
         )?.name;
+
+        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+        parsedQuery.leadStatusId = selectedStatusId.toString();
+        parsedQuery.leadStatus = updatedStatusName!.toString();
+        const newQueryString = qs.stringify({
+          leadData: JSON.stringify(parsedQuery),
+        });
+
         setSelectedLeadData((prev: any) => ({
           ...prev,
           leadStatus: updatedStatusName,
@@ -100,6 +137,9 @@ const ViewLeadManagement = () => {
         setReasonInputBoxOpen(false);
         setReasonText("");
         setSelectedStatusId(null);
+
+        const newPath = `${window.location.pathname}?${newQueryString}`;
+        navigate(newPath, { replace: true });
       }
     } catch (err) {
       console.error("Failed to update lead", err);
@@ -187,7 +227,6 @@ const ViewLeadManagement = () => {
     website: "",
   });
 
-
   const getLeadDetails = async () => {
     const PostData = {
       company_id: loginStatus.companyId,
@@ -224,8 +263,8 @@ const ViewLeadManagement = () => {
           updatedby: data.updatedby,
           updatedon: data.updatedon,
         });
-          countryChangeRef.current = data.country_id;
-          stateChangeRef.current = data.state_id;
+        countryChangeRef.current = data.country_id;
+        stateChangeRef.current = data.state_id;
         // districtChangeRef.current = data.district_id;
       } else {
         throw new Error("Failed to fetch lead details");
@@ -236,11 +275,10 @@ const ViewLeadManagement = () => {
       await retryRequest(fetchDetails, 3);
     } catch (error) {
       console.error("Failed to fetch lead details after retries:", error);
-      alert("Unable to fetch Lead Details. Please try again later.");
     }
   };
-  const getAllState = async (countryId : number | null) => {
-    if(!countryId) return;
+  const getAllState = async (countryId: number | null) => {
+    if (!countryId) return;
     const PostDataForState: State = {
       id: null,
       country_id: countryId,
@@ -267,12 +305,11 @@ const ViewLeadManagement = () => {
       await retryRequest(fetchStates, 4);
     } catch (error) {
       console.error("Failed to fetch states after retries:", error);
-      alert("Unable to fetch States. Please try again later.");
     }
   };
 
-  const getAllDistrict = async (stateId : number | null) => {
-    if(!stateId) return;
+  const getAllDistrict = async (stateId: number | null) => {
+    if (!stateId) return;
     const PostDataForDistrict: District = {
       id: null,
       state_id: stateId,
@@ -281,7 +318,6 @@ const ViewLeadManagement = () => {
       isactive: true,
     };
 
-   
     const fetchDistricts = async () => {
       const response = await axios.post(
         POST_API.GET_DISTRICT,
@@ -315,35 +351,93 @@ const ViewLeadManagement = () => {
       await getIndustryType();
       await getAllState(countryChangeRef.current);
       await getAllDistrict(stateChangeRef.current);
-     
     };
-   
-    const apiCallsWhenCountryChanged = async (countryId : number | null ) => {
-      await getAllState(countryId);
-      
-    }
 
-    const apiCallWhenStateChanged = async (stateId : number | null) => {
-      await getAllDistrict(stateId)
-    }
-    if(countryChangeRef.current !==leadDetailsData.country_id && countryChangeRef.current !== 0 ){
-      countryChangeRef.current  = leadDetailsData.country_id;
-      apiCallsWhenCountryChanged(countryChangeRef.current)
-    }
-    else if(stateChangeRef.current !==leadDetailsData.state_id && stateChangeRef.current !== 0 ){
+    const apiCallsWhenCountryChanged = async (countryId: number | null) => {
+      await getAllState(countryId);
+    };
+
+    const apiCallWhenStateChanged = async (stateId: number | null) => {
+      await getAllDistrict(stateId);
+    };
+    if (
+      countryChangeRef.current !== leadDetailsData.country_id &&
+      countryChangeRef.current !== 0
+    ) {
+      countryChangeRef.current = leadDetailsData.country_id;
+      apiCallsWhenCountryChanged(countryChangeRef.current);
+    } else if (
+      stateChangeRef.current !== leadDetailsData.state_id &&
+      stateChangeRef.current !== 0
+    ) {
       stateChangeRef.current = leadDetailsData.state_id;
-      apiCallWhenStateChanged(stateChangeRef.current)
-    }
-    else if(stateChangeRef.current === 0 && countryChangeRef.current === 0 ){
+      apiCallWhenStateChanged(stateChangeRef.current);
+    } else if (stateChangeRef.current === 0 && countryChangeRef.current === 0) {
       apisCalls();
     }
   }, [leadDetailsData]);
+
+  const handleLeadInfoSave = async () => {
+
+    const PostDataForLeadUpdate: PostDataLeadUpdate = {
+      company_id: loginStatus.companyId,
+      id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT
+      name: selectedLeadData.name,
+      email: selectedLeadData.email,
+      mobilenumber: selectedLeadData.mobileNumber,
+      updatedby: loginStatus.id,
+    };
+    try {
+      const response = await axios.post(
+        POST_API.UPDATE_LEAD,
+        PostDataForLeadUpdate,
+        { withCredentials: true }
+      );
+      if (response.data.status === true) {
+        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+        parsedQuery.name = selectedLeadData.name.toString();
+        parsedQuery.email = selectedLeadData.email.toString();
+        parsedQuery.mobileNumber = selectedLeadData.mobileNumber.toString()
+        const newQueryString = qs.stringify({
+          leadData: JSON.stringify(parsedQuery),
+        });
+
+        const newPath = `${window.location.pathname}?${newQueryString}`;
+        navigate(newPath, { replace: true });
+
+        showMessageSnackbar({
+          message: response.data.message,
+          type: "success",
+        });
+      } else if (response.data.status === false) {
+        showMessageSnackbar({
+          message: response.data.message,
+          type: "error",
+        });
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: handleLeadInfoSave,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
 
   return (
     <div
       className={`${
         position === "left" ? "mx-6" : ""
-      } fixed top-8 inset-0 z-10 bg-white mt-4 overflow-auto pl-9`}
+      } fixed top-8 inset-0 z-10 bg-white mt-4  pl-9`}
     >
       {/* Header */}
       <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b my-1 mr-1 pr-2">
@@ -357,13 +451,20 @@ const ViewLeadManagement = () => {
             <ChevronLeft size={18} />
             <span>Leads</span>
           </button>
-          <div>
-            <div className="text-xs text-gray-500">Lead</div>
-            <div className="font-semibold">
-              {selectedLeadData?.name ||
-                selectedLeadData.email ||
-                selectedLeadData.mobileNumber ||
-                "-"}
+          <div className="py-1">
+            <div className="text-lg font-semibold">
+              <Detail
+                label="Name"
+                type="text"
+                value={selectedLeadData?.name}
+                onChange={(e) => {
+                  setSelectedLeadData({
+                    ...selectedLeadData,
+                    name: e.target.value,
+                  });
+                }}
+                handleLeadInfoSave={handleLeadInfoSave}
+              />
             </div>
           </div>
         </div>
@@ -378,20 +479,55 @@ const ViewLeadManagement = () => {
             Edit
           </button>
 
-          <Detail label="Lead Owner " value={selectedLeadData?.leadOwner} />
+          <Detail
+            label="Lead Owner"
+            type="text"
+            value={selectedLeadData?.leadOwner}
+          />
         </div>
       </div>
 
       <div className="w-full">
         <div className="ml-4 flex justify-between gap-4 w-3/4 overflow-auto">
-          <Detail label="Email" value={selectedLeadData?.email} />
+          <Detail
+            label="Email"
+            type="text"
+            value={selectedLeadData?.email}
+            onChange={(e) => {
+              setSelectedLeadData({
+                ...selectedLeadData,
+                email: e.target.value.trim(),
+              });
+            }}
+            handleLeadInfoSave={handleLeadInfoSave}
+          />
           <Detail
             label="Mobile Number"
+            type="text"
             value={selectedLeadData?.mobileNumber}
+            onChange={(e) => {
+              setSelectedLeadData({
+                ...selectedLeadData,
+                mobileNumber: e.target.value,
+              });
+            }}
+            handleLeadInfoSave={handleLeadInfoSave}
           />
-          <Detail label="Lead Source" value={selectedLeadData?.leadSource} />
-          <Detail label="Created By" value={selectedLeadData?.createdBy} />
-          <Detail label="Created On" value={selectedLeadData?.createdOn} />
+          <Detail
+            type="none"
+            label="Lead Source"
+            value={selectedLeadData?.leadSource}
+          />
+          <Detail
+            type="none"
+            label="Created By"
+            value={selectedLeadData?.createdBy}
+          />
+          <Detail
+            type="none"
+            label="Created On"
+            value={selectedLeadData?.createdOn}
+          />
         </div>
       </div>
 
@@ -455,7 +591,7 @@ const ViewLeadManagement = () => {
 
       <div className=" w-[100%] h-auto flex gap-4  shadow-sm    ">
         {/* First child: 70% width */}
-        <div className="w-[65%] h-full overflow-auto   bg-gray-0 shadow-md m-2 rounded">
+        <div className="w-[65%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
             district={district}
             stateData={stateData}
@@ -473,15 +609,14 @@ const ViewLeadManagement = () => {
         </div>
       </div>
 
-      {isUpdateLeadFormOpen && (
-        <UpdateLeadForm
-          isOpen={isUpdateLeadFormOpen}
-          onClose={() => {
-            setIsUpdateLeadFormOpen(false);
-          }}
-          selectedLeadForEdit={selectedLeadData}
-        />
-      )}
+      <UpdateLeadForm
+        isOpen={isUpdateLeadFormOpen}
+        onClose={() => {
+          setIsUpdateLeadFormOpen(false);
+        }}
+        selectedLeadForEdit={selectedLeadData}
+      />
+
       <LeadStatusHistory
         selectedLeadData={selectedLeadData}
         isOpen={isOpenLeadStatusHistory}
@@ -489,17 +624,144 @@ const ViewLeadManagement = () => {
           setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
         }}
       />
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
     </div>
   );
 };
 
 export default ViewLeadManagement;
 
-const Detail = ({ label, value }: { label: string; value: string }) => (
-  <div>
-    <p className="text-xs text-gray-500">{label}</p>
-    <p className="font-medium text-xs text-gray-700 whitespace-nowrap overflow-x-auto text-clip">
-      {value || "-"}
-    </p>
-  </div>
-);
+type DetailProps = {
+  label: string;
+  value: string;
+  type?: "text" | "number" | "select" | "none";
+  options?: string[]; //only used if type is 'select'
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  handleLeadInfoSave?: () => Promise<void>;
+};
+
+const Detail: React.FC<DetailProps> = ({
+  label,
+  value,
+  type ,
+  options = [],
+  onChange,
+  handleLeadInfoSave,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+//note : Message Snackbar
+const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  open: false,
+  message: "",
+  type: "success" as "success" | "error",
+});
+
+const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  setMessageSnackbar({ open: true, message, type });
+};
+
+const handleCloseSnackbar = () => {
+  setMessageSnackbar((prev) => ({ ...prev, open: false }));
+};
+  const prevValueRef = useRef(value);
+
+  const handleClick = () => {
+    prevValueRef.current=value;
+    setIsEditing(true);
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+
+    if (label === "Mobile Number") {
+      const isValid = value.match(
+        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+      );
+      if (!isValid) {
+        //revert to previous value
+        const syntheticEvent = {
+          target: { value: prevValueRef.current },
+        } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+  
+        onChange?.(syntheticEvent);
+        showMessageSnackbar({
+          message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
+          type: "error",
+        });
+        return;
+      }
+    }
+    if(value !== prevValueRef.current){
+      handleLeadInfoSave!();
+    }
+  };
+
+  return (
+    <div className="">
+      <label className="text-xs text-gray-600 block   ">{label}</label>
+      {isEditing ? (
+        type === "select" ? (
+          <select
+            className="text-xs text-gray-700 "
+            value={value}
+            onChange={onChange}
+            onBlur={handleBlur}
+            autoFocus
+          >
+            {options.map((opt, idx) => (
+              <option key={idx} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        ) : (
+          type !== "none" && (
+            <input
+              type={type}
+              className="text-xs focus:outline-2  text-gray-700 border-none "
+              value={value}
+              onChange={onChange}
+              onBlur={handleBlur}
+              autoFocus
+            />
+          )
+        )
+      ) : type === "none" ? (
+        <div>
+          <p className="font-medium text-xs text-gray-800 whitespace-nowrap overflow-x-auto text-clip">
+            {value || "-"}
+          </p>
+        </div>
+      ) : (
+        <div
+          className={`font-medium ${label ==="Name" ? "text-sm text-black" : "text-xs text-gray-900"}   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          onClick={handleClick}
+        >
+          {value || "-"}
+        </div>
+      )}
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+    </div>
+  );
+};
