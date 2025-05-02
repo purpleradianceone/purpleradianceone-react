@@ -1,13 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { MOBILE_NUMBER_VALIDATION, NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import {
+  MOBILE_NUMBER_VALIDATION,
+  NUMBER_VALUES,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
@@ -27,16 +31,20 @@ import MessageSnackBar from "../../ui/MessageSnackbar";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
+import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
 // import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] = useState(false);
+  const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] = useState<boolean>(false);
   const { position } = usePanel();
   const [searchParams] = useSearchParams();
-  const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState(false);
-  const [reasonText, setReasonText] = useState("");
+  const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState<boolean>(false);
+  const [reasonInputBoxOpenForLeadOwner, setReasonInputBoxOpenForLeadOwner] = useState<boolean>(false);
+  const [reasonText, setReasonText] = useState<string>("");
+  const [reasonTextForLeadOwnerChange, setReasonTextForLeadOwnerChange] = useState<string>("");
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
   const countryChangeRef = useRef<number>(0);
   const stateChangeRef = useRef<number>(0);
@@ -138,7 +146,7 @@ const ViewLeadManagement = () => {
         setReasonText("");
         setSelectedStatusId(null);
 
-        const newPath = `${window.location.pathname}?${newQueryString}`;
+        const  newPath = `${window.location.pathname}?${newQueryString}`;
         navigate(newPath, { replace: true });
       }
     } catch (err) {
@@ -205,6 +213,134 @@ const ViewLeadManagement = () => {
     }
   };
 
+  //lead owner change
+  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password: "",
+  });
+  const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
+    useState<boolean>(false);
+  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+    number | null
+  >(selectedLeadData.companyUserId);
+
+ 
+  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
+    if (params) {
+      setPersistedSelectedUserId(params.id);
+
+      setSelectedCompanyUser({
+        company_id: params.company_id,
+        id: params.id,
+        fullname: params.fullname,
+        email: params.email,
+        mobilenumber: params.mobilenumber,
+        createdby: "",
+        isactive: params.isactive,
+        requestedby: "",
+        generate_password: "",
+      });
+    } else {
+      setPersistedSelectedUserId(null);
+      // Reset selectedCompanyUser to its initial state when null is received
+      setSelectedCompanyUser({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
+    }
+  };
+
+  const handleClickLeadOwnerChange = () => {
+    setIsLeadOwnerPopUpOpen(true);
+  };
+
+  useEffect(() => {
+    console.log("this is selected user id ");
+    console.log(selectedCompanyUser);
+  }, [selectedCompanyUser]);
+
+  const handleLeadOwnerChange =async () =>{
+    if(selectedCompanyUser.id ===null ||selectedCompanyUser.id ===0){
+      setReasonInputBoxOpenForLeadOwner(false);
+      showMessageSnackbar({
+        message : "Select Onwer before submitting",
+        type : 'error'
+      })
+      return;
+    }
+    const PostDataLeadOwnerChange = {
+      company_id : loginStatus.companyId ,
+      id : selectedLeadData.id,
+      ownerid  : selectedCompanyUser.id,
+      reason : reasonTextForLeadOwnerChange,
+      updatedby : loginStatus.id,
+    }
+    try{
+
+      const response =await axios.post(POST_API.UPDATE_LEAD_OWNER, PostDataLeadOwnerChange, {withCredentials: true})
+      
+      if(response.status ===STATUS_CODE.OK){
+        showMessageSnackbar({
+          message : response.data.message,
+          type : 'success'
+        })
+
+        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+        parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
+        const newQueryString = qs.stringify({
+          leadData: JSON.stringify(parsedQuery),
+        });
+
+        const  newPath = `${window.location.pathname}?${newQueryString}`;
+        navigate(newPath, { replace: true });
+
+        //resetting the states 
+        setReasonTextForLeadOwnerChange("")
+        setReasonInputBoxOpenForLeadOwner(false);
+        setSelectedLeadData((prev: any) => ({
+          ...prev,
+          leadOwner: selectedCompanyUser.fullname,
+        }));
+
+      }else{
+        showMessageSnackbar({
+          message : response.data.status,
+          type : 'error'
+        })
+      }
+    }
+    catch(error : any){
+       //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+       if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: handleLeadOwnerChange,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  }
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
     id: 0,
     lead_id: 0,
@@ -378,7 +514,6 @@ const ViewLeadManagement = () => {
   }, [leadDetailsData]);
 
   const handleLeadInfoSave = async () => {
-
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT
@@ -397,7 +532,7 @@ const ViewLeadManagement = () => {
         const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
         parsedQuery.name = selectedLeadData.name.toString();
         parsedQuery.email = selectedLeadData.email.toString();
-        parsedQuery.mobileNumber = selectedLeadData.mobileNumber.toString()
+        parsedQuery.mobileNumber = selectedLeadData.mobileNumber.toString();
         const newQueryString = qs.stringify({
           leadData: JSON.stringify(parsedQuery),
         });
@@ -471,7 +606,7 @@ const ViewLeadManagement = () => {
 
         <div className="flex justify-evenly w-48">
           <button
-            className="text-xs rounded border px-3 my-1 text-gray-500"
+            className=" hidden text-xs rounded border px-3 my-1 text-gray-500"
             onClick={() => {
               setIsUpdateLeadFormOpen(true);
             }}
@@ -480,15 +615,15 @@ const ViewLeadManagement = () => {
           </button>
 
           <Detail
-            label="Lead Owner"
-            type="text"
-            value={selectedLeadData?.leadOwner}
+            type="none"
+            label="Created On"
+            value={selectedLeadData?.createdOn}
           />
         </div>
       </div>
 
       <div className="w-full">
-        <div className="ml-4 flex justify-between gap-4 w-3/4 overflow-auto">
+        <div className="ml-4 flex justify-between w-3/4   overflow-auto">
           <Detail
             label="Email"
             type="text"
@@ -524,11 +659,38 @@ const ViewLeadManagement = () => {
             value={selectedLeadData?.createdBy}
           />
           <Detail
-            type="none"
-            label="Created On"
-            value={selectedLeadData?.createdOn}
+            label="Lead Owner"
+            type="text"
+            value={selectedLeadData?.leadOwner}
+            handleClickLeadOwnerChange={handleClickLeadOwnerChange}
           />
-        </div>
+          
+
+         
+           {reasonInputBoxOpenForLeadOwner && (
+          <div className=" md:block  gap-1 items-center">
+            <label className="text-xs text-gray-600 font-medium">
+              Reason (Optional)
+            </label>
+            <input
+              type="text"
+              placeholder="Enter reason for Owner Update"
+              className=" border rounded px-3  text-sm "
+              value={reasonTextForLeadOwnerChange}
+              onChange={(e) => setReasonTextForLeadOwnerChange(e.target.value)}
+            />
+            <button
+              className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded w-fit"
+              onClick={()=>{
+                handleLeadOwnerChange();
+              
+              }}
+            >
+              Save
+            </button>
+          </div>
+        )}
+         </div>
       </div>
 
       <div className="m-3 mt-2 pl-1 flex h- bg-slate-50 flex-col shadow-md rounded-xl">
@@ -638,6 +800,37 @@ const ViewLeadManagement = () => {
         title="Session Expired !"
         message="Session Expired. Please login again."
       />
+      {isLeadOwnerPopUpOpen && (
+        <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
+          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[80%] overflow-y-auto relative animate-fadeIn">
+            {/* Header with Close Button */}
+            <div className="flex justify-between items-center p-2 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800">
+                Select Company User
+              </h3>
+              <button
+                onClick={() => {
+                  setIsLeadOwnerPopUpOpen(false);
+                  // 
+                  setReasonInputBoxOpenForLeadOwner(true);
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {/* NOTE : CALL TO THE MODAL COMPONENT */}
+            <div className="p-1">
+              <GetCompanyUsersForLead
+                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                handleSelectedCompanyUserChange={
+                  handleSelectedCompanyUserChange
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -653,35 +846,37 @@ type DetailProps = {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
   handleLeadInfoSave?: () => Promise<void>;
+  handleClickLeadOwnerChange?: () => void;
 };
 
 const Detail: React.FC<DetailProps> = ({
   label,
   value,
-  type ,
+  type,
   options = [],
   onChange,
   handleLeadInfoSave,
+  handleClickLeadOwnerChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-//note : Message Snackbar
-const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  open: false,
-  message: "",
-  type: "success" as "success" | "error",
-});
+  //note : Message Snackbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
-const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  setMessageSnackbar({ open: true, message, type });
-};
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
 
-const handleCloseSnackbar = () => {
-  setMessageSnackbar((prev) => ({ ...prev, open: false }));
-};
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
   const prevValueRef = useRef(value);
 
   const handleClick = () => {
-    prevValueRef.current=value;
+    prevValueRef.current = value;
     setIsEditing(true);
   };
 
@@ -697,7 +892,7 @@ const handleCloseSnackbar = () => {
         const syntheticEvent = {
           target: { value: prevValueRef.current },
         } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
-  
+
         onChange?.(syntheticEvent);
         showMessageSnackbar({
           message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
@@ -706,7 +901,7 @@ const handleCloseSnackbar = () => {
         return;
       }
     }
-    if(value !== prevValueRef.current){
+    if (value !== prevValueRef.current) {
       handleLeadInfoSave!();
     }
   };
@@ -733,7 +928,7 @@ const handleCloseSnackbar = () => {
           type !== "none" && (
             <input
               type={type}
-              className="text-xs focus:outline-2  text-gray-700 border-none "
+              className="text-xs focus:outline-2x  text-gray-700 border-none "
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -747,9 +942,18 @@ const handleCloseSnackbar = () => {
             {value || "-"}
           </p>
         </div>
+      ) : label === "Lead Owner" ? (
+        <div
+          className={`font-medium text-xs text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          onClick={handleClickLeadOwnerChange}
+        >
+          {value || "-"}
+        </div>
       ) : (
         <div
-          className={`font-medium ${label ==="Name" ? "text-sm text-black" : "text-xs text-gray-900"}   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`font-medium ${
+            label === "Name" ? "text-sm text-black" : "text-xs text-gray-900"
+          }   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClick}
         >
           {value || "-"}

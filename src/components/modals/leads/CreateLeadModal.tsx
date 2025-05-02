@@ -111,7 +111,7 @@ function CreateLeadModal({
 
   const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
     number | null
-  >(null);
+  >(loginStatus.id);
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
