@@ -1,11 +1,11 @@
 // export default CompanyUserAgGridForLead;
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { INNERHTML } from "../../../../constants/AppConstants";
-
+import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 
@@ -21,7 +21,19 @@ function CompanyUserAgGridForLead({
   selectedUserId, // Destructure the prop
 }: CompanyUserAgGridPropsForLead) {
   const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(selectedUserId); // Initialize local state with the prop
-
+  const gridRef = useRef<AgGridReactType<any>>(null);
+  
+  useEffect(() => {
+    setLocalSelectedUserId(selectedUserId);
+    // Refresh the Action column
+    if (gridRef.current?.api) {
+      gridRef.current.api.refreshCells({
+        force: true,
+        columns: ['Action'], // Only refresh the checkbox column
+      });
+    }
+  }, [selectedUserId]);
+  
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -41,7 +53,7 @@ function CompanyUserAgGridForLead({
         headerName: "Email",
         sortable: true,
         filter: true,
-        flex: 1.5,
+        flex: 1,
       },
       {
         field: "mobilenumber",
@@ -125,12 +137,13 @@ function CompanyUserAgGridForLead({
       style={{ height: "460px", width: "100%" }}
     >
       <AgGridReact
+      ref={gridRef}
         rowData={users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
+        theme={themeBalham}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, {  useState } from "react";
+import React, { ChangeEventHandler, useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
 import State from "../../../@types/general/State";
@@ -9,7 +9,11 @@ import industryType from "../../../@types/general/industryType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { MOBILE_NUMBER_VALIDATION, NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import {
+  MOBILE_NUMBER_VALIDATION,
+  NUMBER_VALUES,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
@@ -55,11 +59,16 @@ const LeadDetails = ({
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (leadDetailsData.additional_contact_number!=="" && leadDetailsData.additional_contact_number!==null&& !leadDetailsData.additional_contact_number?.match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN)) {
+    if (
+      leadDetailsData.additional_contact_number !== "" &&
+      leadDetailsData.additional_contact_number !== null &&
+      !leadDetailsData.additional_contact_number?.match(
+        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+      )
+    ) {
       setMessageSnackbar({
         open: true,
-        message:
-        MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
+        message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
         type: "error",
       });
       return;
@@ -162,7 +171,7 @@ const LeadDetails = ({
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-2">
-        <FormField
+          <FormField
             type="text"
             label="Job title"
             value={leadDetailsData.job_title}
@@ -173,8 +182,8 @@ const LeadDetails = ({
               });
             }}
           />
-           <FormField
-            type="text"
+          <FormField
+            type="textarea"
             label="Address"
             value={leadDetailsData.address}
             onChange={(e) => {
@@ -183,7 +192,7 @@ const LeadDetails = ({
                 address: e.target.value,
               });
             }}
-          />  
+          />
           <FormField
             type="select"
             label="Industry"
@@ -196,8 +205,6 @@ const LeadDetails = ({
               });
             }}
           />
-         
-         
 
           <FormField
             type="text"
@@ -210,24 +217,22 @@ const LeadDetails = ({
               });
             }}
           />
-          
-          
-          <FormField
-          type="select"
-          label="Country"
-          selectOptions={countryOptions}
-          value={leadDetailsData.country_id}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              country_id: parseInt(e.target.value),
-            });
 
-          }}
-        />
-          
+          <FormField
+            type="select"
+            label="Country"
+            selectOptions={countryOptions}
+            value={leadDetailsData.country_id}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                country_id: parseInt(e.target.value),
+              });
+            }}
+          />
+
           {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
-          
+
           <FormField
             type="text"
             label="Industry Name"
@@ -251,9 +256,8 @@ const LeadDetails = ({
               });
             }}
           />
-          
-        {/* <p className="text-xs">Selected coutry: {countryOptions.find(opt => opt.value === leadDetailsData.country_id)?.label || 'None'}</p> */}
 
+          {/* <p className="text-xs">Selected coutry: {countryOptions.find(opt => opt.value === leadDetailsData.country_id)?.label || 'None'}</p> */}
 
           <FormField
             type="text"
@@ -267,18 +271,17 @@ const LeadDetails = ({
             }}
           />
           <FormField
-          type="select"
-          label="District"
-          selectOptions={districtOptions}
-          value={leadDetailsData.district_id}
-          onChange={(e) => {
-            setLeadDetailsData({
-              ...leadDetailsData,
-              district_id: parseInt(e.target.value),
-            });
-          }}
-        />
-          
+            type="select"
+            label="District"
+            selectOptions={districtOptions}
+            value={leadDetailsData.district_id}
+            onChange={(e) => {
+              setLeadDetailsData({
+                ...leadDetailsData,
+                district_id: parseInt(e.target.value),
+              });
+            }}
+          />
         </div>
       </form>
       <MessageSnackBar
@@ -301,9 +304,11 @@ type FormFieldProps = {
   label: string;
   value?: string | number;
   onChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => void;
-  type: "text" | "number" | "select";
+  type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
 };
 
@@ -321,16 +326,27 @@ const FormField = ({
   };
 
   return (
-    <div className="flex justify-between items-center border-b  ">
-      <div className="text-gray-700 text-xs">{label}</div>
+    <div className="flex w-full  items-center border-b  ">
+      <div className="text-gray-700 w-[50%] text-xs">{label}</div>
       <div
-        className="flex items-center whitespace-nowrap  min-w-[150px]"
+        className="flex items-center w-[50%]   min-w-[150px]"
         onClick={() => setIsEditing(true)}
       >
         {!isEditing ? (
-          <span className="text-gray-900 font-medium text-xs cursor-pointer " title={selectOptions?.find((opt) => opt.value === value)?.label?.toLocaleString() || value?.toLocaleString()}>
+          <span
+            className="text-gray-900 font-medium text-xs cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            title={
+              selectOptions
+                ?.find((opt) => opt.value === value)
+                ?.label?.toLocaleString() || value?.toLocaleString()
+            }
+          >
             {type === "select"
-              ? selectOptions?.find((opt) => opt.value === value)?.label || <span className="text-xs text-gray-500">Select {label.toLowerCase()}</span>
+              ? selectOptions?.find((opt) => opt.value === value)?.label || (
+                  <span className="text-xs text-gray-500">
+                    Select {label.toLowerCase()}
+                  </span>
+                )
               : value || (
                   <span className="text-xs text-gray-500">Add here...</span>
                 )}
@@ -350,6 +366,17 @@ const FormField = ({
               </option>
             ))}
           </select>
+        ) : type === "textarea" ? (
+          <textarea
+            rows={3}
+            cols={50}
+            placeholder="enter text here"
+            value={value}
+            onChange={onChange}
+            onBlur={handleBlur}
+            autoFocus
+            className="text-gray-900 text-xs border border-gray-300 rounded p-1 focus:outline-none"
+          />
         ) : (
           <input
             autoFocus
