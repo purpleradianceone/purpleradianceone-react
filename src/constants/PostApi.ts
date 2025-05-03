@@ -51,7 +51,7 @@ const POST_API = {
     CREATE_LEAD_DETAILS : import.meta.env.VITE_CREATE_LEAD_DETAIL!,
     UPDATE_LEAD_DETAILS : import.meta.env.VITE_UPDATE_LEAD_DETAIL!,
     UPDATE_LEAD_OWNER : import.meta.env.VITE_UPDATE_LEAD_OWNER!,
-
+    GET_LEAD_OWNER_HISTORY : import.meta.env.VITE_GET_LEAD_OWNER_HISTORY!,
 
     GET_COUNTRY : import.meta.env.VITE_GET_COUNTRY!,
     GET_STATE : import.meta.env.VITE_GET_STATE!,
