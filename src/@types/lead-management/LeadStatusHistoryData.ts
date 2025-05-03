@@ -1,5 +1,4 @@
 type LeadStatusHistoryData={
-    
     id: number,
     leadId : number,
     leadStatusId :number,

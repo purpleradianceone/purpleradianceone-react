@@ -9,8 +9,8 @@ const LeadOwnerHistoryAgGrid: React.FC<{
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        field: "leadOnwer",
-        headerName: "Lead Owner",
+        field: "leadOwner",
+        headerName: "Changed Lead Owner",
         cellStyle: {
           color: "black",
           fontWeight: "bold",
@@ -24,11 +24,7 @@ const LeadOwnerHistoryAgGrid: React.FC<{
       },
       {
         field: "reason",
-        headerName: "Reason", 
-      },
-      {
-        field: "createdBy",
-        headerName: "Changed By",
+        headerName: "Reason to change", 
       },
       {
         field: "createdOn",
