@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ChevronLeft, History, X } from "lucide-react";
+import { ArrowBigRightDash, ChevronLeft, History, Plus, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
@@ -34,12 +34,16 @@ import qs from "query-string";
 import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
-// import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
+import AssignProductToLead from "./AssignProductToLead";
+import FormInput from "../../ui/FormInput";
+import Button from "../../ui/Button";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
+    useState<boolean>(false);
+  const [isAddProductLeadFormOpen, setIsAddProductLeadFormOpen] =
     useState<boolean>(false);
   const { position } = usePanel();
   const [searchParams] = useSearchParams();
@@ -57,7 +61,7 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
 
   const [isOpenLeadOwnerHistory, setIsOpenLeadOwnerHistory] =
-  useState<boolean>(false);
+    useState<boolean>(false);
   const [selectedLeadData, setSelectedLeadData] = useState(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
@@ -90,6 +94,27 @@ const ViewLeadManagement = () => {
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
+
+  type activity = {
+    work?: string;
+    person?: string;
+  };
+
+  const [activityData, setActivityData] = useState<activity[]>([
+    {
+      person: "hrutik sargar ",
+      work: "changed lead deatils",
+    },
+    {
+      person: "Gaurav Chandel ",
+      work: "changed lead owner",
+    },
+    {
+      person: "hrutik sargar ",
+      work: "changed lead name",
+    },
+  ]);
+
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -111,8 +136,21 @@ const ViewLeadManagement = () => {
           setLeadStatus([]);
         }
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: fetchLeadStatus,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
     }
   };
 
@@ -152,12 +190,31 @@ const ViewLeadManagement = () => {
         setReasonInputBoxOpen(false);
         setReasonText("");
         setSelectedStatusId(null);
-
+        setActivityData([
+          {
+            person: loginStatus.fullName,
+            work: response.data.message,
+          },
+          ...activityData,
+        ]);
         const newPath = `${window.location.pathname}?${newQueryString}`;
         navigate(newPath, { replace: true });
       }
-    } catch (err) {
-      console.error("Failed to update lead", err);
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: handleSaveStatusUpdate,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
     }
   };
 
@@ -177,8 +234,21 @@ const ViewLeadManagement = () => {
       if (response.status == STATUS_CODE.OK) {
         setCountries(response.data);
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: getAllCountries,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
     }
   };
   const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
@@ -201,14 +271,31 @@ const ViewLeadManagement = () => {
       name: null,
       isactive: true,
     };
-    const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
-      withCredentials: true,
-    });
+    try {
+      const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+        withCredentials: true,
+      });
 
-    if (response.status === STATUS_CODE.OK) {
-      setIndustryType(response.data);
-    } else {
-      throw new Error("Failed to fetch industry type");
+      if (response.status === STATUS_CODE.OK) {
+        setIndustryType(response.data);
+      } else {
+        throw new Error("Failed to fetch industry type");
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: fetchIndustryType,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
     }
   };
 
@@ -239,10 +326,9 @@ const ViewLeadManagement = () => {
   >(selectedLeadData.companyUserId);
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(previouseOwnerRef.current);
-    
-  },[])
+  }, []);
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
@@ -329,6 +415,13 @@ const ViewLeadManagement = () => {
           ...prev,
           leadOwner: selectedCompanyUser.fullname,
         }));
+        setActivityData([
+          {
+            person: loginStatus.fullName,
+            work: response.data.message,
+          },
+          ...activityData,
+        ]);
       } else {
         showMessageSnackbar({
           message: response.data.status,
@@ -383,39 +476,56 @@ const ViewLeadManagement = () => {
     };
 
     const fetchDetails = async () => {
-      const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.status === STATUS_CODE.OK) {
-        const data = response.data;
-        setLeadDetailsData({
-          id: data.id,
-          lead_id: data.lead_id,
-          country_id: data.country_id,
-          country_name: data["Country Name"],
-          district_id: data.district_id,
-          district_name: data["District Name"],
-          state_id: data.state_id,
-          state_name: data["State Name"],
-          address: data.address,
-          industry_type_id: data.industry_type_id,
-          industry_type: data["Industry Type"],
-          industry_name: data.industry_name,
-          job_title: data.job_title,
-          website: data.website,
-          additional_contact_number: data.additional_contact_number,
-          createdby: data.createdby,
-          createdon: data.createdon,
-          updatedby: data.updatedby,
-          updatedon: data.updatedon,
+      try {
+        const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
         });
-        countryChangeRef.current = data.country_id;
-        stateChangeRef.current = data.state_id;
-        // districtChangeRef.current = data.district_id;
-      } else {
-        throw new Error("Failed to fetch lead details");
+
+        if (response.status === STATUS_CODE.OK) {
+          const data = response.data;
+          setLeadDetailsData({
+            id: data.id,
+            lead_id: data.lead_id,
+            country_id: data.country_id,
+            country_name: data["Country Name"],
+            district_id: data.district_id,
+            district_name: data["District Name"],
+            state_id: data.state_id,
+            state_name: data["State Name"],
+            address: data.address,
+            industry_type_id: data.industry_type_id,
+            industry_type: data["Industry Type"],
+            industry_name: data.industry_name,
+            job_title: data.job_title,
+            website: data.website,
+            additional_contact_number: data.additional_contact_number,
+            createdby: data.createdby,
+            createdon: data.createdon,
+            updatedby: data.updatedby,
+            updatedon: data.updatedon,
+          });
+          countryChangeRef.current = data.country_id;
+          stateChangeRef.current = data.state_id;
+          // districtChangeRef.current = data.district_id;
+        } else {
+          throw new Error("Failed to fetch lead details");
+        }
+      } catch (error: any) {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: getLeadDetails,
+          });
+
+          // setIsDialogueOpen(!refreshTokenStatus);
+          if (refreshTokenStatus) {
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
       }
     };
 
@@ -467,20 +577,39 @@ const ViewLeadManagement = () => {
     };
 
     const fetchDistricts = async () => {
-      const response = await axios.post(
-        POST_API.GET_DISTRICT,
-        PostDataForDistrict,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
+      try {
+        const response = await axios.post(
+          POST_API.GET_DISTRICT,
+          PostDataForDistrict,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === STATUS_CODE.OK) {
+          setDistrict(response.data);
         }
-      );
-      if (response.status === STATUS_CODE.OK) {
-        setDistrict(response.data);
-      } else {
-        throw new Error("Failed to fetch districts");
+        // } else {
+        //   throw new Error("Failed to fetch districts");
+        // }
+      } catch (error: any) {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: fetchDistricts,
+          });
+
+          // setIsDialogueOpen(!refreshTokenStatus);
+          if (refreshTokenStatus) {
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
       }
     };
 
@@ -556,6 +685,13 @@ const ViewLeadManagement = () => {
           message: response.data.message,
           type: "success",
         });
+        setActivityData([
+          {
+            person: loginStatus.fullName,
+            work: response.data.message,
+          },
+          ...activityData,
+        ]);
       } else if (response.data.status === false) {
         showMessageSnackbar({
           message: response.data.message,
@@ -580,11 +716,31 @@ const ViewLeadManagement = () => {
     }
   };
 
+  // new code
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const togglePopup = () => setIsAddProductModalOpen(!isAddProductModalOpen);
+
+  // Close popup on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsAddProductModalOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div
       className={`${
-        position === "left" ? "mx-6" : ""
-      } fixed top-8 inset-0 z-10 bg-white mt-4  pl-9`}
+        position === "left" ? " ml-14" : "ml-1"
+      } fixed top-8 inset-0 z-10 bg-white mt-4   overflow-auto`}
     >
       {/* Header */}
       <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b my-1 mr-1 pr-2">
@@ -617,13 +773,60 @@ const ViewLeadManagement = () => {
         </div>
 
         <div className="flex justify-evenly w-48">
+          {/* new code  */}
+          <div className="relative inline-block" ref={wrapperRef}>
+           
+           <button
+              onClick={togglePopup}
+              className="px-1 py-1 text-xs flex gap-1 items-center text-gray-500 bg-transparent border rounded  transition"
+            >
+             <Plus size={8}/><span>Product</span>
+            </button>
+
+            {isAddProductModalOpen && (
+              <div className="absolute -right-28  mt-2 w-96  bg-gray-50 border rounded-lg shadow-xl p-2  z-10">
+                <div className="border-b flex items-center gap-1 font-semibold text-sm text-gray-700 ">
+                <Plus size={10}/> <span>Assign Product to lead</span>
+                </div>
+
+                <form className="space-y-3">
+                  <div>
+                    <FormInput label="Name :" type="text" />
+                    <FormInput label="Quantity Req. :" type="text" />
+                    <FormInput label="Expected Cost :" type="text" />
+                  </div>
+
+                  <div className="float-right max-w-16">
+
+                  <Button
+                    type="submit"
+                    onClick={(e) =>{
+                      e.preventDefault();
+                    }}
+                    // className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    >
+                    Add
+                  </Button>
+                    </div>
+                </form>
+              </div>
+            )}
+          </div>
           <button
-            className=" hidden text-xs rounded border px-3 my-1 text-gray-500"
+            className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
             onClick={() => {
               setIsUpdateLeadFormOpen(true);
             }}
           >
             Edit
+          </button>
+          <button
+            className="hidden  text-xs rounded border px-1 my-1 text-gray-500"
+            onClick={() => {
+              setIsAddProductLeadFormOpen(true);
+            }}
+          >
+            <Plus size={16} />
           </button>
 
           <Detail
@@ -634,8 +837,8 @@ const ViewLeadManagement = () => {
         </div>
       </div>
 
-      <div className="w-full">
-        <div className="ml-4 flex justify-between w-3/4   overflow-auto">
+      <div className="w-full flex">
+        <div className="ml-4 flex justify-between w-3/4   whitespace-nowrap overflow-auto">
           <Detail
             label="Email"
             type="text"
@@ -677,24 +880,25 @@ const ViewLeadManagement = () => {
               value={selectedLeadData?.leadOwner}
               handleClickLeadOwnerChange={handleClickLeadOwnerChange}
             />
-            <button onClick={
-              () =>{
-                setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory)
-              }
-            }>
+            <button
+              onClick={() => {
+                setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+              }}
+            >
               <History size={13} className="mt-0" />
             </button>
           </div>
-
-          {reasonInputBoxOpenForLeadOwner && (
-            <div className=" md:block  gap-1 items-center">
+        </div>
+        {reasonInputBoxOpenForLeadOwner && (
+          <div className="w-1/4 ">
+            <div className="  flex ml-2  gap-1 items-center">
               <label className="text-xs text-gray-600 font-medium">
-                Reason (Optional)
+                Reason(Optional)
               </label>
               <input
                 type="text"
                 placeholder="Enter reason for Owner Update"
-                className=" border rounded px-3  text-sm "
+                className=" border rounded px-3   text-xs "
                 value={reasonTextForLeadOwnerChange}
                 onChange={(e) =>
                   setReasonTextForLeadOwnerChange(e.target.value)
@@ -709,11 +913,11 @@ const ViewLeadManagement = () => {
                 Save
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      <div className="m-3 mt-2 pl-1 flex h- bg-slate-50 flex-col shadow-md rounded-xl">
+      <div className="m-3 mt-2 pl-1 flex h- bg-slate-100 flex-col shadow-md rounded-xl">
         <div className="flex justify-between text-xs text-gray-600 mb-1 px-2">
           <span>Lead Status</span>
           <button
@@ -729,11 +933,12 @@ const ViewLeadManagement = () => {
         <div className="flex border rounded-r-full mb-0.5  bg-white">
           {leadStatus!.map((item: any) => (
             <button
+              title={item.name}
               key={item.id}
               className={`flex-1 text-xs text-ellipsis overflow-hidden ${
                 selectedLeadData.leadStatus === item.name
-                  ? "bg-blue-500 text-white hover:bg-blue-800"
-                  : "hover:bg-blue-500 hover:text-white"
+                  ? "bg-blue-700 text-white hover:bg-blue-900"
+                  : "hover:bg-blue-700 hover:text-white"
               } text-gray-800 font-medium text-center`}
               style={{
                 clipPath:
@@ -775,6 +980,15 @@ const ViewLeadManagement = () => {
         {/* First child: 70% width */}
         <div className="w-[65%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
+            handleLeadActivityChange={(person: string, work: string) => {
+              setActivityData([
+                {
+                  person: person,
+                  work: work,
+                },
+                ...activityData,
+              ]);
+            }}
             district={district}
             stateData={stateData}
             leadDetailsData={leadDetailsData}
@@ -783,6 +997,33 @@ const ViewLeadManagement = () => {
             selectedLeadData={selectedLeadData}
             industryType={industryType}
           />
+        </div>
+
+        {/* Second child: 30% width */}
+        <div className="w-[35%] h-full bg-green-50 border my-2 text-white p-4">
+          This div should get 30% width and full height
+        </div>
+      </div>
+      <div className=" w-[100%]  flex gap-2  shadow-sm    ">
+        {/* First child: 70% width */}
+        <div className="w-[65%]     bg-gray-0 shadow-md m-2 rounded">
+          <div className="sticky w-full bg-slate-100 font-sans text-sm font-semibold ">
+            Activity
+          </div>
+          <div className=" pl-1 ">
+            {activityData.map((item: activity, index: number) => (
+              <div key={index}>
+                {" "}
+                <span className="text-sm font-semibold overflow-y-auto">
+                  <span className="inline-block">
+                    <ArrowBigRightDash size={12} />
+                  </span>{" "}
+                  {item.person}
+                </span>{" "}
+                <span>➡️</span> <span className="text-xs ">{item.work}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Second child: 30% width */}
@@ -857,6 +1098,14 @@ const ViewLeadManagement = () => {
             </div>
           </div>
         </div>
+      )}
+      {isAddProductLeadFormOpen && (
+        <AssignProductToLead
+          isOpen={isAddProductLeadFormOpen}
+          onClose={() => {
+            setIsAddProductLeadFormOpen(false);
+          }}
+        />
       )}
     </div>
   );
@@ -935,7 +1184,9 @@ const Detail: React.FC<DetailProps> = ({
 
   return (
     <div className="">
-      <label className="text-xs text-gray-600 block   ">{label}</label>
+      <label className="text-xs text-gray-700 block  whitespace-nowrap overflow-hidden  ">
+        {label}
+      </label>
       {isEditing ? (
         type === "select" ? (
           <select
@@ -965,12 +1216,16 @@ const Detail: React.FC<DetailProps> = ({
         )
       ) : type === "none" ? (
         <div>
-          <p className="font-medium text-xs text-gray-800 whitespace-nowrap overflow-x-auto text-clip">
+          <p
+            title={value}
+            className="font-medium text-xs text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
+          >
             {value || "-"}
           </p>
         </div>
       ) : label === "Lead Owner" ? (
         <div
+          title={value}
           className={`font-medium text-xs text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
@@ -978,9 +1233,12 @@ const Detail: React.FC<DetailProps> = ({
         </div>
       ) : (
         <div
+          title={value}
           className={`font-medium ${
-            label === "Name" ? "text-sm text-black" : "text-xs text-gray-900"
-          }   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+            label === "Name"
+              ? "text-sm text-black"
+              : "text-xs md:whitespace-nowrap md:overflow-hidden text-gray-900"
+          }   whitespace-nowrap overflow-hidden   cursor-pointer`}
           onClick={handleClick}
         >
           {value || "-"}

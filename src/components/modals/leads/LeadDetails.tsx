@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { ChangeEventHandler, useState } from "react";
+
+import React, {  useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
 import State from "../../../@types/general/State";
@@ -20,6 +20,10 @@ import {
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import ROUTES_URL from "../../../constants/Routes";
+import { useNavigate } from "react-router-dom";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -29,7 +33,9 @@ const LeadDetails = ({
   stateData,
   district,
   selectedLeadData,
+  handleLeadActivityChange
 }: {
+  handleLeadActivityChange : (person : string , work:string) => void,
   leadDetailsData: LeadDetailsData;
   setLeadDetailsData: React.Dispatch<React.SetStateAction<LeadDetailsData>>;
   selectedLeadData: any;
@@ -40,6 +46,7 @@ const LeadDetails = ({
 }) => {
   // const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
 
+  const [showSaveLeadButton , setShowSaveLeadButton] = useState<boolean>(false);
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -53,6 +60,13 @@ const LeadDetails = ({
 
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
+  const navigate = useNavigate();
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
   };
 
   const { loginStatus } = useLoggedInUserContext();
@@ -99,28 +113,47 @@ const LeadDetails = ({
     const url = createNewDetail
       ? POST_API.CREATE_LEAD_DETAILS
       : POST_API.UPDATE_LEAD_DETAILS;
+    try{
 
-    const response = await axios.post(url, PostDataCreateLead, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.status === STATUS_CODE.OK) {
-      if (response.data.status) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
-        return;
+      const response = await axios.post(url, PostDataCreateLead, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.status === STATUS_CODE.OK) {
+        if (response.data.status) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          }); 
+          setShowSaveLeadButton(false);
+          handleLeadActivityChange(loginStatus.fullName!, response.data.message)
+          return;
+        }
+        if (response.data.status === false) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "warning",
+          });
+          return;
+        }
       }
-      if (response.data.status === false) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "warning",
+    }catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: handleSave,
         });
-        return;
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
       }
     }
   };
@@ -160,15 +193,17 @@ const LeadDetails = ({
   return (
     <div>
       <form>
-        <div className="w-auto flex justify-between bg-slate-100 px-2 mb-1  ">
+        <div className="w-auto flex justify-between bg-slate-200 px-2 mb-1  ">
           <span className="text-sm text-gray-800">Details</span>
-
-          <button
-            className="text-xs text-gray-500 mb-1  hover:text-black hover:underline"
+          {
+            showSaveLeadButton &&
+            <button
+            className="text-xs text-white mb-1 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
             onClick={handleSave}
-          >
+            >
             Save
           </button>
+          }
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-2">
           <FormField
@@ -176,6 +211,7 @@ const LeadDetails = ({
             label="Job title"
             value={leadDetailsData.job_title}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 job_title: e.target.value,
@@ -187,6 +223,7 @@ const LeadDetails = ({
             label="Address"
             value={leadDetailsData.address}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 address: e.target.value,
@@ -199,6 +236,7 @@ const LeadDetails = ({
             selectOptions={industryOptions}
             value={leadDetailsData.industry_type_id}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 industry_type_id: parseInt(e.target.value),
@@ -211,6 +249,7 @@ const LeadDetails = ({
             label="Additional contact number"
             value={leadDetailsData.additional_contact_number}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 additional_contact_number: e.target.value,
@@ -224,6 +263,7 @@ const LeadDetails = ({
             selectOptions={countryOptions}
             value={leadDetailsData.country_id}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 country_id: parseInt(e.target.value),
@@ -238,6 +278,7 @@ const LeadDetails = ({
             label="Industry Name"
             value={leadDetailsData.industry_name}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 industry_name: e.target.value,
@@ -250,6 +291,7 @@ const LeadDetails = ({
             selectOptions={stateOptions}
             value={leadDetailsData.state_id}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 state_id: parseInt(e.target.value),
@@ -264,6 +306,7 @@ const LeadDetails = ({
             label="Website"
             value={leadDetailsData.website}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 website: e.target.value,
@@ -276,6 +319,7 @@ const LeadDetails = ({
             selectOptions={districtOptions}
             value={leadDetailsData.district_id}
             onChange={(e) => {
+              setShowSaveLeadButton(true)
               setLeadDetailsData({
                 ...leadDetailsData,
                 district_id: parseInt(e.target.value),
@@ -291,6 +335,13 @@ const LeadDetails = ({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
+      <DialogueBox
+              isOpen={isDialogueOpen}
+              onClose={() => setIsDialogueOpen(false)}
+              onConfirm={handleDialogueConfirm}
+              title="Session Expired !"
+              message="Session Expired. Please login again."
+            />
     </div>
   );
 };
