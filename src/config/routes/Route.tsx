@@ -27,6 +27,8 @@ import CreateSubscription from "../../components/subscription-module/CreateSubsc
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
 import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
+import { EditorCanvas } from "../../components/email-template/EditorCanvas";
+import { TemplatesPage } from "../../components/email-template/TemplatesPage";
 
 
 export const router = createBrowserRouter([
@@ -240,6 +242,27 @@ export const router = createBrowserRouter([
         </Navbar>
       </PrivateRoute>
     )
+  },
+  {
+    path :ROUTES_URL.EMAIL_TEMPLATE,
+    element : (
+      <PrivateRoute>
+      <Navbar>
+        <TemplatesPage/>
+      </Navbar>
+      </PrivateRoute>
+    )
+  },
+  {
+    path :ROUTES_URL.EMAIL_TEMPLATE_CREATE,
+    element : (
+      <PrivateRoute>
+         <Navbar>
+        <EditorCanvas/>
+        </Navbar>
+      </PrivateRoute>
+    ),
+ 
   },
 ]);
 export default router;

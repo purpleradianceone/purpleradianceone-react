@@ -20,7 +20,10 @@ const ROUTES_URL = {
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
-    LEAD_DETAILS : "/lead/view"
+    LEAD_DETAILS : "/lead/view",
+    //for email template
+    EMAIL_TEMPLATE : "/email-template",
+    EMAIL_TEMPLATE_CREATE : "/email-template/create"
     
 }
 export default ROUTES_URL;

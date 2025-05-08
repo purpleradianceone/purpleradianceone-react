@@ -1,0 +1,39 @@
+.editor-toolbar {
+  background: #f9f9f9;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editor-toolbar button {
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-toolbar input[type="color"] {
+  width: 40px;
+  height: 32px;
+  border: none;
+  cursor: pointer;
+}
+
+.editor-content {
+  min-height: 150px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.editor-placeholder {
+  color: #888;
+  padding: 12px;
+  position: absolute;
+  pointer-events: none;
+}
