@@ -11,12 +11,6 @@ type Template = {
   description: string;
 };
 
-type TemplateForm = {
-  name: string;
-  subject: string;
-  description: string;
-  typeId: number;
-};
 
 type TemplateType = {
   id: number;

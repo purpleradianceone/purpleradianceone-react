@@ -10,13 +10,13 @@ import { SectionBlock } from "./SectionBlock";
 import { HtmlPreviewModal } from "./HtmlPreviewModal";
 import { ExportPanel } from "./ExportPanel";
 import { ColumnBlock } from "./ColumnBlock";
-import { TableBlock } from "./TableBlock";
 import { HeadingBlock } from "./HeadingBlock";
 import { DynamicFieldBlock } from "./DynamicFieldBlock";
 import { SubjectBlock } from "./SubjectBlock";
 import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
+import { TableBlock } from "./TableBlock";
 
 
 
@@ -304,7 +304,7 @@ export const EditorCanvas: React.FC = () => {
                 position: "relative",
               }}
             >
-              <div style={{ position: "absolute", top: 10, right: 300, zIndex: 1000 }}>
+              <div style={{ position: "absolute", top: 10, right: 300, zIndex: 10 }}>
                 <label style={{ fontSize: "14px", fontWeight: 500 }}>
                   Canvas Background:
                   <input
@@ -316,7 +316,7 @@ export const EditorCanvas: React.FC = () => {
                 </label>
               </div>
 
-              <div className="fixed inset-0 justify-self-end top-12 " style={{ zIndex: 0 }}>
+              <div className="fixed inset-0 justify-self-end top-12 " style={{ zIndex: 15, height: "fit-content" }}>
                 <ExportPanel onPreview={handlePreview} />
               </div>
               
