@@ -16,6 +16,7 @@ import { DynamicFieldBlock } from "./DynamicFieldBlock";
 import { SubjectBlock } from "./SubjectBlock";
 import DOMPurify from 'dompurify';
 import 'tinymce';
+import { DynamicFieldsContext } from "./DynamicFieldsContext";
 
 
 
@@ -32,7 +33,8 @@ export const EditorCanvas: React.FC = () => {
     "email": "nitikesh.yewale@g.com",
     "unsubscribe_link": "https://unsubscribe.example.com",
     "product_name": "CDR software",
-    "support_number": "9158176888"
+    "support_number": "9158176888",
+    "company_name":"PurpleRadiance"
   }`;
 
   const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
@@ -47,6 +49,13 @@ export const EditorCanvas: React.FC = () => {
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
   };
+
+  const parsedFields = Object.entries(JSON.parse(json)).map(
+  ([key]) => ({
+    label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    value: key,
+  })
+);
 
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlInput(e.target.value);
@@ -76,13 +85,15 @@ export const EditorCanvas: React.FC = () => {
   return (
     <>
       {/* Button to toggle between modes */}
-      <div style={{ position: 'fixed', top: 50, left: '50%', transform: 'translateX(-50%)', zIndex: 500 }}>
+      <div className="fixed  inset-0 justify-self-center top-12  " style={{ height: "fit-content", zIndex: 100,}}>
         <button
           onClick={() => setMode('editor')}
           style={{
             padding: '6px 12px',
             fontSize: '14px',
             borderRadius: '4px',
+             height: "fit-content", // or "max-content"
+            overflow: "visible",    // Ensures content isn't clipped
             cursor: 'pointer',
             backgroundColor: mode === 'editor' ? '#4CAF50' : '#f1f1f1',
             color: mode === 'editor' ? 'white' : '#000',
@@ -117,7 +128,7 @@ export const EditorCanvas: React.FC = () => {
           position: "fixed",
           top: 100,
           right: 20,
-          zIndex: 501,
+          zIndex: 1,
           background: "transparent",
           border: "1px solid #ccc",
           borderRadius: "4px",
@@ -129,7 +140,7 @@ export const EditorCanvas: React.FC = () => {
         ⚙️ {showDynamicEditor ? 'Hide Fields' : 'Show Fields'}
       </button>
       {showDynamicEditor && (
-                <div
+                <div 
                   style={{
                     position: "fixed",
                     top: 100,
@@ -139,7 +150,7 @@ export const EditorCanvas: React.FC = () => {
                     padding: "10px",
                     borderRadius: "8px",
                     boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-                    zIndex: 1000,
+                    zIndex:1
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -265,11 +276,12 @@ export const EditorCanvas: React.FC = () => {
     </div>
   </div>
 ) : (
+      <DynamicFieldsContext.Provider value={parsedFields}>
 
         <Editor
           resolver={{
             SubjectBlock,
-            LexicalText,
+            LexicalText ,
             ImageBlock,
             ButtonBlock,
             DividerBlock,
@@ -304,7 +316,7 @@ export const EditorCanvas: React.FC = () => {
                 </label>
               </div>
 
-              <div style={{ position: "fixed", top: 50, right: 20, zIndex: 1000 }}>
+              <div className="fixed inset-0 justify-self-end top-12 " style={{ zIndex: 0 }}>
                 <ExportPanel onPreview={handlePreview} />
               </div>
               
@@ -335,6 +347,9 @@ export const EditorCanvas: React.FC = () => {
             </div>
           </div>
         </Editor>
+
+        </DynamicFieldsContext.Provider>
+
         
       )}
     </>
