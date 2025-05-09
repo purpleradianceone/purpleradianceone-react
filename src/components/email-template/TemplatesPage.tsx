@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,16 +11,34 @@ type Template = {
   description: string;
 };
 
-const templates: Template[] = [
-  { id: 1, name: 'Birthday Template', category: 'Contacts', description: 'Wish you a happy birthday...!' },
-  { id: 2, name: 'Big Deal Alert', category: 'Potentials', description: 'Big Deal Alert' },
-];
+type TemplateForm = {
+  name: string;
+  subject: string;
+  description: string;
+  typeId: number;
+};
 
-const TEMPLATE_TYPES = [
+type TemplateType = {
+  id: number;
+  name: string;
+  isActive: boolean;
+};
+
+const TEMPLATE_TYPES: TemplateType[] = [
   { id: 1, name: 'Welcome company user', isActive: true },
   { id: 2, name: 'New lead created', isActive: true },
   { id: 3, name: 'Lead assigned', isActive: true },
   { id: 4, name: 'Lead status changed', isActive: true },
+];
+
+const findTemplateById = (id: number): TemplateType => {
+  const template = TEMPLATE_TYPES.find((template) => template.id === id);
+  return template ?? { id: 1, name: 'Welcome company user', isActive: true };
+};
+
+const templates: Template[] = [
+  { id: 1, name: 'Welcome Template', category: findTemplateById(1).name, description: 'Welcome to the company...!' },
+  { id: 2, name: 'Lead Assign 1', category: findTemplateById(3).name, description: 'Lead Assign to you...!' },
 ];
 
 export const TemplatesPage: React.FC = () => {
@@ -50,12 +69,12 @@ const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
       + Create New Template
     </button>
     <nav className="space-y-2 text-sm">
-      <a href="#" className="text-blue-600 font-semibold block">All Templates</a>
-      <a href="#">Favorites</a>
-      <a href="#">Associated Templates</a>
-      <a href="#">Created by me</a>
-      <a href="#">Shared with me</a>
-      <a href="#">Public Email Templates</a>
+      <a href="" className="text-blue-600 font-semibold block">All Templates</a>
+      <a href="">Favorites</a>
+      <a href="">Associated Templates</a>
+      <a href="">Created by me</a>
+      <a href="">Shared with me</a>
+      <a href="">Public Email Templates</a>
     </nav>
   </div>
 );
@@ -101,7 +120,6 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates }) => (
   </div>
 );
 
-// Modal Component
 type ModalProps = {
   onClose: () => void;
   onCreate: (typeId: number) => void;
@@ -110,7 +128,7 @@ type ModalProps = {
 const TemplateTypeModal: React.FC<ModalProps> = ({ onClose, onCreate }) => {
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
 
-  const handleCreate = () => {
+  const handleSubmit = () => {
     if (selectedTypeId !== null) {
       onCreate(selectedTypeId);
     }
@@ -120,26 +138,24 @@ const TemplateTypeModal: React.FC<ModalProps> = ({ onClose, onCreate }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>
-        <ul className="space-y-2 max-h-60 overflow-y-auto">
+        <select
+          value={selectedTypeId ?? ''}
+          onChange={(e) => setSelectedTypeId(Number(e.target.value))}
+          className="w-full mb-3 border px-3 py-2 rounded"
+        >
+          <option value="" disabled>Select template type</option>
           {TEMPLATE_TYPES.filter(t => t.isActive).map((type) => (
-            <li key={type.id}>
-              <button
-                className={`w-full text-left px-4 py-2 border rounded ${selectedTypeId === type.id ? 'bg-blue-100 border-blue-500' : 'hover:bg-gray-100'}`}
-                onClick={() => setSelectedTypeId(type.id)}
-              >
-                {type.name}
-              </button>
-            </li>
+            <option key={type.id} value={type.id}>{type.name}</option>
           ))}
-        </ul>
-        <div className="flex justify-between items-center mt-6">
+        </select>
+        <div className="flex justify-between mt-4">
           <button className="text-sm text-gray-600 hover:underline" onClick={onClose}>Cancel</button>
           <button
             className={`px-4 py-2 rounded text-white ${selectedTypeId !== null ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
             disabled={selectedTypeId === null}
-            onClick={handleCreate}
+            onClick={handleSubmit}
           >
-            Create
+            Continue
           </button>
         </div>
       </div>

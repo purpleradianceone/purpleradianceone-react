@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useContext, useEffect } from "react";
 import { useEditor, useNode } from "@craftjs/core";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-
 import {
   $getRoot,
   $getSelection,
@@ -17,31 +17,21 @@ import {
   FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
-  LexicalCommand,
+  $createParagraphNode,
+  $createTextNode,
 } from "lexical";
 
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 
-import { ResizableBox } from "react-resizable";
-
-import "react-resizable/css/styles.css";
 import "./lexical.css";
-
-// Error boundary
-export function ErrorBoundaryComponent({
-  children,
-  onError,
-}: {
-  children: React.JSX.Element;
-  onError: (error: Error) => void;
-}) {
-  return <>{children}</>;
-}
+import { DynamicFieldsContext } from "./DynamicFieldsContext";
 
 // Toolbar
 const Toolbar = ({ editor }: { editor: any }) => {
-  const applyFormat = (command: LexicalCommand<any>, value?: any) => {
+  const dynamicFields = useContext(DynamicFieldsContext);
+
+  const applyFormat = (command: any, value?: any) => {
     editor.dispatchCommand(command, value);
   };
 
@@ -50,6 +40,15 @@ const Toolbar = ({ editor }: { editor: any }) => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         selection.setStyle(style);
+      }
+    });
+  };
+
+  const insertDynamicField = (fieldKey: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        selection.insertText(`{{${fieldKey}}}`);
       }
     });
   };
@@ -101,6 +100,22 @@ const Toolbar = ({ editor }: { editor: any }) => {
           <option value="Verdana">Verdana</option>
         </select>
       </label>
+
+      <label>
+        Insert Field:
+        <select defaultValue="" onChange={(e) => {
+          const value = e.target.value;
+          if (value) insertDynamicField(value);
+          e.target.value = "";
+        }}>
+          <option value="" disabled>Select…</option>
+          {dynamicFields.map((field) => (
+            <option key={field.value} value={field.value}>
+              {field.label}
+            </option>
+          ))}
+        </select>
+      </label>
     </div>
   );
 };
@@ -110,15 +125,14 @@ const ToolbarWrapper = () => {
   return <Toolbar editor={editor} />;
 };
 
+
+
 export const LexicalText: React.FC = () => {
   const {
     connectors: { connect, drag },
     actions: { setProp },
     id,
-    props,
-  } = useNode((node) => ({
-    props: node.data.props,
-  }));
+  } = useNode();
 
   const { actions } = useEditor();
 
@@ -181,7 +195,7 @@ export const LexicalText: React.FC = () => {
             />
           }
           placeholder={<div className="editor-placeholder">Type your content…</div>}
-          ErrorBoundary={ErrorBoundaryComponent}
+          ErrorBoundary={LexicalErrorBoundary}
         />
         <HistoryPlugin />
         <OnChangePlugin
