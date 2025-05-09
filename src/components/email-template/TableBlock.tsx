@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { Element, useNode, useEditor } from "@craftjs/core";
 import { ResizableBox } from "react-resizable";
@@ -55,7 +58,7 @@ export const TableBlock: React.FC<TableBlockProps> = ({ width = 600, height = 30
           width: "100%",
           height: "100%",
           border: "1px dashed #aaa",
-          padding: "10px",
+          padding: "40px",
           borderRadius: "8px",
           background: "transparent",
           boxSizing: "border-box",
