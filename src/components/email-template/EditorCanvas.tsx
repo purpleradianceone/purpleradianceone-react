@@ -336,8 +336,10 @@ export const EditorCanvas: React.FC = () => {
                     is="div"
                     canvas
                     id="ROOT"
+                    className="justify-self-start top-18"
                     style={{
-                      minHeight: "500px",
+                      minWidth:"720px",
+                      minHeight: "600px",
                       border: "1px dashed #ccc",
                       padding: "20px",
                     }}
@@ -349,8 +351,6 @@ export const EditorCanvas: React.FC = () => {
         </Editor>
 
         </DynamicFieldsContext.Provider>
-
-        
       )}
     </>
   );

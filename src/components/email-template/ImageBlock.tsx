@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
@@ -150,7 +151,7 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
             border: "1px solid #ccc",
           }}
         />
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+        {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
 
         <div style={{ marginTop: "10px" }}>
           <label style={{ marginRight: "10px" }}>Alignment:</label>
