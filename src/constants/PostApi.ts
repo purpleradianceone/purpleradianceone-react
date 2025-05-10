@@ -1,3 +1,5 @@
+
+
 const POST_API = {
     CREATE_FORGOT_PASSWORD: import.meta.env.VITE_CREATE_FORGOT_PASSWORD!,
     CHANGE_FORGOT_PASSWORD: import.meta.env.VITE_CHANGE_FORGOT_PASSWORD!,
@@ -52,11 +54,18 @@ const POST_API = {
     UPDATE_LEAD_DETAILS : import.meta.env.VITE_UPDATE_LEAD_DETAIL!,
     UPDATE_LEAD_OWNER : import.meta.env.VITE_UPDATE_LEAD_OWNER!,
     GET_LEAD_OWNER_HISTORY : import.meta.env.VITE_GET_LEAD_OWNER_HISTORY!,
+    ASSIGN_PRODUCT_TO_LEAD : import.meta.env.VITE_ASSIGN_PRODUCT_TO_LEAD!,
+    GET_LEAD_ASSIGED_PRODUCT : import.meta.env.VITE_GET_LEAD_ASSIGED_PRODUCT!,
 
+    //company user profile
+    GET_COMPANY_USER_PROFILE : import.meta.env.VITE_GET_COMPANY_USER_PROFILE!,
+
+    // MASTER DATA
     GET_COUNTRY : import.meta.env.VITE_GET_COUNTRY!,
     GET_STATE : import.meta.env.VITE_GET_STATE!,
     GET_DISTRICT : import.meta.env.VITE_GET_DISTRICT!,
     GET_INDUSTRY_TYPE : import.meta.env.VITE_GET_INDUSTRY_TYPE!,
+    GET_LEAD_INTEREST_TYPE : import.meta.env.VITE_GET_LEAD_INTEREST_TYPE!,
 }
 
 export default POST_API;

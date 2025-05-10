@@ -158,9 +158,6 @@ const LeadDetails = ({
     }
   };
 
-  React.useEffect(() => {
-    console.log(leadDetailsData);
-  }, [leadDetailsData]);
 
   const districtOptions = Array.isArray(district)
     ? district.map((val) => ({
@@ -205,7 +202,7 @@ const LeadDetails = ({
           </button>
           }
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2">
           <FormField
             type="text"
             label="Job title"
@@ -385,7 +382,7 @@ const FormField = ({
       >
         {!isEditing ? (
           <span
-            className="text-gray-900 font-medium text-xs cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="text-gray-900  text-xs cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
               selectOptions
                 ?.find((opt) => opt.value === value)

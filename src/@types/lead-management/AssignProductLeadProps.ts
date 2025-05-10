@@ -1,7 +1,7 @@
 
 type AssignProductLeadProps ={
 
-    isOpen : boolean
-    onClose : () => void;
+    isOpen? : boolean
+    // onClose : () => void;
 }
 export default AssignProductLeadProps;
