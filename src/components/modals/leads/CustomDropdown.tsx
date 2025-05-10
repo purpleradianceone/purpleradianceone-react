@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react';
-import PostDataTypeForLeadSourceAndStatusAndStates from '../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates';
 import { ChevronDown, ChevronUp, Delete } from 'lucide-react';
 
 
 interface DropdownProps {
-  options: PostDataTypeForLeadSourceAndStatusAndStates[];
+  options: any[];
   onSelect: (selectedValue: number | undefined) => void;
   labelName: string;
 }
@@ -43,7 +43,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   };
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
+    <div className="relative w-full " ref={dropdownRef}>
       <label className="block  text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" ? "": labelName}</label>
 
       <div
@@ -57,7 +57,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
           : options.find((o) => o.id === selectedOption)?.name
           :
           selectedOption === undefined
-          ? 'select option'
+          ? 'Select Option'
           : options.find((o) => o.id === selectedOption)?.name
           }
           

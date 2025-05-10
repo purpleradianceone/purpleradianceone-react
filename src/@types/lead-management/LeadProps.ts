@@ -1,5 +1,4 @@
 type LeadDataProps = {
-
     count : number ,
     id : number ,
     companyId : number ,
@@ -14,6 +13,5 @@ type LeadDataProps = {
     mobileNumber? : string ,
     createdBy : string ,
     createdOn : string ,
-
 }
 export default LeadDataProps;
