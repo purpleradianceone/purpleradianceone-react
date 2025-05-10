@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // ExportPanel.tsx
 import React from "react";
 import { useEditor } from "@craftjs/core";
@@ -335,35 +337,6 @@ const componentRenderers: Record<string, ComponentRenderer> = {
     return `<div><a href="${escapeHtml(href)}" style="${style}" ${attrs}>${escapeHtml(text)}</a></div>`;
   },
 
-  // Text Block (Lexical)
-  'LexicalText': ({ node }) => {
-  try {
-    // Parse editorState if it's a string or use the existing object
-    const editorState = typeof node.props.editorState === 'string'
-      ? JSON.parse(node.props.editorState)
-      : node.props.editorState;
-    
-    // Extract text from Lexical editorState
-    const text = extractTextFromLexical(editorState);
-    console.log(text);
-
-    // Generate styles for the container
-    const style = formatStyle({
-      margin: '8px 0',
-      whiteSpace: 'pre-wrap',
-      ...node.props.style
-    });
-
-    // Return HTML with inline styles and safely escaped text
-    return `<div style="${style}">${escapeHtml(text)}</div>`;
-  } catch (e) {
-    console.error('Error parsing Lexical content', e);
-    
-    // Fallback to plain text if error occurs
-    return `<div>${escapeHtml(node.props.text || '')}</div>`;
-  }
-},
-
 
   // Column Block
 
@@ -431,7 +404,6 @@ const componentRenderers: Record<string, ComponentRenderer> = {
 
   Object.entries(rows)
     .sort(([a], [b]) => parseInt(a) - parseInt(b))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .forEach(([_, rowCells]) => {
       html += "<tr>";
       rowCells
@@ -452,8 +424,34 @@ const componentRenderers: Record<string, ComponentRenderer> = {
   return html;
 },
 
-  
 
+'LexicalText': ({ node }) => {
+  try {
+    // Parse editorState if it's a string or use the existing object
+    const editorState = typeof node.props.editorState === 'string'
+      ? JSON.parse(node.props.editorState)
+      : node.props.editorState;
+    
+    // Extract HTML content from Lexical editorState
+    const htmlContent = extractHtmlFromLexical(editorState);
+
+    // Generate styles for the container
+    const style = formatStyle({
+      margin: '8px 0',
+      whiteSpace: 'pre-wrap',
+      ...node.props.style
+    });
+
+    // Return HTML with inline styles
+    return `<div style="${style}">${htmlContent}</div>`;
+  } catch (e) {
+    console.error('Error parsing Lexical content', e);
+    
+    // Fallback to plain text if error occurs
+    return `<div>${escapeHtml(node.props.text || '')}</div>`;
+  }
+},
+  
 
   'DynamicFieldBlock': ({ node }) => {
   // eslint-disable-next-line no-unsafe-optional-chaining
@@ -474,78 +472,74 @@ const componentRenderers: Record<string, ComponentRenderer> = {
 
 };
 
-
-
-// Helper function to extract text from Lexical editor state
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractTextFromLexical(editorState: any): string {
+// Enhanced function to extract HTML from Lexical editor state
+function extractHtmlFromLexical(editorState: any): string {
   if (!editorState?.root?.children) return '';
 
-  // Helper function to process individual nodes
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const extractText = (node: any): string => {
-    let text = '';
-    
-    // If the node has text, return it directly
-    if (node.text) {
-      text = node.text;
-    }
-    // If the node has children, recursively extract text from them
-    else if (node.children) {
-      text = node.children.map(extractText).join('');
+  const processNode = (node: any): string => {
+    // Handle text nodes
+    if (node.type === 'text') {
+      let style = '';
+      if (node.style) {
+        style = ` style="${node.style}"`;
+      }
+
+      // Apply formatting tags
+      let content = escapeHtml(node.text);
+      if (node.format & 1) content = `<strong>${content}</strong>`; // Bold
+      if (node.format & 2) content = `<em>${content}</em>`; // Italic
+      if (node.format & 4) content = `<u>${content}</u>`; // Underline
+      if (node.format & 8) content = `<code>${content}</code>`; // Code
+      if (node.format & 16) content = `<s>${content}</s>`; // Strikethrough
+
+      return style ? `<span${style}>${content}</span>` : content;
     }
 
-    // Handle inline styles and attributes (e.g., color, background color, font family)
-    const style = node.style || {};
-    let styleString = '';
-
-    // Collect inline styles (e.g., color, background color)
-    if (style.color) styleString += `color: ${style.color}; `;
-    if (style.backgroundColor) styleString += `background-color: ${style.backgroundColor}; `;
-    if (style.fontFamily) styleString += `font-family: ${style.fontFamily}; `;
-    if (style.fontSize) styleString += `font-size: ${style.fontSize}; `;
-
-    // Handle additional inline styles like bold, italic, underline, etc.
-    let formattedText = text;
-
-    // Apply bold if needed
-    if (node.isBold) {
-      formattedText = `<strong style="${styleString}">${formattedText}</strong>`;
-    }
-    // Apply italic if needed
-    if (node.isItalic) {
-      formattedText = `<em style="${styleString}">${formattedText}</em>`;
-    }
-    // Apply underline if needed
-    if (node.isUnderline) {
-      formattedText = `<u style="${styleString}">${formattedText}</u>`;
-    }
-    // Apply strikethrough if needed
-    if (node.isStrikethrough) {
-      formattedText = `<strike style="${styleString}">${formattedText}</strike>`;
+    // Handle paragraph nodes
+    if (node.type === 'paragraph') {
+      const children = node.children.map(processNode).join('');
+      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
+      return `<p${style}>${children}</p>`;
     }
 
-    // If no specific formatting is applied, wrap text with a span and apply styles
-    if (!node.isBold && !node.isItalic && !node.isUnderline && !node.isStrikethrough && styleString) {
-      formattedText = `<span style="${styleString}">${formattedText}</span>`;
+    // Handle heading nodes
+    if (node.type === 'heading') {
+      const tag = `h${node.tag || '1'}`;
+      const children = node.children.map(processNode).join('');
+      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
+      return `<${tag}${style}>${children}</${tag}>`;
     }
 
-    // Process nested nodes if present
-    if (node.children && node.children.length > 0) {
-      formattedText = node.children
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((childNode: any) => extractText(childNode))
-        .join('');
+    // Handle list nodes
+    if (node.type === 'list') {
+      const tag = node.listType === 'bullet' ? 'ul' : 'ol';
+      const children = node.children.map(processNode).join('');
+      return `<${tag}>${children}</${tag}>`;
     }
 
-    return formattedText;
+    if (node.type === 'listitem') {
+      const children = node.children.map(processNode).join('');
+      return `<li>${children}</li>`;
+    }
+
+    // Handle quote nodes
+    if (node.type === 'quote') {
+      const children = node.children.map(processNode).join('');
+      return `<blockquote>${children}</blockquote>`;
+    }
+
+    // Handle generic element nodes
+    if (node.children) {
+      return node.children.map(processNode).join('');
+    }
+
+    return '';
   };
 
-  // Process all children of the root and join the result with line breaks for block elements
-  return editorState.root.children
-    .map(extractText)
-    .join('\n');
+  // Process all children of the root
+  return editorState.root.children.map(processNode).join('\n');
 }
+
 
 // Helper to convert style object to CSS string
 function formatStyle(styleObj: Record<string, string | number | undefined>): string {

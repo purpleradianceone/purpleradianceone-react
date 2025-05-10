@@ -57,7 +57,7 @@ export const Sidebar: React.FC = () => {
         </div>
         <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">
           <span>🔄</span>
-          <span>Dynamic</span>
+          <span>Dynamic Field Block</span>
         </div>
       </div>
     </div>
