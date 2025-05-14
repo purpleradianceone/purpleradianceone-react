@@ -29,6 +29,7 @@ import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
 import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
 import { EditorCanvas } from "../../components/email-template/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
+import UserProfileSetting from "../../components/user-profile/UserProfileSetting";
 
 
 export const router = createBrowserRouter([
@@ -236,8 +237,6 @@ export const router = createBrowserRouter([
     element : (
       <PrivateRoute>
         <Navbar>
-          
-          {/* <LeadDetails/> */}
           <ViewLeadManagement/>
         </Navbar>
       </PrivateRoute>
@@ -262,7 +261,16 @@ export const router = createBrowserRouter([
         </Navbar>
       </PrivateRoute>
     ),
- 
   },
+  {
+    path :ROUTES_URL.USER_PROFILE_SETTING,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          <UserProfileSetting/>
+        </Navbar>
+      </PrivateRoute>
+    )
+  }
 ]);
 export default router;

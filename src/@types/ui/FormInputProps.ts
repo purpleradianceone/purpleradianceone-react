@@ -9,7 +9,7 @@ type FormInputProps = {
     name?: string;
     placeholder?: string;
     required?: boolean;
-    value?:string ,
+    value?:string | number ,
     rightElement?: React.ReactNode;
     onChange? : (event: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur? : (event : React.FocusEvent<HTMLInputElement>) => void;

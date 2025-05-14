@@ -35,15 +35,12 @@ import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUs
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
 import AssignProductToLead from "./AssignProductToLead";
-import FormInput from "../../ui/FormInput";
-import Button from "../../ui/Button";
+import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
-    useState<boolean>(false);
-  const [isAddProductLeadFormOpen, setIsAddProductLeadFormOpen] =
     useState<boolean>(false);
   const { position } = usePanel();
   const [searchParams] = useSearchParams();
@@ -62,6 +59,8 @@ const ViewLeadManagement = () => {
 
   const [isOpenLeadOwnerHistory, setIsOpenLeadOwnerHistory] =
     useState<boolean>(false);
+
+  //NOTE : THIS IS THE SELECTED LEAD
   const [selectedLeadData, setSelectedLeadData] = useState(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
@@ -73,7 +72,7 @@ const ViewLeadManagement = () => {
   const [industryType, setIndustryType] = useState<industryType[]>([]);
   const [stateData, setStateData] = useState<State[]>([]);
   const [district, setDistrict] = useState<District[]>([]);
-
+  const [leadAssignedCompanyProduct , setLeadAssignedCompanyProduct] = useState<LeadAssignedCompanyProduct[]>([])
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -326,9 +325,7 @@ const ViewLeadManagement = () => {
   >(selectedLeadData.companyUserId);
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
-  useEffect(() => {
-    console.log(previouseOwnerRef.current);
-  }, []);
+  
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
@@ -365,10 +362,6 @@ const ViewLeadManagement = () => {
     setIsLeadOwnerPopUpOpen(true);
   };
 
-  useEffect(() => {
-    console.log("this is selected user id ");
-    console.log(selectedCompanyUser);
-  }, [selectedCompanyUser]);
 
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
@@ -516,8 +509,6 @@ const ViewLeadManagement = () => {
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithEvent: getLeadDetails,
           });
-
-          // setIsDialogueOpen(!refreshTokenStatus);
           if (refreshTokenStatus) {
             setIsDialogueOpen(false);
           } else {
@@ -592,16 +583,11 @@ const ViewLeadManagement = () => {
         if (response.status === STATUS_CODE.OK) {
           setDistrict(response.data);
         }
-        // } else {
-        //   throw new Error("Failed to fetch districts");
-        // }
       } catch (error: any) {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithEvent: fetchDistricts,
           });
-
-          // setIsDialogueOpen(!refreshTokenStatus);
           if (refreshTokenStatus) {
             setIsDialogueOpen(false);
           } else {
@@ -620,6 +606,40 @@ const ViewLeadManagement = () => {
     }
   };
 
+
+  //fetch the lead assigned company product 
+  const fetchLeadCompanyProduct= async ()=>{
+    try{
+
+      const response =await axios.get(POST_API.GET_LEAD_ASSIGED_PRODUCT, {
+        params  : {
+          companyId :loginStatus.companyId ,
+          leadId : selectedLeadData.id,
+          companyProductId : null,
+          leadInterestId : null,
+          requestedBy : loginStatus.id,
+        },
+        withCredentials: true,
+      })
+      
+      if(response.status === STATUS_CODE.OK){
+        setLeadAssignedCompanyProduct(response.data)
+      }
+    }catch (error: any) {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: fetchLeadCompanyProduct,
+          });
+          if (refreshTokenStatus) {
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
+      }
+  }
   useEffect(() => {
     const apisCalls = async () => {
       await getLeadDetails();
@@ -628,8 +648,10 @@ const ViewLeadManagement = () => {
       await getIndustryType();
       await getAllState(countryChangeRef.current);
       await getAllDistrict(stateChangeRef.current);
+      await fetchLeadCompanyProduct();
     };
 
+   
     const apiCallsWhenCountryChanged = async (countryId: number | null) => {
       await getAllState(countryId);
     };
@@ -716,26 +738,8 @@ const ViewLeadManagement = () => {
     }
   };
 
-  // new code
+  // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const togglePopup = () => setIsAddProductModalOpen(!isAddProductModalOpen);
-
-  // Close popup on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setIsAddProductModalOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <div
       className={`${
@@ -774,43 +778,23 @@ const ViewLeadManagement = () => {
 
         <div className="flex justify-evenly w-48">
           {/* new code  */}
-          <div className="relative inline-block" ref={wrapperRef}>
+          <div className="relative inline-block" >
            
            <button
-              onClick={togglePopup}
+              onClick={()=>{
+                setIsAddProductModalOpen(true);
+              }}
               className="px-1 py-1 text-xs flex gap-1 items-center text-gray-500 bg-transparent border rounded  transition"
             >
              <Plus size={8}/><span>Product</span>
             </button>
-
-            {isAddProductModalOpen && (
-              <div className="absolute -right-28  mt-2 w-96  bg-gray-50 border rounded-lg shadow-xl p-2  z-10">
-                <div className="border-b flex items-center gap-1 font-semibold text-sm text-gray-700 ">
-                <Plus size={10}/> <span>Assign Product to lead</span>
-                </div>
-
-                <form className="space-y-3">
-                  <div>
-                    <FormInput label="Name :" type="text" />
-                    <FormInput label="Quantity Req. :" type="text" />
-                    <FormInput label="Expected Cost :" type="text" />
-                  </div>
-
-                  <div className="float-right max-w-16">
-
-                  <Button
-                    type="submit"
-                    onClick={(e) =>{
-                      e.preventDefault();
-                    }}
-                    // className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-                    >
-                    Add
-                  </Button>
-                    </div>
-                </form>
-              </div>
-            )}
+              <AssignProductToLead
+              selectedLeadData={selectedLeadData}
+                isOpen={isAddProductModalOpen}
+                onClose={()=>{
+                  setIsAddProductModalOpen(false);
+                }}
+              />
           </div>
           <button
             className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
@@ -819,14 +803,6 @@ const ViewLeadManagement = () => {
             }}
           >
             Edit
-          </button>
-          <button
-            className="hidden  text-xs rounded border px-1 my-1 text-gray-500"
-            onClick={() => {
-              setIsAddProductLeadFormOpen(true);
-            }}
-          >
-            <Plus size={16} />
           </button>
 
           <Detail
@@ -976,9 +952,9 @@ const ViewLeadManagement = () => {
         )}
       </div>
 
-      <div className=" w-[100%] h-auto flex gap-4  shadow-sm    ">
+      <div className=" w-[100%] h-auto flex  shadow-sm    ">
         {/* First child: 70% width */}
-        <div className="w-[65%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
+        <div className="w-[50%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
             handleLeadActivityChange={(person: string, work: string) => {
               setActivityData([
@@ -1000,7 +976,7 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 30% width */}
-        <div className="w-[35%] h-full bg-green-50 border my-2 text-white p-4">
+        <div className="w-[50%] h-full bg-green-50 border my-2 text-white p-4">
           This div should get 30% width and full height
         </div>
       </div>
@@ -1070,7 +1046,7 @@ const ViewLeadManagement = () => {
       />
       {isLeadOwnerPopUpOpen && (
         <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[80%] overflow-y-auto relative animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
             {/* Header with Close Button */}
             <div className="flex justify-between items-center p-2 border-b border-gray-200">
               <h3 className="text-lg font-bold text-gray-800">
@@ -1098,14 +1074,6 @@ const ViewLeadManagement = () => {
             </div>
           </div>
         </div>
-      )}
-      {isAddProductLeadFormOpen && (
-        <AssignProductToLead
-          isOpen={isAddProductLeadFormOpen}
-          onClose={() => {
-            setIsAddProductLeadFormOpen(false);
-          }}
-        />
       )}
     </div>
   );

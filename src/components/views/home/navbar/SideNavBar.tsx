@@ -222,7 +222,12 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             to= {ROUTES_URL.EMAIL_TEMPLATE}
             >
             Email Template
-            </Link>
+            </Link>, 
+              <Link
+            to= {ROUTES_URL.USER_PROFILE_SETTING}
+            >
+            User Setting
+            </Link>            
           ]}
         ></SideNavBarItem>
       </nav>
