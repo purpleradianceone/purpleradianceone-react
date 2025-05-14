@@ -110,7 +110,6 @@ const ToolbarSelect = ({ onChange, children, defaultValue = "" }: { onChange: (e
 );
 
 // Toolbar Component
-// Toolbar Component
 const Toolbar = ({ editor }: { editor: any }) => {
   const dynamicFields = useContext(DynamicFieldsContext);
   const [activeFormats, setActiveFormats] = React.useState<Record<string, boolean>>({

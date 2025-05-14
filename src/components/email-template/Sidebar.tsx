@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import React from "react";
 import { useEditor } from "@craftjs/core";
@@ -16,21 +17,18 @@ export const Sidebar: React.FC = () => {
   const { connectors } = useEditor();
 
   return (
-    <div className="sidebar-container">
-      <h3 className="sidebar-title">Blocks</h3>
+    <div className="sidebar-container" >
+      <h1 style={{color:"transparent"}}>_</h1>
+      <h1 className="sidebar-title">Email Template Blocks</h1>
       <div className="sidebar-grid">
-        <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SubjectBlock />); }} className="sidebar-block">
+        {/* <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SubjectBlock />); }} className="sidebar-block">
           <span>📄</span>
           <span>Subject</span>
-        </div>
+        </div> */}
         <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlock />); }} className="sidebar-block">
           <span>📦</span>
           <span>Section</span>
         </div>
-        {/* <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldPalette fields={} />); }} className="sidebar-block">
-          <span>🗞️</span>
-          <span>Text</span>
-        </div> */}
         <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <LexicalText />); }} className="sidebar-block">
           <span>📝</span>
           <span>Text</span>
@@ -56,8 +54,8 @@ export const Sidebar: React.FC = () => {
           <span>Table</span>
         </div>
         <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">
-          <span>🔄</span>
-          <span>Dynamic Field Block</span>
+          <span>∯</span>
+          <span>Dynamic Fields</span>
         </div>
       </div>
     </div>

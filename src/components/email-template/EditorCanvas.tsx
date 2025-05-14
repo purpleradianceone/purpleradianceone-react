@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
@@ -17,6 +18,9 @@ import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
 import { TableBlock } from "./TableBlock";
+import { LucideMail, } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { TemplateSettingsPanel } from "./TemplateSettingsPanel ";
 
 
 
@@ -28,14 +32,57 @@ export const EditorCanvas: React.FC = () => {
   const [mode, setMode] = useState<'editor' | 'insert'>('editor');
   const [htmlInput, setHtmlInput] = useState("");
 
-  const json = `{
-    "full_name": "Nitikesh Yewale",
-    "email": "nitikesh.yewale@g.com",
-    "unsubscribe_link": "https://unsubscribe.example.com",
-    "product_name": "CDR software",
-    "support_number": "9158176888",
-    "company_name":"PurpleRadiance"
-  }`;
+  const jsonPlaceholdersMap:{ [key: number]: string } = {
+    1:`{
+    "company.fullname":"PurpleRadiance",
+    "company_user.fullname":"Nitikesh Yewale",
+    "company_user.email":"nitikesh@g.co",
+    "company_user.mobilenumber":"9878987898"
+    }`,
+
+    2:`{
+    "lead.name":"Elon ",
+    "lead.email":"elon@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web"
+    }`,
+
+    3:`
+    {
+    "lead.name":"Mark3",
+    "lead.email":"Mark3@g.co",
+    "lead.mobilenumber":"+1 87889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web"
+    }
+    `,
+
+    4:`
+    {
+    "lead.name":"Elon4",
+    "lead.email":"elon4@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Suraj",
+    "lead.status":"on going",
+    "lead.source":"web"
+    }
+    `,
+  };
+
+  const type = new URLSearchParams(useLocation().search).get('type');
+  const json = jsonPlaceholdersMap[parseInt(type??"1")];
+
+  // const json = `{
+  //   "full_name": "Nitikesh Yewale",
+  //   "email": "nitikesh.yewale@g.com",
+  //   "unsubscribe_link": "https://unsubscribe.example.com",
+  //   "product_name": "CDR software",
+  //   "support_number": "9158176888",
+  //   "company_name":"PurpleRadiance"
+  // }`;
 
   const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
   const [dynamicVariables, setDynamicVariables] = useState<Record<string, string>>(parsedPlaceHolders);
@@ -82,8 +129,18 @@ export const EditorCanvas: React.FC = () => {
     setPreviewHtml(updatedHtml); // Keep modal in sync too
   };
 
-  return (
+    const [isOpen, setIsOpen] = useState(false);
+
+
+  return (<>
+        <div className="fixed z-10 top-12 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-64 p-2">
+          <div className="flex  gap-2">
+            {<LucideMail className="w-6 h-6 text-blue-600" />}
+              <span className="text-1xl font-bold">Email Template</span>
+          </div>
+        </div>
     <>
+    
       {/* Button to toggle between modes */}
       <div className="fixed  inset-0 justify-self-center top-12  " style={{ height: "fit-content", zIndex: 100,}}>
         <button
@@ -127,7 +184,7 @@ export const EditorCanvas: React.FC = () => {
         style={{
           position: "fixed",
           top: 100,
-          right: 20,
+          right: 150,
           zIndex: 1,
           background: "transparent",
           border: "1px solid #ccc",
@@ -144,13 +201,13 @@ export const EditorCanvas: React.FC = () => {
                   style={{
                     position: "fixed",
                     top: 100,
-                    right: 20,
+                    right: 150,
                     width: "260px",
                     background: "white",
                     padding: "10px",
                     borderRadius: "8px",
                     boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-                    zIndex:1
+                    zIndex:90
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -193,7 +250,10 @@ export const EditorCanvas: React.FC = () => {
                 </div>
               )}
 
+<DynamicFieldsContext.Provider value={parsedFields}>
+
 {mode === 'insert' ? (
+
   <div style={{ marginTop: '60px', padding: '40px' }}>
     <div>
       <textarea
@@ -275,8 +335,8 @@ export const EditorCanvas: React.FC = () => {
       />
     </div>
   </div>
+
 ) : (
-      <DynamicFieldsContext.Provider value={parsedFields}>
 
         <Editor
           resolver={{
@@ -293,7 +353,7 @@ export const EditorCanvas: React.FC = () => {
           }}
         >
           <div style={{ display: "flex", width: "100%" }}>
-            <div style={{ position: 'sticky', top:'50px', height: '3000px', backgroundColor: 'white' }}>
+            <div style={{ position: 'sticky', top:'0px', height: '3000px', backgroundColor: 'blue' }}>
               <Sidebar />
             </div>
             <div
@@ -350,8 +410,16 @@ export const EditorCanvas: React.FC = () => {
           </div>
         </Editor>
 
-        </DynamicFieldsContext.Provider>
-      )}
+        )}
+
+        <>
+        {/* Settings panel */}
+          <TemplateSettingsPanel />
+        </>
+
+    </DynamicFieldsContext.Provider>
+
+    </>
     </>
   );
 };

@@ -1,12 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ROUTES_URL from '../../constants/Routes';
+import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
+import axios from 'axios';
+import POST_API from '../../constants/PostApi';
+import { STATUS_CODE } from '../../constants/AppConstants';
 
-type Template = {
+type EmailTemplate = {
+  count:number;
   id: number;
+  companyId:number;
+  emailTypeId:number;
   name: string;
+  emailSubject:string;
+  emailBodyHtml:string;
+  isMaster:boolean;
+  isDefault:boolean;
+  isActive:boolean;
+  createdBy:string;
   category: string;
   description: string;
 };
@@ -18,33 +31,49 @@ type TemplateType = {
   isActive: boolean;
 };
 
-const TEMPLATE_TYPES: TemplateType[] = [
-  { id: 1, name: 'Welcome company user', isActive: true },
-  { id: 2, name: 'New lead created', isActive: true },
-  { id: 3, name: 'Lead assigned', isActive: true },
-  { id: 4, name: 'Lead status changed', isActive: true },
-];
 
-const findTemplateById = (id: number): TemplateType => {
-  const template = TEMPLATE_TYPES.find((template) => template.id === id);
-  return template ?? { id: 1, name: 'Welcome company user', isActive: true };
-};
+// const findTemplateById = (id: number): TemplateType => {
+//   const template = TEMPLATE_TYPES.find((template) => template.id === id);
+//   return template ?? { id: 1, name: 'Welcome company user', isActive: true };
+// };
 
-const templates: Template[] = [
-  { id: 1, name: 'Welcome Template', category: findTemplateById(1).name, description: 'Welcome to the company...!' },
-  { id: 2, name: 'Lead Assign 1', category: findTemplateById(3).name, description: 'Lead Assign to you...!' },
+const templates: EmailTemplate[] = [
+  {
+    id: 1, name: 'Welcome Template', category: "", description: 'Welcome to the company...!',
+    count: 0,
+    companyId: 0,
+    emailTypeId: 0,
+    emailSubject: '',
+    emailBodyHtml: '',
+    isMaster: false,
+    isDefault: false,
+    isActive: false,
+    createdBy: ''
+  },
+  {
+    id: 2, name: 'Lead Assign 1', category: "", description: 'Lead Assign to you...!',
+    count: 0,
+    companyId: 0,
+    emailTypeId: 0,
+    emailSubject: '',
+    emailBodyHtml: '',
+    isMaster: false,
+    isDefault: false,
+    isActive: false,
+    createdBy: ''
+  },
 ];
 
 export const TemplatesPage: React.FC = () => {
+
   const [activeTab, setActiveTab] = useState<'Email' | 'Inventory' | 'Mail Merge'>('Email');
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-
-  const handleTemplateCreate = (typeId: number) => {
+ 
+const handleTemplateCreate = (typeId: number) => {
     setShowModal(false);
     navigate(`${ROUTES_URL.EMAIL_TEMPLATE_CREATE}?type=${typeId}`);
   };
-
   return (
     <div className="flex h-screen font-sans text-gray-800">
       <Sidebar onCreate={() => setShowModal(true)} />
@@ -93,7 +122,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, onTabChange }) => (
 );
 
 type TemplateListProps = {
-  templates: Template[];
+  templates: EmailTemplate[];
 };
 
 const TemplateList: React.FC<TemplateListProps> = ({ templates }) => (
@@ -127,6 +156,37 @@ const TemplateTypeModal: React.FC<ModalProps> = ({ onClose, onCreate }) => {
       onCreate(selectedTypeId);
     }
   };
+   const {loginStatus} = useLoggedInUserContext();
+
+  const [templateType,setTemplateType] = useState<TemplateType[]>([]);
+  
+const getTemplateTypes= async()=>{
+  setTemplateType([]);
+  const postDataTemplateType = {
+    "company_id":loginStatus.companyId,
+    "requestedby":loginStatus.id,
+  }
+
+  await axios.post(POST_API.GET_EMAIL_TYPE,postDataTemplateType,{
+    withCredentials:true
+  })
+  .then((response) =>{
+    console.log(response.data);
+    if(response.status === STATUS_CODE.OK){
+      response.data.map((res : any)=>{
+        setTemplateType((prev)=>[...prev,{
+          id:res.id,
+          name:res.name,
+          isActive:res.isactive
+        }])
+      })
+    }
+  }).catch((error)=>{console.log(error)})
+}
+
+useEffect(()=>{
+  getTemplateTypes();
+},[])
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
@@ -138,7 +198,7 @@ const TemplateTypeModal: React.FC<ModalProps> = ({ onClose, onCreate }) => {
           className="w-full mb-3 border px-3 py-2 rounded"
         >
           <option value="" disabled>Select template type</option>
-          {TEMPLATE_TYPES.filter(t => t.isActive).map((type) => (
+          {templateType.filter(t => t.isActive).map((type) => (
             <option key={type.id} value={type.id}>{type.name}</option>
           ))}
         </select>
