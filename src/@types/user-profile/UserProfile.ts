@@ -1,12 +1,17 @@
-type UserProfile = {
+type UserPreference = {
 
     id: number,
     companyUserId: number,
-    companyUserProfile: number,
     timezoneId: number,
+    isLeftMenu : boolean,
+    isHamburgerMenuCollapsed : boolean,
+    timezoneName : string,
+    timezoneUTCOffset : string,
+    timezone : string
+    rowsInGrid : number,
     createdBy: string,
     updatedBy: string,
     createdOn: string,
     updatedOn: string
 }
-export default UserProfile;
+export default UserPreference;
