@@ -23,16 +23,19 @@ import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
 import {
   NUMBER_VALUES,
   SITE_KEY,
+  STATUS_CODE,
   STRING_VALUES,
 } from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
+  const { setUserPreference } = useUserPreference();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
@@ -139,11 +142,9 @@ function SignInForm() {
             .post(POST_API.SIGN_IN, user, { withCredentials: true })
             .then((response) => {
               if (response.data.status) {
-
                 loginStatusRef.current = response.data;
                 setLoginStatus({
-                
-                   id: response.data.id,
+                  id: response.data.id,
                   companyId: response.data.company_id,
                   companyName: response.data.company_name,
                   fullName: response.data.fullname,
@@ -162,7 +163,7 @@ function SignInForm() {
                   endDateSubscription: response.data.end_date_subscription,
                 });
 
-                // note: is status false , then it will navigate to create subscription page 
+                // note: is status false , then it will navigate to create subscription page
                 if (!response.data.isactive_subscription) {
                   setTimeout(() => {
                     showMessageSnackbar({
@@ -172,11 +173,6 @@ function SignInForm() {
                     navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
                   }, 1500);
                   return; // ⬅️ Stops further execution
-                }
-                 //note : changes are made here
-                 if ((response.data.active_users_in_company > response.data.subscription_allowed_users)) {
-                  setShowSubscriptionOrInActivePopUp(true);
-                  return;
                 }
 
                 const getCrmModuleAccessData = {
@@ -202,17 +198,57 @@ function SignInForm() {
                       type: "success",
                     });
 
-                    // //note : temporary fix
-                    // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
-                    //   setShowSubscriptionOrInActivePopUp(true);
-                    //   return;
-                    // }
+                    //note : 
+                    if (
+                      loginStatusRef.current.active_users_in_company >
+                      loginStatusRef.current.subscription_allowed_users
+                    ) {
+                      setShowSubscriptionOrInActivePopUp(true);
+                      return;
+                    }
                     if (!loginStatusRef.current.isactive_subscription) {
                       navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
                       return;
-                    } else if (loginStatusRef.current.isactive_subscription && loginStatusRef.current.active_users_in_company <= loginStatusRef.current.subscription_allowed_users) {
+                    } else if (
+                      loginStatusRef.current.isactive_subscription &&
+                      loginStatusRef.current.active_users_in_company <=
+                        loginStatusRef.current.subscription_allowed_users
+                    ) {
                       setTimeout(() => {
-                        navigate(ROUTES_URL.HOME); // ⬅️ Navigates ONLY if subscription checks pass
+                        axios
+                          .get(POST_API.GET_COMPANY_USER_PREFERENCE, {
+                            params: {
+                              companyId: loginStatusRef.current.company_id,
+                              companyUserId: loginStatusRef.current.id,
+                              requestedBy: loginStatusRef.current.id,
+                            },
+                            withCredentials: true,
+                          })
+                          .then((response) => {
+                            if (response.status === STATUS_CODE.OK) {
+                              const res = response.data;
+
+                              console.log(res);
+
+                              setUserPreference({
+                                companyUserId: res.company_user_id,
+                                createdBy: res.createdby,
+                                createdOn: res.createdon,
+                                id: res.id,
+                                timezoneId: res.timezone_id,
+                                updatedBy: res.updatedby,
+                                updatedOn: res.updatedon,
+                                isHamburgerMenuCollapsed:
+                                  res.is_hamburger_menu_collapsed,
+                                isLeftMenu: res.is_left_menu,
+                                rowsInGrid: res.rows_in_grid,
+                                timezone: res.Timezone,
+                                timezoneName: res["Timezone Name"],
+                                timezoneUTCOffset: res["Timezone UTC Offset"],
+                              });
+                            }
+                          });
+                        navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
                       }, 1000);
                     }
                   })
@@ -263,121 +299,6 @@ function SignInForm() {
                 message: "",
               });
             });
-
-          // axios
-          //   .post(POST_API.SIGN_IN, user, { withCredentials: true })
-          //   .then((response) => {
-          //     if (response.data.status) {
-          //       setLoginStatus({
-          //         id: response.data.id,
-          //         companyId: response.data.company_id,
-          //         companyName: response.data.company_name,
-          //         fullName: response.data.fullname,
-          //         email: response.data.email,
-          //         mobileNumber: response.data.mobilenumber,
-          //         message: response.data.message,
-          //         token: response.data.token,
-          //         status: response.data.status,
-          //         createdOn: response.data.createdon,
-          //         isActiveSubscription:response.data.isactive_subscription,
-          //         // isActiveSubscription:false,
-          //         subscriptionAllowedUsers: response.data.subscription_allowed_users,
-          //         activeUsersInCompany: response.data.active_users_in_company
-          //       });
-
-          //       if(response.data.isactive_subscription){
-          //         setShowSubscriptionOrInActivePopUp(true);
-          //         // navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
-          //         return
-          //       }else{
-
-          //         if (response.data) {
-
-          //           //NOTE : CHANGES REQUIRED
-          //           console.log(response.data);
-          //           if(response.data.active_users_in_company > response.data.subscription_allowed_users){
-          //             setTimeout(() => {
-          //               showMessageSnackbar({
-          //                 message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
-          //                 type: "error",
-          //               });
-          //               navigate(ROUTES_URL.CREATE_SUBSCRIPTION)
-          //             return ;
-          //             }, 4000);
-
-          //           }
-
-          //           const getCrmModuleAccessData = {
-          //             company_id: response.data.company_id,
-          //             company_user_id: response.data.id,
-          //             requestedby: response.data.id,
-          //           };
-
-          //           axios
-          //             .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData,{
-          //               withCredentials : true
-          //             })
-          //             .then((response) => {
-          //               setAccessModules(response.data);
-          //               setSpinnerAnimation({
-          //                 status: "success",
-          //                 message: MESSAGE.SUCCESS.LOGGED_IN,
-          //               });
-          //               showMessageSnackbar({
-          //                 message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-          //                 type: "success",
-          //               });
-
-          //               setTimeout(() => {
-          //                   navigate(ROUTES_URL.HOME);
-          //               }, 1000);
-          //             })
-          //             .catch((error) => {
-          //               console.error(error);
-          //               setSpinnerAnimation({
-          //                 status: "idle",
-          //                 message: "",
-          //               });
-          //             });
-          //         }
-          //       }
-          //     } else {
-          //       showMessageSnackbar({
-          //         message: MESSAGE.ERROR.WRONG_CREDENTIALS,
-          //         type: "error",
-          //       });
-          //       setSpinnerAnimation({
-          //         status: "idle",
-          //         message: "",
-          //       });
-          //       setLoginStatus({
-          //         companyId: 0,
-          //         companyName: "",
-          //         createdOn: "",
-          //         email: "",
-          //         fullName: "",
-          //         id: 0,
-          //         message: "",
-          //         mobileNumber: "",
-          //         status: false,
-          //         token: "",
-          //         isActiveSubscription:false,
-          //         subscriptionAllowedUsers:0,
-          //         activeUsersInCompany:0
-          //       });
-          //     }
-          //   })
-          //   .catch((error) => {
-          //     console.log(error);
-          //     showMessageSnackbar({
-          //       message: MESSAGE.ERROR.WRONG_CREDENTIALS,
-          //       type: "error",
-          //     });
-          //     setSpinnerAnimation({
-          //       status: "idle",
-          //       message: "",
-          //     });
-          //   });
         }
       })
       .catch((error) => {
@@ -417,6 +338,22 @@ function SignInForm() {
     setAccessModules([]);
     localStorage.clear();
   }, []);
+
+
+    useEffect(() => {
+      window.history.pushState(null, document.title, window.location.href);
+  
+      const handleBackButton = (event: PopStateEvent) => {
+        event.preventDefault();
+        navigate(ROUTES_URL.SIGN_IN, { replace: true }); 
+      };
+  
+      window.addEventListener('popstate', handleBackButton);
+
+      return () => {
+        window.removeEventListener('popstate', handleBackButton);
+      };
+    }, [navigate]);
 
   const handleRememberMeCheckBoxChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -501,10 +438,9 @@ function SignInForm() {
         </form>
         <SubscriptionDialogueBox
           isOpen={showSubscriptionOrInActivePopUp}
-          cardTitle="Title of this card"
-          message="message for this card will display here."
+          cardTitle="Subscription Required"
+          message="Get the Subscription / Inactive Some users."
           onClose={() => {
-
             setShowSubscriptionOrInActivePopUp(false);
             localStorage.clear();
             navigate(ROUTES_URL.SIGN_IN);

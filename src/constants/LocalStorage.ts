@@ -4,5 +4,6 @@ const LOCALSTORAGE_KEYS = {
     LOGIN_CREDENTIALS : "loginUserCredentials",
     LOGIN_STATUS : "loginStatus",
     ACCESS_MANAGEMENT : "AccessManagement",
+    USER_PREFERENCE : "userpreference"
 }
 export default LOCALSTORAGE_KEYS;
