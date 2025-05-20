@@ -165,6 +165,8 @@ const getTemplateTypes= async()=>{
   const postDataTemplateType = {
     "company_id":loginStatus.companyId,
     "requestedby":loginStatus.id,
+    "is_host_email":false,
+
   }
 
   await axios.post(POST_API.GET_EMAIL_TYPE,postDataTemplateType,{
