@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
 import { Sidebar } from "./Sidebar";
 import { LexicalText } from "./LexicalText";
@@ -18,9 +18,10 @@ import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
 import { TableBlock } from "./TableBlock";
-import { LucideMail, } from "lucide-react";
-import { useLocation } from "react-router-dom";
-import { TemplateSettingsPanel } from "./TemplateSettingsPanel ";
+import { LucideCode, LucideEdit, LucideMail, LucideMailCheck, LucideMailX, LucideMessageCircleCode, LucideMessageCirclePlus, } from "lucide-react";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
+import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
 
 
 
@@ -72,18 +73,18 @@ export const EditorCanvas: React.FC = () => {
     `,
   };
 
-  const type = new URLSearchParams(useLocation().search).get('type');
-  const json = jsonPlaceholdersMap[parseInt(type??"1")];
+  const [searchParams] = useSearchParams();
+const params = searchParams.get("type");
+  useEffect(()=> {
+if(params){
+  console.log("parsed JsonPArmas : ")
+  console.log(JSON.parse(params))
+}
 
-  // const json = `{
-  //   "full_name": "Nitikesh Yewale",
-  //   "email": "nitikesh.yewale@g.com",
-  //   "unsubscribe_link": "https://unsubscribe.example.com",
-  //   "product_name": "CDR software",
-  //   "support_number": "9158176888",
-  //   "company_name":"PurpleRadiance"
-  // }`;
-
+  
+  },[])
+  
+  const json = jsonPlaceholdersMap[parseInt(JSON.parse(params!).id)];
   const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
   const [dynamicVariables, setDynamicVariables] = useState<Record<string, string>>(parsedPlaceHolders);
 
@@ -91,9 +92,10 @@ export const EditorCanvas: React.FC = () => {
     let replacedHtml = html;
     Object.entries(dynamicVariables).forEach(([key, value]) => {
       const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
-      replacedHtml = replacedHtml.replace(regex, `<input data-key="${key}" value="${value}" style="border:none;background:transparent;color:#000;width:auto;" />`);
+      replacedHtml = replacedHtml.replace(regex, value);
+      // replacedHtml = replacedHtml.replace(regex, `<input data-key="${key}" value="${value}" style="border:none;background:transparent;color:#000;width:auto;" />`);
     });
-    setPreviewHtml(replacedHtml);
+    setPreviewHtml(replacedHtml); 
     setIsPreviewOpen(true);
   };
 
@@ -143,6 +145,16 @@ export const EditorCanvas: React.FC = () => {
     
       {/* Button to toggle between modes */}
       <div className="fixed  inset-0 justify-self-center top-12  " style={{ height: "fit-content", zIndex: 100,}}>
+        <div className="flex-col justify-center justify-items-center">
+          <div>
+            <div className="top-12 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-fit p-2">
+          <div className="flex  gap-2">
+            {<LucideEdit className="w-6 h-6 text-blue-600" />}
+              <span className="text-1xl font-bold">"{JSON.parse(params!).name}" Template </span>
+          </div>
+        </div>
+        </div>
+          <div>
         <button
           onClick={() => setMode('editor')}
           style={{
@@ -176,6 +188,8 @@ export const EditorCanvas: React.FC = () => {
         >
           📥 Insert Email Template
         </button>
+        </div>
+        </div>
       </div>
 
       {/* Show Fields Button - Always Visible */}
@@ -334,6 +348,10 @@ export const EditorCanvas: React.FC = () => {
 
       />
     </div>
+        <>
+        {/* Settings panel */}
+          <TemplateSettingsPanelEdit htmlBody = {htmlInput} />
+        </>
   </div>
 
 ) : (
@@ -390,32 +408,33 @@ export const EditorCanvas: React.FC = () => {
 
               />
               </div>
-              <div id="CANVAS">
+              <div id="CANVAS" style={{top:55}}>
                 <Frame>
                   <Element
                     is="div"
                     canvas
                     id="ROOT"
-                    className="justify-self-start top-18"
+                    className="justify-self-start top-28"
                     style={{
-                      minWidth:"720px",
-                      minHeight: "600px",
+                      minWidth:"700px",
+                      minHeight: "800px",
                       border: "1px dashed #ccc",
-                      padding: "20px",
+                      padding: "70px",
                     }}
                   />
                 </Frame>
               </div>
             </div>
           </div>
+          <>
+        {/* Settings panel */}
+          <TemplateSettingsPanelCreate />
+        </>
         </Editor>
 
         )}
 
-        <>
-        {/* Settings panel */}
-          <TemplateSettingsPanel />
-        </>
+        
 
     </DynamicFieldsContext.Provider>
 
