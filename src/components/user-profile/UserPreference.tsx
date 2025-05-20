@@ -17,6 +17,7 @@ import {
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../ui/MessageSnackbar";
+import REGEX from "../../constants/Regex";
 
 const UserPreference = () => {
   const navigate = useNavigate();
@@ -167,14 +168,14 @@ const UserPreference = () => {
     errorMsg = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
   } else {
     if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = REGEX.EMAIL;
       if (!emailRegex.test(value)) {
         errorMsg = "Invalid email format";
       }
     }
 
     if (name === "mobileNumber") {
-      const mobileRegex = /^[6-9]\d{9}$/;
+      const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
       if (!mobileRegex.test(value)) {
         errorMsg = "Mobile number must be 10 digits and start with 6–9";
       }

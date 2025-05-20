@@ -55,9 +55,6 @@ const CustomTimezoneDropdown: React.FC<Props> = ({
     }
   }, [searchText, dropdownOpen]);
 
-  useEffect(() => {
-    console.log(timezoneData);
-  }, [timezoneData]);
 
 
   // Close the dropdown if click is outside the card

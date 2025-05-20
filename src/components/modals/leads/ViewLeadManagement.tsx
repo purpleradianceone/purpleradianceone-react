@@ -36,6 +36,8 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
 import AssignProductToLead from "./AssignProductToLead";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
+import LeadAssignedComponyProducts from "./LeadAssignedCompanyProduct";
+import InterestType from "../../../@types/lead-management/InterestType";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -72,7 +74,13 @@ const ViewLeadManagement = () => {
   const [industryType, setIndustryType] = useState<industryType[]>([]);
   const [stateData, setStateData] = useState<State[]>([]);
   const [district, setDistrict] = useState<District[]>([]);
-  const [leadAssignedCompanyProduct , setLeadAssignedCompanyProduct] = useState<LeadAssignedCompanyProduct[]>([])
+  const [leadAssignedCompanyProduct, setLeadAssignedCompanyProduct] = useState<
+    LeadAssignedCompanyProduct[]
+  >([]);
+  const [interestTypeData, setInterestTypeData] = React.useState<
+    InterestType[]
+  >([]);
+
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -101,7 +109,7 @@ const ViewLeadManagement = () => {
 
   const [activityData, setActivityData] = useState<activity[]>([
     {
-      person: "hrutik sargar ",
+      person: "Shrutika Kohalatkar ",
       work: "changed lead deatils",
     },
     {
@@ -325,7 +333,6 @@ const ViewLeadManagement = () => {
   >(selectedLeadData.companyUserId);
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
-  
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
@@ -361,7 +368,6 @@ const ViewLeadManagement = () => {
   const handleClickLeadOwnerChange = () => {
     setIsLeadOwnerPopUpOpen(true);
   };
-
 
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
@@ -606,40 +612,123 @@ const ViewLeadManagement = () => {
     }
   };
 
-
-  //fetch the lead assigned company product 
-  const fetchLeadCompanyProduct= async ()=>{
-    try{
-
-      const response =await axios.get(POST_API.GET_LEAD_ASSIGED_PRODUCT, {
-        params  : {
-          companyId :loginStatus.companyId ,
-          leadId : selectedLeadData.id,
-          companyProductId : null,
-          leadInterestId : null,
-          requestedBy : loginStatus.id,
+  // API call to get lead interest data
+  async function getLeadInterestData() {
+    try {
+      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
+        params: {
+          id: null,
+          name: null,
+          isActive: true,
         },
         withCredentials: true,
-      })
-      
-      if(response.status === STATUS_CODE.OK){
-        setLeadAssignedCompanyProduct(response.data)
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        setInterestTypeData(response.data);
       }
-    }catch (error: any) {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithEvent: fetchLeadCompanyProduct,
-          });
-          if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
-          }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getLeadInterestData,
+        });
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
           setIsDialogueOpen(true);
         }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
       }
+    }
   }
+  //fetch the lead assigned company product
+  const fetchLeadCompanyProduct = async () => {
+    try {
+      const response = await axios.get(POST_API.GET_LEAD_ASSIGED_PRODUCT, {
+        params: {
+          companyId: loginStatus.companyId,
+          leadId: selectedLeadData.id,
+          companyProductId: null,
+          leadInterestId: null,
+          requestedBy: loginStatus.id,
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        const mappedData: LeadAssignedCompanyProduct[] = response.data.map(
+          (item: any) => ({
+            id: item.id,
+            leadName: item["Lead Name"],
+            leadId: item["lead_id"],
+            companyProductName: item["Company Product Name"],
+            companyProductId: item["company_product_id"],
+            leadInterestName: item["Lead Interest Name"],
+            leadInterestId: item["lead_interest_id"],
+            costExpected: item["cost_expected"],
+            quantityRequired: item["quantity_required"],
+            createdBy: item["createdby"],
+            createdOn: item["createdon"],
+            updatedBy: item["updatedby"],
+            updatedOn: item["updatedon"],
+            isActive: item["isactive"],
+          })
+        );
+
+        setLeadAssignedCompanyProduct(mappedData);
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: fetchLeadCompanyProduct,
+        });
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
+
+  const handleLeadProductStatusUpdate = (
+    updatedProduct: LeadAssignedCompanyProduct
+  ) => {
+    setLeadAssignedCompanyProduct((prev) =>
+      prev.map((product) =>
+        product.id === updatedProduct.id
+          ? {
+              ...product,
+              isActive: !product.isActive,
+            }
+          : product
+      )
+    );
+  };
+  const handleLeadProductUpdate = (
+    updatedProduct: LeadAssignedCompanyProduct
+  ) => {
+    console.log(updatedProduct);
+    console.log("this is updated lead product");
+
+    setLeadAssignedCompanyProduct((prevData) =>
+      prevData.map((product) =>
+        product.id === updatedProduct.id
+          ? {
+              ...product,
+              quantityRequired: updatedProduct.quantityRequired,
+              costExpected: updatedProduct.costExpected,
+              leadInterestId: updatedProduct.leadInterestId!,
+            }
+          : product
+      )
+    );
+  };
   useEffect(() => {
     const apisCalls = async () => {
       await getLeadDetails();
@@ -649,9 +738,9 @@ const ViewLeadManagement = () => {
       await getAllState(countryChangeRef.current);
       await getAllDistrict(stateChangeRef.current);
       await fetchLeadCompanyProduct();
+      await getLeadInterestData();
     };
 
-   
     const apiCallsWhenCountryChanged = async (countryId: number | null) => {
       await getAllState(countryId);
     };
@@ -747,8 +836,8 @@ const ViewLeadManagement = () => {
       } fixed top-8 inset-0 z-10 bg-white mt-4   overflow-auto`}
     >
       {/* Header */}
-      <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b my-1 mr-1 pr-2">
-        <div className="flex gap-4">
+      <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 pr-2">
+        <div className="flex gap-6">
           <button
             className="flex items-center pr-1 text-sm text-gray-600 hover:text-blue-600 transition"
             onClick={() => {
@@ -778,23 +867,26 @@ const ViewLeadManagement = () => {
 
         <div className="flex justify-evenly w-48">
           {/* new code  */}
-          <div className="relative inline-block" >
-           
-           <button
-              onClick={()=>{
+          <div className="relative inline-block">
+            <button
+              onClick={() => {
                 setIsAddProductModalOpen(true);
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center text-gray-500 bg-transparent border rounded  transition"
             >
-             <Plus size={8}/><span>Product</span>
+              <Plus size={8} />
+              <span>Product</span>
             </button>
-              <AssignProductToLead
+            <AssignProductToLead
               selectedLeadData={selectedLeadData}
-                isOpen={isAddProductModalOpen}
-                onClose={()=>{
-                  setIsAddProductModalOpen(false);
-                }}
-              />
+              isOpen={isAddProductModalOpen}
+              onClose={() => {
+                setIsAddProductModalOpen(false);
+              }}
+              leadAssignedComponyProduct={leadAssignedCompanyProduct}
+              fetchLeadCompanyProduct={fetchLeadCompanyProduct}
+              interestTypeData={interestTypeData}
+            />
           </div>
           <button
             className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
@@ -813,7 +905,8 @@ const ViewLeadManagement = () => {
         </div>
       </div>
 
-      <div className="w-full flex">
+      {/* Lead Basic Info */}
+      <div className="w-full flex ">
         <div className="ml-4 flex justify-between w-3/4   whitespace-nowrap overflow-auto">
           <Detail
             label="Email"
@@ -893,9 +986,10 @@ const ViewLeadManagement = () => {
         )}
       </div>
 
-      <div className="m-3 mt-2 pl-1 flex h- bg-slate-100 flex-col shadow-md rounded-xl">
-        <div className="flex justify-between text-xs text-gray-600 mb-1 px-2">
-          <span>Lead Status</span>
+      {/* Lead Status Section */}
+      <div className="m-3 mt-2 pl-1 flex h- bg-slate-100 flex-col shadow-md rounded-md">
+        <div className="flex justify-between text-xs  mb-1 px-2">
+          <span className="font-semibold ">Lead Status</span>
           <button
             onClick={() => {
               setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
@@ -911,7 +1005,7 @@ const ViewLeadManagement = () => {
             <button
               title={item.name}
               key={item.id}
-              className={`flex-1 text-xs text-ellipsis overflow-hidden ${
+              className={`flex-1 text-xs text-ellipsis  overflow-hidden ${
                 selectedLeadData.leadStatus === item.name
                   ? "bg-blue-700 text-white hover:bg-blue-900"
                   : "hover:bg-blue-700 hover:text-white"
@@ -952,8 +1046,9 @@ const ViewLeadManagement = () => {
         )}
       </div>
 
+      {/* Lead Details & Meeting Section */}
       <div className=" w-[100%] h-auto flex  shadow-sm    ">
-        {/* First child: 70% width */}
+        {/* First child: 50% width */}
         <div className="w-[50%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
             handleLeadActivityChange={(person: string, work: string) => {
@@ -972,17 +1067,28 @@ const ViewLeadManagement = () => {
             countries={countries}
             selectedLeadData={selectedLeadData}
             industryType={industryType}
+            getLeadDetails={getLeadDetails}
           />
         </div>
 
-        {/* Second child: 30% width */}
-        <div className="w-[50%] h-full bg-green-50 border my-2 text-white p-4">
-          This div should get 30% width and full height
-        </div>
+        {/* Second child: 50% width */}
+        <div className="w-[50%] h-full bg-green-50 border my-2  p-4"></div>
       </div>
-      <div className=" w-[100%]  flex gap-2  shadow-sm    ">
-        {/* First child: 70% width */}
-        <div className="w-[65%]     bg-gray-0 shadow-md m-2 rounded">
+
+      {/* Assigned Company Product & Activity Section */}
+      <div className=" w-[100%]   flex gap-1  shadow-sm">
+        {/* First child: 50% width */}
+        <div className="w-[50%] bg-slate-100 shadow-xl  rounded">
+          <LeadAssignedComponyProducts
+            data={leadAssignedCompanyProduct}
+            interestTypeData={interestTypeData}
+            handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
+            handleLeadProductUpdate={handleLeadProductUpdate}
+          />
+        </div>
+
+        {/* Second child: 50% width */}
+        <div className="w-[50%] h-full  border my- p-4">
           <div className="sticky w-full bg-slate-100 font-sans text-sm font-semibold ">
             Activity
           </div>
@@ -1000,11 +1106,6 @@ const ViewLeadManagement = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Second child: 30% width */}
-        <div className="w-[35%] h-full bg-green-50 border my-2 text-white p-4">
-          This div should get 30% width and full height
         </div>
       </div>
 
@@ -1158,7 +1259,7 @@ const Detail: React.FC<DetailProps> = ({
       {isEditing ? (
         type === "select" ? (
           <select
-            className="text-xs text-gray-700 "
+            className="text-sm text-gray-700 "
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
@@ -1174,7 +1275,7 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-xs focus:outline-2x  text-gray-700 border-none "
+              className="text-sm text-gray-700 p-0 m-0 border-none focus:outline-none focus:ring-0 w-auto"
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1186,7 +1287,7 @@ const Detail: React.FC<DetailProps> = ({
         <div>
           <p
             title={value}
-            className="font-medium text-xs text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
+            className="font-medium text-sm text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
           >
             {value || "-"}
           </p>
@@ -1194,7 +1295,7 @@ const Detail: React.FC<DetailProps> = ({
       ) : label === "Lead Owner" ? (
         <div
           title={value}
-          className={`font-medium text-xs text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`font-medium text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
           {value || "-"}
@@ -1205,7 +1306,7 @@ const Detail: React.FC<DetailProps> = ({
           className={`font-medium ${
             label === "Name"
               ? "text-sm text-black"
-              : "text-xs md:whitespace-nowrap md:overflow-hidden text-gray-900"
+              : "text-sm md:whitespace-nowrap md:overflow-hidden text-gray-900"
           }   whitespace-nowrap overflow-hidden   cursor-pointer`}
           onClick={handleClick}
         >

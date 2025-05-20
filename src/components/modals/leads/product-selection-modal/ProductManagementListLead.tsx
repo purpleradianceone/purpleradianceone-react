@@ -22,7 +22,7 @@ function ProductsManagementListLead({
   // handleSelectedProductChange,
   interestTypeData,
   handleProductCheckboxChange,
-  preservedSelectedProductIdArray,
+  alreadyAssignedCompanyProduct
 }: LeadProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
@@ -249,11 +249,11 @@ function ProductsManagementListLead({
             style={{ height: "75vh", width: "100%" }}
           >
             <ProductsManagementGridLead
-              preservedSelectedProductIdArray={preservedSelectedProductIdArray}
               handleProductCheckboxChange={handleProductCheckboxChange}
               products={products}
               // handleSelectedProductChange={handleSelectedProductChange}
               interestTypeData={interestTypeData}
+              alreadyAssignedCompanyProduct={alreadyAssignedCompanyProduct}
             />
           </div>
         </div>
