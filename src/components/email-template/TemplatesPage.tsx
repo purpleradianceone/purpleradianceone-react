@@ -28,14 +28,12 @@ type EmailTemplate = {
 type TemplateType = {
   id: number;
   name: string;
+  is_host_email:boolean;
   isActive: boolean;
 };
 
 
-// const findTemplateById = (id: number): TemplateType => {
-//   const template = TEMPLATE_TYPES.find((template) => template.id === id);
-//   return template ?? { id: 1, name: 'Welcome company user', isActive: true };
-// };
+
 
 const templates: EmailTemplate[] = [
   {
@@ -70,12 +68,13 @@ export const TemplatesPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
  
-const handleTemplateCreate = (typeId: number) => {
+const handleTemplateCreate = (type: string) => {
     setShowModal(false);
-    navigate(`${ROUTES_URL.EMAIL_TEMPLATE_CREATE}?type=${typeId}`);
+
+    navigate(`${ROUTES_URL.EMAIL_TEMPLATE_CREATE}?type=${type}`);
   };
   return (
-    <div className="flex h-screen font-sans text-gray-800">
+    <div className="flex place-items-start min-w-full h-screen font-sans text-gray-800">
       <Sidebar onCreate={() => setShowModal(true)} />
       <div className="flex-1 p-4">
         <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
@@ -87,12 +86,12 @@ const handleTemplateCreate = (typeId: number) => {
 };
 
 const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
-  <div className="w-64 border-r p-4">
-    <button className="bg-blue-500 text-white w-full py-2 rounded mb-4" onClick={onCreate}>
+  <div className="  w-64 border-r p-4">
+    <button className="fixed top-14 right-4 bg-blue-500 text-white w-fit py-2 rounded mb-4 p-3" onClick={onCreate}>
       + Create New Template
     </button>
-    <nav className="space-y-2 text-sm">
-      <a href="" className="text-blue-600 font-semibold block">All Templates</a>
+    <nav className="sticky top-14 left-4 space-y-2 text-sm">
+      <a href="" className="left-2 text-blue-600 font-semibold block">All Templates</a>
       <a href="">Favorites</a>
       <a href="">Associated Templates</a>
       <a href="">Created by me</a>
@@ -145,20 +144,21 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates }) => (
 
 type ModalProps = {
   onClose: () => void;
-  onCreate: (typeId: number) => void;
+  onCreate: (typeId: string) => void;
 };
 
 const TemplateTypeModal: React.FC<ModalProps> = ({ onClose, onCreate }) => {
-  const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
+  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
 
   const handleSubmit = () => {
     if (selectedTypeId !== null) {
       onCreate(selectedTypeId);
     }
   };
-   const {loginStatus} = useLoggedInUserContext();
+   
+const {loginStatus} = useLoggedInUserContext();
 
-  const [templateType,setTemplateType] = useState<TemplateType[]>([]);
+const [templateType,setTemplateType] = useState<TemplateType[]>([]);
   
 const getTemplateTypes= async()=>{
   setTemplateType([]);
@@ -177,6 +177,7 @@ const getTemplateTypes= async()=>{
         setTemplateType((prev)=>[...prev,{
           id:res.id,
           name:res.name,
+          is_host_email:res.is_host_email,
           isActive:res.isactive
         }])
       })
@@ -194,12 +195,12 @@ useEffect(()=>{
         <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>
         <select
           value={selectedTypeId ?? ''}
-          onChange={(e) => setSelectedTypeId(Number(e.target.value))}
+          onChange={(e) => setSelectedTypeId(e.target.value)}
           className="w-full mb-3 border px-3 py-2 rounded"
         >
           <option value="" disabled>Select template type</option>
           {templateType.filter(t => t.isActive).map((type) => (
-            <option key={type.id} value={type.id}>{type.name}</option>
+            <option key={type.id} value={JSON.stringify(type!)}>{type.name}</option>
           ))}
         </select>
         <div className="flex justify-between mt-4">

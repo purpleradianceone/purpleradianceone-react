@@ -36,6 +36,8 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
       });
   };
 
+ 
+
   return (
     <div style={{ display: "flex", gap: "20px" }}>
     <button
@@ -537,7 +539,7 @@ function extractHtmlFromLexical(editorState: any): string {
   };
 
   // Process all children of the root
-  return editorState.root.children.map(processNode).join('\n');
+  return editorState.root.children.map(processNode).join('');
 }
 
 
@@ -562,5 +564,6 @@ function escapeHtml(unsafe: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/'/g, "&#039;")
+    ;
 }
