@@ -269,6 +269,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Prd Team/users"
                         />
                       )}
+                      
                       <NavItem
                         to={ROUTES_URL.LEAD_SETTINGS}
                         icon={<SettingsIcon size={SIZE.TWENTY} />}

@@ -8,6 +8,7 @@ import { router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
 import { PanelProvider } from "./context/panel/usePanel";
+import { UserPreferenceContextProvider } from "./context/user/UserPreference";
 
 /**
  *
@@ -15,6 +16,7 @@ import { PanelProvider } from "./context/panel/usePanel";
  */
 function App() {
   return (
+    <UserPreferenceContextProvider>
     <PanelProvider>
       <AccessManagementContextProvider>
         <LoggedInUserContextProvider>
@@ -22,6 +24,7 @@ function App() {
         </LoggedInUserContextProvider>
       </AccessManagementContextProvider>
     </PanelProvider>
+    </UserPreferenceContextProvider>
   );
 }
 

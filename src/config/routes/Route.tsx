@@ -29,7 +29,7 @@ import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
 import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
 import { EditorCanvas } from "../../components/email-template/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
-import UserProfileSetting from "../../components/user-profile/UserProfileSetting";
+import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
 
 
 export const router = createBrowserRouter([
@@ -267,7 +267,7 @@ export const router = createBrowserRouter([
     element : (
       <PrivateRoute>
         <Navbar>
-          <UserProfileSetting/>
+          <UserPrerefenceManagement/>
         </Navbar>
       </PrivateRoute>
     )

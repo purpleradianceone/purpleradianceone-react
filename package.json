@@ -41,7 +41,7 @@
     "react-modal": "^3.16.3",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^7.1.1",
-    "react-select": "^5.10.0",
+    "react-select": "^5.10.1",
     "tinymce": "^7.8.0",
     "uuid": "^11.1.0"
   },
