@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, {  useState } from "react";
+import React, {  useRef, useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
 import State from "../../../@types/general/State";
@@ -33,7 +33,8 @@ const LeadDetails = ({
   stateData,
   district,
   selectedLeadData,
-  handleLeadActivityChange
+  handleLeadActivityChange,
+  getLeadDetails
 }: {
   handleLeadActivityChange : (person : string , work:string) => void,
   leadDetailsData: LeadDetailsData;
@@ -43,6 +44,7 @@ const LeadDetails = ({
   industryType: industryType[];
   stateData: State[];
   district: District[];
+  getLeadDetails : () => void,
 }) => {
   // const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
 
@@ -70,6 +72,7 @@ const LeadDetails = ({
   };
 
   const { loginStatus } = useLoggedInUserContext();
+  const createNewDetailRef= useRef<boolean>(false);
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -87,12 +90,15 @@ const LeadDetails = ({
       });
       return;
     }
-    let createNewDetail = false;
+    // let createNewDetail = false;
     if (leadDetailsData.id === null || leadDetailsData.id === 0) {
-      createNewDetail = true;
+      // createNewDetail = true;
+      createNewDetailRef.current=true;
+    }else{
+      createNewDetailRef.current=false;
     }
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
-      ...(createNewDetail
+      ...(createNewDetailRef.current
         ? { lead_id: selectedLeadData.id }
         : { id: leadDetailsData.id }),
       company_id: loginStatus.companyId,
@@ -105,12 +111,12 @@ const LeadDetails = ({
       job_title: leadDetailsData.job_title,
       state_id: leadDetailsData.state_id,
       website: leadDetailsData.website,
-      ...(createNewDetail
+      ...(createNewDetailRef.current
         ? { createdby: loginStatus.id }
         : { updatedby: loginStatus.id }),
     };
 
-    const url = createNewDetail
+    const url = createNewDetailRef.current
       ? POST_API.CREATE_LEAD_DETAILS
       : POST_API.UPDATE_LEAD_DETAILS;
     try{
@@ -130,6 +136,8 @@ const LeadDetails = ({
           }); 
           setShowSaveLeadButton(false);
           handleLeadActivityChange(loginStatus.fullName!, response.data.message)
+          createNewDetailRef.current=false;
+          getLeadDetails();
           return;
         }
         if (response.data.status === false) {
@@ -190,19 +198,19 @@ const LeadDetails = ({
   return (
     <div>
       <form>
-        <div className="w-auto flex justify-between bg-slate-200 px-2 mb-1  ">
-          <span className="text-sm text-gray-800">Details</span>
+        <div className="w-auto flex justify-between bg-slate-200 px-1 mb-1  ">
+          <span className="text-sm font-semibold text-gray-800">Details</span>
           {
             showSaveLeadButton &&
             <button
-            className="text-xs text-white mb-1 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
+            className="text-xs text-white mb-0 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
             onClick={handleSave}
             >
             Save
           </button>
           }
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             type="text"
             label="Job title"
@@ -243,7 +251,7 @@ const LeadDetails = ({
 
           <FormField
             type="text"
-            label="Additional contact number"
+            label="Add. Contact number"
             value={leadDetailsData.additional_contact_number}
             onChange={(e) => {
               setShowSaveLeadButton(true)
@@ -382,7 +390,7 @@ const FormField = ({
       >
         {!isEditing ? (
           <span
-            className="text-gray-900  text-xs cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="text-gray-900  text-sm cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
               selectOptions
                 ?.find((opt) => opt.value === value)
@@ -391,12 +399,12 @@ const FormField = ({
           >
             {type === "select"
               ? selectOptions?.find((opt) => opt.value === value)?.label || (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-sm text-gray-500">
                     Select {label.toLowerCase()}
                   </span>
                 )
               : value || (
-                  <span className="text-xs text-gray-500">Add here...</span>
+                  <span className="text-sm text-gray-500">Add here...</span>
                 )}
           </span>
         ) : type === "select" ? (
@@ -405,7 +413,7 @@ const FormField = ({
             value={value}
             onBlur={handleBlur}
             onChange={onChange}
-            className="text-gray-900 font-semibold border border-gray-300 rounded p-1 text-xs focus:outline-none"
+            className="text-gray-900 font-semibold border border-gray-300 w-36 rounded p-1 text-sm focus:outline-none"
           >
             <option value="">Select {label}</option>
             {selectOptions?.map((opt) => (
@@ -423,7 +431,7 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
-            className="text-gray-900 text-xs border border-gray-300 rounded p-1 focus:outline-none"
+            className="text-gray-900 text-sm border border-gray-300 rounded p-1 focus:outline-none"
           />
         ) : (
           <input
@@ -432,7 +440,7 @@ const FormField = ({
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
-            className="text-gray-900 text-xs  border-none border-gray-300 focus:outline-none"
+            className="text-gray-900 text-sm  border-none border-gray-300 focus:outline-none"
           />
         )}
       </div>

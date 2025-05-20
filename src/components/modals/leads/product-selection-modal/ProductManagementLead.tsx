@@ -15,18 +15,23 @@ import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import ProductsManagementListLead from "./ProductManagementListLead";
 import ApiError from "../../../../@types/error/ApiError";
 import InterestType from "../../../../@types/lead-management/InterestType";
-import { LeadProductsManagementGridState } from "./ProductManagementAgGridLead";
+import LeadAssignedCompanyProduct from "../../../../@types/lead-management/LeadAssignedCompanyProduct";
 
 function ProductManagementLead({
   // handleSelectedProductChange,
+  AssignLeadId,
   interestTypeData,
   handleProductCheckboxChange,
-  preservedSelectedProductIdArray
+
+  alreadyAssignedCompanyProduct// these are already assigned products
 }:{
   // handleSelectedProductChange : (product: number[]) =>void
   interestTypeData : InterestType[],
-  handleProductCheckboxChange: (params:LeadProductsManagementGridState , event: React.ChangeEvent<HTMLInputElement>) => void;
-  preservedSelectedProductIdArray : number[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleProductCheckboxChange: (params:any , event: React.ChangeEvent<HTMLInputElement>) => void;
+  alreadyAssignedCompanyProduct : LeadAssignedCompanyProduct[],
+  AssignLeadId: number
+
 }) {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -56,6 +61,10 @@ function ProductManagementLead({
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers();
 
+  const [leadId , setLeadId] = useState<number>(AssignLeadId);
+  useEffect(()=>{
+    setLeadId(AssignLeadId)
+  },[AssignLeadId])
   const fetchCompanyProducts = async () => {
     if (userHasAccessToViewProduct) {
       const offset = (currentPage - 1) * pageSize;
@@ -68,7 +77,7 @@ function ProductManagementLead({
       setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
-        id : null,
+        lead_id : leadId,
         requestedby: loginStatus.id,
         limit: pageSize,
         offset: offset,
@@ -79,7 +88,7 @@ function ProductManagementLead({
 
       try {
         const response = await axios.post(
-          POST_API.GET_PRODUCTS,
+          POST_API.GET_COMPANY_PRODUCT_NOT_ASSIGNED_TO_LEAD,
           getProductPostData,
           {
             withCredentials: true,
@@ -142,6 +151,14 @@ function ProductManagementLead({
     navigate(ROUTES_URL.SIGN_IN);
   };
 
+
+  useEffect(()=>{
+    console.log("this is lead id ");
+    
+    console.log(leadId);
+    
+  },[])
+
   useEffect(() => {
     setTimeout(() => {
       setProductsData([]);
@@ -168,7 +185,6 @@ function ProductManagementLead({
         <>
           <div>
              <ProductsManagementListLead
-             preservedSelectedProductIdArray={preservedSelectedProductIdArray}
              handleProductCheckboxChange={handleProductCheckboxChange}
               onEndDateChange={handleEndDateChange}
               onStartDateChange={handleStartDateChange}
@@ -186,6 +202,8 @@ function ProductManagementLead({
               products={productsData}
               // handleSelectedProductChange={handleSelectedProductChange}
               interestTypeData ={interestTypeData}
+              alreadyAssignedCompanyProduct={alreadyAssignedCompanyProduct}
+
             />                      
           </div>
           <DialogueBox

@@ -1,30 +1,115 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useMemo, useState } from "react";
+import React, {
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import {
   AllCommunityModule,
   ColDef,
   ICellRendererParams,
   themeBalham,
+  GridApi,
+    GridReadyEvent,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { INNERHTML } from "../../../../constants/AppConstants"; // Adjust the path if needed
-import LeadProductsManagementGridProps from "../../../../@types/ag-grid/LeadProductsManagementGridProps"; // Adjust the path if needed
-import { Product } from "../../../../@types/products/ProductsManagementProps"; // Adjust the path if needed
+import LeadProductsManagementGridProps from "../../../../@types/ag-grid/LeadProductsManagementGridProps";
+import { Product } from "../../../../@types/products/ProductsManagementProps";
 
-export interface LeadProductsManagementGridState extends Product {
-  expectedCost: number;
-  requiredQuantity: number;
-  interest: string;
-}
 const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   products,
   interestTypeData,
   handleProductCheckboxChange,
-  preservedSelectedProductIdArray,
+  alreadyAssignedCompanyProduct = [],
 }) => {
+  const [gridApi, setGridApi] = useState<GridApi | null>(null);
+  const [rowData, setRowData] = useState<Product[]>(products); // State for row data
+  const gridRef = useRef<AgGridReact>(null);
+
+  // Update rowData when products prop changes
+  useEffect(() => {
+    setRowData(products);
+  }, [products]);
+
+  const actionCellRenderer = useCallback(
+    (params: ICellRendererParams) => {
+      const currentId = params.data.id;
+      const alreadyAssignedIds =
+        alreadyAssignedCompanyProduct?.map((p) => p.companyProductId) || [];
+
+      const isAlreadyAssigned = alreadyAssignedIds.includes(currentId);
+      const isInterestFilled =
+        params.data.interest != null && params.data.interest !== "";
+      const isQtyFilled =
+        params.data.requiredQuantity != null &&
+        params.data.requiredQuantity !== "";
+      const isCostFilled =
+        params.data.expectedCost != null && params.data.expectedCost !== "";
+
+      const allFieldsFilled = isInterestFilled && isQtyFilled && isCostFilled;
+
+      const isBlocked = !allFieldsFilled && !isAlreadyAssigned;
+      const isChecked = isAlreadyAssigned || params.data.checked;
+      const title = isAlreadyAssigned
+        ? "Already Assigned to Lead"
+        : isBlocked
+        ? "Please fill Interest, Required Quantity and Expected Cost"
+        : "";
+
+      const handleCheckboxChangeLocal = (
+        event: React.ChangeEvent<HTMLInputElement>
+      ) => {
+        if (isBlocked || isAlreadyAssigned) {
+          event.preventDefault();
+          return;
+        }
+        if (handleProductCheckboxChange) {
+          handleProductCheckboxChange(params.data, event);
+        }
+
+         if (gridApi) {
+                    // Safely access params.node.id
+                    const rowNodeId = params.node.id;
+                    if (rowNodeId) {
+                        const rowNode = params.api.getRowNode(rowNodeId);
+                        if (rowNode) {
+                            // Directly update the data in the grid
+                            rowNode.setDataValue("checked", event.target.checked);
+                            // No need to update the entire rowData state here.  Ag-Grid knows about the change.
+                            params.data.checked = event.target.checked; // Keep data in cellRenderer consistent
+                            params.api.refreshCells({
+                                rowNodes: [rowNode],
+                                columns: ["Action"],
+                                force: true,
+                            });
+                        }
+                    }
+                }
+      };
+
+      return (
+        <div title={title}>
+          <input
+            type="checkbox"
+            onChange={handleCheckboxChangeLocal}
+            checked={isChecked}
+            disabled={isChecked && isAlreadyAssigned }
+            className={`accent-blue-500 ${
+              isBlocked || isAlreadyAssigned
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+          />
+        </div>
+      );
+    },
+    [alreadyAssignedCompanyProduct, handleProductCheckboxChange, gridApi]
+  );
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -40,21 +125,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         filter: false,
         width: 60,
         maxWidth: 60,
-        cellRenderer: (params: any) => {
-          const isChecked = preservedSelectedProductIdArray
-            ? preservedSelectedProductIdArray.includes(params.data.id)
-            : false;
-          return (
-            <input
-              type="checkbox"
-              onChange={(event) => {
-                handleProductCheckboxChange!(params.data, event);
-              }}
-              checked={isChecked}
-              className="cursor-pointer accent-blue-500"
-            />
-          );
-        },
+        cellRenderer: actionCellRenderer,
       },
       {
         field: "interest",
@@ -64,27 +135,20 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         cellEditorParams: {
           values:
             Array.isArray(interestTypeData) &&
-            interestTypeData.map((item) => JSON.stringify(item)), // Store full object as string
+            interestTypeData.map((item) => item.id),
         },
         flex: 1,
         valueFormatter: (params) => {
-          try {
-            const interest =
-              typeof params.value === "string"
-                ? JSON.parse(params.value)
-                : params.value;
-            return interest?.name;
-          } catch {
+          if (params.value == null || params.value === "")
             return "Select Interest";
-          }
+          const interestObj = interestTypeData.find(
+            (i) => i.id === params.value
+          );
+          return interestObj ? interestObj.name : "Unknown Interest";
         },
         valueParser: (params) => {
-          try {
-            const parsed = JSON.parse(params.newValue);
-            return parsed.id; // return ID to store
-          } catch {
-            return null;
-          }
+          const selectedId = params.newValue;
+          return selectedId;
         },
       },
       {
@@ -92,16 +156,33 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         headerName: "Req. Quantity",
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
-          const [value, setValue] = useState(params.value ?? "");
+          const [value, setValue] = useState<string | number>(
+            params.value ?? ""
+          );
 
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const val = e.target.value;
             if (/^\d*$/.test(val)) {
               setValue(val);
-              params.node.setDataValue(
-                "requiredQuantity",
-                val === "" ? "" : Number(val)
-              );
+              const numValue = val === "" ? null : Number(val);
+
+              // Update the row data directly in the grid.
+              if (gridApi) {
+                const rowNodeId = params.node.id;
+                if (rowNodeId) {
+                  const rowNode = params.api.getRowNode(rowNodeId);
+                  if (rowNode) {
+                    rowNode.setDataValue("requiredQuantity", numValue);
+                  }
+                }
+              }
+              params.node.setDataValue("requiredQuantity", numValue);
+
+              params.api.refreshCells({
+                rowNodes: [params.node],
+                columns: ["Action"],
+                force: true,
+              });
             }
           };
 
@@ -117,62 +198,37 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
           );
         },
       },
-      // {
-      //   field: "requiredQuantity",
-      //   headerName: "Req. Quantity",
-      //   flex: 1,
-      //   cellRenderer: (params: ICellRendererParams) => {
-      //     return (
-      //       <input
-      //         type="number"
-      //         value={params.value}
-      //         onChange={(e) => {
-      //           params.node.setDataValue(
-      //             "requiredQuantity",
-      //             Number(e.target.value)
-      //           );
-      //         }}
-      //         className="w-full h-6 border border-gray-300 rounded"
-      //       />
-      //     );
-      //   },
-      // },
-      // {
-      //   hide:true,
-      //   field: "expectedCost",
-      //   headerName: "Expected Cost",
-      //   flex: 1,
-      //   cellRenderer: (params: ICellRendererParams) => {
-      //     return (
-      //       <input
-      //         type="number"
-      //         value={params.value}
-      //         onChange={(e) => {
-      //           params.node.setDataValue(
-      //             "expectedCost",
-      //             Number(e.target.value)
-      //           );
-      //         }}
-      //         className="w-full h-6 border border-gray-300 rounded"
-      //       />
-      //     );
-      //   },
-      // },
       {
         field: "expectedCost",
         headerName: "Expected Cost",
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
-           const [value, setValue] = useState(params.value ?? "");
+          const [value, setValue] = useState<string | number>(
+            params.value ?? ""
+          );
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const val = e.target.value;
-            // Allow only valid decimal numbers (optional leading digits, one dot, optional decimal)
             if (/^\d*\.?\d*$/.test(val)) {
-              setValue(val)
-              params.node.setDataValue(
-                "expectedCost",
-                val === "" ? "" : Number(val)
-              );
+              setValue(val);
+              const numValue = val === "" ? null : Number(val);
+
+              // Update the row data directly in the grid.
+              if (gridApi) {
+                const rowNodeId = params.node.id;
+                if (rowNodeId) {
+                  const rowNode = params.api.getRowNode(rowNodeId);
+                  if (rowNode) {
+                    rowNode.setDataValue("expectedCost", numValue);
+                  }
+                }
+              }
+              params.node.setDataValue("expectedCost", numValue);
+
+              params.api.refreshCells({
+                rowNodes: [params.node],
+                columns: ["Action"],
+                force: true,
+              });
             }
           };
 
@@ -183,7 +239,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
               onChange={handleChange}
               className="w-full h-6 border border-gray-300 rounded px-1"
               inputMode="decimal"
-              pattern="\d*"
+              pattern="\d*\.?\d*"
             />
           );
         },
@@ -227,12 +283,11 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         },
       },
       {
-        hide: true,
+        hide: false,
         field: "isActive",
         headerName: "Active",
         sortable: true,
         filter: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: ICellRendererParams<Product>) => {
           return (
             <div className="flex items-center gap-1 mt-1">
@@ -276,9 +331,9 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         hide: true,
         valueFormatter: (params) => {
           if (params.value === 0) {
-            return ""; // Return an empty string if the value is 0
+            return "";
           }
-          return params.value; // Otherwise, return the original value
+          return params.value;
         },
       },
       {
@@ -307,18 +362,33 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         flex: 1,
       },
     ],
-    [preservedSelectedProductIdArray]
+    [interestTypeData, alreadyAssignedCompanyProduct, actionCellRenderer]
   );
 
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
-      // minWidth: 150,
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
     };
   }, []);
+
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    setGridApi(params.api);
+  }, []);
+
+  useEffect(() => {
+    if (gridApi) {
+      const initialRowData = products.map((product) => ({
+        ...product,
+        checked: alreadyAssignedCompanyProduct.some(
+          (p) => p.companyProductId === product.id
+        ),
+      }));
+      setRowData(initialRowData);
+    }
+  }, [gridApi, products, alreadyAssignedCompanyProduct]);
 
   return (
     <div
@@ -326,14 +396,25 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={products}
+        ref={gridRef}
+        rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        overlayNoRowsTemplate={`<span>No Products Available</span>`}
         theme={themeBalham}
         rowSelection="multiple"
         singleClickEdit={true}
+        onCellValueChanged={(params) => {
+          if (["interest"].includes(params.colDef.field!)) {
+            params.api.refreshCells({
+              rowNodes: [params.node],
+              columns: ["Action"],
+              force: true,
+            });
+          }
+        }}
+        onGridReady={onGridReady}
       />
     </div>
   );

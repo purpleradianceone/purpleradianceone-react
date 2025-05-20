@@ -214,8 +214,7 @@ function SignInForm() {
                       loginStatusRef.current.active_users_in_company <=
                         loginStatusRef.current.subscription_allowed_users
                     ) {
-                      setTimeout(() => {
-                        axios
+                       axios
                           .get(POST_API.GET_COMPANY_USER_PREFERENCE, {
                             params: {
                               companyId: loginStatusRef.current.company_id,
@@ -248,6 +247,7 @@ function SignInForm() {
                               });
                             }
                           });
+                      setTimeout(() => {
                         navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
                       }, 1000);
                     }

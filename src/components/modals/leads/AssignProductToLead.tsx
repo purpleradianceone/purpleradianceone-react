@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { X } from "lucide-react";
 
 import axios from "axios";
@@ -23,20 +20,31 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { LeadProductsManagementGridState } from "./product-selection-modal/ProductManagementAgGridLead";
+import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 
 const AssignProductToLead = ({
   selectedLeadData,
   onClose,
   isOpen,
+  leadAssignedComponyProduct,
+  fetchLeadCompanyProduct,
+  interestTypeData,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedLeadData: any;
   onClose: () => void;
   isOpen: boolean;
+  leadAssignedComponyProduct: LeadAssignedCompanyProduct[];
+  fetchLeadCompanyProduct: () => void;
+  interestTypeData: InterestType[];
 }) => {
   const navigate = useNavigate();
+  const { position } = usePanel();
+  const { loginStatus } = useLoggedInUserContext();
 
+  const [showSaveButton, SetShowSaveButton] = useState<boolean>(false);
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -58,51 +66,8 @@ const AssignProductToLead = ({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const { loginStatus } = useLoggedInUserContext();
-  const [interestTypeData, setInterestTypeData] = React.useState<
-    InterestType[]
-  >([]);
-
-  const { position } = usePanel();
-  //STATE FOR PRODUCT ID PRESERVATION
-  const [preservedProductIdArray, setPreservedProductIdArray] = useState<
-    number[]
-  >([]);
-
   //this state is used for getting data
   const [itemData, setItemData] = React.useState<ItemData[]>([]);
-
-  // API call to get lead interest data
-  async function getLeadInterestData() {
-    try {
-      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
-        params: {
-          id: null,
-          name: null,
-          isActive: true,
-        },
-        withCredentials: true,
-      });
-
-      if (response.status === STATUS_CODE.OK) {
-        setInterestTypeData(response.data);
-      }
-    } catch (error: ApiError | any) {
-      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunction: getLeadInterestData,
-        });
-        if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
-        }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
-      }
-    }
-  }
 
   const handleProductAddToLead = async (
     event: React.FormEvent<HTMLButtonElement>
@@ -112,7 +77,7 @@ const AssignProductToLead = ({
     const PostDataAssignProductToLead: AssignProductToLeadType = {
       company_id: loginStatus.companyId,
       lead_id: selectedLeadData.id,
-      input_data : itemData,
+      input_data: itemData,
       createdby: loginStatus.id,
     };
     try {
@@ -125,16 +90,25 @@ const AssignProductToLead = ({
       );
 
       if (response.status === STATUS_CODE.OK) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
-
+        if (response.data.status) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
+          await fetchLeadCompanyProduct();
+        }
+        if (response.data.status === false) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "error",
+          });
+        }
         //delay before closing
         setTimeout(() => {
           onClose();
         }, 1000);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -153,55 +127,48 @@ const AssignProductToLead = ({
   };
 
   useEffect(() => {
-    if(isOpen){
-      getLeadInterestData();
+    if (!isOpen) {
+      setItemData([]);
     }
   }, [isOpen]);
 
   //NOTE : THIS IS THE CODE FOR GETTING SELECTED PRODUCT
   const handleProductCheckboxChange = (
-    params: LeadProductsManagementGridState,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: any,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const parsedInterest: InterestType = JSON.parse(params.interest);
     if (event.target.checked) {
-      setPreservedProductIdArray((prev) => [...prev, params.id!]);
       setItemData((prev) => [
         ...prev,
         {
           company_product_id: params.id!,
           cost_expected: params.expectedCost,
-          lead_interest_id: parsedInterest.id,
+          lead_interest_id: params.interest,
           quantity_required: params.requiredQuantity,
         },
       ]);
     } else if (!event.target.checked) {
-      setPreservedProductIdArray((prev) =>
-        prev.filter((id) => id !== params.id)
-      );
       setItemData((prev) =>
         prev.filter((item) => item.company_product_id !== params.id)
       );
     }
   };
-
   useEffect(() => {
-    console.log(itemData);
+    if (itemData.length > 0) {
+      SetShowSaveButton(true);
+    } else {
+      SetShowSaveButton(false);
+    }
   }, [itemData]);
 
   if (!isOpen) return null;
   return (
     <div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
-
       <div
-        className={` fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4`}
+        className={`${
+          position === "top" ? "top-12" : ""
+        } fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4`}
       >
         <div
           className={` ${
@@ -216,7 +183,10 @@ const AssignProductToLead = ({
             <div className="flex items-center gap-5">
               <button
                 onClick={handleProductAddToLead}
-                className="bg-blue-600 text-white px-2 rounded-xl text-md hover:bg-blue-700"
+                className={`${
+                  showSaveButton ? "bg-blue-700" : "bg-blue-400"
+                }  text-white px-2 rounded-xl text-md `}
+                disabled={!showSaveButton}
               >
                 Save
               </button>
@@ -231,9 +201,10 @@ const AssignProductToLead = ({
           {/* NOTE : CALL TO THE MODAL COMPONENT */}
           <div className=" p-1">
             <ProductManagementLead
+              AssignLeadId={selectedLeadData.id}
               handleProductCheckboxChange={handleProductCheckboxChange}
               interestTypeData={interestTypeData}
-              preservedSelectedProductIdArray={preservedProductIdArray}
+              alreadyAssignedCompanyProduct={leadAssignedComponyProduct}
             />
           </div>
         </div>
@@ -245,6 +216,13 @@ const AssignProductToLead = ({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
       />
     </div>
   );

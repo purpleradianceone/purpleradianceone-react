@@ -1,10 +1,10 @@
 type LeadAssignedCompanyProduct = {
     id: number;
-    lead_id: number;
+    leadId: number;
     leadName: string;
     companyProductId: number;
     companyProductName: string;
-    leadinterestId: number;
+    leadInterestId: number;
     leadInterestName: string;
     quantityRequired: number;
     costExpected: number;
