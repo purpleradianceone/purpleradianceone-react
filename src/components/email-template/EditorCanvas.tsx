@@ -18,7 +18,7 @@ import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
 import { TableBlock } from "./TableBlock";
-import { LucideCode, LucideEdit, LucideMail,  } from "lucide-react";
+import { LucideCode,  LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
 import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
@@ -131,7 +131,6 @@ if(params){
     setPreviewHtml(updatedHtml); // Keep modal in sync too
   };
 
-    const [isOpen, setIsOpen] = useState(false);
 
 
   return (<>
@@ -173,7 +172,18 @@ if(params){
           ✏️ Create Email Template
         </button>
         <button
-          onClick={() => setMode('insert')}
+          onClick={() => {
+
+            const confirmed = window.confirm(
+              "\nIf you go to the Insert Email Template page, all the work done on Create Email Template will be vanished. \n\nDo you want to continue?"
+          );
+            if (confirmed) {
+                setMode('insert');
+            }
+
+            
+          
+          }}
           style={{
             padding: '6px 12px',
             fontSize: '14px',
