@@ -18,7 +18,7 @@ import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
 import { TableBlock } from "./TableBlock";
-import { LucideCode, LucideEdit, LucideMail, LucideMailCheck, LucideMailX, LucideMessageCircleCode, LucideMessageCirclePlus, } from "lucide-react";
+import { LucideCode, LucideEdit, LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
 import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
@@ -149,7 +149,7 @@ if(params){
           <div>
             <div className="top-12 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-fit p-2">
           <div className="flex  gap-2">
-            {<LucideEdit className="w-6 h-6 text-blue-600" />}
+            {<LucideCode className="w-6 h-6 text-blue-600" />}
               <span className="text-1xl font-bold">"{JSON.parse(params!).name}" Template </span>
           </div>
         </div>
@@ -350,7 +350,7 @@ if(params){
     </div>
         <>
         {/* Settings panel */}
-          <TemplateSettingsPanelEdit htmlBody = {htmlInput} />
+          <TemplateSettingsPanelEdit htmlBody = {htmlInput} htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}/>
         </>
   </div>
 
@@ -428,7 +428,7 @@ if(params){
           </div>
           <>
         {/* Settings panel */}
-          <TemplateSettingsPanelCreate />
+          <TemplateSettingsPanelCreate htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name} />
         </>
         </Editor>
 

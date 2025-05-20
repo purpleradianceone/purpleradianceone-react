@@ -9,9 +9,10 @@ import { STATUS_CODE } from '../../constants/AppConstants';
 
 type TemplateSettingsPanelEditProps = {
   htmlBody: string;
+  htmlTemplateTypeSubjectPlaceholder: string;
 };
 
-export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps> = ({htmlBody}) => {
+export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
@@ -170,7 +171,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
-                  placeholder="e.g., Welcome Email"
+                  placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
 
@@ -219,7 +220,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                     backgroundColor: "#f9f9f9",
                   }}
                 >
-                  <option value="">Insert Dynamic Field</option>
+                  <option value="">Insert Dynamic Field In Subject</option>
                   {dynamicFields.map((field) => (
                     <option key={field.value} value={field.value}>
                       {field.label}
@@ -229,7 +230,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
               </div>
 
               {/* Description */}
-              <div>
+              {/* <div>
                 <label
                   style={{
                     display: "block",
@@ -254,7 +255,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                   }}
                   placeholder="Template description..."
                 />
-              </div>
+              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}

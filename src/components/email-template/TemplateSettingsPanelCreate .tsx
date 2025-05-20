@@ -10,7 +10,11 @@ import { STATUS_CODE } from '../../constants/AppConstants';
 import { useSearchParams } from 'react-router-dom';
 
 
-export const TemplateSettingsPanelCreate = () => {
+type TemplateSettingsPanelEditProps = {
+  htmlTemplateTypeSubjectPlaceholder: string;
+};
+
+export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
@@ -19,7 +23,7 @@ export const TemplateSettingsPanelCreate = () => {
   const[htmlBody,setHtmlBody] = useState('');
 const [isDefault, setIsDefault] = useState(false);
 
-  const dynamicFields = useDynamicFields(); 
+  const dynamicFields = useDynamicFields();
 
     const { query } = useEditor();
   
@@ -133,10 +137,7 @@ function getHtmlEmailBody(): string {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-
-              alert("Template saved successfully!");
               setIsOpen(false);
-
               const resultHtml = await getHtmlEmailBody();
 
               createEmailTemplateCreate(resultHtml);
@@ -183,7 +184,7 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
-                  placeholder="e.g., Welcome Email"
+                  placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
 
@@ -232,7 +233,7 @@ function getHtmlEmailBody(): string {
                     backgroundColor: "#f9f9f9",
                   }}
                 >
-                  <option value="">Insert Dynamic Field</option>
+                  <option value="">Insert Dynamic Field In Subject</option>
                   {dynamicFields.map((field) => (
                     <option key={field.value} value={field.value}>
                       {field.label}
@@ -242,7 +243,7 @@ function getHtmlEmailBody(): string {
               </div>
 
               {/* Description */}
-              <div>
+              {/* <div>
                 <label
                   style={{
                     display: "block",
@@ -267,7 +268,7 @@ function getHtmlEmailBody(): string {
                   }}
                   placeholder="Template description..."
                 />
-              </div>
+              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
