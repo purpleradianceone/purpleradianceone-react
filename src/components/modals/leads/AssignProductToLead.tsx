@@ -1,0 +1,231 @@
+import { X } from "lucide-react";
+
+import axios from "axios";
+import POST_API from "../../../constants/PostApi";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import React, { useEffect, useState } from "react";
+import InterestType from "../../../@types/lead-management/InterestType";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import ROUTES_URL from "../../../constants/Routes";
+import { useNavigate } from "react-router-dom";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
+import ProductManagementLead from "./product-selection-modal/ProductManagementLead";
+import { usePanel } from "../../../context/panel/usePanel";
+import AssignProductToLeadType, {
+  ItemData,
+} from "../../../@types/lead-management/AssignProductToLeadType";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ApiError from "../../../@types/error/ApiError";
+import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
+
+const AssignProductToLead = ({
+  selectedLeadData,
+  onClose,
+  isOpen,
+  leadAssignedComponyProduct,
+  fetchLeadCompanyProduct,
+  interestTypeData,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selectedLeadData: any;
+  onClose: () => void;
+  isOpen: boolean;
+  leadAssignedComponyProduct: LeadAssignedCompanyProduct[];
+  fetchLeadCompanyProduct: () => void;
+  interestTypeData: InterestType[];
+}) => {
+  const navigate = useNavigate();
+  const { position } = usePanel();
+  const { loginStatus } = useLoggedInUserContext();
+
+  const [showSaveButton, SetShowSaveButton] = useState<boolean>(false);
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
+
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  //this state is used for getting data
+  const [itemData, setItemData] = React.useState<ItemData[]>([]);
+
+  const handleProductAddToLead = async (
+    event: React.FormEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+
+    const PostDataAssignProductToLead: AssignProductToLeadType = {
+      company_id: loginStatus.companyId,
+      lead_id: selectedLeadData.id,
+      input_data: itemData,
+      createdby: loginStatus.id,
+    };
+    try {
+      const response = await axios.post(
+        POST_API.ASSIGN_PRODUCT_TO_LEAD,
+        PostDataAssignProductToLead,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        if (response.data.status) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
+          await fetchLeadCompanyProduct();
+        }
+        if (response.data.status === false) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "error",
+          });
+        }
+        //delay before closing
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: ApiError | any) {
+      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: handleProductAddToLead,
+        });
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setItemData([]);
+    }
+  }, [isOpen]);
+
+  //NOTE : THIS IS THE CODE FOR GETTING SELECTED PRODUCT
+  const handleProductCheckboxChange = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: any,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      setItemData((prev) => [
+        ...prev,
+        {
+          company_product_id: params.id!,
+          cost_expected: params.expectedCost,
+          lead_interest_id: params.interest,
+          quantity_required: params.requiredQuantity,
+        },
+      ]);
+    } else if (!event.target.checked) {
+      setItemData((prev) =>
+        prev.filter((item) => item.company_product_id !== params.id)
+      );
+    }
+  };
+  useEffect(() => {
+    if (itemData.length > 0) {
+      SetShowSaveButton(true);
+    } else {
+      SetShowSaveButton(false);
+    }
+  }, [itemData]);
+
+  if (!isOpen) return null;
+  return (
+    <div>
+      <div
+        className={`${
+          position === "top" ? "top-12" : ""
+        } fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4`}
+      >
+        <div
+          className={` ${
+            position === "left" ? " inset-0 top-6 left-6 " : ""
+          }bg-white rounded-2xl shadow-lg min-w-fit  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
+        >
+          {/* Header with Close Button */}
+          <div className="flex justify-between items-center ml-4 p-1 border-b border-gray-200">
+            <h3 className="text-md font-medium text-gray-800 hover:shadow-sm">
+              Assign Product to Lead
+            </h3>
+            <div className="flex items-center gap-5">
+              <button
+                onClick={handleProductAddToLead}
+                className={`${
+                  showSaveButton ? "bg-blue-700" : "bg-blue-400"
+                }  text-white px-2 rounded-xl text-md `}
+                disabled={!showSaveButton}
+              >
+                Save
+              </button>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+          {/* NOTE : CALL TO THE MODAL COMPONENT */}
+          <div className=" p-1">
+            <ProductManagementLead
+              AssignLeadId={selectedLeadData.id}
+              handleProductCheckboxChange={handleProductCheckboxChange}
+              interestTypeData={interestTypeData}
+              alreadyAssignedCompanyProduct={leadAssignedComponyProduct}
+            />
+          </div>
+        </div>
+      </div>
+
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
+    </div>
+  );
+};
+
+export default AssignProductToLead;

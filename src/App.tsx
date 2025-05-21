@@ -10,6 +10,7 @@ import { AccessManagementContextProvider } from "./context/user/AccessManagement
 import { PanelProvider } from "./context/panel/usePanel";
 import  { GoogleMeetContextProvider } from "./context/meeting/GoogleMeetContext";
 import { ZoomMeetingContextProvider } from "./context/meeting/ZoomMeetingContext";
+import { UserPreferenceContextProvider } from "./context/user/UserPreference";
 
 /**
  *
@@ -17,6 +18,7 @@ import { ZoomMeetingContextProvider } from "./context/meeting/ZoomMeetingContext
  */
 function App() {
   return (
+    <UserPreferenceContextProvider>
     <PanelProvider>
       <ZoomMeetingContextProvider>
       <GoogleMeetContextProvider>
@@ -28,6 +30,7 @@ function App() {
       </GoogleMeetContextProvider>
       </ZoomMeetingContextProvider>
     </PanelProvider>
+    </UserPreferenceContextProvider>
   );
 }
 

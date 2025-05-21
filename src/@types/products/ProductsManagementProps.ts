@@ -15,23 +15,6 @@ export type Product = {
     validFrom? : string,
     
 }
-
 export type Products = {
     products : Product[]
 }
-
-
-// code
-// company_id
-// cost
-// count
-// createdby
-// createdon
-// description
-// hsn
-// id
-// isactive
-// name
-// sac
-// tax_rate
-// valid_from

@@ -62,24 +62,23 @@ function GetCompanyUserListForLeadAssignment({
 
   return (
     userHasAccessToViewUser && (
-      <div className="w-full pt-2 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex  gap-4">
+      <div className="w-full  pl-5 pr-1 gap-1">
+        <div className="sticky z-10 top-10  mb-2 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.8w-full">
+          <div className=" w-56  flex items-center justify-evenly  gap-5 ">
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl  font-bold">Company Users</span>
+              <span className="text-1xl  font-bold whitespace-nowrap text-ellipsis">Company Users</span>
             )}
           </div>
 
           {isLargeScreen && (
             <>
-              <div className="flex gap-1">
+              <div className="flex items-center gap-1">
                 {/* search box flex div */}
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
                     onChange={(e) => {
-                      
                       handleSearchOption.handleSearchParameterChange(
                         e.target.value
                       );
@@ -264,7 +263,7 @@ function GetCompanyUserListForLeadAssignment({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
+            className="ag-theme-balhal w-full"
             style={{ height: "460px", width: "100%" }}
           >
 
@@ -283,7 +282,7 @@ function GetCompanyUserListForLeadAssignment({
           /> */}
         </div>
 
-        <div className="flex items-center justify-end mt-1">
+        <div className="flex items-center justify-end ">
           <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}

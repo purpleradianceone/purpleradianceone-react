@@ -32,7 +32,7 @@ function Button(prop : ButtonProps){
       title={prop.title}
         type={prop.type}
         onClick={prop.onClick}
-      className = {prop.className ? prop.className : (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center ${isSmallScreen ? 'py-1.5 px-2.5' : 'py-2.5 px-4' }  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.BG_BLUE_600_COLOR}  ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`} 
+      className = {prop.className ? prop.className : (prop.children == "Reset Password" ? "mt-6 " : "") +`w-full flex justify-center ${isSmallScreen ? 'py-1.5 px-2.5' : 'py-2 px-3' }  border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${COLORS.BG_BLUE_600_COLOR}  ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`} 
         >
               {prop.spinner ? (
                 prop.spinner.status === "loading" ? (

@@ -16,12 +16,16 @@ const ROUTES_URL = {
     LEAD_SETTINGS : "/settings/lead",
     TEAM_MANAGEMENT : "/home/manage-teams/teams",
     PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
+    USER_PROFILE_SETTING : "/settings/userprofile",
     //for subscription
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
     LEAD_DETAILS : "/lead/view",
     SCHEDULE_MEETING : "/meetings/schedule",
+    //for email template
+    EMAIL_TEMPLATE : "/email-template",
+    EMAIL_TEMPLATE_CREATE : "/email-template/create"
     
 }
 export default ROUTES_URL;

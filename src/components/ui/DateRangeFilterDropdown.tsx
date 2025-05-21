@@ -32,7 +32,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             bg-white
             border border-gray-300
             text-gray-700
-            py-2 px-4
+            py-1 px-4
             rounded-lg
             shadow-sm
             cursor-pointer

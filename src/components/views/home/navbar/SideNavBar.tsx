@@ -218,7 +218,16 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             >
               Lead
             </Link>,
-            "Product",
+            <Link
+            to= {ROUTES_URL.EMAIL_TEMPLATE}
+            >
+            Email Template
+            </Link>, 
+            //   <Link
+            // to= {ROUTES_URL.USER_PROFILE_SETTING}
+            // >
+            // Profile/Preferences
+            // </Link>            
           ]}
         ></SideNavBarItem>
       </nav>

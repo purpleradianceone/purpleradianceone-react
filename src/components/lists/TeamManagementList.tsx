@@ -59,10 +59,6 @@ function TeamManagementList({
               setSelectedTeamForUpdate(params);
               setIsUpdateCompanyTeamModalOpen(true);
             }
-            
-           
-
-
       }
 
     return (

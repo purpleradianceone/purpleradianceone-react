@@ -71,22 +71,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // const handleModuleSearch = (event : React.ChangeEvent<HTMLInputElement>) => {
-  // const query = event.target.value.toLowerCase();
-  // setSearchQuery(query);
-  // setIsSearching(query.length > 0);
-
-  // if (query.length > 0) {
-  //   const filtered = APP_MODULES.filter(module =>
-  //     module.name.toLowerCase().includes(query) ||
-  //     module.description.toLowerCase().includes(query)
-  //   );
-  //   setSearchResults(filtered);
-  // } else {
-  //   setSearchResults([]);
-  // }
-  // }
-
   const handleLogout = () => {
     Navigate(ROUTES_URL.SIGN_IN);
     setLoginStatus({
@@ -114,6 +98,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
     Navigate(ROUTES_URL.GET_SUBSCRIPTION);
   };
 
+  const handleClickOnUserProfile = () =>{
+    Navigate(ROUTES_URL.USER_PROFILE_SETTING);
+  }
   if (!loginStatus.status) {
     return (
       <div>
@@ -282,6 +269,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Prd Team/users"
                         />
                       )}
+                      
                       <NavItem
                         to={ROUTES_URL.LEAD_SETTINGS}
                         icon={<SettingsIcon size={SIZE.TWENTY} />}
@@ -417,9 +405,17 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                         {/* Menu Options */}
                         <div className="flex flex-col">
-                          <button className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                            👤 Profile
+                         {userHasAccessToViewUser ? (
+                           <button onClick={handleClickOnUserProfile} className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                             👤 Profile 
                           </button>
+                         ):(
+                           <button onClick={() =>{
+                            setAccessDeniedPopUpView(true);
+                           }} className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                             👤 Profile 
+                          </button>
+                         )}
                           <button className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
                             ⚙️ Account Setting
                           </button>
@@ -464,7 +460,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             position === "left"
               ? sidebarOpen && !isSmallScreen
                 ? "mt-16 ml-60 flex justify-center items-center"
-                : "mt-12 ml-10 flex justify-center items-center"
+                : "mt-12 ml-14 flex justify-center items-center"
               : "mt-12 ml-0 flex justify-center items-center"
           }
         >
