@@ -28,7 +28,7 @@ const UserPreference = () => {
     navigate(ROUTES_URL.SIGN_IN);
   };
   const [isDialogueOpen, setIsDialogueOpen] = React.useState<boolean>(false);
-  const { loginStatus  , setLoginStatus} = useLoggedInUserContext();
+  const { loginStatus, setLoginStatus } = useLoggedInUserContext();
 
   const [showTimeZoneData, setShowTimeZoneData] = React.useState(false);
   const [selectedTimeZoneData, setSelectedTimeZoneData] =
@@ -62,6 +62,16 @@ const UserPreference = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  // timezone states
+  const limitForGrid = userPreference.rowsInGrid;
+  const [timezoneList, setTimezoneList] = useState<Timezone[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [limit, setLimit] = useState(userPreference.rowsInGrid);
+  const [hasMore, setHasMore] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+
   const handleTimezonePreferenceChange = async () => {
     const postData = {
       company_id: loginStatus.companyId,
@@ -82,14 +92,20 @@ const UserPreference = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        setUserPreference({
-          ...userPreference,
-          timezoneId: selectedTimezoneId,
-          timezoneUTCOffset: selectedTimeZoneData.utc_offset,
-          timezoneName: selectedTimeZoneData.name,
-          timezone: selectedTimeZoneData.timezone,
-        });
-        setShowTimeZoneData(false);
+        if (response.data.status) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
+          setUserPreference({
+            ...userPreference,
+            timezoneId: selectedTimezoneId,
+            timezoneUTCOffset: selectedTimeZoneData.utc_offset,
+            timezoneName: selectedTimeZoneData.name,
+            timezone: selectedTimeZoneData.timezone,
+          });
+          setShowTimeZoneData(false);
+        }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
@@ -158,51 +174,49 @@ const UserPreference = () => {
     setIsEditing(!isEditing);
   };
 
- const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let errorMsg = "";
 
-  const { name, value } = e.target;
-  let errorMsg = "";
+    // Check empty input for all fields
+    if (!value.trim()) {
+      errorMsg = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+    } else {
+      if (name === "email") {
+        const emailRegex = REGEX.EMAIL;
+        if (!emailRegex.test(value)) {
+          errorMsg = "Invalid email format";
+        }
+      }
 
-  // Check empty input for all fields
-  if (!value.trim()) {
-    errorMsg = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
-  } else {
-    if (name === "email") {
-      const emailRegex = REGEX.EMAIL;
-      if (!emailRegex.test(value)) {
-        errorMsg = "Invalid email format";
+      if (name === "mobileNumber") {
+        const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+        if (!mobileRegex.test(value)) {
+          errorMsg = "Mobile number must be 10 digits and start with 6–9";
+        }
       }
     }
 
-    if (name === "mobileNumber") {
-      const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-      if (!mobileRegex.test(value)) {
-        errorMsg = "Mobile number must be 10 digits and start with 6–9";
-      }
-    }
-  }
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: errorMsg,
+    }));
 
-  setFormErrors((prev) => ({
-    ...prev,
-    [name]: errorMsg,
-  }));
+    const hasChanged =
+      formData.fullName !== initialData.fullName ||
+      formData.email !== initialData.email ||
+      formData.mobileNumber !== initialData.mobileNumber;
 
-  const hasChanged =
-    formData.fullName !== initialData.fullName ||
-    formData.email !== initialData.email ||
-    formData.mobileNumber !== initialData.mobileNumber;
+    // Include current error for updated field
+    const currentErrors = {
+      ...formErrors,
+      [name]: errorMsg,
+    };
 
-  // Include current error for updated field
-  const currentErrors = {
-    ...formErrors,
-    [name]: errorMsg,
+    const hasErrors = Object.values(currentErrors).some((e) => e !== "");
+
+    setIsSaveEnabled(hasChanged && !hasErrors);
   };
-
-  const hasErrors = Object.values(currentErrors).some((e) => e !== "");
-
-  setIsSaveEnabled(hasChanged && !hasErrors);
-};
-
 
   const updateUserProfile = async () => {
     try {
@@ -226,10 +240,9 @@ const UserPreference = () => {
         });
         setLoginStatus({
           ...loginStatus,
-          fullName : formData.fullName.trim(),
+          fullName: formData.fullName.trim(),
           mobileNumber: formData.mobileNumber.trim(),
-        })
-        
+        });
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -251,15 +264,6 @@ const UserPreference = () => {
   };
 
   // code for getting timezone data
-
-  const limitForGrid = userPreference.rowsInGrid;
-  const [timezoneList, setTimezoneList] = useState<Timezone[]>([]);
-  const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(userPreference.rowsInGrid);
-  const [hasMore, setHasMore] = useState(true);
-  const [searchText, setSearchText] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const loadTimezones = async (
     newOffset: number,
@@ -386,21 +390,20 @@ const UserPreference = () => {
             <h4 className="text-sm font-semibold text-gray-500">Name</h4>
             {isEditing ? (
               <>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="w-full p-2 border rounded"
-                
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="w-full p-2 border rounded"
                 />
-              {formErrors.fullName && (
-                <p className="text-red-500 text-sm mt-1">
+                {formErrors.fullName && (
+                  <p className="text-red-500 text-sm mt-1">
                     {formErrors.fullName}
                   </p>
                 )}
-                </>
+              </>
             ) : (
               <p className="text-gray-800">
                 {formData.fullName || "Not Provided"}
