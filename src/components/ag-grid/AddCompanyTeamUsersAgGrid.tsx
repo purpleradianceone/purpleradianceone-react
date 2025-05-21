@@ -122,6 +122,7 @@ function AddCompanyTeamUsersAgGrid({
                   onChange={(event) => {
                        handleCompanyUserCheckBoxChange!(params.data, event);
                   }}
+                  
                 />
               </div>
             );

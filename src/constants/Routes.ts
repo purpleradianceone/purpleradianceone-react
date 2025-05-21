@@ -22,6 +22,7 @@ const ROUTES_URL = {
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
     LEAD_DETAILS : "/lead/view",
+    SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
     EMAIL_TEMPLATE : "/email-template",
     EMAIL_TEMPLATE_CREATE : "/email-template/create"

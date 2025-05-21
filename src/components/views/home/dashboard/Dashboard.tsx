@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
+import LeadMeetingsModal from "../../../modals/meetings/LeadMeetingsModal";
 
 function Dashboard(){
     const navigate = useNavigate();
@@ -19,8 +20,20 @@ function Dashboard(){
         window.removeEventListener('popstate', handleBackButton);
       };
     }, [navigate]);
+
+    
+
     return (
-        <div className="flex items-center justify-center">Home Screen</div>
+        <div className="flex w-full">
+          <div className="flex min-w-[98%] ml-5">
+<LeadMeetingsModal
+         isMeetingModalOpenFromProp = {true}
+          isCalendarViewEnabled = {true}
+          showConnectToPlatform = {false}
+          />
+          </div>
+          
+        </div>
     )
 }
 

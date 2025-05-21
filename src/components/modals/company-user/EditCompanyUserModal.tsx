@@ -54,6 +54,8 @@ function EditCompanyUserModal({
     }
   ]
 
+  
+
 
   const {
     formData: updateUserformData,
@@ -74,6 +76,8 @@ function EditCompanyUserModal({
     type: "success" as "success" | "error",
   });
   const { loginStatus } = useLoggedInUserContext();
+
+  
 
   useEffect(() => {
     if (isOpen) {

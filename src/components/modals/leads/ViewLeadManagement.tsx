@@ -22,6 +22,10 @@ import industryType from "../../../@types/general/industryType";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
+
+import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
+import qs from "query-string";
+
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
 import {
   MessageSnackbarState,
@@ -30,7 +34,6 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import qs from "query-string";
 import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
@@ -197,6 +200,7 @@ const ViewLeadManagement = () => {
         setReasonInputBoxOpen(false);
         setReasonText("");
         setSelectedStatusId(null);
+
         setActivityData([
           {
             person: loginStatus.fullName,
@@ -739,6 +743,7 @@ const ViewLeadManagement = () => {
       await getAllDistrict(stateChangeRef.current);
       await fetchLeadCompanyProduct();
       await getLeadInterestData();
+
     };
 
     const apiCallsWhenCountryChanged = async (countryId: number | null) => {
@@ -1050,6 +1055,7 @@ const ViewLeadManagement = () => {
       <div className=" w-[100%] h-auto flex  shadow-sm    ">
         {/* First child: 50% width */}
         <div className="w-[50%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
+
           <LeadDetails
             handleLeadActivityChange={(person: string, work: string) => {
               setActivityData([
@@ -1072,7 +1078,13 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 50% width */}
-        <div className="w-[50%] h-full bg-green-50 border my-2  p-4"></div>
+        <div className="w-[50%] h-full bg-green-50 border my-2  p-4">
+           <LeadMeetingsModal 
+          isMeetingModalOpenFromProp={false}
+          isCalendarViewEnabled={true}
+          showConnectToPlatform={false}
+          ></LeadMeetingsModal>
+        </div>
       </div>
 
       {/* Assigned Company Product & Activity Section */}
@@ -1107,7 +1119,6 @@ const ViewLeadManagement = () => {
             ))}
           </div>
         </div>
-      </div>
 
       <UpdateLeadForm
         isOpen={isUpdateLeadFormOpen}
