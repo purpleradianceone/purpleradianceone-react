@@ -246,7 +246,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   return (
     <div className=" max-h-80 w-full overflow-auto p-2 bg-gray-50 rounded-lg">
       {/* Header row */}
-      <div className=" hidden sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold text-gray-700 text-sm mb-3 px-2">
+      <div className=" hidden sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold text-gray-900 text-sm mb-3 px-2">
         <div>Product Name</div>
         <div className="text-center">Req. Quantity</div>
         <div className="text-center">Exp. Cost</div>
@@ -260,9 +260,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           <div
             ref={editingProductId === product.id ? wrapperRef : null}
             title={product.companyProductName}
-            className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-2 mb-2 text-sm transition hover:shadow-md items-center"
+            className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-1  mb-2 text-sm transition hover:shadow-md items-center"
           >
-            <div className="font-medium truncate">
+            <div className="text-sm font-medium text-gray-800 truncate">
               {product.companyProductName}
             </div>
 
