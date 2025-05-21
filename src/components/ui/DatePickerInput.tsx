@@ -4,11 +4,11 @@ import FormInputProps from "../../@types/ui/FormInputProps";
 
 function DatePickerInput(props : FormInputProps){
     return (
-        <div className="mt-4">
-      <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
+        <div className="mt-2">
+      <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
         {props.label}
       </label>
-      <div className="mt-4 relative">
+      <div className="mt-1 relative">
         <input
         ref ={props.ref}
         readOnly={props.readonly}

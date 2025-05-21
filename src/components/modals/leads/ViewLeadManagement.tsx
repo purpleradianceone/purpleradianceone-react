@@ -18,6 +18,8 @@ import industryType from "../../../@types/general/industryType";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
+import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
+import qs from "query-string";
 // import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 
 const ViewLeadManagement = () => {
@@ -38,7 +40,7 @@ const ViewLeadManagement = () => {
   const [selectedLeadData, setSelectedLeadData] = useState(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
-   
+
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
@@ -93,6 +95,13 @@ const ViewLeadManagement = () => {
         const updatedStatusName = leadStatus?.find(
           (item) => item.id === selectedStatusId
         )?.name;
+
+        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+        parsedQuery.leadStatusId = selectedStatusId.toString();
+        parsedQuery.leadStatus = updatedStatusName!.toString();
+        const newQueryString = qs.stringify({
+          leadData: JSON.stringify(parsedQuery),
+        });
         setSelectedLeadData((prev: any) => ({
           ...prev,
           leadStatus: updatedStatusName,
@@ -100,6 +109,9 @@ const ViewLeadManagement = () => {
         setReasonInputBoxOpen(false);
         setReasonText("");
         setSelectedStatusId(null);
+
+        const newPath = `${window.location.pathname}?${newQueryString}`;
+        navigate(newPath, { replace: true });
       }
     } catch (err) {
       console.error("Failed to update lead", err);
@@ -187,7 +199,6 @@ const ViewLeadManagement = () => {
     website: "",
   });
 
-
   const getLeadDetails = async () => {
     const PostData = {
       company_id: loginStatus.companyId,
@@ -224,8 +235,8 @@ const ViewLeadManagement = () => {
           updatedby: data.updatedby,
           updatedon: data.updatedon,
         });
-          countryChangeRef.current = data.country_id;
-          stateChangeRef.current = data.state_id;
+        countryChangeRef.current = data.country_id;
+        stateChangeRef.current = data.state_id;
         // districtChangeRef.current = data.district_id;
       } else {
         throw new Error("Failed to fetch lead details");
@@ -239,8 +250,8 @@ const ViewLeadManagement = () => {
       alert("Unable to fetch Lead Details. Please try again later.");
     }
   };
-  const getAllState = async (countryId : number | null) => {
-    if(!countryId) return;
+  const getAllState = async (countryId: number | null) => {
+    if (!countryId) return;
     const PostDataForState: State = {
       id: null,
       country_id: countryId,
@@ -271,8 +282,8 @@ const ViewLeadManagement = () => {
     }
   };
 
-  const getAllDistrict = async (stateId : number | null) => {
-    if(!stateId) return;
+  const getAllDistrict = async (stateId: number | null) => {
+    if (!stateId) return;
     const PostDataForDistrict: District = {
       id: null,
       state_id: stateId,
@@ -281,7 +292,6 @@ const ViewLeadManagement = () => {
       isactive: true,
     };
 
-   
     const fetchDistricts = async () => {
       const response = await axios.post(
         POST_API.GET_DISTRICT,
@@ -315,26 +325,28 @@ const ViewLeadManagement = () => {
       await getIndustryType();
       await getAllState(countryChangeRef.current);
       await getAllDistrict(stateChangeRef.current);
-     
     };
-   
-    const apiCallsWhenCountryChanged = async (countryId : number | null ) => {
-      await getAllState(countryId);
-      
-    }
 
-    const apiCallWhenStateChanged = async (stateId : number | null) => {
-      await getAllDistrict(stateId)
-    }
-    if(countryChangeRef.current !==leadDetailsData.country_id && countryChangeRef.current !== 0 ){
-      countryChangeRef.current  = leadDetailsData.country_id;
-      apiCallsWhenCountryChanged(countryChangeRef.current)
-    }
-    else if(stateChangeRef.current !==leadDetailsData.state_id && stateChangeRef.current !== 0 ){
+    const apiCallsWhenCountryChanged = async (countryId: number | null) => {
+      await getAllState(countryId);
+    };
+
+    const apiCallWhenStateChanged = async (stateId: number | null) => {
+      await getAllDistrict(stateId);
+    };
+    if (
+      countryChangeRef.current !== leadDetailsData.country_id &&
+      countryChangeRef.current !== 0
+    ) {
+      countryChangeRef.current = leadDetailsData.country_id;
+      apiCallsWhenCountryChanged(countryChangeRef.current);
+    } else if (
+      stateChangeRef.current !== leadDetailsData.state_id &&
+      stateChangeRef.current !== 0
+    ) {
       stateChangeRef.current = leadDetailsData.state_id;
-      apiCallWhenStateChanged(stateChangeRef.current)
-    }
-    else if(stateChangeRef.current === 0 && countryChangeRef.current === 0 ){
+      apiCallWhenStateChanged(stateChangeRef.current);
+    } else if (stateChangeRef.current === 0 && countryChangeRef.current === 0) {
       apisCalls();
     }
   }, [leadDetailsData]);
@@ -455,7 +467,7 @@ const ViewLeadManagement = () => {
 
       <div className=" w-[100%] h-auto flex gap-4  shadow-sm    ">
         {/* First child: 70% width */}
-        <div className="w-[65%] h-full overflow-auto   bg-gray-0 shadow-md m-2 rounded">
+        <div className="w-[55%] h-full overflow-auto   bg-gray-0 shadow-md m-2 rounded">
           <LeadDetails
             district={district}
             stateData={stateData}
@@ -468,8 +480,12 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 30% width */}
-        <div className="w-[35%] h-full bg-green-50 border my-2 text-white p-4">
-          This div should get 30% width and full height
+        <div className="w-[45%] h-full bg-green-50 border my-2 text-white p-4">
+          <LeadMeetingsModal 
+          isMeetingModalOpenFromProp={false}
+          isCalendarViewEnabled={true}
+          showConnectToPlatform={false}
+          ></LeadMeetingsModal>
         </div>
       </div>
 

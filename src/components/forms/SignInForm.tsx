@@ -23,16 +23,21 @@ import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
 import {
   NUMBER_VALUES,
   SITE_KEY,
+  STATUS_CODE,
   STRING_VALUES,
 } from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
+import { useGoogleMeetContext } from "../../context/meeting/GoogleMeetContext";
+import { useZoomMeetingContext } from "../../context/meeting/ZoomMeetingContext";
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
+  const {setGoogleMeetStatus} = useGoogleMeetContext();
+  const {setZoomMeetingStatus} = useZoomMeetingContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
@@ -201,7 +206,44 @@ function SignInForm() {
                       message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
                       type: "success",
                     });
+                    const validateGoogleMeetConnection = {
+                      company_id : loginStatusRef.current.company_id,
+                      company_user_id : loginStatusRef.current.id ,
+                      requestedby : loginStatusRef.current.id 
+                    }
+                    axios.post(POST_API.VALIDATE_GOOGLE_MEET_CONNECTION,validateGoogleMeetConnection,{
+                      withCredentials: true
+                    })
+                    .then((response) => {
+                      console.log(response)
+                      if(response.status === STATUS_CODE.OK){
+                          setGoogleMeetStatus({
+                            isConnected : response.data.status
+                          })  
 
+                      const validateZoomMeetingsConnection = {
+                        company_id : loginStatusRef.current.company_id,
+                      company_user_id : loginStatusRef.current.id ,
+                      requestedby : loginStatusRef.current.id 
+                      }
+                      axios.post(POST_API.VALIDATE_ZOOM_MEETINGS_CONNECTION,validateZoomMeetingsConnection,{
+                        withCredentials : true
+                      }).then((response) => {
+                        console.log(response)
+                        if(response.status === STATUS_CODE.OK){
+                          setZoomMeetingStatus({
+                              isConnected : response.data.status  
+                          });
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error)
+                      })
+                      }
+                    })
+                    .catch((error) => {
+                      console.log(error)
+                    })
                     // //note : temporary fix
                     // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
                     //   setShowSubscriptionOrInActivePopUp(true);

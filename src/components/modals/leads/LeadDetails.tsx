@@ -149,7 +149,7 @@ const LeadDetails = ({
     : [];
 
   return (
-    <div>
+    <div className="flex">
       <form>
         <div className="w-auto flex justify-between bg-slate-100 px-2 mb-1  ">
           <span className="text-sm text-gray-800">Details</span>
@@ -281,6 +281,7 @@ const LeadDetails = ({
           
         </div>
       </form>
+
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}

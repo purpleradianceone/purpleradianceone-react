@@ -8,6 +8,8 @@ import { router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
 import { PanelProvider } from "./context/panel/usePanel";
+import  { GoogleMeetContextProvider } from "./context/meeting/GoogleMeetContext";
+import { ZoomMeetingContextProvider } from "./context/meeting/ZoomMeetingContext";
 
 /**
  *
@@ -16,11 +18,15 @@ import { PanelProvider } from "./context/panel/usePanel";
 function App() {
   return (
     <PanelProvider>
+      <ZoomMeetingContextProvider>
+      <GoogleMeetContextProvider>
       <AccessManagementContextProvider>
         <LoggedInUserContextProvider>
           <RouterProvider router={router} />
         </LoggedInUserContextProvider>
       </AccessManagementContextProvider>
+      </GoogleMeetContextProvider>
+      </ZoomMeetingContextProvider>
     </PanelProvider>
   );
 }

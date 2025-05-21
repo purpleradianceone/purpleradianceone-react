@@ -20,7 +20,8 @@ const ROUTES_URL = {
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
-    LEAD_DETAILS : "/lead/view"
+    LEAD_DETAILS : "/lead/view",
+    SCHEDULE_MEETING : "/meetings/schedule",
     
 }
 export default ROUTES_URL;

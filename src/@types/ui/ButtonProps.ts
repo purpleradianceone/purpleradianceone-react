@@ -17,6 +17,7 @@ type ButtonProps = {
     onClick? : (event : React.FormEvent<HTMLButtonElement>) => void;
     spinner? : EmailVerificationType;
     setSpinner? : (spinner : EmailVerificationType) => void;
+    title? : string;
   };
   
   export default ButtonProps;
