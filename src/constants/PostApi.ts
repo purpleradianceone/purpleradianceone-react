@@ -70,7 +70,8 @@ const POST_API = {
     GET_STATE : import.meta.env.VITE_GET_STATE!,
     GET_DISTRICT : import.meta.env.VITE_GET_DISTRICT!,
     GET_INDUSTRY_TYPE : import.meta.env.VITE_GET_INDUSTRY_TYPE!,
-
+    GET_MASTER_ROWS_IN_GRID :import.meta.env.VITE_GET_MASTER_ROWS_IN_GRID!,
+    
     //N: EMAIL TEMPLATE
     GET_EMAIL_TYPE : import.meta.env.VITE_GET_EMAIL_TYPE!,
     CREATE_EMAIL_TEMPLATE : import.meta.env.VITE_CREATE_EMAIL_TEMPLATE!,
