@@ -27,9 +27,11 @@ import CreateSubscription from "../../components/subscription-module/CreateSubsc
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
 import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
+import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler";
 import { EditorCanvas } from "../../components/email-template/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
 import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
+
 
 
 export const router = createBrowserRouter([
@@ -238,6 +240,17 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <Navbar>
           <ViewLeadManagement/>
+        </Navbar>
+      </PrivateRoute>
+    )
+  },
+  {
+    path:ROUTES_URL.SCHEDULE_MEETING,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          <MeetingScheduler>
+          </MeetingScheduler>
         </Navbar>
       </PrivateRoute>
     )

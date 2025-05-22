@@ -507,7 +507,6 @@ function CompanyTeamUsersAgGrid({
         },
       },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [usersUpdateCount, companyTeamUsersList, companyProductUsersList]
   );
   const defaultColDef = useMemo(() => {

@@ -38,6 +38,7 @@ import AssignProductToLead from "./AssignProductToLead";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 import LeadAssignedComponyProducts from "./LeadAssignedCompanyProduct";
 import InterestType from "../../../@types/lead-management/InterestType";
+import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -1072,7 +1073,13 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 50% width */}
-        <div className="w-[50%] h-full bg-green-50 border my-2  p-4"></div>
+        <div className="w-[50%] h-full bg-green-50 border my-2  p-4">
+          <LeadMeetingsModal
+          isCalendarViewEnabled={false}
+          isMeetingModalOpenFromProp={false}
+          showConnectToPlatform = {false}
+          />
+        </div>
       </div>
 
       {/* Assigned Company Product & Activity Section */}
