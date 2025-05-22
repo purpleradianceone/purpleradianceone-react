@@ -8,7 +8,9 @@ import {
   LayoutPanelLeft,
   LogOut,
   Menu,
+  MessageCircle,
   Network,
+  Settings,
   SettingsIcon,
   Store,
   X,
@@ -98,9 +100,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
     Navigate(ROUTES_URL.GET_SUBSCRIPTION);
   };
 
-  const handleClickOnUserProfile = () =>{
+  const handleClickOnUserProfile = () => {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
-  }
+  };
+
   if (!loginStatus.status) {
     return (
       <div>
@@ -194,12 +197,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
         <header>
           <nav className="z-20 bg-white border-b border-gray-200 fixed w-full  top-0 h-12">
             <div className="px-4 py-1 lg:px-6">
-              <div className={`flex ${position === 'left' ? "ml-10" : ""}  items-center justify-between`}>
+              <div
+                className={`flex ${
+                  position === "left" ? "ml-10" : ""
+                }  items-center justify-between`}
+              >
                 <div className="flex items-center justify-between text-sm   font-bold text-blue-700 cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className="font-sora ">
-                      {loginStatus.companyName}
-                    </h2>
+                    <h2 className="font-sora ">{loginStatus.companyName}</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -217,133 +222,150 @@ function Navbar({ children }: { children: React.ReactNode }) {
                 )}
                 {position === "top" && (
                   <>
-                  <div className="flex-1 max-w-6xl hidden lg:block">
-                    {/* Navbar Icons */}
-                    <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-11  ">
-                      {/* note : NavItem id created component in navbar/Component folder */}
-                      <NavItem
-                        to={ROUTES_URL.HOME}
-                        icon={<Home size={SIZE.TWENTY} />}
-                        label="Home"
-                      />
-                      {userHasAccessToViewUser && (
+                    <div className="flex-1 max-w-6xl hidden lg:block">
+                      {/* Navbar Icons */}
+                      <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-11  ">
+                        {/* note : NavItem id created component in navbar/Component folder */}
                         <NavItem
-                          to={ROUTES_URL.GET_COMPANY_USERS}
-                          icon={<Building2 size={SIZE.TWENTY} />}
-                          label="Manage Users"
+                          to={ROUTES_URL.HOME}
+                          icon={<Home size={SIZE.TWENTY} />}
+                          label="Home"
                         />
-                      )}
-                      {!userHasAccessToViewUser && (
-                        <NavItem
-                          to={ROUTES_URL.GET_COMPANY_USERS}
-                          icon={<Building2 size={SIZE.TWENTY} />}
-                          label="Manage Users"
-                        />
-                      )}
+                        {userHasAccessToViewUser && (
+                          <NavItem
+                            to={ROUTES_URL.GET_COMPANY_USERS}
+                            icon={<Building2 size={SIZE.TWENTY} />}
+                            label="Manage Users"
+                          />
+                        )}
+                        {!userHasAccessToViewUser && (
+                          <NavItem
+                            to={ROUTES_URL.GET_COMPANY_USERS}
+                            icon={<Building2 size={SIZE.TWENTY} />}
+                            label="Manage Users"
+                          />
+                        )}
 
-                      {userHasAccessToViewLead && (
+                        {userHasAccessToViewLead && (
+                          <NavItem
+                            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
+                            icon={<Handshake size={SIZE.TWENTY} />}
+                            label="Lead"
+                          />
+                        )}
+                        {userHasAccessToViewProduct && (
+                          <NavItem
+                            to={ROUTES_URL.PRODUCT_MANAGEMENT}
+                            icon={<Store size={SIZE.TWENTY} />}
+                            label="Products"
+                          />
+                        )}
+                        {userHasAccessToViewTeamManagement && (
+                          <NavItem
+                            to={ROUTES_URL.TEAM_MANAGEMENT}
+                            icon={<Network size={SIZE.TWENTY} />}
+                            label="Team"
+                          />
+                        )}
+                        {userHasAccessToViewProductTeam && (
+                          <NavItem
+                            to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
+                            icon={<BoxesIcon size={SIZE.TWENTY} />}
+                            label="Prd Team/users"
+                          />
+                        )}
+
                         <NavItem
-                          to={ROUTES_URL.GET_LEAD_MANAGEMENT}
-                          icon={<Handshake size={SIZE.TWENTY} />}
-                          label="Lead"
+                          icon={<Settings />}
+                          label="Crm Settings"
+                          dropdownItems={[
+                            {
+                              icon: <Handshake size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.LEAD_SETTINGS,
+                              label: "Lead",
+                            },
+                            {
+                              icon: <MessageCircle size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.EMAIL_TEMPLATE,
+                              label: "Customize Email",
+                            },
+                          ]}
                         />
-                      )}
-                      {userHasAccessToViewProduct && (
-                        <NavItem
-                          to={ROUTES_URL.PRODUCT_MANAGEMENT}
-                          icon={<Store size={SIZE.TWENTY} />}
-                          label="Products"
-                        />
-                      )}
-                      {userHasAccessToViewTeamManagement && (
-                        <NavItem
-                          to={ROUTES_URL.TEAM_MANAGEMENT}
-                          icon={<Network size={SIZE.TWENTY} />}
-                          label="Team"
-                        />
-                      )}
-                      {userHasAccessToViewProductTeam && (
-                        <NavItem
-                          to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
-                          icon={<BoxesIcon size={SIZE.TWENTY} />}
-                          label="Prd Team/users"
-                        />
-                      )}
-                      
-                      <NavItem
-                        to={ROUTES_URL.LEAD_SETTINGS}
-                        icon={<SettingsIcon size={SIZE.TWENTY} />}
-                        label="Crm Settings"
-                      />
+                      </div>
                     </div>
-                  </div>
-                  {/* Mobile View */}
-                <div className="lg:hidden xl:hidden  px-4 py-2">
-                <button
-                  onMouseEnter={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-gray-700"
-                >
-                  <Menu size={20}/>
-                </button>
-                {isDropdownOpen && (
-                  // <div className=" absolute top-full  bg-white  rounded-md py-2 px-3  z-50">
-                  <div className="absolute top-full bg-white shadow-lg rounded-md py-2 px-4 z-50 flex flex-col gap-2">
-                    <NavItem
-                      to={ROUTES_URL.HOME}
-                      icon={<Home size={SIZE.TWENTY} />}
-                      label=""
-                      onClick={() => setIsDropdownOpen(false)}
-                    />
-                    <NavItem
-                      to={ROUTES_URL.GET_COMPANY_USERS}
-                      icon={<Building2 size={SIZE.TWENTY} />}
-                      label=""
-                      onClick={() => setIsDropdownOpen(false)}
-                    />
-                    {userHasAccessToViewLead && (
-                      <NavItem
-                        to={ROUTES_URL.GET_LEAD_MANAGEMENT}
-                        icon={<Handshake size={SIZE.TWENTY} />}
-                        label=""
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                    )}
-                    {userHasAccessToViewProduct && (
-                      <NavItem
-                        to={ROUTES_URL.PRODUCT_MANAGEMENT}
-                        icon={<Store size={SIZE.TWENTY} />}
-                        label=""
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                    )}
-                    {userHasAccessToViewTeamManagement && (
-                      <NavItem
-                        to={ROUTES_URL.TEAM_MANAGEMENT}
-                        icon={<Network size={SIZE.TWENTY} />}
-                        label=""
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                    )}
-                    {userHasAccessToViewProductTeam && (
-                      <NavItem
-                        to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
-                        icon={<BoxesIcon size={SIZE.TWENTY} />}
-                        label=""
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                    )}
-                    <NavItem
-                      to={ROUTES_URL.LEAD_SETTINGS}
-                      icon={<SettingsIcon size={SIZE.TWENTY} />}
-                      label=""
-                      onClick={() => setIsDropdownOpen(false)}
-                    />
-                  </div>
-                )}
-              </div>
+                    {/* Mobile View */}
+                    <div className="lg:hidden xl:hidden  px-4 py-2">
+                      <button
+                        onMouseEnter={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="text-gray-700"
+                      >
+                        <Menu size={20} />
+                      </button>
+                      {isDropdownOpen && (
+                        // <div className=" absolute top-full  bg-white  rounded-md py-2 px-3  z-50">
+                        <div className="absolute top-full bg-white shadow-lg rounded-md py-2 px-4 z-50 flex flex-col gap-2">
+                          <NavItem
+                            to={ROUTES_URL.HOME}
+                            icon={<Home size={SIZE.TWENTY} />}
+                            label=""
+                            onClick={() => setIsDropdownOpen(false)}
+                          />
+                          <NavItem
+                            to={ROUTES_URL.GET_COMPANY_USERS}
+                            icon={<Building2 size={SIZE.TWENTY} />}
+                            label=""
+                            onClick={() => setIsDropdownOpen(false)}
+                          />
+                          {userHasAccessToViewLead && (
+                            <NavItem
+                              to={ROUTES_URL.GET_LEAD_MANAGEMENT}
+                              icon={<Handshake size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+                          {userHasAccessToViewProduct && (
+                            <NavItem
+                              to={ROUTES_URL.PRODUCT_MANAGEMENT}
+                              icon={<Store size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+                          {userHasAccessToViewTeamManagement && (
+                            <NavItem
+                              to={ROUTES_URL.TEAM_MANAGEMENT}
+                              icon={<Network size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+                          {userHasAccessToViewProductTeam && (
+                            <NavItem
+                              to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
+                              icon={<BoxesIcon size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+
+                          <NavItem
+                            to={ROUTES_URL.LEAD_SETTINGS}
+                            icon={<SettingsIcon size={SIZE.TWENTY} />}
+                            label=""
+                            onClick={() => setIsDropdownOpen(false)}
+                          />
+                          <NavItem
+                            to={ROUTES_URL.EMAIL_TEMPLATE}
+                            icon={<MessageCircle size={SIZE.TWENTY}/>}
+                            onClick={() => setIsDropdownOpen(false)}
+                            label=""
+                          />
+                        </div>
+                      )}
+                    </div>
                   </>
                 )}
-                
 
                 <div className=" flex items-center space-x-4">
                   {!isSmallScreen && (
@@ -405,17 +427,23 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                         {/* Menu Options */}
                         <div className="flex flex-col">
-                         {userHasAccessToViewUser ? (
-                           <button onClick={handleClickOnUserProfile} className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                             👤 Profile 
-                          </button>
-                         ):(
-                           <button onClick={() =>{
-                            setAccessDeniedPopUpView(true);
-                           }} className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                             👤 Profile 
-                          </button>
-                         )}
+                          {userHasAccessToViewUser ? (
+                            <button
+                              onClick={handleClickOnUserProfile}
+                              className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                            >
+                              👤 Profile
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setAccessDeniedPopUpView(true);
+                              }}
+                              className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                            >
+                              👤 Profile
+                            </button>
+                          )}
                           <button className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
                             ⚙️ Account Setting
                           </button>
@@ -460,7 +488,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             position === "left"
               ? sidebarOpen && !isSmallScreen
                 ? "mt-16 ml-60 flex justify-center items-center"
-                : "mt-12 ml-14 flex justify-center items-center"
+                : "mt-12 ml-10 flex justify-center items-center"
               : "mt-12 ml-0 flex justify-center items-center"
           }
         >
