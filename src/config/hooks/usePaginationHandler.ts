@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { STRING_VALUES } from '../../constants/AppConstants';
-import PAGINATION from '../../constants/Pagination';
+import { useUserPreference } from '../../context/user/UserPreference';
 
 interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
@@ -22,7 +22,10 @@ interface UseSearchFilterPaginationDateHandlersResult {
 
 export const useSearchFilterPaginationDateHandlers = (
 ): UseSearchFilterPaginationDateHandlersResult => {
-  const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
+  const {userPreference}=useUserPreference();
+
+  // const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
+  const firstValue = userPreference.rowsInGrid;
   const [pageSize, setPageSize] = useState(firstValue);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Initialize totalPages
@@ -32,7 +35,13 @@ export const useSearchFilterPaginationDateHandlers = (
   const [searchParameter, setSearchParameter] = useState('');
   const [concatDate, setConcatDate] = useState('');
 
-  
+
+  // useEffect(()=>{
+   
+  //  firstValue = userPreference.rowsInGrid 
+  // },[userPreference])
+
+
     const formatDate = (date: Date): string => {
       if (!date || date.toString() === STRING_VALUES.INVALID_DATE) return "";
       const day = date.getDate().toString().padStart(2, "0");
@@ -110,11 +119,6 @@ export const useSearchFilterPaginationDateHandlers = (
     setCurrentPage(1);
   };
 
-  
-
-
-
-  
   // Update concatenated date string
   useEffect(() => {
     if (dateRangeId === 8) {

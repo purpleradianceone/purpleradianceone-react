@@ -74,12 +74,21 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   ) => {
     const updatedStatus = !product.isActive;
 
+    // const postData = {
+    //   company_id: loginStatus.companyId,
+    //   id: product.id,
+    //   lead_interest_id: product.leadInterestId,
+    //   quantity_required: product.quantityRequired,
+    //   cost_expected: product.costExpected,
+    //   isactive: updatedStatus,
+    //   updatedby: loginStatus.id,
+    // };
     const postData = {
       company_id: loginStatus.companyId,
       id: product.id,
-      lead_interest_id: product.leadInterestId,
-      quantity_required: product.quantityRequired,
-      cost_expected: product.costExpected,
+      lead_interest_id:null,
+      quantity_required: null,
+      cost_expected: null,
       isactive: updatedStatus,
       updatedby: loginStatus.id,
     };
@@ -199,6 +208,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         isactive: product.isActive,
         updatedby : loginStatus.id,
       };
+
       const updatedProduct: LeadAssignedCompanyProduct = {
         ...product,
         quantityRequired: parsedQuantity,
@@ -227,7 +237,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handleUpdateLeadCompanyProductStatus,
+          callFunctionWithEvent: handleSaveClick,
         });
 
         if (refreshTokenStatus) {

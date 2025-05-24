@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PaginationProps from "../../@types/List/PaginationProps";
 import COLORS from "../../constants/Colors";
-import PAGINATION from "../../constants/Pagination";
+import { useMasterRowsInGrid } from "../../config/hooks/useMasterRowsInGrid";
 
 function Pagination({
   totalPages,
@@ -28,7 +28,9 @@ function Pagination({
   };
 
   // const sizeArray=[15,10,5];
-  const sizeArray = PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION;
+  // const sizeArray = PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION;
+  const {rowsInGridDropdownOptions}= useMasterRowsInGrid();
+  const sizeArray=rowsInGridDropdownOptions
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       <label htmlFor="pageSize" className="text-sm">Page Size</label>
@@ -43,9 +45,9 @@ function Pagination({
           fontSize: "0.85rem",
         }}
       >
-        {sizeArray.map((size) => (
-          <option key={size} value={size}>
-            {size}
+        {sizeArray.map((data) => (
+          <option key={data.id} value={data.rowsInGrid}>
+            {data.rowsInGrid}
           </option>
         ))}
       </select>
@@ -99,72 +101,6 @@ function Pagination({
     </div>
   );
   
-  // return (
-  //   <div  style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-  //     <label htmlFor="pageSize" className="text-sm">Page Size</label>
-  //     <select
-  //       id="pageSize"
-  //       value={pageSize}
-  //       onChange={handlePageSizeChange}
-  //       style={{
-  //         padding: "5px",
-  //         border: "1px solid #ccc",
-  //         borderRadius: "5px",
-  //       }}
-  //     >
-  //       {sizeArray.map((size) => (
-  //         <option key={size} value={size}>
-  //           {size}
-  //         </option>
-  //       ))}
-  //     </select>
-  //     <button
-  //       onClick={handlePreviousPage}
-  //       disabled={currentPage === 1}
-  //       style={{
-  //         padding: "5px 10px",
-  //         border: "1px solid #ccc",
-  //         borderRadius: "5px",
-  //         backgroundColor: currentPage === 1? COLORS.WHITE_SMOKE : COLORS.WHITE,
-  //         cursor: currentPage === 1 ? "not-allowed" : "pointer",
-  //       }}
-  //     >
-  //       <ChevronLeft/>
-  //     </button>
-  //     <span>
-  //       Page{" "}
-  //       <input
-  //         type="number"
-  //         value={currentPage}
-  //         onChange={(e) => {
-  //           onPageChange(Number(e.target.value));
-  //         }}
-  //         style={{
-  //           width: "50px",
-  //           textAlign: "center",
-  //           padding: "5px",
-  //           border: "1px solid #ccc",
-  //           borderRadius: "5px",
-  //         }}
-  //       />{" "}
-  //       of {Number(totalPages)}
-  //     </span>
-  //     <button
-  //       onClick={handleNextPage}
-  //       disabled={currentPage === totalPages}
-  //       style={{
-  //         // background:"none",
-  //         padding: "5px 10px",
-  //         border: "1px solid #ccc",
-  //         borderRadius: "5px",
-  //         backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE: COLORS.WHITE,
-  //         cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-  //       }}
-  //     >
-  //       <ChevronRight/>
-  //     </button>
-  //   </div>
-  // );
 }
 
 export default Pagination;
