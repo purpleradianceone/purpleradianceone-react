@@ -124,7 +124,7 @@ function AddTeamModal({
           name: AddTeamFormData.name,
           description: AddTeamFormData.description,
           company_user_array: addCompanyTeamUserArray,
-          createdby: loginStatus.id,
+          createdbyid: loginStatus.id,
         };
 
         try {

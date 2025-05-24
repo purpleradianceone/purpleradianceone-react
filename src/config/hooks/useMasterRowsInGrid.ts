@@ -38,7 +38,7 @@ export const useMasterRowsInGrid = () => {
                 }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: ApiError | any) => {  
+            .catch((error: ApiError | any) => {
                 if (error.status === STATUS_CODE.UNATHORISED) {
 
                     RefreshToken({ callFunction: fetchMasterRowsInGridDropdownOptions })
@@ -47,7 +47,11 @@ export const useMasterRowsInGrid = () => {
     }
 
     useEffect(() => {
-        fetchMasterRowsInGridDropdownOptions();
+        const delay = 200;
+        const timerId = setTimeout(() => {
+            fetchMasterRowsInGridDropdownOptions()
+        }, delay)
+        return () => clearTimeout(timerId);
     }, []);
     return {
         rowsInGridDropdownOptions,
