@@ -56,51 +56,13 @@ const MeetingScheduler = () => {
   >([]);
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { googleMeetStatus } = useGoogleMeetContext();
+  const {zoomMeetingStatus} = useZoomMeetingContext();
 
-  const { googleMeetStatus, setGoogleMeetStatus } = useGoogleMeetContext();
-  const {zoomMeetingStatus,setZoomMeetingStatus} = useZoomMeetingContext();
 
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
 
   const handleGoogleMeetAuth = () => {
-    localStorage.setItem("redirectPlatform","Google Meet");
-    const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/google";
-    const params = new URLSearchParams();
-    params.append("company_id", loginStatus.companyId.toString());
-    params.append("company_user_id", loginStatus.id.toString());
-    params.append("createdby", loginStatus.id.toString());
-    window.location.href = `${baseUrl}?${params}`;
-    // window.open(POST_API.GOOGLE_MEET_AUTH, '_blank')
-  };
-
-  const handleGoogleMeetCallback = async (code: string, state: string) => {
-    const googleMeetCallbackPostData = {
-      company_id: loginStatus.companyId,
-      code: code,
-      state: state,
-      company_user_id: loginStatus.id,
-    };
-
-    axios
-      .post(POST_API.GOOGLE_MEET_CALLBACK, googleMeetCallbackPostData, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.status === STATUS_CODE.OK) {
-          console.log(response);
-          setGoogleMeetStatus({
-            isConnected: true,
-          });
-          const newUrl = window.location.pathname;
-          window.history.replaceState(null, "", newUrl);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    navigate(ROUTES_URL.GOOGLE_OAUTH);
   };
 
   const createGoogleMeetMeeting = async () => {
@@ -132,7 +94,10 @@ const MeetingScheduler = () => {
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response);
+          if(response.status === STATUS_CODE.OK){
+            console.log(response);
+          }
+
 
           setTitle("");
           setEndTime("");
@@ -148,6 +113,9 @@ const MeetingScheduler = () => {
         })
         .catch((error) => {
           console.log(error);
+                  if(error.status === STATUS_CODE.PERMANENT_REDIRECT){
+            handleGoogleMeetAuth();
+          }
         });
     } else {
       alert("Please fill all the fields");
@@ -312,46 +280,7 @@ const MeetingScheduler = () => {
   };
 
   const handleZoomMeetingsOAuth = () => {
-    localStorage.setItem("redirectPlatform","Zoom Meetings");
-        const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
-    const params = new URLSearchParams();
-    params.append("company_id", loginStatus.companyId.toString());
-    params.append("company_user_id", loginStatus.id.toString());
-    params.append("createdby", loginStatus.id.toString());
-    params.append("redirect_url" , window.location.origin + window.location.pathname )
-    // console.log(window.location.origin + window.location.pathname);
-    window.location.href = `${baseUrl}?${params}`;
-    }
-
-    const handleZoomMeetingOAuthCallback = (codeString : string, stateString : string) => {
-      const zoomMeetingCallbackPostData = {
-      company_id: loginStatus.companyId,
-      code: codeString,
-      state: stateString,
-      redirect_url: window.location.origin + window.location.pathname,
-      company_user_id: loginStatus.id,
-    };
-
-    axios
-      .post(POST_API.ZOOM_MEETINGS_CALLBACK, zoomMeetingCallbackPostData, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if(response.status === STATUS_CODE.OK){
-        localStorage.setItem("zoomCallbackResponse" , JSON.stringify(response.data));
-        // if(response.status == STATUS_CODE.OK){
-        //   createZoomMeeting(response.data.access_token);
-        // }
-        
-        const newUrl = window.location.pathname;
-        window.history.replaceState(null, "", newUrl);
-        }
-        
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    navigate(ROUTES_URL.ZOOM_OAUTH);
     }
 
   const timeOptions = generateTimeOptions();
@@ -394,18 +323,6 @@ const MeetingScheduler = () => {
     sessionStorage.removeItem("leadData");
     navigate(newPath);
   };
-
-  useEffect(() => {
-    if (code && state) {
-      const redirectPlatform = localStorage.getItem("redirectPlatform");
-      if (!googleMeetStatus.isConnected && redirectPlatform === "Google Meet") {
-        handleGoogleMeetCallback(code, state);
-      }
-      else if(!zoomMeetingStatus.isConnected && redirectPlatform === "Zoom Meetings") {
-        handleZoomMeetingOAuthCallback(code, state);
-      }
-    }
-  }, []);
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto">

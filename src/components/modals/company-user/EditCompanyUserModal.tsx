@@ -94,6 +94,8 @@ function EditCompanyUserModal({
     navigate(ROUTES_URL.SIGN_IN);
   };
 
+
+
   const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 

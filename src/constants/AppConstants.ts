@@ -9,6 +9,8 @@ export const  STRING_VALUES = {
     REGISTERED : "registered",
     CONFIRM : "Confirm",
     CANCEL : "Cancel",
+    GOOGLE_MEET : "Google Meet",
+    ZOOM_MEETINGS : "Zoom Meetings",
     
 }
 
@@ -38,6 +40,8 @@ export const STATUS_CODE = {
     OK : 200,
     UNATHORISED : 401,
     FORBIDDEN : 403,
+    PERMANENT_REDIRECT : 308,
+
 }
 export const JSX_CHILDREN_NAME = {
     ADD_SUBSCRIPTION: "Upfront Purchase",

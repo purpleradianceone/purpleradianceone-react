@@ -1,10 +1,12 @@
+/* eslint-disable no-constant-binary-expression */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createPortal } from "react-dom";
 import FormInput from "../../ui/FormInput";
 import { useEffect, useState } from "react";
 import { useGoogleMeetContext } from "../../../context/meeting/GoogleMeetContext";
-import { Plus, UserPlus, Users, Video, X } from "lucide-react";
+import { Copy, CopyCheck, CopyX, Info, Plus, UserPlus, Users, Video, X } from "lucide-react";
 import { meetingPaltform } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -14,12 +16,15 @@ import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import ApiError from "../../../@types/error/ApiError";
 import RadioButtons from "../../ui/RadioButton";
 import CalendarEventType from "../../../@types/meeting/CalendarEventType";
 import { useZoomMeetingContext } from "../../../context/meeting/ZoomMeetingContext";
+import { CLASS_NAMES } from "../../../constants/ClassNames";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../constants/Routes";
 
 function EditMeetingDetailsModal({
   meetingDetails,
@@ -81,6 +86,8 @@ function EditMeetingDetailsModal({
     meetingDetails!.description
   );
 
+  const navigate = useNavigate();
+
   const [meetingStatus, setMeetingStatus] = useState<
     | "confirmed"
     | "cancelled"
@@ -126,6 +133,10 @@ function EditMeetingDetailsModal({
     isAddCompanyUserEmailAttedeesModalOpen,
     setIsAddCompanyUserEmailAttedeesModalOpen,
   ] = useState<boolean>(false);
+
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
+    "idle"
+  );
 
   const generateTimeOptions = () => {
     const options = [];
@@ -260,6 +271,29 @@ function EditMeetingDetailsModal({
     );
   };
 
+  const handleCopyMeetingDetailsToClipboard = async () => {
+    const detailsToCopy =
+      meetingDetails.platform === 1
+        ? `Meeting link : ${meetingDetails.meetingLink},\nMeeting ID : ${meetingDetails.meetingConferenceId}`
+        : `Meeting Link : ${meetingDetails.zoomMeetingJoinLink},\nMeeting ID : ${meetingDetails.meetingIdFromZoom},\nMeeting Password : ${meetingDetails.zoomMeetingPasswordGeneral}\nH323 Password : ${meetingDetails.zoomMeetingPasswordH323}\nPSTN Password : ${meetingDetails.zoomMeetingPassworsPstn}`;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(detailsToCopy);
+        setCopyStatus("copied");
+        setTimeout(() => setCopyStatus("idle"), 2000); // Reset status after 2 seconds
+      } else {
+        alert("Clipboard API not available. Please copy manually.");
+        setCopyStatus("failed");
+        setTimeout(() => setCopyStatus("idle"), 3000); // Reset status after 3 seconds
+      }
+    } catch (err) {
+      console.error("Failed to copy meeting details: ", err);
+      setCopyStatus("failed");
+      setTimeout(() => setCopyStatus("idle"), 3000); // Reset status after 3 seconds
+    }
+  };
+
   const timeOptions = generateTimeOptions();
 
   const getCompanyUsersPresentInAttendeesArray = async (
@@ -308,6 +342,14 @@ function EditMeetingDetailsModal({
     }
   };
 
+  const handleOAuthConsent = () => {
+    if (selectedMeetingPlatform === "Google Meet") {
+      navigate(ROUTES_URL.GOOGLE_OAUTH);
+    } else if (selectedMeetingPlatform === "Zoom Meetings") {
+      navigate(ROUTES_URL.ZOOM_OAUTH);
+    }
+  };
+
   const updateMeetingDetails = async () => {
     if (
       title !== "" &&
@@ -315,6 +357,15 @@ function EditMeetingDetailsModal({
       endDate !== "" &&
       startTime !== "" &&
       endTime !== "" &&
+      (title !== meetingDetails.title ||
+        description !== meetingDetails.description ||
+        meetingDetails.startDateByUserTimeZone !==
+          new Date(`${startDate} ${startTime}:00`) ||
+        meetingDetails.endDateByUserTimeZone !==
+          new Date(`${endDate} ${endTime}:00`) ||
+        (!meetingDetails.isActive
+          ? meetingDetails.meetingStatusFromGoogle !== "confirmed"
+          : meetingDetails.meetingStatusFromZoom !== "waiting")) &&
       meetingPaltform
     ) {
       setIsCreating(true);
@@ -359,6 +410,9 @@ function EditMeetingDetailsModal({
         })
         .catch((error) => {
           console.log(error);
+          if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+            handleOAuthConsent();
+          }
         });
     }
   };
@@ -392,25 +446,68 @@ function EditMeetingDetailsModal({
       <div className="max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
         <div className="flex justify-between">
           <h1 className="text-xl font-semibold mb-3 text-gray-800">
-            Schedule Meeting
+            Update Meeting
+            {!meetingDetails.isActive && (
+              <div className="flex gap-2 ">
+                <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
+                <span className="text-red-500 text-xs mt-1">
+                  This Meeting Has been cancelled
+                </span>
+              </div>
+            )}
           </h1>
-          <div className="flex self-start">
-            <Button
+
+          <div className="flex gap-2 self-start">
+            {meetingDetails.isActive && (
+              <Button
+                onClick={() => {
+                  if (meetingDetails.platform === 1) {
+                    window.open(meetingDetails.meetingLink, "_blank");
+                  } else if (meetingDetails.platform === 2) {
+                    window.open(meetingDetails.zoomMeetingJoinLink, "_blank");
+                  }
+                }}
+              >
+                <div className="flex gap-2 items-center">
+                  <span>Join</span>
+                  <Video></Video>
+                </div>
+              </Button>
+            )}
+
+            {meetingDetails.isActive && (
+              <button
+                title={
+                  copyStatus === "copied"
+                    ? "Copied!"
+                    : copyStatus === "failed"
+                    ? "Failed to Copy"
+                    : "Copy Meeting Details"
+                }
+                onClick={handleCopyMeetingDetailsToClipboard}
+              >
+                {copyStatus === "copied" && (
+                  <CopyCheck className="text-gray-600 hover:text-gray-500"></CopyCheck>
+                )}
+                {copyStatus === "idle" && (
+                  <Copy className="text-blue-600 hover:text-blue-500"></Copy>
+                )}
+                {copyStatus === "failed" && (
+                  <CopyX className="text-Red-600 hover:text-red-500"></CopyX>
+                )}
+              </button>
+            )}
+
+            <button
               onClick={() => {
-                if(meetingDetails.platform === 1){
-                   window.open(meetingDetails.meetingLink,"_blank") 
-                }
-                else if(meetingDetails.platform === 2){
-                  window.open(meetingDetails.zoomMeetingJoinLink,"_blank")
-                }
+                onClose();
               }}
             >
-              <div className="flex items-center">
-                <span>{"JOIN  "}</span>
-                <Video></Video>
-              </div>
-           
-            </Button>
+              <X
+                size={SIZE.TWENTY}
+                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+              ></X>
+            </button>
           </div>
         </div>
         <div className="mb-1 grid grid-cols-3 gap-1">
@@ -421,9 +518,9 @@ function EditMeetingDetailsModal({
               //   value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Meeting Title"
-              className="mt-1"
               label="Title"
               defaultValue={title}
+              readonly={!meetingDetails.isActive}
             />
           </div>
           <div className="mt-1 col-span-1">
@@ -436,6 +533,7 @@ function EditMeetingDetailsModal({
             <select
               id="startTtime"
               value={selectedMeetingPlatform}
+              disabled={!meetingDetails.isActive}
               onChange={(e) => {
                 if (e.target.value === "Google Meet") {
                   if (googleMeetStatus.isConnected) {
@@ -453,7 +551,11 @@ function EditMeetingDetailsModal({
                   setSelectedMeetingPlatform("");
                 }
               }}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className={
+                meetingDetails.isActive
+                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              }
             >
               <option value="">Select Platform</option>
               {meetingPaltform.map((option) => (
@@ -473,6 +575,7 @@ function EditMeetingDetailsModal({
                 setStartDate(e.target.value);
                 console.log(e.target.value);
               }}
+              readonly={!meetingDetails.isActive}
             />
           </div>
 
@@ -485,9 +588,14 @@ function EditMeetingDetailsModal({
             </label>
             <select
               id="startTtime"
+              disabled={!meetingDetails.isActive}
               defaultValue={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className={
+                meetingDetails.isActive
+                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              }
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -505,6 +613,7 @@ function EditMeetingDetailsModal({
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
+              readonly={!meetingDetails.isActive}
             />
           </div>
 
@@ -519,7 +628,11 @@ function EditMeetingDetailsModal({
               id="endTime"
               defaultValue={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className={
+                meetingDetails.isActive
+                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              }
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -542,6 +655,7 @@ function EditMeetingDetailsModal({
             onChange={(e) => {
               setDescription(e.target.value);
             }}
+            readonly={!meetingDetails.isActive}
           />
         </div>
         <div className="mb-1">
@@ -630,60 +744,57 @@ function EditMeetingDetailsModal({
           )}
         </div>
 
-        {
-          meetingDetails.isActive && (
-<div className="flex justify-end gap-3">
-          <div className="max-w-28 mt-1 place-self-center">
-            <Button
-              className="px-4 py-2.5 text-sm font-medium text-gray-100 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-              onClick={() => {
-                onClose();
-              }}
-            >
-              Close
-            </Button>
-          </div>
-          <div className="max-w-48 mt-1 place-self-center">
-            <Button
-              onClick={() => {
-                if (
-                  googleMeetStatus.isConnected ||
-                  zoomMeetingStatus.isConnected
-                ) {
-                  updateMeetingDetails();
-                } else {
-                  //   handleGoogleMeetAuth();
+        {meetingDetails.isActive && (
+          <div className="flex justify-end gap-3">
+            <div className="max-w-28 mt-1 place-self-center">
+              <Button
+                className="px-4 py-2.5 text-sm font-medium text-gray-100 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                Close
+              </Button>
+            </div>
+            <div className="max-w-48 mt-1 place-self-center">
+              <Button
+                onClick={() => {
+                  if (
+                    !googleMeetStatus.isConnected ||
+                    zoomMeetingStatus.isConnected
+                  ) {
+                    updateMeetingDetails();
+                  } else {
+                    //   handleGoogleMeetAuth();
+                  }
+                }}
+                disabled={
+                  isCreating ||
+                  !title.trim() ||
+                  !startDate ||
+                  !startTime ||
+                  !endDate ||
+                  !endTime
                 }
-              }}
-              disabled={
-                isCreating ||
-                !title.trim() ||
-                !startDate ||
-                !startTime ||
-                !endDate ||
-                !endTime
-              }
-            >
-              {isCreating ? "Updating..." : "Update Meeting"}
-            </Button>
+              >
+                {isCreating ? "Updating..." : "Update Meeting"}
+              </Button>
+            </div>
+            <div className="max-w-28 mt-1 place-self-center">
+              <Button
+                onClick={() => {
+                  if (googleMeetStatus.isConnected) {
+                    //   getGoogleMeeting();
+                  } else {
+                    //   handleGoogleMeetAuth();
+                  }
+                }}
+              >
+                Get
+              </Button>
+            </div>
           </div>
-          <div className="max-w-28 mt-1 place-self-center">
-            <Button
-              onClick={() => {
-                if (googleMeetStatus.isConnected) {
-                  //   getGoogleMeeting();
-                } else {
-                  //   handleGoogleMeetAuth();
-                }
-              }}
-            >
-              Get
-            </Button>
-          </div>
-        </div>
-          )
-        }
-        
+        )}
       </div>
       <AddCompanyUsersEmailAttendeesModal
         isOpen={isAddCompanyUserEmailAttedeesModalOpen}

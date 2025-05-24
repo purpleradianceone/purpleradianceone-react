@@ -7,6 +7,7 @@ const LOCALSTORAGE_KEYS = {
 
     GOOGLE_MEET_STATUS : "googleMeetStatus",
     ZOOM_MEETING_STATUS : "zoomMeetingStatus",
-    USER_PREFERENCE : "userpreference"
+    USER_PREFERENCE : "userpreference",
+    REDIRECT_PLATFORM : "redirectPlatform",
 }
 export default LOCALSTORAGE_KEYS;

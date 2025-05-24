@@ -31,6 +31,9 @@ import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler"
 import { EditorCanvas } from "../../components/email-template/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
 import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
+import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
+import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
+import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
 
 
 
@@ -283,6 +286,29 @@ export const router = createBrowserRouter([
           <UserPrerefenceManagement/>
         </Navbar>
       </PrivateRoute>
+    )
+  },{
+    path : ROUTES_URL.GOOGLE_OAUTH,
+    element : (
+        <GoogleOAuthConsent></GoogleOAuthConsent>
+    )
+  },
+  {
+    path : ROUTES_URL.ZOOM_OAUTH,
+    element : (
+        <ZoomMeetingsOAuthConsent></ZoomMeetingsOAuthConsent>
+    )
+  },
+  {
+    path : ROUTES_URL.GOOGLE_OAUTH_ANDROID,
+    element : (
+      <GoogleOAuthConsentAndroid></GoogleOAuthConsentAndroid>
+    )
+  },
+  {
+    path : ROUTES_URL.ZOOM_OAUTH_ANDROID,
+    element : (
+      <ZoomMeetingsOAuthConsent></ZoomMeetingsOAuthConsent>
     )
   }
 ]);
