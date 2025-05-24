@@ -33,6 +33,9 @@ import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import EditMeetingDetailsModal from "./EditMeetingDetailsModal";
 import CalendarEventType from "../../../@types/meeting/CalendarEventType";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 const localizer = momentLocalizer(moment);
 
@@ -55,6 +58,9 @@ function LeadMeetingsModal({
 
   const [meetingDetailsUpdateCount, setMeetDetailsUpdateCount] =
     useState<number>(0);
+
+  const [isSessionExpiredDialogueOpen, setIsSessionExpiredDialogueOpen] =
+    useState<boolean>(false);
 
   const leadDataSearchParams = JSON.parse(searchParams.get("leadData") || "{}");
   const [isEditMettingModalOpen, setIsEditMettingModalOpen] =
@@ -79,10 +85,12 @@ function LeadMeetingsModal({
       startDateByUserTimeZone: new Date(),
       title: "",
       isAttendeePresent: false,
-      platform : 1,
+      platform: 1,
     });
 
   const viewNames = ["month", "week", "day", "agenda"];
+
+  const [concatDate,setConcatDate] = useState<string>("");
 
   const getGoogleMeeting = async () => {
     setGoogleMeetEventData([]);
@@ -124,21 +132,33 @@ function LeadMeetingsModal({
                 attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
-                platform : 1,
-                isActive : res.isactive,
-                createdBy : res.createdby,
-                updatedBy : res.updatedby,
-                createdOn : res.createdon,
-                updatedOn : res.updatedon
+                platform: 1,
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                updatedBy: res.updatedby,
+                createdOn: res.createdon,
+                updatedOn: res.updatedon,
               },
             ]);
-
           });
-           getZoomMeeting();
+          getZoomMeeting();
         }
       })
-      .catch((error) => {
+      .catch(async (error: ApiError | any) => {
         console.log(error);
+
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: getGoogleMeeting,
+          });
+          if (refreshTokenStatus) {
+            setIsSessionExpiredDialogueOpen(false);
+          } else {
+            setIsSessionExpiredDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsSessionExpiredDialogueOpen(true);
+        }
       });
   };
 
@@ -148,28 +168,31 @@ function LeadMeetingsModal({
       company_user_id: loginStatus.id,
       requestedby: loginStatus.id,
     };
-    await axios.post(POST_API.GET_ZOOM_MEETING,getZoomMeetingsPostData,{
-      withCredentials : true
-    })
-    .then((response) => {
-      if(response.status === STATUS_CODE.OK){
-        response.data.map((res : any) => {
-setGoogleMeetEventData((prev) => [...prev,{
+    await axios
+      .post(POST_API.GET_ZOOM_MEETING, getZoomMeetingsPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          response.data.map((res: any) => {
+            setGoogleMeetEventData((prev) => [
+              ...prev,
+              {
                 count: res.count,
                 companyId: res.company_id,
                 id: res.id,
                 companyUserId: res.company_user_id,
-                meetingHostIdFromZoom : res.meeting_host_id_from_zoom,
-                meetingStatusFromZoom : res.meeting_status_from_zoom,
-                title : res.summary_title,
-                description : res.description,
-                creatorEmail : res.creator_email,
-                meetingIdFromZoom : res.meeting_id_from_zoom,
-                zoomMeetingJoinLink : res.meeting_join_link,
-                zoomMeetingStartLink : res.meeting_start_link,
-                zoomMeetingPasswordGeneral : res.meeting_password_general,
-                zoomMeetingPasswordH323 : res.meeting_h323_password,
-                zoomMeetingPassworsPstn : res.meeting_pstn_password,
+                meetingHostIdFromZoom: res.meeting_host_id_from_zoom,
+                meetingStatusFromZoom: res.meeting_status_from_zoom,
+                title: res.summary_title,
+                description: res.description,
+                creatorEmail: res.creator_email,
+                meetingIdFromZoom: res.meeting_id_from_zoom,
+                zoomMeetingJoinLink: res.meeting_join_link,
+                zoomMeetingStartLink: res.meeting_start_link,
+                zoomMeetingPasswordGeneral: res.meeting_password_general,
+                zoomMeetingPasswordH323: res.meeting_h323_password,
+                zoomMeetingPassworsPstn: res.meeting_pstn_password,
                 startDateByIST: res["Start Date By Indian Time"],
                 endDateByIST: res["End Date By Indian Time"],
                 startDateByUserTimeZone: new Date(
@@ -178,47 +201,71 @@ setGoogleMeetEventData((prev) => [...prev,{
                 endDateByUserTimeZone: new Date(
                   res["End Date By User Time Zone"]
                 ),
-                 attendeesEmailAll: res.attendees_email_all,
+                attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
-                platform : 2,
-                isActive : res.isactive,
-                createdBy : res.createdby,
-                updatedBy : res.updatedby,
-                createdOn : res.createdon,
-                updatedOn : res.updatedon
-      }]) 
-        })
- 
-      }
-     
-    })
-    .catch((error) =>{
-      console.log(error);
-    });
-  }
+                platform: 2,
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                updatedBy: res.updatedby,
+                createdOn: res.createdon,
+                updatedOn: res.updatedon,
+              },
+            ]);
+          });
+        }
+      })
+      .catch(async (error: ApiError | any) => {
+        console.log(error);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: getZoomMeeting,
+          });
+          if (refreshTokenStatus) {
+            setIsSessionExpiredDialogueOpen(false);
+          } else {
+            setIsSessionExpiredDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsSessionExpiredDialogueOpen(true);
+        }
+      });
+  };
 
-  const eventStyleGetter = (event : CalendarEventType ) => {
-    let backgroundColor = '';
-    if (event.platform === 1) {
-      backgroundColor = 'lightviolet';
-    } else if (event.platform === 2) {
-      backgroundColor = 'lightgreen';
-    } else if (event.platform === 3) {
-      backgroundColor = 'lightcoral';
+  const eventStyleGetter = (event: CalendarEventType) => {
+    let backgroundColor = "";
+    let color = "";
+    if (event.platform === 1 && event.isActive && view !== "agenda") {
+      backgroundColor = "lightgreen";
+      color = "black";
+    } else if (event.platform === 2 && event.isActive  && view !== "agenda") {
+      backgroundColor = "blue";
+      color = "white";
+    } else if (event.platform === 3 && event.isActive  && view !== "agenda") {
+      backgroundColor = "lightcoral";
+    } else if (!event.isActive  && view !== "agenda") {
+      backgroundColor = "lightcoral";
+      color = "white";
+    }
+    else if(view === "agenda"){
+      backgroundColor = "#1e88e5";
+      color = !event.isActive ? "red" : "white";
     }
 
     const style = {
       backgroundColor: backgroundColor,
-      borderRadius: '5px',
-      opacity: 0.8,
-      color: 'black',
-      border: '0px',
-      display: 'block',
-      boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)', // Adding a subtle shadow
-      fontSize: '0.7em', // Making the text extra small
+      borderRadius: "5px",
+      opacity: 0.7,
+      color: color,
+      textSize: "12px",
+      border: "0px",
+      height : view === "agenda" ? "20px" : "auto",
+      display: view === "agenda" ? "flex-1" : "block",
+      marginTop : view === "agenda" ? "2px" : "0px",
+      boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.2)", // Adding a subtle shadow
+      fontSize: "0.8em", // Making the text extra small
+      
     };
-
 
     return {
       style: style,
@@ -230,10 +277,23 @@ setGoogleMeetEventData((prev) => [...prev,{
   const [view, setView] = useState<View>("day");
 
   const goToToday = useCallback(() => {
+    if(view === "agenda"){
+      alert(moment(new Date()).format("DD-MMM-YYYY"));
+    }
     setCurrentViewDate(new Date());
   }, []);
 
   const goBack = useCallback(() => {
+    if(view === "agenda"){
+      alert(moment(currentViewDate).subtract(1,"days").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY"));
+    }
+    else if(view === "month"){
+      alert(moment(currentViewDate).subtract(1,"months").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY") );
+    }
+    else if(view === "week"){
+      alert(moment(currentViewDate).subtract(1,"weeks").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY") );
+    }
+    console.log(currentViewDate + " - " + moment(currentViewDate).subtract(1,"days").toDate());
     setCurrentViewDate(
       moment(currentViewDate)
         .subtract(
@@ -245,6 +305,15 @@ setGoogleMeetEventData((prev) => [...prev,{
   }, [currentViewDate, view]);
 
   const goNext = useCallback(() => {
+    if(view === "agenda"){
+      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " +moment(currentViewDate).add(1,"days").format("DD-MMM-YYYY"));
+    }
+    else if(view === "month"){
+      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " +moment(currentViewDate).add(1,"months").format("DD-MMM-YYYY"));
+    }
+    else if(view === "week"){
+      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " + moment(currentViewDate).add(1,"weeks").format("DD-MMM-YYYY"));
+    }
     setCurrentViewDate(
       moment(currentViewDate)
         .add(
@@ -255,24 +324,23 @@ setGoogleMeetEventData((prev) => [...prev,{
     );
   }, [currentViewDate, view]);
 
-  const goFirst = useCallback(() => {
-    setCurrentViewDate(moment(currentViewDate).startOf("month").toDate());
-  }, [currentViewDate]);
-
-  const goLast = useCallback(() => {
-    setCurrentViewDate(moment(currentViewDate).endOf("month").toDate());
-  }, [currentViewDate]);
-
   const onViewChange = useCallback((newView: View) => {
     setView(newView);
   }, []);
 
   const onDateChange = useCallback((newDate: Date) => {
+    console.log(currentViewDate + " - " + newDate);
     setCurrentViewDate(newDate);
   }, []);
 
   const handleMeetingDetailsUpdate = () => {
     setMeetDetailsUpdateCount(meetingDetailsUpdateCount + 1);
+  };
+
+  const handleSessionExpiredDialogueConfirm = () => {
+    setIsSessionExpiredDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
   };
 
   useEffect(() => {
@@ -441,7 +509,7 @@ setGoogleMeetEventData((prev) => [...prev,{
             onClick={() => {
               // setScheduleMeetingModalOpen(true);
               if (isMeetingModalOpenFromProp) {
-                navigate(ROUTES_URL.SCHEDULE_MEETING);
+                navigate(ROUTES_URL.SCHEDULE_MEETING + "?from=");
               } else {
                 sessionStorage.setItem(
                   "leadData",
@@ -547,7 +615,7 @@ setGoogleMeetEventData((prev) => [...prev,{
                 </div>
               </div>
               <div className="border rounded-lg shadow-md overflow-hidden">
-                <Calendar<CalendarEventType>
+                <Calendar
                   localizer={localizer}
                   events={googleMeetEventData}
                   startAccessor="startDateByUserTimeZone"
@@ -565,7 +633,6 @@ setGoogleMeetEventData((prev) => [...prev,{
                     setSelectedMeetingEvent(event);
                     setIsEditMettingModalOpen(true);
                   }}
-                
                 />
               </div>
             </div>
@@ -583,6 +650,14 @@ setGoogleMeetEventData((prev) => [...prev,{
           handleMeetingDetailsUpdate={handleMeetingDetailsUpdate}
         />
       )}
+
+      <DialogueBox
+        isOpen={isSessionExpiredDialogueOpen}
+        onClose={() => setIsSessionExpiredDialogueOpen(false)}
+        onConfirm={handleSessionExpiredDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
     </div>
   );
 }

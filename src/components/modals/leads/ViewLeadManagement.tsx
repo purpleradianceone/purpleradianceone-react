@@ -64,8 +64,7 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
 
   //NOTE : THIS IS THE SELECTED LEAD
-  const [selectedLeadData, setSelectedLeadData] = useState(
-    JSON.parse(searchParams.get("leadData") || "{}")
+  const [selectedLeadData, setSelectedLeadData] = useState(JSON.parse(searchParams.get("leadData") || "{}")
   );
 
   const [leadStatus, setLeadStatus] = useState<
@@ -1073,7 +1072,7 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 50% width */}
-        <div className="w-[50%] h-full bg-green-50 border my-2  p-4">
+        <div className="w-[50%] h-full overflow-y-auto bg-green-50 border my-2  p-4">
           <LeadMeetingsModal
           isCalendarViewEnabled={false}
           isMeetingModalOpenFromProp={false}

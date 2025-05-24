@@ -25,7 +25,11 @@ const ROUTES_URL = {
     SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
     EMAIL_TEMPLATE : "/email-template",
-    EMAIL_TEMPLATE_CREATE : "/email-template/create"
+    EMAIL_TEMPLATE_CREATE : "/email-template/create",
+    GOOGLE_OAUTH : "/authenticate/google",
+    ZOOM_OAUTH : "/authenticate/zoom",
+    GOOGLE_OAUTH_ANDROID : "/authenticate/google/android",
+    ZOOM_OAUTH_ANDROID : "/authenticate/zoom/android"
     
 }
 export default ROUTES_URL;
