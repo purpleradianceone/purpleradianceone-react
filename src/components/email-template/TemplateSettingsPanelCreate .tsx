@@ -63,7 +63,7 @@ function getHtmlEmailBody(): string {
        const createEmailTemplateCreate = async(emailBody:string)=>{
                     const postDataCreateEmailTemplate = {
                           "company_id":loginStatus.companyId,
-                          "createdby":loginStatus.id,
+                          "createdby_id":loginStatus.id,
                           "email_type_id":JSON.parse(params!).id,
                           "name":templateName,
                           "email_subject":subject,
@@ -90,9 +90,9 @@ function getHtmlEmailBody(): string {
         onClick={() => setIsOpen(true)}
         style={{
           position: "fixed",
-          top: "100px",
+          top: "125px",
           right: 0,
-          padding: "8px 16px",
+          padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
@@ -107,7 +107,7 @@ function getHtmlEmailBody(): string {
         <div
           style={{
             position: "fixed",
-            top: "100px",
+            top: "120px",
             right: 2,
             backgroundColor: "white",
             padding: "20px",
@@ -231,6 +231,8 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
+                    maxHeight: "120px",
+                    overflowY: "auto",
                   }}
                 >
                   <option value="">Insert Dynamic Field In Subject</option>

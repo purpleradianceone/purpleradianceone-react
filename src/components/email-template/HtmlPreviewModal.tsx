@@ -7,7 +7,7 @@ interface HtmlPreviewModalProps {
   onClose: () => void;
   html: string;
   onHtmlChange: (updatedHtml: string) => void;
-  visible?: boolean; // controls Save button + editability
+  editable?: boolean; // controls Save button + editability
 }
 
 export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
@@ -15,12 +15,12 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
   onClose,
   html,
   onHtmlChange,
-  visible = false
+  editable = false
 }) => {
   const editableRef = useRef<HTMLDivElement>(null);
 
   const handleSave = () => {
-    if (editableRef.current && visible) {
+    if (editableRef.current && editable) {
       onHtmlChange(editableRef.current.innerHTML);
     }
     onClose();
@@ -50,7 +50,7 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
         <h2>HTML Preview</h2>
         <div
           ref={editableRef}
-          contentEditable={visible}
+          contentEditable={editable}
           suppressContentEditableWarning
           dangerouslySetInnerHTML={{ __html: html }}
           style={{
@@ -60,12 +60,12 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
             backgroundColor: "#fff",
             overflowY: "auto",
             marginBottom: "20px",
-            cursor: visible ? "text" : "not-allowed",
+            cursor: editable ? "text" : "not-allowed",
           }}
         />
 
         <div style={{ display: "flex", gap: "10px" }}>
-          {visible && (
+          {editable && (
             <button
               onClick={handleSave}
               style={{
