@@ -51,7 +51,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
        const createEmailTemplateInsert = async(emailBody:string)=>{
                     const postDataCreateEmailTemplate = {
                           "company_id":loginStatus.companyId,
-                          "createdby":loginStatus.id,
+                          "createdby_id":loginStatus.id,
                           "email_type_id":JSON.parse(params!).id,
                           "name":templateName,
                           "email_subject":subject,
@@ -79,14 +79,14 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
         onClick={() => setIsOpen(true)}
         style={{
           position: "fixed",
-          top: "100px",
+          top: "50px",
           right: 0,
-          padding: "8px 16px",
+          padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
-          zIndex: 1,
+          zIndex: 10,
         }}
       >
         Save Template
@@ -96,7 +96,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
         <div
           style={{
             position: "fixed",
-            top: "100px",
+            top: "50px",
             right: 2,
             backgroundColor: "white",
             padding: "20px",
@@ -309,7 +309,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                     fontSize: "14px",
                   }}
                 >
-                  Save2
+                  Save
                 </button>
               </div>
             </div>

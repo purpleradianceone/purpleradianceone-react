@@ -13,7 +13,7 @@ interface ExportPanelProps {
 export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml }) => {
   const { query } = useEditor();
 
-  const handleExport = async () => {
+  const handlePreview = async () => {
     const json = query.serialize();
     console.log(json);
     console.log("|||||||||||||||||||||||||||||||||||||||||||");
@@ -39,13 +39,13 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
  
 
   return (
-    <div style={{ display: "flex", gap: "20px" }}>
+    <div style={{ display: "grid", gap: 10 }}>
     <button
-      onClick={handleExport}
+      onClick={handlePreview}
       style={{
-        top: "20px",
+        top: 50,
         left: "50%",
-        padding: "8px 16px",
+        padding: "2px 8px",
         backgroundColor: "#007bff",
         color: "#fff",
         border: "none",
@@ -57,7 +57,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
     </button>
 
     <button onClick={handleCopy} style={{ 
-      padding: "8px 16px", 
+      padding: "2px 8px", 
       backgroundColor: "#4CAF50", 
       color: "white", 
       borderRadius: "4px", 
@@ -65,8 +65,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
       }}>
         Copy HTML
       </button>
-    </div>
-    
+    </div> 
   );
 };
 

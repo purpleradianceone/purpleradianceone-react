@@ -34,6 +34,7 @@ import UserPrerefenceManagement from "../../components/user-profile/UserPreferen
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
+import EmailSettingsPage from "../../components/email-settings/EmailSettingsPage";
 
 
 
@@ -274,6 +275,16 @@ export const router = createBrowserRouter([
       <PrivateRoute>
          <Navbar>
         <EditorCanvas/>
+        </Navbar>
+      </PrivateRoute>
+    ),
+  },
+   {
+    path :ROUTES_URL.EMAIL_SETTING,
+    element : (
+      <PrivateRoute>
+         <Navbar>
+        <EmailSettingsPage/>
         </Navbar>
       </PrivateRoute>
     ),

@@ -29,7 +29,10 @@ const ROUTES_URL = {
     GOOGLE_OAUTH : "/authenticate/google",
     ZOOM_OAUTH : "/authenticate/zoom",
     GOOGLE_OAUTH_ANDROID : "/authenticate/google/android",
-    ZOOM_OAUTH_ANDROID : "/authenticate/zoom/android"
+    ZOOM_OAUTH_ANDROID : "/authenticate/zoom/android",
+
+    //for email settings
+    EMAIL_SETTING : "/email-setting",
     
 }
 export default ROUTES_URL;
