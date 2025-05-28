@@ -67,7 +67,11 @@ function LeadManagementAgGrid({
         sortable: true,
         filter: true,
       },
-      { field: "createdBy", headerName: "Created By", filter: true },
+      { 
+        field: "createdBy",
+        headerName: "Created By",
+        filter: true
+      },
       {
         field: "createdOn",
         headerName: "Created On",
