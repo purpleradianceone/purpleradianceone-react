@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
@@ -34,7 +35,7 @@ import UserPrerefenceManagement from "../../components/user-profile/UserPreferen
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
-import EmailSettingsPage from "../../components/email-settings/EmailSettingsPage";
+import EmailSetting from "../../components/email-settings/EmailSetting";
 
 
 
@@ -284,7 +285,7 @@ export const router = createBrowserRouter([
     element : (
       <PrivateRoute>
          <Navbar>
-        <EmailSettingsPage/>
+        <EmailSetting/>
         </Navbar>
       </PrivateRoute>
     ),
