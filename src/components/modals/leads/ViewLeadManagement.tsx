@@ -714,8 +714,6 @@ const ViewLeadManagement = () => {
   const handleLeadProductUpdate = (
     updatedProduct: LeadAssignedCompanyProduct
   ) => {
-    console.log(updatedProduct);
-    console.log("this is updated lead product");
 
     setLeadAssignedCompanyProduct((prevData) =>
       prevData.map((product) =>
@@ -775,17 +773,27 @@ const ViewLeadManagement = () => {
       mobilenumber: selectedLeadData.mobileNumber,
       updatedby: loginStatus.id,
     };
-    try {
+  try {
       const response = await axios.post(
         POST_API.UPDATE_LEAD,
         PostDataForLeadUpdate,
         { withCredentials: true }
       );
-      if (response.data.status === true) {
-        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+      if (response.data.status) {
+      
+
+        // const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+        // another way to parse query string
+        const rawLeadData = window.location.search;
+        const urlParams = new URLSearchParams(rawLeadData);
+        const leadDataStr = urlParams.get("leadData");
+
+        const parsedQuery = JSON.parse(leadDataStr || "{}");
+
         parsedQuery.name = selectedLeadData.name.toString();
         parsedQuery.email = selectedLeadData.email.toString();
         parsedQuery.mobileNumber = selectedLeadData.mobileNumber.toString();
+
         const newQueryString = qs.stringify({
           leadData: JSON.stringify(parsedQuery),
         });
@@ -1075,9 +1083,9 @@ const ViewLeadManagement = () => {
         {/* Second child: 50% width */}
         <div className="w-[50%] h-full bg-green-50 border my-2  p-4">
           <LeadMeetingsModal
-          isCalendarViewEnabled={false}
-          isMeetingModalOpenFromProp={false}
-          showConnectToPlatform = {false}
+            isCalendarViewEnabled={false}
+            isMeetingModalOpenFromProp={false}
+            showConnectToPlatform={false}
           />
         </div>
       </div>
