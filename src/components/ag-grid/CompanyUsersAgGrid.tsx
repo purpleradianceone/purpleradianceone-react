@@ -230,7 +230,7 @@ function CompanyUserAgGrid({
   return (
     <div
       className="ag-theme-balham w-full"
-      style={{ height: "100%", width: "100%" }}
+      style={{ height: "83vh", width: "100%" }}
     >
       <AgGridReact
         rowData={users}
@@ -238,7 +238,8 @@ function CompanyUserAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        theme={themeBalham} 
+        // domLayout="autoHeight"
       />
     </div>
   );
