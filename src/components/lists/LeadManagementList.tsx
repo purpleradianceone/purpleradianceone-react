@@ -5,6 +5,7 @@ import {
   ClipboardPlus,
   Filter,
   Handshake,
+  LucideNavigation,
   User,
   X,
 } from "lucide-react";
@@ -396,9 +397,7 @@ function LeadManagementList({
               handleRowClick={handleRowClickedForShowLead}
               onRowSelect={handleRowSelectedForShowLead}
               handleLeadDataFormChange={handleLeadDataFormChange}
-              // handleIsEditLeadFormOpen={handleIsEditLeadFormOpen}
               leads={leadData}
-              // handleIdIsMeetingsModalOpen={handleIdIsMeetingsModalOpen}
             />
           </div>
           {/* </div> */}
@@ -407,20 +406,6 @@ function LeadManagementList({
             onClose={handleCreateLeadModalClose}
             onCreateLeadRefreshLeadData={handleAddLead}
           ></CreateLeadModal>
-          {/* <LeadMeetingsModal
-            isOpen={isMeetingdModalOpen}
-            onClose={() => {
-              setIsMeetingsModalOpen(false);
-            }}
-          />
-          <UpdateLeadForm
-            onEditRefreshLeadData={handleAddLead}
-            selectedLeadForEdit={selectedLeadForEdit}
-            isOpen={isEditModalOpenForLead}
-            onClose={() => {
-              setIsEditModalOpenForLead(false);
-            }}
-          /> */}
         </div>
 
         <div className="flex items-center justify-end ">
@@ -459,14 +444,6 @@ function LeadManagementList({
             </div>
           </div>
         )}
-        {/* <ViewLead
-        leadStatus={leadStatus}
-        selectedLeadData={leadDataForViewLead}
-          isOpen={isViewLeadModalOpen}
-          onClose={() => {
-            setIsViewLeadModalOpen(false)
-          }}
-        /> */}
       </div>
     );
   }
