@@ -388,9 +388,8 @@ function LeadManagementList({
         </div>
 
         <div className="flex bg-white rounded-lg shadow-sm p-0">
-          {/* <div className="ag-theme-alpine overflow-y-auto w-full"> */}
           <div
-            className="ag-theme-alpine w-full"
+            className="ag-theme-alpine w-full h-full"
             style={{ height: 505, width: "100%" }}
           >
             <LeadManagementAgGrid
