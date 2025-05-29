@@ -46,9 +46,6 @@ function GoogleOAuthConsent() {
 
 
      const handleGoogleMeetCallback = async (code: string, state: string) => {
-
-      console.log("code : " + code);
-      console.log("state : " + state);
     const googleMeetCallbackPostData = {
       code: code,
       state: state,

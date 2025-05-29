@@ -25,12 +25,8 @@ function Dashboard(){
 
     return (
         <div className="flex w-full">
-          <div className="flex min-w-[98%] ml-5">
-<LeadMeetingsModal
-         isMeetingModalOpenFromProp = {true}
-          isCalendarViewEnabled = {true}
-          showConnectToPlatform = {false}
-          />
+          <div className="flex min-w-[100%] ml-5">
+              home Screen
           </div>
           
         </div>

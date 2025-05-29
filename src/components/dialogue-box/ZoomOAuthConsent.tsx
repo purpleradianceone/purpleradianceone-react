@@ -26,13 +26,14 @@ function ZoomMeetingsOAuthConsent() {
     const handleClose = (isFlowCompleted : boolean) => {
       console.log(window.history)
         if(isFlowCompleted){
-            window.history.go(-6);
+            window.history.go(-7);
         }
         window.history.back();
     }
 
     const handleConfirm = () =>{
       localStorage.setItem(LOCALSTORAGE_KEYS.REDIRECT_PLATFORM,STRING_VALUES.ZOOM_MEETINGS)
+      setZoomMeetingStatus({isConnected:false})
         const baseUrl =
       "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
     const params = new URLSearchParams();
@@ -47,11 +48,9 @@ function ZoomMeetingsOAuthConsent() {
 
      const handleZoomMeetingOAuthCallback = (codeString : string, stateString : string) => {
       const zoomMeetingCallbackPostData = {
-      company_id: loginStatus.companyId,
       code: codeString,
       state: stateString,
       redirect_url: window.location.origin + window.location.pathname,
-      company_user_id: loginStatus.id,
     };
 
     axios

@@ -29,6 +29,7 @@ type FormInputProps = {
     center? : boolean,
     ref?:React.LegacyRef<HTMLInputElement> | undefined,
     inputMode?:"search" | "email" | "tel" | "text" | "url" | "none" | "numeric" | "decimal" | undefined,
+    maxDate? : string
   }
 
   /**

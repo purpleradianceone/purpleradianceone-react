@@ -6,7 +6,18 @@ import { createPortal } from "react-dom";
 import FormInput from "../../ui/FormInput";
 import { useEffect, useState } from "react";
 import { useGoogleMeetContext } from "../../../context/meeting/GoogleMeetContext";
-import { Copy, CopyCheck, CopyX, Info, Plus, UserPlus, Users, Video, X } from "lucide-react";
+import {
+  Copy,
+  CopyCheck,
+  CopyX,
+  Info,
+  Plus,
+  UserPlus,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
+import { parse } from "date-fns";
 import { meetingPaltform } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -16,7 +27,11 @@ import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import {
+  NUMBER_VALUES,
+  SIZE,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import ApiError from "../../../@types/error/ApiError";
 import RadioButtons from "../../ui/RadioButton";
@@ -25,6 +40,14 @@ import { useZoomMeetingContext } from "../../../context/meeting/ZoomMeetingConte
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
+import { useServerCurrentTime } from "../../../config/hooks/useServerCurrentTime";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 function EditMeetingDetailsModal({
   meetingDetails,
@@ -62,22 +85,48 @@ function EditMeetingDetailsModal({
     },
   ];
 
-  const startDateArray = meetingDetails.startDateByIST.split(" ");
+  const { userHasAccessToUpdateMeeting, userHasAccessToViewMeeting } =
+    useUserAccessModules();
+
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  const startDateArray = meetingDetails.startDateByUserTimeZoneString.split(" ");
   const startDateValue = startDateArray[0];
   const startTimeArray = startDateArray[1].split(".");
   const startTimeValue = startTimeArray[0];
 
-  const endDateArray = meetingDetails.endDateByIST.split(" ");
-  const [isAttendeeNotPresentAddedNew, setIsAttendeeNotPresentAddedNew] =
-    useState<boolean>(isAttendeesPresent);
+  const startDateArrayIST = meetingDetails.startDateByIST.split(" ");
+  const startDateValueIST = startDateArrayIST[0];
+  const startTimeArrayIST = startDateArrayIST[1].split(".");
+  const startTimeValueIST = startTimeArrayIST[0].substring(0,5);
+  
+
+  const endDateArray = meetingDetails.endDateByUserTimeZoneString.split(" ");
   const endDateValue = endDateArray[0];
   const endTimeArray = endDateArray[1].split(".");
   const endTimeValue = endTimeArray[0];
+
+   const endDateArrayIST = meetingDetails.endDateByIST.split(" ");
+  const endDateValueIST = endDateArrayIST[0];
+  const endTimeArrayIST = endDateArrayIST[1].split(".");
+  const endTimeValueIST = endTimeArrayIST[0].substring(0,5);
+
+
+  const [isAttendeeNotPresentAddedNew, setIsAttendeeNotPresentAddedNew] =
+    useState<boolean>(isAttendeesPresent);
+  
   const [title, setTitle] = useState<string>(meetingDetails!.title);
+  const [startDate, setStartDate] = useState<string>(startDateValue);
+  const [endDate, setEndDate] = useState<string>(endDateValue);
   const [endTime, setEndTime] = useState<string>(endTimeValue.substring(0, 5));
   const [startTime, setStartTime] = useState<string>(
     startTimeValue.substring(0, 5)
   );
+
   const [attendees, setAttendees] = useState<string[]>(() => {
     return isAttendeeNotPresentAddedNew ? meetingDetails.attendeesEmailAll : [];
   });
@@ -85,6 +134,8 @@ function EditMeetingDetailsModal({
   const [description, setDescription] = useState<string>(
     meetingDetails!.description
   );
+
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -116,8 +167,7 @@ function EditMeetingDetailsModal({
       return "";
     }
   });
-  const [startDate, setStartDate] = useState<string>(startDateValue);
-  const [endDate, setEndDate] = useState<string>(endDateValue);
+  
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -128,6 +178,39 @@ function EditMeetingDetailsModal({
 
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
+  const { currentTime } = useServerCurrentTime();
+  const [serverCurrentTime,setServerCurrentTime] = useState<Date>();
+  const [parsedStartDateTime,setParsedStartDateTime] = useState<Date>();
+  const [parsedEndDateTime,setParsedEndDateTime] = useState<Date>();
+
+  useEffect(()=>{
+    // console.log(currentTime);
+    const pickerFormatString = "yyyy-MM-dd HH:mm";
+
+     const combinedPickerStartDateTimeString = `${startDateValueIST} ${startTimeValueIST}`;
+     const combinedPickerEndDateTimeString = `${endDateValueIST} ${endTimeValueIST}`;
+    
+    setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
+    setParsedStartDateTime(parse(
+      combinedPickerStartDateTimeString,
+      pickerFormatString,
+      new Date()
+    ))
+    setParsedEndDateTime(parse(
+      combinedPickerEndDateTimeString,
+      pickerFormatString,
+      new Date()
+    ))
+  },[currentTime]);
+
+  useEffect(() => {
+    console.log("Server time ");
+      console.log(serverCurrentTime);
+      console.log(parsedStartDateTime);
+      console.log(parsedEndDateTime);
+  },[parsedEndDateTime])
+    
+   
 
   const [
     isAddCompanyUserEmailAttedeesModalOpen,
@@ -138,6 +221,19 @@ function EditMeetingDetailsModal({
     "idle"
   );
 
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
   const generateTimeOptions = () => {
     const options = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -154,9 +250,6 @@ function EditMeetingDetailsModal({
     params: CompanyUsersSearchProps,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log("from add email to meeting");
-    console.log(params);
-    console.log(selectedCompanyUsersIdArray);
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
       setAttendees((prev) => [...prev, params.email]);
@@ -178,7 +271,8 @@ function EditMeetingDetailsModal({
     }
   };
   const isEmailIsOfCompanyUser = async (email: string) => {
-    const getCompanyUserPostData = {
+    if(serverCurrentTime! < parsedStartDateTime!){
+const getCompanyUserPostData = {
       company_id: loginStatus.companyId,
       id: null,
       requestedby: loginStatus.id,
@@ -221,6 +315,8 @@ function EditMeetingDetailsModal({
         });
       }
     }
+    }
+    
   };
 
   const handleAddAttendee = async () => {
@@ -299,7 +395,8 @@ function EditMeetingDetailsModal({
   const getCompanyUsersPresentInAttendeesArray = async (
     attendees: string[]
   ) => {
-    for (let i = 0; i < attendees.length; i++) {
+  if(serverCurrentTime! < parsedStartDateTime! && currentTime && parsedStartDateTime){
+for (let i = 0; i < attendees.length; i++) {
       const getUserPostData = {
         company_id: loginStatus.companyId,
         id: null,
@@ -340,86 +437,191 @@ function EditMeetingDetailsModal({
           }
         });
     }
+  }
+    
   };
 
   const handleOAuthConsent = () => {
     if (selectedMeetingPlatform === "Google Meet") {
       navigate(ROUTES_URL.GOOGLE_OAUTH);
     } else if (selectedMeetingPlatform === "Zoom Meetings") {
+      alert();
       navigate(ROUTES_URL.ZOOM_OAUTH);
     }
   };
 
+  
+
   const updateMeetingDetails = async () => {
-    if (
-      title !== "" &&
-      startDate !== "" &&
-      endDate !== "" &&
-      startTime !== "" &&
-      endTime !== "" &&
-      (title !== meetingDetails.title ||
-        description !== meetingDetails.description ||
-        meetingDetails.startDateByUserTimeZone !==
-          new Date(`${startDate} ${startTime}:00`) ||
-        meetingDetails.endDateByUserTimeZone !==
-          new Date(`${endDate} ${endTime}:00`) ||
-        (!meetingDetails.isActive
-          ? meetingDetails.meetingStatusFromGoogle !== "confirmed"
-          : meetingDetails.meetingStatusFromZoom !== "waiting")) &&
-      meetingPaltform
-    ) {
-      setIsCreating(true);
-      const updateMeetingDetailsPostData = {
-        company_id: loginStatus.companyId,
-        company_user_id: loginStatus.id,
-        id: meetingDetails.id,
-        meeting_id:
-          meetingDetails.platform === 1
-            ? meetingDetails.meetingIdFromGoogle!
-            : meetingDetails.meetingIdFromZoom!,
-        meeting_status: meetingStatus,
-        summary_title: title,
-        description: description,
-        start_time: startDate + "T" + startTime + ":00",
-        end_time: endDate + "T" + endTime + ":00",
-        time_zone: "Asia/Kolkata",
-        attendees_email_all: attendees,
-        host_id: meetingDetails.meetingHostIdFromZoom,
-        attendees_company_user_id: selectedCompanyUsersIdArray,
-        isactive: meetingStatus === "cancelled" ? false : true,
-        // isactive : true,
-        updatedby: loginStatus.id,
-      };
-      await axios
-        .post(
-          meetingDetails.platform === 1
-            ? POST_API.UPDATE_GOOGLE_MEETINGS
-            : POST_API.UPDATE_ZOOM_MEETING,
-          updateMeetingDetailsPostData,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((response) => {
-          console.log(response);
-          if (response.status == STATUS_CODE.OK) {
-            handleMeetingDetailsUpdate();
-            setIsCreating(false);
-            onClose();
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
-            handleOAuthConsent();
-          }
-        });
+    
+    if (serverCurrentTime! > parsedStartDateTime!) {
+      showMessageSnackbar({
+        message: "cannot Update meeting details as it is already started",
+        type: "warning",
+      });
+      return;
+    }
+
+    if(isAttendeeNotPresentAddedNew){
+if(meetingDetails.title === title 
+      && meetingDetails.description === description 
+      && startDate ===  startDateValue
+      && endDate === endDateValue
+      && startTime === startTimeValue.substring(0, 5)
+      && endTime === endTimeValue.substring(0, 5)
+      && meetingDetails.attendeesEmailAll === attendees
+    ){
+      showMessageSnackbar({
+        message : "No changes made to meeting details",
+        type : "error"
+      });
+      return;
+    }
+    }
+    else if(!isAttendeeNotPresentAddedNew){
+      if((meetingDetails.title === title 
+      && meetingDetails.description === description 
+      && startDate ===  startDateValue
+      && endDate === endDateValue
+      && startTime === startTimeValue.substring(0, 5)
+      && endTime === endTimeValue.substring(0, 5))
+      || attendees.length
+    ){
+      showMessageSnackbar({
+        message : "No changes made to meeting details",
+        type : "error"
+      });
+      return;
+    }
+    }
+    
+
+    if (!userHasAccessToUpdateMeeting) {
+      if (
+        title !== "" &&
+        startDate !== "" &&
+        endDate !== "" &&
+        startTime !== "" &&
+        endTime !== "" &&
+        (title !== meetingDetails.title ||
+          description !== meetingDetails.description ||
+          meetingDetails.startDateByUserTimeZone !==
+            new Date(`${startDate} ${startTime}:00`) ||
+          meetingDetails.endDateByUserTimeZone !==
+            new Date(`${endDate} ${endTime}:00`) ||
+          (!meetingDetails.isActive
+            ? meetingDetails.meetingStatusFromGoogle !== "confirmed"
+            : meetingDetails.meetingStatusFromZoom !== "waiting")) &&
+        meetingPaltform
+      ) {
+        setIsCreating(true);
+        const updateMeetingDetailsPostData = {
+          company_id: loginStatus.companyId,
+          company_user_id: loginStatus.id,
+          id: meetingDetails.id,
+          meeting_id:
+            meetingDetails.platform === 1
+              ? meetingDetails.meetingIdFromGoogle!
+              : meetingDetails.meetingIdFromZoom!,
+          meeting_status: meetingStatus,
+          summary_title: title,
+          description: description,
+          start_time: startDate + "T" + startTime + ":00",
+          end_time: endDate + "T" + endTime + ":00",
+          time_zone: "Asia/Kolkata",
+          attendees_email_all: attendees,
+          host_id: meetingDetails.meetingHostIdFromZoom,
+          attendees_company_user_id: selectedCompanyUsersIdArray,
+          isactive: meetingStatus === "cancelled" ? false : true,
+          // isactive : true,
+          updatedby: loginStatus.id,
+        };
+        await axios
+          .post(
+            meetingDetails.platform === 1
+              ? POST_API.UPDATE_GOOGLE_MEETINGS
+              : POST_API.UPDATE_ZOOM_MEETING,
+            updateMeetingDetailsPostData,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            console.log(response);
+            if (response.status == STATUS_CODE.OK) {
+              if (response.data.status) {
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "success",
+                });
+                setTimeout(() => {
+                  handleMeetingDetailsUpdate();
+                  setIsCreating(false);
+                  onClose();
+                }, 3000);
+              } else if (!response.data.status) {
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "error",
+                });
+              }
+            }
+          })
+          .catch(async (error: ApiError | any) => {
+            console.log(error);
+            if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+              handleOAuthConsent();
+            } else if (error.status === STATUS_CODE.UNATHORISED) {
+              const refreshTokenStatus = await RefreshToken({
+                callFunction: updateMeetingDetails,
+              });
+            }
+          });
+      }
+    } else {
+      console.log("___________________Start Comparision_____________________________");
+      console.log(meetingDetails.title + " === " + title);
+      console.log(meetingDetails.title === title);
+      console.log("________________________________________________");
+      console.log(meetingDetails.description + " === " + description);
+      console.log(description === meetingDetails.description);
+      console.log("________________________________________________");
+      console.log(startDate + "=== " + startDateValue);
+      console.log(startDate === startDateValue);
+      console.log("________________________________________________");
+      console.log(endDate + "=== " + endDateValue);
+      console.log(endDate === endDateValue);
+      console.log("________________________________________________");
+      console.log(startTime + "=== " + startTimeValue.substring(0, 5));
+      console.log(startTime === startTimeValue.substring(0, 5));
+      console.log("________________________________________________");
+      console.log(endTime + "=== " + endTimeValue.substring(0, 5));
+      console.log(endTime === endTimeValue.substring(0, 5));
+      console.log("________________________________________________");
+      console.log(meetingDetails.attendeesEmailAll);
+      console.log(attendees)
+      console.log(attendees !== meetingDetails.attendeesEmailAll!);
+      console.log("________________________________________________");
+      console.log("is Attendees present : " + isAttendeeNotPresentAddedNew)
+
+
+      // meetingDetails.title === title 
+      // && meetingDetails.description === description 
+      // && startDate ===  startDateValue
+      // && endDate === endDateValue
+      // && startTime === startTimeValue.substring(0, 5)
+      // && endTime === endTimeValue.substring(0, 5)
+      // && meetingDetails.attendeesEmailAll === attendees
+      showMessageSnackbar({
+        message: "You are not Authorised to Update the Meeting details!",
+        type: "error",
+      });
     }
   };
 
   useEffect(() => {
     if (isOpen) {
-      if (isAttendeesPresent) {
+      if (isAttendeesPresent && meetingDetails.creatorAttenting !== "Attending") {
         getCompanyUsersPresentInAttendeesArray(
           meetingDetails.attendeesEmailAll
         );
@@ -438,7 +640,7 @@ function EditMeetingDetailsModal({
       setSelectedCompanyUserDetailArray([]);
       setSelectedCompanyUsersIdArray([]);
     }
-  }, [isOpen]);
+  }, [isOpen,parsedStartDateTime]);
 
   if (!isOpen) return null;
   return createPortal(
@@ -447,18 +649,53 @@ function EditMeetingDetailsModal({
         <div className="flex justify-between">
           <h1 className="text-xl font-semibold mb-3 text-gray-800">
             Update Meeting
-            {!meetingDetails.isActive && (
+            {!meetingDetails.isActive &&  meetingDetails.creatorAttenting !== "Attending" && (
               <div className="flex gap-2 ">
                 <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
                 <span className="text-red-500 text-xs mt-1">
-                  This Meeting Has been cancelled
+                  You Have cancelled this Meeting 
+                </span>
+              </div>
+            )}
+            {meetingDetails.creatorAttenting === "Attending" &&
+            (
+              <div className="flex gap-2 ">
+                <Info size={SIZE.TWENTY} className="text-green-500"></Info>{" "}
+                <span className="text-green-500 text-xs mt-1">
+                 You have Invited to this Meeting
+                </span>
+              </div>
+            )
+            }
+            {!meetingDetails.isActive &&  meetingDetails.creatorAttenting === "Attending" && (
+              <div className="flex gap-2 ">
+                <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
+                <span className="text-red-500 text-xs mt-1">
+                  This Meeting has been cancelled by the host 
+                </span>
+              </div>
+            )}
+            {serverCurrentTime! > parsedStartDateTime! && serverCurrentTime! > parsedEndDateTime! && meetingDetails.isActive &&(
+              <div className="flex gap-2 ">
+                <Info size={SIZE.TWENTY} className="text-yellow-500"></Info>{" "}
+                <span className="text-yellow-500 text-xs mt-1">
+                  This Meeting has been Started or has already passed
+                </span>
+              </div>
+            )}
+
+            {serverCurrentTime! >= parsedStartDateTime! && serverCurrentTime! <= parsedEndDateTime! && meetingDetails.isActive && (
+              <div className="flex gap-2 ">
+                <Info size={SIZE.TWENTY} className="text-green-500"></Info>{" "}
+                <span className="text-green-500 text-xs mt-1">
+                  Ongoing Meeting
                 </span>
               </div>
             )}
           </h1>
 
           <div className="flex gap-2 self-start">
-            {meetingDetails.isActive && (
+            {meetingDetails.isActive && serverCurrentTime! < parsedEndDateTime! && (
               <Button
                 onClick={() => {
                   if (meetingDetails.platform === 1) {
@@ -475,7 +712,7 @@ function EditMeetingDetailsModal({
               </Button>
             )}
 
-            {meetingDetails.isActive && (
+            {meetingDetails.isActive && serverCurrentTime! < parsedEndDateTime! && (
               <button
                 title={
                   copyStatus === "copied"
@@ -520,7 +757,7 @@ function EditMeetingDetailsModal({
               placeholder="Meeting Title"
               label="Title"
               defaultValue={title}
-              readonly={!meetingDetails.isActive}
+              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
             />
           </div>
           <div className="mt-1 col-span-1">
@@ -533,7 +770,7 @@ function EditMeetingDetailsModal({
             <select
               id="startTtime"
               value={selectedMeetingPlatform}
-              disabled={!meetingDetails.isActive}
+              disabled={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
               onChange={(e) => {
                 if (e.target.value === "Google Meet") {
                   if (googleMeetStatus.isConnected) {
@@ -553,7 +790,8 @@ function EditMeetingDetailsModal({
               }}
               className={
                 meetingDetails.isActive
-                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  ? meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               }
             >
@@ -575,7 +813,8 @@ function EditMeetingDetailsModal({
                 setStartDate(e.target.value);
                 console.log(e.target.value);
               }}
-              readonly={!meetingDetails.isActive}
+              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+              maxDate={new Date(currentTime).toLocaleDateString().replace(/\//g,"-")}
             />
           </div>
 
@@ -588,14 +827,16 @@ function EditMeetingDetailsModal({
             </label>
             <select
               id="startTtime"
-              disabled={!meetingDetails.isActive}
+              disabled={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
               defaultValue={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               className={
                 meetingDetails.isActive
-                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  ?  meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                   : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              }
+                  : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+
+                }
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -613,7 +854,7 @@ function EditMeetingDetailsModal({
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
-              readonly={!meetingDetails.isActive}
+              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
             />
           </div>
 
@@ -630,9 +871,11 @@ function EditMeetingDetailsModal({
               onChange={(e) => setEndTime(e.target.value)}
               className={
                 meetingDetails.isActive
-                  ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  ? meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                   : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              }
+                 : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+
+                }
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -655,7 +898,7 @@ function EditMeetingDetailsModal({
             onChange={(e) => {
               setDescription(e.target.value);
             }}
-            readonly={!meetingDetails.isActive}
+            readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
           />
         </div>
         <div className="mb-1">
@@ -673,7 +916,7 @@ function EditMeetingDetailsModal({
           />
         </div>
         <div className="mb-1">
-          {meetingDetails.isActive && (
+          {meetingDetails.isActive && meetingDetails.creatorAttenting === "Creator" && serverCurrentTime! < parsedStartDateTime! && (
             <div className="grid grid-cols-7 gap-2">
               <div className="col-span-5">
                 <FormInput
@@ -707,6 +950,7 @@ function EditMeetingDetailsModal({
               </div>
             </div>
           )}
+          
 
           {isAttendeeNotPresentAddedNew && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
@@ -720,7 +964,8 @@ function EditMeetingDetailsModal({
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
                       <span className="text-xs text-gray-600">{attendee}</span>
                     </span>
-                    <Button
+                    {meetingDetails.creatorAttenting === "Attending" || meetingDetails.isActive || serverCurrentTime! < parsedStartDateTime!&& (
+<Button
                       size="icon"
                       onClick={() => {
                         selectedCompanyUserDetailArray.map((user) => {
@@ -737,6 +982,8 @@ function EditMeetingDetailsModal({
                     >
                       <X className="h-3 w-3" />
                     </Button>
+                    )}
+                    
                   </div>
                 </div>
               ))}
@@ -744,7 +991,7 @@ function EditMeetingDetailsModal({
           )}
         </div>
 
-        {meetingDetails.isActive && (
+        {meetingDetails.isActive && meetingDetails.creatorAttenting !== "Attending" && serverCurrentTime! < parsedStartDateTime! && (
           <div className="flex justify-end gap-3">
             <div className="max-w-28 mt-1 place-self-center">
               <Button
@@ -805,6 +1052,20 @@ function EditMeetingDetailsModal({
           handleAddCompanyUserEmailCheckboxChange
         }
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
+      />
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+      <DialogueBox
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
       />
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.
