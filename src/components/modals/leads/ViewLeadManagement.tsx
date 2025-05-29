@@ -373,7 +373,7 @@ const ViewLeadManagement = () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       showMessageSnackbar({
-        message: "select new onwer before submitting.",
+        message: "Select new lead owner before procedding.",
         type: "error",
       });
       return;
@@ -727,6 +727,7 @@ const ViewLeadManagement = () => {
       )
     );
   };
+  // call to the all apis 
   useEffect(() => {
     const apisCalls = async () => {
       await getLeadDetails();

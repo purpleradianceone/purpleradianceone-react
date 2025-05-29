@@ -262,7 +262,7 @@ function SignInForm() {
                     } else if (
                       loginStatusRef.current.isactive_subscription &&
                       loginStatusRef.current.active_users_in_company <=
-                        loginStatusRef.current.subscription_allowed_users
+                      loginStatusRef.current.subscription_allowed_users
                     ) {
                        axios
                           .get(POST_API.GET_COMPANY_USER_PREFERENCE, {
@@ -276,9 +276,6 @@ function SignInForm() {
                           .then((response) => {
                             if (response.status === STATUS_CODE.OK) {
                               const res = response.data;
-
-                              console.log(res);
-
                               setUserPreference({
                                 companyUserId: res.company_user_id,
                                 createdBy: res.createdby,
