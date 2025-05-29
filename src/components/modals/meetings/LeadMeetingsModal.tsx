@@ -9,6 +9,7 @@ import {
   momentLocalizer,
   View,
 } from "react-big-calendar";
+import momentTimezone from 'moment-timezone';
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../../../assets/styles/CalendarWithTicks.css";
 import { useCallback, useEffect, useState } from "react";
@@ -24,8 +25,7 @@ import {
   LayoutList,
   List,
 } from "lucide-react";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import moment from 'moment-timezone';import "react-big-calendar/lib/css/react-big-calendar.css";
 import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
@@ -36,8 +36,9 @@ import CalendarEventType from "../../../@types/meeting/CalendarEventType";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import { useUserPreference } from "../../../context/user/UserPreference";
 
-const localizer = momentLocalizer(moment);
+
 
 function LeadMeetingsModal({
   isCalendarViewEnabled,
@@ -48,14 +49,26 @@ function LeadMeetingsModal({
   showConnectToPlatform: boolean;
   isMeetingModalOpenFromProp: boolean;
 }) {
+    const {userPreference} = useUserPreference();
+    const backEndDateFormat = "YYYY-MM-DD HH:mm:ss.S";
+  const localizer = momentLocalizer(moment.tz.setDefault(userPreference.timezoneName));
+
+  const [customMoment,setCustomMoment] = useState(moment)
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+
 
   const [googleMeetEventData, setGoogleMeetEventData] = useState<
     CalendarEventType[]
   >([]);
 
+  const [currentViewDate, setCurrentViewDate] = useState(new Date());
+  const [view, setView] = useState<View>("day");
+
+  // const [concatDateDearchParameter,setConcatDateDearchParameter] = useState<string>(`${currentViewDate.toLocaleDateString("dd-MMM-yyyy").replace(/\//g,"-")}@${currentViewDate.toLocaleDateString("dd-MMM-yyyy").replace(/\//g,"-")}`);
+  const [concatDateDearchParameter, setConcatDateDearchParameter] =
+    useState<string>();
   const [meetingDetailsUpdateCount, setMeetDetailsUpdateCount] =
     useState<number>(0);
 
@@ -76,6 +89,7 @@ function LeadMeetingsModal({
       description: "",
       endDateByIST: "",
       endDateByUserTimeZone: new Date(),
+      endDateByUserTimeZoneString : "",
       meetingConferenceId: "",
       meetingIdFromGoogle: "",
       meetingLink: "",
@@ -83,20 +97,28 @@ function LeadMeetingsModal({
       organizerEmail: "",
       startDateByIST: "",
       startDateByUserTimeZone: new Date(),
+      startDateByUserTimeZoneString : "",
       title: "",
       isAttendeePresent: false,
       platform: 1,
+      creatorAttenting: "",
     });
 
   const viewNames = ["month", "week", "day", "agenda"];
 
-  const [concatDate,setConcatDate] = useState<string>("");
+  const [concatDate, setConcatDate] = useState<string>(
+    `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(new Date()).format(
+      "DD-MMM-YYYY"
+    )}`
+  );
 
   const getGoogleMeeting = async () => {
     setGoogleMeetEventData([]);
     const getGoogleMeetingsPostData = {
       company_id: loginStatus.companyId,
       company_user_id: loginStatus.id,
+      search_company_specific_date_range_id: 8,
+      search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
     await axios
@@ -106,6 +128,16 @@ function LeadMeetingsModal({
       .then((response) => {
         if (response.status == STATUS_CODE.OK) {
           response.data.map((res: any) => {
+            const startDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["Start Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+            const endDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["End Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
             setGoogleMeetEventData((prev) => [
               ...prev,
               {
@@ -123,12 +155,11 @@ function LeadMeetingsModal({
                 organizerEmail: res.organizer_email,
                 startDateByIST: res["Start Date By Indian Time"],
                 endDateByIST: res["End Date By Indian Time"],
-                startDateByUserTimeZone: new Date(
-                  res["Start Date By User Time Zone"]
-                ),
-                endDateByUserTimeZone: new Date(
-                  res["End Date By User Time Zone"]
-                ),
+                startDateByUserTimeZone: startDateByUserTimeZoneParsed.toDate(),
+                startDateByUserTimeZoneString : res["Start Date By User Time Zone"],
+                endDateByUserTimeZoneString : res["End Date By User Time Zone"],
+                endDateByUserTimeZone: endDateByUserTimeZoneParsed.toDate(),
+                creatorAttenting: res.creator_attending,
                 attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
@@ -166,6 +197,8 @@ function LeadMeetingsModal({
     const getZoomMeetingsPostData = {
       company_id: loginStatus.companyId,
       company_user_id: loginStatus.id,
+      search_company_specific_date_range_id: 8,
+      search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
     await axios
@@ -175,6 +208,19 @@ function LeadMeetingsModal({
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           response.data.map((res: any) => {
+            const startDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["Start Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+            const endDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["End Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+
+            console.log("endDate By User Time Zone : " );
+            console.log(endDateByUserTimeZoneParsed);
             setGoogleMeetEventData((prev) => [
               ...prev,
               {
@@ -195,12 +241,10 @@ function LeadMeetingsModal({
                 zoomMeetingPassworsPstn: res.meeting_pstn_password,
                 startDateByIST: res["Start Date By Indian Time"],
                 endDateByIST: res["End Date By Indian Time"],
-                startDateByUserTimeZone: new Date(
-                  res["Start Date By User Time Zone"]
-                ),
-                endDateByUserTimeZone: new Date(
-                  res["End Date By User Time Zone"]
-                ),
+                startDateByUserTimeZone:startDateByUserTimeZoneParsed.toDate(),
+                endDateByUserTimeZone: endDateByUserTimeZoneParsed.toDate(),
+                startDateByUserTimeZoneString : res["Start Date By User Time Zone"],
+                endDateByUserTimeZoneString : res["End Date By User Time Zone"],
                 attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
@@ -210,6 +254,7 @@ function LeadMeetingsModal({
                 updatedBy: res.updatedby,
                 createdOn: res.createdon,
                 updatedOn: res.updatedon,
+                creatorAttenting: res.creator_attending,
               },
             ]);
           });
@@ -235,21 +280,48 @@ function LeadMeetingsModal({
   const eventStyleGetter = (event: CalendarEventType) => {
     let backgroundColor = "";
     let color = "";
-    if (event.platform === 1 && event.isActive && view !== "agenda") {
-      backgroundColor = "lightgreen";
-      color = "black";
-    } else if (event.platform === 2 && event.isActive  && view !== "agenda") {
-      backgroundColor = "blue";
-      color = "white";
-    } else if (event.platform === 3 && event.isActive  && view !== "agenda") {
-      backgroundColor = "lightcoral";
-    } else if (!event.isActive  && view !== "agenda") {
-      backgroundColor = "lightcoral";
-      color = "white";
-    }
-    else if(view === "agenda"){
-      backgroundColor = "#1e88e5";
-      color = !event.isActive ? "red" : "white";
+    if (event.creatorAttenting === "Creator") {
+      if (event.platform === 1 && event.isActive && view !== "agenda") {
+        backgroundColor = "#24bf26";
+        color = "black";
+      } else if (event.platform === 2 && event.isActive && view !== "agenda") {
+        backgroundColor = "blue";
+        color = "white";
+      } else if (event.platform === 3 && event.isActive && view !== "agenda") {
+        backgroundColor = "lightcoral";
+      } else if (!event.isActive && view !== "agenda") {
+        backgroundColor = "#de1f65";
+        color = "white";
+      } else if (view === "agenda") {
+        backgroundColor = "#1e88e5";
+        color = !event.isActive ? "red" : "white";
+      }
+    } else if (event.creatorAttenting === "Attending") {
+      if (event.creatorAttenting === "Attending") {
+        if (event.platform === 1 && event.isActive && view !== "agenda") {
+          backgroundColor = "#58e858";
+          color = "black";
+        } else if (
+          event.platform === 2 &&
+          event.isActive &&
+          view !== "agenda"
+        ) {
+          backgroundColor = "#2895d4";
+          color = "white";
+        } else if (
+          event.platform === 3 &&
+          event.isActive &&
+          view !== "agenda"
+        ) {
+          backgroundColor = "#de1f65";
+        } else if (!event.isActive && view !== "agenda") {
+          backgroundColor = "#de1f65";
+          color = "white";
+        } else if (view === "agenda") {
+          backgroundColor = "#1e88e5";
+          color = !event.isActive ? "red" : "white";
+        }
+      }
     }
 
     const style = {
@@ -259,12 +331,11 @@ function LeadMeetingsModal({
       color: color,
       textSize: "12px",
       border: "0px",
-      height : view === "agenda" ? "20px" : "auto",
+      height: view === "agenda" ? "20px" : "auto",
       display: view === "agenda" ? "flex-1" : "block",
-      marginTop : view === "agenda" ? "2px" : "0px",
+      marginTop: view === "agenda" ? "2px" : "0px",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.2)", // Adding a subtle shadow
       fontSize: "0.8em", // Making the text extra small
-      
     };
 
     return {
@@ -273,27 +344,45 @@ function LeadMeetingsModal({
   };
 
   // const [events, setEvents] = useState(hardcodedEvents);
-  const [currentViewDate, setCurrentViewDate] = useState(new Date());
-  const [view, setView] = useState<View>("day");
 
   const goToToday = useCallback(() => {
-    if(view === "agenda"){
-      alert(moment(new Date()).format("DD-MMM-YYYY"));
-    }
     setCurrentViewDate(new Date());
+    if (view === "agenda") {
+      
+      setConcatDate(
+        `${moment(new Date).format("DD-MMM-YYYY")}@${moment(
+          new Date()
+        ).add(1,"months").format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "day") {
+      console.log(`${moment(new Date()).format("DD-MMM-YYYY")}@${moment(
+          new Date()
+        ).format("DD-MMM-YYYY")}`)
+      setConcatDate(
+        `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(
+          new Date()
+        ).format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "month") {
+      setConcatDate(
+        `${moment(new Date())
+          .startOf("months")
+          .format("DD-MMM-YYYY")}@${moment(new Date())
+          .endOf("months")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "week") {
+      setConcatDate(
+        `${moment(new Date())
+          .startOf("week")
+          .format("DD-MMM-YYYY")}@${moment(new Date())
+          .endOf("week")
+          .format("DD-MMM-YYYY")}`
+      );
+    }
   }, []);
 
   const goBack = useCallback(() => {
-    if(view === "agenda"){
-      alert(moment(currentViewDate).subtract(1,"days").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY"));
-    }
-    else if(view === "month"){
-      alert(moment(currentViewDate).subtract(1,"months").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY") );
-    }
-    else if(view === "week"){
-      alert(moment(currentViewDate).subtract(1,"weeks").format("DD-MMM-YYYY")+ " - " +moment(currentViewDate).format("DD-MMM-YYYY") );
-    }
-    console.log(currentViewDate + " - " + moment(currentViewDate).subtract(1,"days").toDate());
     setCurrentViewDate(
       moment(currentViewDate)
         .subtract(
@@ -302,18 +391,48 @@ function LeadMeetingsModal({
         )
         .toDate()
     );
+
+    if (view === "agenda") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .subtract(1, "days")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .add(1, "months")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "month") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .subtract(1, "months")
+          .startOf("month")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .subtract(1, "months")
+          .endOf("month")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "week") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .subtract(1, "week")
+          .startOf("week")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .subtract(1, "week")
+          .endOf("week")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "day") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .subtract(1, "days")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .subtract(1, "days")
+          .format("DD-MMM-YYYY")}`
+      );
+    }
   }, [currentViewDate, view]);
 
   const goNext = useCallback(() => {
-    if(view === "agenda"){
-      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " +moment(currentViewDate).add(1,"days").format("DD-MMM-YYYY"));
-    }
-    else if(view === "month"){
-      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " +moment(currentViewDate).add(1,"months").format("DD-MMM-YYYY"));
-    }
-    else if(view === "week"){
-      alert(moment(currentViewDate).format("DD-MMM-YYYY") + " - " + moment(currentViewDate).add(1,"weeks").format("DD-MMM-YYYY"));
-    }
+    
     setCurrentViewDate(
       moment(currentViewDate)
         .add(
@@ -322,12 +441,83 @@ function LeadMeetingsModal({
         )
         .toDate()
     );
+
+    if (view === "agenda") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .add(1, "days")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .add(1, "months")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "month") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .add(1, "months")
+          .startOf("month")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .add(1, "months")
+          .endOf("month")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "week") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .add(1, "week")
+          .startOf("week")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .add(1, "week")
+          .endOf("week")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (view === "day") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .add(1, "days")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .add(1, "days")
+          .format("DD-MMM-YYYY")}`
+      );
+    }
   }, [currentViewDate, view]);
 
   const onViewChange = useCallback((newView: View) => {
+   
     setView(newView);
+    
   }, []);
 
+  const handleViewChange = (newView : View) => {
+     if (newView === "agenda") {
+      setConcatDate(
+        `${moment(currentViewDate).format("DD-MMM-YYYY")}@${moment(
+          currentViewDate
+        ).add(1,"months").format("DD-MMM-YYYY")}`
+      );
+    } else if (newView === "day") {
+      setConcatDate(
+        `${moment(currentViewDate).format("DD-MMM-YYYY")}@${moment(
+          currentViewDate
+        ).format("DD-MMM-YYYY")}`
+      );
+    } else if (newView === "month") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .startOf("month")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .endOf("month")
+          .format("DD-MMM-YYYY")}`
+      );
+    } else if (newView === "week") {
+      setConcatDate(
+        `${moment(currentViewDate)
+          .startOf("week")
+          .format("DD-MMM-YYYY")}@${moment(currentViewDate)
+          .endOf("week")
+          .format("DD-MMM-YYYY")}`
+      );
+    }
+  }
   const onDateChange = useCallback((newDate: Date) => {
     console.log(currentViewDate + " - " + newDate);
     setCurrentViewDate(newDate);
@@ -345,8 +535,8 @@ function LeadMeetingsModal({
 
   useEffect(() => {
     getGoogleMeeting();
-    console.log(googleMeetEventData);
-  }, [meetingDetailsUpdateCount]);
+    console.log(view);
+  }, [meetingDetailsUpdateCount,concatDate]);
   return (
     <div className="bg-white w-full">
       {showConnectToPlatform && (
@@ -509,7 +699,11 @@ function LeadMeetingsModal({
             onClick={() => {
               // setScheduleMeetingModalOpen(true);
               if (isMeetingModalOpenFromProp) {
-                navigate(ROUTES_URL.SCHEDULE_MEETING + "?from=");
+                navigate(
+                  ROUTES_URL.SCHEDULE_MEETING +
+                    "?from=" +
+                    window.location.pathname
+                );
               } else {
                 sessionStorage.setItem(
                   "leadData",
@@ -593,8 +787,10 @@ function LeadMeetingsModal({
                           : "Agenda"
                       }
                       size="sm"
-                      onClick={() =>
+                      onClick={() =>{
+                        handleViewChange(viewName as "month" | "week" | "day" | "agenda")
                         setView(viewName as "month" | "week" | "day" | "agenda")
+                      }
                       }
                     >
                       {viewName === "month" && (

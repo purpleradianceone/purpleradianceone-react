@@ -1,6 +1,7 @@
 import {
   BoxesIcon,
   Building2,
+  Calendar,
   Handshake,
   Home,
   Menu,
@@ -23,6 +24,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewProductTeam,
+    userHasAccessToViewMeeting
   } = useUserAccessModules();
   const { isSmallScreen } = useScreenSize();
 
@@ -202,6 +204,29 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             ></SideNavBarItem>
           </Link>
         )}
+        {userHasAccessToViewMeeting && (
+          <Link
+            to={ROUTES_URL.MEETINGS}
+            onClick={() => {
+              if (isSmallScreen) {
+                onNextTab();
+              }
+            }}
+          >
+            <SideNavBarItem icon={Calendar} label="Meetings" isOpen={isOpen} />
+          </Link>
+        )}
+
+         {!userHasAccessToViewMeeting && (
+          
+            <SideNavBarItem
+            disabled = {true}
+             icon={Calendar} 
+             label="Meetings" 
+             isOpen={isOpen} />
+          
+        )}
+
 
         <SideNavBarItem
           icon={Settings}

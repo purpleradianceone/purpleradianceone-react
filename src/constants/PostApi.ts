@@ -93,6 +93,8 @@ const POST_API = {
     GET_EMAIL_PLACEHOLDER : import.meta.env.VITE_GET_EMAIL_PLACEHOLDER!,
     GET_LEAD_INTEREST_TYPE : import.meta.env.VITE_GET_LEAD_INTEREST_TYPE!,
     GET_TIMEZONE : import.meta.env.VITE_GET_TIMEZONE!,
+
+    GET_SERVER_CURRENT_TIME : import.meta.env.VITE_GET_SERVER_CURRENT_TIME!,
 }
 
 export default POST_API;
