@@ -327,29 +327,29 @@ function GetCompanyUsersList({
           )}
         </div>
 
-        {/* ag grid component */}
-        <div className="bg-white flex-1 overflow-y-auto rounded-lg shadow-sm p-0">
-          <div
+
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+          {/* <div
             className="ag-theme-alpine w-full"
-            style={{ height: 505, width: "100%" }
-          }
-          >
+            style={{ height: "80%", width: "100%" }}
+          > */}
+
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               users={users}
               handleIdIsEditModalOpen={handleIdIsEditModalOpen}
               handleIsAccessModalOpen={handleIsAccessModalOpen}
             />
-          </div>
+          {/* </div> */}
           <CompanyUserAccessManagementModal
             isOpen={isAccessModalOpen}
             onClose={() => setIsAccessModalOpen(false)}
             users={selectedCompanyUser}
           />
         </div>
-
         {/* pagination component */}
         <div className="flex items-center justify-end ">
+
           <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}

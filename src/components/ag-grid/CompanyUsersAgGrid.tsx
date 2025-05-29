@@ -228,20 +228,20 @@ function CompanyUserAgGrid({
   }, []);
 
   return (
-    // <div
-    //   className="ag-theme-balham w-full"
-    //   style={{ height: "80vh", width: "100%" }}
-    // >
+
+    <div
+      className="ag-theme-balham w-full"
+      style={{ height: "83vh", width: "100%" }}
+    >
       <AgGridReact
         rowData={users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
-        // domLayout="autoHeight"
+        theme={themeBalham} 
       />
-    //  </div>
+     </div>
   );
 }
 
