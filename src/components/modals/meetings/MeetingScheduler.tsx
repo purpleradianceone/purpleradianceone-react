@@ -23,6 +23,8 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useZoomMeetingContext } from "../../../context/meeting/ZoomMeetingContext";
 import CalendarEventType from "../../../@types/meeting/CalendarEventType";
+import { useServerCurrentTime } from "../../../config/hooks/useServerCurrentTime";
+import { useUserPreference } from "../../../context/user/UserPreference";
 
 const MeetingScheduler = () => {
   const [title, setTitle] = useState<string>("");
@@ -40,7 +42,13 @@ const MeetingScheduler = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
+  const {userPreference} = useUserPreference();
+
   const { loginStatus } = useLoggedInUserContext();
+
+  const [searchParams] = useSearchParams();
+
+  const {currentTime} = useServerCurrentTime();
 
   const [
     isAddCompanyUserEmailAttedeesModalOpen,
@@ -82,7 +90,7 @@ const MeetingScheduler = () => {
         description: description,
         start_date_string: startDate + "T" + startTime + ":00",
         end_date_string: endDate + "T" + endTime + ":00",
-        time_zone: "Asia/Kolkata",
+        time_zone: userPreference.timezoneName,
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
@@ -137,7 +145,7 @@ const MeetingScheduler = () => {
         description: description,
         start_date_string: startDate + "T" + startTime + ":00",
         end_date_string: endDate + "T" + endTime + ":00",
-        time_zone: "Asia/Kolkata",
+        time_zone: userPreference.timezoneName,
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
@@ -314,7 +322,12 @@ const MeetingScheduler = () => {
   };
 
   const handleCloseMeetingModal = () => {
-    const leadData = sessionStorage.getItem("leadData");
+    const openedFrom = searchParams.get("from");
+    if(openedFrom){
+      navigate(openedFrom);
+    }
+    else{
+ const leadData = sessionStorage.getItem("leadData");
     const newQueryString = qs.stringify({
       leadData: leadData,
     });
@@ -322,6 +335,7 @@ const MeetingScheduler = () => {
     const newPath = `${ROUTES_URL.LEAD_DETAILS}?${newQueryString}`;
     sessionStorage.removeItem("leadData");
     navigate(newPath);
+    }
   };
 
   return createPortal(
@@ -372,7 +386,13 @@ const MeetingScheduler = () => {
                     handleGoogleMeetAuth();
                   }
                 } else if (e.target.value === "Zoom Meetings") {
-                  setSelectedMeetingPlatform("Zoom Meetings");
+                  if(zoomMeetingStatus.isConnected){
+                    setSelectedMeetingPlatform("Zoom Meetings");  
+                  }
+                  else{
+                    handleZoomMeetingsOAuth();
+                  }
+                  
                 } else if (e.target.value === "Teams") {
                   setSelectedMeetingPlatform("Teams");
                 } else {

@@ -131,6 +131,37 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === 8 && accessModule.add
   );
 
+  //meeting setting
+  const userHasAccessToViewMeetingSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 11 && accessModule.view
+  );
+
+  const userHasAccessToUpdateMeetingSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 11 && accessModule.update
+  );
+
+  const userHasAccessToAddMeetingSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 11 && accessModule.add
+  );
+
+  //meeting
+  const userHasAccessToViewMeeting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 12 && accessModule.view
+  );
+
+  const userHasAccessToUpdateMeeting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 12 && accessModule.update
+  );
+
+  const userHasAccessToAddMeeting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 12 && accessModule.add
+  );
 
   return {
     userHasAccessToAddUser,
@@ -157,5 +188,11 @@ export const useUserAccessModules = () => {
     userHasAccessToAddProductTeam,
     userHasAccessToViewProductTeam,
     userHasAccessToUpdateProductTeam,
+    userHasAccessToViewMeetingSetting,
+    userHasAccessToUpdateMeetingSetting,
+    userHasAccessToAddMeetingSetting,
+    userHasAccessToViewMeeting,
+    userHasAccessToUpdateMeeting,
+    userHasAccessToAddMeeting
   };
 };

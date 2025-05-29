@@ -30,6 +30,7 @@ const ROUTES_URL = {
     ZOOM_OAUTH : "/authenticate/zoom",
     GOOGLE_OAUTH_ANDROID : "/authenticate/google/android",
     ZOOM_OAUTH_ANDROID : "/authenticate/zoom/android",
+    MEETINGS : "/meetings",
 
     //for email settings
     EMAIL_SETTING : "/email-setting",
