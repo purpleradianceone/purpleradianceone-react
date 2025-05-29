@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS system files
+.DS_Store
+Thumbs.db
+
+# Editor directories and settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# React Native or Expo (if not using, still safe to ignore)
+.expo/
+.expo-shared/

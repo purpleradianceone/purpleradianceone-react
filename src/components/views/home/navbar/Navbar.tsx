@@ -8,6 +8,7 @@ import {
   Home,
   LayoutPanelLeft,
   LogOut,
+  LucideSettings,
   Menu,
   MessageCircle,
   Network,
@@ -289,7 +290,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             {
                               icon: <MessageCircle size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
-                              label: "Customize Email",
+                              label: "Email Template",
+                            },
+                            {
+                              icon: <LucideSettings size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.EMAIL_SETTING,
+                              label: "Email Setting",
                             },
                           ]}
                         />
@@ -368,7 +374,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.EMAIL_TEMPLATE}
-                            icon={<MessageCircle size={SIZE.TWENTY}/>}
+                            icon={<MessageCircle size={SIZE.TWENTY} />}
+                            onClick={() => setIsDropdownOpen(false)}
+                            label=""
+                          />
+                          <NavItem
+                            to={ROUTES_URL.EMAIL_SETTING}
+                            icon={<LucideSettings size={SIZE.TWENTY} />}
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />

@@ -31,6 +31,9 @@ const ROUTES_URL = {
     GOOGLE_OAUTH_ANDROID : "/authenticate/google/android",
     ZOOM_OAUTH_ANDROID : "/authenticate/zoom/android",
     MEETINGS : "/meetings",
+
+    //for email settings
+    EMAIL_SETTING : "/email-setting",
     
 }
 export default ROUTES_URL;

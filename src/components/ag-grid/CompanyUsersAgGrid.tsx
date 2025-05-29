@@ -221,16 +221,17 @@ function CompanyUserAgGrid({
     return {
       filter: "agTextColumnFilter",
       minWidth: 150,
-      flex: 0.8,
+      flex: 1,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
     };
   }, []);
 
   return (
+
     <div
       className="ag-theme-balham w-full"
-      style={{ height: "100%", width: "100%" }}
+      style={{ height: "83vh", width: "100%" }}
     >
       <AgGridReact
         rowData={users}
@@ -238,9 +239,9 @@ function CompanyUserAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        theme={themeBalham} 
       />
-    </div>
+     </div>
   );
 }
 

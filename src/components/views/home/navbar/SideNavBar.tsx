@@ -248,6 +248,11 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             >
             Email Template
             </Link>, 
+            <Link
+            to= {ROUTES_URL.EMAIL_SETTING}
+            >
+            Email Setting
+            </Link>,
             //   <Link
             // to= {ROUTES_URL.USER_PROFILE_SETTING}
             // >
