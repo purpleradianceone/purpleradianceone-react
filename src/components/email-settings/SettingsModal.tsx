@@ -19,13 +19,13 @@ const Dialog: React.FC<{
       className="fixed w-full inset-0 bg-black bg-opacity-30 flex justify-center items-center"
       onClick={() => onOpenChange(false)}
     >
-      <div onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div className="min-w-[40%] max-w-xl min-h-fit max-h-fit" onClick={(e) => e.stopPropagation()}>{children}</div>
     </div>
   );
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white p-4 rounded shadow max-w-lg">{children}</div>;
+}) => <div className="bg-white p-4 rounded shadow ">{children}</div>;
 const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => <div className="mb-4">{children}</div>;
