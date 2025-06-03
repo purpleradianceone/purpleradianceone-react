@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useDynamicFields } from './DynamicFieldsContext'; 
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
@@ -17,7 +16,6 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
-  const [description, setDescription] = useState('');
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const [isDefault, setIsDefault] = useState(false);
 
@@ -129,7 +127,6 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
               setIsOpen(false);
               // TODO: API Call
               await createEmailTemplateInsert(htmlBody);
-              console.log({ templateName, subject, description, htmlBody });
             }}
           >
             <div style={{ marginBottom: "15px" }}>
@@ -229,33 +226,6 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                 </select>
               </div>
 
-              {/* Description */}
-              {/* <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    minHeight: "80px",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
-                  placeholder="Template description..."
-                />
-              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
