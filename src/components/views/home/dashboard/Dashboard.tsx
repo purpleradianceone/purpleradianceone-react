@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
-import LeadMeetingsModal from "../../../modals/meetings/LeadMeetingsModal";
-
 function Dashboard(){
     const navigate = useNavigate();
 

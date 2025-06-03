@@ -329,10 +329,10 @@ function GetCompanyUsersList({
 
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          {/* <div
+          <div
             className="ag-theme-alpine w-full"
             style={{ height: "80%", width: "100%" }}
-          > */}
+          >
 
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
@@ -340,7 +340,7 @@ function GetCompanyUsersList({
               handleIdIsEditModalOpen={handleIdIsEditModalOpen}
               handleIsAccessModalOpen={handleIsAccessModalOpen}
             />
-          {/* </div> */}
+          </div>
           <CompanyUserAccessManagementModal
             isOpen={isAccessModalOpen}
             onClose={() => setIsAccessModalOpen(false)}

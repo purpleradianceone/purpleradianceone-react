@@ -5,7 +5,7 @@ import {
   ClipboardPlus,
   Filter,
   Handshake,
-  LucideNavigation,
+  Plus,
   User,
   X,
 } from "lucide-react";
@@ -123,6 +123,9 @@ function LeadManagementList({
     });
     navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
   };
+  const handleShowImportModule =() =>{
+   navigate(ROUTES_URL.LEAD_IMPORT_CSV);
+  }
 
 
   if (userHasAccessToViewLead) {
@@ -132,7 +135,8 @@ function LeadManagementList({
 
     return (
       <div className="w-full pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-10 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+        
+        <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex">
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
 
@@ -365,6 +369,12 @@ function LeadManagementList({
               )}
             </>
           )}
+          <div className="flex float-end mx-1">
+          <Button onClick={handleShowImportModule}>
+           <Plus size={16} className="text-white"/>
+            <span className="text-xs">Import </span>
+          </Button>
+        </div>
           <div className="flex gap-1">
             {userHasAccessToAddLead && (
               <Button
@@ -372,25 +382,30 @@ function LeadManagementList({
                   setIsCreateLeadModalOpen(true);
                 }}
               >
-                {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
+                <span className="text-xs flex">
+                {!isSmallScreen && <ClipboardPlus size={16} />}
                 {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                </span>
               </Button>
             )}
             {!userHasAccessToAddLead && (
               <Button disabled={true}>
+                 <span className="text-xs flex">
                 {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                </span>
               </Button>
             )}
           </div>
+          
         </div>
 
-        <div className="flex bg-white rounded-lg shadow-sm p-0">
-          <div
-            className="ag-theme-alpine w-full h-full"
-            style={{ height: 505, width: "100%" }}
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+         <div
+            className="ag-theme-alpine w-full"
+            style={{ height: "90vh", width: "100%" }}
           >
             <LeadManagementAgGrid
               handleRowClick={handleRowClickedForShowLead}
