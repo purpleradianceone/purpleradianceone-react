@@ -7,11 +7,16 @@ import ROUTES_URL from '../../constants/Routes';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import POST_API from '../../constants/PostApi';
-import { STATUS_CODE } from '../../constants/AppConstants';
-import { Eye, Edit2, Trash2, CheckCircle, XCircle, Star, Loader2, LucideMail, LucideLayoutTemplate, LucideMailPlus, LucidePlus } from 'lucide-react';
-import { useComapanySpecificSearchDateRange } from '../../config/hooks/useCompanySpecificDateRange'; // fix import spelling if possible
-import LoadingSpinner from '../../assets/animations/LoadingSpinner';
-// import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler'; // This hook is not used in the provided snippet, so keeping it commented.
+import { SIZE, STATUS_CODE } from '../../constants/AppConstants';
+import { Eye, Edit2, Trash2, CheckCircle, XCircle, Star, Loader2, LucideMailPlus, LucidePlus, LayoutDashboard, Calendar, Filter, User, X } from 'lucide-react';
+import { useComapanySpecificSearchDateRange } from '../../config/hooks/useCompanySpecificDateRange';
+import useScreenSize from '../../config/hooks/useScreenSize';
+import Button from '../ui/Button';
+import { useDateRangeIdChange } from '../../config/hooks/useDateRangeIdChange';
+import DateRangeFilterDropdown from '../ui/DateRangeFilterDropdown';
+import DateRangePicker from '../ui/DateRangePicker';
+import SearchInput from '../ui/SearchInput';
+import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler';
 
 type EmailTemplate = {
   count: number;
@@ -43,15 +48,42 @@ export const TemplatesPage: React.FC = () => {
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [offset, setOffset] = useState<number>(0);
   const [hasMoreTemplates, setHasMoreTemplates] = useState(true);
-  const [loadingTemplates, setLoadingTemplates] = useState<boolean>(false); // For individual template fetching
-  const [loadingTemplatePage, setLoadingTemplatesPage] = useState<boolean>(false); // For initial page load
+  const [loadingTemplates, setLoadingTemplates] = useState<boolean>(false);
+  const [loadingTemplatePage, setLoadingTemplatesPage] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+
+  const limit : number = 10;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedTypeId, setSelectedTypeId] = useState<number>(0);
+
+  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-  const limit = 10; // Number of templates to fetch per request
-  const containerRef = useRef<HTMLDivElement>(null); // Ref for the scrollable container
-  const [selectedTypeId, setSelectedTypeId] = useState<number>(0); // Store ID of the active template type
+
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState(false);
+
+  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
+    useState<boolean>(false);
+  const {
+    dateRangeId,
+    concatDate,
+    searchParameter,
+    handleDatePageIdChange,
+    handleEndDateChange,
+    handleSearchParameterChange,
+    handleStartDateChange,
+  } = useSearchFilterPaginationDateHandlers();
+
+  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+    useDateRangeIdChange({
+      dateRangeDropdownOptions, handleSearchOption: {
+        handleDateRangeIdChange: handleDatePageIdChange
+      }
+    });
+
 
   const handleTemplateCreate = (type: string) => {
     setShowModal(false);
@@ -59,7 +91,7 @@ export const TemplatesPage: React.FC = () => {
   };
 
   const getTemplateTypes = async () => {
-    setLoadingTemplatesPage(true); // Indicate overall page loading
+    setLoadingTemplatesPage(true);
     try {
       const response = await axios.post(
         POST_API.GET_EMAIL_TYPE,
@@ -72,21 +104,17 @@ export const TemplatesPage: React.FC = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        const activeTypes = response.data.filter((type: TemplateType) => type.isactive); // Ensure only active types
+        const activeTypes = response.data.filter((type: TemplateType) => type.isactive);
         setTemplateTypes(activeTypes);
         if (activeTypes.length > 0) {
-          // Set initial active tab and load templates for it
           setActiveTab(activeTypes[0].name);
           setSelectedTypeId(activeTypes[0].id);
           setOffset(0); // Always reset offset for initial load of a type
           setTemplates([]); // Clear previous templates
           setHasMoreTemplates(true); // Assume there are more templates for the first type
-          getTemplatesOfCompany({ typeId: activeTypes[0].id, reset: true }); // Fetch first batch
         } else {
-          // If no active types, ensure states are reset
           setActiveTab('');
           setSelectedTypeId(0);
-          setOffset(0);
           setTemplates([]);
           setHasMoreTemplates(false);
         }
@@ -94,40 +122,44 @@ export const TemplatesPage: React.FC = () => {
     } catch (error) {
       console.error("Error fetching template types:", error);
     } finally {
-      setLoadingTemplatesPage(false); // Page loading complete
+      setLoadingTemplatesPage(false);
     }
   };
 
-  // Memoize this function using useCallback
+  // Refined useCallback for fetching templates
+  // Removed 'offset' from dependencies as it's updated within the function
+  // Removed 'loadingTemplates' and 'hasMoreTemplates' as dependencies to prevent loops
   const getTemplatesOfCompany = useCallback(async ({
     typeId,
-    reset = false, // 'reset' indicates if we should clear existing templates and start from offset 0
+    reset = false,
   }: {
     typeId: number;
     reset?: boolean;
   }) => {
-    // Prevent fetching if already loading or no more templates and not a reset action
-    if (loadingTemplates || (!hasMoreTemplates && !reset)) {
-      console.log(`Skipping fetch. Loading: ${loadingTemplates}, Has More: ${hasMoreTemplates}, Reset: ${reset}`);
-      return;
-    }
-
+    // We use a functional update for setOffset to get the latest value
+    // and avoid including 'offset' in useCallback dependencies.
     setLoadingTemplates(true); // Set loading state for templates
 
     try {
-      const currentOffset = reset ? 0 : offset; // Determine the offset for the current fetch
-      console.log(`Workspaceing templates for typeId: ${typeId}, offset: ${currentOffset}, limit: ${limit}, reset: ${reset}`);
+
+      setOffset(reset?0:offset);
+      // Get the current offset using a ref or state that's not in useCallback deps
+      // For this case, it's okay to read `offset` from state as it's only modified after fetch
+      // or set to 0 by the calling useEffect for reset.
+      const currentOffset = reset ? 0 : offset;
+
+      console.log(`Fetching templates for typeId: ${typeId}, offset: ${currentOffset}, limit: ${limit}, reset: ${reset}`);
 
       const response = await axios.post(
         POST_API.GET_EMAIL_TEMPLATE,
         {
           company_id: loginStatus.companyId,
           requestedby_id: loginStatus.id,
-          id: null, // Not fetching a specific ID
+          id: null,
           email_type_id: typeId,
-          search_company_specific_date_range_id: null,
-          search_parameter: null,
-          search_parameter_date: null,
+          search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
+          search_parameter: searchParameter,
+          search_parameter_date: concatDate,
           offset: currentOffset,
           limit,
         },
@@ -136,28 +168,35 @@ export const TemplatesPage: React.FC = () => {
 
       if (response.status === STATUS_CODE.OK) {
         const newTemplates = response.data;
-        console.log(`Workspaceed ${newTemplates.length} new templates.`);
-
-        if (newTemplates.length < limit) {
-          setHasMoreTemplates(false); 
-        } else {
-          setHasMoreTemplates(true); 
-        }
+        console.log(`Fetched ${newTemplates.length} new templates.`);
+        // if(newTemplates.length===limit){
+        //     setHasMoreTemplates(true);
+        // }else{
+        //   if(newTemplates.length<limit)setHasMoreTemplates(false)
+        // }
+        // setHasMoreTemplates(!(newTemplates.length < limit)); // If fewer than limit, no more templates
+        setHasMoreTemplates(newTemplates.length === limit); 
+        const newOffset:number = currentOffset+limit;
+        setOffset(newOffset); 
+        console.log("++++++++++++++++++++++++Get template of company +++++++++++++++++++++++++++++++++++++");
+        console.log(newTemplates.length === limit)
+        console.log(newOffset);
+        console.log(currentOffset);
+        console.log(offset);
+        console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
         setTemplates((prev) => (reset ? newTemplates : [...prev, ...newTemplates]));
-        setOffset(currentOffset + newTemplates.length); 
       } else {
         console.warn("API response not OK:", response.status);
-        setHasMoreTemplates(false); 
+        setHasMoreTemplates(false);
       }
     } catch (error) {
       console.error("Error fetching templates:", error);
-      setHasMoreTemplates(false); 
+      setHasMoreTemplates(false);
     } finally {
-      setLoadingTemplates(false); 
+      setLoadingTemplates(false);
     }
-  }, [offset, hasMoreTemplates, loadingTemplates, loginStatus.companyId, loginStatus.id, limit]); // Dependencies for useCallback
-
+  }, [offset, hasMoreTemplates,loginStatus.companyId, loginStatus.id, dateRangeId, searchParameter, concatDate, limit]); // Keep offset here if it's read directly, or use a ref
 
   const handleTabChange = (tab: string) => {
     const selectedType = templateTypes.find((type) => type.name === tab);
@@ -165,17 +204,51 @@ export const TemplatesPage: React.FC = () => {
       console.log(`Changing tab to: ${tab}, typeId: ${selectedType.id}`);
       setActiveTab(tab);
       setSelectedTypeId(selectedType.id);
-      setOffset(0); 
-      setTemplates([]); 
-      setHasMoreTemplates(true); 
-      getTemplatesOfCompany({ typeId: selectedType.id, reset: true });
+      // When tab changes, we always want a fresh fetch starting from 0 offset
+      setOffset(0);
+      console.log("++++++++++++++++++++++ Handle Tab Change ++++++++++++++++++++++++");
+      console.log(offset);
+      setTemplates([]);
+      setHasMoreTemplates(true);
+      // The useEffect below will trigger the fetch due to selectedTypeId change
     }
   };
 
   useEffect(() => {
     getTemplateTypes();
-  }, []); 
+  }, []); // Dependency on loginStatus is appropriate here
 
+  // Effect to trigger initial fetch or re-fetch when selectedTypeId changes (e.g., tab change)
+  //No error
+  useEffect(() => {
+    if (selectedTypeId !== 0) { // Only fetch if a valid type is selected
+      console.log(`Selected type ID changed to ${selectedTypeId}. Fetching initial templates.`);
+      setTemplates([]); // Clear templates for new type
+      setOffset(0); // Reset offset
+       console.log("++++++++++++++++++++++ selected id Change ++++++++++++++++++++++++");
+      console.log(offset);
+      setHasMoreTemplates(true); // Assume more templates for new type
+      getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
+    }
+  }, [selectedTypeId]);
+
+
+  
+  //No error
+  useEffect(() => {
+    if (selectedTypeId !== 0) {
+      console.log("Filter parameters changed. Resetting templates and fetching anew.");
+      setTemplates([]); 
+      setOffset(0); 
+       console.log("++++++++++++++++++++++ Filter parameters changed ++++++++++++++++++++++++");
+      console.log(offset);
+      setHasMoreTemplates(true); 
+      getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
+    }
+  }, [dateRangeId, concatDate, searchParameter, ]);
+
+
+  // Effect for infinite scroll
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -183,15 +256,17 @@ export const TemplatesPage: React.FC = () => {
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
       const scrollBottom = scrollTop + clientHeight;
-      const threshold = 200; 
+      const threshold = 200; // Pixels from bottom to trigger load
       if (
-        scrollBottom >= scrollHeight - threshold && 
-        !loadingTemplates && 
-        hasMoreTemplates && 
-        selectedTypeId !== 0 
+        scrollBottom >= scrollHeight - threshold &&
+        !loadingTemplates &&
+        hasMoreTemplates &&
+        selectedTypeId !== 0
       ) {
         console.log("Scroll conditions met. Initiating fetch for more templates.");
+        
         getTemplatesOfCompany({ typeId: selectedTypeId, reset: false }); 
+        
       }
     };
 
@@ -200,7 +275,8 @@ export const TemplatesPage: React.FC = () => {
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [loadingTemplates, hasMoreTemplates, selectedTypeId, getTemplatesOfCompany]);
+  }, [loadingTemplates, hasMoreTemplates, selectedTypeId, getTemplatesOfCompany]); // Dependencies are correct here, getTemplatesOfCompany is stable enough now.
+
 
   return (
     <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col">
@@ -208,9 +284,197 @@ export const TemplatesPage: React.FC = () => {
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
         <div className="flex justify-between w-full h-12 items-center">
           <div className="flex gap-2">
-            <LucideMailPlus className="w-7 h-7 text-blue-600 " />
+            {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
+            {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
             <span className="text-xl font-bold ">Email Templates</span>
           </div>
+          {isLargeScreen && (
+            <>
+              <div className="flex">
+                {/* search box flex div */}
+                <div className="relative flex items-start w-44">
+                  <div className="grid w-full">
+                    <SearchInput
+                      onChange={(e) => {
+                        handleSearchParameterChange(
+                          e.target.value
+                        );
+                      }}
+                    ></SearchInput>
+
+                  </div>
+                </div>
+
+                {/* Date FIlters Dropdown */}
+                <div className="flex mx-1">
+                  <div className="flex">
+                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                      <Calendar className="mt-2" />
+                    </div>
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
+                    ></DateRangeFilterDropdown>
+                  </div>
+                </div>
+
+              </div>
+              {/* Custom Date Picker Div Flex Box*/}
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={handleStartDateChange}
+                  onEndDateChange={handleEndDateChange}
+                />
+              </div>
+            </>
+          )}
+
+          {isMediumScreen && (
+            <>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                ></SearchInput>
+              </div>
+              <div className="flex relative  gap-2  ">
+                <div className="mt-1 flex ">
+                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                    <Calendar />
+                  </div>
+
+                  <DateRangeFilterDropdown
+                    dropdownOptions={dateRangeDropdownOptions}
+                    handleDateIdChange={handleDateRangeIdChange}
+                  ></DateRangeFilterDropdown>
+                </div>
+              </div>
+              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
+                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                    <button
+                      onClick={() => {
+                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
+                      }}
+                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={SIZE.TWENTY} />
+                    </button>
+
+                    <div className="my-10 justify-items-center mb-5">
+                      <div className="mb-5">
+                        <DateRangePicker
+                          onStartDateChange={handleStartDateChange}
+                          onEndDateChange={handleEndDateChange}
+                        />
+                      </div>
+                      <div className="w-full justify-items-center">
+                        <div className="w-24">
+                          <Button>Done</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {isSmallScreen && (
+            <>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                ></SearchInput>
+              </div>
+              <div className="flex relative gap-2">
+                <Button
+                  onClick={() => {
+                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
+                  }}
+                >
+                  <Filter size={SIZE.EIGHT} />
+                </Button>
+              </div>
+              {isFiltersOpenInMobileView && (
+                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
+                    <button
+                      onClick={() => {
+                        setIsFiltersOpenInMobileView(
+                          !isFiltersOpenInMobileView
+                        );
+                      }}
+                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={SIZE.EIGHT} />
+                    </button>
+                    {/* Date FIlters Dropdown */}
+
+                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
+                      <div className="mt-1 flex ">
+                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                          <Calendar size={SIZE.TWENTY} />
+                        </div>
+
+                        <DateRangeFilterDropdown
+                          dropdownOptions={dateRangeDropdownOptions}
+                          handleDateIdChange={handleDateRangeIdChange}
+                        ></DateRangeFilterDropdown>
+                      </div>
+                    </div>
+
+                    {/* Custom Date Picker Div Flex Box*/}
+                    <div
+                      className="mb-10 justify-items-center"
+                      style={
+                        isCustomDateOptionSelected
+                          ? { visibility: "visible" }
+                          : { visibility: "hidden" }
+                      }
+                    >
+                      <DateRangePicker
+                        onStartDateChange={handleStartDateChange}
+                        onEndDateChange={handleEndDateChange}
+                      />
+                    </div>
+
+                    {
+                      <div className="flex w-full justify-center items-center mb-5">
+                        <div className="w-28">
+                          <Button
+                            onClick={() => {
+                              setIsFiltersOpenInMobileView(
+                                !isFiltersOpenInMobileView
+                              );
+                            }}
+                          >
+                            Done
+                          </Button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          {
+          <Sidebar onCreate={() => setShowModal(true)} />
+          }
         </div>
       </div>
 
@@ -221,7 +485,6 @@ export const TemplatesPage: React.FC = () => {
         </div>
       ) : (
         <>
-          <Sidebar onCreate={() => setShowModal(true)} />
           <div className="flex-1 p-4 overflow-y-auto" ref={containerRef}>
             <Tabs
               activeTab={activeTab}
@@ -250,12 +513,12 @@ export const TemplatesPage: React.FC = () => {
 
 const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
   <button
-    className="fixed top-14 right-4 z-10 bg-blue-500 text-white w-fit rounded mb-4 p-1 hover:bg-blue-600 transition"
+    className=" top-16 right-4 z-10 bg-blue-500 text-white w-fit rounded mb-4 p-1 hover:bg-blue-600 transition"
     onClick={onCreate}
   >
     <div className="flex gap-1">
-    <LucidePlus className="w-6 h-6 text-white " />
-    <span className=" font-bold ">New Template </span>
+      <LucidePlus className="w-6 h-6 text-white " />
+      <span className=" font-bold ">New Template </span>
     </div>
   </button>
 );
@@ -363,7 +626,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
               <span>
                 <strong>Created On:</strong> {new Date(template.createdon).toLocaleDateString()}
               </span>
-               <span>
+              <span>
                 <strong>Updated By:</strong> {template.updatedby}
               </span>
               <span>
@@ -465,7 +728,7 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
           <button className="text-sm text-gray-600 hover:underline" onClick={onClose}>Cancel</button>
           <button
             className={`px-4 py-2 rounded text-white ${selectedTypeId !== null ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
-            disabled={selectedTypeId === null}
+            disabled={selectedTypeId === ''}
             onClick={handleSubmit}
           >
             Continue
@@ -475,3 +738,4 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
     </div>
   );
 };
+
