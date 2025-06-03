@@ -37,6 +37,7 @@ import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthCon
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
 import Meetings from "../../components/views/meeting/Meetings";
 import EmailSetting from "../../components/email-settings/EmailSetting";
+import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
 
 
 
@@ -329,6 +330,15 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <Navbar>
           <Meetings></Meetings>
+        </Navbar>
+      </PrivateRoute>
+    )
+  },{
+    path : ROUTES_URL.LEAD_IMPORT_CSV,
+    element :(
+      <PrivateRoute>
+        <Navbar>
+          <LeadImportCsv/>
         </Navbar>
       </PrivateRoute>
     )

@@ -781,19 +781,17 @@ const ViewLeadManagement = () => {
       );
       if (response.data.status) {
       
-
         // const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
         // another way to parse query string
         const rawLeadData = window.location.search;
         const urlParams = new URLSearchParams(rawLeadData);
         const leadDataStr = urlParams.get("leadData");
-
+        
         const parsedQuery = JSON.parse(leadDataStr || "{}");
-
-        parsedQuery.name = selectedLeadData.name.toString();
-        parsedQuery.email = selectedLeadData.email.toString();
-        parsedQuery.mobileNumber = selectedLeadData.mobileNumber.toString();
-
+        parsedQuery.name = !selectedLeadData.name  ? "-" : selectedLeadData.name;
+        parsedQuery.email = !selectedLeadData.email  ? "-" : selectedLeadData.email;
+        parsedQuery.mobileNumber = !selectedLeadData.mobileNumber ? "-" : selectedLeadData.mobileNumber;
+        
         const newQueryString = qs.stringify({
           leadData: JSON.stringify(parsedQuery),
         });
