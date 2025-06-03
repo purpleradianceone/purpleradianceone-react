@@ -6,7 +6,6 @@ import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import POST_API from '../../constants/PostApi';
 import { useEffect } from 'react';
-import LOCALSTORAGE_KEYS from '../../constants/LocalStorage';
 import { useSearchParams } from 'react-router-dom';
 import { useZoomMeetingContext } from '../../context/meeting/ZoomMeetingContext';
 
@@ -15,7 +14,7 @@ function ZoomMeetingsOAuthConsentAndroid() {
 
 
   const {loginStatus} = useLoggedInUserContext();
-  const {zoomMeetingStatus,setZoomMeetingStatus} = useZoomMeetingContext();
+  const {setZoomMeetingStatus} = useZoomMeetingContext();
 
   const [searchParams] = useSearchParams();
 
@@ -32,7 +31,7 @@ function ZoomMeetingsOAuthConsentAndroid() {
     }
 
     const handleConfirm = () =>{
-      localStorage.setItem(LOCALSTORAGE_KEYS.REDIRECT_PLATFORM,STRING_VALUES.ZOOM_MEETINGS)
+      // localStorage.setItem(LOCALSTORAGE_KEYS.REDIRECT_PLATFORM,STRING_VALUES.ZOOM_MEETINGS)
         const baseUrl =
       "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
     const params = new URLSearchParams();
@@ -75,14 +74,13 @@ function ZoomMeetingsOAuthConsentAndroid() {
     }
 
    useEffect(() => {
+
       if (code && state){
-        const redirectPlatform = localStorage.getItem(LOCALSTORAGE_KEYS.REDIRECT_PLATFORM);
-      
-        if (!zoomMeetingStatus.isConnected && redirectPlatform === STRING_VALUES.ZOOM_MEETINGS) {
-          handleZoomMeetingOAuthCallback(code, state);
-        }
-      }
-    }, []);
+        
+          handleZoomMeetingOAuthCallback(code, state);    
+          }
+    },[]);
+
 
   return (createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -106,7 +104,7 @@ function ZoomMeetingsOAuthConsentAndroid() {
 
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In With Google</h2>
-          <p className="text-gray-600">Do you want to signin with your google account for managing meetings</p>
+          <p className="text-gray-600">Do you want to signin with your Zoom account for managing meetings</p>
         </div>
 
         <div className="flex justify-end gap-3">

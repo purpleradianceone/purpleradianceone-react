@@ -25,6 +25,7 @@
     "ag-grid-community": "^33.0.4",
     "ag-grid-react": "^33.0.4",
     "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
     "dompurify": "^3.2.5",
     "jwt-decode": "^4.0.0",
     "lexical": "^0.31.0",

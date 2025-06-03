@@ -5,6 +5,7 @@ import {
   ClipboardPlus,
   Filter,
   Handshake,
+  LucideNavigation,
   User,
   X,
 } from "lucide-react";
@@ -387,18 +388,15 @@ function LeadManagementList({
         </div>
 
         <div className="flex bg-white rounded-lg shadow-sm p-0">
-          {/* <div className="ag-theme-alpine overflow-y-auto w-full"> */}
           <div
-            className="ag-theme-alpine w-full"
+            className="ag-theme-alpine w-full h-full"
             style={{ height: 505, width: "100%" }}
           >
             <LeadManagementAgGrid
               handleRowClick={handleRowClickedForShowLead}
               onRowSelect={handleRowSelectedForShowLead}
               handleLeadDataFormChange={handleLeadDataFormChange}
-              // handleIsEditLeadFormOpen={handleIsEditLeadFormOpen}
               leads={leadData}
-              // handleIdIsMeetingsModalOpen={handleIdIsMeetingsModalOpen}
             />
           </div>
           {/* </div> */}
@@ -407,20 +405,6 @@ function LeadManagementList({
             onClose={handleCreateLeadModalClose}
             onCreateLeadRefreshLeadData={handleAddLead}
           ></CreateLeadModal>
-          {/* <LeadMeetingsModal
-            isOpen={isMeetingdModalOpen}
-            onClose={() => {
-              setIsMeetingsModalOpen(false);
-            }}
-          />
-          <UpdateLeadForm
-            onEditRefreshLeadData={handleAddLead}
-            selectedLeadForEdit={selectedLeadForEdit}
-            isOpen={isEditModalOpenForLead}
-            onClose={() => {
-              setIsEditModalOpenForLead(false);
-            }}
-          /> */}
         </div>
 
         <div className="flex items-center justify-end ">
@@ -459,14 +443,6 @@ function LeadManagementList({
             </div>
           </div>
         )}
-        {/* <ViewLead
-        leadStatus={leadStatus}
-        selectedLeadData={leadDataForViewLead}
-          isOpen={isViewLeadModalOpen}
-          onClose={() => {
-            setIsViewLeadModalOpen(false)
-          }}
-        /> */}
       </div>
     );
   }

@@ -8,7 +8,6 @@ interface UserPreferenceContextProps {
 }
 
 const UserPreferenceContext = createContext<UserPreferenceContextProps| undefined>(undefined);
-
 export const UserPreferenceContextProvider : React.FC<{children : ReactNode}>=({
     children
 })=>{

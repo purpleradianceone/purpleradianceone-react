@@ -3,6 +3,7 @@ import {
   Bell,
   BoxesIcon,
   Building2,
+  Calendar,
   Handshake,
   Home,
   LayoutPanelLeft,
@@ -39,6 +40,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
+    userHasAccessToViewMeeting
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -350,6 +352,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             <NavItem
                               to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                               icon={<BoxesIcon size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+
+                          {userHasAccessToViewMeeting && (
+                             <NavItem
+                              to={ROUTES_URL.MEETINGS}
+                              icon={<Calendar size={SIZE.TWENTY} />}
                               label=""
                               onClick={() => setIsDropdownOpen(false)}
                             />

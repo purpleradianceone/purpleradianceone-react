@@ -35,6 +35,7 @@ import UserPrerefenceManagement from "../../components/user-profile/UserPreferen
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
+import Meetings from "../../components/views/meeting/Meetings";
 import EmailSetting from "../../components/email-settings/EmailSetting";
 
 
@@ -321,6 +322,15 @@ export const router = createBrowserRouter([
     path : ROUTES_URL.ZOOM_OAUTH_ANDROID,
     element : (
       <ZoomMeetingsOAuthConsent></ZoomMeetingsOAuthConsent>
+    )
+  },{
+    path : ROUTES_URL.MEETINGS,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          <Meetings></Meetings>
+        </Navbar>
+      </PrivateRoute>
     )
   }
 ]);
