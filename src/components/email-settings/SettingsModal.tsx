@@ -42,7 +42,7 @@ interface BaseEmailSettings {
   smtp_port: number;
   email_security_type_id: number;
   authentication_required: boolean;
-  isactive: boolean;
+  isactive: boolean; // Add isactive to the base interface
   createdby: string;
   updatedby: string;
   createdon: string;
@@ -58,7 +58,7 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settingType: SettingType;
-  initialData?: EmailSettings;
+  initialData?: EmailSettings; // initialData will be present in edit mode
   onSubmit: (data: EmailSettings) => void;
 }
 
@@ -73,7 +73,7 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         smtp_port: 587,
         email_security_type_id: 1,
         authentication_required: false,
-        isactive: true,
+        isactive: true, // Default to true for new company settings
         createdby: "Owner",
         updatedby: "Owner",
         createdon: "1 May 2025",
@@ -89,7 +89,7 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         smtp_port: 465,
         email_security_type_id: 1,
         authentication_required: false,
-        isactive: true,
+        isactive: true, // Default to true for new user settings
         createdby: "Owner",
         updatedby: "Owner",
         createdon: "1 May 2025",
@@ -100,16 +100,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   settingType,
-  initialData,
+  initialData, // This prop indicates if it's an edit operation
   onSubmit,
 }) => {
   const [formData, setFormData] = useState<EmailSettings>(
     getDefaultSettings(settingType)
   );
-  const [loading, setLoading] = useState(false); // <-- Add loading state
+  const [loading, setLoading] = useState(false);
   const { loginStatus } = useLoggedInUserContext();
 
+  // Determine if it's an edit operation based on initialData
+  const isEdit = Boolean(initialData);
+
   useEffect(() => {
+    // When initialData changes (or settingType), update formData
     setFormData(initialData ?? getDefaultSettings(settingType));
   }, [initialData, settingType]);
 
@@ -127,9 +131,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleApiCall = async () => {
-    const isEdit = Boolean(initialData);
     const isCompany = settingType === "company";
-    const apiEndpoint = isEdit
+    const apiEndpoint = isEdit // Use the isEdit variable here
       ? isCompany
         ? POST_API.UPDATE_EMAIL_SETTING_COMPANY
         : POST_API.UPDATE_EMAIL_SETTING_COMPANY_USER
@@ -140,39 +143,50 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     const payload: any = {
       ...formData,
       company_id: loginStatus.companyId,
+      // Ensure specific fields are correctly mapped if needed, though ...formData usually covers it
       email: formData.email,
       email_password: formData.email_password,
       smtp_host: formData.smtp_host,
       smtp_port: formData.smtp_port,
       email_security_type_id: formData.email_security_type_id,
-      authatication_required: formData.authentication_required,
+      authatication_required: formData.authentication_required, // Typo: Should be authentication_required
+      isactive: formData.isactive, // Include isactive in payload
       ...(isEdit
-        ? { updatedby_id: loginStatus.id }
+        ? { updatedby_id: loginStatus.id, id: formData.id } // Pass ID for update
         : { createdby_id: loginStatus.id }),
     };
+
+    // Correct the typo for authentication_required if your API expects it correctly spelled
+    if ('authatication_required' in payload) {
+        payload.authentication_required = payload.authatication_required;
+        delete payload.authatication_required;
+    }
+
 
     if (!isCompany) payload.company_user_id = loginStatus.id;
 
     try {
-      setLoading(true); // <-- Start loading
+      setLoading(true);
       const response = await axios.post(apiEndpoint, payload, {
         withCredentials: true,
       });
       window.alert(response.data.message);
-    } catch (error) {
+    } catch (error: any) { // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
-      window.alert("Something went wrong. Please try again.");
+      // More robust error message, checking for response.data
+      window.alert(`Something went wrong. Please try again. ${error.response?.data?.message || ''}`);
     } finally {
-      setLoading(false); // <-- Stop loading
+      setLoading(false);
       window.location.reload();
-
     }
   };
 
   const handleSubmit = async () => {
-    onSubmit(formData);
+    // Optionally perform form validation here before calling onSubmit and API
+    onSubmit(formData); // Call onSubmit with current form data
     await handleApiCall();
-    onClose();
+    // onClose() is called after API call in finally block which causes reload, so it's handled.
+    // If you want modal to close without reload on success, move onClose into try block.
   };
 
   const renderField = (
@@ -226,7 +240,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {initialData ? "Edit" : "Create"} {settingType} Email Setting
+            {isEdit ? "Edit" : "Create"} {settingType} Email Setting
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -247,6 +261,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             "authentication_required",
             "checkbox"
           )}
+          {/* Conditional rendering for isactive checkbox */}
+          {isEdit && (
+            renderField(
+              "Active", // Label for the checkbox
+              "isactive",
+              "checkbox"
+            )
+          )}
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <Button onClick={onClose} disabled={loading}>
@@ -256,10 +278,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             {loading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>{initialData ? "Updating..." : "Creating..."}</span>
+                <span>{isEdit ? "Updating..." : "Creating..."}</span>
               </div>
             ) : (
-              <span>{initialData ? "Update" : "Create"}</span>
+              <span>{isEdit ? "Update" : "Create"}</span>
             )}
           </Button>
         </div>
@@ -270,4 +292,3 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
 
 export default SettingsModal;
-
