@@ -178,13 +178,6 @@ export const TemplatesPage: React.FC = () => {
         setHasMoreTemplates(newTemplates.length === limit); 
         const newOffset:number = currentOffset+limit;
         setOffset(newOffset); 
-        console.log("++++++++++++++++++++++++Get template of company +++++++++++++++++++++++++++++++++++++");
-        console.log(newTemplates.length === limit)
-        console.log(newOffset);
-        console.log(currentOffset);
-        console.log(offset);
-        console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-
         setTemplates((prev) => (reset ? newTemplates : [...prev, ...newTemplates]));
       } else {
         console.warn("API response not OK:", response.status);
@@ -206,8 +199,6 @@ export const TemplatesPage: React.FC = () => {
       setSelectedTypeId(selectedType.id);
       // When tab changes, we always want a fresh fetch starting from 0 offset
       setOffset(0);
-      console.log("++++++++++++++++++++++ Handle Tab Change ++++++++++++++++++++++++");
-      console.log(offset);
       setTemplates([]);
       setHasMoreTemplates(true);
       // The useEffect below will trigger the fetch due to selectedTypeId change
@@ -222,11 +213,8 @@ export const TemplatesPage: React.FC = () => {
   //No error
   useEffect(() => {
     if (selectedTypeId !== 0) { // Only fetch if a valid type is selected
-      console.log(`Selected type ID changed to ${selectedTypeId}. Fetching initial templates.`);
       setTemplates([]); // Clear templates for new type
       setOffset(0); // Reset offset
-       console.log("++++++++++++++++++++++ selected id Change ++++++++++++++++++++++++");
-      console.log(offset);
       setHasMoreTemplates(true); // Assume more templates for new type
       getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
     }
@@ -237,11 +225,8 @@ export const TemplatesPage: React.FC = () => {
   //No error
   useEffect(() => {
     if (selectedTypeId !== 0) {
-      console.log("Filter parameters changed. Resetting templates and fetching anew.");
       setTemplates([]); 
       setOffset(0); 
-       console.log("++++++++++++++++++++++ Filter parameters changed ++++++++++++++++++++++++");
-      console.log(offset);
       setHasMoreTemplates(true); 
       getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
     }
@@ -263,7 +248,6 @@ export const TemplatesPage: React.FC = () => {
         hasMoreTemplates &&
         selectedTypeId !== 0
       ) {
-        console.log("Scroll conditions met. Initiating fetch for more templates.");
         
         getTemplatesOfCompany({ typeId: selectedTypeId, reset: false }); 
         
@@ -672,7 +656,7 @@ type TemplateTypeModalProps = {
 };
 
 const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate }) => {
-  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
+  const [selectedTypeId, setSelectedTypeId] = useState<string>(''); // Initial state is an empty string
   const { loginStatus } = useLoggedInUserContext();
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -693,7 +677,9 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
         if (response.status === STATUS_CODE.OK) {
           const activeTypes = response.data.filter((type: TemplateType) => type.isactive);
           setTemplateTypes(activeTypes);
-          if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id)); // Set default selected type
+          // Optional: If you want to pre-select the first active type, uncomment the line below.
+          // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
+          // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
         }
       } catch (error) {
         console.error("Error fetching template types for modal:", error);
@@ -705,8 +691,8 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
   }, [loginStatus.companyId, loginStatus.id]);
 
   const handleSubmit = () => {
-    if (selectedTypeId) {
-      onCreate(selectedTypeId);
+    if (selectedTypeId) { // This check ensures selectedTypeId is not an empty string
+      onCreate(selectedTypeId); // Pass the ID string directly
     }
   };
 
@@ -715,11 +701,11 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>
         <select
-          value={selectedTypeId ?? ''}
+          value={selectedTypeId} // Value will be '' initially or the selected ID string
           onChange={(e) => setSelectedTypeId(e.target.value)}
           className="w-full mb-3 border px-3 py-2 rounded"
         >
-          <option value="" >Select template type</option>
+          <option value="" >Select template type</option> {/* Value is empty string for no selection */}
           {templateTypes.filter((t) => t.isactive).map((type) => (
             <option key={type.id} value={JSON.stringify(type)}>{type.name}</option>
           ))}
@@ -727,8 +713,8 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
         <div className="flex justify-between mt-4">
           <button className="text-sm text-gray-600 hover:underline" onClick={onClose}>Cancel</button>
           <button
-            className={`px-4 py-2 rounded text-white ${selectedTypeId !== null ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
             disabled={selectedTypeId === ''}
+            className={`px-4 py-2 rounded text-white ${selectedTypeId !== '' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
             onClick={handleSubmit}
           >
             Continue
@@ -738,4 +724,6 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
     </div>
   );
 };
+
+
 
