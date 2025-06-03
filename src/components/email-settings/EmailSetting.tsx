@@ -49,43 +49,6 @@ interface CompanyUserEmailSetting {
   updatedon: string;
 }
 
-// const mockCompanySettings: CompanyEmailSetting[] = [
-//   {
-//     id:1,
-//     company_id:1,
-//     email: "support@company.com",
-//     email_password: "secret",
-//     smtp_host: "smtp.company.com",
-//     smtp_port: 587,
-//     email_security_type_id: 1,
-//     authentication_required: true,
-//      isactive: true,
-//   createdby: "Owner",
-//   updatedby: "Owner",
-//   createdon: "1 May 2025",
-//   updatedon: "1 May 2025",
-
-//   },
-// ];
-
-// const mockUserSettings: CompanyUserEmailSetting[] = [
-//   {
-//     id:1,
-//     company_id:1,
-//     company_user_id:1,
-//     email: "john.doe@company.com",
-//     email_password: "secretuser",
-//     smtp_host: "smtp.user.com",
-//     smtp_port: 465,
-//     email_security_type_id: 2,
-//     authentication_required: false,
-//      isactive: true,
-//   createdby: "Owner",
-//   updatedby: "Owner",
-//   createdon: "1 May 2025",
-//   updatedon: "1 May 2025",
-//   },
-// ];
 
 export default function EmailSettingsTabs() {
   const [activeTab, setActiveTab] = useState<"company" | "user">("company");
@@ -201,7 +164,7 @@ const getEmailSettings = async () => {
             : setting.email_security_type_id === 2
             ? "TLS"
             : "Unknown"}
-        </p>
+        </p> 
       </div>
       <div className="flex items-center space-x-2">
         <ShieldCheck
@@ -212,6 +175,36 @@ const getEmailSettings = async () => {
         <p className="text-gray-700 text-sm">
           <strong>Authentication Required:</strong>{" "}
           {setting.authentication_required ? "Yes" : "No"}
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong></strong>{" "}
+          {"-"}
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Created By:</strong>{" "}
+          {setting.createdby }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Created On:</strong>{" "}
+          {setting.createdon }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Updated By:</strong>{" "}
+          {setting.updatedby }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Updated On:</strong>{" "}
+          {setting.updatedon }
         </p>
       </div>
     </div>
@@ -278,6 +271,36 @@ const getEmailSettings = async () => {
           {setting.authentication_required ? "Yes" : "No"}
         </p>
       </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong></strong>{" "}
+          {"-"}
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Created By:</strong>{" "}
+          {setting.createdby }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Created On:</strong>{" "}
+          {setting.createdon }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Updated By:</strong>{" "}
+          {setting.updatedby }
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="text-gray-700 text-sm">
+          <strong>Updated On:</strong>{" "}
+          {setting.updatedon }
+        </p>
+      </div>
     </div>
   );
 
@@ -321,30 +344,28 @@ const getEmailSettings = async () => {
           <div className="w-full">
             <div className="flex justify-end mb-4">
               <button
-                className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                className="fixed top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
                 onClick={() => {
                   setModalType("company");
                   setEditData(null);
                   setIsModalOpen(true);
                 }}
               >
-                <Plus className="w-5 h-5 mr-2" /> Create
+                <Plus className="w-6 h-6 text-white " />{" "}
+                <span className=" font-bold ">Create</span>
               </button>
             </div>
             {isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {companySettings.length > 0 ? (
                   companySettings.map(renderCompanyEmailCard)
                 ) : (
-                  <div className="justify-center items-center">
-                    <h6 className="justify-center items-center">
-                      {" "}
-                      No Email Settings For company{" "}
-                    </h6>
+                  <div className="text-center w-full text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
+                    No Email Settings For company
                   </div>
                 )}
               </div>
@@ -354,14 +375,15 @@ const getEmailSettings = async () => {
           <div className="w-full">
             <div className="flex justify-end mb-4">
               <button
-                className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                className="fixed top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
                 onClick={() => {
                   setModalType("user");
                   setEditData(null);
                   setIsModalOpen(true);
                 }}
               >
-                <Plus className="w-5 h-5 mr-2" /> Create
+                <Plus className="w-6 h-6 text-white " />{" "}
+                <span className=" font-bold ">Create</span>{" "}
               </button>
             </div>
             {isLoading ? (
@@ -373,12 +395,8 @@ const getEmailSettings = async () => {
                 {userSettings.length > 0 ? (
                   userSettings.map(renderUserEmailCard)
                 ) : (
-                  <div className="justify-center items-center">
-                    {" "}
-                    <h6 className="justify-center items-center">
-                      {" "}
-                      No Email Settings For Company User{" "}
-                    </h6>
+                  <div className="text-center w-full text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
+                    No Email Settings For Company User
                   </div>
                 )}
               </div>
