@@ -9,6 +9,8 @@ import {
   Plus,
   LucideMail,
   LucideSettings,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import SettingsModal from "./SettingsModal";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
@@ -166,7 +168,7 @@ const getEmailSettings = async () => {
             : "Unknown"}
         </p> 
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-2">
         <ShieldCheck
           className={`w-5 h-5 ${
             setting.authentication_required ? "text-emerald-600" : "text-gray-400"
@@ -177,10 +179,17 @@ const getEmailSettings = async () => {
           {setting.authentication_required ? "Yes" : "No"}
         </p>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-4">
+        {setting.isactive ?<CheckCircle 
+          className={`w-5 h-5 ${
+            "text-emerald-600" 
+          }`}
+        />:<XCircle className={`w-5 h-5 ${
+             "text-red-600" 
+          }`}/>}
         <p className="text-gray-700 text-sm">
-          <strong></strong>{" "}
-          {"-"}
+          <strong>Active:</strong>{" "}
+          {setting.isactive ? "Yes" : "No"}
         </p>
       </div>
       <div className="flex items-center space-x-2">
@@ -260,7 +269,7 @@ const getEmailSettings = async () => {
             : "Unknown"}
         </p>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-2">
         <ShieldCheck
           className={`w-5 h-5 ${
             setting.authentication_required ? "text-emerald-600" : "text-gray-400"
@@ -271,12 +280,20 @@ const getEmailSettings = async () => {
           {setting.authentication_required ? "Yes" : "No"}
         </p>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-4">
+        {setting.isactive ?<CheckCircle 
+          className={`w-5 h-5 ${
+            "text-emerald-600" 
+          }`}
+        />:<XCircle className={`w-5 h-5 ${
+             "text-red-600" 
+          }`}/>}
         <p className="text-gray-700 text-sm">
-          <strong></strong>{" "}
-          {"-"}
+          <strong>Active:</strong>{" "}
+          {setting.isactive ? "Yes" : "No"}
         </p>
       </div>
+      
       <div className="flex items-center space-x-2">
         <p className="text-gray-700 text-sm">
           <strong>Created By:</strong>{" "}
