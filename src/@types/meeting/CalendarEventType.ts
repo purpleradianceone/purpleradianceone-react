@@ -24,6 +24,7 @@ type CalendarEventType = {
     organizerEmail? : string,
     startDateByIST : string,
     endDateByIST : string,
+    colorCode : string,
     startDateByUserTimeZone : Date,
     startDateByUserTimeZoneString : string,
     endDateByUserTimeZone : Date,
