@@ -39,6 +39,9 @@ import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssi
 import LeadAssignedComponyProducts from "./LeadAssignedCompanyProduct";
 import InterestType from "../../../@types/lead-management/InterestType";
 import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
+import LeadContact from "./LeadContact";
+import LeadContactType from "../../../@types/lead-management/LeadContact";
+
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -64,7 +67,8 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
 
   //NOTE : THIS IS THE SELECTED LEAD
-  const [selectedLeadData, setSelectedLeadData] = useState(JSON.parse(searchParams.get("leadData") || "{}")
+  const [selectedLeadData, setSelectedLeadData] = useState(
+    JSON.parse(searchParams.get("leadData") || "{}")
   );
 
   const [leadStatus, setLeadStatus] = useState<
@@ -80,6 +84,11 @@ const ViewLeadManagement = () => {
   const [interestTypeData, setInterestTypeData] = React.useState<
     InterestType[]
   >([]);
+  //meeting modal states
+  const [leadContact , setLeadContact] = useState<LeadContactType[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("meeting");
+  const [isOpenMeetingsModal, setIsOpenMeetingsModal] = useState<boolean>(true);
+  const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(false);
 
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
@@ -713,7 +722,6 @@ const ViewLeadManagement = () => {
   const handleLeadProductUpdate = (
     updatedProduct: LeadAssignedCompanyProduct
   ) => {
-
     setLeadAssignedCompanyProduct((prevData) =>
       prevData.map((product) =>
         product.id === updatedProduct.id
@@ -727,7 +735,47 @@ const ViewLeadManagement = () => {
       )
     );
   };
-  // call to the all apis 
+
+  // get lead contact 
+  const fetchLeadContact = async () =>{
+    const postDataGetLeadContact = {
+      company_id : loginStatus.companyId,
+      lead_id : selectedLeadData.id,
+      requestedby : loginStatus.id
+    }
+    await axios.post(POST_API.GET_LEAD_CONTACT, postDataGetLeadContact , {
+      withCredentials : true,
+    } )
+    .then((response)=>{
+     
+      const mappedLeadContactData : LeadContactType[] = response.data.map((item : any) =>({
+        id : item.id,
+        name : item.name,
+        email : item.email,
+        address : item.address,
+        createdBy : item.createdby,
+        createdOn : item.createdon,
+        isActive : item.isactive,
+        isPrimary : item.is_primary,
+        jobTitle : item.job_title,
+        leadId : item.lead_id,
+        linkedinProfile : item.linkedin_profile,
+        mobileNumber : item.mobilenumber,
+        preferredCommunicationChannel : item.preferred_communication_channel,
+        preferredLanguage : item.preferred_language,
+        socialMediaHandles : item.social_media_handles,
+        updatedBy : item.updatedby,
+        updatedOn : item.updatedon,  
+      }))
+      setLeadContact(mappedLeadContactData);
+
+    })
+    .catch((error) =>{
+      alert("exception in fetch lead contact  :"+ error);
+    })
+  }
+
+  // call to the all apis
   useEffect(() => {
     const apisCalls = async () => {
       await getLeadDetails();
@@ -738,6 +786,7 @@ const ViewLeadManagement = () => {
       await getAllDistrict(stateChangeRef.current);
       await fetchLeadCompanyProduct();
       await getLeadInterestData();
+      await fetchLeadContact();
     };
 
     const apiCallsWhenCountryChanged = async (countryId: number | null) => {
@@ -773,25 +822,28 @@ const ViewLeadManagement = () => {
       mobilenumber: selectedLeadData.mobileNumber,
       updatedby: loginStatus.id,
     };
-  try {
+    try {
       const response = await axios.post(
         POST_API.UPDATE_LEAD,
         PostDataForLeadUpdate,
         { withCredentials: true }
       );
       if (response.data.status) {
-      
         // const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
         // another way to parse query string
         const rawLeadData = window.location.search;
         const urlParams = new URLSearchParams(rawLeadData);
         const leadDataStr = urlParams.get("leadData");
-        
+
         const parsedQuery = JSON.parse(leadDataStr || "{}");
-        parsedQuery.name = !selectedLeadData.name  ? "-" : selectedLeadData.name;
-        parsedQuery.email = !selectedLeadData.email  ? "-" : selectedLeadData.email;
-        parsedQuery.mobileNumber = !selectedLeadData.mobileNumber ? "-" : selectedLeadData.mobileNumber;
-        
+        parsedQuery.name = !selectedLeadData.name ? "-" : selectedLeadData.name;
+        parsedQuery.email = !selectedLeadData.email
+          ? "-"
+          : selectedLeadData.email;
+        parsedQuery.mobileNumber = !selectedLeadData.mobileNumber
+          ? "-"
+          : selectedLeadData.mobileNumber;
+
         const newQueryString = qs.stringify({
           leadData: JSON.stringify(parsedQuery),
         });
@@ -834,6 +886,19 @@ const ViewLeadManagement = () => {
     }
   };
 
+  const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
+    const id = event.currentTarget.id;
+    setActiveTab(id); // set active tab for border effect
+
+    if (id === "meeting") {
+      setIsOpenProductCard(false);
+      setIsOpenMeetingsModal(true);
+    } else if (id === "contact") {
+      setIsOpenProductCard(true);
+      setIsOpenMeetingsModal(false);
+    }
+  };
+
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   return (
@@ -843,7 +908,7 @@ const ViewLeadManagement = () => {
       } fixed top-8 inset-0 z-10 bg-white mt-4   overflow-auto`}
     >
       {/* Header */}
-      <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 pr-2">
+      <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 ">
         <div className="flex gap-6">
           <button
             className="flex items-center pr-1 text-sm text-gray-600 hover:text-blue-600 transition"
@@ -1054,9 +1119,9 @@ const ViewLeadManagement = () => {
       </div>
 
       {/* Lead Details & Meeting Section */}
-      <div className=" w-[100%] h-auto flex  shadow-sm    ">
+      <div className=" w-[100%] h-auto flex gap-2    shadow-sm  m-2  ">
         {/* First child: 50% width */}
-        <div className="w-[50%] h-full overflow-x-hidden   bg-gray-0 shadow-md m-2 rounded">
+        <div className="w-[50%] shadow-md  rounded-sm">
           <LeadDetails
             handleLeadActivityChange={(person: string, work: string) => {
               setActivityData([
@@ -1079,17 +1144,77 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Second child: 50% width */}
-        <div className="w-[50%] h-full overflow-y-auto bg-green-50 border my-2  p-4">
-          <LeadMeetingsModal
-            isCalendarViewEnabled={false}
-            isMeetingModalOpenFromProp={false}
-            showConnectToPlatform={false}
-          />
+        <div className="w-[50%] h-auto overflow-auto bg-green-0 border   ">
+          {/* <div className="bg-slate-200 flex text-sm font-semibold text-gray-800 gap-4 ">
+            <span
+              id="meeting"
+              className="cursor-pointer"
+              onClick={handleClickCards}
+            >
+              Meeting
+            </span>
+            <span
+              id="contact"
+              className="cursor-pointer"
+              onClick={handleClickCards}
+            >
+              Contact
+            </span>
+            <span className="cursor-pointer">Span</span>
+          </div> */}
+          <div className="bg-slate-200 pl-1 flex text-sm font-semibold text-gray-800 gap-4 transition-all duration-300 ease-in-out">
+            <span
+              id="meeting"
+              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
+                activeTab === "meeting"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "hover:text-blue-500"
+              }`}
+              onClick={handleClickCards}
+            >
+              Meeting
+            </span>
+            <span
+              id="contact"
+              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
+                activeTab === "contact"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "hover:text-blue-500"
+              }`}
+              onClick={handleClickCards}
+            >
+              Contact
+            </span>
+            <span
+              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
+                activeTab === "span"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "hover:text-blue-500"
+              }`}
+              onClick={() => setActiveTab("span")}
+            >
+              Span
+            </span>
+          </div>
+          <div className=" flex h-full ">
+            {isOpenMeetingsModal && (
+              <LeadMeetingsModal
+                isCalendarViewEnabled={false}
+                isMeetingModalOpenFromProp={false}
+                showConnectToPlatform={false}
+              />
+            )}
+            {isOpenProductCard && 
+            <LeadContact 
+              leadContact={leadContact}
+              selectedLeadData = {selectedLeadData}
+            />}
+          </div>
         </div>
       </div>
 
       {/* Assigned Company Product & Activity Section */}
-      <div className=" w-[100%]   flex gap-1  shadow-sm">
+      <div className=" w-[100%]   flex gap-2 m-2  shadow-sm">
         {/* First child: 50% width */}
         <div className="w-[50%] bg-slate-100 shadow-xl  rounded">
           <LeadAssignedComponyProducts
