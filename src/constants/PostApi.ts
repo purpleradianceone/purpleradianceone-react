@@ -60,6 +60,7 @@ const POST_API = {
     LEAD_IMPORT_VIA_CSV : import.meta.env.VITE_LEAD_IMPORT_VIA_CSV!,
     GET_LEAD_CONTACT : import.meta.env.VITE_GET_LEAD_CONTACT!,
     CREATE_LEAD_CONTACT : import.meta.env.VITE_CREATE_LEAD_CONTACT!,
+    UPDATE_LEAD_CONTACT : import.meta.env.VITE_UPDATE_LEAD_CONTACT!,
     
     //company user preference
     GET_COMPANY_USER_PREFERENCE : import.meta.env.VITE_GET_COMPANY_USER_PREFERENCE!,

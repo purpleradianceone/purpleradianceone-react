@@ -74,15 +74,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   ) => {
     const updatedStatus = !product.isActive;
 
-    // const postData = {
-    //   company_id: loginStatus.companyId,
-    //   id: product.id,
-    //   lead_interest_id: product.leadInterestId,
-    //   quantity_required: product.quantityRequired,
-    //   cost_expected: product.costExpected,
-    //   isactive: updatedStatus,
-    //   updatedby: loginStatus.id,
-    // };
+
     const postData = {
       company_id: loginStatus.companyId,
       id: product.id,
@@ -254,16 +246,23 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   };
 
   return (
-    <div className=" max-h-80 w-full overflow-auto p-2 bg-gray-50 rounded-lg">
+    <div className=" max-h-80 w-full   bg-gray-0 rounded-lg p-2">
   {/* Header row */}
-  <div className=" hidden sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold text-gray-900 text-sm mb-3 px-2">
+  <div className="  sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold h-6 bg-gray-50 text-gray-900 text-sm mb-3 px-2">
     <div>Product Name</div>
     <div className="text-center">Req. Quantity</div>
     <div className="text-center">Exp. Cost</div>
     <div>Interest</div>
     <div className="text-center">Status</div>
+   
   </div>
-
+ {
+    data.length==0 && (
+      <div className="flex w-full h-28 bg-green50 text-xs text-gray-400 justify-center items-center ">
+        Product is not assigned to lead. 
+      </div>
+    )
+  }
   {/* Data rows */}
   {data.map((product, index) => ( // Added 'index' to the map function
     <form key={product.id}>
@@ -367,6 +366,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       </div>
     </form>
   ))}
+  
 
   <MessageSnackBar
     isOpen={messageSnackbar.open}

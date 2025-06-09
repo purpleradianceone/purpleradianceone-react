@@ -42,7 +42,6 @@ import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
 import LeadContact from "./LeadContact";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 
-
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -85,10 +84,10 @@ const ViewLeadManagement = () => {
     InterestType[]
   >([]);
   //meeting modal states
-  const [leadContact , setLeadContact] = useState<LeadContactType[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("meeting");
-  const [isOpenMeetingsModal, setIsOpenMeetingsModal] = useState<boolean>(true);
-  const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(false);
+  const [leadContact, setLeadContact] = useState<LeadContactType[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("contact");
+  const [isOpenMeetingsModal, setIsOpenMeetingsModal] = useState<boolean>(false);
+  const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
 
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
@@ -736,44 +735,45 @@ const ViewLeadManagement = () => {
     );
   };
 
-  // get lead contact 
-  const fetchLeadContact = async () =>{
+  // get lead contact
+  const fetchLeadContact = async () => {
     const postDataGetLeadContact = {
-      company_id : loginStatus.companyId,
-      lead_id : selectedLeadData.id,
-      requestedby : loginStatus.id
-    }
-    await axios.post(POST_API.GET_LEAD_CONTACT, postDataGetLeadContact , {
-      withCredentials : true,
-    } )
-    .then((response)=>{
-     
-      const mappedLeadContactData : LeadContactType[] = response.data.map((item : any) =>({
-        id : item.id,
-        name : item.name,
-        email : item.email,
-        address : item.address,
-        createdBy : item.createdby,
-        createdOn : item.createdon,
-        isActive : item.isactive,
-        isPrimary : item.is_primary,
-        jobTitle : item.job_title,
-        leadId : item.lead_id,
-        linkedinProfile : item.linkedin_profile,
-        mobileNumber : item.mobilenumber,
-        preferredCommunicationChannel : item.preferred_communication_channel,
-        preferredLanguage : item.preferred_language,
-        socialMediaHandles : item.social_media_handles,
-        updatedBy : item.updatedby,
-        updatedOn : item.updatedon,  
-      }))
-      setLeadContact(mappedLeadContactData);
-
-    })
-    .catch((error) =>{
-      alert("exception in fetch lead contact  :"+ error);
-    })
-  }
+      company_id: loginStatus.companyId,
+      lead_id: selectedLeadData.id,
+      requestedby: loginStatus.id,
+    };
+    await axios
+      .post(POST_API.GET_LEAD_CONTACT, postDataGetLeadContact, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const mappedLeadContactData: LeadContactType[] = response.data.map(
+          (item: any) => ({
+            id: item.id,
+            name: item.name,
+            email: item.email,
+            address: item.address,
+            createdBy: item.createdby,
+            createdOn: item.createdon,
+            isActive: item.isactive,
+            isPrimary: item.is_primary,
+            jobTitle: item.job_title,
+            leadId: item.lead_id,
+            linkedinProfile: item.linkedin_profile,
+            mobileNumber: item.mobilenumber,
+            preferredCommunicationChannel: item.preferred_communication_channel,
+            preferredLanguage: item.preferred_language,
+            socialMediaHandles: item.social_media_handles,
+            updatedBy: item.updatedby,
+            updatedOn: item.updatedon,
+          })
+        );
+        setLeadContact(mappedLeadContactData);
+      })
+      .catch((error) => {
+        alert("exception in fetch lead contact  :" + error);
+      });
+  };
 
   // call to the all apis
   useEffect(() => {
@@ -1118,54 +1118,60 @@ const ViewLeadManagement = () => {
         )}
       </div>
 
-      {/* Lead Details & Meeting Section */}
-      <div className=" w-[100%] h-auto flex gap-2    shadow-sm  m-2  ">
-        {/* First child: 50% width */}
-        <div className="w-[50%] shadow-md  rounded-sm">
-          <LeadDetails
-            handleLeadActivityChange={(person: string, work: string) => {
-              setActivityData([
-                {
-                  person: person,
-                  work: work,
-                },
-                ...activityData,
-              ]);
-            }}
-            district={district}
-            stateData={stateData}
-            leadDetailsData={leadDetailsData}
-            setLeadDetailsData={setLeadDetailsData}
-            countries={countries}
-            selectedLeadData={selectedLeadData}
-            industryType={industryType}
-            getLeadDetails={getLeadDetails}
-          />
+      {/* start */}
+      <div className="w-full flex flex-col md:flex-row gap-1 p-2">
+        {/* Column 1 */}
+        <div className="w-full md:w-1/2 flex flex-col gap-4
+        ">
+          {/* Lead Details */}
+          <div className="shadow-md rounded-sm">
+            <LeadDetails
+              handleLeadActivityChange={(person: string, work: string) => {
+                setActivityData([
+                  { person: person, work: work },
+                  ...activityData,
+                ]);
+              }}
+              district={district}
+              stateData={stateData}
+              leadDetailsData={leadDetailsData}
+              setLeadDetailsData={setLeadDetailsData}
+              countries={countries}
+              selectedLeadData={selectedLeadData}
+              industryType={industryType}
+              getLeadDetails={getLeadDetails}
+            />
+          </div>
+
+          {/* Assigned Company Product */}
+          <div className=" shadow-xl rounded">
+            <LeadAssignedComponyProducts
+              data={leadAssignedCompanyProduct}
+              interestTypeData={interestTypeData}
+              handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
+              handleLeadProductUpdate={handleLeadProductUpdate}
+            />
+          </div>
         </div>
 
-        {/* Second child: 50% width */}
-        <div className="w-[50%] h-auto overflow-auto bg-green-0 border   ">
-          {/* <div className="bg-slate-200 flex text-sm font-semibold text-gray-800 gap-4 ">
-            <span
-              id="meeting"
-              className="cursor-pointer"
-              onClick={handleClickCards}
-            >
-              Meeting
-            </span>
+        {/* Column 2 */}
+        <div className="w-full md:w-1/2 flex flex-col gap-0">
+          {/* Meeting / Contact / Span Tabs */}
+          <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
             <span
               id="contact"
-              className="cursor-pointer"
+              className={`cursor-pointer ${
+                activeTab === "contact"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "hover:text-blue-500"
+              }`}
               onClick={handleClickCards}
             >
-              Contact
+              Contacts
             </span>
-            <span className="cursor-pointer">Span</span>
-          </div> */}
-          <div className="bg-slate-200 pl-1 flex text-sm font-semibold text-gray-800 gap-4 transition-all duration-300 ease-in-out">
             <span
               id="meeting"
-              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
+              className={`cursor-pointer ${
                 activeTab === "meeting"
                   ? "border-b-2 border-blue-500 text-blue-600"
                   : "hover:text-blue-500"
@@ -1174,19 +1180,9 @@ const ViewLeadManagement = () => {
             >
               Meeting
             </span>
+            
             <span
-              id="contact"
-              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
-                activeTab === "contact"
-                  ? "border-b-2 border-blue-500 text-blue-600"
-                  : "hover:text-blue-500"
-              }`}
-              onClick={handleClickCards}
-            >
-              Contact
-            </span>
-            <span
-              className={`cursor-pointer  transition-all duration-200 ease-in-out ${
+              className={`cursor-pointer ${
                 activeTab === "span"
                   ? "border-b-2 border-blue-500 text-blue-600"
                   : "hover:text-blue-500"
@@ -1196,7 +1192,7 @@ const ViewLeadManagement = () => {
               Span
             </span>
           </div>
-          <div className=" flex h-full ">
+          <div className="flex flex-col gap-2">
             {isOpenMeetingsModal && (
               <LeadMeetingsModal
                 isCalendarViewEnabled={false}
@@ -1204,49 +1200,38 @@ const ViewLeadManagement = () => {
                 showConnectToPlatform={false}
               />
             )}
-            {isOpenProductCard && 
-            <LeadContact 
-              leadContact={leadContact}
-              selectedLeadData = {selectedLeadData}
-            />}
+            {isOpenProductCard && (
+              <LeadContact
+                leadContact={leadContact}
+                fetchLeadContact ={fetchLeadContact}
+              />
+            )}
           </div>
-        </div>
-      </div>
 
-      {/* Assigned Company Product & Activity Section */}
-      <div className=" w-[100%]   flex gap-2 m-2  shadow-sm">
-        {/* First child: 50% width */}
-        <div className="w-[50%] bg-slate-100 shadow-xl  rounded">
-          <LeadAssignedComponyProducts
-            data={leadAssignedCompanyProduct}
-            interestTypeData={interestTypeData}
-            handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
-            handleLeadProductUpdate={handleLeadProductUpdate}
-          />
-        </div>
-
-        {/* Second child: 50% width */}
-        <div className="w-[50%] h-full  border my- p-4">
-          <div className="sticky w-full bg-slate-100 font-sans text-sm font-semibold ">
-            Activity
-          </div>
-          <div className=" pl-1 ">
-            {activityData.map((item: activity, index: number) => (
-              <div key={index}>
-                {" "}
-                <span className="text-sm font-semibold overflow-y-auto">
-                  <span className="inline-block">
-                    <ArrowBigRightDash size={12} />
+          {/* Activity */}
+          <div className="border p-4 bg-white shadow-sm rounded">
+            <div className=" top-0 bg-slate-100 font-sans text-sm font-semibold">
+              Activity
+            </div>
+            <div className="pl-1 space-y-1">
+              {activityData.map((item: activity, index: number) => (
+                <div key={index}>
+                  <span className="text-sm font-semibold">
+                    <ArrowBigRightDash
+                      size={12}
+                      className="inline-block mr-1"
+                    />
+                    {item.person}
                   </span>{" "}
-                  {item.person}
-                </span>{" "}
-                <span>➡️</span> <span className="text-xs ">{item.work}</span>
-              </div>
-            ))}
+                  <span>➡️</span> <span className="text-xs">{item.work}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
+      {/* end  */}
       <UpdateLeadForm
         isOpen={isUpdateLeadFormOpen}
         onClose={() => {
