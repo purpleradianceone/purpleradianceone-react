@@ -18,7 +18,6 @@ import {
   X,
 } from "lucide-react";
 import { parse } from "date-fns";
-import { meetingPaltform } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import Button from "../../ui/Button";
@@ -48,6 +47,7 @@ import {
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import MeetingPlatforms from "../../../@types/meeting/MeetingPlatform";
 
 function EditMeetingDetailsModal({
   meetingDetails,
@@ -55,12 +55,14 @@ function EditMeetingDetailsModal({
   onClose,
   isAttendeesPresent,
   handleMeetingDetailsUpdate,
+  meetingPlatform 
 }: {
   meetingDetails: CalendarEventType;
   isOpen: boolean;
   onClose: () => void;
   isAttendeesPresent: boolean;
   handleMeetingDetailsUpdate: () => void;
+  meetingPlatform : MeetingPlatforms[]
 }) {
   const meetingStautsRadioButtonOptions = [
     {
@@ -94,7 +96,8 @@ function EditMeetingDetailsModal({
     type: "success" as "success" | "error",
   });
 
-  const startDateArray = meetingDetails.startDateByUserTimeZoneString.split(" ");
+  const startDateArray =
+    meetingDetails.startDateByUserTimeZoneString.split(" ");
   const startDateValue = startDateArray[0];
   const startTimeArray = startDateArray[1].split(".");
   const startTimeValue = startTimeArray[0];
@@ -102,23 +105,21 @@ function EditMeetingDetailsModal({
   const startDateArrayIST = meetingDetails.startDateByIST.split(" ");
   const startDateValueIST = startDateArrayIST[0];
   const startTimeArrayIST = startDateArrayIST[1].split(".");
-  const startTimeValueIST = startTimeArrayIST[0].substring(0,5);
-  
+  const startTimeValueIST = startTimeArrayIST[0].substring(0, 5);
 
   const endDateArray = meetingDetails.endDateByUserTimeZoneString.split(" ");
   const endDateValue = endDateArray[0];
   const endTimeArray = endDateArray[1].split(".");
   const endTimeValue = endTimeArray[0];
 
-   const endDateArrayIST = meetingDetails.endDateByIST.split(" ");
+  const endDateArrayIST = meetingDetails.endDateByIST.split(" ");
   const endDateValueIST = endDateArrayIST[0];
   const endTimeArrayIST = endDateArrayIST[1].split(".");
-  const endTimeValueIST = endTimeArrayIST[0].substring(0,5);
-
+  const endTimeValueIST = endTimeArrayIST[0].substring(0, 5);
 
   const [isAttendeeNotPresentAddedNew, setIsAttendeeNotPresentAddedNew] =
     useState<boolean>(isAttendeesPresent);
-  
+
   const [title, setTitle] = useState<string>(meetingDetails!.title);
   const [startDate, setStartDate] = useState<string>(startDateValue);
   const [endDate, setEndDate] = useState<string>(endDateValue);
@@ -154,20 +155,17 @@ function EditMeetingDetailsModal({
       : meetingDetails.meetingStatusFromZoom!;
   });
   const [isCreating, setIsCreating] = useState<boolean>(false); // Simulate meeting creation
-  const [selectedMeetingPlatform, setSelectedMeetingPlatform] = useState<
-    "Google Meet" | "Zoom Meetings" | "Teams" | ""
-  >(() => {
+  const [selectedMeetingPlatform, setSelectedMeetingPlatform] = useState<string>(() => {
     if (meetingDetails.platform === 1) {
-      return "Google Meet";
+      return meetingPlatform[0].name;
     } else if (meetingDetails.platform === 2) {
-      return "Zoom Meetings";
+      return meetingPlatform[1].name;
     } else if (meetingDetails.platform === 3) {
-      return "Teams";
+      return meetingPlatform[2].name;
     } else {
       return "";
     }
   });
-  
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -179,38 +177,32 @@ function EditMeetingDetailsModal({
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
   const { currentTime } = useServerCurrentTime();
-  const [serverCurrentTime,setServerCurrentTime] = useState<Date>();
-  const [parsedStartDateTime,setParsedStartDateTime] = useState<Date>();
-  const [parsedEndDateTime,setParsedEndDateTime] = useState<Date>();
+  const [serverCurrentTime, setServerCurrentTime] = useState<Date>();
+  const [parsedStartDateTime, setParsedStartDateTime] = useState<Date>();
+  const [parsedEndDateTime, setParsedEndDateTime] = useState<Date>();
 
-  useEffect(()=>{
+  useEffect(() => {
     // console.log(currentTime);
     const pickerFormatString = "yyyy-MM-dd HH:mm";
 
-     const combinedPickerStartDateTimeString = `${startDateValueIST} ${startTimeValueIST}`;
-     const combinedPickerEndDateTimeString = `${endDateValueIST} ${endTimeValueIST}`;
-    
+    const combinedPickerStartDateTimeString = `${startDateValueIST} ${startTimeValueIST}`;
+    const combinedPickerEndDateTimeString = `${endDateValueIST} ${endTimeValueIST}`;
+
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
-    setParsedStartDateTime(parse(
-      combinedPickerStartDateTimeString,
-      pickerFormatString,
-      new Date()
-    ))
-    setParsedEndDateTime(parse(
-      combinedPickerEndDateTimeString,
-      pickerFormatString,
-      new Date()
-    ))
-  },[currentTime]);
+    setParsedStartDateTime(
+      parse(combinedPickerStartDateTimeString, pickerFormatString, new Date())
+    );
+    setParsedEndDateTime(
+      parse(combinedPickerEndDateTimeString, pickerFormatString, new Date())
+    );
+  }, [currentTime]);
 
   useEffect(() => {
-    console.log("Server time ");
-      console.log(serverCurrentTime);
-      console.log(parsedStartDateTime);
-      console.log(parsedEndDateTime);
-  },[parsedEndDateTime])
-    
-   
+    console.log(meetingPlatform);
+    console.log(serverCurrentTime);
+    console.log(parsedStartDateTime);
+    console.log(parsedEndDateTime);
+  }, [parsedEndDateTime]);
 
   const [
     isAddCompanyUserEmailAttedeesModalOpen,
@@ -271,52 +263,51 @@ function EditMeetingDetailsModal({
     }
   };
   const isEmailIsOfCompanyUser = async (email: string) => {
-    if(serverCurrentTime! < parsedStartDateTime!){
-const getCompanyUserPostData = {
-      company_id: loginStatus.companyId,
-      id: null,
-      requestedby: loginStatus.id,
-      limit: null,
-      offset: null,
-      search_company_specific_date_range_id: null,
-      search_parameter: email,
-      search_parameter_date: null,
-    };
-    try {
-      const response = await axios.post(
-        POST_API.GET_COMPANY_USERS,
-        getCompanyUserPostData,
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        console.log("length : " + response.data.length);
-        if (response.data.length === 0) {
-          return 0;
-        }
-        console.log(response.data[0]);
-        setSelectedCompanyUserDetailArray((prev) => [
-          ...prev,
+    if (serverCurrentTime! < parsedStartDateTime!) {
+      const getCompanyUserPostData = {
+        company_id: loginStatus.companyId,
+        id: null,
+        requestedby: loginStatus.id,
+        limit: null,
+        offset: null,
+        search_company_specific_date_range_id: null,
+        search_parameter: email,
+        search_parameter_date: null,
+      };
+      try {
+        const response = await axios.post(
+          POST_API.GET_COMPANY_USERS,
+          getCompanyUserPostData,
           {
-            id: response.data[0].id,
-            email: response.data[0].email,
-          },
-        ]);
+            withCredentials: true,
+          }
+        );
 
-        return response.data[0].id;
-      }
-    } catch (error: ApiError | any) {
-      console.log(error);
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
-        });
+        if (response.status === STATUS_CODE.OK) {
+          console.log("length : " + response.data.length);
+          if (response.data.length === 0) {
+            return 0;
+          }
+          console.log(response.data[0]);
+          setSelectedCompanyUserDetailArray((prev) => [
+            ...prev,
+            {
+              id: response.data[0].id,
+              email: response.data[0].email,
+            },
+          ]);
+
+          return response.data[0].id;
+        }
+      } catch (error: ApiError | any) {
+        console.log(error);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
+          });
+        }
       }
     }
-    }
-    
   };
 
   const handleAddAttendee = async () => {
@@ -395,65 +386,65 @@ const getCompanyUserPostData = {
   const getCompanyUsersPresentInAttendeesArray = async (
     attendees: string[]
   ) => {
-  if(serverCurrentTime! < parsedStartDateTime! && currentTime && parsedStartDateTime){
-for (let i = 0; i < attendees.length; i++) {
-      const getUserPostData = {
-        company_id: loginStatus.companyId,
-        id: null,
-        requestedby: loginStatus.id,
-        limit: null,
-        offset: null,
-        search_company_specific_date_range_id: null,
-        search_parameter: attendees[i],
-        search_parameter_date: null,
-      };
-      await axios
-        .post(POST_API.GET_COMPANY_USERS, getUserPostData, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status == STATUS_CODE.OK) {
-            if (response.data.length !== 0) {
-              response.data.map((res: any) => {
-                setSelectedCompanyUserDetailArray((prev) => [
-                  ...prev,
-                  {
-                    email: res.email,
-                    id: res.id,
-                  },
-                ]);
-              });
+    if (
+      serverCurrentTime! < parsedStartDateTime! &&
+      currentTime &&
+      parsedStartDateTime
+    ) {
+      for (let i = 0; i < attendees.length; i++) {
+        const getUserPostData = {
+          company_id: loginStatus.companyId,
+          id: null,
+          requestedby: loginStatus.id,
+          limit: null,
+          offset: null,
+          search_company_specific_date_range_id: null,
+          search_parameter: attendees[i],
+          search_parameter_date: null,
+        };
+        await axios
+          .post(POST_API.GET_COMPANY_USERS, getUserPostData, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.status == STATUS_CODE.OK) {
+              if (response.data.length !== 0) {
+                response.data.map((res: any) => {
+                  setSelectedCompanyUserDetailArray((prev) => [
+                    ...prev,
+                    {
+                      email: res.email,
+                      id: res.id,
+                    },
+                  ]);
+                });
+              }
             }
-          }
-        })
-        .catch(async (error) => {
-          console.log(error);
-          if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenStatus = await RefreshToken({
-              callFunctionWithParamsNotEvent:
-                getCompanyUsersPresentInAttendeesArray,
-            });
-            console.log(refreshTokenStatus);
-          }
-        });
+          })
+          .catch(async (error) => {
+            console.log(error);
+            if (error.status === STATUS_CODE.UNATHORISED) {
+              const refreshTokenStatus = await RefreshToken({
+                callFunctionWithParamsNotEvent:
+                  getCompanyUsersPresentInAttendeesArray,
+              });
+              console.log(refreshTokenStatus);
+            }
+          });
+      }
     }
-  }
-    
   };
 
   const handleOAuthConsent = () => {
-    if (selectedMeetingPlatform === "Google Meet") {
+    if (selectedMeetingPlatform === meetingPlatform[0].name) {
       navigate(ROUTES_URL.GOOGLE_OAUTH);
-    } else if (selectedMeetingPlatform === "Zoom Meetings") {
+    } else if (selectedMeetingPlatform  === meetingPlatform[1].name) {
       alert();
       navigate(ROUTES_URL.ZOOM_OAUTH);
     }
   };
 
-  
-
   const updateMeetingDetails = async () => {
-    
     if (serverCurrentTime! > parsedStartDateTime!) {
       showMessageSnackbar({
         message: "cannot Update meeting details as it is already started",
@@ -462,41 +453,44 @@ for (let i = 0; i < attendees.length; i++) {
       return;
     }
 
-    if(isAttendeeNotPresentAddedNew){
-if(meetingDetails.title === title 
-      && meetingDetails.description === description 
-      && startDate ===  startDateValue
-      && endDate === endDateValue
-      && startTime === startTimeValue.substring(0, 5)
-      && endTime === endTimeValue.substring(0, 5)
-      && meetingDetails.attendeesEmailAll === attendees
-    ){
-      showMessageSnackbar({
-        message : "No changes made to meeting details",
-        type : "error"
-      });
-      return;
+    if (isAttendeeNotPresentAddedNew) {
+      if (
+        (
+        meetingDetails.title === title &&
+        meetingDetails.description === description &&
+        startDate === startDateValue &&
+        endDate === endDateValue &&
+        startTime === startTimeValue.substring(0, 5) &&
+        endTime === endTimeValue.substring(0, 5) &&
+        meetingDetails.attendeesEmailAll === attendees
+      ) && (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
+      ) {
+        
+        showMessageSnackbar({
+          message: "No changes made to mesgvs",
+          type: "error",
+        });
+        return;
+      }
+    } else if (!isAttendeeNotPresentAddedNew) {
+      if (
+        (meetingDetails.title === title &&
+          meetingDetails.description === description &&
+          startDate === startDateValue &&
+          endDate === endDateValue &&
+          startTime === startTimeValue.substring(0, 5) &&
+          endTime === endTimeValue.substring(0, 5)) ||
+        attendees.length || (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
+      ) {
+        showMessageSnackbar({
+          message: "No changes made to meeting details",
+          type: "error",
+        });
+        return;
+      }
     }
-    }
-    else if(!isAttendeeNotPresentAddedNew){
-      if((meetingDetails.title === title 
-      && meetingDetails.description === description 
-      && startDate ===  startDateValue
-      && endDate === endDateValue
-      && startTime === startTimeValue.substring(0, 5)
-      && endTime === endTimeValue.substring(0, 5))
-      || attendees.length
-    ){
-      showMessageSnackbar({
-        message : "No changes made to meeting details",
-        type : "error"
-      });
-      return;
-    }
-    }
-    
 
-    if (!userHasAccessToUpdateMeeting) {
+    if (userHasAccessToUpdateMeeting) {
       if (
         title !== "" &&
         startDate !== "" &&
@@ -511,8 +505,7 @@ if(meetingDetails.title === title
             new Date(`${endDate} ${endTime}:00`) ||
           (!meetingDetails.isActive
             ? meetingDetails.meetingStatusFromGoogle !== "confirmed"
-            : meetingDetails.meetingStatusFromZoom !== "waiting")) &&
-        meetingPaltform
+            : meetingDetails.meetingStatusFromZoom !== "waiting"))
       ) {
         setIsCreating(true);
         const updateMeetingDetailsPostData = {
@@ -579,7 +572,9 @@ if(meetingDetails.title === title
           });
       }
     } else {
-      console.log("___________________Start Comparision_____________________________");
+      console.log(
+        "___________________Start Comparision_____________________________"
+      );
       console.log(meetingDetails.title + " === " + title);
       console.log(meetingDetails.title === title);
       console.log("________________________________________________");
@@ -599,14 +594,13 @@ if(meetingDetails.title === title
       console.log(endTime === endTimeValue.substring(0, 5));
       console.log("________________________________________________");
       console.log(meetingDetails.attendeesEmailAll);
-      console.log(attendees)
+      console.log(attendees);
       console.log(attendees !== meetingDetails.attendeesEmailAll!);
       console.log("________________________________________________");
-      console.log("is Attendees present : " + isAttendeeNotPresentAddedNew)
+      console.log("is Attendees present : " + isAttendeeNotPresentAddedNew);
 
-
-      // meetingDetails.title === title 
-      // && meetingDetails.description === description 
+      // meetingDetails.title === title
+      // && meetingDetails.description === description
       // && startDate ===  startDateValue
       // && endDate === endDateValue
       // && startTime === startTimeValue.substring(0, 5)
@@ -621,7 +615,10 @@ if(meetingDetails.title === title
 
   useEffect(() => {
     if (isOpen) {
-      if (isAttendeesPresent && meetingDetails.creatorAttenting !== "Attending") {
+      if (
+        isAttendeesPresent &&
+        meetingDetails.creatorAttenting !== "Attending"
+      ) {
         getCompanyUsersPresentInAttendeesArray(
           meetingDetails.attendeesEmailAll
         );
@@ -640,7 +637,7 @@ if(meetingDetails.title === title
       setSelectedCompanyUserDetailArray([]);
       setSelectedCompanyUsersIdArray([]);
     }
-  }, [isOpen,parsedStartDateTime]);
+  }, [isOpen, parsedStartDateTime]);
 
   if (!isOpen) return null;
   return createPortal(
@@ -649,91 +646,96 @@ if(meetingDetails.title === title
         <div className="flex justify-between">
           <h1 className="text-xl font-semibold mb-3 text-gray-800">
             Update Meeting
-            {!meetingDetails.isActive &&  meetingDetails.creatorAttenting !== "Attending" && (
-              <div className="flex gap-2 ">
-                <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
-                <span className="text-red-500 text-xs mt-1">
-                  You Have cancelled this Meeting 
-                </span>
-              </div>
-            )}
-            {meetingDetails.creatorAttenting === "Attending" &&
-            (
-              <div className="flex gap-2 ">
-                <Info size={SIZE.TWENTY} className="text-green-500"></Info>{" "}
-                <span className="text-green-500 text-xs mt-1">
-                 You have Invited to this Meeting
-                </span>
-              </div>
-            )
-            }
-            {!meetingDetails.isActive &&  meetingDetails.creatorAttenting === "Attending" && (
-              <div className="flex gap-2 ">
-                <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
-                <span className="text-red-500 text-xs mt-1">
-                  This Meeting has been cancelled by the host 
-                </span>
-              </div>
-            )}
-            {serverCurrentTime! > parsedStartDateTime! && serverCurrentTime! > parsedEndDateTime! && meetingDetails.isActive &&(
-              <div className="flex gap-2 ">
-                <Info size={SIZE.TWENTY} className="text-yellow-500"></Info>{" "}
-                <span className="text-yellow-500 text-xs mt-1">
-                  This Meeting has been Started or has already passed
-                </span>
-              </div>
-            )}
-
-            {serverCurrentTime! >= parsedStartDateTime! && serverCurrentTime! <= parsedEndDateTime! && meetingDetails.isActive && (
+            {!meetingDetails.isActive &&
+              meetingDetails.creatorAttenting !== "Attending" && (
+                <div className="flex gap-2 ">
+                  <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
+                  <span className="text-red-500 text-xs mt-1">
+                    You Have cancelled this Meeting
+                  </span>
+                </div>
+              )}
+            {meetingDetails.creatorAttenting === "Attending" && (
               <div className="flex gap-2 ">
                 <Info size={SIZE.TWENTY} className="text-green-500"></Info>{" "}
                 <span className="text-green-500 text-xs mt-1">
-                  Ongoing Meeting
+                  You have Invited to this Meeting
                 </span>
               </div>
             )}
+            {!meetingDetails.isActive &&
+              meetingDetails.creatorAttenting === "Attending" && (
+                <div className="flex gap-2 ">
+                  <Info size={SIZE.TWENTY} className="text-red-500"></Info>{" "}
+                  <span className="text-red-500 text-xs mt-1">
+                    This Meeting has been cancelled by the host
+                  </span>
+                </div>
+              )}
+            {serverCurrentTime! > parsedStartDateTime! &&
+              serverCurrentTime! > parsedEndDateTime! &&
+              meetingDetails.isActive && (
+                <div className="flex gap-2 ">
+                  <Info size={SIZE.TWENTY} className="text-yellow-500"></Info>{" "}
+                  <span className="text-yellow-500 text-xs mt-1">
+                    This Meeting has been Started or has already passed
+                  </span>
+                </div>
+              )}
+            {serverCurrentTime! >= parsedStartDateTime! &&
+              serverCurrentTime! <= parsedEndDateTime! &&
+              meetingDetails.isActive && (
+                <div className="flex gap-2 ">
+                  <Info size={SIZE.TWENTY} className="text-green-500"></Info>{" "}
+                  <span className="text-green-500 text-xs mt-1">
+                    Ongoing Meeting
+                  </span>
+                </div>
+              )}
           </h1>
 
           <div className="flex gap-2 self-start">
-            {meetingDetails.isActive && serverCurrentTime! < parsedEndDateTime! && (
-              <Button
-                onClick={() => {
-                  if (meetingDetails.platform === 1) {
-                    window.open(meetingDetails.meetingLink, "_blank");
-                  } else if (meetingDetails.platform === 2) {
-                    window.open(meetingDetails.zoomMeetingJoinLink, "_blank");
-                  }
-                }}
-              >
-                <div className="flex gap-2 items-center">
-                  <span>Join</span>
-                  <Video></Video>
-                </div>
-              </Button>
-            )}
+            {meetingDetails.isActive &&
+              serverCurrentTime! < parsedEndDateTime! && (
+                <Button
+                  onClick={() => {
+                    if (meetingDetails.platform === 1) {
+                      window.open(meetingDetails.meetingLink, "_blank");
+                    } else if (meetingDetails.platform === 2) {
+                      window.open(meetingDetails.zoomMeetingJoinLink, "_blank");
+                    }
+                  }}
+                >
+                  <div className="flex gap-2 items-center">
+                    <span>Join</span>
+                    <Video></Video>
+                  </div>
+                </Button>
+              )}
 
-            {meetingDetails.isActive && serverCurrentTime! < parsedEndDateTime! && (
-              <button
-                title={
-                  copyStatus === "copied"
-                    ? "Copied!"
-                    : copyStatus === "failed"
-                    ? "Failed to Copy"
-                    : "Copy Meeting Details"
-                }
-                onClick={handleCopyMeetingDetailsToClipboard}
-              >
-                {copyStatus === "copied" && (
-                  <CopyCheck className="text-gray-600 hover:text-gray-500"></CopyCheck>
-                )}
-                {copyStatus === "idle" && (
-                  <Copy className="text-blue-600 hover:text-blue-500"></Copy>
-                )}
-                {copyStatus === "failed" && (
-                  <CopyX className="text-Red-600 hover:text-red-500"></CopyX>
-                )}
-              </button>
-            )}
+            {meetingDetails.isActive &&
+              serverCurrentTime! < parsedEndDateTime! && (
+                <button
+                  title={
+                    copyStatus === "copied"
+                      ? "Copied!"
+                      : copyStatus === "failed"
+                      ? "Failed to Copy"
+                      : "Copy Meeting Details"
+                  }
+                  onClick={handleCopyMeetingDetailsToClipboard}
+                >
+                  {copyStatus === "copied" && (
+                    <CopyCheck className="text-gray-600 hover:text-gray-500"></CopyCheck>
+                  )}
+                  {copyStatus === "idle" && (
+                    <Copy className="text-blue-600 hover:text-blue-500"></Copy>
+                  )}
+                  {copyStatus === "failed" && (
+                    <CopyX className="text-Red-600 hover:text-red-500"></CopyX>
+                  )}
+                </button>
+              )}
 
             <button
               onClick={() => {
@@ -757,7 +759,10 @@ if(meetingDetails.title === title
               placeholder="Meeting Title"
               label="Title"
               defaultValue={title}
-              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+              readonly={
+                !meetingDetails.isActive ||
+                meetingDetails.creatorAttenting === "Attending"
+              }
             />
           </div>
           <div className="mt-1 col-span-1">
@@ -770,35 +775,25 @@ if(meetingDetails.title === title
             <select
               id="startTtime"
               value={selectedMeetingPlatform}
-              disabled={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+              disabled={
+                !meetingDetails.isActive ||
+                meetingDetails.creatorAttenting === "Attending"
+              }
               onChange={(e) => {
-                if (e.target.value === "Google Meet") {
-                  if (googleMeetStatus.isConnected) {
-                    setSelectedMeetingPlatform(e.target.value);
-                  } else {
-                    setSelectedMeetingPlatform(e.target.value);
-                    // handleGoogleMeetAuth();
-                    alert("handle Google OAUTH");
-                  }
-                } else if (e.target.value === "Zoom Meetings") {
-                  setSelectedMeetingPlatform("Zoom Meetings");
-                } else if (e.target.value === "Teams") {
-                  setSelectedMeetingPlatform("Teams");
-                } else {
-                  setSelectedMeetingPlatform("");
-                }
+               showMessageSnackbar({message : "cannot Change Platform to create new meeting meeting with different platform" , type:"error"})
               }}
               className={
                 meetingDetails.isActive
-                  ? meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  ? meetingDetails.creatorAttenting !== "Attending"
+                    ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   : "appearance-none block w-full mt-1 px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               }
             >
               <option value="">Select Platform</option>
-              {meetingPaltform.map((option) => (
-                <option key={option.id} value={option.paltform}>
-                  {option.paltform}
+              {meetingPlatform.map((option : MeetingPlatforms) => (
+                <option key={option.id} value={option.name}>
+                  {option.name}
                 </option>
               ))}
             </select>
@@ -813,8 +808,13 @@ if(meetingDetails.title === title
                 setStartDate(e.target.value);
                 console.log(e.target.value);
               }}
-              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
-              maxDate={new Date(currentTime).toLocaleDateString().replace(/\//g,"-")}
+              readonly={
+                !meetingDetails.isActive ||
+                meetingDetails.creatorAttenting === "Attending"
+              }
+              maxDate={new Date(currentTime)
+                .toLocaleDateString()
+                .replace(/\//g, "-")}
             />
           </div>
 
@@ -827,16 +827,19 @@ if(meetingDetails.title === title
             </label>
             <select
               id="startTtime"
-              disabled={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+              disabled={
+                !meetingDetails.isActive ||
+                meetingDetails.creatorAttenting === "Attending"
+              }
               defaultValue={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               className={
                 meetingDetails.isActive
-                  ?  meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  ? meetingDetails.creatorAttenting !== "Attending"
+                    ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-
-                }
+              }
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -854,7 +857,10 @@ if(meetingDetails.title === title
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
-              readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+              readonly={
+                !meetingDetails.isActive ||
+                meetingDetails.creatorAttenting === "Attending"
+              }
             />
           </div>
 
@@ -871,11 +877,11 @@ if(meetingDetails.title === title
               onChange={(e) => setEndTime(e.target.value)}
               className={
                 meetingDetails.isActive
-                  ? meetingDetails.creatorAttenting !== "Attending" ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  ? meetingDetails.creatorAttenting !== "Attending"
+                    ? "mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 : "appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-
-                }
+              }
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -898,7 +904,10 @@ if(meetingDetails.title === title
             onChange={(e) => {
               setDescription(e.target.value);
             }}
-            readonly={!meetingDetails.isActive || meetingDetails.creatorAttenting === "Attending"}
+            readonly={
+              !meetingDetails.isActive ||
+              meetingDetails.creatorAttenting === "Attending"
+            }
           />
         </div>
         <div className="mb-1">
@@ -916,41 +925,42 @@ if(meetingDetails.title === title
           />
         </div>
         <div className="mb-1">
-          {meetingDetails.isActive && meetingDetails.creatorAttenting === "Creator" && serverCurrentTime! < parsedStartDateTime! && (
-            <div className="grid grid-cols-7 gap-2">
-              <div className="col-span-5">
-                <FormInput
-                  type="email"
-                  value={newAttendeeEmail === "" ? "" : newAttendeeEmail}
-                  onChange={(e) => setNewAttendeeEmail(e.target.value)}
-                  placeholder="Enter Attendees"
-                  label="Attendees"
-                  id="attendee"
-                />
+          {meetingDetails.isActive &&
+            meetingDetails.creatorAttenting === "Creator" &&
+            serverCurrentTime! < parsedStartDateTime! && (
+              <div className="grid grid-cols-7 gap-2">
+                <div className="col-span-5">
+                  <FormInput
+                    type="email"
+                    value={newAttendeeEmail === "" ? "" : newAttendeeEmail}
+                    onChange={(e) => setNewAttendeeEmail(e.target.value)}
+                    placeholder="Enter Attendees"
+                    label="Attendees"
+                    id="attendee"
+                  />
+                </div>
+                <div className="col-span-1 mt-7">
+                  <Button
+                    onClick={() => {
+                      setIsAddCompanyUserEmailAttedeesModalOpen(true);
+                    }}
+                  >
+                    <UserPlus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="col-span-1 mt-7">
+                  <Button
+                    onClick={() => {
+                      console.log(newAttendeeEmail);
+                      handleAddAttendee();
+                    }}
+                    disabled={!newAttendeeEmail.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="col-span-1 mt-7">
-                <Button
-                  onClick={() => {
-                    setIsAddCompanyUserEmailAttedeesModalOpen(true);
-                  }}
-                >
-                  <UserPlus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="col-span-1 mt-7">
-                <Button
-                  onClick={() => {
-                    console.log(newAttendeeEmail);
-                    handleAddAttendee();
-                  }}
-                  disabled={!newAttendeeEmail.trim()}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-          
+            )}
 
           {isAttendeeNotPresentAddedNew && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
@@ -964,26 +974,26 @@ if(meetingDetails.title === title
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
                       <span className="text-xs text-gray-600">{attendee}</span>
                     </span>
-                    {meetingDetails.creatorAttenting === "Attending" || meetingDetails.isActive || serverCurrentTime! < parsedStartDateTime!&& (
-<Button
-                      size="icon"
-                      onClick={() => {
-                        selectedCompanyUserDetailArray.map((user) => {
-                          if (user.email === attendee) {
-                            handleRemoveAttendee(attendee, user.id);
-                            return;
-                          } else {
-                            handleRemoveAttendee(attendee, 0);
-                            return;
-                          }
-                        });
-                      }}
-                      className="text-gray-600 hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                    )}
-                    
+                    {meetingDetails.creatorAttenting === "Attending" ||
+                      (meetingDetails.isActive && (
+                        <Button
+                          size="icon"
+                          onClick={() => {
+                            selectedCompanyUserDetailArray.map((user) => {
+                              if (user.email === attendee) {
+                                handleRemoveAttendee(attendee, user.id);
+                                return;
+                              } else {
+                                handleRemoveAttendee(attendee, 0);
+                                return;
+                              }
+                            });
+                          }}
+                          className="text-gray-600 hover:text-red-500"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      ))}
                   </div>
                 </div>
               ))}
@@ -991,57 +1001,46 @@ if(meetingDetails.title === title
           )}
         </div>
 
-        {meetingDetails.isActive && meetingDetails.creatorAttenting !== "Attending" && serverCurrentTime! < parsedStartDateTime! && (
-          <div className="flex justify-end gap-3">
-            <div className="max-w-28 mt-1 place-self-center">
-              <Button
-                className="px-4 py-2.5 text-sm font-medium text-gray-100 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                onClick={() => {
-                  onClose();
-                }}
-              >
-                Close
-              </Button>
-            </div>
-            <div className="max-w-48 mt-1 place-self-center">
-              <Button
-                onClick={() => {
-                  if (
-                    !googleMeetStatus.isConnected ||
-                    zoomMeetingStatus.isConnected
-                  ) {
-                    updateMeetingDetails();
-                  } else {
-                    //   handleGoogleMeetAuth();
+        {meetingDetails.isActive &&
+          meetingDetails.creatorAttenting !== "Attending" &&
+          serverCurrentTime! < parsedStartDateTime! && (
+            <div className="flex justify-end gap-3">
+              <div className="max-w-28 mt-1 place-self-center">
+                <Button
+                  className="px-4 py-2.5 text-sm font-medium text-gray-100 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+              <div className="max-w-48 mt-1 place-self-center">
+                <Button
+                  onClick={() => {
+                    if (
+                      !googleMeetStatus.isConnected ||
+                      zoomMeetingStatus.isConnected
+                    ) {
+                      updateMeetingDetails();
+                    } else {
+                      handleOAuthConsent();
+                    }
+                  }}
+                  disabled={
+                    isCreating ||
+                    !title.trim() ||
+                    !startDate ||
+                    !startTime ||
+                    !endDate ||
+                    !endTime
                   }
-                }}
-                disabled={
-                  isCreating ||
-                  !title.trim() ||
-                  !startDate ||
-                  !startTime ||
-                  !endDate ||
-                  !endTime
-                }
-              >
-                {isCreating ? "Updating..." : "Update Meeting"}
-              </Button>
+                >
+                  {isCreating ? "Updating..." : "Update Meeting"}
+                </Button>
+              </div>
             </div>
-            <div className="max-w-28 mt-1 place-self-center">
-              <Button
-                onClick={() => {
-                  if (googleMeetStatus.isConnected) {
-                    //   getGoogleMeeting();
-                  } else {
-                    //   handleGoogleMeetAuth();
-                  }
-                }}
-              >
-                Get
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
       </div>
       <AddCompanyUsersEmailAttendeesModal
         isOpen={isAddCompanyUserEmailAttedeesModalOpen}
