@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ShieldCheck,
   Mail,
@@ -17,6 +18,8 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import Button from "../ui/Button";
 
 interface CompanyEmailSetting {
  id: number;
@@ -63,6 +66,7 @@ export default function EmailSettingsTabs() {
   const [modalType, setModalType] = useState<"company" | "user">("company");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { userHasAccessToAddEmailSetting, userHasAccessToUpdateEmailSetting } = useUserAccessModules();
 
 
   const handleModalSubmit = (data: any) => {
@@ -118,21 +122,33 @@ const getEmailSettings = async () => {
 }, []); 
 
   
-  const renderCompanyEmailCard = (setting: CompanyEmailSetting, index: number) => (
+  const renderCompanyEmailCard = (
+    setting: CompanyEmailSetting,
+    index: number
+  ) => (
     <div
       key={index}
       className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
     >
-      <button
+      <Button
+        disabled={!userHasAccessToUpdateEmailSetting}
+
         className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
         onClick={() => {
-          setModalType("company");
+          
+          if(userHasAccessToUpdateEmailSetting){
+            setModalType("company");
           setEditData(setting);
           setIsModalOpen(true);
+          }else{
+            alert("not have access!")
+          }
+          
         }}
       >
         Edit
-      </button>
+      </Button>
+      
       <div className="flex items-center space-x-2 mb-2">
         <Mail className="text-blue-600 w-5 h-5" />
         <p className="text-gray-700 text-sm">
@@ -166,12 +182,14 @@ const getEmailSettings = async () => {
             : setting.email_security_type_id === 2
             ? "TLS"
             : "Unknown"}
-        </p> 
+        </p>
       </div>
       <div className="flex items-center space-x-2 mb-2">
         <ShieldCheck
           className={`w-5 h-5 ${
-            setting.authentication_required ? "text-emerald-600" : "text-gray-400"
+            setting.authentication_required
+              ? "text-emerald-600"
+              : "text-gray-400"
           }`}
         />
         <p className="text-gray-700 text-sm">
@@ -180,40 +198,33 @@ const getEmailSettings = async () => {
         </p>
       </div>
       <div className="flex items-center space-x-2 mb-4">
-        {setting.isactive ?<CheckCircle 
-          className={`w-5 h-5 ${
-            "text-emerald-600" 
-          }`}
-        />:<XCircle className={`w-5 h-5 ${
-             "text-red-600" 
-          }`}/>}
+        {setting.isactive ? (
+          <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
+        ) : (
+          <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
+        )}
         <p className="text-gray-700 text-sm">
-          <strong>Active:</strong>{" "}
-          {setting.isactive ? "Yes" : "No"}
+          <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
         </p>
       </div>
       <div className="flex items-center space-x-2">
         <p className="text-gray-700 text-sm">
-          <strong>Created By:</strong>{" "}
-          {setting.createdby }
+          <strong>Created By:</strong> {setting.createdby}
         </p>
       </div>
       <div className="flex items-center space-x-2">
         <p className="text-gray-700 text-sm">
-          <strong>Created On:</strong>{" "}
-          {setting.createdon }
+          <strong>Created On:</strong> {setting.createdon}
         </p>
       </div>
       <div className="flex items-center space-x-2">
         <p className="text-gray-700 text-sm">
-          <strong>Updated By:</strong>{" "}
-          {setting.updatedby }
+          <strong>Updated By:</strong> {setting.updatedby}
         </p>
       </div>
       <div className="flex items-center space-x-2">
         <p className="text-gray-700 text-sm">
-          <strong>Updated On:</strong>{" "}
-          {setting.updatedon }
+          <strong>Updated On:</strong> {setting.updatedon}
         </p>
       </div>
     </div>
@@ -224,16 +235,22 @@ const getEmailSettings = async () => {
       key={index}
       className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
     >
-      <button
+      <Button
+        disabled={!userHasAccessToUpdateEmailSetting}
         className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
         onClick={() => {
-          setModalType("user");
+          if(userHasAccessToUpdateEmailSetting){
+            setModalType("user");
           setEditData(setting);
           setIsModalOpen(true);
+          }else{
+            alert("not have access!")
+          }
+          
         }}
       >
         Edit
-      </button>
+      </Button>
       <div className="flex items-center space-x-2 mb-2">
         <Mail className="text-blue-600 w-5 h-5" />
         <p className="text-gray-700 text-sm">
@@ -330,6 +347,46 @@ const getEmailSettings = async () => {
             {<LucideSettings className="w-4 h-4 text-blue-600" />}
             <span className="text-xl font-bold ">Email Settings</span>
           </div>
+          <div className="flex justify-end ">
+            {activeTab === "company" ? (
+              <div className="flex justify-end ">
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  className=" top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
+                  onClick={() => {
+                    if(userHasAccessToAddEmailSetting){setModalType("company");
+                    setEditData(null);
+                    setIsModalOpen(true);}else{
+                      alert("not have access!");
+                    }
+                    
+                  }
+                }
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-end ">
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  className=" top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
+                  onClick={() => {
+                    if(userHasAccessToAddEmailSetting){setModalType("user");
+                    setEditData(null);
+                    setIsModalOpen(true);}else{
+                      alert("not have access!")
+                    }
+                    
+                  }}
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>{" "}
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="mb-6 flex border-b border-gray-300">
@@ -359,19 +416,6 @@ const getEmailSettings = async () => {
       <div>
         {activeTab === "company" ? (
           <div className="w-full">
-            <div className="flex justify-end mb-4">
-              <button
-                className="fixed top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-                onClick={() => {
-                  setModalType("company");
-                  setEditData(null);
-                  setIsModalOpen(true);
-                }}
-              >
-                <Plus className="w-6 h-6 text-white " />{" "}
-                <span className=" font-bold ">Create</span>
-              </button>
-            </div>
             {isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
@@ -390,19 +434,6 @@ const getEmailSettings = async () => {
           </div>
         ) : (
           <div className="w-full">
-            <div className="flex justify-end mb-4">
-              <button
-                className="fixed top-20 right-4 z-10 flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-                onClick={() => {
-                  setModalType("user");
-                  setEditData(null);
-                  setIsModalOpen(true);
-                }}
-              >
-                <Plus className="w-6 h-6 text-white " />{" "}
-                <span className=" font-bold ">Create</span>{" "}
-              </button>
-            </div>
             {isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>

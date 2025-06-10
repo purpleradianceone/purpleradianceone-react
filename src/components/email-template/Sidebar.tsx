@@ -2,16 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import React from "react";
 import { useEditor } from "@craftjs/core";
-import { LexicalText } from "./LexicalText";
-import { ImageBlock } from "./ImageBlock";
-import { ButtonBlock } from "./ButtonBlock";
-import { DividerBlock } from "./DividerBlock";
-import { SectionBlock } from "./SectionBlock";
-import { ColumnBlock } from "./ColumnBlock";
-import { TableBlock } from "./TableBlock";
-import { DynamicFieldBlock } from "./DynamicFieldBlock";
-import { SubjectBlock } from "./SubjectBlock";
+import { ImageBlock } from "./email-template-blocks/ImageBlock";
+import { ButtonBlock } from "./email-template-blocks/ButtonBlock";
+import { DividerBlock } from "./email-template-blocks/DividerBlock";
+import { SectionBlock } from "./email-template-blocks/SectionBlock";
+import { ColumnBlock } from "./email-template-blocks/ColumnBlock";
+import { TableBlock } from "./email-template-blocks/TableBlock";
+import { SubjectBlock } from "./email-template-blocks/SubjectBlock";
 import "./Sidebar.css"; // 👈 Import the CSS
+import { DynamicFieldBlock } from "./email-template-blocks/DynamicFieldBlock";
+import { LexicalText } from "./email-template-blocks/LexicalText";
 
 export const Sidebar: React.FC = () => {
   const { connectors } = useEditor();

@@ -19,7 +19,7 @@ import {
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { FiBold, FiItalic, FiAlignLeft, FiAlignCenter, FiAlignRight, FiX } from "react-icons/fi";
-import { DynamicFieldsContext } from "./DynamicFieldsContext";
+import { DynamicFieldsContext } from "../DynamicFieldsContext";
 
 // Styled Components
 const EditorContainer = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(({ children }, ref) => (

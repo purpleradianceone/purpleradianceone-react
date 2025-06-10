@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
@@ -16,10 +15,10 @@ const Dialog: React.FC<{
 }> = ({ open, onOpenChange, children }) =>
   !open ? null : (
     <div
-      className="fixed w-full inset-0 bg-black bg-opacity-30 flex justify-center items-center"
+      className="fixed w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center"
       onClick={() => onOpenChange(false)}
     >
-      <div className="min-w-[40%] max-w-xl min-h-fit max-h-fit" onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50" onClick={(e) => e.stopPropagation()}>{children}</div>
     </div>
   );
 
