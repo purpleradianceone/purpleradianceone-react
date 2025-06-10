@@ -246,7 +246,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   };
 
   return (
-    <div className=" max-h-80 w-full   bg-gray-0 rounded-lg p-2">
+    <div className=" h-auto w-full overflow-auto  bg-gray-0 rounded-lg p-2">
   {/* Header row */}
   <div className="  sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold h-6 bg-gray-50 text-gray-900 text-sm mb-3 px-2">
     <div>Product Name</div>
@@ -355,7 +355,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 }}
               >
                 <div
-                  className={`bg-white w-2.5 h-2.5 rounded-full shadow-md transform transition-transform ${
+                  className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
                     product.isActive ? "translate-x-4" : "translate-x-0"
                   }`}
                 ></div>
