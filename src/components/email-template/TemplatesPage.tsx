@@ -17,6 +17,7 @@ import DateRangeFilterDropdown from '../ui/DateRangeFilterDropdown';
 import DateRangePicker from '../ui/DateRangePicker';
 import SearchInput from '../ui/SearchInput';
 import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler';
+import { useUserAccessModules } from '../../config/hooks/useAccessModules';
 
 type EmailTemplate = {
   count: number;
@@ -263,14 +264,16 @@ export const TemplatesPage: React.FC = () => {
 
 
   return (
-    <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col">
+    <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col ">
       {/* Header */}
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
-        <div className="flex justify-between w-full h-12 items-center">
+        <div className="flex  justify-between w-full h-12 items-center">
           <div className="flex gap-2">
             {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
             {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
+
             <span className="text-xl font-bold ">Email Templates</span>
+           
           </div>
           {isLargeScreen && (
             <>
@@ -456,9 +459,7 @@ export const TemplatesPage: React.FC = () => {
               )}
             </>
           )}
-          {
-          <Sidebar onCreate={() => setShowModal(true)} />
-          }
+           <Sidebar onCreate={() => setShowModal(true)} />
         </div>
       </div>
 
@@ -495,9 +496,12 @@ export const TemplatesPage: React.FC = () => {
 };
 
 
-const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
+const Sidebar: React.FC<{onCreate: () => void }> = ({ onCreate }) => { 
+        const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
+    return  (
   <button
-    className=" top-16 right-4 z-10 bg-blue-500 text-white w-fit rounded mb-4 p-1 hover:bg-blue-600 transition"
+      disabled = {!userHasAccessToAddSettingGeneral}
+    className=" top-16  right-4 z-10 bg-blue-500 text-white w-fit rounded p-1 hover:bg-blue-600 transition"
     onClick={onCreate}
   >
     <div className="flex gap-1">
@@ -505,7 +509,7 @@ const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
       <span className=" font-bold ">New Template </span>
     </div>
   </button>
-);
+);};
 
 type TabsProps = {
   activeTab: string;
@@ -537,12 +541,14 @@ type TemplateListProps = {
 
 const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore }) => {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
+    const {userHasAccessToUpdateSettingGeneral} = useUserAccessModules();
+
 
   return (
     <>
       {templates.length === 0 && !loading && !hasmore && (
         <div className="text-center text-gray-500 mt-10 p-4 border rounded-md bg-white shadow-sm">
-          No templates found for this category.
+          No templates found.
         </div>
       )}
 
@@ -565,6 +571,10 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                 <button
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
+                  disabled={!userHasAccessToUpdateSettingGeneral}
+                  // onClick={
+                  
+                  // }
                 >
                   <Edit2 size={18} />
                 </button>

@@ -3,25 +3,25 @@
 import React, { useEffect, useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
 import { Sidebar } from "./Sidebar";
-import { LexicalText } from "./LexicalText";
-import { ImageBlock } from "./ImageBlock";
-import { ButtonBlock } from "./ButtonBlock";
-import { DividerBlock } from "./DividerBlock";
-import { SectionBlock } from "./SectionBlock";
+import { ImageBlock } from "./email-template-blocks/ImageBlock";
+import { ButtonBlock } from "./email-template-blocks/ButtonBlock";
+import { DividerBlock } from "./email-template-blocks/DividerBlock";
+import { SectionBlock } from "./email-template-blocks/SectionBlock";
 import { HtmlPreviewModal } from "./HtmlPreviewModal";
 import { ExportPanel } from "./ExportPanel";
-import { ColumnBlock } from "./ColumnBlock";
-import { HeadingBlock } from "./HeadingBlock";
-import { DynamicFieldBlock } from "./DynamicFieldBlock";
-import { SubjectBlock } from "./SubjectBlock";
+import { ColumnBlock } from "./email-template-blocks/ColumnBlock";
+import { HeadingBlock } from "./email-template-blocks/HeadingBlock";
+import { SubjectBlock } from "./email-template-blocks/SubjectBlock";
 import DOMPurify from 'dompurify';
 import 'tinymce';
 import { DynamicFieldsContext } from "./DynamicFieldsContext";
-import { TableBlock } from "./TableBlock";
+import { TableBlock } from "./email-template-blocks/TableBlock";
 import { LucideCode,  LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
 import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
+import { DynamicFieldBlock } from "./email-template-blocks/DynamicFieldBlock";
+import { LexicalText } from "./email-template-blocks/LexicalText";
 
 
 

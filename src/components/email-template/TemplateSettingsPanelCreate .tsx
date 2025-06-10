@@ -2,12 +2,12 @@
 import React, { useState, useRef } from 'react';
 import { useDynamicFields } from './DynamicFieldsContext'; 
 import { useEditor } from '@craftjs/core';
-import { craftJsonToHtml } from './ExportPanel';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import POST_API from '../../constants/PostApi';
 import axios from 'axios';
 import { STATUS_CODE } from '../../constants/AppConstants';
 import { useSearchParams } from 'react-router-dom';
+import { craftJsonToHtml } from './email-template-util/CraftJsonToHtml';
 
 
 type TemplateSettingsPanelEditProps = {

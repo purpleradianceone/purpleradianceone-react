@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
-import { useDynamicFields } from "./DynamicFieldsContext"; // ⬅️ import this
+import { useDynamicFields } from "../DynamicFieldsContext";
 
 interface DynamicFieldBlockProps {
   name: string;
