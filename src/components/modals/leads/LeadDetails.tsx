@@ -196,9 +196,9 @@ const LeadDetails = ({
     : [];
 
   return (
-    <div className="flex">
+    <div >
       <form>
-        <div className="w-auto flex justify-between bg-slate-200 px-1 mb-1  ">
+        <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
           <span className="text-sm font-semibold text-gray-800">Details</span>
           {
             showSaveLeadButton &&

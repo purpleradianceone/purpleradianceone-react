@@ -20,7 +20,6 @@ const LeadStatusHistoryAgGrid: React.FC<{
         field: "id",
         headerName: "id",
         hide: true,
-        
       },
       {
         field: "reason",
