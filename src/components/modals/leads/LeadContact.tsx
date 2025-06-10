@@ -34,7 +34,6 @@ const LeadContact = ({
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
 }) => {
-  const {position} = usePanel();
   const { loginStatus } = useLoggedInUserContext();
   const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
     useState(false);

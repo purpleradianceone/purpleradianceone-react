@@ -1144,7 +1144,7 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Assigned Company Product */}
-          <div className=" shadow-xl rounded">
+          <div className=" shadow-md rounded">
             <LeadAssignedComponyProducts
               data={leadAssignedCompanyProduct}
               interestTypeData={interestTypeData}
@@ -1157,7 +1157,7 @@ const ViewLeadManagement = () => {
         {/* Column 2 */}
         <div className="w-full md:w-1/2 flex flex-col gap-0">
           {/* Meeting / Contact / Span Tabs */}
-          <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
+          <div className="bg-slate-200 pl-1  flex  text-xs font-semibold text-gray-800 gap-4">
             <span
               id="contact"
               className={`cursor-pointer ${
@@ -1192,7 +1192,7 @@ const ViewLeadManagement = () => {
               Span
             </span>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col  min-h-32 gap-2">
             {isOpenMeetingsModal && (
               <LeadMeetingsModal
                 isCalendarViewEnabled={false}
