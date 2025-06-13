@@ -12,20 +12,26 @@ import { craftJsonToHtml } from './email-template-util/CraftJsonToHtml';
 
 type TemplateSettingsPanelEditProps = {
   htmlTemplateTypeSubjectPlaceholder: string;
+  id: number;
+  templateTypeId: number;
+  emailTemplateName: string;
+  emailTemplateSubject:string;
+  emailTemplateIsDefault:boolean;
+
 };
 
-export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelUpdate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder,id,templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [subject, setSubject] = useState('');
-  const [description, setDescription] = useState('');
+  
+  const [templateName, setTemplateName] = useState(emailTemplateName);
+  const [subject, setSubject] = useState(emailTemplateSubject);
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const[htmlBody,setHtmlBody] = useState('');
-  const [isDefault, setIsDefault] = useState(false);
+const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
 
   const dynamicFields = useDynamicFields();
 
-  const { query } = useEditor();
+    const { query } = useEditor();
   
   
 
@@ -47,18 +53,10 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
       input.focus();
     }, 0);
   };
-
-  function getCraftJson(): string {
-    const json = query.serialize();
-    return json;
-  }
-
 function getHtmlEmailBody(): string {
     const canvasElement = document.getElementById("CANVAS");
     if (!canvasElement) return "" ;
     const json = query.serialize();
-  
-
     const html = craftJsonToHtml(json).trim();
       setHtmlBody(html.trim());
       return html;
@@ -67,20 +65,35 @@ function getHtmlEmailBody(): string {
     const {loginStatus} = useLoggedInUserContext();
     const [searchParams] = useSearchParams();
     const params = searchParams.get("type");
+    const createEmailTemplateCreate = async(emailBody:string)=>{
 
-       const createEmailTemplateCreate = async(emailBody:string, resultJson:string)=>{
+                    const json = query.serialize();
                     const postDataCreateEmailTemplate = {
-                          "company_id":loginStatus.companyId,
-                          "createdby_id":loginStatus.id,
-                          "email_type_id":JSON.parse(params!).id,
-                          "name":templateName,
-                          "email_subject":subject,
-                          "email_body_html":emailBody,
-                          "email_body_json":resultJson,
-                          "is_default":isDefault
-                    }                   
+                      company_id: loginStatus.companyId,
+                      updatedby_id: loginStatus.id,
+                      id:id,
+                      email_type_id: templateTypeId,
+                      name: templateName,
+                      email_subject: subject,
+                      email_body_html: emailBody,
+                      email_body_json: json,
+                      is_default: isDefault,
+                    };                   
 
-              await axios.post(POST_API.CREATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(emailTemplateSubject);
+                    console.log(emailTemplateName);
+                    console.log(subject);
+                    console.log(postDataCreateEmailTemplate.id);
+                    console.log(postDataCreateEmailTemplate.email_type_id);
+                    console.log(postDataCreateEmailTemplate.name);
+                    console.log(postDataCreateEmailTemplate.is_default);
+                    console.log(emailBody);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(json);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
                         withCredentials:true
                 })
                 .then((response) =>{
@@ -109,7 +122,7 @@ function getHtmlEmailBody(): string {
           zIndex: 1,
         }}
       >
-        Save Template
+        Update Template
       </button>
 
       {isOpen && (
@@ -148,10 +161,10 @@ function getHtmlEmailBody(): string {
               e.preventDefault();
               setIsOpen(false);
               const resultHtml = await getHtmlEmailBody();
-              const resultJson = await getCraftJson();
-              createEmailTemplateCreate(resultHtml, resultJson);
+
+              createEmailTemplateCreate(resultHtml);
               // TODO: API Call
-              console.log({ templateName, subject, description, resultHtml });
+              console.log({ templateName, subject, resultHtml });
             }}
           >
             <div style={{ marginBottom: "15px" }}>
@@ -162,7 +175,7 @@ function getHtmlEmailBody(): string {
                   fontWeight: "600",
                 }}
               >
-                Template Settings
+                Update Template Settings
               </h3>
             </div>
 
@@ -333,7 +346,7 @@ function getHtmlEmailBody(): string {
                     fontSize: "14px",
                   }}
                 >
-                  Save
+                  Update
                 </button>
               </div>
             </div>

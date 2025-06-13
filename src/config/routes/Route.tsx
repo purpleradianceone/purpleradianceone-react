@@ -38,6 +38,7 @@ import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuth
 import Meetings from "../../components/views/meeting/Meetings";
 import EmailSetting from "../../components/email-settings/EmailSetting";
 import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
+import { EditorCanvasWithJson } from "../../components/email-template/EditorCanvasWithJson";
 
 
 
@@ -278,6 +279,16 @@ export const router = createBrowserRouter([
       <PrivateRoute>
          <Navbar>
         <EditorCanvas/>
+        </Navbar>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path :ROUTES_URL.EMAIL_TEMPLATE_UPDATE,
+    element : (
+      <PrivateRoute>
+         <Navbar>
+        <EditorCanvasWithJson />
         </Navbar>
       </PrivateRoute>
     ),

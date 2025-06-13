@@ -6,12 +6,12 @@ import POST_API from '../../constants/PostApi';
 import axios from 'axios';
 import { STATUS_CODE } from '../../constants/AppConstants';
 
-type TemplateSettingsPanelEditProps = {
+type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
   htmlTemplateTypeSubjectPlaceholder: string;
 };
 
-export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
@@ -54,6 +54,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                           "name":templateName,
                           "email_subject":subject,
                           "email_body_html":emailBody,
+                          "email_body_json":null,
                           "is_default":isDefault
                     }                   
 

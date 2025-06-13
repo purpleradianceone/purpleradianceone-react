@@ -29,6 +29,9 @@ const ROUTES_URL = {
     //for email template
     EMAIL_TEMPLATE : "/email-template",
     EMAIL_TEMPLATE_CREATE : "/email-template/create",
+    EMAIL_TEMPLATE_UPDATE : "/email-template/update",
+
+    //for meetings
     GOOGLE_OAUTH : "/authenticate/google",
     ZOOM_OAUTH : "/authenticate/zoom",
     GOOGLE_OAUTH_ANDROID : "/authenticate/google/android",
