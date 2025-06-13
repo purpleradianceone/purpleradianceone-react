@@ -19,9 +19,10 @@ import { TableBlock } from "./email-template-blocks/TableBlock";
 import { LucideCode,  LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
-import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
 import { DynamicFieldBlock } from "./email-template-blocks/DynamicFieldBlock";
 import { LexicalText } from "./email-template-blocks/LexicalText";
+import { TemplateSettingsPanelInsert } from "./TemplateSettingsPanelInsert";
+import { GenericBlock } from "./email-template-blocks/GenericBlock";
 
 
 
@@ -100,7 +101,7 @@ export const EditorCanvas: React.FC = () => {
     `,
   };
 
-  const [searchParams] = useSearchParams();
+const [searchParams] = useSearchParams();
 const params = searchParams.get("type");
   useEffect(()=> {
 if(params){
@@ -413,7 +414,7 @@ if(params){
               </div>
               <>
                 {/* Settings panel */}
-                <TemplateSettingsPanelEdit
+                <TemplateSettingsPanelInsert
                   htmlBody={htmlInput}
                   htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
                 />
@@ -432,6 +433,8 @@ if(params){
                 TableBlock,
                 HeadingBlock,
                 DynamicFieldBlock,
+                GenericBlock, // 👈 Don't forget
+
               }}
             >
               <div style={{ display: "flex", width: "100%" }}>

@@ -18,23 +18,10 @@ import DateRangePicker from '../ui/DateRangePicker';
 import SearchInput from '../ui/SearchInput';
 import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler';
 import { useUserAccessModules } from '../../config/hooks/useAccessModules';
+import { EditorCanvasWithJson } from './EditorCanvasWithJson';
+import EmailTemplate from '../../@types/email-template/EmailTemplateType';
 
-type EmailTemplate = {
-  count: number;
-  id: number;
-  company_id: number;
-  email_type_id: number;
-  name: string;
-  email_subject: string;
-  email_body_html: string;
-  is_master: boolean;
-  is_default: boolean;
-  isactive: boolean;
-  createdby: string;
-  createdon: string;
-  updatedby: string;
-  updatedon: string;
-};
+
 
 type TemplateType = {
   id: number;
@@ -42,6 +29,73 @@ type TemplateType = {
   is_host_email: boolean;
   isactive: boolean;
 };
+
+const jsonPlaceholdersMap:{ [key: number]: string } = {
+    1:`{
+    "company.fullname":"PurpleRadiance",
+    "company_user.fullname":"Nitikesh Yewale",
+    "company_user.email":"nitikesh@g.co",
+    "company_user.mobilenumber":"9878987898",
+    "company_user.password":"abc#wio345",
+    "current_year":"2025",
+    "crm_url":"http://localhost:5173"
+    }`,
+
+    2:`{
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Elon ",
+    "lead.email":"elon@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }`,
+
+    3:`
+    {
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Mark3",
+    "lead.email":"Mark3@g.co",
+    "lead.mobilenumber":"+1 87889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }
+    `,
+
+    4:`
+    {
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Elon4",
+    "lead.email":"elon4@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Suraj",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }
+    `,
+  };
 
 export const TemplatesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('');
@@ -481,6 +535,7 @@ export const TemplatesPage: React.FC = () => {
               templates={templates}
               loading={loadingTemplates}
               hasmore={hasMoreTemplates}
+              selectedTypeId={selectedTypeId}
             />
           </div>
           {showModal && (
@@ -537,12 +592,20 @@ type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
+  selectedTypeId:number;
 };
 
-const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore }) => {
+const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore, selectedTypeId }) => {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
     const {userHasAccessToUpdateSettingGeneral} = useUserAccessModules();
+      const navigate = useNavigate();
 
+
+     const handleEditTemplate = (emailTemplate : EmailTemplate): void => {
+      console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+      console.log(emailTemplate)
+      navigate(`${ROUTES_URL.EMAIL_TEMPLATE_UPDATE}?template_type_id=${emailTemplate.email_type_id}&template_id=${emailTemplate.id}`);
+     };
 
   return (
     <>
@@ -566,24 +629,32 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                   className="text-blue-500 hover:text-blue-700 transition"
                   aria-label={`Preview ${template.name}`}
                 >
-                  <Eye size={18} />
+                  <Eye size={25} />
                 </button>
-                <button
+                <Button
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
-                  disabled={!userHasAccessToUpdateSettingGeneral}
-                  // onClick={
-                  
-                  // }
+                  disabled={!userHasAccessToUpdateSettingGeneral||template.is_master}
+                  onClick={() =>{
+                    if(userHasAccessToUpdateSettingGeneral && !template.is_master){
+                      handleEditTemplate(template);
+                    }else{
+                      if(template.is_master){
+                        alert("Can't Update Master Templates!")
+                      }else{
+                        alert("You Don't have access!");
+                      }
+                    }
+                  }}
                 >
-                  <Edit2 size={18} />
-                </button>
-                <button
+                  <Edit2 size={25} />
+                </Button>
+                {/* <button
                   className="text-red-500 hover:text-red-700 transition"
                   aria-label={`Delete ${template.name}`}
                 >
                   <Trash2 size={18} />
-                </button>
+                </button> */}
               </div>
             </div>
             <p className="text-sm text-gray-500 mb-2">
@@ -627,6 +698,13 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                 <strong>Updated On:</strong> {new Date(template.updatedon).toLocaleDateString()}
               </span>
             </div>
+            {/* {isEditorCanvasWithJsonOpen &&(
+          <EditorCanvasWithJson
+                isOpen= {isEditorCanvasWithJsonOpen}
+                details={template}
+          ></EditorCanvasWithJson>
+            )} */}
+            
           </div>
         ))}
       </div>
@@ -654,6 +732,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
               </button>
             </div>
           </div>
+          
         </div>
       )}
     </>

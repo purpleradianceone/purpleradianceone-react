@@ -10,16 +10,20 @@ interface ExportPanelProps {
   onCopyHtml?: (html: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml }) => {
   const { query } = useEditor();
 
   const handlePreview = async () => {
     const json = query.serialize();
+    console.log("|||||||||||||||||||||Craft JSON||||||||||||||||||||||");
     console.log(json);
-    console.log("|||||||||||||||||||||||||||||||||||||||||||");
+    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+    console.log("|||||||||||||||||||||HTML||||||||||||||||||||||");
     const html1 = craftJsonToHtml(json);
     console.log(html1);
+    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
     onPreview(html1);
   };
 
