@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
-import { useDynamicFields } from './DynamicFieldsContext'; 
+import { useDynamicFields } from '../DynamicFieldsContext'; 
 import { useEditor } from '@craftjs/core';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import POST_API from '../../constants/PostApi';
+import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
+import POST_API from '../../../constants/PostApi';
 import axios from 'axios';
-import { STATUS_CODE } from '../../constants/AppConstants';
+import { STATUS_CODE } from '../../../constants/AppConstants';
 import { useSearchParams } from 'react-router-dom';
-import { craftJsonToHtml } from './email-template-util/CraftJsonToHtml';
+import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 
 
 type TemplateSettingsPanelEditProps = {
@@ -65,10 +65,10 @@ function getHtmlEmailBody(): string {
     const {loginStatus} = useLoggedInUserContext();
     const [searchParams] = useSearchParams();
     const params = searchParams.get("type");
-    const createEmailTemplateCreate = async(emailBody:string)=>{
+    const updateEmailTemplate = async(emailBody:string)=>{
 
                     const json = query.serialize();
-                    const postDataCreateEmailTemplate = {
+                    const postDataUpdateEmailTemplate = {
                       company_id: loginStatus.companyId,
                       updatedby_id: loginStatus.id,
                       id:id,
@@ -84,16 +84,16 @@ function getHtmlEmailBody(): string {
                     console.log(emailTemplateSubject);
                     console.log(emailTemplateName);
                     console.log(subject);
-                    console.log(postDataCreateEmailTemplate.id);
-                    console.log(postDataCreateEmailTemplate.email_type_id);
-                    console.log(postDataCreateEmailTemplate.name);
-                    console.log(postDataCreateEmailTemplate.is_default);
+                    console.log(postDataUpdateEmailTemplate.id);
+                    console.log(postDataUpdateEmailTemplate.email_type_id);
+                    console.log(postDataUpdateEmailTemplate.name);
+                    console.log(postDataUpdateEmailTemplate.is_default);
                     console.log(emailBody);
                     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                     console.log(json);
                     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
+              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
                         withCredentials:true
                 })
                 .then((response) =>{
@@ -162,7 +162,7 @@ function getHtmlEmailBody(): string {
               setIsOpen(false);
               const resultHtml = await getHtmlEmailBody();
 
-              createEmailTemplateCreate(resultHtml);
+              updateEmailTemplate(resultHtml);
               // TODO: API Call
               console.log({ templateName, subject, resultHtml });
             }}

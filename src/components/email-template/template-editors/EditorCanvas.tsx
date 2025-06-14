@@ -2,27 +2,27 @@
 
 import React, { useEffect, useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
-import { Sidebar } from "./Sidebar";
-import { ImageBlock } from "./email-template-blocks/ImageBlock";
-import { ButtonBlock } from "./email-template-blocks/ButtonBlock";
-import { DividerBlock } from "./email-template-blocks/DividerBlock";
-import { SectionBlock } from "./email-template-blocks/SectionBlock";
-import { HtmlPreviewModal } from "./HtmlPreviewModal";
-import { ExportPanel } from "./ExportPanel";
-import { ColumnBlock } from "./email-template-blocks/ColumnBlock";
-import { HeadingBlock } from "./email-template-blocks/HeadingBlock";
-import { SubjectBlock } from "./email-template-blocks/SubjectBlock";
+import { ImageBlock } from "../template-blocks/ImageBlock";
+import { ButtonBlock } from "../template-blocks/ButtonBlock";
+import { DividerBlock } from "../template-blocks/DividerBlock";
+import { SectionBlock } from "../template-blocks/SectionBlock";
+import { HtmlPreviewModal } from "../HtmlPreviewModal";
+import { ColumnBlock } from "../template-blocks/ColumnBlock";
+import { HeadingBlock } from "../template-blocks/HeadingBlock";
+import { SubjectBlock } from "../template-blocks/SubjectBlock";
 import DOMPurify from 'dompurify';
 import 'tinymce';
-import { DynamicFieldsContext } from "./DynamicFieldsContext";
-import { TableBlock } from "./email-template-blocks/TableBlock";
+import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode,  LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
-import { DynamicFieldBlock } from "./email-template-blocks/DynamicFieldBlock";
-import { LexicalText } from "./email-template-blocks/LexicalText";
-import { TemplateSettingsPanelInsert } from "./TemplateSettingsPanelInsert";
-import { GenericBlock } from "./email-template-blocks/GenericBlock";
+import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
+import { LexicalText } from "../template-blocks/LexicalText";
+import { GenericBlock } from "../template-blocks/GenericBlock";
+import { TemplateSettingsPanelCreate } from "../template-panel/TemplateSettingsPanelCreate ";
+import { TemplateSettingsPanelInsert } from "../template-panel/TemplateSettingsPanelInsert";
+import { ExportPanel } from "../template-panel/ExportPanel";
+import { Sidebar } from "../sidebar/Sidebar";
 
 
 
