@@ -2,34 +2,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from "react";
 import { Editor, Frame, Element, useEditor } from "@craftjs/core";
-import { Sidebar } from "./Sidebar";
-import { ImageBlock } from "./email-template-blocks/ImageBlock";
-import { ButtonBlock } from "./email-template-blocks/ButtonBlock";
-import { DividerBlock } from "./email-template-blocks/DividerBlock";
-import { SectionBlock } from "./email-template-blocks/SectionBlock";
-import { HtmlPreviewModal } from "./HtmlPreviewModal";
-import { ExportPanel } from "./ExportPanel";
-import { ColumnBlock } from "./email-template-blocks/ColumnBlock";
-import { HeadingBlock } from "./email-template-blocks/HeadingBlock";
-import { SubjectBlock } from "./email-template-blocks/SubjectBlock";
-import { DynamicFieldsContext } from "./DynamicFieldsContext";
-import { TableBlock } from "./email-template-blocks/TableBlock";
+import { ImageBlock } from "../template-blocks/ImageBlock";
+import { ButtonBlock } from "../template-blocks/ButtonBlock";
+import { DividerBlock } from "../template-blocks/DividerBlock";
+import { SectionBlock } from "../template-blocks/SectionBlock";
+import { HtmlPreviewModal } from "../HtmlPreviewModal";
+import { ColumnBlock } from "../template-blocks/ColumnBlock";
+import { HeadingBlock } from "../template-blocks/HeadingBlock";
+import { SubjectBlock } from "../template-blocks/SubjectBlock";
+import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DynamicFieldBlock } from "./email-template-blocks/DynamicFieldBlock";
-import { LexicalText } from "./email-template-blocks/LexicalText";
-import { TemplateSettingsPanelUpdate } from "./TemplateSettingsPanelUpdate";
-import { htmlToCraftJson } from "./email-template-util/HtmlToCraftJson";
-import { GenericBlock } from "./email-template-blocks/GenericBlock";
-import EmailTemplate from "../../@types/email-template/EmailTemplateType";
+import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
+import { LexicalText } from "../template-blocks/LexicalText";
+import { TemplateSettingsPanelUpdate } from "../template-panel/TemplateSettingsPanelUpdate";
+import { htmlToCraftJson } from "../template-util/HtmlToCraftJson";
+import { GenericBlock } from "../template-blocks/GenericBlock";
+import EmailTemplate from "../../../@types/email-template/EmailTemplateType";
 import axios from "axios";
-import POST_API from "../../constants/PostApi";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import { STATUS_CODE } from "../../constants/AppConstants";
-import ApiError from "../../@types/error/ApiError";
-import RefreshToken from "../../config/validations/RefreshToken";
-import { DialogueBox } from "../dialogue-box/Dialogue";
-import ROUTES_URL from "../../constants/Routes";
+import POST_API from "../../../constants/PostApi";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
+import ROUTES_URL from "../../../constants/Routes";
+import { ExportPanel } from "../template-panel/ExportPanel";
+import { Sidebar } from "../sidebar/Sidebar";
 
 
 
@@ -77,6 +77,11 @@ export const EditorCanvasWithJson = () => {
   const templateTypeId = searchParams.get("template_type_id");
   const emailTemplateId = searchParams.get("template_id");
 
+
+  //Handaling HTML INSERT TEMPLATES
+  const [htmlInput, setHtmlInput] = useState("");
+  
+
   const getTemplateToUpdate = async ({
     emailTemplateId,
     templateTypeId,
@@ -109,6 +114,7 @@ export const EditorCanvasWithJson = () => {
             
             setEmailTemplateName(response.data[0].name);
             setEmailTemplateSubject( response.data[0].email_subject);
+            setHtmlInput(response.data[0].email_body_html);
             console.log(response.data[0].name);
             console.log(response.data[0].email_subject);
 
@@ -271,12 +277,41 @@ export const EditorCanvasWithJson = () => {
     // onSave?.(currentJson);
   };
 
+
+  //FOR HANDALING INSERT HTML TEMPLATES
+  const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setHtmlInput(e.target.value);
+    };
+
+
+const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setHtmlInput(reader.result as string);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const insertHtmlTemplate = () => {
+    const htmlForPreview = htmlInput.toString();
+    handlePreview(htmlForPreview);
+  };
+
+  const setHtmlContent = (updatedHtml: string) => {
+    setHtmlInput(updatedHtml);
+    setPreviewHtml(updatedHtml); 
+  };
+
   return (
     isLoading ? (
         <div className="flex justify-center items-center h-full">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       ) : (
+        
     <>
       <div className="fixed z-10 top-12 left-14 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm mb-1.5 w-fit p-2">
         <div className="flex gap-1">
@@ -285,7 +320,7 @@ export const EditorCanvasWithJson = () => {
           <span className="text-1xl font-bold">Email Template Update</span>
           {templateTypeId && (
             <span className="text-1xl font-bold">
-              : : : {JSON.parse(templateTypeId).name} Template
+              : : : {emailTemplateName}
             </span>
           )}
         </div>
@@ -379,7 +414,90 @@ export const EditorCanvasWithJson = () => {
       )}
 
       <DynamicFieldsContext.Provider value={parsedFields}>
-        {isEditorReady ? (
+        {currentJson == null ||currentJson === ""?(
+            <div style={{ marginTop: "60px", padding: "40px" }}>
+              <div>
+                <textarea
+                  placeholder="Paste your HTML template here"
+                  value={htmlInput}
+                  onChange={handleHtmlInputChange}
+                  style={{
+                    width: "100%",
+                    minWidth: "400px",
+                    height: "200px",
+                    padding: "10px",
+                    resize: "both",
+                    overflow: "auto",
+                    whiteSpace: "pre",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginTop: "20px" }}>
+                <input
+                  type="file"
+                  accept=".html"
+                  onChange={handleHtmlFileUpload}
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    transition: "background-color 0.3s ease",
+                  }}
+                />
+              </div>
+
+              <button
+                onClick={insertHtmlTemplate}
+                style={{ padding: "8px 14px", marginTop: "20px" }}
+              >
+                ⏭️ Preview HTML Template
+              </button>
+
+              <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+                <button
+                  onClick={() => {
+                    const beautified = htmlInput;
+                    navigator.clipboard.writeText(beautified);
+                    alert("Email Template copied to clipboard!");
+                  }}
+                  style={{ padding: "8px 14px" }}
+                >
+                  📋 Copy HTML Email
+                </button>
+
+                <button
+                  onClick={() => {
+                    const beautified = htmlInput;
+                    const blob = new Blob([beautified], { type: "text/html" });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "sanitized-template.html";
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                  }}
+                  style={{ padding: "8px 14px" }}
+                >
+                  💾 Export HTML Email
+                </button>
+              </div>
+
+              <div style={{ marginTop: "20px", zIndex: 2000 }}>
+                <HtmlPreviewModal
+                  isOpen={isPreviewOpen}
+                  onClose={() => setIsPreviewOpen(false)}
+                  html={previewHtml}
+                  onHtmlChange={setHtmlContent}
+                  editable={false}
+                />
+              </div>
+             
+            </div>
+          ):(
           <Editor
             resolver={{
               SubjectBlock,
@@ -482,8 +600,6 @@ export const EditorCanvasWithJson = () => {
               />
             )}
           </Editor>
-        ) : (
-          <div>Loading editor...</div>
         )}
       </DynamicFieldsContext.Provider>
       <DialogueBox

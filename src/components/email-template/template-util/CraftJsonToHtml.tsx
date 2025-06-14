@@ -422,17 +422,33 @@ function extractHtmlFromLexical(editorState: any): string {
 
     // Handle paragraph nodes
     if (node.type === 'paragraph') {
-      const children = node.children.map(processNode).join('');
-      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
-      return `<p${style}>${children}</p>`;
-    }
+  const children = node.children.map(processNode).join('');
+  let style = node.textStyle || '';
+
+  if (node.format && typeof node.format === 'string') {
+    style = appendStyle(style, `text-align: ${node.format};`);
+  }
+
+  const styleAttr = style ? ` style="${style}"` : '';
+  return `<p${styleAttr}>${children}</p>`;
+}
 
     // Handle heading nodes
     if (node.type === 'heading') {
       const tag = `h${node.tag || '1'}`;
       const children = node.children.map(processNode).join('');
-      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
-      return `<${tag}${style}>${children}</${tag}>`;
+      let style = node.textStyle ? node.textStyle : '';
+      
+      // Add alignment to style if present
+      if (node.format) {
+        if (node.format & 1 << 0) style = appendStyle(style, 'text-align: left;');
+        if (node.format & 1 << 1) style = appendStyle(style, 'text-align: center;');
+        if (node.format & 1 << 2) style = appendStyle(style, 'text-align: right;');
+        if (node.format & 1 << 3) style = appendStyle(style, 'text-align: justify;');
+      }
+      
+      const styleAttr = style ? ` style="${style}"` : '';
+      return `<${tag}${styleAttr}>${children}</${tag}>`;
     }
 
     // Handle list nodes
@@ -450,7 +466,18 @@ function extractHtmlFromLexical(editorState: any): string {
     // Handle quote nodes
     if (node.type === 'quote') {
       const children = node.children.map(processNode).join('');
-      return `<blockquote>${children}</blockquote>`;
+      let style = node.textStyle ? node.textStyle : '';
+      
+      // Add alignment to style if present
+      if (node.format) {
+        if (node.format & 1 << 0) style = appendStyle(style, 'text-align: left;');
+        if (node.format & 1 << 1) style = appendStyle(style, 'text-align: center;');
+        if (node.format & 1 << 2) style = appendStyle(style, 'text-align: right;');
+        if (node.format & 1 << 3) style = appendStyle(style, 'text-align: justify;');
+      }
+      
+      const styleAttr = style ? ` style="${style}"` : '';
+      return `<blockquote${styleAttr}>${children}</blockquote>`;
     }
 
     // Handle generic element nodes
@@ -461,10 +488,16 @@ function extractHtmlFromLexical(editorState: any): string {
     return '';
   };
 
+  // Helper function to append styles properly
+  function appendStyle(existing: string, newStyle: string): string {
+    if (!existing) return newStyle;
+    if (existing.endsWith(';')) return existing + ' ' + newStyle;
+    return existing + '; ' + newStyle;
+  }
+
   // Process all children of the root
   return editorState.root.children.map(processNode).join('');
 }
-
 
 // Helper to convert style object to CSS string
 function formatStyle(styleObj: Record<string, string | number | undefined>): string {

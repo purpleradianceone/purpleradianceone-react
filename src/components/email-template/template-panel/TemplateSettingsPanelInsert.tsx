@@ -1,32 +1,27 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
-import { useDynamicFields } from './DynamicFieldsContext'; 
-import { useEditor } from '@craftjs/core';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import POST_API from '../../constants/PostApi';
-import axios from 'axios';
-import { STATUS_CODE } from '../../constants/AppConstants';
+
 import { useSearchParams } from 'react-router-dom';
-import { craftJsonToHtml } from './email-template-util/CraftJsonToHtml';
+import axios from 'axios';
+import { useDynamicFields } from '../DynamicFieldsContext';
+import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
+import POST_API from '../../../constants/PostApi';
+import { STATUS_CODE } from '../../../constants/AppConstants';
 
-
-type TemplateSettingsPanelEditProps = {
+type TemplateSettingsPanelInsertProps = {
+  htmlBody: string;
   htmlTemplateTypeSubjectPlaceholder: string;
 };
 
-export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
-  const [description, setDescription] = useState('');
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const[htmlBody,setHtmlBody] = useState('');
   const [isDefault, setIsDefault] = useState(false);
 
-  const dynamicFields = useDynamicFields();
+  const dynamicFields = useDynamicFields(); 
 
-  const { query } = useEditor();
-  
   
 
   const insertDynamicField = (field: string) => {
@@ -48,27 +43,11 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
     }, 0);
   };
 
-  function getCraftJson(): string {
-    const json = query.serialize();
-    return json;
-  }
-
-function getHtmlEmailBody(): string {
-    const canvasElement = document.getElementById("CANVAS");
-    if (!canvasElement) return "" ;
-    const json = query.serialize();
-  
-
-    const html = craftJsonToHtml(json).trim();
-      setHtmlBody(html.trim());
-      return html;
-    };
-
-    const {loginStatus} = useLoggedInUserContext();
+     const {loginStatus} = useLoggedInUserContext();
     const [searchParams] = useSearchParams();
     const params = searchParams.get("type");
 
-       const createEmailTemplateCreate = async(emailBody:string, resultJson:string)=>{
+       const createEmailTemplateInsert = async(emailBody:string)=>{
                     const postDataCreateEmailTemplate = {
                           "company_id":loginStatus.companyId,
                           "createdby_id":loginStatus.id,
@@ -76,7 +55,7 @@ function getHtmlEmailBody(): string {
                           "name":templateName,
                           "email_subject":subject,
                           "email_body_html":emailBody,
-                          "email_body_json":resultJson,
+                          "email_body_json":null,
                           "is_default":isDefault
                     }                   
 
@@ -84,11 +63,12 @@ function getHtmlEmailBody(): string {
                         withCredentials:true
                 })
                 .then((response) =>{
+                      console.log(response.data);
                       if(response.status === STATUS_CODE.OK){
                           console.log(response.data);
                         }
-                        alert(response.data.message);
-                        
+                       alert(response.data.message);
+
                 }).catch((error)=>{console.log(error)})
         }
   
@@ -99,14 +79,14 @@ function getHtmlEmailBody(): string {
         onClick={() => setIsOpen(true)}
         style={{
           position: "fixed",
-          top: "125px",
+          top: "50px",
           right: 0,
           padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
-          zIndex: 1,
+          zIndex: 10,
         }}
       >
         Save Template
@@ -116,7 +96,7 @@ function getHtmlEmailBody(): string {
         <div
           style={{
             position: "fixed",
-            top: "120px",
+            top: "50px",
             right: 2,
             backgroundColor: "white",
             padding: "20px",
@@ -147,11 +127,8 @@ function getHtmlEmailBody(): string {
             onSubmit={async (e) => {
               e.preventDefault();
               setIsOpen(false);
-              const resultHtml = await getHtmlEmailBody();
-              const resultJson = await getCraftJson();
-              createEmailTemplateCreate(resultHtml, resultJson);
               // TODO: API Call
-              console.log({ templateName, subject, description, resultHtml });
+              await createEmailTemplateInsert(htmlBody);
             }}
           >
             <div style={{ marginBottom: "15px" }}>
@@ -240,8 +217,6 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
-                    maxHeight: "120px",
-                    overflowY: "auto",
                   }}
                 >
                   <option value="">Insert Dynamic Field In Subject</option>
@@ -253,33 +228,6 @@ function getHtmlEmailBody(): string {
                 </select>
               </div>
 
-              {/* Description */}
-              {/* <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    minHeight: "80px",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
-                  placeholder="Template description..."
-                />
-              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}

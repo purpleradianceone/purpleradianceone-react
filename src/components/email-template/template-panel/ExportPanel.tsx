@@ -3,7 +3,7 @@
 // ExportPanel.tsx
 import React from "react";
 import { useEditor } from "@craftjs/core";
-import { craftJsonToHtml } from "./email-template-util/CraftJsonToHtml";
+import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;

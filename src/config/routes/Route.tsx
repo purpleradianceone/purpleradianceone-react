@@ -29,7 +29,7 @@ import SubscriptionManagement from "../../components/subscription-module/Subscri
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
 import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement";
 import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler";
-import { EditorCanvas } from "../../components/email-template/EditorCanvas";
+import { EditorCanvas } from "../../components/email-template/template-editors/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
 import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
@@ -38,7 +38,7 @@ import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuth
 import Meetings from "../../components/views/meeting/Meetings";
 import EmailSetting from "../../components/email-settings/EmailSetting";
 import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
-import { EditorCanvasWithJson } from "../../components/email-template/EditorCanvasWithJson";
+import { EditorCanvasWithJson } from "../../components/email-template/template-editors/EditorCanvasWithJson";
 
 
 
