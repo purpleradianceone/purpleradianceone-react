@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useEditor } from '@craftjs/core';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDynamicFields } from '../DynamicFieldsContext';
 import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
+import ROUTES_URL from '../../../constants/Routes';
 
 
 type TemplateSettingsPanelEditProps = {
@@ -18,12 +18,11 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
-  const [description, setDescription] = useState('');
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const[htmlBody,setHtmlBody] = useState('');
   const [isDefault, setIsDefault] = useState(false);
 
   const dynamicFields = useDynamicFields();
+  const navigate = useNavigate();
 
   const { query } = useEditor();
   
@@ -60,7 +59,6 @@ function getHtmlEmailBody(): string {
   
 
     const html = craftJsonToHtml(json).trim();
-      setHtmlBody(html.trim());
       return html;
     };
 
@@ -86,6 +84,7 @@ function getHtmlEmailBody(): string {
                 .then((response) =>{
                       if(response.status === STATUS_CODE.OK){
                           console.log(response.data);
+                          navigate(ROUTES_URL.EMAIL_TEMPLATE)
                         }
                         alert(response.data.message);
                         
@@ -151,7 +150,7 @@ function getHtmlEmailBody(): string {
               const resultJson = await getCraftJson();
               createEmailTemplateCreate(resultHtml, resultJson);
               // TODO: API Call
-              console.log({ templateName, subject, description, resultHtml });
+              console.log({ templateName, subject, resultHtml });
             }}
           >
             <div style={{ marginBottom: "15px" }}>
