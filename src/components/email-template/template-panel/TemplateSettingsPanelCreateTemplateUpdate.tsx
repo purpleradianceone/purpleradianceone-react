@@ -1,28 +1,36 @@
 import React, { useState, useRef } from 'react';
-
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
-import { useDynamicFields } from '../DynamicFieldsContext';
+import { useDynamicFields } from '../DynamicFieldsContext'; 
+import { useEditor } from '@craftjs/core';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
+import axios from 'axios';
 import { STATUS_CODE } from '../../../constants/AppConstants';
+import { useNavigate, } from 'react-router-dom';
+import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import ROUTES_URL from '../../../constants/Routes';
 
-type TemplateSettingsPanelInsertProps = {
-  htmlBody: string;
-  htmlTemplateTypeSubjectPlaceholder: string;
+
+type TemplateSettingsPanelUpdateProps = {
+  id: number;
+  templateTypeId: number;
+  emailTemplateName: string;
+  emailTemplateSubject:string;
+  emailTemplateIsDefault:boolean;
+
 };
 
-export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
-
+export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettingsPanelUpdateProps>  = ({id,templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [subject, setSubject] = useState('');
+  const [templateName, setTemplateName] = useState(emailTemplateName);
+  const [subject, setSubject] = useState(emailTemplateSubject);
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const [isDefault, setIsDefault] = useState(false);
+  const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
   const navigate = useNavigate();
-  const dynamicFields = useDynamicFields(); 
 
+  const dynamicFields = useDynamicFields();
+
+    const { query } = useEditor();
+  
   
 
   const insertDynamicField = (field: string) => {
@@ -43,34 +51,54 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
       input.focus();
     }, 0);
   };
+function getHtmlEmailBody(): string {
+    const canvasElement = document.getElementById("CANVAS");
+    if (!canvasElement) return "" ;
+    const json = query.serialize();
+    const html = craftJsonToHtml(json).trim();
+      return html;
+    };
 
-     const {loginStatus} = useLoggedInUserContext();
-    const [searchParams] = useSearchParams();
-    const params = searchParams.get("type");
+    const {loginStatus} = useLoggedInUserContext();
+    const updateEmailTemplate = async(emailBody:string)=>{
 
-       const createEmailTemplateInsert = async(emailBody:string)=>{
-                    const postDataCreateEmailTemplate = {
-                          "company_id":loginStatus.companyId,
-                          "createdby_id":loginStatus.id,
-                          "email_type_id":JSON.parse(params!).id,
-                          "name":templateName,
-                          "email_subject":subject,
-                          "email_body_html":emailBody,
-                          "email_body_json":null,
-                          "is_default":isDefault
-                    }                   
+                    const json = query.serialize();
+                    const postDataUpdateEmailTemplate = {
+                      company_id: loginStatus.companyId,
+                      updatedby_id: loginStatus.id,
+                      id:id,
+                      email_type_id: templateTypeId,
+                      name: templateName,
+                      email_subject: subject,
+                      email_body_html: emailBody,
+                      email_body_json: json,
+                      is_default: isDefault,
+                    };                   
 
-              await axios.post(POST_API.CREATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(emailTemplateSubject);
+                    console.log(emailTemplateName);
+                    console.log(subject);
+                    console.log(postDataUpdateEmailTemplate.id);
+                    console.log(postDataUpdateEmailTemplate.email_type_id);
+                    console.log(postDataUpdateEmailTemplate.name);
+                    console.log(postDataUpdateEmailTemplate.is_default);
+                    console.log(emailBody);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(json);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
                         withCredentials:true
                 })
                 .then((response) =>{
-                      console.log(response.data);
                       if(response.status === STATUS_CODE.OK){
                           console.log(response.data);
-                          navigate(ROUTES_URL.EMAIL_TEMPLATE)
-                        }
-                       alert(response.data.message);
+                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
 
+                        }
+                        alert(response.data.message);
+                        
                 }).catch((error)=>{console.log(error)})
         }
   
@@ -81,14 +109,14 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
         onClick={() => setIsOpen(true)}
         style={{
           position: "fixed",
-          top: "50px",
+          top: "125px",
           right: 0,
           padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
-          zIndex: 10,
+          zIndex: 1,
         }}
       >
         Save Template
@@ -98,7 +126,7 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
         <div
           style={{
             position: "fixed",
-            top: "50px",
+            top: "120px",
             right: 2,
             backgroundColor: "white",
             padding: "20px",
@@ -129,8 +157,11 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
             onSubmit={async (e) => {
               e.preventDefault();
               setIsOpen(false);
+              const resultHtml = await getHtmlEmailBody();
+
+              updateEmailTemplate(resultHtml);
               // TODO: API Call
-              await createEmailTemplateInsert(htmlBody);
+              console.log({ templateName, subject, resultHtml });
             }}
           >
             <div style={{ marginBottom: "15px" }}>
@@ -141,7 +172,7 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                   fontWeight: "600",
                 }}
               >
-                Template Settings
+                Update Template Settings
               </h3>
             </div>
 
@@ -172,7 +203,6 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
-                  placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
 
@@ -219,6 +249,8 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
+                    maxHeight: "120px",
+                    overflowY: "auto",
                   }}
                 >
                   <option value="">Insert Dynamic Field In Subject</option>
@@ -230,6 +262,33 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                 </select>
               </div>
 
+              {/* Description */}
+              {/* <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                  }}
+                >
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    minHeight: "80px",
+                    fontSize: "14px",
+                    resize: "vertical",
+                  }}
+                  placeholder="Template description..."
+                />
+              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -283,7 +342,7 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                     fontSize: "14px",
                   }}
                 >
-                  Save
+                  Update
                 </button>
               </div>
             </div>
