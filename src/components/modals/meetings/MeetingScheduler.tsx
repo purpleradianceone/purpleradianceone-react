@@ -228,8 +228,7 @@ const MeetingScheduler = () => {
       showMessageSnackbar({message:"Please fill the required fields",type:"error"});
     }
   };
-  const createZoomMeeting = () => {
-    alert(selectedMeetingPlatform);
+  const createZoomMeeting = async () => {
     if (
       title !== "" &&
       startDate !== "" &&
@@ -251,7 +250,7 @@ const MeetingScheduler = () => {
         company_user_id: loginStatus.id,
         createdby: loginStatus.id,
       };
-      axios
+      await axios
         .post(POST_API.CREATE_ZOOM_MEETING, createZoomMeetingPostData, {
           withCredentials: true,
         })
@@ -282,8 +281,13 @@ const MeetingScheduler = () => {
           setSelectedMeetingPlatform("");
           handleCloseMeetingModal();
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(async(error : ApiError | any) => {
+          if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenResponse = await RefreshToken({callFunction:createZoomMeeting})
+          }
+          else if(error.status === STATUS_CODE.PERMANENT_REDIRECT){
+           handleZoomMeetingsOAuth();
+          }
         });
     }
   };
