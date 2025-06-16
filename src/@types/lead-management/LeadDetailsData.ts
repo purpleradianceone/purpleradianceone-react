@@ -17,26 +17,7 @@ type LeadDetailsData={
     createdby: string,
     createdon: string,
     updatedby: string,
-    updatedon: string
-    // additional_contact_number: string,
-    // address: "",
-    // country_id: 0,
-    // country_name: "",
-    // createdby: "",
-    // createdon: "",
-    // district_id: 0,
-    // district_name: "",
-    // id: 0,
-    // industry_name: "",
-    // industry_type: "",
-    // industry_type_id: 0,
-    // job_title: "",
-    // lead_id: 0,
-    // state_id: 0,
-    // state_name: "",
-    // updatedby: "",
-    // updatedon: "",
-    // website: "",
+    updatedon: string,
 }
 
 export default LeadDetailsData;

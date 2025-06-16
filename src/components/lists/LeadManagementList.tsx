@@ -29,6 +29,7 @@ import LeadDataProps from "../../@types/lead-management/LeadProps";
 import { useNavigate } from "react-router-dom";
 import qs from "query-string";
 import ROUTES_URL from "../../constants/Routes";
+import { usePanel } from "../../context/panel/usePanel";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -45,6 +46,7 @@ function LeadManagementList({
   handleLeadSelectedSource,
 }: LeadManagementListProps) {
   const navigate = useNavigate();
+  const {position} = usePanel();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
@@ -134,23 +136,23 @@ function LeadManagementList({
     };
 
     return (
-      <div className="w-full pl-5 pr-1 gap-1">
+      <div className={`w-full ${position ==="left" ? "pl-5" : "pl-1"} pr-1 gap-1`}>
         
         <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex">
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">Lead Management</span>
+              <span className="text-1xl font-bold">{" Leads"} </span>
             )}
           </div>
 
           {isLargeScreen && (
             <>
-              <div className="flex">
+              <div className="flex gap-2 justify-center items-center">
                 {/* search box flex div */}
-                <div className="relative flex items-start w-44">
-                  <div className="grid w-full">
+                <div className="relative flex items-center justify-center w-auto">
+                  <div className="grid w-56">
                     <SearchInput
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
@@ -181,10 +183,10 @@ function LeadManagementList({
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex mx-1">
+                <div className="flex ">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar className="mt-2" />
+                      <Calendar  />
                     </div>
                     <DateRangeFilterDropdown
                       dropdownOptions={dateRangeDropdownOptions}
@@ -208,12 +210,12 @@ function LeadManagementList({
                 </div>
 
                 <Button
-                  className="flex ml-0.5 h-9 w-fit justify-between text-sm py-2 px-3 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
+                  className="flex ml-0.5 h-7 w-fit items-center justify-between gap-3 text-xs py-1 px-1 border-2 bg-white border-gray-300  rounded-md cursor-pointer text-gray-700 focus:outline-none"
                   onClick={handleCompanyUserPopUp}
                   type="button"
                 >
-                  <User size={14} className="self-center ml-2" />
                   <span className="self-center">Owner</span>
+                  <User size={14} className="" />
                 </Button>
               </div>
               {/* Custom Date Picker Div Flex Box*/}

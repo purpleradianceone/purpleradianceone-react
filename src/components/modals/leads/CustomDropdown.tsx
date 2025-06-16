@@ -43,11 +43,11 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   };
 
   return (
-    <div className="relative w-full " ref={dropdownRef}>
+    <div className="relative w-auto " ref={dropdownRef}>
       <label className="block  text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" ? "": labelName}</label>
 
       <div
-        className="w-full flex justify-between py-2 px-3 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
+        className="w-full flex justify-between py-1 px-1 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
         onClick={() => setShowDropdown((prev) => !prev)}
       >
         <div className='text-xs'>
@@ -78,7 +78,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             <div
               key={option.id}
               onClick={() => handleSelect(option.id!)}
-              className="px-4 py-0.5 text-xs hover:bg-blue-700 hover:text-white cursor-pointer text-gray-800"
+              className="px-4 py-0.5 text-xs border-b hover:bg-blue-700 hover:text-white cursor-pointer text-gray-800"
             >
               {option.name}
             </div>

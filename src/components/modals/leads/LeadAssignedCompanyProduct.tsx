@@ -38,11 +38,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     costExpected: string;
     leadInterestId: number | null;
     isActive: boolean;
+    interestName : string,
   }>({
     quantityRequired: "",
     costExpected: "",
     leadInterestId: null,
     isActive: false,
+    interestName : ""
   });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -153,6 +155,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       costExpected: String(product.costExpected),
       leadInterestId: product.leadInterestId!,
       isActive: product.isActive,
+      interestName : product.leadInterestName
     });
   };
 
@@ -206,6 +209,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         quantityRequired: parsedQuantity,
         costExpected: parsedCost,
         leadInterestId: editedValues.leadInterestId!,
+        leadInterestName : editedValues.interestName
       };
      
       try {
@@ -223,6 +227,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               type: "success",
             });
              handleLeadProductUpdate(updatedProduct);
+             console.log("this is the updated product");  
+             console.log(updatedProduct);
           }
         }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -244,6 +250,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       setEditingProductId(null);
     }
   };
+ 
 
   return (
     <div className=" h-auto w-full overflow-auto  bg-gray-0 rounded-lg p-2">
@@ -269,7 +276,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       <div
         ref={editingProductId === product.id ? wrapperRef : null}
         title={product.companyProductName}
-        className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-1 mb-2 text-sm transition hover:shadow-md items-center animate-fade-in" // Added 'animate-fade-in'
+        className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-1 mb-2 text-sm transition hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
         style={{ animationDelay: `${index * 50}ms` }} // Staggered delay
       >
         <div className="text-sm font-medium text-gray-800 truncate">
@@ -295,8 +302,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               onChange={(e) =>
                 setEditedValues((prev) => ({
                   ...prev,
-                  leadInterestId:
-                    e.target.value === "" ? null : parseInt(e.target.value),
+                  leadInterestId:e.target.value === "" ? null : parseInt(e.target.value),
+                  interestName : e.target.selectedOptions[0].text
                 }))
               }
               className="border rounded w-16"
@@ -336,11 +343,14 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               className="truncate cursor-pointer"
               onClick={() => product.isActive && handleEditClick(product)}
             >
-              {interestTypeData.map((value) => {
+              {/* {interestTypeData.map((value) => {
                 if (value.id === product.leadInterestId) {
                   return value.name;
                 }
-              })}
+              })} */}
+              {
+                product.leadInterestName
+              }
             </div>
             <div className="flex items-center justify-start sm:justify-center">
               <button
