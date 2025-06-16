@@ -1,84 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// ExportPanel.tsx
-import React from "react";
-import { useEditor } from "@craftjs/core";
-
-interface ExportPanelProps {
-  onPreview: (html: string) => void;
-  onCopyHtml?: (html: string) => void;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml }) => {
-  const { query } = useEditor();
-
-  const handlePreview = async () => {
-    const json = query.serialize();
-    console.log(json);
-    console.log("|||||||||||||||||||||||||||||||||||||||||||");
-    const html1 = craftJsonToHtml(json);
-    console.log(html1);
-    onPreview(html1);
-  };
-
-  const handleCopy = () => {
-    const canvasElement = document.getElementById("CANVAS");
-    if (!canvasElement) return;
-    const json = query.serialize();
-    const html = craftJsonToHtml(json);
-    navigator.clipboard.writeText(html)
-      .then(() => {
-        alert("HTML copied to clipboard!");
-      })
-      .catch(() => {
-        alert("Failed to copy HTML");
-      });
-  };
-
- 
-
-  return (
-    <div style={{ display: "grid", gap: 10 }}>
-    <button
-      onClick={handlePreview}
-      style={{
-        top: 50,
-        left: "50%",
-        padding: "2px 8px",
-        backgroundColor: "#007bff",
-        color: "#fff",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-      }}
-    >
-      Preview HTML
-    </button>
-
-    <button onClick={handleCopy} style={{ 
-      padding: "2px 8px", 
-      backgroundColor: "#4CAF50", 
-      color: "white", 
-      borderRadius: "4px", 
-      cursor: "pointer",
-      }}>
-        Copy HTML
-      </button>
-    </div> 
-  );
-};
-
-
-
-
-
-
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface CraftNode {
   type: string | { resolvedName: string };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: Record<string, any>;
   nodes?: string[];
   linkedNodes?: Record<string, string>;
@@ -498,17 +422,33 @@ function extractHtmlFromLexical(editorState: any): string {
 
     // Handle paragraph nodes
     if (node.type === 'paragraph') {
-      const children = node.children.map(processNode).join('');
-      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
-      return `<p${style}>${children}</p>`;
-    }
+  const children = node.children.map(processNode).join('');
+  let style = node.textStyle || '';
+
+  if (node.format && typeof node.format === 'string') {
+    style = appendStyle(style, `text-align: ${node.format};`);
+  }
+
+  const styleAttr = style ? ` style="${style}"` : '';
+  return `<p${styleAttr}>${children}</p>`;
+}
 
     // Handle heading nodes
     if (node.type === 'heading') {
       const tag = `h${node.tag || '1'}`;
       const children = node.children.map(processNode).join('');
-      const style = node.textStyle ? ` style="${node.textStyle}"` : '';
-      return `<${tag}${style}>${children}</${tag}>`;
+      let style = node.textStyle ? node.textStyle : '';
+      
+      // Add alignment to style if present
+      if (node.format) {
+        if (node.format & 1 << 0) style = appendStyle(style, 'text-align: left;');
+        if (node.format & 1 << 1) style = appendStyle(style, 'text-align: center;');
+        if (node.format & 1 << 2) style = appendStyle(style, 'text-align: right;');
+        if (node.format & 1 << 3) style = appendStyle(style, 'text-align: justify;');
+      }
+      
+      const styleAttr = style ? ` style="${style}"` : '';
+      return `<${tag}${styleAttr}>${children}</${tag}>`;
     }
 
     // Handle list nodes
@@ -526,7 +466,18 @@ function extractHtmlFromLexical(editorState: any): string {
     // Handle quote nodes
     if (node.type === 'quote') {
       const children = node.children.map(processNode).join('');
-      return `<blockquote>${children}</blockquote>`;
+      let style = node.textStyle ? node.textStyle : '';
+      
+      // Add alignment to style if present
+      if (node.format) {
+        if (node.format & 1 << 0) style = appendStyle(style, 'text-align: left;');
+        if (node.format & 1 << 1) style = appendStyle(style, 'text-align: center;');
+        if (node.format & 1 << 2) style = appendStyle(style, 'text-align: right;');
+        if (node.format & 1 << 3) style = appendStyle(style, 'text-align: justify;');
+      }
+      
+      const styleAttr = style ? ` style="${style}"` : '';
+      return `<blockquote${styleAttr}>${children}</blockquote>`;
     }
 
     // Handle generic element nodes
@@ -537,10 +488,16 @@ function extractHtmlFromLexical(editorState: any): string {
     return '';
   };
 
+  // Helper function to append styles properly
+  function appendStyle(existing: string, newStyle: string): string {
+    if (!existing) return newStyle;
+    if (existing.endsWith(';')) return existing + ' ' + newStyle;
+    return existing + '; ' + newStyle;
+  }
+
   // Process all children of the root
   return editorState.root.children.map(processNode).join('');
 }
-
 
 // Helper to convert style object to CSS string
 function formatStyle(styleObj: Record<string, string | number | undefined>): string {

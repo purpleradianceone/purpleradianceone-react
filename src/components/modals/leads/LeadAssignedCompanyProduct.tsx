@@ -38,11 +38,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     costExpected: string;
     leadInterestId: number | null;
     isActive: boolean;
+    interestName : string,
   }>({
     quantityRequired: "",
     costExpected: "",
     leadInterestId: null,
     isActive: false,
+    interestName : ""
   });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -74,15 +76,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   ) => {
     const updatedStatus = !product.isActive;
 
-    // const postData = {
-    //   company_id: loginStatus.companyId,
-    //   id: product.id,
-    //   lead_interest_id: product.leadInterestId,
-    //   quantity_required: product.quantityRequired,
-    //   cost_expected: product.costExpected,
-    //   isactive: updatedStatus,
-    //   updatedby: loginStatus.id,
-    // };
+
     const postData = {
       company_id: loginStatus.companyId,
       id: product.id,
@@ -161,6 +155,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       costExpected: String(product.costExpected),
       leadInterestId: product.leadInterestId!,
       isActive: product.isActive,
+      interestName : product.leadInterestName
     });
   };
 
@@ -214,6 +209,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         quantityRequired: parsedQuantity,
         costExpected: parsedCost,
         leadInterestId: editedValues.leadInterestId!,
+        leadInterestName : editedValues.interestName
       };
      
       try {
@@ -231,6 +227,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               type: "success",
             });
              handleLeadProductUpdate(updatedProduct);
+             console.log("this is the updated product");  
+             console.log(updatedProduct);
           }
         }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -252,25 +250,33 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       setEditingProductId(null);
     }
   };
+ 
 
   return (
-    <div className=" max-h-80 w-full overflow-auto p-2 bg-gray-50 rounded-lg">
+    <div className=" h-auto w-full overflow-auto  bg-gray-0 rounded-lg p-2">
   {/* Header row */}
-  <div className=" hidden sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold text-gray-900 text-sm mb-3 px-2">
+  <div className="  sm:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold h-6 bg-gray-50 text-gray-900 text-sm mb-3 px-2">
     <div>Product Name</div>
     <div className="text-center">Req. Quantity</div>
     <div className="text-center">Exp. Cost</div>
     <div>Interest</div>
     <div className="text-center">Status</div>
+   
   </div>
-
+ {
+    data.length==0 && (
+      <div className="flex w-full h-28 bg-green50 text-xs text-gray-400 justify-center items-center ">
+        Product is not assigned to lead. 
+      </div>
+    )
+  }
   {/* Data rows */}
   {data.map((product, index) => ( // Added 'index' to the map function
     <form key={product.id}>
       <div
         ref={editingProductId === product.id ? wrapperRef : null}
         title={product.companyProductName}
-        className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-1 mb-2 text-sm transition hover:shadow-md items-center animate-fade-in" // Added 'animate-fade-in'
+        className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-white shadow border border-gray-200 rounded-lg p-1 mb-2 text-sm transition hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
         style={{ animationDelay: `${index * 50}ms` }} // Staggered delay
       >
         <div className="text-sm font-medium text-gray-800 truncate">
@@ -296,8 +302,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               onChange={(e) =>
                 setEditedValues((prev) => ({
                   ...prev,
-                  leadInterestId:
-                    e.target.value === "" ? null : parseInt(e.target.value),
+                  leadInterestId:e.target.value === "" ? null : parseInt(e.target.value),
+                  interestName : e.target.selectedOptions[0].text
                 }))
               }
               className="border rounded w-16"
@@ -337,11 +343,14 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               className="truncate cursor-pointer"
               onClick={() => product.isActive && handleEditClick(product)}
             >
-              {interestTypeData.map((value) => {
+              {/* {interestTypeData.map((value) => {
                 if (value.id === product.leadInterestId) {
                   return value.name;
                 }
-              })}
+              })} */}
+              {
+                product.leadInterestName
+              }
             </div>
             <div className="flex items-center justify-start sm:justify-center">
               <button
@@ -356,7 +365,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 }}
               >
                 <div
-                  className={`bg-white w-2.5 h-2.5 rounded-full shadow-md transform transition-transform ${
+                  className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
                     product.isActive ? "translate-x-4" : "translate-x-0"
                   }`}
                 ></div>
@@ -367,6 +376,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       </div>
     </form>
   ))}
+  
 
   <MessageSnackBar
     isOpen={messageSnackbar.open}

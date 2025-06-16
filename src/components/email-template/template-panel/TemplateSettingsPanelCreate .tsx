@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
-import { useDynamicFields } from './DynamicFieldsContext'; 
 import { useEditor } from '@craftjs/core';
-import { craftJsonToHtml } from './ExportPanel';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import POST_API from '../../constants/PostApi';
 import axios from 'axios';
-import { STATUS_CODE } from '../../constants/AppConstants';
 import { useSearchParams } from 'react-router-dom';
+import { useDynamicFields } from '../DynamicFieldsContext';
+import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
+import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
+import POST_API from '../../../constants/PostApi';
+import { STATUS_CODE } from '../../../constants/AppConstants';
 
 
 type TemplateSettingsPanelEditProps = {
@@ -21,11 +21,11 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
   const [description, setDescription] = useState('');
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const[htmlBody,setHtmlBody] = useState('');
-const [isDefault, setIsDefault] = useState(false);
+  const [isDefault, setIsDefault] = useState(false);
 
   const dynamicFields = useDynamicFields();
 
-    const { query } = useEditor();
+  const { query } = useEditor();
   
   
 
@@ -47,20 +47,28 @@ const [isDefault, setIsDefault] = useState(false);
       input.focus();
     }, 0);
   };
+
+  function getCraftJson(): string {
+    const json = query.serialize();
+    return json;
+  }
+
 function getHtmlEmailBody(): string {
     const canvasElement = document.getElementById("CANVAS");
     if (!canvasElement) return "" ;
     const json = query.serialize();
+  
+
     const html = craftJsonToHtml(json).trim();
       setHtmlBody(html.trim());
       return html;
     };
 
-       const {loginStatus} = useLoggedInUserContext();
+    const {loginStatus} = useLoggedInUserContext();
     const [searchParams] = useSearchParams();
     const params = searchParams.get("type");
 
-       const createEmailTemplateCreate = async(emailBody:string)=>{
+       const createEmailTemplateCreate = async(emailBody:string, resultJson:string)=>{
                     const postDataCreateEmailTemplate = {
                           "company_id":loginStatus.companyId,
                           "createdby_id":loginStatus.id,
@@ -68,6 +76,7 @@ function getHtmlEmailBody(): string {
                           "name":templateName,
                           "email_subject":subject,
                           "email_body_html":emailBody,
+                          "email_body_json":resultJson,
                           "is_default":isDefault
                     }                   
 
@@ -139,8 +148,8 @@ function getHtmlEmailBody(): string {
               e.preventDefault();
               setIsOpen(false);
               const resultHtml = await getHtmlEmailBody();
-
-              createEmailTemplateCreate(resultHtml);
+              const resultJson = await getCraftJson();
+              createEmailTemplateCreate(resultHtml, resultJson);
               // TODO: API Call
               console.log({ templateName, subject, description, resultHtml });
             }}

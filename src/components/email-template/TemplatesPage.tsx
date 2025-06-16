@@ -8,7 +8,7 @@ import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import POST_API from '../../constants/PostApi';
 import { SIZE, STATUS_CODE } from '../../constants/AppConstants';
-import { Eye, Edit2, Trash2, CheckCircle, XCircle, Star, Loader2, LucideMailPlus, LucidePlus, LayoutDashboard, Calendar, Filter, User, X } from 'lucide-react';
+import { Eye, Edit2, CheckCircle, XCircle, Star, Loader2, LucideMailPlus, LucidePlus, LayoutDashboard, Calendar, Filter, X } from 'lucide-react';
 import { useComapanySpecificSearchDateRange } from '../../config/hooks/useCompanySpecificDateRange';
 import useScreenSize from '../../config/hooks/useScreenSize';
 import Button from '../ui/Button';
@@ -17,23 +17,12 @@ import DateRangeFilterDropdown from '../ui/DateRangeFilterDropdown';
 import DateRangePicker from '../ui/DateRangePicker';
 import SearchInput from '../ui/SearchInput';
 import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler';
+import { useUserAccessModules } from '../../config/hooks/useAccessModules';
+import EmailTemplate from '../../@types/email-template/EmailTemplateType';
+import { Switch } from "@headlessui/react"; // Or use your own styled switch
 
-type EmailTemplate = {
-  count: number;
-  id: number;
-  company_id: number;
-  email_type_id: number;
-  name: string;
-  email_subject: string;
-  email_body_html: string;
-  is_master: boolean;
-  is_default: boolean;
-  isactive: boolean;
-  createdby: string;
-  createdon: string;
-  updatedby: string;
-  updatedon: string;
-};
+
+
 
 type TemplateType = {
   id: number;
@@ -41,6 +30,73 @@ type TemplateType = {
   is_host_email: boolean;
   isactive: boolean;
 };
+
+const jsonPlaceholdersMap:{ [key: number]: string } = {
+    1:`{
+    "company.fullname":"PurpleRadiance",
+    "company_user.fullname":"Nitikesh Yewale",
+    "company_user.email":"nitikesh@g.co",
+    "company_user.mobilenumber":"9878987898",
+    "company_user.password":"abc#wio345",
+    "current_year":"2025",
+    "crm_url":"http://localhost:5173"
+    }`,
+
+    2:`{
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Elon ",
+    "lead.email":"elon@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }`,
+
+    3:`
+    {
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Mark3",
+    "lead.email":"Mark3@g.co",
+    "lead.mobilenumber":"+1 87889978998",
+    "lead.owner": "Pravin",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }
+    `,
+
+    4:`
+    {
+    "company.fullname":"PurpleRadiance",
+    "lead.name":"Elon4",
+    "lead.email":"elon4@g.co",
+    "lead.mobilenumber":"+1 987889978998",
+    "lead.owner": "Suraj",
+    "lead.status":"on going",
+    "lead.source":"web",
+    "lead.createdby":"Pratik",
+    "lead.createdon":"12 May 2025 ",
+    "lead.updatedby":"Kundan",
+    "lead.updatedon":"01 June 2025",
+    "company_product.name":"CDR Analysis",
+    "crm_url":"http://localhost:5173",
+    "current_year":"2025"
+    }
+    `,
+  };
 
 export const TemplatesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('');
@@ -261,16 +317,23 @@ export const TemplatesPage: React.FC = () => {
     };
   }, [loadingTemplates, hasMoreTemplates, selectedTypeId, getTemplatesOfCompany]); // Dependencies are correct here, getTemplatesOfCompany is stable enough now.
 
+   function refresh() {
+        getTemplatesOfCompany({ typeId: selectedTypeId, reset: true }); 
+  }
+
+  
 
   return (
-    <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col">
+    <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col ">
       {/* Header */}
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
-        <div className="flex justify-between w-full h-12 items-center">
+        <div className="flex  justify-between w-full h-12 items-center">
           <div className="flex gap-2">
             {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
             {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
+
             <span className="text-xl font-bold ">Email Templates</span>
+           
           </div>
           {isLargeScreen && (
             <>
@@ -456,9 +519,7 @@ export const TemplatesPage: React.FC = () => {
               )}
             </>
           )}
-          {
-          <Sidebar onCreate={() => setShowModal(true)} />
-          }
+           <Sidebar onCreate={() => setShowModal(true)} />
         </div>
       </div>
 
@@ -480,6 +541,8 @@ export const TemplatesPage: React.FC = () => {
               templates={templates}
               loading={loadingTemplates}
               hasmore={hasMoreTemplates}
+              selectedTypeId={selectedTypeId}
+              reset={refresh}
             />
           </div>
           {showModal && (
@@ -495,17 +558,21 @@ export const TemplatesPage: React.FC = () => {
 };
 
 
-const Sidebar: React.FC<{ onCreate: () => void }> = ({ onCreate }) => (
-  <button
-    className=" top-16 right-4 z-10 bg-blue-500 text-white w-fit rounded mb-4 p-1 hover:bg-blue-600 transition"
-    onClick={onCreate}
+const Sidebar: React.FC<{onCreate: () => void }> = ({ onCreate }) => { 
+        const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
+    return  (
+  <Button
+      disabled = {!userHasAccessToAddSettingGeneral}
+    className=" top-16  right-4 z-10 bg-blue-500 text-white w-fit rounded p-1 hover:bg-blue-600 transition"
+    onClick={
+      userHasAccessToAddSettingGeneral?onCreate:()=>{alert("Don't have access!")}}
   >
     <div className="flex gap-1">
       <LucidePlus className="w-6 h-6 text-white " />
       <span className=" font-bold ">New Template </span>
     </div>
-  </button>
-);
+  </Button>
+);};
 
 type TabsProps = {
   activeTab: string;
@@ -533,16 +600,71 @@ type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
+  selectedTypeId:number;
+  reset: ()=> void;
 };
 
-const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore }) => {
+const TemplateList: React.FC<TemplateListProps> = ({
+  templates,
+  loading,
+  hasmore,
+  selectedTypeId,
+  reset
+}) => {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
+  const [updatingDefaultId, setUpdatingDefaultId] = useState<number | null>(null);
+
+  const { userHasAccessToUpdateSettingGeneral } = useUserAccessModules();
+  const navigate = useNavigate();
+
+  const handleEditTemplate = (emailTemplate: EmailTemplate): void => {
+    navigate(
+      `${ROUTES_URL.EMAIL_TEMPLATE_UPDATE}?template_type_id=${emailTemplate.email_type_id}&template_id=${emailTemplate.id}`
+    );
+  };
+  const {loginStatus} = useLoggedInUserContext();
+  const handleDefaultToggle = async (template: EmailTemplate) => {
+    if (!userHasAccessToUpdateSettingGeneral) {
+      alert("You don't have access to update the default status.");
+      return;
+    }
+
+    try {
+      setUpdatingDefaultId(template.id);
+                   const postDataUpdateEmailTemplate = {
+                      company_id: loginStatus.companyId,
+                      updatedby_id: loginStatus.id,
+                      id:template.id,
+                      email_type_id: template.email_type_id,
+                      name: null,
+                      email_subject: null,
+                      email_body_html: null,
+                      email_body_json: null,
+                      is_default: template.is_default,
+                    };                    
+
+              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
+                        withCredentials:true
+                })
+                .then((response) =>{
+                      if(response.status === STATUS_CODE.OK){
+                          reset();
+                        }                      
+                }).catch((error)=>{console.log(error)})
+     
+    } catch (error) {
+      console.error("Failed to update default status:", error);
+      alert("Failed to update default status.");
+    } finally {
+      // setUpdatingDefaultId(null);
+    }
+  };
 
   return (
     <>
       {templates.length === 0 && !loading && !hasmore && (
         <div className="text-center text-gray-500 mt-10 p-4 border rounded-md bg-white shadow-sm">
-          No templates found for this category.
+          No templates found.
         </div>
       )}
 
@@ -560,24 +682,31 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                   className="text-blue-500 hover:text-blue-700 transition"
                   aria-label={`Preview ${template.name}`}
                 >
-                  <Eye size={18} />
+                  <Eye size={25} />
                 </button>
-                <button
+                <Button
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
+                  disabled={!userHasAccessToUpdateSettingGeneral || template.is_master}
+                  onClick={() => {
+                    if (userHasAccessToUpdateSettingGeneral && !template.is_master) {
+                      handleEditTemplate(template);
+                    } else {
+                      alert(
+                        template.is_master
+                          ? "Can't Update Master Templates!"
+                          : "You don't have access!"
+                      );
+                    }
+                  }}
                 >
-                  <Edit2 size={18} />
-                </button>
-                <button
-                  className="text-red-500 hover:text-red-700 transition"
-                  aria-label={`Delete ${template.name}`}
-                >
-                  <Trash2 size={18} />
-                </button>
+                  <Edit2 size={25} />
+                </Button>
               </div>
             </div>
             <p className="text-sm text-gray-500 mb-2">
-              <strong>Subject:</strong> {template.email_subject || <em>No subject</em>}
+              <strong>Subject:</strong>{" "}
+              {template.email_subject || <em>No subject</em>}
             </p>
             <div className="flex flex-col space-y-1 text-sm text-gray-700">
               <span className="flex items-center gap-1">
@@ -586,15 +715,34 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                 ) : (
                   <XCircle className="text-gray-400" size={16} />
                 )}
-                <strong>Active:</strong> {template.isactive ? 'Yes' : 'No'}
+                <strong>Active:</strong> {template.isactive ? "Yes" : "No"}
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-2">
                 {template.is_default ? (
                   <Star className="text-yellow-500" size={16} />
                 ) : (
                   <XCircle className="text-gray-400" size={16} />
                 )}
-                <strong>Default:</strong> {template.is_default ? 'Yes' : 'No'}
+                <strong>Default:</strong>
+                <Switch
+                  aria-disabled = {!userHasAccessToUpdateSettingGeneral}
+                  checked={template.is_default}
+                  onChange={() => {
+                    template.is_default = !template.is_default;
+                    handleDefaultToggle(template);
+                  }}
+                  className={`${
+                    template.is_default ? "bg-blue-600" : "bg-gray-300"
+                  } relative inline-flex h-5 w-10 items-center rounded-full transition`}
+                  disabled={updatingDefaultId === template.id}
+                >
+                  <span className="sr-only">Toggle Default</span>
+                  <span
+                    className={`${
+                      template.is_default ? "translate-x-5" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                  />
+                </Switch>
               </span>
               <span className="flex items-center gap-1">
                 {template.is_master ? (
@@ -602,19 +750,21 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
                 ) : (
                   <XCircle className="text-gray-400" size={16} />
                 )}
-                <strong>Master:</strong> {template.is_master ? 'Yes' : 'No'}
+                <strong>Master:</strong> {template.is_master ? "Yes" : "No"}
               </span>
               <span>
                 <strong>Created By:</strong> {template.createdby}
               </span>
               <span>
-                <strong>Created On:</strong> {new Date(template.createdon).toLocaleDateString()}
+                <strong>Created On:</strong>{" "}
+                {new Date(template.createdon).toLocaleDateString()}
               </span>
               <span>
                 <strong>Updated By:</strong> {template.updatedby}
               </span>
               <span>
-                <strong>Updated On:</strong> {new Date(template.updatedon).toLocaleDateString()}
+                <strong>Updated On:</strong>{" "}
+                {new Date(template.updatedon).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -630,10 +780,14 @@ const TemplateList: React.FC<TemplateListProps> = ({ templates, loading, hasmore
       {previewTemplate && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <h2 className="text-xl font-semibold mb-4">Preview: {previewTemplate.name}</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Preview: {previewTemplate.name}
+            </h2>
             <div
               className="overflow-y-auto flex-1 border rounded p-4 text-sm text-gray-800 bg-gray-50"
-              dangerouslySetInnerHTML={{ __html: previewTemplate.email_body_html }}
+              dangerouslySetInnerHTML={{
+                __html: previewTemplate.email_body_html,
+              }}
             />
             <div className="text-right mt-4">
               <button
@@ -724,6 +878,8 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
     </div>
   );
 };
+
+
 
 
 

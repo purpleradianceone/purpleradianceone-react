@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, {  useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import Country from "../../../@types/general/Country";
 import State from "../../../@types/general/State";
@@ -28,27 +28,65 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 const LeadDetails = ({
   leadDetailsData,
   setLeadDetailsData,
-  countries,
-  industryType,
-  stateData,
-  district,
   selectedLeadData,
   handleLeadActivityChange,
-  getLeadDetails
+  getLeadDetails,
+  handleSaveEditLeadDetailsCallback,
 }: {
-  handleLeadActivityChange : (person : string , work:string) => void,
+  handleLeadActivityChange: (person: string, work: string) => void;
   leadDetailsData: LeadDetailsData;
   setLeadDetailsData: React.Dispatch<React.SetStateAction<LeadDetailsData>>;
   selectedLeadData: any;
-  countries: Country[];
-  industryType: industryType[];
-  stateData: State[];
-  district: District[];
-  getLeadDetails : () => void,
-}) => {
-  // const [isRequestForCreate, setIsRequestForCreate] = useState<boolean>(false);
 
-  const [showSaveLeadButton , setShowSaveLeadButton] = useState<boolean>(false);
+  getLeadDetails: () => void;
+  handleSaveEditLeadDetailsCallback: (
+    editLeadDetailsData: LeadDetailsData
+  ) => void;
+}) => {
+
+  const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
+    additional_contact_number: "",
+    address: "",
+    country_id: 0,
+    district_id: 0,
+    country_name: "",
+    createdby: "",
+    createdon: "",
+    district_name: "",
+    id: 0,
+    industry_name: "",
+    industry_type: "",
+    industry_type_id: 0,
+    job_title: "",
+    lead_id: 0,
+    state_id: 0,
+    state_name: "",
+    updatedby: "",
+    updatedon: "",
+    website: "",
+  });
+
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [industryType, setIndustryType] = useState<industryType[]>([]);
+  const [stateData, setStateData] = useState<State[]>([]);
+  const [district, setDistrict] = useState<District[]>([]);
+
+  const [countryid, setCountryid] = useState<string>("");
+  const [stateId, setStateId] = useState<string>("");
+  const [districtId, setDistrictId] = useState<string>("");
+  const [industryTypeId, setIndustryTypeId] = useState<string>("");
+
+  // note : for checking it is changed or not
+  const [changedCountryId, setChangedCountryId] = useState<number | null>(null);
+  const [changedStateId, setChangedStateId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setEditLeadDetails(leadDetailsData);
+    setChangedCountryId(leadDetailsData.country_id);
+    setChangedStateId(leadDetailsData.state_id);
+  }, [leadDetailsData]);
+
+  const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -72,14 +110,16 @@ const LeadDetails = ({
   };
 
   const { loginStatus } = useLoggedInUserContext();
-  const createNewDetailRef= useRef<boolean>(false);
+  const createNewDetailRef = useRef<boolean>(false);
+
+  // Note : Create or Edit save api call 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
     if (
-      leadDetailsData.additional_contact_number !== "" &&
-      leadDetailsData.additional_contact_number !== null &&
-      !leadDetailsData.additional_contact_number?.match(
+      editLeadDetails.additional_contact_number !== "" &&
+      editLeadDetails.additional_contact_number !== null &&
+      !editLeadDetails.additional_contact_number?.match(
         MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
       )
     ) {
@@ -90,27 +130,27 @@ const LeadDetails = ({
       });
       return;
     }
-    // let createNewDetail = false;
+    
     if (leadDetailsData.id === null || leadDetailsData.id === 0) {
-      // createNewDetail = true;
-      createNewDetailRef.current=true;
-    }else{
-      createNewDetailRef.current=false;
+      
+      createNewDetailRef.current = true;
+    } else {
+      createNewDetailRef.current = false;
     }
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
       ...(createNewDetailRef.current
         ? { lead_id: selectedLeadData.id }
-        : { id: leadDetailsData.id }),
+        : { id: editLeadDetails.id }),
       company_id: loginStatus.companyId,
-      country_id: leadDetailsData.country_id,
-      address: leadDetailsData.address,
-      additional_contact_number: leadDetailsData.additional_contact_number,
-      district_id: leadDetailsData.district_id,
-      industry_name: leadDetailsData.industry_name,
-      industry_type_id: leadDetailsData.industry_type_id,
-      job_title: leadDetailsData.job_title,
-      state_id: leadDetailsData.state_id,
-      website: leadDetailsData.website,
+      country_id: editLeadDetails.country_id,
+      address: editLeadDetails.address,
+      additional_contact_number: editLeadDetails.additional_contact_number,
+      district_id: editLeadDetails.district_id,
+      industry_name: editLeadDetails.industry_name,
+      industry_type_id: editLeadDetails.industry_type_id,
+      job_title: editLeadDetails.job_title,
+      state_id: editLeadDetails.state_id,
+      website: editLeadDetails.website,
       ...(createNewDetailRef.current
         ? { createdby: loginStatus.id }
         : { updatedby: loginStatus.id }),
@@ -119,24 +159,28 @@ const LeadDetails = ({
     const url = createNewDetailRef.current
       ? POST_API.CREATE_LEAD_DETAILS
       : POST_API.UPDATE_LEAD_DETAILS;
-    try{
-
+    try {
       const response = await axios.post(url, PostDataCreateLead, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
       });
-      
+
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
           showMessageSnackbar({
             message: response.data.message,
             type: "success",
-          }); 
+          });
           setShowSaveLeadButton(false);
-          handleLeadActivityChange(loginStatus.fullName!, response.data.message)
-          createNewDetailRef.current=false;
+          handleLeadActivityChange(
+            loginStatus.fullName!,
+            response.data.message
+          );
+          createNewDetailRef.current = false;
+
+          handleSaveEditLeadDetailsCallback(editLeadDetails);
           getLeadDetails();
           return;
         }
@@ -148,7 +192,7 @@ const LeadDetails = ({
           return;
         }
       }
-    }catch (error: any) {
+    } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithEvent: handleSave,
@@ -166,59 +210,236 @@ const LeadDetails = ({
     }
   };
 
+  // Note : function to get industry type 
+  const fetchIndustryType = async () => {
+    const postData = {
+      id: null,
+      name: null,
+      isactive: true,
+    };
+    try {
+      const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+        withCredentials: true,
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        setIndustryType(response.data);
+      } else {
+        throw new Error("Failed to fetch industry type");
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: fetchIndustryType,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
+
+  // Note : function to get countries 
+  const getAllCountries = async () => {
+    const PostData: Country = {
+      id: null,
+      dailcode: null,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+    try {
+      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+        withCredentials: true,
+      });
+      if (response.status == STATUS_CODE.OK) {
+        setCountries(response.data);
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: getAllCountries,
+        });
+        if (refreshTokenStatus) {
+          getAllCountries();
+          setIsDialogueOpen(false);
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
+
+  //Note : function to get state 
+  const getAllState = async (countryId: number | null) => {
+    if (!countryId) return;
+    const PostDataForState: State = {
+      id: null,
+      country_id: countryId,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+    try{
+
+  
+      const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === STATUS_CODE.OK) {
+        setStateData(response.data);
+      } else {
+        throw new Error("Failed to fetch states");
+      }
+    }catch(error : any){
+       if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getAllState,
+          });
+          if (refreshTokenStatus) {
+            getAllState(countryId);
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
+    }
+  };
+
+  //Note : function to get district 
+  const getAllDistrict = async (stateId: number | null) => {
+    if (!stateId) return;
+    const PostDataForDistrict: District = {
+      id: null,
+      state_id: stateId,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+
+      try {
+        const response = await axios.post(
+          POST_API.GET_DISTRICT,
+          PostDataForDistrict,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === STATUS_CODE.OK) {
+          setDistrict(response.data);
+        }
+      } catch (error: any) {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getAllDistrict,
+          });
+          if (refreshTokenStatus) {
+            getAllDistrict(stateId);
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
+      }
+  };
 
   const districtOptions = Array.isArray(district)
     ? district.map((val) => ({
         label: val.name,
-        value: val.id,
+        value: val.name,
+        id: val.id,
       }))
     : [];
 
-  const stateOptions = Array.isArray(stateData)
-    ? stateData.map((state) => ({
+  const [stateOptions , setStateOptions ] = useState<{
+    label: string | null;
+    value: string | null;
+    id: number | null;
+
+  }[]>([])
+
+  useEffect(()=>{
+    setStateOptions(()=>{
+      return stateData.map((state) => ({
         label: state.name,
-        value: state.id,
+        value: state.name,
+        id: state.id,
       }))
-    : [];
+    })
+    console.log(stateData);
+    
+  } , [stateData])
+
+  // const stateOptions = Array.isArray(stateData)
+  //   ? stateData.map((state) => ({
+  //       label: state.name,
+  //       value: state.name,
+  //       id: state.id,
+  //     }))
+  //   : [];
 
   const countryOptions = Array.isArray(countries)
     ? countries.map((country) => ({
         label: country.name,
-        value: country.id,
+        value: country.name,
+        id: country.id,
       }))
     : [];
 
+  
   const industryOptions = Array.isArray(industryType)
     ? industryType.map((val) => ({
         label: val.name,
-        value: val.id,
+        value: val.name,
+        id: val.id,
       }))
     : [];
 
   return (
-    <div className="flex">
+    <div>
       <form>
-        <div className="w-auto flex justify-between bg-slate-200 px-1 mb-1  ">
+        <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
           <span className="text-sm font-semibold text-gray-800">Details</span>
-          {
-            showSaveLeadButton &&
+          {showSaveLeadButton && (
             <button
-            className="text-xs text-white mb-0 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
-            onClick={handleSave}
+              className="text-xs text-white mb-0 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
+              onClick={handleSave}
             >
-            Save
-          </button>
-          }
+              Save
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             type="text"
             label="Job title"
-            value={leadDetailsData.job_title}
+            value={editLeadDetails.job_title}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
+              // handleLeadDetailsValueChange(e)
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
                 job_title: e.target.value,
               });
             }}
@@ -226,11 +447,12 @@ const LeadDetails = ({
           <FormField
             type="textarea"
             label="Address"
-            value={leadDetailsData.address}
+            value={editLeadDetails.address}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
+              // handleLeadDetailsValueChange(e)
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
                 address: e.target.value,
               });
             }}
@@ -238,12 +460,19 @@ const LeadDetails = ({
           <FormField
             type="select"
             label="Industry"
+            handleGetDropdownData={()=>{
+              fetchIndustryType();
+            }}
             selectOptions={industryOptions}
-            value={leadDetailsData.industry_type_id}
+            // note chaged here
+            // value={leadDetailsData.industry_type_id}
+            value={editLeadDetails.industry_type}
+            selectedId={industryTypeId}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
+              setShowSaveLeadButton(true);
+              setIndustryTypeId(e.target.value);
+              setEditLeadDetails({
+                ...editLeadDetails,
                 industry_type_id: parseInt(e.target.value),
               });
             }}
@@ -252,11 +481,11 @@ const LeadDetails = ({
           <FormField
             type="text"
             label="Add. Contact number"
-            value={leadDetailsData.additional_contact_number}
+            value={editLeadDetails.additional_contact_number}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
                 additional_contact_number: e.target.value,
               });
             }}
@@ -265,27 +494,60 @@ const LeadDetails = ({
           <FormField
             type="select"
             label="Country"
+            handleGetDropdownData={() =>{
+              getAllCountries()
+            }}
             selectOptions={countryOptions}
-            value={leadDetailsData.country_id}
+            value={editLeadDetails.country_name}
+            selectedId={countryid}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
-                country_id: parseInt(e.target.value),
-              });
+              setShowSaveLeadButton(true);
+              setCountryid(e.target.value);
+
+              const selectedCountryId = parseInt(e.target.value);
+              console.log("this is country data");
+              
+              console.log(selectedCountryId);
+              
+              const selectedCountryName =
+                countryOptions.find((option) => option.id === selectedCountryId)
+                  ?.value || "";
+
+              console.log(selectedCountryName);
+              
+              // check if changed or not
+              const isCountryChanged =
+                changedCountryId !==parseInt( e.target.value);
+
+              const updatedDetails = {
+                ...editLeadDetails,
+                country_id: selectedCountryId,
+                country_name: selectedCountryName,
+              };
+
+              if (isCountryChanged) {
+                updatedDetails.state_id = 0;
+                updatedDetails.state_name = "";
+                updatedDetails.district_id = 0; // optional
+                updatedDetails.district_name = ""; // optional
+                setStateId("");
+                setDistrictId("")
+                setDistrict([])
+                setStateData([])
+              }
+
+              setEditLeadDetails(updatedDetails);
             }}
           />
-
           {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
-
           <FormField
             type="text"
             label="Industry Name"
-            value={leadDetailsData.industry_name}
+            value={editLeadDetails.industry_name}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
                 industry_name: e.target.value,
               });
             }}
@@ -293,14 +555,39 @@ const LeadDetails = ({
           <FormField
             type="select"
             label="State"
+            handleGetDropdownData={()=>{
+              getAllState(editLeadDetails.country_id)
+            }}
             selectOptions={stateOptions}
-            value={leadDetailsData.state_id}
+            value={editLeadDetails.state_name}
+            selectedId={stateId}
+            // value={leadDetailsData.state_id}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
-              setLeadDetailsData({
-                ...leadDetailsData,
-                state_id: parseInt(e.target.value),
-              });
+              setShowSaveLeadButton(true);
+              setStateId(e.target.value);
+
+              const selectedStateId = parseInt(e.target.value);
+              const selectedStateName =
+                stateOptions.find(
+                  (option) => option.id === parseInt(e.target.value)
+                )?.value || "";
+
+              const isStateChanged =
+                changedStateId !== parseInt(e.target.value);
+
+              const updatedDetails = {
+                ...editLeadDetails,
+                state_id: selectedStateId,
+                state_name: selectedStateName,
+              };
+
+              if (isStateChanged) {
+                updatedDetails.district_id = 0;
+                updatedDetails.district_name = "";
+                setDistrictId("")
+                setDistrict([])
+              }
+              setEditLeadDetails(updatedDetails);
             }}
           />
 
@@ -309,11 +596,11 @@ const LeadDetails = ({
           <FormField
             type="text"
             label="Website"
-            value={leadDetailsData.website}
+            value={editLeadDetails.website}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
+              setShowSaveLeadButton(true);
               setLeadDetailsData({
-                ...leadDetailsData,
+                ...editLeadDetails,
                 website: e.target.value,
               });
             }}
@@ -321,13 +608,22 @@ const LeadDetails = ({
           <FormField
             type="select"
             label="District"
+            handleGetDropdownData={()=>{
+              getAllDistrict(editLeadDetails.state_id)
+            }}
             selectOptions={districtOptions}
-            value={leadDetailsData.district_id}
+            selectedId={districtId}
+            value={editLeadDetails.district_name}
             onChange={(e) => {
-              setShowSaveLeadButton(true)
+              setShowSaveLeadButton(true);
+              setDistrictId(e.target.value);
               setLeadDetailsData({
-                ...leadDetailsData,
+                ...editLeadDetails,
                 district_id: parseInt(e.target.value),
+                district_name:
+                  districtOptions.find(
+                    (opt) => opt.id === parseInt(e.target.value)
+                  )?.value || "",
               });
             }}
           />
@@ -342,19 +638,20 @@ const LeadDetails = ({
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
       <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            />
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
     </div>
   );
 };
 
 type OptionType = {
   label: string | null;
-  value: string | null | number;
+  value: string | null ;
+  id: number | null;
 };
 
 type FormFieldProps = {
@@ -367,6 +664,8 @@ type FormFieldProps = {
   ) => void;
   type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
+  selectedId?: string;
+  handleGetDropdownData ?: () => void | null
 };
 
 const FormField = ({
@@ -375,50 +674,65 @@ const FormField = ({
   onChange,
   type,
   selectOptions,
+  selectedId,
+  handleGetDropdownData
 }: FormFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleBlur = () => {
     setTimeout(() => setIsEditing(false), 100); // Delay so dropdown click registers
   };
+  useEffect(()=>{
+    console.log("inside the form");
+    
+    console.log(selectOptions);
+    
+  }, [selectOptions])
 
   return (
     <div className="flex w-full  items-center border-b  ">
       <div className="text-gray-700 w-[50%] text-xs">{label}</div>
       <div
         className="flex items-center w-[50%]   min-w-[150px]"
-        onClick={() => setIsEditing(true)}
+        onClick={
+          () =>{
+            setIsEditing(true)
+            handleGetDropdownData!()
+          } 
+        }
       >
         {!isEditing ? (
           <span
             className="text-gray-900  text-sm cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
-              selectOptions
-                ?.find((opt) => opt.value === value)
-                ?.label?.toLocaleString() || value?.toLocaleString()
+              // selectOptions
+              //   ?.find((opt) => opt.value === value)
+              //   ?.label?.toLocaleString() || value?.toLocaleString()
+              value?.toLocaleString()
             }
           >
-            {type === "select"
-              ? selectOptions?.find((opt) => opt.value === value)?.label || (
-                  <span className="text-sm text-gray-500">
-                    Select {label.toLowerCase()}
-                  </span>
-                )
-              : value || (
-                  <span className="text-sm text-gray-500">Add here...</span>
-                )}
+            {value ? (
+              // selectOptions?.find((opt) => opt.value === value)?.label || (
+              //     <span className="text-sm text-gray-500">
+              //       Select {label.toLowerCase()}
+              //     </span>
+              //   )
+              <span>{value?.toLocaleString()}</span>
+            ) : (
+              <span className="text-sm text-gray-500">Add here...</span>
+            )}
           </span>
         ) : type === "select" ? (
           <select
             autoFocus
-            value={value}
+            value={selectedId}
             onBlur={handleBlur}
             onChange={onChange}
             className="text-gray-900 font-semibold border border-gray-300 w-36 rounded p-1 text-sm focus:outline-none"
           >
-            <option value="">Select {label}</option>
+            <option value=""> Select {label} </option>
             {selectOptions?.map((opt) => (
-              <option key={opt.value} value={opt.value!}>
+              <option key={opt.value} value={opt.id!}>
                 {opt.label}
               </option>
             ))}

@@ -1,17 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { useDynamicFields } from './DynamicFieldsContext'; 
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import { useSearchParams } from 'react-router-dom';
-import POST_API from '../../constants/PostApi';
-import axios from 'axios';
-import { STATUS_CODE } from '../../constants/AppConstants';
 
-type TemplateSettingsPanelEditProps = {
+import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+import { useDynamicFields } from '../DynamicFieldsContext';
+import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
+import POST_API from '../../../constants/PostApi';
+import { STATUS_CODE } from '../../../constants/AppConstants';
+
+type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
   htmlTemplateTypeSubjectPlaceholder: string;
 };
 
-export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
@@ -54,6 +55,7 @@ export const TemplateSettingsPanelEdit: React.FC<TemplateSettingsPanelEditProps>
                           "name":templateName,
                           "email_subject":subject,
                           "email_body_html":emailBody,
+                          "email_body_json":null,
                           "is_default":isDefault
                     }                   
 

@@ -2,26 +2,27 @@
 
 import React, { useEffect, useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
-import { Sidebar } from "./Sidebar";
-import { LexicalText } from "./LexicalText";
-import { ImageBlock } from "./ImageBlock";
-import { ButtonBlock } from "./ButtonBlock";
-import { DividerBlock } from "./DividerBlock";
-import { SectionBlock } from "./SectionBlock";
-import { HtmlPreviewModal } from "./HtmlPreviewModal";
-import { ExportPanel } from "./ExportPanel";
-import { ColumnBlock } from "./ColumnBlock";
-import { HeadingBlock } from "./HeadingBlock";
-import { DynamicFieldBlock } from "./DynamicFieldBlock";
-import { SubjectBlock } from "./SubjectBlock";
+import { ImageBlock } from "../template-blocks/ImageBlock";
+import { ButtonBlock } from "../template-blocks/ButtonBlock";
+import { DividerBlock } from "../template-blocks/DividerBlock";
+import { SectionBlock } from "../template-blocks/SectionBlock";
+import { HtmlPreviewModal } from "../HtmlPreviewModal";
+import { ColumnBlock } from "../template-blocks/ColumnBlock";
+import { HeadingBlock } from "../template-blocks/HeadingBlock";
+import { SubjectBlock } from "../template-blocks/SubjectBlock";
 import DOMPurify from 'dompurify';
 import 'tinymce';
-import { DynamicFieldsContext } from "./DynamicFieldsContext";
-import { TableBlock } from "./TableBlock";
+import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode,  LucideMail,  } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
-import { TemplateSettingsPanelEdit } from "./TemplateSettingsPanelEdit";
+import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
+import { LexicalText } from "../template-blocks/LexicalText";
+import { GenericBlock } from "../template-blocks/GenericBlock";
+import { TemplateSettingsPanelCreate } from "../template-panel/TemplateSettingsPanelCreate ";
+import { TemplateSettingsPanelInsert } from "../template-panel/TemplateSettingsPanelInsert";
+import { ExportPanel } from "../template-panel/ExportPanel";
+import { Sidebar } from "../sidebar/Sidebar";
 
 
 
@@ -100,7 +101,7 @@ export const EditorCanvas: React.FC = () => {
     `,
   };
 
-  const [searchParams] = useSearchParams();
+const [searchParams] = useSearchParams();
 const params = searchParams.get("type");
   useEffect(()=> {
 if(params){
@@ -413,7 +414,7 @@ if(params){
               </div>
               <>
                 {/* Settings panel */}
-                <TemplateSettingsPanelEdit
+                <TemplateSettingsPanelInsert
                   htmlBody={htmlInput}
                   htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
                 />
@@ -432,6 +433,8 @@ if(params){
                 TableBlock,
                 HeadingBlock,
                 DynamicFieldBlock,
+                GenericBlock, // 👈 Don't forget
+
               }}
             >
               <div style={{ display: "flex", width: "100%" }}>

@@ -131,6 +131,38 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === 8 && accessModule.add
   );
 
+//  email template
+    const userHasAccessToViewSettingGeneral = accessModules.some(
+    (accessModule)=>
+        accessModule.crm_module_id === 9 && accessModule.view
+  );
+
+   const userHasAccessToUpdateSettingGeneral = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 9 && accessModule.update
+  );
+
+  const userHasAccessToAddSettingGeneral = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 9 && accessModule.add
+  );
+
+  //Setting - Email
+  const userHasAccessToViewEmailSetting = accessModules.some(
+    (accessModule)=>
+        accessModule.crm_module_id === 10 && accessModule.view
+  );
+
+   const userHasAccessToUpdateEmailSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 10 && accessModule.update
+  );
+
+  const userHasAccessToAddEmailSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 10 && accessModule.add
+  );
+  
   //meeting setting
   const userHasAccessToViewMeetingSetting = accessModules.some(
     (accessModule) =>
@@ -163,34 +195,54 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === 12 && accessModule.add
   );
 
+
+
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
     userHasAccessToUpdateUser,
+
     userHasAccessToAddAccess,
     userHasAccessToViewAccess,
     userHasAccessToUpdateAccess,
+
     userHasAccessToAddLead,
     userHasAccessToViewLead,
     userHasAccessToUpdateLead,
+
     userHasAccessToAddProduct,
     userHasAccessToViewProduct,
     userHasAccessToUpdateProduct,
+
     userHasAccessToAddProductTax,
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProductTax,
+
     userHasAccessToAddTeamManagement,
     userHasAccessToViewTeamManagement,
     userHasAccessToUpdateTeamManagement,
+
     userHasAccessToAddSubscription,
     userHasAccessToViewSubscription,
     userHasAccessToUpdateSubscription,
+
     userHasAccessToAddProductTeam,
     userHasAccessToViewProductTeam,
     userHasAccessToUpdateProductTeam,
+
+    userHasAccessToAddSettingGeneral,
+    userHasAccessToViewSettingGeneral,
+    userHasAccessToUpdateSettingGeneral,
+
+    userHasAccessToAddEmailSetting,
+    userHasAccessToViewEmailSetting,
+    userHasAccessToUpdateEmailSetting,
+
     userHasAccessToViewMeetingSetting,
     userHasAccessToUpdateMeetingSetting,
     userHasAccessToAddMeetingSetting,
+    
     userHasAccessToViewMeeting,
     userHasAccessToUpdateMeeting,
     userHasAccessToAddMeeting

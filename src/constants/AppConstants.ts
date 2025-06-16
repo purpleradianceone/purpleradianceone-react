@@ -85,6 +85,7 @@ export const  MOBILE_NUMBER_VALIDATION ={
 export const VALIDATIONS ={
     NUMBER : /^\d+$/,
     NUMBER_WITH_DECIMAL : /^\d+(\.\d+)?$/,
-     NUMBER_WITH_DECIMAL_STRING : "/^\d+(\.\d+)?$/"
+    NUMBER_WITH_DECIMAL_STRING : "/^\d+(\.\d+)?$/",
+    EMAIL : /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 }
 
