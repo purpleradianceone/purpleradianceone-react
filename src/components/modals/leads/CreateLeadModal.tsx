@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handshake, UserRoundPlus, X } from "lucide-react";
 import {
+  MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
+  VALIDATIONS,
 } from "../../../constants/AppConstants";
-import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import {
@@ -42,7 +43,9 @@ function CreateLeadModal({
     email: "",
     mobileNumber: "",
   };
-
+  const createLeadLabelCss = "text-xs font-medium text-gray-700 block mb-1";
+  const createLeadInputTagCss =
+    "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
   const { loginStatus } = useLoggedInUserContext();
   const { errors } = useFormValidation(
     initialCreatLeadFormData,
@@ -62,6 +65,14 @@ function CreateLeadModal({
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
 
+  // note : changes needs to be done
+  const [error, setError] = useState<{
+    email: string;
+    mobileNumber: string;
+  }>({
+    email: "",
+    mobileNumber: "",
+  });
   //note : states to set the data from dropdown
 
   // NOTE : ADD THIS selectedStatus
@@ -166,17 +177,19 @@ function CreateLeadModal({
       description: null,
       isactive: true,
     };
-    try{
-     const response =await axios
-      .post(POST_API.GET_LEAD_SOURCE, postDataForLeadSource, {
-        withCredentials: true,
-      })
-      if(response.status === STATUS_CODE.OK){
+    try {
+      const response = await axios.post(
+        POST_API.GET_LEAD_SOURCE,
+        postDataForLeadSource,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === STATUS_CODE.OK) {
         setLeadSource(response.data);
         getLeadStatusOptions();
       }
-    }
-    catch (error: any) {
+    } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunction: getLeadStatusOptions,
@@ -195,7 +208,6 @@ function CreateLeadModal({
   };
 
   //called the function in here
-
   const getLeadStatusOptions = async () => {
     const postDataForLeadStatus: PostDataTypeForLeadSourceAndStatusAndStates = {
       id: null,
@@ -237,6 +249,37 @@ function CreateLeadModal({
       getLeadSourceOptions();
     }
   }, [isOpen]);
+  //
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "email" && !VALIDATIONS.EMAIL.test(value) && value !== "") {
+      setError((prev) => ({
+        ...prev,
+        email: "please enter invalid email address.",
+      }));
+    } else {
+      setError((prev) => ({
+        ...prev,
+        email: "",
+      }));
+    }
+
+    if (
+      name === "mobileNumber" &&
+      !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
+      value.length !== 0
+    ) {
+      setError((prev) => ({
+        ...prev,
+        mobileNumber: "Please enter a valid mobile number.",
+      }));
+    } else {
+      setError((prev) => ({
+        ...prev,
+        mobileNumber: "",
+      }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,9 +292,9 @@ function CreateLeadModal({
       setShowErrorAtLeadStatus(true);
     }
     if (!isEmailFilled && !isMobileNumberFilled) {
-      showMessageSnackbar({
-        message: "Please fill either Email or Mobile Number.",
-        type: "error",
+      setError({
+        email: "Eighter email or Mobile number is req.",
+        mobileNumber: "Eighter email or Mobile number is req.",
       });
       return;
     }
@@ -334,6 +377,10 @@ function CreateLeadModal({
         requestedby: "",
         generate_password: "",
       });
+      setError({
+        email: "",
+        mobileNumber: "",
+      });
 
       handleCloseSnackbar();
       setShowErrorAtLeadStatus(false);
@@ -379,17 +426,48 @@ function CreateLeadModal({
         {/* Form */}
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
           <div className="flex flex-col space-y-3">
-            <FormInput
+            <div className="">
+              <label className={createLeadLabelCss} htmlFor="name">
+                Name:
+              </label>
+              <input
+                className={createLeadInputTagCss}
+                type="text"
+                name="name"
+                placeholder="Enter Name: "
+                value={createLeadModalFormData.name}
+                onChange={handleCreateLeadModalFormDataChange}
+              />
+            </div>
+            {/* <FormInput
               label="Name : "
               type="text"
               name="name"
               placeholder="Enter Name"
               value={createLeadModalFormData.name}
               onChange={handleCreateLeadModalFormDataChange}
-            />
+            /> */}
 
             {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
-            <FormInput
+            <div className="">
+              <label className={createLeadLabelCss} htmlFor="email">
+                Email:
+              </label>
+              <input
+                className={createLeadInputTagCss}
+                type="email"
+                name="email"
+                placeholder="Enter Email: "
+                value={createLeadModalFormData.email}
+                onChange={handleCreateLeadModalFormDataChange}
+                onBlur={handleBlur}
+              />
+              {error.email && (
+                <div className="text-red-500 text-xs">{error.email}</div>
+              )}
+            </div>
+
+            {/* <FormInput
               label="Email : "
               type="email"
               name="email"
@@ -397,9 +475,27 @@ function CreateLeadModal({
               value={createLeadModalFormData.email}
               onChange={handleCreateLeadModalFormDataChange}
               error={errors.email}
-            />
-
-            <FormInput
+              onBlur={handleBlur}
+            /> */}
+            <div className="">
+              <label className={createLeadLabelCss} htmlFor="mobileNumber">
+                Mobile Number:
+              </label>
+              <input
+                type="text"
+                // pattern="[0-9]{10}"
+                className={createLeadInputTagCss}
+                name="mobileNumber"
+                placeholder="Enter Mobile Number: "
+                value={createLeadModalFormData.mobileNumber}
+                onBlur={handleBlur}
+                onChange={handleCreateLeadModalFormDataChange}
+              />
+              {error.mobileNumber && (
+                <div className="text-red-500 text-xs">{error.mobileNumber}</div>
+              )}
+            </div>
+            {/* <FormInput
               label="Mobile Number : "
               type="tel"
               name="mobileNumber"
@@ -407,9 +503,9 @@ function CreateLeadModal({
               placeholder="Enter Phone Number"
               value={createLeadModalFormData.mobileNumber}
               onChange={handleCreateLeadModalFormDataChange}
-              // onBlur={handleBlur}
+              onBlur={handleBlur}
               error={errors.mobileNumber}
-            />
+            /> */}
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
                 <Button onClick={handleCompanyUserPopUp} type="button">

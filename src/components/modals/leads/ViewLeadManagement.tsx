@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { ArrowBigRightDash, ChevronLeft, History, Plus, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
@@ -17,11 +16,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import LeadStatusHistory from "./LeadStatusHistory";
 import LeadDetails from "./LeadDetails";
-import Country from "../../../@types/general/Country";
-import industryType from "../../../@types/general/industryType";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
-import State from "../../../@types/general/State";
-import District from "../../../@types/general/District";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
 import {
   MessageSnackbarState,
@@ -41,6 +36,7 @@ import InterestType from "../../../@types/lead-management/InterestType";
 import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
 import LeadContact from "./LeadContact";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
+import LeadAssignedTeams from "./LeadAssignedTeams";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -73,10 +69,7 @@ const ViewLeadManagement = () => {
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [industryType, setIndustryType] = useState<industryType[]>([]);
-  const [stateData, setStateData] = useState<State[]>([]);
-  const [district, setDistrict] = useState<District[]>([]);
+ 
   const [leadAssignedCompanyProduct, setLeadAssignedCompanyProduct] = useState<
     LeadAssignedCompanyProduct[]
   >([]);
@@ -88,7 +81,8 @@ const ViewLeadManagement = () => {
   const [activeTab, setActiveTab] = useState<string>("contact");
   const [isOpenMeetingsModal, setIsOpenMeetingsModal] = useState<boolean>(false);
   const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
-
+ const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] = useState<boolean>(false);
+ 
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -233,94 +227,87 @@ const ViewLeadManagement = () => {
     }
   };
 
-  const getAllCountries = async () => {
-    const PostData: Country = {
-      id: null,
-      dailcode: null,
-      name: null,
-      description: null,
-      isactive: true,
-    };
+  // const getAllCountries = async () => {
+  //   const PostData: Country = {
+  //     id: null,
+  //     dailcode: null,
+  //     name: null,
+  //     description: null,
+  //     isactive: true,
+  //   };
 
-    try {
-      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
-        withCredentials: true,
-      });
-      if (response.status == STATUS_CODE.OK) {
-        setCountries(response.data);
-      }
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getAllCountries,
-        });
+  //   try {
+  //     const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+  //       withCredentials: true,
+  //     });
+  //     if (response.status == STATUS_CODE.OK) {
+  //       setCountries(response.data);
+  //     }
+  //   } catch (error: any) {
+  //     if (error.status === STATUS_CODE.UNATHORISED) {
+  //       const refreshTokenStatus = await RefreshToken({
+  //         callFunctionWithEvent: getAllCountries,
+  //       });
 
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
-        }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
-      }
-    }
-  };
-  const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
-    while (retries > 0) {
-      try {
-        await fn();
-        return;
-      } catch (error) {
-        retries--;
-        if (retries === 0) {
-          throw error;
-        }
-      }
-    }
-  };
+  //       // setIsDialogueOpen(!refreshTokenStatus);
+  //       if (refreshTokenStatus) {
+  //         setIsDialogueOpen(false);
+  //       } else {
+  //         setIsDialogueOpen(true);
+  //       }
+  //     } else if (error.status === STATUS_CODE.FORBIDDEN) {
+  //       setIsDialogueOpen(true);
+  //     }
+  //   }
+  // };
+  // const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
+  //   while (retries > 0) {
+  //     try {
+  //       await fn();
+  //       return;
+  //     } catch (error) {
+  //       retries--;
+  //       if (retries === 0) {
+  //         throw error;
+  //       }
+  //     }
+  //   }
+  // };
 
-  const fetchIndustryType = async () => {
-    const postData = {
-      id: null,
-      name: null,
-      isactive: true,
-    };
-    try {
-      const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
-        withCredentials: true,
-      });
+  // const fetchIndustryType = async () => {
+  //   const postData = {
+  //     id: null,
+  //     name: null,
+  //     isactive: true,
+  //   };
+  //   try {
+  //     const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+  //       withCredentials: true,
+  //     });
 
-      if (response.status === STATUS_CODE.OK) {
-        setIndustryType(response.data);
-      } else {
-        throw new Error("Failed to fetch industry type");
-      }
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: fetchIndustryType,
-        });
+  //     if (response.status === STATUS_CODE.OK) {
+  //       setIndustryType(response.data);
+  //     } else {
+  //       throw new Error("Failed to fetch industry type");
+  //     }
+  //   } catch (error: any) {
+  //     if (error.status === STATUS_CODE.UNATHORISED) {
+  //       const refreshTokenStatus = await RefreshToken({
+  //         callFunctionWithEvent: fetchIndustryType,
+  //       });
 
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
-        }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
-      }
-    }
-  };
+  //       // setIsDialogueOpen(!refreshTokenStatus);
+  //       if (refreshTokenStatus) {
+  //         setIsDialogueOpen(false);
+  //       } else {
+  //         setIsDialogueOpen(true);
+  //       }
+  //     } else if (error.status === STATUS_CODE.FORBIDDEN) {
+  //       setIsDialogueOpen(true);
+  //     }
+  //   }
+  // };
 
-  const getIndustryType = async () => {
-    try {
-      await retryRequest(fetchIndustryType, 3);
-    } catch (error) {
-      console.error("Failed after retries:", error);
-    }
-  };
 
   //lead owner change
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
@@ -481,8 +468,7 @@ const ViewLeadManagement = () => {
       lead_id: selectedLeadData.id,
       requestedby: loginStatus.id,
     };
-
-    const fetchDetails = async () => {
+    
       try {
         const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
           withCredentials: true,
@@ -515,10 +501,8 @@ const ViewLeadManagement = () => {
           countryChangeRef.current = data.country_id;
           stateChangeRef.current = data.state_id;
           // districtChangeRef.current = data.district_id;
-        } else {
-          throw new Error("Failed to fetch lead details");
         }
-      } catch (error: any) {
+      } catch ( error: any) {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithEvent: getLeadDetails,
@@ -531,94 +515,92 @@ const ViewLeadManagement = () => {
         } else if (error.status === STATUS_CODE.FORBIDDEN) {
           setIsDialogueOpen(true);
         }
-      }
-    };
+     };
+  };  
+  // this is the lead details data on save callback
+  const handleSaveEditLeadDetailsCallback = (editLeadDetailsData : LeadDetailsData) =>{
+    setLeadDetailsData(editLeadDetailsData);
+  }
 
-    try {
-      await retryRequest(fetchDetails, 3);
-    } catch (error) {
-      console.error("Failed to fetch lead details after retries:", error);
-    }
-  };
-  const getAllState = async (countryId: number | null) => {
-    if (!countryId) return;
-    const PostDataForState: State = {
-      id: null,
-      country_id: countryId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
+  // const getAllState = async (countryId: number | null) => {
+  //   if (!countryId) return;
+  //   const PostDataForState: State = {
+  //     id: null,
+  //     country_id: countryId,
+  //     name: null,
+  //     description: null,
+  //     isactive: true,
+  //   };
 
-    const fetchStates = async () => {
-      const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === STATUS_CODE.OK) {
-        setStateData(response.data);
-      } else {
-        throw new Error("Failed to fetch states");
-      }
-    };
+  //   const fetchStates = async () => {
+  //     const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
+  //       withCredentials: true,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     if (response.status === STATUS_CODE.OK) {
+  //       setStateData(response.data);
+  //     } else {
+  //       throw new Error("Failed to fetch states");
+  //     }
+  //   };
 
-    try {
-      await retryRequest(fetchStates, 4);
-    } catch (error) {
-      console.error("Failed to fetch states after retries:", error);
-    }
-  };
+  //   try {
+  //     await retryRequest(fetchStates, 4);
+  //   } catch (error) {
+  //     console.error("Failed to fetch states after retries:", error);
+  //   }
+  // };
 
-  const getAllDistrict = async (stateId: number | null) => {
-    if (!stateId) return;
-    const PostDataForDistrict: District = {
-      id: null,
-      state_id: stateId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
+  // const getAllDistrict = async (stateId: number | null) => {
+  //   if (!stateId) return;
+  //   const PostDataForDistrict: District = {
+  //     id: null,
+  //     state_id: stateId,
+  //     name: null,
+  //     description: null,
+  //     isactive: true,
+  //   };
 
-    const fetchDistricts = async () => {
-      try {
-        const response = await axios.post(
-          POST_API.GET_DISTRICT,
-          PostDataForDistrict,
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  //   const fetchDistricts = async () => {
+  //     try {
+  //       const response = await axios.post(
+  //         POST_API.GET_DISTRICT,
+  //         PostDataForDistrict,
+  //         {
+  //           withCredentials: true,
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
 
-        if (response.status === STATUS_CODE.OK) {
-          setDistrict(response.data);
-        }
-      } catch (error: any) {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithEvent: fetchDistricts,
-          });
-          if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
-          }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
-        }
-      }
-    };
+  //       if (response.status === STATUS_CODE.OK) {
+  //         setDistrict(response.data);
+  //       }
+  //     } catch (error: any) {
+  //       if (error.status === STATUS_CODE.UNATHORISED) {
+  //         const refreshTokenStatus = await RefreshToken({
+  //           callFunctionWithEvent: fetchDistricts,
+  //         });
+  //         if (refreshTokenStatus) {
+  //           setIsDialogueOpen(false);
+  //         } else {
+  //           setIsDialogueOpen(true);
+  //         }
+  //       } else if (error.status === STATUS_CODE.FORBIDDEN) {
+  //         setIsDialogueOpen(true);
+  //       }
+  //     }
+  //   };
 
-    try {
-      await retryRequest(fetchDistricts, 4);
-    } catch (error) {
-      console.error("Failed to fetch districts after retries:", error);
-    }
-  };
+  //   try {
+  //     await retryRequest(fetchDistricts, 4);
+  //   } catch (error) {
+  //     console.error("Failed to fetch districts after retries:", error);
+  //   }
+  // };
 
   // API call to get lead interest data
   async function getLeadInterestData() {
@@ -729,6 +711,8 @@ const ViewLeadManagement = () => {
               quantityRequired: updatedProduct.quantityRequired,
               costExpected: updatedProduct.costExpected,
               leadInterestId: updatedProduct.leadInterestId!,
+              // changes here 
+              leadInterestName: updatedProduct.leadInterestName,
             }
           : product
       )
@@ -777,41 +761,15 @@ const ViewLeadManagement = () => {
 
   // call to the all apis
   useEffect(() => {
-    const apisCalls = async () => {
-      await getLeadDetails();
+    const apisCalls = async () => {     
       await fetchLeadStatus();
-      await getAllCountries();
-      await getIndustryType();
-      await getAllState(countryChangeRef.current);
-      await getAllDistrict(stateChangeRef.current);
-      await fetchLeadCompanyProduct();
-      await getLeadInterestData();
+      await getLeadDetails();
       await fetchLeadContact();
+      await getLeadInterestData();
+      await fetchLeadCompanyProduct();
     };
-
-    const apiCallsWhenCountryChanged = async (countryId: number | null) => {
-      await getAllState(countryId);
-    };
-
-    const apiCallWhenStateChanged = async (stateId: number | null) => {
-      await getAllDistrict(stateId);
-    };
-    if (
-      countryChangeRef.current !== leadDetailsData.country_id &&
-      countryChangeRef.current !== 0
-    ) {
-      countryChangeRef.current = leadDetailsData.country_id;
-      apiCallsWhenCountryChanged(countryChangeRef.current);
-    } else if (
-      stateChangeRef.current !== leadDetailsData.state_id &&
-      stateChangeRef.current !== 0
-    ) {
-      stateChangeRef.current = leadDetailsData.state_id;
-      apiCallWhenStateChanged(stateChangeRef.current);
-    } else if (stateChangeRef.current === 0 && countryChangeRef.current === 0) {
       apisCalls();
-    }
-  }, [leadDetailsData]);
+  }, []);
 
   const handleLeadInfoSave = async () => {
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
@@ -862,6 +820,7 @@ const ViewLeadManagement = () => {
           },
           ...activityData,
         ]);
+        fetchLeadContact();
       } else if (response.data.status === false) {
         showMessageSnackbar({
           message: response.data.message,
@@ -893,9 +852,15 @@ const ViewLeadManagement = () => {
     if (id === "meeting") {
       setIsOpenProductCard(false);
       setIsOpenMeetingsModal(true);
+      setIsOpenProductCard(false);
     } else if (id === "contact") {
       setIsOpenProductCard(true);
       setIsOpenMeetingsModal(false);
+      setIsOpenLeadTeamsCard(false);
+    }else if(id==="LeadTeams/Owner"){
+      setIsOpenProductCard(false)
+      setIsOpenMeetingsModal(false);
+      setIsOpenLeadTeamsCard(true);
     }
   };
 
@@ -937,14 +902,14 @@ const ViewLeadManagement = () => {
           </div>
         </div>
 
-        <div className="flex justify-evenly w-48">
+        <div className="flex items-center justify-evenly w-48">
           {/* new code  */}
           <div className="relative inline-block">
             <button
               onClick={() => {
                 setIsAddProductModalOpen(true);
               }}
-              className="px-1 py-1 text-xs flex gap-1 items-center text-gray-500 bg-transparent border rounded  transition"
+              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
             >
               <Plus size={8} />
               <span>Product</span>
@@ -1126,19 +1091,20 @@ const ViewLeadManagement = () => {
           {/* Lead Details */}
           <div className="shadow-md rounded-sm">
             <LeadDetails
+            handleSaveEditLeadDetailsCallback={handleSaveEditLeadDetailsCallback}
               handleLeadActivityChange={(person: string, work: string) => {
                 setActivityData([
                   { person: person, work: work },
                   ...activityData,
                 ]);
               }}
-              district={district}
-              stateData={stateData}
+              // district={district}
+              // stateData={stateData}
               leadDetailsData={leadDetailsData}
               setLeadDetailsData={setLeadDetailsData}
-              countries={countries}
+              // countries={countries}
               selectedLeadData={selectedLeadData}
-              industryType={industryType}
+              // industryType={industryType}
               getLeadDetails={getLeadDetails}
             />
           </div>
@@ -1182,14 +1148,19 @@ const ViewLeadManagement = () => {
             </span>
             
             <span
+            id="LeadTeams/Owner"
               className={`cursor-pointer ${
-                activeTab === "span"
+                activeTab === "LeadTeams/Owner"
                   ? "border-b-2 border-blue-500 text-blue-600"
                   : "hover:text-blue-500"
               }`}
-              onClick={() => setActiveTab("span")}
+              onClick={
+                handleClickCards
+                // () => setActiveTab("Lead Teams/Owner")
+              }
             >
-              Span
+              span
+              {/* Lead Teams/Owner */}
             </span>
           </div>
           <div className="flex flex-col  min-h-32 gap-2">
@@ -1206,6 +1177,11 @@ const ViewLeadManagement = () => {
                 fetchLeadContact ={fetchLeadContact}
               />
             )}
+            {
+              isOpenLeadTeamsCard && (
+                <LeadAssignedTeams/>
+              )
+            }
           </div>
 
           {/* Activity */}
