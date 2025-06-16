@@ -1,11 +1,9 @@
-import { X } from 'lucide-react';
-import Button from '../ui/Button';
+import { Loader2,} from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { STATUS_CODE, STRING_VALUES } from '../../constants/AppConstants';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
+import { STATUS_CODE } from '../../constants/AppConstants';
 import axios from 'axios';
 import POST_API from '../../constants/PostApi';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useZoomMeetingContext } from '../../context/meeting/ZoomMeetingContext';
 
@@ -13,7 +11,6 @@ import { useZoomMeetingContext } from '../../context/meeting/ZoomMeetingContext'
 function ZoomMeetingsOAuthConsentAndroid() {
 
 
-  const {loginStatus} = useLoggedInUserContext();
   const {setZoomMeetingStatus} = useZoomMeetingContext();
 
   const [searchParams] = useSearchParams();
@@ -30,27 +27,13 @@ function ZoomMeetingsOAuthConsentAndroid() {
         window.history.back();
     }
 
-    const handleConfirm = () =>{
-      // localStorage.setItem(LOCALSTORAGE_KEYS.REDIRECT_PLATFORM,STRING_VALUES.ZOOM_MEETINGS)
-        const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
-    const params = new URLSearchParams();
-    params.append("company_id", loginStatus.companyId.toString());
-    params.append("company_user_id", loginStatus.id.toString());
-    params.append("createdby", loginStatus.id.toString());
-    params.append("redirect_url" , window.location.origin + window.location.pathname )
-    // console.log(window.location.origin + window.location.pathname);
-    window.location.href = `${baseUrl}?${params}`;
-    }
-
 
      const handleZoomMeetingOAuthCallback = (codeString : string, stateString : string) => {
       const zoomMeetingCallbackPostData = {
-      company_id: loginStatus.companyId,
       code: codeString,
       state: stateString,
       redirect_url: window.location.origin + window.location.pathname,
-      company_user_id: loginStatus.id,
+
     };
 
     axios
@@ -73,6 +56,25 @@ function ZoomMeetingsOAuthConsentAndroid() {
       });
     }
 
+    const initialText = 'Please wait Redirecting To PurpleCRM';
+      const dotCount = 12; // ...... means 6 dots max
+      const interval = 300;
+      const [dots, setDots] = useState('.');
+    
+      useEffect(() => {
+        // Set up an interval to update the dots
+        const dotInterval = setInterval(() => {
+          setDots(prevDots => {
+            // Cycle through 0 to dotCount dots
+            const nextDotCount = (prevDots.length + 1) % (dotCount + 1);
+            return '.'.repeat(nextDotCount);
+          });
+        }, interval);
+    
+        // Clear the interval when the component unmounts
+        return () => clearInterval(dotInterval);
+      }, [dotCount, interval]);
+
    useEffect(() => {
 
       if (code && state){
@@ -82,55 +84,20 @@ function ZoomMeetingsOAuthConsentAndroid() {
     },[]);
 
 
-  return (createPortal(
+return (createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={()=> {
-          handleClose(false);
-        }}
-      />
-      
-
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm"/>
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in duration-200">
-        <button
-           onClick={()=> {
-          handleClose(false);
-        }}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={20} />
-        </button>
-
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In With Google</h2>
-          <p className="text-gray-600">Do you want to signin with your Zoom account for managing meetings</p>
-        </div>
-
-        <div className="flex justify-end gap-3">
-          <div className='flex'>
-          <button
-             onClick={()=> {
-          handleClose(false);
-        }}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-          >
-            {STRING_VALUES.CANCEL}
-          </button>
+          <div className='justify-items-center'>
+          <div className="w-20 h-20 bg-white rounded-lg flex justify-center">
+                  <Loader2 className="w-14 h-14 text-indigo-600 animate-spin" />
+                </div>
           </div>
-         
-
-         <div className="flex">
-         <Button
-            onClick={() => {
-              handleConfirm();
-              // handleClose(true);
-            }}
-          >
-            {STRING_VALUES.CONFIRM}
-          </Button>
-         </div>
-          
+        <h2 className="text-xl font-semibold text-gray-900 mb-2 text-center">
+        {initialText}
+      </h2>
+       <div className="text-4xl justify-self-center text-blue-500 ">{dots}</div>
         </div>
       </div>
     </div>,

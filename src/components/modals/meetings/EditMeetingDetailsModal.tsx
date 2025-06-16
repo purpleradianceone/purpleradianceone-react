@@ -48,6 +48,7 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 import MeetingPlatforms from "../../../@types/meeting/MeetingPlatform";
+import { useUserPreference } from "../../../context/user/UserPreference";
 
 function EditMeetingDetailsModal({
   meetingDetails,
@@ -89,6 +90,8 @@ function EditMeetingDetailsModal({
 
   const { userHasAccessToUpdateMeeting, userHasAccessToViewMeeting } =
     useUserAccessModules();
+
+  const  {userPreference} = useUserPreference();
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -479,9 +482,10 @@ function EditMeetingDetailsModal({
           startDate === startDateValue &&
           endDate === endDateValue &&
           startTime === startTimeValue.substring(0, 5) &&
-          endTime === endTimeValue.substring(0, 5)) ||
-        attendees.length || (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
+          endTime === endTimeValue.substring(0, 5)) &&
+        attendees.length !== 0 || (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
       ) {
+        alert( (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom));
         showMessageSnackbar({
           message: "No changes made to meeting details",
           type: "error",
@@ -521,7 +525,7 @@ function EditMeetingDetailsModal({
           description: description,
           start_time: startDate + "T" + startTime + ":00",
           end_time: endDate + "T" + endTime + ":00",
-          time_zone: "Asia/Kolkata",
+          time_zone: userPreference.timezoneName,
           attendees_email_all: attendees,
           host_id: meetingDetails.meetingHostIdFromZoom,
           attendees_company_user_id: selectedCompanyUsersIdArray,
