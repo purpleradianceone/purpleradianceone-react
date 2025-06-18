@@ -1,28 +1,44 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ROUTES_URL from '../../constants/Routes';
-import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
-import axios from 'axios';
-import POST_API from '../../constants/PostApi';
-import { SIZE, STATUS_CODE } from '../../constants/AppConstants';
-import { Eye, Edit2, CheckCircle, XCircle, Star, Loader2, LucideMailPlus, LucidePlus, LayoutDashboard, Calendar, Filter, X } from 'lucide-react';
-import { useComapanySpecificSearchDateRange } from '../../config/hooks/useCompanySpecificDateRange';
-import useScreenSize from '../../config/hooks/useScreenSize';
-import Button from '../ui/Button';
-import { useDateRangeIdChange } from '../../config/hooks/useDateRangeIdChange';
-import DateRangeFilterDropdown from '../ui/DateRangeFilterDropdown';
-import DateRangePicker from '../ui/DateRangePicker';
-import SearchInput from '../ui/SearchInput';
-import { useSearchFilterPaginationDateHandlers } from '../../config/hooks/usePaginationHandler';
-import { useUserAccessModules } from '../../config/hooks/useAccessModules';
-import EmailTemplate from '../../@types/email-template/EmailTemplateType';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../constants/PostApi";
+import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../constants/AppConstants";
+import {
+  Eye,
+  Edit2,
+  CheckCircle,
+  XCircle,
+  Star,
+  Loader2,
+  LucideMailPlus,
+  LucidePlus,
+  LayoutDashboard,
+  Calendar,
+  Filter,
+  X,
+} from "lucide-react";
+import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
+import useScreenSize from "../../config/hooks/useScreenSize";
+import Button from "../ui/Button";
+import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
+import DateRangePicker from "../ui/DateRangePicker";
+import SearchInput from "../ui/SearchInput";
+import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import EmailTemplate from "../../@types/email-template/EmailTemplateType";
 import { Switch } from "@headlessui/react"; // Or use your own styled switch
-
-
-
+import MessageSnackBar from "../ui/MessageSnackbar";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../@types/ui/MessageSnackbarProps";
+import MESSAGE from "../../constants/Messages";
 
 type TemplateType = {
   id: number;
@@ -31,8 +47,8 @@ type TemplateType = {
   isactive: boolean;
 };
 
-const jsonPlaceholdersMap:{ [key: number]: string } = {
-    1:`{
+const jsonPlaceholdersMap: { [key: number]: string } = {
+  1: `{
     "company.fullname":"PurpleRadiance",
     "company_user.fullname":"Nitikesh Yewale",
     "company_user.email":"nitikesh@g.co",
@@ -42,7 +58,7 @@ const jsonPlaceholdersMap:{ [key: number]: string } = {
     "crm_url":"http://localhost:5173"
     }`,
 
-    2:`{
+  2: `{
     "company.fullname":"PurpleRadiance",
     "lead.name":"Elon ",
     "lead.email":"elon@g.co",
@@ -59,7 +75,7 @@ const jsonPlaceholdersMap:{ [key: number]: string } = {
     "current_year":"2025"
     }`,
 
-    3:`
+  3: `
     {
     "company.fullname":"PurpleRadiance",
     "lead.name":"Mark3",
@@ -78,7 +94,7 @@ const jsonPlaceholdersMap:{ [key: number]: string } = {
     }
     `,
 
-    4:`
+  4: `
     {
     "company.fullname":"PurpleRadiance",
     "lead.name":"Elon4",
@@ -96,21 +112,22 @@ const jsonPlaceholdersMap:{ [key: number]: string } = {
     "current_year":"2025"
     }
     `,
-  };
+};
 
 export const TemplatesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>("");
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [offset, setOffset] = useState<number>(0);
   const [hasMoreTemplates, setHasMoreTemplates] = useState(true);
   const [loadingTemplates, setLoadingTemplates] = useState<boolean>(false);
-  const [loadingTemplatePage, setLoadingTemplatesPage] = useState<boolean>(false);
+  const [loadingTemplatePage, setLoadingTemplatesPage] =
+    useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
-  const limit : number = 10;
+  const limit: number = 10;
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number>(0);
 
@@ -135,11 +152,26 @@ export const TemplatesPage: React.FC = () => {
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({
-      dateRangeDropdownOptions, handleSearchOption: {
-        handleDateRangeIdChange: handleDatePageIdChange
-      }
+      dateRangeDropdownOptions,
+      handleSearchOption: {
+        handleDateRangeIdChange: handleDatePageIdChange,
+      },
     });
 
+  //message snakbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   const handleTemplateCreate = (type: string) => {
     setShowModal(false);
@@ -160,7 +192,9 @@ export const TemplatesPage: React.FC = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        const activeTypes = response.data.filter((type: TemplateType) => type.isactive);
+        const activeTypes = response.data.filter(
+          (type: TemplateType) => type.isactive
+        );
         setTemplateTypes(activeTypes);
         if (activeTypes.length > 0) {
           setActiveTab(activeTypes[0].name);
@@ -169,7 +203,7 @@ export const TemplatesPage: React.FC = () => {
           setTemplates([]); // Clear previous templates
           setHasMoreTemplates(true); // Assume there are more templates for the first type
         } else {
-          setActiveTab('');
+          setActiveTab("");
           setSelectedTypeId(0);
           setTemplates([]);
           setHasMoreTemplates(false);
@@ -185,67 +219,77 @@ export const TemplatesPage: React.FC = () => {
   // Refined useCallback for fetching templates
   // Removed 'offset' from dependencies as it's updated within the function
   // Removed 'loadingTemplates' and 'hasMoreTemplates' as dependencies to prevent loops
-  const getTemplatesOfCompany = useCallback(async ({
-    typeId,
-    reset = false,
-  }: {
-    typeId: number;
-    reset?: boolean;
-  }) => {
-    // We use a functional update for setOffset to get the latest value
-    // and avoid including 'offset' in useCallback dependencies.
-    setLoadingTemplates(true); // Set loading state for templates
+  const getTemplatesOfCompany = useCallback(
+    async ({ typeId, reset = false }: { typeId: number; reset?: boolean }) => {
+      // We use a functional update for setOffset to get the latest value
+      // and avoid including 'offset' in useCallback dependencies.
+      setLoadingTemplates(true); // Set loading state for templates
 
-    try {
+      try {
+        setOffset(reset ? 0 : offset);
+        // Get the current offset using a ref or state that's not in useCallback deps
+        // For this case, it's okay to read `offset` from state as it's only modified after fetch
+        // or set to 0 by the calling useEffect for reset.
+        const currentOffset = reset ? 0 : offset;
 
-      setOffset(reset?0:offset);
-      // Get the current offset using a ref or state that's not in useCallback deps
-      // For this case, it's okay to read `offset` from state as it's only modified after fetch
-      // or set to 0 by the calling useEffect for reset.
-      const currentOffset = reset ? 0 : offset;
+        console.log(
+          `Fetching templates for typeId: ${typeId}, offset: ${currentOffset}, limit: ${limit}, reset: ${reset}`
+        );
 
-      console.log(`Fetching templates for typeId: ${typeId}, offset: ${currentOffset}, limit: ${limit}, reset: ${reset}`);
+        const response = await axios.post(
+          POST_API.GET_EMAIL_TEMPLATE,
+          {
+            company_id: loginStatus.companyId,
+            requestedby_id: loginStatus.id,
+            id: null,
+            email_type_id: typeId,
+            search_company_specific_date_range_id:
+              dateRangeId === 0 ? null : dateRangeId,
+            search_parameter: searchParameter,
+            search_parameter_date: concatDate,
+            offset: currentOffset,
+            limit,
+          },
+          { withCredentials: true }
+        );
 
-      const response = await axios.post(
-        POST_API.GET_EMAIL_TEMPLATE,
-        {
-          company_id: loginStatus.companyId,
-          requestedby_id: loginStatus.id,
-          id: null,
-          email_type_id: typeId,
-          search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
-          search_parameter: searchParameter,
-          search_parameter_date: concatDate,
-          offset: currentOffset,
-          limit,
-        },
-        { withCredentials: true }
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        const newTemplates = response.data;
-        console.log(`Fetched ${newTemplates.length} new templates.`);
-        // if(newTemplates.length===limit){
-        //     setHasMoreTemplates(true);
-        // }else{
-        //   if(newTemplates.length<limit)setHasMoreTemplates(false)
-        // }
-        // setHasMoreTemplates(!(newTemplates.length < limit)); // If fewer than limit, no more templates
-        setHasMoreTemplates(newTemplates.length === limit); 
-        const newOffset:number = currentOffset+limit;
-        setOffset(newOffset); 
-        setTemplates((prev) => (reset ? newTemplates : [...prev, ...newTemplates]));
-      } else {
-        console.warn("API response not OK:", response.status);
+        if (response.status === STATUS_CODE.OK) {
+          const newTemplates = response.data;
+          console.log(`Fetched ${newTemplates.length} new templates.`);
+          // if(newTemplates.length===limit){
+          //     setHasMoreTemplates(true);
+          // }else{
+          //   if(newTemplates.length<limit)setHasMoreTemplates(false)
+          // }
+          // setHasMoreTemplates(!(newTemplates.length < limit)); // If fewer than limit, no more templates
+          setHasMoreTemplates(newTemplates.length === limit);
+          const newOffset: number = currentOffset + limit;
+          setOffset(newOffset);
+          setTemplates((prev) =>
+            reset ? newTemplates : [...prev, ...newTemplates]
+          );
+        } else {
+          console.warn("API response not OK:", response.status);
+          setHasMoreTemplates(false);
+        }
+      } catch (error) {
+        console.error("Error fetching templates:", error);
         setHasMoreTemplates(false);
+      } finally {
+        setLoadingTemplates(false);
       }
-    } catch (error) {
-      console.error("Error fetching templates:", error);
-      setHasMoreTemplates(false);
-    } finally {
-      setLoadingTemplates(false);
-    }
-  }, [offset, hasMoreTemplates,loginStatus.companyId, loginStatus.id, dateRangeId, searchParameter, concatDate, limit]); // Keep offset here if it's read directly, or use a ref
+    },
+    [
+      offset,
+      hasMoreTemplates,
+      loginStatus.companyId,
+      loginStatus.id,
+      dateRangeId,
+      searchParameter,
+      concatDate,
+      limit,
+    ]
+  ); // Keep offset here if it's read directly, or use a ref
 
   const handleTabChange = (tab: string) => {
     const selectedType = templateTypes.find((type) => type.name === tab);
@@ -261,14 +305,24 @@ export const TemplatesPage: React.FC = () => {
     }
   };
 
+
+  const [searchParams] = useSearchParams();
+  const message = searchParams.get("message");
+  const status = searchParams.get("status");
+
   useEffect(() => {
     getTemplateTypes();
+    console.log(typeof(status));
+    if(message && status){
+      showMessageSnackbar({message:message,type:status==="true"?"success":"error"})
+    }
   }, []); // Dependency on loginStatus is appropriate here
 
   // Effect to trigger initial fetch or re-fetch when selectedTypeId changes (e.g., tab change)
   //No error
   useEffect(() => {
-    if (selectedTypeId !== 0) { // Only fetch if a valid type is selected
+    if (selectedTypeId !== 0) {
+      // Only fetch if a valid type is selected
       setTemplates([]); // Clear templates for new type
       setOffset(0); // Reset offset
       setHasMoreTemplates(true); // Assume more templates for new type
@@ -276,18 +330,15 @@ export const TemplatesPage: React.FC = () => {
     }
   }, [selectedTypeId]);
 
-
-  
   //No error
   useEffect(() => {
     if (selectedTypeId !== 0) {
-      setTemplates([]); 
-      setOffset(0); 
-      setHasMoreTemplates(true); 
+      setTemplates([]);
+      setOffset(0);
+      setHasMoreTemplates(true);
       getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
     }
-  }, [dateRangeId, concatDate, searchParameter, ]);
-
+  }, [dateRangeId, concatDate, searchParameter]);
 
   // Effect for infinite scroll
   useEffect(() => {
@@ -304,24 +355,25 @@ export const TemplatesPage: React.FC = () => {
         hasMoreTemplates &&
         selectedTypeId !== 0
       ) {
-        
-        getTemplatesOfCompany({ typeId: selectedTypeId, reset: false }); 
-        
+        getTemplatesOfCompany({ typeId: selectedTypeId, reset: false });
       }
     };
 
-    container.addEventListener('scroll', handleScroll);
+    container.addEventListener("scroll", handleScroll);
 
     return () => {
-      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener("scroll", handleScroll);
     };
-  }, [loadingTemplates, hasMoreTemplates, selectedTypeId, getTemplatesOfCompany]); // Dependencies are correct here, getTemplatesOfCompany is stable enough now.
+  }, [
+    loadingTemplates,
+    hasMoreTemplates,
+    selectedTypeId,
+    getTemplatesOfCompany,
+  ]); // Dependencies are correct here, getTemplatesOfCompany is stable enough now.
 
-   function refresh() {
-        getTemplatesOfCompany({ typeId: selectedTypeId, reset: true }); 
+  function refresh() {
+    getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
   }
-
-  
 
   return (
     <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col ">
@@ -333,7 +385,6 @@ export const TemplatesPage: React.FC = () => {
             {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
 
             <span className="text-xl font-bold ">Email Templates</span>
-           
           </div>
           {isLargeScreen && (
             <>
@@ -343,12 +394,9 @@ export const TemplatesPage: React.FC = () => {
                   <div className="grid w-full">
                     <SearchInput
                       onChange={(e) => {
-                        handleSearchParameterChange(
-                          e.target.value
-                        );
+                        handleSearchParameterChange(e.target.value);
                       }}
                     ></SearchInput>
-
                   </div>
                 </div>
 
@@ -364,7 +412,6 @@ export const TemplatesPage: React.FC = () => {
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
-
               </div>
               {/* Custom Date Picker Div Flex Box*/}
               <div
@@ -387,9 +434,7 @@ export const TemplatesPage: React.FC = () => {
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
-                    handleSearchParameterChange(
-                      e.target.value
-                    );
+                    handleSearchParameterChange(e.target.value);
                   }}
                 ></SearchInput>
               </div>
@@ -441,9 +486,7 @@ export const TemplatesPage: React.FC = () => {
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
-                    handleSearchParameterChange(
-                      e.target.value
-                    );
+                    handleSearchParameterChange(e.target.value);
                   }}
                 ></SearchInput>
               </div>
@@ -519,7 +562,19 @@ export const TemplatesPage: React.FC = () => {
               )}
             </>
           )}
-           <Sidebar onCreate={() => setShowModal(true)} />
+          <Sidebar
+            onCreate={() => setShowModal(true)}
+            handleAccessDenied={(message: string) => {
+              showMessageSnackbar({ message: message, type: "error" });
+            }}
+          />
+          <MessageSnackBar
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleMessageSnackbarClose}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION}
+          />
         </div>
       </div>
 
@@ -543,6 +598,12 @@ export const TemplatesPage: React.FC = () => {
               hasmore={hasMoreTemplates}
               selectedTypeId={selectedTypeId}
               reset={refresh}
+              handleAccessDenied={({
+                message,
+                type,
+              }: ShowMessageSnackbarProps) => {
+                showMessageSnackbar({ message: message, type: type });
+              }}
             />
           </div>
           {showModal && (
@@ -557,22 +618,29 @@ export const TemplatesPage: React.FC = () => {
   );
 };
 
-
-const Sidebar: React.FC<{onCreate: () => void }> = ({ onCreate }) => { 
-        const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
-    return  (
-  <Button
-      disabled = {!userHasAccessToAddSettingGeneral}
-    className=" top-16  right-4 z-10 bg-blue-500 text-white w-fit rounded p-1 hover:bg-blue-600 transition"
-    onClick={
-      userHasAccessToAddSettingGeneral?onCreate:()=>{alert("Don't have access!")}}
-  >
-    <div className="flex gap-1">
-      <LucidePlus className="w-6 h-6 text-white " />
-      <span className=" font-bold ">New Template </span>
+const Sidebar: React.FC<{
+  onCreate: () => void;
+  handleAccessDenied: (message: string) => void;
+}> = ({ onCreate, handleAccessDenied }) => {
+  const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
+  return (
+    <div className="flex max-w-60">
+      <Button
+        disabled={!userHasAccessToAddSettingGeneral}
+        onClick={() =>
+          userHasAccessToAddSettingGeneral
+            ? onCreate()
+            : handleAccessDenied(MESSAGE.ERROR.NOT_ATHORISED)
+        }
+      >
+        <div className="flex gap-1">
+          <LucidePlus className="w-6 h-6 text-white " />
+          <span className=" font-bold ">New Template </span>
+        </div>
+      </Button>
     </div>
-  </Button>
-);};
+  );
+};
 
 type TabsProps = {
   activeTab: string;
@@ -580,14 +648,20 @@ type TabsProps = {
   templateTypes: TemplateType[];
 };
 
-const Tabs: React.FC<TabsProps> = ({ activeTab, onTabChange, templateTypes }) => (
+const Tabs: React.FC<TabsProps> = ({
+  activeTab,
+  onTabChange,
+  templateTypes,
+}) => (
   <div className="sticky top-0 flex bg-white">
     {templateTypes.map((tab) => (
       <button
         key={tab.id}
         onClick={() => onTabChange(tab.name)}
         className={`py-2 px-4 border-b-2 ${
-          activeTab === tab.name ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-gray-600 hover:text-gray-900'
+          activeTab === tab.name
+            ? "border-blue-600 text-blue-600 font-semibold"
+            : "border-transparent text-gray-600 hover:text-gray-900"
         } transition-colors duration-200`}
       >
         {tab.name}
@@ -600,8 +674,9 @@ type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
-  selectedTypeId:number;
-  reset: ()=> void;
+  selectedTypeId: number;
+  reset: () => void;
+  handleAccessDenied: ({ message, type }: ShowMessageSnackbarProps) => void;
 };
 
 const TemplateList: React.FC<TemplateListProps> = ({
@@ -609,10 +684,15 @@ const TemplateList: React.FC<TemplateListProps> = ({
   loading,
   hasmore,
   selectedTypeId,
-  reset
+  reset,
+  handleAccessDenied,
 }) => {
-  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
-  const [updatingDefaultId, setUpdatingDefaultId] = useState<number | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
+    null
+  );
+  const [updatingDefaultId, setUpdatingDefaultId] = useState<number | null>(
+    null
+  );
 
   const { userHasAccessToUpdateSettingGeneral } = useUserAccessModules();
   const navigate = useNavigate();
@@ -622,39 +702,52 @@ const TemplateList: React.FC<TemplateListProps> = ({
       `${ROUTES_URL.EMAIL_TEMPLATE_UPDATE}?template_type_id=${emailTemplate.email_type_id}&template_id=${emailTemplate.id}`
     );
   };
-  const {loginStatus} = useLoggedInUserContext();
+  const { loginStatus } = useLoggedInUserContext();
   const handleDefaultToggle = async (template: EmailTemplate) => {
     if (!userHasAccessToUpdateSettingGeneral) {
-      alert("You don't have access to update the default status.");
+      handleAccessDenied({
+        message: "You don't have access to update the default status.",
+        type: "error",
+      });
       return;
     }
 
     try {
       setUpdatingDefaultId(template.id);
-                   const postDataUpdateEmailTemplate = {
-                      company_id: loginStatus.companyId,
-                      updatedby_id: loginStatus.id,
-                      id:template.id,
-                      email_type_id: template.email_type_id,
-                      name: null,
-                      email_subject: null,
-                      email_body_html: null,
-                      email_body_json: null,
-                      is_default: template.is_default,
-                    };                    
+      const postDataUpdateEmailTemplate = {
+        company_id: loginStatus.companyId,
+        updatedby_id: loginStatus.id,
+        id: template.id,
+        email_type_id: template.email_type_id,
+        name: null,
+        email_subject: null,
+        email_body_html: null,
+        email_body_json: null,
+        is_default: template.is_default,
+      };
 
-              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
-                        withCredentials:true
-                })
-                .then((response) =>{
-                      if(response.status === STATUS_CODE.OK){
-                          reset();
-                        }                      
-                }).catch((error)=>{console.log(error)})
-     
+      await axios
+        .post(POST_API.UPDATE_EMAIL_TEMPLATE, postDataUpdateEmailTemplate, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            reset();
+            handleAccessDenied({
+              message: response.data.message,
+              type: "success",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } catch (error) {
       console.error("Failed to update default status:", error);
-      alert("Failed to update default status.");
+      handleAccessDenied({
+        message: "Failed to update default status.",
+        type: "error",
+      });
     } finally {
       // setUpdatingDefaultId(null);
     }
@@ -675,7 +768,9 @@ const TemplateList: React.FC<TemplateListProps> = ({
             className="bg-white shadow rounded-lg p-4 border hover:shadow-md transition duration-200 ease-in-out"
           >
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold text-gray-800">{template.name}</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {template.name}
+              </h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPreviewTemplate(template)}
@@ -687,16 +782,22 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 <Button
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
-                  disabled={!userHasAccessToUpdateSettingGeneral || template.is_master}
+                  disabled={
+                    !userHasAccessToUpdateSettingGeneral || template.is_master
+                  }
                   onClick={() => {
-                    if (userHasAccessToUpdateSettingGeneral && !template.is_master) {
+                    if (
+                      userHasAccessToUpdateSettingGeneral &&
+                      !template.is_master
+                    ) {
                       handleEditTemplate(template);
                     } else {
-                      alert(
-                        template.is_master
+                      handleAccessDenied({
+                        message: template.is_master
                           ? "Can't Update Master Templates!"
-                          : "You don't have access!"
-                      );
+                          : "You don't have access!",
+                        type: "error",
+                      });
                     }
                   }}
                 >
@@ -725,7 +826,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 )}
                 <strong>Default:</strong>
                 <Switch
-                  aria-disabled = {!userHasAccessToUpdateSettingGeneral}
+                  aria-disabled={!userHasAccessToUpdateSettingGeneral}
                   checked={template.is_default}
                   onChange={() => {
                     template.is_default = !template.is_default;
@@ -809,8 +910,11 @@ type TemplateTypeModalProps = {
   onCreate: (typeId: string) => void;
 };
 
-const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate }) => {
-  const [selectedTypeId, setSelectedTypeId] = useState<string>(''); // Initial state is an empty string
+const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
+  onClose,
+  onCreate,
+}) => {
+  const [selectedTypeId, setSelectedTypeId] = useState<string>(""); // Initial state is an empty string
   const { loginStatus } = useLoggedInUserContext();
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -829,7 +933,9 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
           { withCredentials: true }
         );
         if (response.status === STATUS_CODE.OK) {
-          const activeTypes = response.data.filter((type: TemplateType) => type.isactive);
+          const activeTypes = response.data.filter(
+            (type: TemplateType) => type.isactive
+          );
           setTemplateTypes(activeTypes);
           // Optional: If you want to pre-select the first active type, uncomment the line below.
           // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
@@ -845,7 +951,8 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
   }, [loginStatus.companyId, loginStatus.id]);
 
   const handleSubmit = () => {
-    if (selectedTypeId) { // This check ensures selectedTypeId is not an empty string
+    if (selectedTypeId) {
+      // This check ensures selectedTypeId is not an empty string
       onCreate(selectedTypeId); // Pass the ID string directly
     }
   };
@@ -859,16 +966,30 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
           onChange={(e) => setSelectedTypeId(e.target.value)}
           className="w-full mb-3 border px-3 py-2 rounded"
         >
-          <option value="" >Select template type</option> {/* Value is empty string for no selection */}
-          {templateTypes.filter((t) => t.isactive).map((type) => (
-            <option key={type.id} value={JSON.stringify(type)}>{type.name}</option>
-          ))}
+          <option value="">Select template type</option>{" "}
+          {/* Value is empty string for no selection */}
+          {templateTypes
+            .filter((t) => t.isactive)
+            .map((type) => (
+              <option key={type.id} value={JSON.stringify(type)}>
+                {type.name}
+              </option>
+            ))}
         </select>
         <div className="flex justify-between mt-4">
-          <button className="text-sm text-gray-600 hover:underline" onClick={onClose}>Cancel</button>
           <button
-            disabled={selectedTypeId === ''}
-            className={`px-4 py-2 rounded text-white ${selectedTypeId !== '' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
+            className="text-sm text-gray-600 hover:underline"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            disabled={selectedTypeId === ""}
+            className={`px-4 py-2 rounded text-white ${
+              selectedTypeId !== ""
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-gray-300 cursor-not-allowed"
+            }`}
             onClick={handleSubmit}
           >
             Continue
@@ -878,8 +999,3 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({ onClose, onCreate
     </div>
   );
 };
-
-
-
-
-

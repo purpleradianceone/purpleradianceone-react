@@ -21,7 +21,7 @@ import { GenericBlock } from "../template-blocks/GenericBlock";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
@@ -29,6 +29,8 @@ import ROUTES_URL from "../../../constants/Routes";
 import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
 import { TemplateSettingsPanelInsertTemplateUpdate } from "../template-panel/TemplateSettingsPanelInsertTemplateUpdate";
+import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
 
 
 interface DynamicField {
@@ -282,7 +284,20 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 
 
+//message snakbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   return isLoading ? (
     <div className="flex justify-center items-center h-full">
@@ -301,6 +316,13 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
             </span>
           )}
         </div>
+        <MessageSnackBar
+          isOpen={messageSnackbar.open}
+          message={messageSnackbar.message}
+          type={messageSnackbar.type}
+          onClose={handleMessageSnackbarClose}
+          duration={NUMBER_VALUES.SNACKBAR_DURATION}
+        />
       </div>
 
       <button
@@ -474,14 +496,13 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
             <>
               {/* Settings panel */}
-              <TemplateSettingsPanelInsertTemplateUpdate 
-              htmlBody={htmlInput} 
-              id={parseInt(emailTemplateId!)}
-              templateTypeId={parseInt(templateTypeId!)}
-              emailTemplateName={emailTemplateName}
-              emailTemplateSubject={emailTemplateSubject}
-              emailTemplateIsDefault={emailTemplateDefault}
-              
+              <TemplateSettingsPanelInsertTemplateUpdate
+                htmlBody={htmlInput}
+                id={parseInt(emailTemplateId!)}
+                templateTypeId={parseInt(templateTypeId!)}
+                emailTemplateName={emailTemplateName}
+                emailTemplateSubject={emailTemplateSubject}
+                emailTemplateIsDefault={emailTemplateDefault}
               />
             </>
           </div>
@@ -521,7 +542,7 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                   position: "relative",
                 }}
               >
-                <div
+                {/* <div
                   style={{
                     position: "absolute",
                     top: 10,
@@ -538,7 +559,7 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                       style={{ marginLeft: "10px" }}
                     />
                   </label>
-                </div>
+                </div> */}
 
                 <div
                   className="fixed inset-0 justify-self-end top-12"
@@ -550,7 +571,7 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                   />
                 </div>
 
-                <div style={{ zIndex: 2000 }}>
+                <div style={{ zIndex: 100 }}>
                   <HtmlPreviewModal
                     isOpen={isPreviewOpen}
                     onClose={() => setIsPreviewOpen(false)}
