@@ -3,6 +3,8 @@ import { CheckCircle, XCircle, X } from "lucide-react";
 import MessageSnackbarProps from "../../@types/ui/MessageSnackbarProps";
 import COLORS  from "../../constants/Colors";
 
+
+
 function MessageSnackBar(props: MessageSnackbarProps) {
   useEffect(() => {
     if (props.isOpen) {
@@ -18,7 +20,7 @@ function MessageSnackBar(props: MessageSnackbarProps) {
   if (!props.isOpen) return null;
 
   return (
-    <div className="fixed top-20 right-4 animate-slide-up">
+    <div className="fixed top-20 z-50 right-4 animate-slide-up">
       <div
         className={`flex items-center gap-2 rounded-lg px-2 py-2 shadow-lg ${
           props.type === "success"

@@ -1,30 +1,36 @@
 import React, { useState, useRef } from 'react';
+import { useDynamicFields } from '../DynamicFieldsContext'; 
 import { useEditor } from '@craftjs/core';
-import axios from 'axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDynamicFields } from '../DynamicFieldsContext';
-import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
+import axios from 'axios';
 import {  STATUS_CODE } from '../../../constants/AppConstants';
+import { useNavigate, } from 'react-router-dom';
+import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import ROUTES_URL from '../../../constants/Routes';
 
 
-type TemplateSettingsPanelEditProps = {
-  htmlTemplateTypeSubjectPlaceholder: string;
+type TemplateSettingsPanelUpdateProps = {
+  id: number;
+  templateTypeId: number;
+  emailTemplateName: string;
+  emailTemplateSubject:string;
+  emailTemplateIsDefault:boolean;
+
+
 };
 
-export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettingsPanelUpdateProps>  = ({id,templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [subject, setSubject] = useState('');
+  const [templateName, setTemplateName] = useState(emailTemplateName);
+  const [subject, setSubject] = useState(emailTemplateSubject);
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const [isDefault, setIsDefault] = useState(false);
-
-  const dynamicFields = useDynamicFields();
+  const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
   const navigate = useNavigate();
 
-  const { query } = useEditor();
+  const dynamicFields = useDynamicFields();
+
+    const { query } = useEditor();
   
   
 
@@ -46,52 +52,64 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
       input.focus();
     }, 0);
   };
-
-  function getCraftJson(): string {
-    const json = query.serialize();
-    return json;
-  }
-
 function getHtmlEmailBody(): string {
     const canvasElement = document.getElementById("CANVAS");
     if (!canvasElement) return "" ;
     const json = query.serialize();
-  
-
     const html = craftJsonToHtml(json).trim();
       return html;
     };
 
     const {loginStatus} = useLoggedInUserContext();
-    const [searchParams] = useSearchParams();
-    const params = searchParams.get("type");
+    const updateEmailTemplate = async(emailBody:string)=>{
 
-       const createEmailTemplateCreate = async(emailBody:string, resultJson:string)=>{
-                    const postDataCreateEmailTemplate = {
-                          "company_id":loginStatus.companyId,
-                          "createdby_id":loginStatus.id,
-                          "email_type_id":JSON.parse(params!).id,
-                          "name":templateName,
-                          "email_subject":subject,
-                          "email_body_html":emailBody,
-                          "email_body_json":resultJson,
-                          "is_default":isDefault
-                    }                   
+                    const json = query.serialize();
+                    const postDataUpdateEmailTemplate = {
+                      company_id: loginStatus.companyId,
+                      updatedby_id: loginStatus.id,
+                      id:id,
+                      email_type_id: templateTypeId,
+                      name: templateName,
+                      email_subject: subject,
+                      email_body_html: emailBody,
+                      email_body_json: json,
+                      is_default: isDefault,
+                    };                   
 
-              await axios.post(POST_API.CREATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
-                        withCredentials:true
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(emailTemplateSubject);
+                    console.log(emailTemplateName);
+                    console.log(subject);
+                    console.log(postDataUpdateEmailTemplate.id);
+                    console.log(postDataUpdateEmailTemplate.email_type_id);
+                    console.log(postDataUpdateEmailTemplate.name);
+                    console.log(postDataUpdateEmailTemplate.is_default);
+                    console.log(emailBody);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    console.log(json);
+                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+              await axios
+                .post(
+                  POST_API.UPDATE_EMAIL_TEMPLATE,
+                  postDataUpdateEmailTemplate,
+                  {
+                    withCredentials: true,
+                  }
+                )
+                .then((response) => {
+                  
+                  if (response.status === STATUS_CODE.OK) {
+                    console.log(response.data);
+                    navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
+                  }
                 })
-                .then((response) =>{
-                      if(response.status === STATUS_CODE.OK){
-                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
-                        }
-                        // alert(response.data.message);
-                        
-                }).catch((error)=>{console.log(error)})
+                .catch((error) => {
+                  console.log(error);
+                });
         }
+        
   
-
-
   return (
     <>
       {/* Fixed Button to Open Settings */}
@@ -148,8 +166,8 @@ function getHtmlEmailBody(): string {
               e.preventDefault();
               setIsOpen(false);
               const resultHtml = await getHtmlEmailBody();
-              const resultJson = await getCraftJson();
-              createEmailTemplateCreate(resultHtml, resultJson);
+
+              updateEmailTemplate(resultHtml);
               // TODO: API Call
               console.log({ templateName, subject, resultHtml });
             }}
@@ -162,7 +180,7 @@ function getHtmlEmailBody(): string {
                   fontWeight: "600",
                 }}
               >
-                Template Settings
+                Update Template Settings
               </h3>
             </div>
 
@@ -193,7 +211,6 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
-                  placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
 
@@ -333,7 +350,7 @@ function getHtmlEmailBody(): string {
                     fontSize: "14px",
                   }}
                 >
-                  Save
+                  Update
                 </button>
               </div>
             </div>
@@ -342,7 +359,5 @@ function getHtmlEmailBody(): string {
       )}
       
     </>
-    
   );
-  
 };

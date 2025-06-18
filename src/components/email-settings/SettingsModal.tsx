@@ -5,6 +5,7 @@ import Button from "../ui/Button";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
+import { ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 
 type SettingType = "company" | "user";
 
@@ -59,6 +60,7 @@ interface SettingsModalProps {
   settingType: SettingType;
   initialData?: EmailSettings; // initialData will be present in edit mode
   onSubmit: (data: EmailSettings) => void;
+  handleResponseMessage: ({ message, type }: ShowMessageSnackbarProps) => void;
 }
 
 const getDefaultSettings = (type: SettingType): EmailSettings =>
@@ -101,6 +103,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settingType,
   initialData, // This prop indicates if it's an edit operation
   onSubmit,
+  handleResponseMessage,
 }) => {
   const [formData, setFormData] = useState<EmailSettings>(
     getDefaultSettings(settingType)
@@ -169,23 +172,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       const response = await axios.post(apiEndpoint, payload, {
         withCredentials: true,
       });
-      window.alert(response.data.message);
+      handleResponseMessage({message:response.data.message,type:response.data.status?'success':"error"});
     } catch (error: any) { // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
-      // More robust error message, checking for response.data
-      window.alert(`Something went wrong. Please try again. ${error.response?.data?.message || ''}`);
+      handleResponseMessage({message:`Something went wrong. Please try again. ${error.response?.data?.message || ''}`,type:"error"});
     } finally {
       setLoading(false);
-      window.location.reload();
     }
   };
 
   const handleSubmit = async () => {
-    // Optionally perform form validation here before calling onSubmit and API
-    onSubmit(formData); // Call onSubmit with current form data
+    
     await handleApiCall();
-    // onClose() is called after API call in finally block which causes reload, so it's handled.
-    // If you want modal to close without reload on success, move onClose into try block.
+    onClose();
+    onSubmit(formData); // Call onSubmit with current form data
+    
   };
 
   const renderField = (

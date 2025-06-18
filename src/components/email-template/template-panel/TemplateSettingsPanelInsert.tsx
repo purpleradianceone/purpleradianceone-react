@@ -1,15 +1,17 @@
 import React, { useState, useRef } from 'react';
 
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useDynamicFields } from '../DynamicFieldsContext';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
+import ROUTES_URL from '../../../constants/Routes';
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
   htmlTemplateTypeSubjectPlaceholder: string;
+  
 };
 
 export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
@@ -19,7 +21,7 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
   const [subject, setSubject] = useState('');
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const [isDefault, setIsDefault] = useState(false);
-
+  const navigate = useNavigate();
   const dynamicFields = useDynamicFields(); 
 
   
@@ -66,8 +68,8 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                       console.log(response.data);
                       if(response.status === STATUS_CODE.OK){
                           console.log(response.data);
+                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
-                       alert(response.data.message);
 
                 }).catch((error)=>{console.log(error)})
         }
