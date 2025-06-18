@@ -40,6 +40,7 @@ import EmailSetting from "../../components/email-settings/EmailSetting";
 import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
 import ZoomMeetingsOAuthConsentAndroid from "../../components/android-page/ZoomOAuthConsentAndrod";
 import { EditorCanvasWithJson } from "../../components/email-template/template-editors/EditorCanvasWithJson";
+import CompanySetting from "../../components/views/settings/company-settings/CompanySetting";
 
 
 
@@ -354,6 +355,16 @@ export const router = createBrowserRouter([
         </Navbar>
       </PrivateRoute>
     )
+  },{
+    path: ROUTES_URL.COMPANY_SETTING,
+    element:(
+       <PrivateRoute>
+        <Navbar>
+          <CompanySetting></CompanySetting>
+        </Navbar>
+      </PrivateRoute>
+    )
+
   }
 ]);
 export default router;
