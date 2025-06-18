@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createPortal } from 'react-dom';
 import { STATUS_CODE } from '../../constants/AppConstants';
 import axios from 'axios';

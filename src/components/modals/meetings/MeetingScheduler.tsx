@@ -7,7 +7,7 @@ import FormInput from "../../ui/FormInput";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import Button from "../../ui/Button";
-import { Plus, UserPlus, Users, X } from "lucide-react";
+import { Contact2, Plus, UserPlus, Users, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -21,7 +21,6 @@ import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useZoomMeetingContext } from "../../../context/meeting/ZoomMeetingContext";
-import CalendarEventType from "../../../@types/meeting/CalendarEventType";
 import { useServerCurrentTime } from "../../../config/hooks/useServerCurrentTime";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import momentTimezone from "moment-timezone";
@@ -31,6 +30,8 @@ import {
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
+import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
+import LeadContactType from "../../../@types/lead-management/LeadContact";
 
 const MeetingScheduler = () => {
   const [title, setTitle] = useState<string>("");
@@ -55,6 +56,7 @@ const MeetingScheduler = () => {
 
   const { currentTime } = useServerCurrentTime();
   const [serverCurrentTime, setServerCurrentTime] = useState<Date>();
+  const [isAddCompanyLeadContactModalOpen,setIsAddCompanyLeadContactModalOpen] = useState<boolean>(false);
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -83,6 +85,9 @@ const MeetingScheduler = () => {
     useState<number[]>([loginStatus.id]);
   const [selectedCompanyUserDetailArray, setSelectedCompanyUserDetailArray] =
     useState<{ email: string; id: number }[]>([]);
+  const [isModalForLead,setIsModalForLead] = useState<boolean>(false);
+
+  const [addCompanyLeadContactIdArray,setAddCompanyLeadContactIdArray] = useState<number[]>([]);
 
 
   const navigate = useNavigate();
@@ -121,6 +126,12 @@ const MeetingScheduler = () => {
     console.log(serverCurrentTime! > startDateTIme.toDate());
   }, [endTime]);
 
+  useEffect(() => {
+    const openedFrom = searchParams.get("from");
+      if(!openedFrom){
+        setIsModalForLead(true);
+      }
+  },[searchParams])
   const createGoogleMeetMeeting = async () => {
 
     alert(selectedMeetingPlatform);
@@ -413,16 +424,33 @@ const MeetingScheduler = () => {
     }
   };
 
+  const handleCompanyLeadContactCheckBoxChange = (data : LeadContactType, event : React.ChangeEvent<HTMLInputElement>) => {
+      if(event.target.checked && data.email){
+        setAddCompanyLeadContactIdArray((prev) => [...prev,data.id])
+        setAttendees((prev) => [...prev,data.email])
+      }
+      else if(event.target.checked && !data.email){
+        showMessageSnackbar({message : "please add email for contact and then try again",type : "error"})
+      }
+      else if(!event.target.checked && data.email){
+        setAddCompanyLeadContactIdArray((prev) => prev.filter((id) => id !== data.id));
+        setAttendees((prev) =>
+          prev.filter((email) => email !== data.email)
+      );
+      }
+  }
+
   const handleCloseMeetingModal = () => {
     const openedFrom = searchParams.get("from");
     if (openedFrom) {
       navigate(openedFrom);
+      setIsModalForLead(false);
     } else {
       const leadData = sessionStorage.getItem("leadData");
       const newQueryString = qs.stringify({
         leadData: leadData,
       });
-
+      setIsModalForLead(false);
       const newPath = `${ROUTES_URL.LEAD_DETAILS}?${newQueryString}`;
       sessionStorage.removeItem("leadData");
       navigate(newPath);
@@ -576,7 +604,7 @@ const MeetingScheduler = () => {
           />
         </div>
         <div className="mb-1">
-          <div className="grid grid-cols-7 gap-2">
+          <div className={isModalForLead ? "grid grid-cols-8 gap-2" : "grid grid-cols-7 gap-2"}>
             <div className="col-span-5">
               <FormInput
                 type="email"
@@ -596,6 +624,18 @@ const MeetingScheduler = () => {
                 <UserPlus className="h-4 w-4" />
               </Button>
             </div>
+            {isModalForLead && (
+               <div className="col-span-1 mt-7">
+              <Button
+                onClick={() => {
+                  setIsAddCompanyLeadContactModalOpen(true);
+                }}
+              
+              >
+                <Contact2 className="h-4 w-4" />
+              </Button>
+            </div>
+            )}
             <div className="col-span-1 mt-7">
               <Button
                 onClick={() => {
@@ -699,6 +739,20 @@ const MeetingScheduler = () => {
         }
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
       />
+      {isAddCompanyLeadContactModalOpen && (
+<CompanyLeadContactsSelectionAgGrid
+      isOpen={isAddCompanyLeadContactModalOpen}
+      onClose={()=> {
+        setIsAddCompanyLeadContactModalOpen(false);
+      }}
+      selectedLeadId={JSON.parse(sessionStorage.getItem("leadData")!).id}
+      addCompanyLeadContactIdArray={addCompanyLeadContactIdArray}
+      handleCompanyLeadContactCheckBoxChange={handleCompanyLeadContactCheckBoxChange}
+      />
+      )
+
+      }
+      
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}

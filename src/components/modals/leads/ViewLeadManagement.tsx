@@ -33,10 +33,10 @@ import AssignProductToLead from "./AssignProductToLead";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 import LeadAssignedComponyProducts from "./LeadAssignedCompanyProduct";
 import InterestType from "../../../@types/lead-management/InterestType";
-import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
 import LeadContact from "./LeadContact";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import LeadAssignedTeams from "./LeadAssignedTeams";
+import Button from "../../ui/Button";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -1163,13 +1163,21 @@ const ViewLeadManagement = () => {
               {/* Lead Teams/Owner */}
             </span>
           </div>
-          <div className="flex flex-col  min-h-32 gap-2">
+          <div className="flex flex-col mt-5 ml-4 min-h-32 gap-2">
             {isOpenMeetingsModal && (
-              <LeadMeetingsModal
-                isCalendarViewEnabled={false}
-                isMeetingModalOpenFromProp={false}
-                showConnectToPlatform={false}
-              />
+              <div className="flec max-w-48">
+                 <Button 
+                 onClick={()=>{
+                  const leadDataSearchParams = JSON.parse(searchParams.get("leadData") || "{}");
+                  sessionStorage.setItem(
+                            "leadData",
+                            JSON.stringify(leadDataSearchParams!)
+                          );
+                  navigate(ROUTES_URL.SCHEDULE_MEETING)
+                 }}
+                 >Schedule Meeting</Button>
+              </div>
+             
             )}
             {isOpenProductCard && (
               <LeadContact
