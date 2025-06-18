@@ -4,7 +4,7 @@ import { useEditor } from '@craftjs/core';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
 import axios from 'axios';
-import { STATUS_CODE } from '../../../constants/AppConstants';
+import {  STATUS_CODE } from '../../../constants/AppConstants';
 import { useNavigate, } from 'react-router-dom';
 import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import ROUTES_URL from '../../../constants/Routes';
@@ -16,6 +16,7 @@ type TemplateSettingsPanelUpdateProps = {
   emailTemplateName: string;
   emailTemplateSubject:string;
   emailTemplateIsDefault:boolean;
+
 
 };
 
@@ -88,19 +89,26 @@ function getHtmlEmailBody(): string {
                     console.log(json);
                     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
-                        withCredentials:true
+              await axios
+                .post(
+                  POST_API.UPDATE_EMAIL_TEMPLATE,
+                  postDataUpdateEmailTemplate,
+                  {
+                    withCredentials: true,
+                  }
+                )
+                .then((response) => {
+                  
+                  if (response.status === STATUS_CODE.OK) {
+                    console.log(response.data);
+                    navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
+                  }
                 })
-                .then((response) =>{
-                      if(response.status === STATUS_CODE.OK){
-                          console.log(response.data);
-                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
-
-                        }
-                        alert(response.data.message);
-                        
-                }).catch((error)=>{console.log(error)})
+                .catch((error) => {
+                  console.log(error);
+                });
         }
+        
   
   return (
     <>
@@ -349,6 +357,7 @@ function getHtmlEmailBody(): string {
           </form>
         </div>
       )}
+      
     </>
   );
 };

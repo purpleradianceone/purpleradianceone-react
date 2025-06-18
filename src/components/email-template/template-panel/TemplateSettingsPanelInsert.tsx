@@ -11,6 +11,7 @@ import ROUTES_URL from '../../../constants/Routes';
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
   htmlTemplateTypeSubjectPlaceholder: string;
+  
 };
 
 export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, htmlTemplateTypeSubjectPlaceholder}) => {
@@ -67,9 +68,8 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                       console.log(response.data);
                       if(response.status === STATUS_CODE.OK){
                           console.log(response.data);
-                          navigate(ROUTES_URL.EMAIL_TEMPLATE)
+                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
-                       alert(response.data.message);
 
                 }).catch((error)=>{console.log(error)})
         }

@@ -10,12 +10,12 @@ import { HtmlPreviewModal } from "../HtmlPreviewModal";
 import { ColumnBlock } from "../template-blocks/ColumnBlock";
 import { HeadingBlock } from "../template-blocks/HeadingBlock";
 import { SubjectBlock } from "../template-blocks/SubjectBlock";
-import DOMPurify from 'dompurify';
-import 'tinymce';
+import DOMPurify from "dompurify";
+import "tinymce";
 import { DynamicFieldsContext } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideCode,  LucideMail,  } from "lucide-react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { LucideCode, LucideMail } from "lucide-react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { GenericBlock } from "../template-blocks/GenericBlock";
@@ -23,19 +23,33 @@ import { TemplateSettingsPanelCreate } from "../template-panel/TemplateSettingsP
 import { TemplateSettingsPanelInsert } from "../template-panel/TemplateSettingsPanelInsert";
 import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
-
-
+import MessageSnackBar from "../../ui/MessageSnackbar";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import { NUMBER_VALUES } from "../../../constants/AppConstants";
+import ROUTES_URL from "../../../constants/Routes";
+import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 export const EditorCanvas: React.FC = () => {
   const [canvasBgColor, setCanvasBgColor] = useState("#f9f9f9");
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
-  const [mode, setMode] = useState<'editor' | 'insert'>('editor');
+  const [mode, setMode] = useState<"editor" | "insert">("editor");
   const [htmlInput, setHtmlInput] = useState("");
+  const navigate = useNavigate();
 
-  const jsonPlaceholdersMap:{ [key: number]: string } = {
-    1:`{
+  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
+  const handleDialogueConfirm = () => {
+    setIsDialogueOpen(false);
+    localStorage.clear();
+    navigate(ROUTES_URL.SIGN_IN);
+  };
+
+  const jsonPlaceholdersMap: { [key: number]: string } = {
+    1: `{
     "company.fullname":"PurpleRadiance",
     "company_user.fullname":"Nitikesh Yewale",
     "company_user.email":"nitikesh@g.co",
@@ -45,7 +59,7 @@ export const EditorCanvas: React.FC = () => {
     "crm_url":"http://localhost:5173"
     }`,
 
-    2:`{
+    2: `{
     "company.fullname":"PurpleRadiance",
     "lead.name":"Elon ",
     "lead.email":"elon@g.co",
@@ -62,7 +76,7 @@ export const EditorCanvas: React.FC = () => {
     "current_year":"2025"
     }`,
 
-    3:`
+    3: `
     {
     "company.fullname":"PurpleRadiance",
     "lead.name":"Mark3",
@@ -81,7 +95,7 @@ export const EditorCanvas: React.FC = () => {
     }
     `,
 
-    4:`
+    4: `
     {
     "company.fullname":"PurpleRadiance",
     "lead.name":"Elon4",
@@ -101,20 +115,19 @@ export const EditorCanvas: React.FC = () => {
     `,
   };
 
-const [searchParams] = useSearchParams();
-const params = searchParams.get("type");
-  useEffect(()=> {
-if(params){
-  console.log("parsed JsonPArmas : ")
-  console.log(JSON.parse(params))
-}
+  const [searchParams] = useSearchParams();
+  const params = searchParams.get("type");
+  useEffect(() => {
+    if (params) {
+      console.log("parsed JsonPArmas : ");
+      console.log(JSON.parse(params));
+    }
+  }, []);
 
-  
-  },[])
-  
   const json = jsonPlaceholdersMap[parseInt(JSON.parse(params!).id)];
   const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
-  const [dynamicVariables, setDynamicVariables] = useState<Record<string, string>>(parsedPlaceHolders);
+  const [dynamicVariables, setDynamicVariables] =
+    useState<Record<string, string>>(parsedPlaceHolders);
 
   const handlePreview = (html: string) => {
     let replacedHtml = html;
@@ -123,16 +136,14 @@ if(params){
       replacedHtml = replacedHtml.replace(regex, value);
       // replacedHtml = replacedHtml.replace(regex, `<input data-key="${key}" value="${value}" style="border:none;background:transparent;color:#000;width:auto;" />`);
     });
-    setPreviewHtml(replacedHtml); 
+    setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
   };
 
-  const parsedFields = Object.entries(JSON.parse(json)).map(
-  ([key]) => ({
+  const parsedFields = Object.entries(JSON.parse(json)).map(([key]) => ({
     label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
     value: key,
-  })
-);
+  }));
 
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlInput(e.target.value);
@@ -154,17 +165,29 @@ if(params){
     handlePreview(htmlForPreview);
   };
 
-
   const setHtmlContent = (updatedHtml: string) => {
     setHtmlInput(updatedHtml);
-    setPreviewHtml(updatedHtml); 
+    setPreviewHtml(updatedHtml);
   };
 
+  //message snakbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   return (
     <>
-      <div className="fixed z-10 top-12 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-fit p-2">
+      <div className="fixed z-10 top-12 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex  gap-1">
           {<LucideMail className="w-6 h-6 text-blue-600" />}
           {<LucideCode className="w-4 h-4 text-blue-600" />}
@@ -173,10 +196,10 @@ if(params){
             : : : {JSON.parse(params!).name} Template
           </span>
           <div
-            className="fixed  inset-0 justify-center  top-12 "
-            style={{ height: "fit-content", zIndex: 100 }}
+            className="fixed  inset-0 justify-center top-12"
+            style={{ height: "fit-content" }}
           >
-            <div className="flex-col gap-2 justify-center justify-items-center">
+            <div className="flex-col gap-2 justify-center justify-items-center ">
               <div
                 style={{
                   display: "flex",
@@ -251,7 +274,7 @@ if(params){
             top: 50,
             right: 130,
             zIndex: 10,
-            color:"white",
+            color: "white",
             background: "#007bff",
             border: "1px solid #ccc",
             borderRadius: "4px",
@@ -280,11 +303,11 @@ if(params){
           >
             <div
               style={{
-                position:"sticky",
+                position: "sticky",
                 display: "flex",
-                top:0,
+                top: 0,
                 justifyContent: "space-between",
-                background:"white",
+                background: "white",
                 alignItems: "center",
                 marginBottom: "10px",
               }}
@@ -297,7 +320,7 @@ if(params){
                   border: "none",
                   cursor: "pointer",
                   fontSize: "16px",
-                  alignContent:"flex-end",
+                  alignContent: "flex-end",
                   lineHeight: 1,
                 }}
               >
@@ -380,7 +403,10 @@ if(params){
                   onClick={() => {
                     const beautified = DOMPurify.sanitize(htmlInput);
                     navigator.clipboard.writeText(beautified);
-                    alert("Email Template copied to clipboard!");
+                    showMessageSnackbar({
+                      message: "Email Template copied to clipboard!",
+                      type: "success",
+                    });
                   }}
                   style={{ padding: "8px 14px" }}
                 >
@@ -411,12 +437,20 @@ if(params){
                   onHtmlChange={setHtmlContent}
                   editable={false}
                 />
+                <MessageSnackBar
+                  isOpen={messageSnackbar.open}
+                  message={messageSnackbar.message}
+                  type={messageSnackbar.type}
+                  onClose={handleMessageSnackbarClose}
+                  duration={NUMBER_VALUES.SNACKBAR_DURATION}
+                />
               </div>
               <>
                 {/* Settings panel */}
                 <TemplateSettingsPanelInsert
                   htmlBody={htmlInput}
                   htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
+                  
                 />
               </>
             </div>
@@ -433,8 +467,7 @@ if(params){
                 TableBlock,
                 HeadingBlock,
                 DynamicFieldBlock,
-                GenericBlock, // 👈 Don't forget
-
+                GenericBlock,
               }}
             >
               <div style={{ display: "flex", width: "100%" }}>
@@ -456,12 +489,12 @@ if(params){
                     position: "relative",
                   }}
                 >
-                  <div
+                  {/* <div
                     style={{
                       position: "absolute",
                       top: 10,
                       right: 300,
-                      zIndex: 10,
+                      // zIndex: 10,
                     }}
                   >
                     <label style={{ fontSize: "14px", fontWeight: 500}}>
@@ -473,16 +506,26 @@ if(params){
                         style={{ marginLeft: "10px" }}
                       />
                     </label>
-                  </div>
+                  </div> */}
 
                   <div
                     className="fixed inset-0 justify-self-end top-12 "
-                    style={{ zIndex: 15, height: "fit-content" }}
+                    style={{
+                      zIndex: 10,
+                      height: "fit-content",
+                    }}
                   >
                     <ExportPanel onPreview={handlePreview} />
+                    <MessageSnackBar
+                      isOpen={messageSnackbar.open}
+                      message={messageSnackbar.message}
+                      type={messageSnackbar.type}
+                      onClose={handleMessageSnackbarClose}
+                      duration={NUMBER_VALUES.SNACKBAR_DURATION}
+                    />
                   </div>
 
-                  <div style={{ zIndex: 2000 }}>
+                  <div style={{ zIndex: 100 }}>
                     <HtmlPreviewModal
                       isOpen={isPreviewOpen}
                       onClose={() => setIsPreviewOpen(false)}
@@ -518,16 +561,14 @@ if(params){
             </Editor>
           )}
         </DynamicFieldsContext.Provider>
+        <DialogueBox
+          isOpen={isDialogueOpen}
+          onClose={() => setIsDialogueOpen(false)}
+          onConfirm={handleDialogueConfirm}
+          title="Session Expired !"
+          message="Session Expired. Please login again."
+        />
       </>
     </>
   );
 };
-
-
-
-
-
-
-
-
-

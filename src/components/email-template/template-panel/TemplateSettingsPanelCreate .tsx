@@ -6,7 +6,7 @@ import { useDynamicFields } from '../DynamicFieldsContext';
 import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
-import { STATUS_CODE } from '../../../constants/AppConstants';
+import {  STATUS_CODE } from '../../../constants/AppConstants';
 import ROUTES_URL from '../../../constants/Routes';
 
 
@@ -83,14 +83,15 @@ function getHtmlEmailBody(): string {
                 })
                 .then((response) =>{
                       if(response.status === STATUS_CODE.OK){
-                          console.log(response.data);
-                          navigate(ROUTES_URL.EMAIL_TEMPLATE)
+                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
-                        alert(response.data.message);
+                        // alert(response.data.message);
                         
                 }).catch((error)=>{console.log(error)})
         }
   
+
+
   return (
     <>
       {/* Fixed Button to Open Settings */}
@@ -339,6 +340,9 @@ function getHtmlEmailBody(): string {
           </form>
         </div>
       )}
+      
     </>
+    
   );
+  
 };
