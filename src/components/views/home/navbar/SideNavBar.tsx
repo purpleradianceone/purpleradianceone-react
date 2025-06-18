@@ -253,6 +253,16 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             >
             Email Setting
             </Link>,
+
+
+
+            <Link
+            to= {ROUTES_URL.COMPANY_SETTING}
+            >
+           Company Setting
+            </Link>, 
+
+
             //   <Link
             // to= {ROUTES_URL.USER_PROFILE_SETTING}
             // >
