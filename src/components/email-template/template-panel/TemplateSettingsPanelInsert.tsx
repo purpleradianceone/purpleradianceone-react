@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -65,13 +66,11 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                         withCredentials:true
                 })
                 .then((response) =>{
-                      console.log(response.data);
                       if(response.status === STATUS_CODE.OK){
-                          console.log(response.data);
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
 
-                }).catch((error)=>{console.log(error)})
+                }).catch((error)=>{})
         }
   
   return (
