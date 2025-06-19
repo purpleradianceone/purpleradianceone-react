@@ -195,7 +195,70 @@ export const useUserAccessModules = () => {
       accessModule.crm_module_id === 12 && accessModule.add
   );
 
+  //email setting company
+  const userHasAccessToAddEmailSettingCompany = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 13 && accessModules.add
+  );
 
+
+   const userHasAccessToViewEmailSettingCompany = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 13 && accessModule.view
+  );
+
+  const userHasAccessToUpdateEmailSettingCompany = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 13 && accessModule.update
+  );
+
+  //setting lead
+  const userHasAccessToAddSettingLead = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 14 && accessModules.add
+  );
+
+   const userHasAccessToViewSettingLeady = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 14 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSettingLead = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 14 && accessModule.update
+  );
+
+  //setting email template
+const userHasAccessToAddEmailTemplateSetting = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 15 && accessModules.add
+  );
+
+   const userHasAccessToViewEmailTemplateSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 15 && accessModule.view
+  );
+
+  const userHasAccessToUpdateEmailTemplateSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 15 && accessModule.update
+  );
+
+  //email type setting 
+  const userHasAccessToAddEmailTypeSetting = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 16 && accessModules.add
+  );
+
+   const userHasAccessToViewEmailTypeSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 16 && accessModule.view
+  );
+
+  const userHasAccessToUpdateEmailTypeSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 16 && accessModule.update
+  );
 
 
   return {
@@ -245,6 +308,22 @@ export const useUserAccessModules = () => {
     
     userHasAccessToViewMeeting,
     userHasAccessToUpdateMeeting,
-    userHasAccessToAddMeeting
+    userHasAccessToAddMeeting,
+
+    userHasAccessToAddEmailSettingCompany,
+    userHasAccessToViewEmailSettingCompany,
+    userHasAccessToUpdateEmailSettingCompany,
+
+    userHasAccessToAddSettingLead,
+    userHasAccessToViewSettingLeady,
+    userHasAccessToUpdateSettingLead,
+
+    userHasAccessToAddEmailTemplateSetting,
+    userHasAccessToViewEmailTemplateSetting,
+    userHasAccessToUpdateEmailTemplateSetting,
+
+    userHasAccessToAddEmailTypeSetting,
+    userHasAccessToViewEmailTypeSetting,
+    userHasAccessToUpdateEmailTypeSetting
   };
 };

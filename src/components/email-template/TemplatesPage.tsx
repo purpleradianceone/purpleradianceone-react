@@ -609,13 +609,13 @@ const Sidebar: React.FC<{
   onCreate: () => void;
   handleAccessDenied: (message: string) => void;
 }> = ({ onCreate, handleAccessDenied }) => {
-  const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
+  const { userHasAccessToAddEmailTemplateSetting } = useUserAccessModules();
   return (
     <div className="flex max-w-60">
       <Button
-        disabled={!userHasAccessToAddSettingGeneral}
+        disabled={!userHasAccessToAddEmailTemplateSetting}
         onClick={() =>
-          userHasAccessToAddSettingGeneral
+          userHasAccessToAddEmailTemplateSetting
             ? onCreate()
             : handleAccessDenied(MESSAGE.ERROR.NOT_ATHORISED)
         }
@@ -681,7 +681,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
     null
   );
 
-  const { userHasAccessToUpdateSettingGeneral } = useUserAccessModules();
+  const { userHasAccessToUpdateEmailTemplateSetting } = useUserAccessModules();
   const navigate = useNavigate();
 
   const handleEditTemplate = (emailTemplate: EmailTemplate): void => {
@@ -691,7 +691,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
   };
   const { loginStatus } = useLoggedInUserContext();
   const handleDefaultToggle = async (template: EmailTemplate) => {
-    if (!userHasAccessToUpdateSettingGeneral) {
+    if (!userHasAccessToUpdateEmailTemplateSetting) {
       handleAccessDenied({
         message: "You don't have access to update the default status.",
         type: "error",
@@ -770,11 +770,11 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
                   disabled={
-                    !userHasAccessToUpdateSettingGeneral || template.is_master
+                    !userHasAccessToUpdateEmailTemplateSetting || template.is_master
                   }
                   onClick={() => {
                     if (
-                      userHasAccessToUpdateSettingGeneral &&
+                      userHasAccessToUpdateEmailTemplateSetting &&
                       !template.is_master
                     ) {
                       handleEditTemplate(template);
@@ -813,7 +813,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 )}
                 <strong>Default:</strong>
                 <Switch
-                  aria-disabled={!userHasAccessToUpdateSettingGeneral}
+                  aria-disabled={!userHasAccessToUpdateEmailTemplateSetting}
                   checked={template.is_default}
                   onChange={() => {
                     template.is_default = !template.is_default;
