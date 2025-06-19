@@ -43,7 +43,7 @@ function renderNode(data: CraftData, nodeId: string): string {
   if (!node || node.hidden) return '';
 
   const renderChildren = (nodeIds?: string[]) => 
-    (nodeIds || []).map(id => renderNode(data, id)).join('');
+    (nodeIds || []).map(id => renderNode(data, id)).join('\n');
 
   const renderLinkedNodes = (linkedNodes?: Record<string, string>) => 
     linkedNodes ? Object.values(linkedNodes).map(id => renderNode(data, id)).join('') : '';
