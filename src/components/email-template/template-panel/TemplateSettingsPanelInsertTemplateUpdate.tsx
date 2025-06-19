@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, } from 'react';
 
 import axios from 'axios';
@@ -64,28 +65,16 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSetting
                       is_default: isDefault,
                     };                   
 
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log(emailTemplateSubject);
-                    console.log(emailTemplateName);
-                    console.log(subject);
-                    console.log(postDataUpdateEmailTemplate.id);
-                    console.log(postDataUpdateEmailTemplate.email_type_id);
-                    console.log(postDataUpdateEmailTemplate.name);
-                    console.log(postDataUpdateEmailTemplate.is_default);
-                    console.log(emailBody);
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
               await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
                         withCredentials:true
                 })
                 .then((response) =>{
                       if(response.status === STATUS_CODE.OK){
-                          console.log(response.data);
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
                         }
                         
-                }).catch((error)=>{console.log(error)})
+                }).catch((error)=>{})
         }
 
   

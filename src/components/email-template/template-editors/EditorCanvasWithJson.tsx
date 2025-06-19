@@ -94,14 +94,11 @@ export const EditorCanvasWithJson = () => {
             setEmailTemplateName(response.data[0].name);
             setEmailTemplateSubject( response.data[0].email_subject);
             setHtmlInput(response.data[0].email_body_html);
-            console.log(response.data[0].name);
-            console.log(response.data[0].email_subject);
+           
 
             setEmailTemplateDefault(response.data[0].is_default);
-            console.log(response.data[0].email_body_json);
           } else {
             //
-            console.log("inside else condition");
           }
         }
       })
@@ -125,9 +122,7 @@ export const EditorCanvasWithJson = () => {
   };
 
   useEffect(() => {
-    console.log("inside use effect of EditorCanvasWithJson")
     if (emailTemplateId && templateTypeId) {
-      console.log("inside use effect if condition")
       getTemplateToUpdate({
         emailTemplateId: parseInt(emailTemplateId),
         templateTypeId: parseInt(templateTypeId),

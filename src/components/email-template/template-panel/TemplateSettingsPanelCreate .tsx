@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useEditor } from '@craftjs/core';
 import axios from 'axios';
@@ -87,7 +88,9 @@ function getHtmlEmailBody(): string {
                         }
                         // alert(response.data.message);
                         
-                }).catch((error)=>{console.log(error)})
+                }).catch((error)=>{
+                  
+                })
         }
   
 
@@ -150,8 +153,6 @@ function getHtmlEmailBody(): string {
               const resultHtml = await getHtmlEmailBody();
               const resultJson = await getCraftJson();
               createEmailTemplateCreate(resultHtml, resultJson);
-              // TODO: API Call
-              console.log({ templateName, subject, resultHtml });
             }}
           >
             <div style={{ marginBottom: "15px" }}>
