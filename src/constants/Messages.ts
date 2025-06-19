@@ -1,4 +1,5 @@
-const MESSAGE = {
+
+ const MESSAGE = {
     ERROR : {
         ENTER_COMPLETE_OTP : "Please enter the complete OTP",
         ENTER_NEW_PAWSSWORD : "Please enter a new password",
@@ -30,8 +31,13 @@ const MESSAGE = {
     INPROCESS : {
         LOGGING_IN : "Logging In",
         SAVING : "Saving...",
+    }, 
+    MODULE_ACCESS : {
+        LEAD_MODULE : {
+            UPDATE_LEAD_ACCESS_DENIED_message : "Dont have an access to update the lead."
+        }
     }
-
 }
+
 
 export default MESSAGE;

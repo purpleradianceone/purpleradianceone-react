@@ -330,7 +330,7 @@ function CompanyProductTeamsModal({
       }
     }
   };
-
+  
   const fetchCompanyTeamsNotAssigned = async (companyTeamsNotAssignedSearchParameter : string) => {
     if (
       !userHasAccessToViewTeamManagement ||

@@ -24,6 +24,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -43,6 +44,8 @@ const LeadDetails = ({
     editLeadDetailsData: LeadDetailsData
   ) => void;
 }) => {
+
+  const {userHasAccessToUpdateLead} = useUserAccessModules();
 
   const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
     additional_contact_number: "",
@@ -201,6 +204,7 @@ const LeadDetails = ({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          handleSave(e);
         } else {
           setIsDialogueOpen(true);
         }
@@ -236,6 +240,7 @@ const LeadDetails = ({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          fetchIndustryType();
         } else {
           setIsDialogueOpen(true);
         }
@@ -432,6 +437,7 @@ const LeadDetails = ({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Job title"
             value={editLeadDetails.job_title}
@@ -445,6 +451,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="textarea"
             label="Address"
             value={editLeadDetails.address}
@@ -458,6 +465,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="Industry"
             handleGetDropdownData={()=>{
@@ -479,6 +487,7 @@ const LeadDetails = ({
           />
 
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Add. Contact number"
             value={editLeadDetails.additional_contact_number}
@@ -492,6 +501,7 @@ const LeadDetails = ({
           />
 
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="Country"
             handleGetDropdownData={() =>{
@@ -505,15 +515,11 @@ const LeadDetails = ({
               setCountryid(e.target.value);
 
               const selectedCountryId = parseInt(e.target.value);
-              console.log("this is country data");
-              
-              console.log(selectedCountryId);
+
               
               const selectedCountryName =
                 countryOptions.find((option) => option.id === selectedCountryId)
                   ?.value || "";
-
-              console.log(selectedCountryName);
               
               // check if changed or not
               const isCountryChanged =
@@ -541,6 +547,7 @@ const LeadDetails = ({
           />
           {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Industry Name"
             value={editLeadDetails.industry_name}
@@ -553,6 +560,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
+           userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="State"
             handleGetDropdownData={()=>{
@@ -591,9 +599,9 @@ const LeadDetails = ({
             }}
           />
 
-          {/* <p className="text-xs">Selected coutry: {countryOptions.find(opt => opt.value === leadDetailsData.country_id)?.label || 'None'}</p> */}
 
           <FormField
+          userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Website"
             value={editLeadDetails.website}
@@ -606,6 +614,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
+          userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="District"
             handleGetDropdownData={()=>{
@@ -666,6 +675,7 @@ type FormFieldProps = {
   selectOptions?: OptionType[];
   selectedId?: string;
   handleGetDropdownData ?: () => void | null
+  userHasAccessToUpdate : boolean;
 };
 
 const FormField = ({
@@ -675,19 +685,14 @@ const FormField = ({
   type,
   selectOptions,
   selectedId,
-  handleGetDropdownData
+  handleGetDropdownData,
+  userHasAccessToUpdate
 }: FormFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleBlur = () => {
-    setTimeout(() => setIsEditing(false), 100); // Delay so dropdown click registers
+    setTimeout(() => setIsEditing(false), 100); 
   };
-  useEffect(()=>{
-    console.log("inside the form");
-    
-    console.log(selectOptions);
-    
-  }, [selectOptions])
 
   return (
     <div className="flex w-full  items-center border-b  ">
@@ -696,14 +701,16 @@ const FormField = ({
         className="flex items-center w-[50%]   min-w-[150px]"
         onClick={
           () =>{
-            setIsEditing(true)
-            handleGetDropdownData!()
+            if(userHasAccessToUpdate){
+              setIsEditing(true)
+              handleGetDropdownData!()
+            }
           } 
         }
       >
-        {!isEditing ? (
+        {!isEditing  ? (
           <span
-            className="text-gray-900  text-sm cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="text-gray-800 font-semibold  text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
               // selectOptions
               //   ?.find((opt) => opt.value === value)
@@ -728,7 +735,7 @@ const FormField = ({
             value={selectedId}
             onBlur={handleBlur}
             onChange={onChange}
-            className="text-gray-900 font-semibold border border-gray-300 w-36 rounded p-1 text-sm focus:outline-none"
+            className="text-gray-900 font-semibold border border-gray-300 w-36 rounded p-1 text-[13px] focus:outline-none"
           >
             <option value=""> Select {label} </option>
             {selectOptions?.map((opt) => (
@@ -746,7 +753,7 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
-            className="text-gray-900 text-sm border border-gray-300 rounded p-1 focus:outline-none"
+            className="text-gray-900 text-[13px] border border-gray-300 rounded p-1 focus:outline-none"
           />
         ) : (
           <input
@@ -755,7 +762,7 @@ const FormField = ({
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
-            className="text-gray-900 text-sm  border-none border-gray-300 focus:outline-none"
+            className="text-gray-900 text-[13px]  border-none border-gray-300 focus:outline-none"
           />
         )}
       </div>

@@ -95,7 +95,7 @@ const AssignProductToLead = ({
             message: response.data.message,
             type: "success",
           });
-          await fetchLeadCompanyProduct();
+           fetchLeadCompanyProduct();
         }
         if (response.data.status === false) {
           showMessageSnackbar({
@@ -117,6 +117,7 @@ const AssignProductToLead = ({
         });
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          handleProductAddToLead(event);
         } else {
           setIsDialogueOpen(true);
         }

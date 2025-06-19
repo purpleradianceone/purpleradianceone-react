@@ -71,6 +71,7 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          getLeadHistory();
         } else {
           setIsDialogueOpen(true);
         }

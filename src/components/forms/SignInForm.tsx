@@ -393,6 +393,7 @@ function SignInForm() {
       const handleBackButton = (event: PopStateEvent) => {
         event.preventDefault();
         navigate(ROUTES_URL.SIGN_IN, { replace: true }); 
+
       };
   
       window.addEventListener('popstate', handleBackButton);

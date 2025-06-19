@@ -37,9 +37,14 @@ import LeadMeetingsModal from "../meetings/LeadMeetingsModal";
 import LeadContact from "./LeadContact";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import LeadAssignedTeams from "./LeadAssignedTeams";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../constants/Messages";
+// import {  MODULE_ACCESS_MESSAGE } from "../../../constants/Messages";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
+  const { userHasAccessToUpdateLead } = useUserAccessModules();
+
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
     useState<boolean>(false);
@@ -69,7 +74,7 @@ const ViewLeadManagement = () => {
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
- 
+
   const [leadAssignedCompanyProduct, setLeadAssignedCompanyProduct] = useState<
     LeadAssignedCompanyProduct[]
   >([]);
@@ -79,10 +84,12 @@ const ViewLeadManagement = () => {
   //meeting modal states
   const [leadContact, setLeadContact] = useState<LeadContactType[]>([]);
   const [activeTab, setActiveTab] = useState<string>("contact");
-  const [isOpenMeetingsModal, setIsOpenMeetingsModal] = useState<boolean>(false);
+  const [isOpenMeetingsModal, setIsOpenMeetingsModal] =
+    useState<boolean>(false);
   const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
- const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] = useState<boolean>(false);
- 
+  const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
+    useState<boolean>(false);
+
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -96,6 +103,7 @@ const ViewLeadManagement = () => {
     type: "success" as "success" | "error",
   });
 
+  // const UPDATE_LEAD_ACCESS_DENIED_message = "oamd;slm"
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
   };
@@ -108,6 +116,8 @@ const ViewLeadManagement = () => {
     work?: string;
     person?: string;
   };
+
+  // const UPDATE_LEAD_ACCESS_DENIED_message =MODULE_ACCESS_MESSAGE.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message;
 
   const [activityData, setActivityData] = useState<activity[]>([
     {
@@ -308,7 +318,6 @@ const ViewLeadManagement = () => {
   //   }
   // };
 
-
   //lead owner change
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -468,59 +477,61 @@ const ViewLeadManagement = () => {
       lead_id: selectedLeadData.id,
       requestedby: loginStatus.id,
     };
-    
-      try {
-        const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        });
 
-        if (response.status === STATUS_CODE.OK) {
-          const data = response.data;
-          setLeadDetailsData({
-            id: data.id,
-            lead_id: data.lead_id,
-            country_id: data.country_id,
-            country_name: data["Country Name"],
-            district_id: data.district_id,
-            district_name: data["District Name"],
-            state_id: data.state_id,
-            state_name: data["State Name"],
-            address: data.address,
-            industry_type_id: data.industry_type_id,
-            industry_type: data["Industry Type"],
-            industry_name: data.industry_name,
-            job_title: data.job_title,
-            website: data.website,
-            additional_contact_number: data.additional_contact_number,
-            createdby: data.createdby,
-            createdon: data.createdon,
-            updatedby: data.updatedby,
-            updatedon: data.updatedon,
-          });
-          countryChangeRef.current = data.country_id;
-          stateChangeRef.current = data.state_id;
-          // districtChangeRef.current = data.district_id;
-        }
-      } catch ( error: any) {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithEvent: getLeadDetails,
-          });
-          if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
-          }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+    try {
+      const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        const data = response.data;
+        setLeadDetailsData({
+          id: data.id,
+          lead_id: data.lead_id,
+          country_id: data.country_id,
+          country_name: data["Country Name"],
+          district_id: data.district_id,
+          district_name: data["District Name"],
+          state_id: data.state_id,
+          state_name: data["State Name"],
+          address: data.address,
+          industry_type_id: data.industry_type_id,
+          industry_type: data["Industry Type"],
+          industry_name: data.industry_name,
+          job_title: data.job_title,
+          website: data.website,
+          additional_contact_number: data.additional_contact_number,
+          createdby: data.createdby,
+          createdon: data.createdon,
+          updatedby: data.updatedby,
+          updatedon: data.updatedon,
+        });
+        countryChangeRef.current = data.country_id;
+        stateChangeRef.current = data.state_id;
+        // districtChangeRef.current = data.district_id;
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: getLeadDetails,
+        });
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+        } else {
           setIsDialogueOpen(true);
         }
-     };
-  };  
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      }
+    }
+  };
   // this is the lead details data on save callback
-  const handleSaveEditLeadDetailsCallback = (editLeadDetailsData : LeadDetailsData) =>{
+  const handleSaveEditLeadDetailsCallback = (
+    editLeadDetailsData: LeadDetailsData
+  ) => {
     setLeadDetailsData(editLeadDetailsData);
-  }
+  };
 
   // const getAllState = async (countryId: number | null) => {
   //   if (!countryId) return;
@@ -711,7 +722,7 @@ const ViewLeadManagement = () => {
               quantityRequired: updatedProduct.quantityRequired,
               costExpected: updatedProduct.costExpected,
               leadInterestId: updatedProduct.leadInterestId!,
-              // changes here 
+              // changes here
               leadInterestName: updatedProduct.leadInterestName,
             }
           : product
@@ -761,14 +772,14 @@ const ViewLeadManagement = () => {
 
   // call to the all apis
   useEffect(() => {
-    const apisCalls = async () => {     
-      await fetchLeadStatus();
-      await getLeadDetails();
-      await fetchLeadContact();
-      await getLeadInterestData();
-      await fetchLeadCompanyProduct();
+    const apisCalls = () => {
+      fetchLeadStatus();
+      getLeadDetails();
+      fetchLeadContact();
+      getLeadInterestData();
+      fetchLeadCompanyProduct();
     };
-      apisCalls();
+    apisCalls();
   }, []);
 
   const handleLeadInfoSave = async () => {
@@ -787,8 +798,7 @@ const ViewLeadManagement = () => {
         { withCredentials: true }
       );
       if (response.data.status) {
-        // const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
-        // another way to parse query string
+        //parse query string
         const rawLeadData = window.location.search;
         const urlParams = new URLSearchParams(rawLeadData);
         const leadDataStr = urlParams.get("leadData");
@@ -857,8 +867,8 @@ const ViewLeadManagement = () => {
       setIsOpenProductCard(true);
       setIsOpenMeetingsModal(false);
       setIsOpenLeadTeamsCard(false);
-    }else if(id==="LeadTeams/Owner"){
-      setIsOpenProductCard(false)
+    } else if (id === "LeadTeams") {
+      setIsOpenProductCard(false);
       setIsOpenMeetingsModal(false);
       setIsOpenLeadTeamsCard(true);
     }
@@ -885,10 +895,25 @@ const ViewLeadManagement = () => {
             <span>Leads</span>
           </button>
           <div className="py-1">
-            <div className="text-lg font-semibold">
+            <div
+              title={
+                userHasAccessToUpdateLead
+                  ? ""
+                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              }
+              className="text-lg font-semibold"
+              onClick={() => {
+                if (!userHasAccessToUpdateLead) {
+                  showMessageSnackbar({
+                    message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    type: "error",
+                  });
+                }
+              }}
+            >
               <Detail
                 label="Name"
-                type="text"
+                type={userHasAccessToUpdateLead ? "text" : "none"}
                 value={selectedLeadData?.name}
                 onChange={(e) => {
                   setSelectedLeadData({
@@ -906,8 +931,16 @@ const ViewLeadManagement = () => {
           {/* new code  */}
           <div className="relative inline-block">
             <button
+            disabled={!userHasAccessToUpdateLead}
               onClick={() => {
-                setIsAddProductModalOpen(true);
+                if(userHasAccessToUpdateLead){
+                  setIsAddProductModalOpen(true);
+                }else{
+                  showMessageSnackbar({
+                    message : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    type : "error"
+                  })
+                }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
             >
@@ -945,30 +978,58 @@ const ViewLeadManagement = () => {
       {/* Lead Basic Info */}
       <div className="w-full flex ">
         <div className="ml-4 flex justify-between w-3/4   whitespace-nowrap overflow-auto">
-          <Detail
-            label="Email"
-            type="text"
-            value={selectedLeadData?.email}
-            onChange={(e) => {
-              setSelectedLeadData({
-                ...selectedLeadData,
-                email: e.target.value.trim(),
-              });
+          <div
+            onClick={() => {
+              if (!userHasAccessToUpdateLead) {
+                showMessageSnackbar({
+                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  type: "error",
+                });
+              }
             }}
-            handleLeadInfoSave={handleLeadInfoSave}
-          />
-          <Detail
-            label="Mobile Number"
-            type="text"
-            value={selectedLeadData?.mobileNumber}
-            onChange={(e) => {
-              setSelectedLeadData({
-                ...selectedLeadData,
-                mobileNumber: e.target.value,
-              });
+            title={
+              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+            }
+          >
+            <Detail
+              label="Email"
+              type={userHasAccessToUpdateLead ? "text" : "none"}
+              value={selectedLeadData?.email}
+              onChange={(e) => {
+                setSelectedLeadData({
+                  ...selectedLeadData,
+                  email: e.target.value.trim(),
+                });
+              }}
+              handleLeadInfoSave={handleLeadInfoSave}
+            />
+          </div>
+          <div
+            onClick={() => {
+              if (!userHasAccessToUpdateLead) {
+                showMessageSnackbar({
+                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  type: "error",
+                });
+              }
             }}
-            handleLeadInfoSave={handleLeadInfoSave}
-          />
+            title={
+              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+            }
+          >
+            <Detail
+              label="Mobile Number"
+              type={userHasAccessToUpdateLead ? "text" : "none"}
+              value={selectedLeadData?.mobileNumber}
+              onChange={(e) => {
+                setSelectedLeadData({
+                  ...selectedLeadData,
+                  mobileNumber: e.target.value,
+                });
+              }}
+              handleLeadInfoSave={handleLeadInfoSave}
+            />
+          </div>
           <Detail
             type="none"
             label="Lead Source"
@@ -979,10 +1040,23 @@ const ViewLeadManagement = () => {
             label="Created By"
             value={selectedLeadData?.createdBy}
           />
-          <div className="flex  ">
+          <div
+            className="flex"
+            title={
+              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+            }
+            onClick={() => {
+              if (!userHasAccessToUpdateLead) {
+                showMessageSnackbar({
+                  message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  type: "error",
+                });
+              }
+            }}
+          >
             <Detail
               label="Lead Owner"
-              type="text"
+              type={userHasAccessToUpdateLead ? "text" : "none"}
               value={selectedLeadData?.leadOwner}
               handleClickLeadOwnerChange={handleClickLeadOwnerChange}
             />
@@ -1041,6 +1115,7 @@ const ViewLeadManagement = () => {
           {leadStatus!.map((item: any) => (
             <button
               title={item.name}
+              disabled={!userHasAccessToUpdateLead}
               key={item.id}
               className={`flex-1 text-xs text-ellipsis  overflow-hidden ${
                 selectedLeadData.leadStatus === item.name
@@ -1052,8 +1127,15 @@ const ViewLeadManagement = () => {
                   "polygon(0 0, calc(100% - 17px) 0, 100% 50%, calc(100% - 17px) 100%, 0 100%)",
               }}
               onClick={() => {
-                setReasonInputBoxOpen(true);
-                setSelectedStatusId(item.id);
+                if (userHasAccessToUpdateLead) {
+                  setReasonInputBoxOpen(true);
+                  setSelectedStatusId(item.id);
+                } else {
+                  showMessageSnackbar({
+                    message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    type: "error",
+                  });
+                }
               }}
             >
               {item.name}
@@ -1083,28 +1165,25 @@ const ViewLeadManagement = () => {
         )}
       </div>
 
-      {/* start */}
+      {/* Sections  */}
       <div className="w-full flex flex-col md:flex-row gap-1 p-2">
         {/* Column 1 */}
-        <div className="w-full md:w-1/2 flex flex-col gap-4
-        ">
+        <div className="w-full md:w-1/2 flex flex-col gap-4">
           {/* Lead Details */}
           <div className="shadow-md rounded-sm">
             <LeadDetails
-            handleSaveEditLeadDetailsCallback={handleSaveEditLeadDetailsCallback}
+              handleSaveEditLeadDetailsCallback={
+                handleSaveEditLeadDetailsCallback
+              }
               handleLeadActivityChange={(person: string, work: string) => {
                 setActivityData([
                   { person: person, work: work },
                   ...activityData,
                 ]);
               }}
-              // district={district}
-              // stateData={stateData}
               leadDetailsData={leadDetailsData}
               setLeadDetailsData={setLeadDetailsData}
-              // countries={countries}
               selectedLeadData={selectedLeadData}
-              // industryType={industryType}
               getLeadDetails={getLeadDetails}
             />
           </div>
@@ -1146,21 +1225,17 @@ const ViewLeadManagement = () => {
             >
               Meeting
             </span>
-            
+
             <span
-            id="LeadTeams/Owner"
+              id="LeadTeams"
               className={`cursor-pointer ${
-                activeTab === "LeadTeams/Owner"
+                activeTab === "LeadTeams"
                   ? "border-b-2 border-blue-500 text-blue-600"
                   : "hover:text-blue-500"
               }`}
-              onClick={
-                handleClickCards
-                // () => setActiveTab("Lead Teams/Owner")
-              }
+              onClick={handleClickCards}
             >
-              span
-              {/* Lead Teams/Owner */}
+              Lead Teams
             </span>
           </div>
           <div className="flex flex-col  min-h-32 gap-2">
@@ -1174,14 +1249,15 @@ const ViewLeadManagement = () => {
             {isOpenProductCard && (
               <LeadContact
                 leadContact={leadContact}
-                fetchLeadContact ={fetchLeadContact}
+                fetchLeadContact={fetchLeadContact}
               />
             )}
-            {
-              isOpenLeadTeamsCard && (
-                <LeadAssignedTeams/>
-              )
-            }
+            {isOpenLeadTeamsCard && (
+              <LeadAssignedTeams
+                selectedLeadData={selectedLeadData}
+                isOpen={isOpenLeadTeamsCard}
+              />
+            )}
           </div>
 
           {/* Activity */}
@@ -1385,7 +1461,7 @@ const Detail: React.FC<DetailProps> = ({
       ) : type === "none" ? (
         <div>
           <p
-            title={value}
+            // title={value}
             className="font-medium text-sm text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
           >
             {value || "-"}

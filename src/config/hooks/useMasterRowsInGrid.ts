@@ -47,10 +47,9 @@ export const useMasterRowsInGrid = () => {
     }
 
     useEffect(() => {
-        const delay = 1000;
         const timerId = setTimeout(() => {
             fetchMasterRowsInGridDropdownOptions()
-        }, delay)
+        }, 0)
         return () => clearTimeout(timerId);
     }, []);
     return {
