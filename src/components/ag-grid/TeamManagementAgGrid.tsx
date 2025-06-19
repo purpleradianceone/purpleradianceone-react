@@ -19,6 +19,7 @@ function TeamManagementAgGrid({
   companyTeamList,
   isUpdateCompanyTeamModalOpen,
   isGridForProductTeam,
+  isGridForLeadProductTeam,
   addCompanyProductTeamArray,
   handleCompanyTeamCheckboxChange,
   handleViewPortChanged,
@@ -46,14 +47,14 @@ function TeamManagementAgGrid({
         minWidth: 300,
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam,
+        hide: isGridForProductTeam || isGridForLeadProductTeam ,
       },
       {
         field: "isActive",
         headerName: "Status",
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam,
+        hide: isGridForProductTeam || isGridForLeadProductTeam,
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
@@ -79,14 +80,14 @@ function TeamManagementAgGrid({
         headerName: "Created By",
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam,
+        hide: isGridForProductTeam || isGridForLeadProductTeam,
       },
       {
         field: "createdOn",
         headerName: "Created On",
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam,
+        hide: isGridForProductTeam|| isGridForLeadProductTeam,
       },
       {
         headerName: "Actions",
@@ -147,7 +148,7 @@ function TeamManagementAgGrid({
               );
           }, []);
 
-          if (!isGridForProductTeam) {
+          if ((isGridForProductTeam !== undefined ? !isGridForProductTeam : false ) || isGridForLeadProductTeam !== undefined ? !isGridForLeadProductTeam : false) {
             return (
               <>
                 <button
@@ -161,7 +162,7 @@ function TeamManagementAgGrid({
                   createPortal(
                     <div
                       ref={dropdownRef}
-                      className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
+                      className="absolute bg-white  border rounded-md shadow-lg w-24 ml-2 z-50"
                       style={{ top: position.top, left: position.left }}
                     >
                       {userHasAccessToUpdateTeamManagement && (
@@ -187,12 +188,12 @@ function TeamManagementAgGrid({
                   )}
               </>
             );
-          } else if (isGridForProductTeam) {
+          } else if (isGridForProductTeam || isGridForLeadProductTeam) {
             const isChecked = addCompanyProductTeamArray!.includes(
               params.data.id
             );
             return (
-              <div className="flex flex-col ml-2 items-center">
+              <div className="flex justify-center mt-1 items-center">
                 <input
                   type="checkbox"
                   checked={isChecked}
@@ -224,7 +225,7 @@ function TeamManagementAgGrid({
     <div
       className="ag-theme-alpine w-full"
       style={
-        isGridForProductTeam
+        isGridForProductTeam || isGridForLeadProductTeam
           ? { height: "300px", width: "100%" }
           : { height: 505, width: "100%" }
       }

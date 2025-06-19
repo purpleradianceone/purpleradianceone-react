@@ -67,6 +67,7 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          getLeadOwnerHistory();
         } else {
           setIsDialogueOpen(true);
         }

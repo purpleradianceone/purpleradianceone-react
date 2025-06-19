@@ -95,16 +95,11 @@ function UpdateLeadForm({
         postDataForLeadUpdate,
         { withCredentials: true }
       );
-      console.log(response);
-      
-      
         if (response.data.status === true) {
           showMessageSnackbar({
             message: response.data.message,
             type: "success",
           });
-
-          // onEditRefreshLeadData();
           onClose();
         } else if (response.data.status === false) {
           showMessageSnackbar({
@@ -122,6 +117,7 @@ function UpdateLeadForm({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           setIsDialogueOpen(false);
+          handleSubmit(event);
         } else {
           setIsDialogueOpen(true);
         }

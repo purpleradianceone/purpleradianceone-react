@@ -6,6 +6,7 @@ import Button from "../../ui/Button";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
+  STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
 import axios from "axios";
@@ -16,7 +17,10 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { usePanel } from "../../../context/panel/usePanel";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../constants/Messages";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -35,6 +39,7 @@ const LeadContact = ({
   fetchLeadContact: () => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
+  const { userHasAccessToUpdateLead } = useUserAccessModules();
   const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
     useState(false);
   const [editContactData, setEditContactData] =
@@ -148,7 +153,9 @@ const LeadContact = ({
   };
 
   // to change the status of contact
-  const handleActiveStatusChange = (selectedContactCard: LeadContactType) => {
+  const handleActiveStatusChange = async (
+    selectedContactCard: LeadContactType
+  ) => {
     const previousStatus = isActive;
     const newStatus = !isActive;
 
@@ -158,7 +165,6 @@ const LeadContact = ({
     //  Proceed with form submission logic here
     const postData = {
       company_id: loginStatus.companyId,
-      // lead_id: selectedLeadData.id,
       name: selectedContactCard.name,
       email: selectedContactCard.email,
       mobilenumber: selectedContactCard.mobileNumber,
@@ -174,39 +180,42 @@ const LeadContact = ({
       isactive: newStatus,
       is_primary: selectedContactCard?.isPrimary,
     };
-    // console.log("Form submitted:", leadContactForm, socialMediaHandles);
-    console.log("this is post data");
-
-    console.log(postData);
 
     const api = POST_API.UPDATE_LEAD_CONTACT;
-    axios
+    await axios
       .post(api, postData, {
         withCredentials: true,
       })
       .then((response) => {
+        const data = response.data;
         if (response.data.status === true) {
-          const data = response.data;
           showMessageSnackbar({
             message: data.message,
             type: "success",
           });
           fetchLeadContact();
         } else {
-          const data = response.data;
           showMessageSnackbar({
             message: data.message,
             type: "error",
           });
         }
       })
-      .catch((error) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
         //if exception occurs then rollback to previous state
         setIsActive(previousStatus);
-        console.error(error);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: handleActiveStatusChange,
+          });
+          if (refreshTokenResponse) {
+            handleActiveStatusChange(selectedContactCard);
+          }
+        }
       });
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email, mobileNumber } = leadContactForm;
     let isValid = true;
@@ -243,9 +252,6 @@ const LeadContact = ({
 
     if (!isValid) return;
     const socialMediaHandlesConcat = socialMediaHandles.join(",");
-    console.log("this is social media concat: ");
-
-    console.log(socialMediaHandlesConcat);
 
     //  Proceed with form submission logic here
     const postData = {
@@ -274,15 +280,11 @@ const LeadContact = ({
             is_primary: false,
           }),
     };
-    // console.log("Form submitted:", leadContactForm, socialMediaHandles);
-    console.log("this is post data");
-
-    console.log(postData);
 
     const api = editingContactId
       ? POST_API.UPDATE_LEAD_CONTACT
       : POST_API.CREATE_LEAD_CONTACT;
-    axios
+    await axios
       .post(api, postData, {
         withCredentials: true,
       })
@@ -302,8 +304,17 @@ const LeadContact = ({
           });
         }
       })
-      .catch((error) => {
-        console.error(error);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithEvent: handleSubmit,
+          });
+          if (refreshTokenResponse) {
+            handleSubmit(e);
+          }
+        }
       });
 
     // Optionally close modal and reset form
@@ -387,7 +398,19 @@ const LeadContact = ({
       <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
         <span>Add</span>
         <button
-          onClick={() => setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm)}
+          disabled={!userHasAccessToUpdateLead}
+          onClick={() => {
+            if (userHasAccessToUpdateLead) {
+              setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
+            } else {
+              showMessageSnackbar({
+                message:
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message,
+                type: "error",
+              });
+            }
+          }}
           className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
         >
           <Plus size={10} />
@@ -434,8 +457,8 @@ const LeadContact = ({
                 <span
                   className={`rounded-full px-2 py-1 border  ${
                     contact.isActive
-                      ? "text-green-700 bg-green-100 border-green-400"
-                      : "text-red-700 bg-red-100 border-red-400"
+                      ? "text-green-900 bg-green-100 border-green-400"
+                      : "text-red-800 bg-red-100 border-red-400"
                   }`}
                 >
                   {contact.isActive ? "Active" : "Inactive"}
@@ -451,7 +474,9 @@ const LeadContact = ({
       </div>
       {/* view in pop up card  */}
       {selectedContactCard && (
-        <div className= {` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}>
+        <div
+          className={` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}
+        >
           <div
             className={` ${
               isActive ? "bg-green-50" : "bg-red-50"
@@ -486,8 +511,18 @@ const LeadContact = ({
               <div>
                 {/* Edit Button */}
                 <button
+                  disabled={!userHasAccessToUpdateLead}
                   onClick={() => {
-                    handleEditLeadContactClick(selectedContactCard);
+                    if (userHasAccessToUpdateLead) {
+                      handleEditLeadContactClick(selectedContactCard);
+                    } else {
+                      showMessageSnackbar({
+                        message:
+                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message,
+                        type: "error",
+                      });
+                    }
                   }}
                   className="top-4 left-4 text-sm bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
                 >
@@ -578,17 +613,7 @@ const LeadContact = ({
                       ))}
                 </div>
               </div>
-              {/* status  */}
-              <div className="hidden">
-                <h4 className={viewLabelClassName}>Status</h4>
-                <p>
-                  {selectedContactCard.isActive ? (
-                    <span className="text-green-500">Active</span>
-                  ) : (
-                    <span className="text-red-500">Inactive</span>
-                  )}
-                </p>
-              </div>
+              {/* status */}
               <div className="flex items-center gap-4 mb-4">
                 <span className="text-sm font-medium text-gray-700">
                   Status:
@@ -598,13 +623,31 @@ const LeadContact = ({
                     type="checkbox"
                     checked={isActive}
                     onChange={
-                      !selectedContactCard.isPrimary
+                      !selectedContactCard.isPrimary &&
+                      userHasAccessToUpdateLead
                         ? () => {
                             handleActiveStatusChange(selectedContactCard);
                           }
-                        : undefined
+                        : () => {
+                            if (selectedContactCard.isPrimary) {
+                              showMessageSnackbar({
+                                message:
+                                  "Cannot Change , User is Primary Contact",
+                                type: "error",
+                              });
+                            } else {
+                              showMessageSnackbar({
+                                message:
+                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                    .UPDATE_LEAD_ACCESS_DENIED_message,
+                                type: "error",
+                              });
+                            }
+                          }
                     }
-                    disabled={selectedContactCard.isPrimary}
+                    disabled={
+                      !userHasAccessToUpdateLead
+                    }
                     title={
                       selectedContactCard.isPrimary
                         ? "Cannot change the status of the primary contact."
@@ -613,6 +656,11 @@ const LeadContact = ({
                     className="sr-only peer"
                   />
                   <div
+                    title={
+                      selectedContactCard.isPrimary
+                        ? "Cannot change the status of the primary contact."
+                        : ""
+                    }
                     className="w-11 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
                  after:content-[''] after:absolute after:top-[2px] after:left-[2px]
                  after:bg-white after:border-gray-300 after:border after:rounded-full

@@ -4,7 +4,8 @@ import CompanyTeamSearchProps from "../team-management/CompanyTeamListProps";
 type TeamManagementAgGridProps = {
     companyTeamList: CompanyTeamSearchProps[];
       isUpdateCompanyTeamModalOpen?: (params: CompanyTeamSearchProps) => void;
-      isGridForProductTeam: boolean;
+      isGridForProductTeam?: boolean;
+      isGridForLeadProductTeam?: boolean;
       addCompanyProductTeamArray?: number[];
       handleCompanyTeamCheckboxChange?: (
         params: CompanyTeamSearchProps,
