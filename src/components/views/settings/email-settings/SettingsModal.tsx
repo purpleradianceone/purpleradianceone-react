@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import Button from "../ui/Button";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import Button from "../../../ui/Button";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import POST_API from "../../constants/PostApi";
-import { ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
+import POST_API from "../../../../constants/PostApi";
+import { ShowMessageSnackbarProps } from "../../../../@types/ui/MessageSnackbarProps";
 
 type SettingType = "company" | "user";
 
@@ -16,7 +16,7 @@ const Dialog: React.FC<{
 }> = ({ open, onOpenChange, children }) =>
   !open ? null : (
     <div
-      className="fixed w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center"
+      className="fixed pt-32 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto"
       onClick={() => onOpenChange(false)}
     >
       <div className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50" onClick={(e) => e.stopPropagation()}>{children}</div>
@@ -25,10 +25,10 @@ const Dialog: React.FC<{
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white p-4 rounded shadow ">{children}</div>;
+}) => <div className="bg-white px-4 py-1 rounded shadow ">{children}</div>;
 const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="mb-4">{children}</div>;
+}) => <div className="mb-2">{children}</div>;
 const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <h2 className="text-lg font-bold">{children}</h2>
 );

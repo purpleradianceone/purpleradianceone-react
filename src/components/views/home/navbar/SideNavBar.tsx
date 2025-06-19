@@ -241,26 +241,17 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
                 }
               }}
             >
-              Lead
+              Settings
             </Link>,
             <Link
             to= {ROUTES_URL.EMAIL_TEMPLATE}
             >
             Email Template
             </Link>, 
-            <Link
-            to= {ROUTES_URL.EMAIL_SETTING}
-            >
-            Email Setting
-            </Link>,
 
 
 
-            <Link
-            to= {ROUTES_URL.COMPANY_SETTING}
-            >
-           Company Setting
-            </Link>, 
+            
 
 
             //   <Link

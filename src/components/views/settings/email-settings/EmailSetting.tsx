@@ -8,24 +8,23 @@ import {
   Lock,
   KeyRound,
   Plus,
-  LucideMail,
-  LucideSettings,
   CheckCircle,
   XCircle,
 } from "lucide-react";
 import SettingsModal from "./SettingsModal";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import POST_API from "../../constants/PostApi";
-import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
-import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import Button from "../ui/Button";
-import MessageSnackBar from "../ui/MessageSnackbar";
+import POST_API from "../../../../constants/PostApi";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import Button from "../../../ui/Button";
+import MessageSnackBar from "../../../ui/MessageSnackbar";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MESSAGE from "../../constants/Messages";
+} from "../../../../@types/ui/MessageSnackbarProps";
+import MESSAGE from "../../../../constants/Messages";
+import EmailTypeSettings from "./EmailTypeSettings";
 
 interface CompanyEmailSetting {
   id: number;
@@ -61,7 +60,7 @@ interface CompanyUserEmailSetting {
 }
 
 export default function EmailSettingsTabs() {
-  const [activeTab, setActiveTab] = useState<"company" | "user">("company");
+  const [activeTab, setActiveTab] = useState<"company" | "user" | "email type">("company");
   const [companySettings, setCompanySettings] = useState<CompanyEmailSetting[]>(
     []
   );
@@ -85,6 +84,19 @@ export default function EmailSettingsTabs() {
   };
 
   const { loginStatus } = useLoggedInUserContext();
+   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   const getEmailSettings = async () => {
     setIsLoading(true); // Start loading
@@ -138,9 +150,10 @@ export default function EmailSettingsTabs() {
     setting: CompanyEmailSetting,
     index: number
   ) => (
+    <div className="flex justify-between">
     <div
       key={index}
-      className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
+      className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
     >
       <Button
         disabled={!userHasAccessToUpdateEmailSetting}
@@ -240,12 +253,65 @@ export default function EmailSettingsTabs() {
         </p>
       </div>
     </div>
+    {activeTab !== "email type" && (
+<div className="flex max-w-28 max-h-10">
+            {activeTab === "company" ? (
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  // className=" top-20 right-4 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
+                  onClick={() => {
+                    if (userHasAccessToAddEmailSetting) {
+                      setModalType("company");
+                      setEditData(null);
+                      setIsModalOpen(true);
+                    } else {
+                      showMessageSnackbar({
+                        message: MESSAGE.ERROR.NOT_ATHORISED,
+                        type: "error",
+                      });
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>
+                </Button>
+            ) : (
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  onClick={() => {
+                    if (userHasAccessToAddEmailSetting) {
+                      setModalType("user");
+                      setEditData(null);
+                      setIsModalOpen(true);
+                    } else {
+                      showMessageSnackbar({
+                        message: MESSAGE.ERROR.NOT_ATHORISED,
+                        type: "error",
+                      });
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>{" "}
+                </Button>
+            )}
+            <MessageSnackBar
+              isOpen={messageSnackbar.open}
+              message={messageSnackbar.message}
+              type={messageSnackbar.type}
+              onClose={handleMessageSnackbarClose}
+              duration={NUMBER_VALUES.SNACKBAR_DURATION}
+            />
+          </div>
+          )}
+          </div>
   );
 
   const renderUserEmailCard = (
     setting: CompanyUserEmailSetting,
     index: number
   ) => (
+    <div className="flex justify-between">
     <div
       key={index}
       className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
@@ -348,33 +414,73 @@ export default function EmailSettingsTabs() {
         </p>
       </div>
     </div>
+    {activeTab !== "email type" && (
+<div className="flex max-w-28 max-h-10">
+            {activeTab === "company" ? (
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  onClick={() => {
+                    if (userHasAccessToAddEmailSetting) {
+                      setModalType("company");
+                      setEditData(null);
+                      setIsModalOpen(true);
+                    } else {
+                      showMessageSnackbar({
+                        message: MESSAGE.ERROR.NOT_ATHORISED,
+                        type: "error",
+                      });
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>
+                </Button>
+            ) : (
+                <Button
+                  disabled={!userHasAccessToAddEmailSetting}
+                  onClick={() => {
+                    if (userHasAccessToAddEmailSetting) {
+                      setModalType("user");
+                      setEditData(null);
+                      setIsModalOpen(true);
+                    } else {
+                      showMessageSnackbar({
+                        message: MESSAGE.ERROR.NOT_ATHORISED,
+                        type: "error",
+                      });
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 text-white " />{" "}
+                  <span className=" font-bold ">Create</span>{" "}
+                </Button>
+            )}
+            <MessageSnackBar
+              isOpen={messageSnackbar.open}
+              message={messageSnackbar.message}
+              type={messageSnackbar.type}
+              onClose={handleMessageSnackbarClose}
+              duration={NUMBER_VALUES.SNACKBAR_DURATION}
+            />
+          </div>
+          )}
+          </div>
   );
 
   //message snakbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+ 
 
   return (
-    <div className="p-6 w-full">
-      <div className="sticky z-5 top-8 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full min-w-full ">
-        <div className="flex justify-between w-full h-12 items-center">
-          <div className="flex gap-1">
+    <div className="w-full">
+      <div className="sticky z-5 top-0 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full min-w-full ">
+        <div className="flex justify-between w-full items-center">
+          {/* <div className="flex gap-1">
             {<LucideMail className="w-6 h-6 text-blue-600" />}
             {<LucideSettings className="w-4 h-4 text-blue-600" />}
             <span className="text-xl font-bold ">Email Settings</span>
-          </div>
-          <div className="flex justify-end ">
+          </div> */}
+          {/* {activeTab !== "email type" && (
+<div className="flex float-end ">
             {activeTab === "company" ? (
               <div className="flex justify-end ">
                 <Button
@@ -428,9 +534,11 @@ export default function EmailSettingsTabs() {
               duration={NUMBER_VALUES.SNACKBAR_DURATION}
             />
           </div>
+          )}
+           */}
         </div>
       </div>
-      <div className="mb-6 flex border-b border-gray-300">
+      <div className="mb-2 flex border-b border-gray-300">
         <button
           onClick={() => setActiveTab("company")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
@@ -451,6 +559,16 @@ export default function EmailSettingsTabs() {
         >
           Company User Email Settings
         </button>
+        <button
+          onClick={() => setActiveTab("email type")}
+          className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
+            activeTab === "email type"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          Email Type
+        </button>
       </div>
 
       {/* Content */}
@@ -462,7 +580,7 @@ export default function EmailSettingsTabs() {
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
                 {companySettings.length > 0 ? (
                   companySettings.map(renderCompanyEmailCard)
                 ) : (
@@ -473,14 +591,14 @@ export default function EmailSettingsTabs() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "user" ?(
           <div className="w-full">
             {isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
                 {userSettings.length > 0 ? (
                   userSettings.map(renderUserEmailCard)
                 ) : (
@@ -490,6 +608,10 @@ export default function EmailSettingsTabs() {
                 )}
               </div>
             )}
+          </div>
+        ) : (
+          <div>
+            <EmailTypeSettings></EmailTypeSettings>
           </div>
         )}
       </div>
