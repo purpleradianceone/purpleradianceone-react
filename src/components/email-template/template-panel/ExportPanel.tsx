@@ -10,20 +10,15 @@ interface ExportPanelProps {
   onCopyHtml?: (html: string) => void;
 }
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml }) => {
+export const ExportPanel: React.FC<ExportPanelProps> = ({
+  onPreview,
+  onCopyHtml,
+}) => {
   const { query } = useEditor();
 
   const handlePreview = async () => {
     const json = query.serialize();
-    console.log("|||||||||||||||||||||Craft JSON||||||||||||||||||||||");
-    console.log(json);
-    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-    console.log("|||||||||||||||||||||HTML||||||||||||||||||||||");
     const html1 = craftJsonToHtml(json);
-    console.log(html1);
-    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
     onPreview(html1);
   };
 
@@ -32,7 +27,8 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
     if (!canvasElement) return;
     const json = query.serialize();
     const html = craftJsonToHtml(json);
-    navigator.clipboard.writeText(html)
+    navigator.clipboard
+      .writeText(html)
       .then(() => {
         alert("HTML copied to clipboard!");
       })
@@ -41,43 +37,36 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ onPreview, onCopyHtml 
       });
   };
 
- 
-
   return (
     <div style={{ display: "grid", gap: 10 }}>
-    <button
-      onClick={handlePreview}
-      style={{
-        top: 50,
-        left: "50%",
-        padding: "2px 8px",
-        backgroundColor: "#007bff",
-        color: "#fff",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-      }}
-    >
-      Preview HTML
-    </button>
+      <button
+        onClick={handlePreview}
+        style={{
+          top: 50,
+          left: "50%",
+          padding: "2px 8px",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
+        Preview HTML
+      </button>
 
-    <button onClick={handleCopy} style={{ 
-      padding: "2px 8px", 
-      backgroundColor: "#4CAF50", 
-      color: "white", 
-      borderRadius: "4px", 
-      cursor: "pointer",
-      }}>
+      <button
+        onClick={handleCopy}
+        style={{
+          padding: "2px 8px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
         Copy HTML
       </button>
-    </div> 
+    </div>
   );
 };
-
-
-
-
-
-
-
-

@@ -1,39 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef } from 'react';
-import { useDynamicFields } from '../DynamicFieldsContext'; 
-import { useEditor } from '@craftjs/core';
+import React, { useState, useRef, } from 'react';
+
+import axios from 'axios';
+import { useDynamicFields } from '../DynamicFieldsContext';
 import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
 import POST_API from '../../../constants/PostApi';
-import axios from 'axios';
 import { STATUS_CODE } from '../../../constants/AppConstants';
-import { useSearchParams } from 'react-router-dom';
-import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
+import { useNavigate, } from 'react-router-dom';
+import ROUTES_URL from '../../../constants/Routes';
 
-
-type TemplateSettingsPanelEditProps = {
-  htmlTemplateTypeSubjectPlaceholder: string;
+type TemplateSettingsPanelInsertProps = {
+  htmlBody: string;
   id: number;
   templateTypeId: number;
   emailTemplateName: string;
   emailTemplateSubject:string;
   emailTemplateIsDefault:boolean;
-
+  
 };
 
-export const TemplateSettingsPanelUpdate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder,id,templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault}) => {
+export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, id, templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault }) => {
+
   const [isOpen, setIsOpen] = useState(false);
-  
   const [templateName, setTemplateName] = useState(emailTemplateName);
   const [subject, setSubject] = useState(emailTemplateSubject);
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const[htmlBody,setHtmlBody] = useState('');
-const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
+  const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
+  const navigate = useNavigate();
+  const dynamicFields = useDynamicFields(); 
 
-  const dynamicFields = useDynamicFields();
 
-    const { query } = useEditor();
-  
-  
 
   const insertDynamicField = (field: string) => {
     const placeholder = `{{${field}}}`;
@@ -53,21 +49,10 @@ const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
       input.focus();
     }, 0);
   };
-function getHtmlEmailBody(): string {
-    const canvasElement = document.getElementById("CANVAS");
-    if (!canvasElement) return "" ;
-    const json = query.serialize();
-    const html = craftJsonToHtml(json).trim();
-      setHtmlBody(html.trim());
-      return html;
-    };
 
-    const {loginStatus} = useLoggedInUserContext();
-    const [searchParams] = useSearchParams();
-    const params = searchParams.get("type");
-    const updateEmailTemplate = async(emailBody:string)=>{
+     const {loginStatus} = useLoggedInUserContext();
+    const updateEmailTemplateInsert = async(emailBody:string)=>{
 
-                    const json = query.serialize();
                     const postDataUpdateEmailTemplate = {
                       company_id: loginStatus.companyId,
                       updatedby_id: loginStatus.id,
@@ -76,34 +61,22 @@ function getHtmlEmailBody(): string {
                       name: templateName,
                       email_subject: subject,
                       email_body_html: emailBody,
-                      email_body_json: json,
+                      email_body_json: null,
                       is_default: isDefault,
                     };                   
 
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log(emailTemplateSubject);
-                    console.log(emailTemplateName);
-                    console.log(subject);
-                    console.log(postDataUpdateEmailTemplate.id);
-                    console.log(postDataUpdateEmailTemplate.email_type_id);
-                    console.log(postDataUpdateEmailTemplate.name);
-                    console.log(postDataUpdateEmailTemplate.is_default);
-                    console.log(emailBody);
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log(json);
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
               await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
                         withCredentials:true
                 })
                 .then((response) =>{
                       if(response.status === STATUS_CODE.OK){
-                          console.log(response.data);
+                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
                         }
-                        alert(response.data.message);
                         
-                }).catch((error)=>{console.log(error)})
+                }).catch((error)=>{})
         }
+
   
   return (
     <>
@@ -112,24 +85,24 @@ function getHtmlEmailBody(): string {
         onClick={() => setIsOpen(true)}
         style={{
           position: "fixed",
-          top: "125px",
+          top: "50px",
           right: 0,
           padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
-          zIndex: 1,
+          zIndex: 10,
         }}
       >
-        Update Template
+        Save Template
       </button>
 
       {isOpen && (
         <div
           style={{
             position: "fixed",
-            top: "120px",
+            top: "50px",
             right: 2,
             backgroundColor: "white",
             padding: "20px",
@@ -160,11 +133,7 @@ function getHtmlEmailBody(): string {
             onSubmit={async (e) => {
               e.preventDefault();
               setIsOpen(false);
-              const resultHtml = await getHtmlEmailBody();
-
-              updateEmailTemplate(resultHtml);
-              // TODO: API Call
-              console.log({ templateName, subject, resultHtml });
+              await updateEmailTemplateInsert(htmlBody);
             }}
           >
             <div style={{ marginBottom: "15px" }}>
@@ -175,7 +144,7 @@ function getHtmlEmailBody(): string {
                   fontWeight: "600",
                 }}
               >
-                Update Template Settings
+                Update Template Settings{" "}
               </h3>
             </div>
 
@@ -206,7 +175,6 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
-                  placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
 
@@ -253,8 +221,6 @@ function getHtmlEmailBody(): string {
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
-                    maxHeight: "120px",
-                    overflowY: "auto",
                   }}
                 >
                   <option value="">Insert Dynamic Field In Subject</option>
@@ -266,33 +232,6 @@ function getHtmlEmailBody(): string {
                 </select>
               </div>
 
-              {/* Description */}
-              {/* <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    minHeight: "80px",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
-                  placeholder="Template description..."
-                />
-              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}

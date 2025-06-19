@@ -40,6 +40,10 @@ const ROUTES_URL = {
 
     //for email settings
     EMAIL_SETTING : "/email-setting",
+
+    COMPANY_SETTING: "/settings/company-settings",
+
+
     
 }
 export default ROUTES_URL;
