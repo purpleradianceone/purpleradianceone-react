@@ -20,7 +20,6 @@ import LoggedInRoute from "./LoggedInRoute";
 import ContactUs from "../../components/views/home/landing-page/ContactUs";
 import LeadManagement from "../../components/views/lead-management/LeadManagement";
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
-import LeadSettingsPage from "../../components/views/settings/lead-settings/LeadSettingsPage";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
 import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
 import Dashboard from "../../components/views/home/dashboard/Dashboard";
@@ -36,11 +35,11 @@ import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
 import Meetings from "../../components/views/meeting/Meetings";
-import EmailSetting from "../../components/email-settings/EmailSetting";
+import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
 import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
 import ZoomMeetingsOAuthConsentAndroid from "../../components/android-page/ZoomOAuthConsentAndrod";
 import { EditorCanvasWithJson } from "../../components/email-template/template-editors/EditorCanvasWithJson";
-import CompanySetting from "../../components/views/settings/company-settings/CompanySetting";
+import SettingsPage from "../../components/views/settings/company-settings/SettingsPage";
 
 
 
@@ -172,7 +171,7 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <div>
           <Navbar>
-            <LeadSettingsPage />
+            <SettingsPage />
           </Navbar>
         </div>
       </PrivateRoute>
@@ -355,16 +354,6 @@ export const router = createBrowserRouter([
         </Navbar>
       </PrivateRoute>
     )
-  },{
-    path: ROUTES_URL.COMPANY_SETTING,
-    element:(
-       <PrivateRoute>
-        <Navbar>
-          <CompanySetting></CompanySetting>
-        </Navbar>
-      </PrivateRoute>
-    )
-
-  }
+  },
 ]);
 export default router;
