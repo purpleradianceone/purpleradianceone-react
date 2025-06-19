@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useDynamicFields } from '../DynamicFieldsContext'; 
 import { useEditor } from '@craftjs/core';
@@ -76,19 +77,6 @@ function getHtmlEmailBody(): string {
                       is_default: isDefault,
                     };                   
 
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log(emailTemplateSubject);
-                    console.log(emailTemplateName);
-                    console.log(subject);
-                    console.log(postDataUpdateEmailTemplate.id);
-                    console.log(postDataUpdateEmailTemplate.email_type_id);
-                    console.log(postDataUpdateEmailTemplate.name);
-                    console.log(postDataUpdateEmailTemplate.is_default);
-                    console.log(emailBody);
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    console.log(json);
-                    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
               await axios
                 .post(
                   POST_API.UPDATE_EMAIL_TEMPLATE,
@@ -100,12 +88,10 @@ function getHtmlEmailBody(): string {
                 .then((response) => {
                   
                   if (response.status === STATUS_CODE.OK) {
-                    console.log(response.data);
                     navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
                   }
                 })
                 .catch((error) => {
-                  console.log(error);
                 });
         }
         
@@ -166,10 +152,7 @@ function getHtmlEmailBody(): string {
               e.preventDefault();
               setIsOpen(false);
               const resultHtml = await getHtmlEmailBody();
-
               updateEmailTemplate(resultHtml);
-              // TODO: API Call
-              console.log({ templateName, subject, resultHtml });
             }}
           >
             <div style={{ marginBottom: "15px" }}>

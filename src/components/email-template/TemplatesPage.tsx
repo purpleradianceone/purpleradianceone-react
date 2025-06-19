@@ -232,10 +232,6 @@ export const TemplatesPage: React.FC = () => {
         // or set to 0 by the calling useEffect for reset.
         const currentOffset = reset ? 0 : offset;
 
-        console.log(
-          `Fetching templates for typeId: ${typeId}, offset: ${currentOffset}, limit: ${limit}, reset: ${reset}`
-        );
-
         const response = await axios.post(
           POST_API.GET_EMAIL_TEMPLATE,
           {
@@ -255,13 +251,6 @@ export const TemplatesPage: React.FC = () => {
 
         if (response.status === STATUS_CODE.OK) {
           const newTemplates = response.data;
-          console.log(`Fetched ${newTemplates.length} new templates.`);
-          // if(newTemplates.length===limit){
-          //     setHasMoreTemplates(true);
-          // }else{
-          //   if(newTemplates.length<limit)setHasMoreTemplates(false)
-          // }
-          // setHasMoreTemplates(!(newTemplates.length < limit)); // If fewer than limit, no more templates
           setHasMoreTemplates(newTemplates.length === limit);
           const newOffset: number = currentOffset + limit;
           setOffset(newOffset);
@@ -294,7 +283,6 @@ export const TemplatesPage: React.FC = () => {
   const handleTabChange = (tab: string) => {
     const selectedType = templateTypes.find((type) => type.name === tab);
     if (selectedType) {
-      console.log(`Changing tab to: ${tab}, typeId: ${selectedType.id}`);
       setActiveTab(tab);
       setSelectedTypeId(selectedType.id);
       // When tab changes, we always want a fresh fetch starting from 0 offset
@@ -312,7 +300,6 @@ export const TemplatesPage: React.FC = () => {
 
   useEffect(() => {
     getTemplateTypes();
-    console.log(typeof(status));
     if(message && status){
       showMessageSnackbar({message:message,type:status==="true"?"success":"error"})
     }
@@ -740,7 +727,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
           }
         })
         .catch((error) => {
-          console.log(error);
+//
         });
     } catch (error) {
       console.error("Failed to update default status:", error);

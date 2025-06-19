@@ -117,13 +117,6 @@ export const EditorCanvas: React.FC = () => {
 
   const [searchParams] = useSearchParams();
   const params = searchParams.get("type");
-  useEffect(() => {
-    if (params) {
-      console.log("parsed JsonPArmas : ");
-      console.log(JSON.parse(params));
-    }
-  }, []);
-
   const json = jsonPlaceholdersMap[parseInt(JSON.parse(params!).id)];
   const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
   const [dynamicVariables, setDynamicVariables] =
