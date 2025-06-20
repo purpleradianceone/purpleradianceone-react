@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useEditor, useNode } from "@craftjs/core";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -28,7 +28,6 @@ import {
   FiX,
 } from "react-icons/fi";
 import { DynamicFieldsContext } from "../DynamicFieldsContext";
-import { EditorState } from "lexical";
 
 // Styled Components
 const EditorContainer = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(({ children }, ref) => (

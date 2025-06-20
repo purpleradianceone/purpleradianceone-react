@@ -55,7 +55,7 @@ export const ColumnBlock: React.FC = () => {
 
       {/* Columns Container */}
       <div style={{ display: "flex", width: "100%", gap: "10px", flexWrap: "nowrap" }}>
-        {columns.map((colId, index) => (
+        {columns.map((colId) => (
           <div
             key={colId}
             style={{

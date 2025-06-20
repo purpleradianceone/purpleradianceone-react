@@ -284,8 +284,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
   const linkedNodeEntries = Object.entries(node.linkedNodes || {});
 
   const columns = linkedNodeEntries
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .map(([_, columnId], index, arr) => {
+    .map(([_, columnId], _index, arr) => {
       const colWidth = `calc(${100 / arr.length}% - ${(parseFloat(gap) * (arr.length - 1)) / arr.length}px)`;
 
       const columnWrapperStyle = formatStyle({

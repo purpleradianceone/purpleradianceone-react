@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, } from 'react';
 
@@ -8,6 +9,8 @@ import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
 import { useNavigate, } from 'react-router-dom';
 import ROUTES_URL from '../../../constants/Routes';
+import ApiError from '../../../@types/error/ApiError';
+import RefreshToken from '../../../config/validations/RefreshToken';
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -74,7 +77,15 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSetting
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
                         }
                         
-                }).catch((error)=>{})
+                }).catch(async(error : ApiError | any) =>{
+                  if(error.status === STATUS_CODE.UNATHORISED){
+                    const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:updateEmailTemplateInsert});
+                    if(refreshTokenResponse){
+                      updateEmailTemplateInsert(emailBody);
+                    }
+                  }
+
+                })
         }
 
   

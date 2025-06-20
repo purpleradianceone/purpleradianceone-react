@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-/* eslint-disable no-constant-binary-expression */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Calendar,
-  EventProps,
-  EventWrapperProps,
   momentLocalizer,
   View,
 } from "react-big-calendar";
@@ -15,7 +11,6 @@ import "../../../assets/styles/CalendarWithTicks.css";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Button from "../../ui/Button";
-// import GoogleMeetScheduler from "./GoogleMeetScheduler";
 import {
   CalendarIcon,
   ChevronLeft,
@@ -40,7 +35,6 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import LiveTimezoneClock from "../../clock/LiveTimeZoneClock";
 import "../../../assets/styles/CustomCalendarCSS.css";
-import { availableMemory } from "process";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 
 function LeadMeetingsModal({
@@ -839,7 +833,7 @@ function LeadMeetingsModal({
                     setSelectedMeetingEvent(event);
                     setIsEditMettingModalOpen(true);
                   }}
-                  dayPropGetter={(date: Date, resourceId?: number | string) => {
+                  dayPropGetter={(date: Date) => {
                     const today = moment(new Date()).toDate();
 
                     // Extract its components (remember to CALL the methods)

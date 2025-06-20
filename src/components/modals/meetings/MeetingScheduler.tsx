@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -99,34 +97,6 @@ const MeetingScheduler = () => {
   };
 
   useEffect(() => {
-    const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
-    const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
-    const pickerFormatString = "yyyy-MM-DD HH:mm";
-
-    // const startDateTIme = parse(combinedPickerStartDateTimeString, pickerFormatString, new Date());
-    const startDateTIme = momentTimezone.tz(
-      combinedPickerStartDateTimeString,
-      pickerFormatString,
-      userPreference.timezoneName
-    );
-    const endDateTime = momentTimezone.tz(
-      combinedPickerEndDateTimeString,
-      pickerFormatString,
-      userPreference.timezoneName
-    );
-
-    console.log(
-      `combinedPickerStartDateTimeString : ${combinedPickerStartDateTimeString}`
-    );
-
-    console.log("parsedStart date");
-    console.log(startDateTIme.toDate());
-    console.log(userPreference.timezoneName);
-    console.log(serverCurrentTime);
-    console.log(serverCurrentTime! > startDateTIme.toDate());
-  }, [endTime]);
-
-  useEffect(() => {
     const openedFrom = searchParams.get("from");
       if(!openedFrom){
         setIsModalForLead(true);
@@ -134,12 +104,10 @@ const MeetingScheduler = () => {
   },[searchParams])
   const createGoogleMeetMeeting = async () => {
 
-    alert(selectedMeetingPlatform);
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
     const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
     const pickerFormatString = "yyyy-MM-DD HH:mm";
 
-    // const startDateTIme = parse(combinedPickerStartDateTimeString, pickerFormatString, new Date());
     const startDateTIme = momentTimezone.tz(
       combinedPickerStartDateTimeString,
       pickerFormatString,
@@ -295,6 +263,9 @@ const MeetingScheduler = () => {
         .catch(async(error : ApiError | any) => {
           if(error.status === STATUS_CODE.UNATHORISED){
             const refreshTokenResponse = await RefreshToken({callFunction:createZoomMeeting})
+            if(refreshTokenResponse){
+              createZoomMeeting();
+            }
           }
           else if(error.status === STATUS_CODE.PERMANENT_REDIRECT){
            handleZoomMeetingsOAuth();
@@ -328,7 +299,7 @@ const MeetingScheduler = () => {
         if (response.data.length === 0) {
           return 0;
         }
-        console.log(response.data[0]);
+        
         setSelectedCompanyUserDetailArray((prev) => [
           ...prev,
           {
@@ -345,6 +316,9 @@ const MeetingScheduler = () => {
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
         });
+        if(refreshTokenStatus){
+          isEmailIsOfCompanyUser(email);
+        }
       }
     }
   };
@@ -356,13 +330,12 @@ const MeetingScheduler = () => {
     ) {
       const id = await isEmailIsOfCompanyUser(newAttendeeEmail.trim());
       if (id !== 0) {
-        console.log("company user id returned from check : " + id);
         setSelectedCompanyUsersIdArray((prev) => [...prev, id]);
         setAttendees([...attendees, newAttendeeEmail.trim()]);
         setNewAttendeeEmail("");
         return;
       } else {
-        console.log("in else : " + id);
+        
         setAttendees([...attendees, newAttendeeEmail.trim()]);
         setNewAttendeeEmail("");
         return;

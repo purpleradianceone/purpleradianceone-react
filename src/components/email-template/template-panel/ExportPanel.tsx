@@ -4,15 +4,16 @@
 import React from "react";
 import { useEditor } from "@craftjs/core";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
+import { ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
-  onCopyHtml?: (html: string) => void;
+  handleCopyHtml? : ({message,type} : ShowMessageSnackbarProps) => void;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
   onPreview,
-  onCopyHtml,
+  handleCopyHtml
 }) => {
   const { query } = useEditor();
 
@@ -30,10 +31,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     navigator.clipboard
       .writeText(html)
       .then(() => {
-        alert("HTML copied to clipboard!");
+        handleCopyHtml!({message : "Copied To Clipboard" , type : "success"})
       })
       .catch(() => {
-        alert("Failed to copy HTML");
+        handleCopyHtml!({message : "Failed To Copy in Clipboard" , type : "error"})
       });
   };
 

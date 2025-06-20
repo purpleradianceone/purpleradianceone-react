@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import Timezone from "../../@types/user-profile/Timezone";
@@ -90,8 +91,7 @@ const UserPreference = () => {
   const [limit, setLimit] = useState(userPreference.rowsInGrid);
   const [hasMore, setHasMore] = useState(true);
   const [searchText, setSearchText] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [totalCount, setTotalCount] = useState<number | null>(null);
+  // const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const handleTimezonePreferenceChange = async () => {
     //getting the id as per value
@@ -157,7 +157,6 @@ const UserPreference = () => {
     setSelectedTimezoneId(userPreference.timezoneId);
   }, [userPreference]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -301,7 +300,7 @@ const UserPreference = () => {
 
       if (newOffset === 0) {
         setTimezoneList(newTimezones);
-        setTotalCount(count); // Update total count on initial load
+        // setTotalCount(count); // Update total count on initial load
         if (searchTextToUse) {
           setLimit(limitForGrid); // If searching, set limit to total count initially
         } else {
@@ -339,7 +338,7 @@ const UserPreference = () => {
       setOffset(0);
       setLimit(limitForGrid);
       setSearchText(""); // Clear search text when dropdown is shown
-      setTotalCount(null);
+      // setTotalCount(null);
       setHasMore(true);
       loadTimezones(0);
     } else {
@@ -348,7 +347,7 @@ const UserPreference = () => {
       setOffset(0);
       setLimit(limitForGrid);
       setSearchText("");
-      setTotalCount(null);
+      // setTotalCount(null);
       setHasMore(true);
     }
   }, [showTimeZoneData]);
@@ -357,7 +356,7 @@ const UserPreference = () => {
   const handleSearchChange = (text: string) => {
     setSearchText(text);
     setOffset(0);
-    setTotalCount(null);
+    // setTotalCount(null);
     setLimit(limitForGrid); // Reset limit for new search
     setHasMore(true);
     loadTimezones(0, text, limitForGrid); // Initial search load with limit 25

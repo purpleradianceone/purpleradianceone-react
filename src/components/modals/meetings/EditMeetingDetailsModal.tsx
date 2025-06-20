@@ -1,6 +1,5 @@
 /* eslint-disable no-constant-binary-expression */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createPortal } from "react-dom";
 import FormInput from "../../ui/FormInput";
@@ -56,14 +55,14 @@ function EditMeetingDetailsModal({
   onClose,
   isAttendeesPresent,
   handleMeetingDetailsUpdate,
-  meetingPlatform 
+  meetingPlatform,
 }: {
   meetingDetails: CalendarEventType;
   isOpen: boolean;
   onClose: () => void;
   isAttendeesPresent: boolean;
   handleMeetingDetailsUpdate: () => void;
-  meetingPlatform : MeetingPlatforms[]
+  meetingPlatform: MeetingPlatforms[];
 }) {
   const meetingStautsRadioButtonOptions = [
     {
@@ -88,10 +87,9 @@ function EditMeetingDetailsModal({
     },
   ];
 
-  const { userHasAccessToUpdateMeeting, userHasAccessToViewMeeting } =
-    useUserAccessModules();
+  const { userHasAccessToUpdateMeeting } = useUserAccessModules();
 
-  const  {userPreference} = useUserPreference();
+  const { userPreference } = useUserPreference();
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -158,17 +156,18 @@ function EditMeetingDetailsModal({
       : meetingDetails.meetingStatusFromZoom!;
   });
   const [isCreating, setIsCreating] = useState<boolean>(false); // Simulate meeting creation
-  const [selectedMeetingPlatform, setSelectedMeetingPlatform] = useState<string>(() => {
-    if (meetingDetails.platform === 1) {
-      return meetingPlatform[0].name;
-    } else if (meetingDetails.platform === 2) {
-      return meetingPlatform[1].name;
-    } else if (meetingDetails.platform === 3) {
-      return meetingPlatform[2].name;
-    } else {
-      return "";
-    }
-  });
+  const [selectedMeetingPlatform, setSelectedMeetingPlatform] =
+    useState<string>(() => {
+      if (meetingDetails.platform === 1) {
+        return meetingPlatform[0].name;
+      } else if (meetingDetails.platform === 2) {
+        return meetingPlatform[1].name;
+      } else if (meetingDetails.platform === 3) {
+        return meetingPlatform[2].name;
+      } else {
+        return "";
+      }
+    });
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -308,6 +307,9 @@ function EditMeetingDetailsModal({
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
           });
+          if (refreshTokenStatus) {
+            isEmailIsOfCompanyUser(email);
+          }
         }
       }
     }
@@ -441,7 +443,7 @@ function EditMeetingDetailsModal({
   const handleOAuthConsent = () => {
     if (selectedMeetingPlatform === meetingPlatform[0].name) {
       navigate(ROUTES_URL.GOOGLE_OAUTH);
-    } else if (selectedMeetingPlatform  === meetingPlatform[1].name) {
+    } else if (selectedMeetingPlatform === meetingPlatform[1].name) {
       alert();
       navigate(ROUTES_URL.ZOOM_OAUTH);
     }
@@ -458,17 +460,16 @@ function EditMeetingDetailsModal({
 
     if (isAttendeeNotPresentAddedNew) {
       if (
-        (
         meetingDetails.title === title &&
         meetingDetails.description === description &&
         startDate === startDateValue &&
         endDate === endDateValue &&
         startTime === startTimeValue.substring(0, 5) &&
         endTime === endTimeValue.substring(0, 5) &&
-        meetingDetails.attendeesEmailAll === attendees
-      ) && (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
+        meetingDetails.attendeesEmailAll === attendees &&
+        (meetingStatus === meetingDetails.meetingStatusFromGoogle ||
+          meetingStatus === meetingDetails.meetingStatusFromZoom)
       ) {
-        
         showMessageSnackbar({
           message: "No changes made to mesgvs",
           type: "error",
@@ -482,10 +483,15 @@ function EditMeetingDetailsModal({
           startDate === startDateValue &&
           endDate === endDateValue &&
           startTime === startTimeValue.substring(0, 5) &&
-          endTime === endTimeValue.substring(0, 5)) &&
-        attendees.length !== 0 || (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom)
+          endTime === endTimeValue.substring(0, 5) &&
+          attendees.length !== 0) ||
+        meetingStatus === meetingDetails.meetingStatusFromGoogle ||
+        meetingStatus === meetingDetails.meetingStatusFromZoom
       ) {
-        alert( (meetingStatus === meetingDetails.meetingStatusFromGoogle || meetingStatus === meetingDetails.meetingStatusFromZoom));
+        alert(
+          meetingStatus === meetingDetails.meetingStatusFromGoogle ||
+            meetingStatus === meetingDetails.meetingStatusFromZoom
+        );
         showMessageSnackbar({
           message: "No changes made to meeting details",
           type: "error",
@@ -572,6 +578,9 @@ function EditMeetingDetailsModal({
               const refreshTokenStatus = await RefreshToken({
                 callFunction: updateMeetingDetails,
               });
+              if (refreshTokenStatus) {
+                updateMeetingDetails();
+              }
             }
           });
       }
@@ -784,7 +793,12 @@ function EditMeetingDetailsModal({
                 meetingDetails.creatorAttenting === "Attending"
               }
               onChange={(e) => {
-               showMessageSnackbar({message : "cannot Change Platform to create new meeting meeting with different platform" , type:"error"})
+                e.preventDefault();
+                showMessageSnackbar({
+                  message:
+                    "cannot Change Platform to create new meeting meeting with different platform",
+                  type: "error",
+                });
               }}
               className={
                 meetingDetails.isActive
@@ -795,7 +809,7 @@ function EditMeetingDetailsModal({
               }
             >
               <option value="">Select Platform</option>
-              {meetingPlatform.map((option : MeetingPlatforms) => (
+              {meetingPlatform.map((option: MeetingPlatforms) => (
                 <option key={option.id} value={option.name}>
                   {option.name}
                 </option>

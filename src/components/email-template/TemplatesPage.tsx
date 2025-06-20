@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -39,6 +39,8 @@ import {
   ShowMessageSnackbarProps,
 } from "../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../constants/Messages";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 type TemplateType = {
   id: number;
@@ -47,72 +49,6 @@ type TemplateType = {
   isactive: boolean;
 };
 
-const jsonPlaceholdersMap: { [key: number]: string } = {
-  1: `{
-    "company.fullname":"PurpleRadiance",
-    "company_user.fullname":"Nitikesh Yewale",
-    "company_user.email":"nitikesh@g.co",
-    "company_user.mobilenumber":"9878987898",
-    "company_user.password":"abc#wio345",
-    "current_year":"2025",
-    "crm_url":"http://localhost:5173"
-    }`,
-
-  2: `{
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon ",
-    "lead.email":"elon@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }`,
-
-  3: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Mark3",
-    "lead.email":"Mark3@g.co",
-    "lead.mobilenumber":"+1 87889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-
-  4: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon4",
-    "lead.email":"elon4@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Suraj",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-};
 
 export const TemplatesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("");
@@ -661,7 +597,7 @@ type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
-  selectedTypeId: number;
+  selectedTypeId?: number;
   reset: () => void;
   handleAccessDenied: ({ message, type }: ShowMessageSnackbarProps) => void;
 };
@@ -670,7 +606,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
   templates,
   loading,
   hasmore,
-  selectedTypeId,
   reset,
   handleAccessDenied,
 }) => {
@@ -726,17 +661,25 @@ const TemplateList: React.FC<TemplateListProps> = ({
             });
           }
         })
-        .catch((error) => {
-//
+        .catch(async(error : ApiError | any) => {
+            if(error.status === STATUS_CODE.UNATHORISED) {
+              const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:handleDefaultToggle});
+              if(refreshTokenResponse){
+                handleDefaultToggle(template);
+              }
+            }
         });
     } catch (error) {
-      console.error("Failed to update default status:", error);
-      handleAccessDenied({
+      if(error){
+        if(error){
+handleAccessDenied({
         message: "Failed to update default status.",
         type: "error",
       });
-    } finally {
-      // setUpdatingDefaultId(null);
+        }
+
+      }   
+      
     }
   };
 
@@ -904,11 +847,10 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   const [selectedTypeId, setSelectedTypeId] = useState<string>(""); // Initial state is an empty string
   const { loginStatus } = useLoggedInUserContext();
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchTypes = async () => {
-      setLoading(true);
+
       try {
         const response = await axios.post(
           POST_API.GET_EMAIL_TYPE,
@@ -930,8 +872,6 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
         }
       } catch (error) {
         console.error("Error fetching template types for modal:", error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchTypes();

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from "react";
-import { Editor, Frame, Element, useEditor } from "@craftjs/core";
+import React, { useEffect, useState } from "react";
+import { Editor, Frame, Element } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -39,7 +39,7 @@ interface DynamicField {
 }
 
 export const EditorCanvasWithJson = () => {
-  const [canvasBgColor, setCanvasBgColor] = useState("#f9f9f9");
+  const canvasBgColor = "#f9f9f9";
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
@@ -70,7 +70,7 @@ export const EditorCanvasWithJson = () => {
     templateTypeId: number;
   }) => {
     setIsLoading(true);
-    const response = await axios
+    await axios
       .post(
         POST_API.GET_EMAIL_TEMPLATE,
         {
@@ -245,9 +245,6 @@ export const EditorCanvasWithJson = () => {
     }
   }, [currentJson]);
 
-  const handleSave = () => {
-    // onSave?.(currentJson);
-  };
 
 
   //FOR HANDALING INSERT HTML TEMPLATES
@@ -562,7 +559,9 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                 >
                   <ExportPanel
                     onPreview={handlePreview}
-                    //   onSave={handleSave}
+                   handleCopyHtml={(data) => {
+                    showMessageSnackbar({message : data.message,type : data.type})
+                   }}
                   />
                 </div>
 

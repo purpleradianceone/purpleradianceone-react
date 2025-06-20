@@ -9,6 +9,7 @@ const RefreshToken = async (props : {
     callFunction? : () => Promise<void>
     callFunctionWithEvent? : (event : any) => Promise<void>,
     callFunctionWithParamsNotEvent?: (params : any) => Promise<void>,
+    callFunctionWithTwoParamsNotEvent?: (paramOne : any , paramTwo : any) => Promise<void>
 }) => {
     try {
       const refreshResponse = await axios.post(

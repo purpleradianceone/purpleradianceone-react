@@ -43,13 +43,15 @@ export const useMeetingPlatform = () => {
         const refreshTokenResponse = await RefreshToken({
           callFunction: getMeetingPlatform,
         });
+        if(refreshTokenResponse){
+          getMeetingPlatform();
+        }
       }
     }
   };
 
   useEffect(() => {
     getMeetingPlatform();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array means this runs once on mount
 
   return {

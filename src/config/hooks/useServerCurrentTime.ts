@@ -23,13 +23,16 @@ export const useServerCurrentTime = () => {
             console.error(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
                 const refreshTokenResponse = await RefreshToken({ callFunction: getServerCurrentTime });
+                if(refreshTokenResponse){
+                    getServerCurrentTime();
+                }
+
             }
         }
     };
 
    useEffect(() => {
           getServerCurrentTime();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []); // Empty dependency array means this runs once on mount
 
     return {
