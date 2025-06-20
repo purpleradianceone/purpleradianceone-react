@@ -48,7 +48,7 @@ const LeadContact = ({
   const [tempHandle, setTempHandle] = useState<string>("");
   const [selectedContactCard, setSelectedContactCard] =
     useState<LeadContactType | null>(null);
-  const [editMode, setEditMode] = useState<boolean>(false);
+  // const [editMode, setEditMode] = useState<boolean>(false);
   const [editingContactId, setEditingContactId] = useState<number | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true); // default to active
 
@@ -359,7 +359,7 @@ const LeadContact = ({
 
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
-    setEditMode(true);
+    // setEditMode(true);
     setEditingContactId(selectedContactCard.id);
     setEditContactData(selectedContactCard);
     setIsOpenAddLeadContactForm(true);
@@ -698,7 +698,7 @@ const LeadContact = ({
               </h2>
               <XIcon
                 onClick={() => {
-                  setEditMode(false);
+                  // setEditMode(false);
                   setEditingContactId(null);
                   setIsOpenAddLeadContactForm(false);
                   setEditContactData(null);

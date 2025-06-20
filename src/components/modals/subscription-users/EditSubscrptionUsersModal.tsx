@@ -1,14 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit, UserPlus2, X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
 
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { useEffect, useRef, useState } from "react";
 import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
@@ -34,7 +33,6 @@ function EditSubscriptionUsersModal({
 }) {
   const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewUser } = useUserAccessModules();
   const navigate = useNavigate();
 
   const [companyUsersList, setCompanyUsersList] = useState<

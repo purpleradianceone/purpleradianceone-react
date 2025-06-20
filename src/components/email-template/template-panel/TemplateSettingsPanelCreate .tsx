@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useEditor } from '@craftjs/core';
@@ -9,6 +10,8 @@ import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContex
 import POST_API from '../../../constants/PostApi';
 import {  STATUS_CODE } from '../../../constants/AppConstants';
 import ROUTES_URL from '../../../constants/Routes';
+import ApiError from '../../../@types/error/ApiError';
+import RefreshToken from '../../../config/validations/RefreshToken';
 
 
 type TemplateSettingsPanelEditProps = {
@@ -86,10 +89,15 @@ function getHtmlEmailBody(): string {
                       if(response.status === STATUS_CODE.OK){
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
-                        // alert(response.data.message);
                         
-                }).catch((error)=>{
-                  
+                        
+                }).catch(async(error : ApiError | any)=>{
+                  if(error.status === STATUS_CODE.UNATHORISED){
+                      const refreshTokenResponse = await RefreshToken({callFunctionWithTwoParamsNotEvent : createEmailTemplateCreate});
+                          if(refreshTokenResponse){
+                            createEmailTemplateCreate(emailBody,resultJson);
+                          }
+                  }
                 })
         }
   

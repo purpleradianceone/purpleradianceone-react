@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Editor, Frame, Element } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
@@ -15,7 +15,7 @@ import "tinymce";
 import { DynamicFieldsContext } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { GenericBlock } from "../template-blocks/GenericBlock";
@@ -33,7 +33,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 export const EditorCanvas: React.FC = () => {
-  const [canvasBgColor, setCanvasBgColor] = useState("#f9f9f9");
+  const canvasBgColor = "#f9f9f9";
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
@@ -508,7 +508,12 @@ export const EditorCanvas: React.FC = () => {
                       height: "fit-content",
                     }}
                   >
-                    <ExportPanel onPreview={handlePreview} />
+                    <ExportPanel 
+                    onPreview={handlePreview}
+                    handleCopyHtml={(data) => {
+                    showMessageSnackbar({message : data.message,type : data.type})
+                   }}
+                    />
                     <MessageSnackBar
                       isOpen={messageSnackbar.open}
                       message={messageSnackbar.message}
