@@ -60,7 +60,9 @@ interface CompanyUserEmailSetting {
 }
 
 export default function EmailSettingsTabs() {
-  const [activeTab, setActiveTab] = useState<"company" | "user" | "email type">("company");
+  const [activeTab, setActiveTab] = useState<"company" | "user" | "email type">(
+    "company"
+  );
   const [companySettings, setCompanySettings] = useState<CompanyEmailSetting[]>(
     []
   );
@@ -84,7 +86,7 @@ export default function EmailSettingsTabs() {
   };
 
   const { loginStatus } = useLoggedInUserContext();
-   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
     message: "",
     type: "success",
@@ -150,325 +152,241 @@ export default function EmailSettingsTabs() {
     setting: CompanyEmailSetting,
     index: number
   ) => (
-    <div className="flex justify-between">
-    <div
-      key={index}
-      className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
-    >
-      <Button
-        disabled={!userHasAccessToUpdateEmailSetting}
-        className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
-        onClick={() => {
-          if (userHasAccessToUpdateEmailSetting) {
-            setModalType("company");
-            setEditData(setting);
-            setIsModalOpen(true);
-          } else {
-            showMessageSnackbar({
-              message: MESSAGE.ERROR.NOT_ATHORISED,
-              type: "error",
-            });
-          }
-        }}
-      >
-        Edit
-      </Button>
+    <>
+      <div className="flex justify-between">
+        <div
+          key={index}
+          className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
+        >
+          <Button
+            disabled={!userHasAccessToUpdateEmailSetting}
+            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
+            onClick={() => {
+              if (userHasAccessToUpdateEmailSetting) {
+                setModalType("company");
+                setEditData(setting);
+                setIsModalOpen(true);
+              } else {
+                showMessageSnackbar({
+                  message: MESSAGE.ERROR.NOT_ATHORISED,
+                  type: "error",
+                });
+              }
+            }}
+          >
+            Edit
+          </Button>
 
-      <div className="flex items-center space-x-2 mb-2">
-        <Mail className="text-blue-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>Company Email:</strong> {setting.email}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <KeyRound className="text-gray-500 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>Email Password:</strong> ********
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Server className="text-green-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>SMTP Host:</strong> {setting.smtp_host}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Server className="text-purple-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>SMTP Port:</strong> {setting.smtp_port}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Lock className="text-orange-500 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>Security Type:</strong>{" "}
-          {setting.email_security_type_id === 1
-            ? "SSL"
-            : setting.email_security_type_id === 2
-            ? "TLS"
-            : "Unknown"}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <ShieldCheck
-          className={`w-5 h-5 ${
-            setting.authentication_required
-              ? "text-emerald-600"
-              : "text-gray-400"
-          }`}
-        />
-        <p className="text-gray-700 text-sm">
-          <strong>Authentication Required:</strong>{" "}
-          {setting.authentication_required ? "Yes" : "No"}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-4">
-        {setting.isactive ? (
-          <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
-        ) : (
-          <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
-        )}
-        <p className="text-gray-700 text-sm">
-          <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Created By:</strong> {setting.createdby}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Created On:</strong> {setting.createdon}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Updated By:</strong> {setting.updatedby}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Updated On:</strong> {setting.updatedon}
-        </p>
-      </div>
-    </div>
-    {activeTab !== "email type" && (
-<div className="flex max-w-28 max-h-10">
-            {activeTab === "company" ? (
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  // className=" top-20 right-4 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("company");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>
-                </Button>
-            ) : (
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("user");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>{" "}
-                </Button>
-            )}
-            <MessageSnackBar
-              isOpen={messageSnackbar.open}
-              message={messageSnackbar.message}
-              type={messageSnackbar.type}
-              onClose={handleMessageSnackbarClose}
-              duration={NUMBER_VALUES.SNACKBAR_DURATION}
+          <div className="flex items-center space-x-2 mb-2">
+            <Mail className="text-blue-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>Company Email:</strong> {setting.email}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <KeyRound className="text-gray-500 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>Email Password:</strong> ********
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Server className="text-green-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>SMTP Host:</strong> {setting.smtp_host}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Server className="text-purple-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>SMTP Port:</strong> {setting.smtp_port}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Lock className="text-orange-500 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>Security Type:</strong>{" "}
+              {setting.email_security_type_id === 1
+                ? "SSL"
+                : setting.email_security_type_id === 2
+                ? "TLS"
+                : "Unknown"}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <ShieldCheck
+              className={`w-5 h-5 ${
+                setting.authentication_required
+                  ? "text-emerald-600"
+                  : "text-gray-400"
+              }`}
             />
+            <p className="text-gray-700 text-sm">
+              <strong>Authentication Required:</strong>{" "}
+              {setting.authentication_required ? "Yes" : "No"}
+            </p>
           </div>
-          )}
+          <div className="flex items-center space-x-2 mb-4">
+            {setting.isactive ? (
+              <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
+            ) : (
+              <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
+            )}
+            <p className="text-gray-700 text-sm">
+              <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+            </p>
           </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Created By:</strong> {setting.createdby}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Created On:</strong> {setting.createdon}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Updated By:</strong> {setting.updatedby}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Updated On:</strong> {setting.updatedon}
+            </p>
+          </div>
+        </div>
+      </div>
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+    </>
   );
 
   const renderUserEmailCard = (
     setting: CompanyUserEmailSetting,
     index: number
   ) => (
-    <div className="flex justify-between">
-    <div
-      key={index}
-      className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
-    >
-      <Button
-        disabled={!userHasAccessToUpdateEmailSetting}
-        className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
-        onClick={() => {
-          if (userHasAccessToUpdateEmailSetting) {
-            setModalType("user");
-            setEditData(setting);
-            setIsModalOpen(true);
-          } else {
-            showMessageSnackbar({
-              message: MESSAGE.ERROR.NOT_ATHORISED,
-              type: "error",
-            });
-          }
-        }}
-      >
-        Edit
-      </Button>
-      <div className="flex items-center space-x-2 mb-2">
-        <Mail className="text-blue-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>User Email:</strong> {setting.email}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <KeyRound className="text-gray-500 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>Email Password:</strong> ********
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Server className="text-green-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>SMTP Host:</strong> {setting.smtp_host}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Server className="text-purple-600 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>SMTP Port:</strong> {setting.smtp_port}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <Lock className="text-orange-500 w-5 h-5" />
-        <p className="text-gray-700 text-sm">
-          <strong>Security Type:</strong>{" "}
-          {setting.email_security_type_id === 1
-            ? "SSL"
-            : setting.email_security_type_id === 2
-            ? "TLS"
-            : "Unknown"}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-2">
-        <ShieldCheck
-          className={`w-5 h-5 ${
-            setting.authentication_required
-              ? "text-emerald-600"
-              : "text-gray-400"
-          }`}
-        />
-        <p className="text-gray-700 text-sm">
-          <strong>Authentication Required:</strong>{" "}
-          {setting.authentication_required ? "Yes" : "No"}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2 mb-4">
-        {setting.isactive ? (
-          <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
-        ) : (
-          <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
-        )}
-        <p className="text-gray-700 text-sm">
-          <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
-        </p>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Created By:</strong> {setting.createdby}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Created On:</strong> {setting.createdon}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Updated By:</strong> {setting.updatedby}
-        </p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <p className="text-gray-700 text-sm">
-          <strong>Updated On:</strong> {setting.updatedon}
-        </p>
-      </div>
-    </div>
-    {activeTab !== "email type" && (
-<div className="flex max-w-28 max-h-10">
-            {activeTab === "company" ? (
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("company");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>
-                </Button>
-            ) : (
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("user");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>{" "}
-                </Button>
-            )}
-            <MessageSnackBar
-              isOpen={messageSnackbar.open}
-              message={messageSnackbar.message}
-              type={messageSnackbar.type}
-              onClose={handleMessageSnackbarClose}
-              duration={NUMBER_VALUES.SNACKBAR_DURATION}
+    <>
+      <div className="flex justify-between">
+        <div
+          key={index}
+          className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
+        >
+          <Button
+            disabled={!userHasAccessToUpdateEmailSetting}
+            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
+            onClick={() => {
+              if (userHasAccessToUpdateEmailSetting) {
+                setModalType("user");
+                setEditData(setting);
+                setIsModalOpen(true);
+              } else {
+                showMessageSnackbar({
+                  message: MESSAGE.ERROR.NOT_ATHORISED,
+                  type: "error",
+                });
+              }
+            }}
+          >
+            Edit
+          </Button>
+          <div className="flex items-center space-x-2 mb-2">
+            <Mail className="text-blue-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>User Email:</strong> {setting.email}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <KeyRound className="text-gray-500 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>Email Password:</strong> ********
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Server className="text-green-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>SMTP Host:</strong> {setting.smtp_host}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Server className="text-purple-600 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>SMTP Port:</strong> {setting.smtp_port}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <Lock className="text-orange-500 w-5 h-5" />
+            <p className="text-gray-700 text-sm">
+              <strong>Security Type:</strong>{" "}
+              {setting.email_security_type_id === 1
+                ? "SSL"
+                : setting.email_security_type_id === 2
+                ? "TLS"
+                : "Unknown"}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <ShieldCheck
+              className={`w-5 h-5 ${
+                setting.authentication_required
+                  ? "text-emerald-600"
+                  : "text-gray-400"
+              }`}
             />
+            <p className="text-gray-700 text-sm">
+              <strong>Authentication Required:</strong>{" "}
+              {setting.authentication_required ? "Yes" : "No"}
+            </p>
           </div>
-          )}
+          <div className="flex items-center space-x-2 mb-4">
+            {setting.isactive ? (
+              <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
+            ) : (
+              <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
+            )}
+            <p className="text-gray-700 text-sm">
+              <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+            </p>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Created By:</strong> {setting.createdby}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Created On:</strong> {setting.createdon}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Updated By:</strong> {setting.updatedby}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-700 text-sm">
+              <strong>Updated On:</strong> {setting.updatedon}
+            </p>
+          </div>
+        </div>
+      </div>
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
+    </>
   );
 
   //message snakbar
- 
 
   return (
     <div className="w-full">
@@ -584,14 +502,34 @@ export default function EmailSettingsTabs() {
                 {companySettings.length > 0 ? (
                   companySettings.map(renderCompanyEmailCard)
                 ) : (
-                  <div className="text-center w-full text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                    No Email Settings For company
+                  <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
+                    <span>No Email Settings For company </span>
+                    <div className="max-w-36">
+                      <Button
+                        disabled={!userHasAccessToAddEmailSetting}
+                        onClick={() => {
+                          if (userHasAccessToAddEmailSetting) {
+                            setModalType("company");
+                            setEditData(null);
+                            setIsModalOpen(true);
+                          } else {
+                            showMessageSnackbar({
+                              message: MESSAGE.ERROR.NOT_ATHORISED,
+                              type: "error",
+                            });
+                          }
+                        }}
+                      >
+                        <Plus className="w-5 h-5 text-white " />{" "}
+                        <span className=" font-bold ">Create</span>{" "}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
             )}
           </div>
-        ) : activeTab === "user" ?(
+        ) : activeTab === "user" ? (
           <div className="w-full">
             {isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
@@ -602,8 +540,28 @@ export default function EmailSettingsTabs() {
                 {userSettings.length > 0 ? (
                   userSettings.map(renderUserEmailCard)
                 ) : (
-                  <div className="text-center w-full text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                    No Email Settings For Company User
+                  <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
+                    <span>No Email Settings For company </span>
+                    <div className="flex justify-center  items-center max-w-36">
+                      <Button
+                        disabled={!userHasAccessToAddEmailSetting}
+                        onClick={() => {
+                          if (userHasAccessToAddEmailSetting) {
+                            setModalType("user");
+                            setEditData(null);
+                            setIsModalOpen(true);
+                          } else {
+                            showMessageSnackbar({
+                              message: MESSAGE.ERROR.NOT_ATHORISED,
+                              type: "error",
+                            });
+                          }
+                        }}
+                      >
+                        <Plus className="w-5 h-5 text-white " />{" "}
+                        <span className=" font-bold ">Create</span>{" "}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
