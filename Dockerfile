@@ -1,14 +1,17 @@
-# --- Build Stage ---
+# Stage 1: Build
 FROM node:18-alpine AS builder
+
 WORKDIR /app
 COPY . .
 RUN npm install && npm run build
 
-# --- Serve Stage ---
+# Stage 2: Serve with NGINX
 FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
 
-# Optional: Custom NGINX config
+# Copy Vite output (dist) to nginx public folder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Optional: custom nginx config for SPA
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
