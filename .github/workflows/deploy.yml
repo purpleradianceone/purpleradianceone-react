@@ -3,7 +3,7 @@ name: Build and Deploy React App via Docker
 on:
   push:
     branches:
-      - development  # Or use 'production' if that’s your release branch
+      - main  # Or use 'production' if that’s your release branch
 
 jobs:
   build-and-deploy:
