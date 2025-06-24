@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useEditor } from '@craftjs/core';
@@ -10,8 +9,6 @@ import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContex
 import POST_API from '../../../constants/PostApi';
 import {  STATUS_CODE } from '../../../constants/AppConstants';
 import ROUTES_URL from '../../../constants/Routes';
-import ApiError from '../../../@types/error/ApiError';
-import RefreshToken from '../../../config/validations/RefreshToken';
 
 
 type TemplateSettingsPanelEditProps = {
@@ -33,7 +30,7 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
   
 
   const insertDynamicField = (field: string) => {
-    const placeholder = `{{${field}}}`;
+    const placeholder = `${field}`;
     const input = subjectInputRef.current;
 
     if (!input) return;
@@ -89,18 +86,22 @@ function getHtmlEmailBody(): string {
                       if(response.status === STATUS_CODE.OK){
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
+                        // alert(response.data.message);
                         
-                        
-                }).catch(async(error : ApiError | any)=>{
-                  if(error.status === STATUS_CODE.UNATHORISED){
-                      const refreshTokenResponse = await RefreshToken({callFunctionWithTwoParamsNotEvent : createEmailTemplateCreate});
-                          if(refreshTokenResponse){
-                            createEmailTemplateCreate(emailBody,resultJson);
-                          }
-                  }
+                }).catch((error)=>{
+                  console.error(error.toString())
                 })
         }
   
+        if (dynamicFields.length === 0) {
+          return (
+            <div
+              style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}
+            >
+              Loading dynamic fields...
+            </div>
+          );
+        }
 
 
   return (
