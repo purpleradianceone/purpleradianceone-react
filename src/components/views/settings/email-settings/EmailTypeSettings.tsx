@@ -57,7 +57,7 @@ function EmailTypeSettings() {
                 id: res.id,
                 companyId: res.company_id,
                 name: res.name,
-                fromCompanyEmail: res.from_company_email,
+                fromCompanyEmail: res.tosend_from_company_email,
                 emailTypeId: res.email_type_id,
                 createdBy: res.createdby,
                 createdOn: res.createdon,

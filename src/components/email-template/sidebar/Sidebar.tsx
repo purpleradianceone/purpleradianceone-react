@@ -8,7 +8,6 @@ import "./Sidebar.css"; // 👈 Import the CSS
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { ColumnBlock } from "../template-blocks/ColumnBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
-import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { SectionBlock } from "../template-blocks/SectionBlock";
@@ -54,10 +53,10 @@ export const Sidebar: React.FC = () => {
           <span>📋</span>
           <span>Table</span>
         </div>
-        <div id="dynamic_fields" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">
+        {/* <div id="dynamic_fields" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">
           <span>∯</span>
           <span>Dynamic Fields</span>
-        </div>
+        </div> */}
         {/* <div id="generic_block" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <GenericBlock />); }} className="sidebar-block">
           <span>"<>"</></span>
           <span>Generic Block</span>
