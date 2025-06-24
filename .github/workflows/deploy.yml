@@ -3,8 +3,8 @@ name: Build and Deploy React App via Docker
 on:
   push:
     branches:
-      - development  # Or use 'production' if that’s your release branch
-      - production  # Or use 'production' if that’s your release branch
+      - development
+      - production
 
 jobs:
   build-and-deploy:
@@ -25,8 +25,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
 
       - name: SSH and Deploy on Hostinger VPS
         uses: appleboy/ssh-action@v0.1.8
@@ -35,13 +35,14 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
 
             docker stop react-app || true
             docker rm react-app || true
 
             docker run -d \
               --name react-app \
-              -p 80:80 \
+              -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
+              -p 80:80 -p 443:443 \
               --restart always \
-              ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
