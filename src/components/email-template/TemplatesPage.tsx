@@ -508,7 +508,7 @@ export const TemplatesPage: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="flex-1 p-4 overflow-y-auto" ref={containerRef}>
+          <div className="flex-1 p-4 overflow-x-auto" ref={containerRef}>
             <Tabs
               activeTab={activeTab}
               onTabChange={handleTabChange}
@@ -576,22 +576,25 @@ const Tabs: React.FC<TabsProps> = ({
   onTabChange,
   templateTypes,
 }) => (
-  <div className="sticky top-0 flex bg-white">
-    {templateTypes.map((tab) => (
-      <button
-        key={tab.id}
-        onClick={() => onTabChange(tab.name)}
-        className={`py-2 px-4 border-b-2 ${
-          activeTab === tab.name
-            ? "border-blue-600 text-blue-600 font-semibold"
-            : "border-transparent text-gray-600 hover:text-gray-900"
-        } transition-colors duration-200`}
-      >
-        {tab.name}
-      </button>
-    ))}
+  <div className="sticky top-0 bg-white overflow-x-auto scrollbar-hide">
+    <div className="flex flex-nowrap text-xs">
+      {templateTypes.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.name)}
+          className={`py-2 px-4 border-b-2 whitespace-nowrap ${
+            activeTab === tab.name
+              ? "border-blue-600 text-blue-600 font-semibold"
+              : "border-transparent text-gray-600 hover:text-gray-900"
+          } transition-colors duration-200`}
+        >
+          {tab.name}
+        </button>
+      ))}
+    </div>
   </div>
 );
+
 
 type TemplateListProps = {
   templates: EmailTemplate[];
