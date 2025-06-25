@@ -44,6 +44,7 @@ jobs:
 
             docker run -d \
               --name react-app \
+              --network purple-net \
               -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
               -p 80:80 -p 443:443 \
               --restart always \
