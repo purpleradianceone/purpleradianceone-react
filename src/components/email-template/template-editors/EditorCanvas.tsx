@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useEffect, useState } from "react";
-import { Editor, Frame, Element } from "@craftjs/core";
+import { Editor, } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -38,6 +38,7 @@ import POST_API from "../../../constants/PostApi";
 import { convertPlaceholdersToFields, convertPlaceholdersToObject, PlaceholderItem } from "../template-util/PlaceHolderDataToPlaceHolderRecord";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import ApiError from "../../../@types/error/ApiError";
+import { CanvasWrapper } from "../canvas-wrapper/CanvasWrapper ";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -573,20 +574,7 @@ export const EditorCanvas: React.FC = () => {
                     />
                   </div>
                   <div id="CANVAS" style={{ top: 55 }}>
-                    <Frame>
-                      <Element
-                        is="div"
-                        canvas
-                        id="ROOT"
-                        className="justify-self-start top-28"
-                        style={{
-                          minWidth: "700px",
-                          minHeight: "800px",
-                          border: "1px dashed #ccc",
-                          padding: "70px",
-                        }}
-                      />
-                    </Frame>
+                    <CanvasWrapper/>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { Editor, Frame, Element } from "@craftjs/core";
+import { Editor, } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -42,6 +42,7 @@ import {
   convertPlaceholdersToObject,
   PlaceholderItem,
 } from "../template-util/PlaceHolderDataToPlaceHolderRecord";
+import { CanvasWrapperWithJson } from "../canvas-wrapper/CanvasWrapperWithJson";
 
 
 export const EditorCanvasWithJson = () => {
@@ -559,7 +560,7 @@ export const EditorCanvasWithJson = () => {
                   />
                 </div>
                 <div id="CANVAS" style={{ top: 55 }}>
-                  <Frame data={currentJson}>
+                  {/* <Frame data={currentJson}>
                     <Element
                       is="div"
                       canvas
@@ -577,7 +578,9 @@ export const EditorCanvasWithJson = () => {
                       canvas
                       columnIds={["col-1", "col-2"]}
                     />
-                  </Frame>
+                  </Frame> */}
+                  <CanvasWrapperWithJson
+                  data={currentJson}/>
                 </div>
               </div>
             </div>
