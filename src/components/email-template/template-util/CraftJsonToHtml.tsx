@@ -289,7 +289,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
       .filter(Boolean)
       .join(" ");
 
-    return `<div><a href="${escapeHtml(
+    return `<div ><a href="${escapeHtml(
       href
     )}" style="${style}" ${attrs}>${escapeHtml(text)}</a></div>`;
   },
