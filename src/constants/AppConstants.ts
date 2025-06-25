@@ -34,7 +34,7 @@ export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
 
-export const SITE_KEY = "6Lcehm0rAAAAANHI32LzShOrwW23VHjiimN1EVlm";
+export const SITE_KEY = "6LeliW0rAAAAAM_uWr8ELyfdWANJd_prmcn03zxQ";
 
 export const STATUS_CODE = {
     OK : 200,
