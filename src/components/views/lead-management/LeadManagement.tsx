@@ -21,24 +21,26 @@ import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-ma
 function LeadManagement() {
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-  const [leadData, setLeadData] = useState<LeadDataProps[]>([
-  ]);
+  const [leadData, setLeadData] = useState<LeadDataProps[]>([]);
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
   const [leadSource, setLeadSource] = useState<
-  PostDataTypeForLeadSourceAndStatusAndStates[] | null
->(null);
+    PostDataTypeForLeadSourceAndStatusAndStates[] | null
+  >(null);
 
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
 
-  const [leadsUpdateCount,setLeadsUpdateCount] = useState<number>(0);
+  const [leadsUpdateCount, setLeadsUpdateCount] = useState<number>(0);
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
-  const [selectedLeadStatus,setSelectedLeadStatus] = useState<number | null>(null);
-  const [selectedLeadSource,setSelectedLeadSource] = useState<number | null>(null);
-  
+  const [selectedLeadStatus, setSelectedLeadStatus] = useState<number | null>(
+    null
+  );
+  const [selectedLeadSource, setSelectedLeadSource] = useState<number | null>(
+    null
+  );
 
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -46,52 +48,47 @@ function LeadManagement() {
     navigate(ROUTES_URL.SIGN_IN);
   };
 
-    const {
-      currentPage,
-      pageSize,
-      dateRangeId,
-      concatDate,
-      searchParameter,
-      totalPages,
-      setTotalPages,
-      handleDatePageIdChange,
-      handleEndDateChange,
-      handlePageChange,
-      handlePageSizeChange,
-      handleSearchParameterChange,
-      handleStartDateChange,
-    } = useSearchFilterPaginationDateHandlers();
+  const {
+    currentPage,
+    pageSize,
+    dateRangeId,
+    concatDate,
+    searchParameter,
+    totalPages,
+    setTotalPages,
+    handleDatePageIdChange,
+    handleEndDateChange,
+    handlePageChange,
+    handlePageSizeChange,
+    handleSearchParameterChange,
+    handleStartDateChange,
+  } = useSearchFilterPaginationDateHandlers();
 
-    const handleLeadSelectedStatus = (selectedLeadStatus : number | undefined) => {
-      if (selectedLeadStatus) {
-        setSelectedLeadStatus(selectedLeadStatus);
-      }
-      else {
-        setSelectedLeadStatus(null);
-      }
+  const handleLeadSelectedStatus = (selectedLeadStatus: number | undefined) => {
+    if (selectedLeadStatus) {
+      setSelectedLeadStatus(selectedLeadStatus);
+    } else {
+      setSelectedLeadStatus(null);
     }
+  };
 
-    const handleLeadSelectedSource = (selectedLeadSource : number | undefined) => {
-      if (selectedLeadSource) {
-        setSelectedLeadSource(selectedLeadSource);
-      }
-      else{
-        setSelectedLeadSource(null);
-      }
+  const handleLeadSelectedSource = (selectedLeadSource: number | undefined) => {
+    if (selectedLeadSource) {
+      setSelectedLeadSource(selectedLeadSource);
+    } else {
+      setSelectedLeadSource(null);
     }
+  };
 
   const getLeadsData = async () => {
     const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate
-        ? 0
-        : dateRangeId;
-
+      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
     //NOTE : need to work on this
     const postDataToGetLeads: PostDataToGetLeadData = {
       company_id: loginStatus.companyId,
-      id : null,
+      id: null,
       ownerid: selectedCompanyUser.id,
       lead_source_id: selectedLeadSource,
       lead_status_id: selectedLeadStatus,
@@ -107,13 +104,11 @@ function LeadManagement() {
         withCredentials: true,
       });
       if (response.status === STATUS_CODE.OK) {
-        fetchLeadStatus();
+        //lead status call was here
         const responseData = response.data;
-        if(response.data.length > 0){
-        setTotalPages(
-          Math.ceil(response.data[0].count / pageSize)
-        );
-      }
+        if (response.data.length > 0) {
+          setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        }
 
         const formattedData: LeadDataProps[] = responseData.map(
           (item: any) => ({
@@ -170,12 +165,9 @@ function LeadManagement() {
           withCredentials: true,
         }
       );
-        if(response.status === STATUS_CODE.OK){
-          setLeadStatus(response.data);
-          fetchLeadSource();
-        }
-
-      
+      if (response.status === STATUS_CODE.OK) {
+        setLeadStatus(response.data);
+      }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -193,7 +185,7 @@ function LeadManagement() {
         setIsDialogueOpen(true);
       }
     }
-  }
+  };
 
   const fetchLeadSource = async () => {
     const postDataForLeadSource: PostDataTypeForLeadSourceAndStatusAndStates = {
@@ -208,12 +200,23 @@ function LeadManagement() {
       })
       .then((response) => {
         setLeadSource(response.data);
-        // getLeadStatusOptions();
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(async (error: any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: fetchLeadSource,
+          });
+          if (refreshTokenStatus) {
+            fetchLeadSource();
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
       });
-  }
+  };
 
   const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
     number | null
@@ -264,7 +267,7 @@ function LeadManagement() {
 
   const handleAddLead = () => {
     setLeadsUpdateCount(leadsUpdateCount + 1);
-  }
+  };
   //NOTE : NEED TO ADD PAGINATION FUNCTIONALITY HERE
   useEffect(() => {
     getLeadsData();
@@ -280,6 +283,10 @@ function LeadManagement() {
     selectedLeadSource,
   ]);
   useEffect(() => {
+    fetchLeadStatus();
+    fetchLeadSource();
+  }, []);
+  useEffect(() => {
     if (!userHasAccessToViewLead) {
       setAccessDeniedPopUpOpen(true);
     }
@@ -289,29 +296,30 @@ function LeadManagement() {
     <div className="w-full">
       {userHasAccessToViewLead ? (
         <LeadManagementList
-        handleAddLead={handleAddLead}
-        handleSearchOption={{
-          handleSearchParameterChange,
-          handleDateRangeIdChange: handleDatePageIdChange,
-        }
-        }
-        leadData={leadData}
-        onEndDateChange={handleEndDateChange}
-        onStartDateChange={handleStartDateChange}
-        paginationData={{
-          selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
-                pageSize,
-        }}
-        handleSelectedCompanyUserCheckBoxChange={handleSelectedCompanyUserCheckBoxChange}
-        persistedSelectedUserId={persistedSelectedUserId}
-        selectedLeadOwner={selectedCompanyUser}
-        leadStatus={leadStatus!}
-        handleLeadSelectedStatus={handleLeadSelectedStatus}
-        leadSource={leadSource!}
-        handleLeadSelectedSource={handleLeadSelectedSource}
+          handleAddLead={handleAddLead}
+          handleSearchOption={{
+            handleSearchParameterChange,
+            handleDateRangeIdChange: handleDatePageIdChange,
+          }}
+          leadData={leadData}
+          onEndDateChange={handleEndDateChange}
+          onStartDateChange={handleStartDateChange}
+          paginationData={{
+            selectedPageSize: handlePageSizeChange,
+            currentPage,
+            handlePageChange,
+            totalPages,
+            pageSize,
+          }}
+          handleSelectedCompanyUserCheckBoxChange={
+            handleSelectedCompanyUserCheckBoxChange
+          }
+          persistedSelectedUserId={persistedSelectedUserId}
+          selectedLeadOwner={selectedCompanyUser}
+          leadStatus={leadStatus!}
+          handleLeadSelectedStatus={handleLeadSelectedStatus}
+          leadSource={leadSource!}
+          handleLeadSelectedSource={handleLeadSelectedSource}
         />
       ) : (
         <div className="flex-none mx-96 mt-14">
@@ -325,12 +333,12 @@ function LeadManagement() {
         </div>
       )}
       <DialogueBox
-          isOpen={isDialogueOpen}
-          onClose={() => setIsDialogueOpen(false)}
-          onConfirm={handleDialogueConfirm}
-          title="Session Expired !"
-          message="Session Expired. Please login again."
-        />
+        isOpen={isDialogueOpen}
+        onClose={() => setIsDialogueOpen(false)}
+        onConfirm={handleDialogueConfirm}
+        title="Session Expired !"
+        message="Session Expired. Please login again."
+      />
     </div>
   );
 }

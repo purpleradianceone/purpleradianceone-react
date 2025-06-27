@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
