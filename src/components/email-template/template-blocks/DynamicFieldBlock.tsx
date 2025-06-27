@@ -27,6 +27,13 @@ export const DynamicFieldBlock: React.FC<Partial<DynamicFieldBlockProps>> = ({
   const { actions: editorActions } = useEditor();
   const [editing, setEditing] = useState(false);
   const availableFields = useDynamicFields(); // ⬅️ Use context
+   if (availableFields.length === 0) {
+    return (
+      <div style={{ padding: '8px', background: '#f0f0f0', color: '#666' }}>
+        Loading dynamic fields...
+      </div>
+    );
+  }
 
   const handleSelectField = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newField = e.target.value;
@@ -35,6 +42,7 @@ export const DynamicFieldBlock: React.FC<Partial<DynamicFieldBlockProps>> = ({
     });
     setEditing(false);
   };
+
 
   return (
     <div
@@ -67,7 +75,7 @@ export const DynamicFieldBlock: React.FC<Partial<DynamicFieldBlockProps>> = ({
           <span style={{ color: "gray" }}>No dynamic fields available</span>
         )
       ) : (
-        <span>{`{{${name}}}`}</span>
+        <span>{`${name}`}</span>
       )}
 
       <button
@@ -111,7 +119,7 @@ export const DynamicFieldBlock: React.FC<Partial<DynamicFieldBlockProps>> = ({
 (DynamicFieldBlock as any).craft = {
   displayName: "Dynamic Field",
   props: {
-    name: "company_name",
+    name: "company_fullname",
     fontSize: "14px",
     color: "#000000",
     backgroundColor: "transparent",

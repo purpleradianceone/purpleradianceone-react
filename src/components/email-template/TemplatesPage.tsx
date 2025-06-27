@@ -49,7 +49,6 @@ type TemplateType = {
   isactive: boolean;
 };
 
-
 export const TemplatesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("");
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
@@ -223,7 +222,7 @@ export const TemplatesPage: React.FC = () => {
       setSelectedTypeId(selectedType.id);
       // When tab changes, we always want a fresh fetch starting from 0 offset
       setOffset(0);
-      setTemplates([]);
+      // setTemplates([]);
       setHasMoreTemplates(true);
       // The useEffect below will trigger the fetch due to selectedTypeId change
     }
@@ -508,7 +507,7 @@ export const TemplatesPage: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="flex-1 p-4 overflow-y-auto" ref={containerRef}>
+          <div className="flex-1 p-4 overflow-x-auto" ref={containerRef}>
             <Tabs
               activeTab={activeTab}
               onTabChange={handleTabChange}
@@ -576,28 +575,31 @@ const Tabs: React.FC<TabsProps> = ({
   onTabChange,
   templateTypes,
 }) => (
-  <div className="sticky top-0 flex bg-white">
-    {templateTypes.map((tab) => (
-      <button
-        key={tab.id}
-        onClick={() => onTabChange(tab.name)}
-        className={`py-2 px-4 border-b-2 ${
-          activeTab === tab.name
-            ? "border-blue-600 text-blue-600 font-semibold"
-            : "border-transparent text-gray-600 hover:text-gray-900"
-        } transition-colors duration-200`}
-      >
-        {tab.name}
-      </button>
-    ))}
+  <div className="sticky top-0 bg-white overflow-x-auto scrollbar-hide">
+    <div className="flex flex-nowrap text-xs">
+      {templateTypes.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.name)}
+          className={`py-2 px-4 border-b-2 whitespace-nowrap ${
+            activeTab === tab.name
+              ? "border-blue-600 text-blue-600 font-semibold"
+              : "border-transparent text-gray-600 hover:text-gray-900"
+          } transition-colors duration-200`}
+        >
+          {tab.name}
+        </button>
+      ))}
+    </div>
   </div>
 );
+
 
 type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
-  selectedTypeId?: number;
+  selectedTypeId: number;
   reset: () => void;
   handleAccessDenied: ({ message, type }: ShowMessageSnackbarProps) => void;
 };
@@ -670,16 +672,13 @@ const TemplateList: React.FC<TemplateListProps> = ({
             }
         });
     } catch (error) {
-      if(error){
-        if(error){
-handleAccessDenied({
+      console.error("Failed to update default status:", error);
+      handleAccessDenied({
         message: "Failed to update default status.",
         type: "error",
       });
-        }
-
-      }   
-      
+    } finally {
+      // setUpdatingDefaultId(null);
     }
   };
 
@@ -847,10 +846,11 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   const [selectedTypeId, setSelectedTypeId] = useState<string>(""); // Initial state is an empty string
   const { loginStatus } = useLoggedInUserContext();
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchTypes = async () => {
-
+      setLoading(true);
       try {
         const response = await axios.post(
           POST_API.GET_EMAIL_TYPE,
@@ -872,6 +872,8 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
         }
       } catch (error) {
         console.error("Error fetching template types for modal:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchTypes();
@@ -884,7 +886,11 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
     }
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+  ) :(
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>

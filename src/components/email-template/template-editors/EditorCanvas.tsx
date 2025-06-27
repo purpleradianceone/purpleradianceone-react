@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { useState } from "react";
-import { Editor, Frame, Element } from "@craftjs/core";
+import React, { useEffect, useState } from "react";
+import { Editor, } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -12,7 +13,7 @@ import { HeadingBlock } from "../template-blocks/HeadingBlock";
 import { SubjectBlock } from "../template-blocks/SubjectBlock";
 import DOMPurify from "dompurify";
 import "tinymce";
-import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import { DynamicFieldOption, DynamicFieldsContext } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -28,9 +29,16 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
-import { NUMBER_VALUES } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import { DialogueBox } from "../../dialogue-box/Dialogue";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../../constants/PostApi";
+import { convertPlaceholdersToFields, convertPlaceholdersToObject, PlaceholderItem } from "../template-util/PlaceHolderDataToPlaceHolderRecord";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import ApiError from "../../../@types/error/ApiError";
+import { CanvasWrapper } from "../canvas-wrapper/CanvasWrapper ";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -48,95 +56,86 @@ export const EditorCanvas: React.FC = () => {
     navigate(ROUTES_URL.SIGN_IN);
   };
 
-  const jsonPlaceholdersMap: { [key: number]: string } = {
-    1: `{
-    "company.fullname":"PurpleRadiance",
-    "company_user.fullname":"Nitikesh Yewale",
-    "company_user.email":"nitikesh@g.co",
-    "company_user.mobilenumber":"9878987898",
-    "company_user.password":"abc#wio345",
-    "current_year":"2025",
-    "crm_url":"http://localhost:5173"
-    }`,
-
-    2: `{
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon ",
-    "lead.email":"elon@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }`,
-
-    3: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Mark3",
-    "lead.email":"Mark3@g.co",
-    "lead.mobilenumber":"+1 87889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-
-    4: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon4",
-    "lead.email":"elon4@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Suraj",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-  };
-
+  const { loginStatus } = useLoggedInUserContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const [placeHolderData, setPlaceHolderData] = useState<PlaceholderItem[]>([]);
   const [searchParams] = useSearchParams();
   const params = searchParams.get("type");
-  const json = jsonPlaceholdersMap[parseInt(JSON.parse(params!).id)];
-  const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
-  const [dynamicVariables, setDynamicVariables] =
-    useState<Record<string, string>>(parsedPlaceHolders);
 
+  const getPlaceHolderDataFromDatabase = async ({
+    templateTypeId,
+  }: {
+    templateTypeId: number;
+  }) => {
+    setIsLoading(true);
+    await axios
+      .post(
+        POST_API.GET_EMAIL_PLACEHOLDER,
+        {
+          company_id: loginStatus.companyId,
+          id: null,
+          isactive: true,
+          email_type_id:templateTypeId,
+          requestedby: loginStatus.id,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          if (response.data.length > 0) {
+            console.log(response.data);
+            if (response.data) {
+              setPlaceHolderData(response.data);
+              console.log(
+                convertPlaceholdersToObject(response.data).toString()
+              );
+            }
+          }
+              setIsLoading(false);
+
+        }
+      }).catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: getPlaceHolderDataFromDatabase,
+          });
+          if (refreshTokenResponse) {
+            getPlaceHolderDataFromDatabase({ templateTypeId });
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        }
+      }).finally(()=>{
+        setIsLoading(false);
+      });
+  };
+ useEffect(() => {
+    if (params) {
+      setIsLoading(true);
+      getPlaceHolderDataFromDatabase({
+        templateTypeId:parseInt(JSON.parse(params!).id),
+      }).then(() => {
+        
+      });
+    }
+  }, []);
+  // const json = jsonPlaceholdersMap[params?parseInt(JSON.parse(params!).id):1];
+  const parsedPlaceHolders: Record<string, string> = convertPlaceholdersToObject(placeHolderData);
+  const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(parsedPlaceHolders);
+  
+  
   const handlePreview = (html: string) => {
     let replacedHtml = html;
-    Object.entries(dynamicVariables).forEach(([key, value]) => {
-      const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
+    Object.entries(dynamicVars).forEach(([key, value]) => {
+      const regex = new RegExp(`${key}`, "g");
       replacedHtml = replacedHtml.replace(regex, value);
-      // replacedHtml = replacedHtml.replace(regex, `<input data-key="${key}" value="${value}" style="border:none;background:transparent;color:#000;width:auto;" />`);
     });
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
   };
 
-  const parsedFields = Object.entries(JSON.parse(json)).map(([key]) => ({
-    label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-    value: key,
-  }));
+  const parsedFields:  DynamicFieldOption[] = convertPlaceholdersToFields(placeHolderData);
 
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlInput(e.target.value);
@@ -178,7 +177,11 @@ export const EditorCanvas: React.FC = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  return (
+  return isLoading ? (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+  ) : (
     <>
       <div className="fixed z-10 top-12 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex  gap-1">
@@ -261,90 +264,133 @@ export const EditorCanvas: React.FC = () => {
       <>
         {/* Show Fields Button - Always Visible */}
         <button
-          onClick={() => setShowDynamicEditor(!showDynamicEditor)}
+        onClick={() => setShowDynamicEditor(!showDynamicEditor)}
+        style={{
+          position: "fixed",
+          top: 50,
+          right: 130,
+          zIndex: 10,
+          color: "white",
+          background: "#007bff",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          padding: "6px 10px",
+          cursor: "pointer",
+          fontSize: "12px",
+        }}
+      >
+        ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
+      </button>
+
+      {showDynamicEditor && (
+        <div
           style={{
             position: "fixed",
-            top: 50,
+            top: 80, // Adjusted to appear below the toggle button
             right: 130,
-            zIndex: 10,
-            color: "white",
-            background: "#007bff",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            padding: "6px 10px",
-            cursor: "pointer",
-            fontSize: "12px",
+            width: "260px",
+            maxHeight: "600px",
+            background: "white",
+            padding: "10px",
+            borderRadius: "8px",
+            boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+            zIndex: 11,
+            overflowY: "auto",
           }}
         >
-          ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
-        </button>
-        {showDynamicEditor && (
           <div
             style={{
-              position: "fixed",
-              top: 50,
-              right: 130,
-              width: "260px",
-              height: "600px", // Fixed height
+              position: "sticky",
+              display: "flex",
+              top: 0,
+              justifyContent: "space-between",
               background: "white",
-              padding: "10px",
-              borderRadius: "8px",
-              boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-              zIndex: 11,
-              overflowY: "auto", // Enables scrolling
+              alignItems: "center",
+              marginBottom: "10px",
+              paddingBottom: "8px",
+              borderBottom: "1px solid #eee",
             }}
           >
-            <div
+            <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600 }}>
+              Dynamic Fields
+            </h4>
+            <button
+              onClick={() => setShowDynamicEditor(false)}
               style={{
-                position: "sticky",
-                display: "flex",
-                top: 0,
-                justifyContent: "space-between",
-                background: "white",
-                alignItems: "center",
-                marginBottom: "10px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "16px",
+                lineHeight: 1,
+                color: "#666",
+                padding: "4px",
               }}
             >
-              <h4 style={{ margin: 0, fontSize: "14px" }}>Dynamic Fields</h4>
-              <button
-                onClick={() => setShowDynamicEditor(false)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  alignContent: "flex-end",
-                  lineHeight: 1,
-                }}
-              >
-                ✖
-              </button>
-            </div>
+              ✖
+            </button>
+          </div>
 
-            {Object.entries(dynamicVariables).map(([key, value]) => (
-              <div key={key} style={{ marginBottom: "8px" }}>
-                <label style={{ fontSize: "12px" }}>{key}</label>
+          {parsedFields.length === 0 ? (
+            <div
+              style={{
+                padding: "16px",
+                textAlign: "center",
+                color: "#666",
+                fontSize: "12px",
+              }}
+            >
+              {isLoading
+                ? "Loading dynamic fields..."
+                : "No dynamic fields available"}
+            </div>
+          ) : (
+            parsedFields.map((field) => (
+              <div key={field.value} style={{ marginBottom: "12px" }}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    display: "block",
+                    marginBottom: "4px",
+                    fontWeight: 500,
+                    color: "#333",
+                  }}
+                >
+                  {field.label}
+                </label>
                 <input
                   style={{
-                    marginTop: "2px",
                     width: "100%",
-                    padding: "4px",
+                    padding: "6px 8px",
                     fontSize: "12px",
                     borderRadius: "4px",
-                    border: "1px solid #ccc",
+                    border: "1px solid #ddd",
+                    backgroundColor: "#fff",
+                    boxSizing: "border-box",
                   }}
-                  value={value}
+                  value={dynamicVars[field.value] || ""}
                   onChange={(e) =>
-                    setDynamicVariables((prev) => ({
+                    setDynamicVars((prev) => ({
                       ...prev,
-                      [key]: e.target.value,
+                      [field.value]: e.target.value,
                     }))
                   }
+                  placeholder={`Enter value for ${field.label}`}
                 />
+                <div
+                  style={{
+                    fontSize: "10px",
+                    color: "#999",
+                    marginTop: "4px",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {field.value}
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
+      )}
 
         <DynamicFieldsContext.Provider value={parsedFields}>
           {mode === "insert" ? (
@@ -508,12 +554,7 @@ export const EditorCanvas: React.FC = () => {
                       height: "fit-content",
                     }}
                   >
-                    <ExportPanel 
-                    onPreview={handlePreview}
-                    handleCopyHtml={(data) => {
-                    showMessageSnackbar({message : data.message,type : data.type})
-                   }}
-                    />
+                    <ExportPanel onPreview={handlePreview} />
                     <MessageSnackBar
                       isOpen={messageSnackbar.open}
                       message={messageSnackbar.message}
@@ -533,20 +574,7 @@ export const EditorCanvas: React.FC = () => {
                     />
                   </div>
                   <div id="CANVAS" style={{ top: 55 }}>
-                    <Frame>
-                      <Element
-                        is="div"
-                        canvas
-                        id="ROOT"
-                        className="justify-self-start top-28"
-                        style={{
-                          minWidth: "700px",
-                          minHeight: "800px",
-                          border: "1px dashed #ccc",
-                          padding: "70px",
-                        }}
-                      />
-                    </Frame>
+                    <CanvasWrapper/>
                   </div>
                 </div>
               </div>
