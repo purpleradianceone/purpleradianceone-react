@@ -40,7 +40,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
-    userHasAccessToViewMeeting
+    userHasAccessToViewMeeting,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -139,12 +139,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Products
                   </a>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                    <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-                  </button>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                    <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
-                  </button>
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                      Get Started
+                    </button>
+                  </Link>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                      Login
+                    </button>
+                  </Link>
                 </div>
 
                 <div className="md:hidden flex justify-center">
@@ -180,12 +184,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Pricing
                   </a>
-                  <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                    <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-                  </Button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                    <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
-                  </button>
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                      Get Started
+                    </Button>
+                  </Link>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                      Login
+                    </button>
+                  </Link>
                 </div>
               </div>
             )}
@@ -358,7 +366,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           )}
 
                           {userHasAccessToViewMeeting && (
-                             <NavItem
+                            <NavItem
                               to={ROUTES_URL.MEETINGS}
                               icon={<Calendar size={SIZE.TWENTY} />}
                               label=""
@@ -396,11 +404,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       <button className="p-2 rounded-lg hover:bg-gray-100">
                         <Bell className="h-5 w-5" />
                       </button>
-                      <button className="p-2 rounded-lg hover:bg-gray-100">
-                        <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                      <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                        <button className="p-2 rounded-lg hover:bg-gray-100">
                           <LayoutPanelLeft className="h-5 w-5" />
-                        </Link>
-                      </button>
+                        </button>
+                      </Link>
                     </>
                   )}
                   {/* paste code here */}
