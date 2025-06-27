@@ -690,7 +690,7 @@ const LeadContact = ({
 
       {/* Add Contact Form Modal */}
       {isOpenAddLeadContactForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
             <div className="border-b pb-1 mb-4 flex justify-between items-center">

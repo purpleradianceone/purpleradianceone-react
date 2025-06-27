@@ -133,7 +133,7 @@ function SignInForm() {
       message: MESSAGE.INPROCESS.LOGGING_IN,
     });
 
-    const captchaRequest = { captchaToken: captchaToken };
+    const captchaRequest = { token: captchaToken };
 
     axios
       .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {

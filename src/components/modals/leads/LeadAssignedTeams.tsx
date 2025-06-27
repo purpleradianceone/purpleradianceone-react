@@ -454,7 +454,7 @@ const LeadAssignedTeams = ({
       />
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
           <div className="bg-white mt-14 rounded-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-2xl sm:px-4 sm:py-4">
             {/* header */}
             <div className="border-b pb-1 mb-4 flex justify-between items-center">
