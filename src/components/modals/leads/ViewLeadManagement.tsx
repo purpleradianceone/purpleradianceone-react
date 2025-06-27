@@ -162,6 +162,7 @@ const ViewLeadManagement = () => {
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
+          fetchLeadStatus();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -189,43 +190,53 @@ const ViewLeadManagement = () => {
         postDataForLeadStatusUpdate,
         { withCredentials: true }
       );
-      if (response?.status === STATUS_CODE.OK) {
-        const updatedStatusName = leadStatus?.find(
-          (item) => item.id === selectedStatusId
-        )?.name;
+      if (response?.status == STATUS_CODE.OK) {
+        if (response.data.status) {
+          const updatedStatusName = leadStatus?.find(
+            (item) => item.id === selectedStatusId
+          )?.name;
 
-        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
-        parsedQuery.leadStatusId = selectedStatusId.toString();
-        parsedQuery.leadStatus = updatedStatusName!.toString();
-        const newQueryString = qs.stringify({
-          leadData: JSON.stringify(parsedQuery),
-        });
+          const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadStatusId = selectedStatusId.toString();
+          parsedQuery.leadStatus = updatedStatusName!.toString();
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
 
-        setSelectedLeadData((prev: any) => ({
-          ...prev,
-          leadStatus: updatedStatusName,
-        }));
-        setReasonInputBoxOpen(false);
-        setReasonText("");
-        setSelectedStatusId(null);
-        setActivityData([
-          {
-            person: loginStatus.fullName,
-            work: response.data.message,
-          },
-          ...activityData,
-        ]);
-        const newPath = `${window.location.pathname}?${newQueryString}`;
-        navigate(newPath, { replace: true });
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadStatus: updatedStatusName,
+          }));
+          setReasonInputBoxOpen(false);
+          setReasonText("");
+          setSelectedStatusId(null);
+          setActivityData([
+            {
+              person: loginStatus.fullName,
+              work: response.data.message,
+            },
+            ...activityData,
+          ]);
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
+        } else {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "error",
+          });
+        }
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithEvent: handleSaveStatusUpdate,
         });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
+          handleSaveStatusUpdate();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -235,87 +246,6 @@ const ViewLeadManagement = () => {
       }
     }
   };
-
-  // const getAllCountries = async () => {
-  //   const PostData: Country = {
-  //     id: null,
-  //     dailcode: null,
-  //     name: null,
-  //     description: null,
-  //     isactive: true,
-  //   };
-
-  //   try {
-  //     const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
-  //       withCredentials: true,
-  //     });
-  //     if (response.status == STATUS_CODE.OK) {
-  //       setCountries(response.data);
-  //     }
-  //   } catch (error: any) {
-  //     if (error.status === STATUS_CODE.UNATHORISED) {
-  //       const refreshTokenStatus = await RefreshToken({
-  //         callFunctionWithEvent: getAllCountries,
-  //       });
-
-  //       // setIsDialogueOpen(!refreshTokenStatus);
-  //       if (refreshTokenStatus) {
-  //         setIsDialogueOpen(false);
-  //       } else {
-  //         setIsDialogueOpen(true);
-  //       }
-  //     } else if (error.status === STATUS_CODE.FORBIDDEN) {
-  //       setIsDialogueOpen(true);
-  //     }
-  //   }
-  // };
-  // const retryRequest = async (fn: () => Promise<void>, retries = 4) => {
-  //   while (retries > 0) {
-  //     try {
-  //       await fn();
-  //       return;
-  //     } catch (error) {
-  //       retries--;
-  //       if (retries === 0) {
-  //         throw error;
-  //       }
-  //     }
-  //   }
-  // };
-
-  // const fetchIndustryType = async () => {
-  //   const postData = {
-  //     id: null,
-  //     name: null,
-  //     isactive: true,
-  //   };
-  //   try {
-  //     const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
-  //       withCredentials: true,
-  //     });
-
-  //     if (response.status === STATUS_CODE.OK) {
-  //       setIndustryType(response.data);
-  //     } else {
-  //       throw new Error("Failed to fetch industry type");
-  //     }
-  //   } catch (error: any) {
-  //     if (error.status === STATUS_CODE.UNATHORISED) {
-  //       const refreshTokenStatus = await RefreshToken({
-  //         callFunctionWithEvent: fetchIndustryType,
-  //       });
-
-  //       // setIsDialogueOpen(!refreshTokenStatus);
-  //       if (refreshTokenStatus) {
-  //         setIsDialogueOpen(false);
-  //       } else {
-  //         setIsDialogueOpen(true);
-  //       }
-  //     } else if (error.status === STATUS_CODE.FORBIDDEN) {
-  //       setIsDialogueOpen(true);
-  //     }
-  //   }
-  // };
 
   //lead owner change
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
@@ -396,34 +326,41 @@ const ViewLeadManagement = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        if (response.data.status) {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
 
-        const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
-        parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
-        const newQueryString = qs.stringify({
-          leadData: JSON.stringify(parsedQuery),
-        });
+          const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
 
-        const newPath = `${window.location.pathname}?${newQueryString}`;
-        navigate(newPath, { replace: true });
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
 
-        //resetting the states
-        setReasonTextForLeadOwnerChange("");
-        setReasonInputBoxOpenForLeadOwner(false);
-        setSelectedLeadData((prev: any) => ({
-          ...prev,
-          leadOwner: selectedCompanyUser.fullname,
-        }));
-        setActivityData([
-          {
-            person: loginStatus.fullName,
-            work: response.data.message,
-          },
-          ...activityData,
-        ]);
+          //resetting the states
+          setReasonTextForLeadOwnerChange("");
+          setReasonInputBoxOpenForLeadOwner(false);
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadOwner: selectedCompanyUser.fullname,
+          }));
+          setActivityData([
+            {
+              person: loginStatus.fullName,
+              work: response.data.message,
+            },
+            ...activityData,
+          ]);
+        } else {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "error",
+          });
+        }
       } else {
         showMessageSnackbar({
           message: response.data.status,
@@ -431,14 +368,12 @@ const ViewLeadManagement = () => {
         });
       }
     } catch (error: any) {
-      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunction: handleLeadOwnerChange,
         });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
+          handleLeadOwnerChange();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -516,6 +451,7 @@ const ViewLeadManagement = () => {
           callFunctionWithEvent: getLeadDetails,
         });
         if (refreshTokenStatus) {
+          getLeadDetails();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -531,86 +467,6 @@ const ViewLeadManagement = () => {
   ) => {
     setLeadDetailsData(editLeadDetailsData);
   };
-
-  // const getAllState = async (countryId: number | null) => {
-  //   if (!countryId) return;
-  //   const PostDataForState: State = {
-  //     id: null,
-  //     country_id: countryId,
-  //     name: null,
-  //     description: null,
-  //     isactive: true,
-  //   };
-
-  //   const fetchStates = async () => {
-  //     const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
-  //       withCredentials: true,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     if (response.status === STATUS_CODE.OK) {
-  //       setStateData(response.data);
-  //     } else {
-  //       throw new Error("Failed to fetch states");
-  //     }
-  //   };
-
-  //   try {
-  //     await retryRequest(fetchStates, 4);
-  //   } catch (error) {
-  //     console.error("Failed to fetch states after retries:", error);
-  //   }
-  // };
-
-  // const getAllDistrict = async (stateId: number | null) => {
-  //   if (!stateId) return;
-  //   const PostDataForDistrict: District = {
-  //     id: null,
-  //     state_id: stateId,
-  //     name: null,
-  //     description: null,
-  //     isactive: true,
-  //   };
-
-  //   const fetchDistricts = async () => {
-  //     try {
-  //       const response = await axios.post(
-  //         POST_API.GET_DISTRICT,
-  //         PostDataForDistrict,
-  //         {
-  //           withCredentials: true,
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-
-  //       if (response.status === STATUS_CODE.OK) {
-  //         setDistrict(response.data);
-  //       }
-  //     } catch (error: any) {
-  //       if (error.status === STATUS_CODE.UNATHORISED) {
-  //         const refreshTokenStatus = await RefreshToken({
-  //           callFunctionWithEvent: fetchDistricts,
-  //         });
-  //         if (refreshTokenStatus) {
-  //           setIsDialogueOpen(false);
-  //         } else {
-  //           setIsDialogueOpen(true);
-  //         }
-  //       } else if (error.status === STATUS_CODE.FORBIDDEN) {
-  //         setIsDialogueOpen(true);
-  //       }
-  //     }
-  //   };
-
-  //   try {
-  //     await retryRequest(fetchDistricts, 4);
-  //   } catch (error) {
-  //     console.error("Failed to fetch districts after retries:", error);
-  //   }
-  // };
 
   // API call to get lead interest data
   async function getLeadInterestData() {
@@ -635,6 +491,7 @@ const ViewLeadManagement = () => {
           callFunction: getLeadInterestData,
         });
         if (refreshTokenStatus) {
+          getLeadInterestData();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -686,6 +543,7 @@ const ViewLeadManagement = () => {
           callFunctionWithEvent: fetchLeadCompanyProduct,
         });
         if (refreshTokenStatus) {
+          fetchLeadCompanyProduct();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -764,8 +622,20 @@ const ViewLeadManagement = () => {
         );
         setLeadContact(mappedLeadContactData);
       })
-      .catch((error) => {
-        alert("exception in fetch lead contact  :" + error);
+      .catch(async (error: any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: fetchLeadContact,
+          });
+          if (refreshTokenStatus) {
+            fetchLeadContact();
+            setIsDialogueOpen(false);
+          } else {
+            setIsDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          setIsDialogueOpen(true);
+        }
       });
   };
 
@@ -898,13 +768,16 @@ const ViewLeadManagement = () => {
               title={
                 userHasAccessToUpdateLead
                   ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
               }
               className="text-lg font-semibold"
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
                   showMessageSnackbar({
-                    message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     type: "error",
                   });
                 }
@@ -930,15 +803,17 @@ const ViewLeadManagement = () => {
           {/* new code  */}
           <div className="relative inline-block">
             <button
-            disabled={!userHasAccessToUpdateLead}
+              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
-                if(userHasAccessToUpdateLead){
+                if (userHasAccessToUpdateLead) {
                   setIsAddProductModalOpen(true);
-                }else{
+                } else {
                   showMessageSnackbar({
-                    message : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
-                    type : "error"
-                  })
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                    type: "error",
+                  });
                 }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
@@ -981,13 +856,18 @@ const ViewLeadManagement = () => {
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
             }}
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
           >
             <Detail
@@ -1007,13 +887,18 @@ const ViewLeadManagement = () => {
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
             }}
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
           >
             <Detail
@@ -1042,12 +927,17 @@ const ViewLeadManagement = () => {
           <div
             className="flex"
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
@@ -1131,7 +1021,9 @@ const ViewLeadManagement = () => {
                   setSelectedStatusId(item.id);
                 } else {
                   showMessageSnackbar({
-                    message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     type: "error",
                   });
                 }
@@ -1237,21 +1129,24 @@ const ViewLeadManagement = () => {
               Lead Teams
             </span>
           </div>
-          <div className="flex flex-col mt-5 ml-4 min-h-32 gap-2">
+          <div className="flex flex-col min-h-32 gap-2">
             {isOpenMeetingsModal && (
               <div className="flec max-w-48">
-                 <Button 
-                 onClick={()=>{
-                  const leadDataSearchParams = JSON.parse(searchParams.get("leadData") || "{}");
-                  sessionStorage.setItem(
-                            "leadData",
-                            JSON.stringify(leadDataSearchParams!)
-                          );
-                  navigate(ROUTES_URL.SCHEDULE_MEETING)
-                 }}
-                 >Schedule Meeting</Button>
+                <Button
+                  onClick={() => {
+                    const leadDataSearchParams = JSON.parse(
+                      searchParams.get("leadData") || "{}"
+                    );
+                    sessionStorage.setItem(
+                      "leadData",
+                      JSON.stringify(leadDataSearchParams!)
+                    );
+                    navigate(ROUTES_URL.SCHEDULE_MEETING);
+                  }}
+                >
+                  Schedule Meeting
+                </Button>
               </div>
-             
             )}
             {isOpenProductCard && (
               <LeadContact
