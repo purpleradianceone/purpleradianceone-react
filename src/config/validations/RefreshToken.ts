@@ -19,8 +19,6 @@ const RefreshToken = async (props : {
           withCredentials: true,
         }
       );
-      console.log(refreshResponse);
-      console.log("response Refresh");
       if (props.callFunction) {
         if (props.callFunction.length === 0) {
             // Call the function without arguments
@@ -31,14 +29,9 @@ const RefreshToken = async (props : {
             await props.callFunctionWithEvent(event)
         }
     }
-
-      
       return true;
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
-      console.log(error);
-      console.log("refresh");
       if (error.status === STATUS_CODE.UNATHORISED) {
         return false;
       }

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handshake, UserRoundPlus, X } from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -283,6 +283,20 @@ function CreateLeadModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if( error.mobileNumber!==""){
+      showMessageSnackbar({
+        message : "Please enter a valid mobile number.",
+        type : "error"
+      })
+      return;
+    }
+     if(error.email!=="" ){
+      showMessageSnackbar({
+        message : "Please enter a valid email address.",
+        type : "error"
+      })
+      return;
+    }
     const isEmailFilled = createLeadModalFormData.email !== "";
     const isMobileNumberFilled = createLeadModalFormData.mobileNumber !== "";
     if (selectedSource === undefined) {
