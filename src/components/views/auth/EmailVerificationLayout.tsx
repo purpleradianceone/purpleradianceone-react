@@ -19,17 +19,21 @@ function EmailVerificationLayout() {
 
   
   // Function to decode Base64 string
-const decodeBase64 = (encodedString : string) => {
+const decodeEmail = (encodedString : string) => {
   // Decode the Base64 string
-  const decodedString = atob(encodedString);
+  // const decodedString = atob(encodedString);
   
-  // Convert the decoded string to a UTF-8 string
-  try {
-      return decodeURIComponent(decodedString);
-  } catch (e) {
-      console.error("Decoding error:", e);
-      return null;
-  }
+  // // Convert the decoded string to a UTF-8 string
+  // try {
+  //     return decodeURIComponent(decodedString);
+  // } catch (e) {
+  //     console.error("Decoding error:", e);
+  //     return null;
+  // }
+
+  const decoded = encodedString.replace(/3D/g, '');
+  const finalDecoded = decoded.replace(/=/g,"");
+  return finalDecoded;
 }
 
   
@@ -52,6 +56,13 @@ const decodeBase64 = (encodedString : string) => {
           window.location.href = ROUTES_URL.SIGN_IN;
         },2000)
       }
+    }).catch((error) => {
+      console.error(error);
+      setVerificationState({ status: 'error', message: 'Error verifying your email' });
+      setTimeout(()=>{
+        setVerificationState({status:"idle",message:""});
+      },3000)
+
     })
   };
 
@@ -76,7 +87,7 @@ const decodeBase64 = (encodedString : string) => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900">Verification Email Sent</p>
-              <p className="text-sm text-gray-500 truncate">{decodeBase64(email || "")}</p>
+              <p className="text-sm text-gray-500 truncate">{decodeEmail(email!) || ""}</p>
             </div>
           </div>
 
@@ -113,19 +124,8 @@ const decodeBase64 = (encodedString : string) => {
 
         <div className="text-center space-y-4">
           <p className="text-sm text-gray-600">
-            Didn't receive the email? Check your spam folder or
+            Verify your account to continue!
           </p>
-          <button
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-            onClick={() => {
-              setVerificationState({
-                status: 'idle',
-                message: '',
-              });
-            }}
-          >
-            Click here to resend
-          </button>
         </div>
       </div>
     </div>

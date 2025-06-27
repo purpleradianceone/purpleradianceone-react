@@ -10,24 +10,40 @@ import LeadFormEmbed from "./LeadFormEmbed";
 import LeadSetting from "../views/settings/lead-settings/LeadSetting";
 import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
 import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
+import CompanyPreferenceSetting from "../views/settings/company-preferences/CompanyPreferenceSetting";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
+
+  const {
+    userHasAccessToViewSettingLeady,
+    userHasAccessToViewCompanyPreferences,
+    userHasAccessToViewMeetingSetting,
+    userHasAccessToViewSettingGeneral,
+  } = useUserAccessModules();
 
   const data = [
     {
       label: "Lead",
       value: "onlineLead",
       desc: (
-        <div className="grid grid-cols-2 gap-2">
-          <div className="col-span-1">
-            <LeadSetting />
-          </div>
+        <>
+          {userHasAccessToViewSettingLeady ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-1">
+                <LeadSetting />
+              </div>
 
-          <div className="col-span-1">
-            <LeadFormEmbed></LeadFormEmbed>
-          </div>
-        </div>
+              <div className="col-span-1">
+                <LeadFormEmbed></LeadFormEmbed>
+              </div>
+            </div>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
       ),
     },
     {
@@ -38,17 +54,44 @@ function SettingsTabs() {
     {
       label: "Meetings",
       value: "meeting",
-      desc: <MeetingSettings></MeetingSettings>,
+      desc: (
+        <>
+          {userHasAccessToViewMeetingSetting ? (
+            <MeetingSettings></MeetingSettings>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Company Preferences",
+      value: "companyPreference",
+      desc: (
+        <>
+          {userHasAccessToViewCompanyPreferences ? (
+            <CompanyPreferenceSetting></CompanyPreferenceSetting>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
     },
     {
       label: "General",
       value: "general",
       desc: (
-        <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            General Settings
-          </h2>
-        </div>
+        <>
+          {userHasAccessToViewSettingGeneral ? (
+            <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                General Settings
+              </h2>
+            </div>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
       ),
     },
   ];
@@ -61,7 +104,7 @@ function SettingsTabs() {
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50 bg-transparent p-0"
+            className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
             indicatorProps={{
               className:
                 "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
