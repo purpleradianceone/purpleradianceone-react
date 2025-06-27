@@ -404,7 +404,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
       console.error("Error parsing Lexical content", e);
 
       // Fallback to plain text if error occurs
-      return `<div>${escapeHtml(node.props.text || "")}</div>`;
+      return `<div>${escapeHtmlForTextBlock(node.props.text || "")}</div>`;
     }
   },
 
@@ -439,7 +439,7 @@ function extractHtmlFromLexical(editorState: any): string {
       }
 
       // Apply formatting tags
-      let content = escapeHtml(node.text);
+      let content = escapeHtmlForTextBlock(node.text);
       if (node.format & 1) content = `<strong>${content}</strong>`; // Bold
       if (node.format & 2) content = `<em>${content}</em>`; // Italic
       if (node.format & 4) content = `<u>${content}</u>`; // Underline
@@ -573,10 +573,29 @@ function formatStyle(
 
 // Basic HTML escaping
 function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return unsafe.replace(/[\u00A0-\u9999<>&"'`]/gim, function (i) {
+    switch (i) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      case '`': return '&#x60;';
+      default: return `&#${i.charCodeAt(0)};`;
+    }
+  });
+}
+
+function escapeHtmlForTextBlock(unsafe: string): string {
+  return unsafe.replace(/[\u00A0-\u9999<>&"'`]/gim, function (i) {
+    switch (i) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      case '`': return '&#x60;';
+      default: return `&#${i.charCodeAt(0)};`;
+    }
+  });
 }

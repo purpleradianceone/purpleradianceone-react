@@ -45,7 +45,7 @@ export const CanvasWrapper = () => {
               color: "#999",
               textAlign: "center",
               pointerEvents: "none",
-              opacity: 1,
+              opacity: isEmpty?1:0,
               transition: "opacity 0.3s ease, z-index 0.3s ease",
             }}
           >

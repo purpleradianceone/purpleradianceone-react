@@ -498,7 +498,7 @@ export const EditorCanvasWithJson = () => {
               TableBlock,
               HeadingBlock,
               DynamicFieldBlock,
-              GenericBlock, // 👈 Don't forget
+              GenericBlock, 
             }}
             enabled={true}
           >
@@ -542,7 +542,9 @@ export const EditorCanvasWithJson = () => {
 
                 <div
                   className="fixed inset-0 justify-self-end top-12"
-                  style={{ zIndex: 15, height: "fit-content" }}
+                  style={{ 
+                    zIndex: 10, 
+                    height: "fit-content" }}
                 >
                   <ExportPanel
                     onPreview={handlePreview}
@@ -560,25 +562,6 @@ export const EditorCanvasWithJson = () => {
                   />
                 </div>
                 <div id="CANVAS" style={{ top: 55 }}>
-                  {/* <Frame data={currentJson}>
-                    <Element
-                      is="div"
-                      canvas
-                      id="ROOT"
-                      className="justify-self-start top-28"
-                      style={{
-                        minWidth: "700px",
-                        minHeight: "800px",
-                        border: "1px dashed #ccc",
-                        padding: "70px",
-                      }}
-                    />
-                    <Element
-                      is={ColumnBlock}
-                      canvas
-                      columnIds={["col-1", "col-2"]}
-                    />
-                  </Frame> */}
                   <CanvasWrapperWithJson
                   data={currentJson}/>
                 </div>
