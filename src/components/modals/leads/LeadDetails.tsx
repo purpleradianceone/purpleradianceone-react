@@ -710,7 +710,7 @@ const FormField = ({
       >
         {!isEditing  ? (
           <span
-            className="text-gray-800 font-semibold  text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="text-gray-800   text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
               // selectOptions
               //   ?.find((opt) => opt.value === value)
@@ -724,9 +724,9 @@ const FormField = ({
               //       Select {label.toLowerCase()}
               //     </span>
               //   )
-              <span>{value?.toLocaleString()}</span>
+              <span className="font-semibold">{value?.toLocaleString()}</span>
             ) : (
-              <span className="text-sm text-gray-500">Add here...</span>
+              <span className="text-[12px] text-gray-500">Add here...</span>
             )}
           </span>
         ) : type === "select" ? (

@@ -233,7 +233,7 @@ const LeadAssignedTeams = ({
     <>
       {/* NOTE : if there is no any team  */}
       {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
-        <div className="w-full h-full bg-slate-0">
+        <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <button
             disabled={!userHasAccessToUpdateLead}
@@ -332,7 +332,7 @@ const LeadAssignedTeams = ({
           {/* view in pop up card  */}
           {selectedCompanyTeamCard && (
             <div
-              className={` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}
+              className={` fixed z-10  inset-0  bg-opacity-0 flex justify-center items-center `}
             >
               <div
                 className={` ${

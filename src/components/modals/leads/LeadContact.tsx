@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Globe, Plus, X, XIcon } from "lucide-react";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
@@ -34,9 +35,11 @@ type LeadContactFormType = {
 const LeadContact = ({
   leadContact,
   fetchLeadContact,
+  selectedLeadData 
 }: {
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
+  selectedLeadData: any;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
@@ -256,7 +259,7 @@ const LeadContact = ({
     //  Proceed with form submission logic here
     const postData = {
       company_id: loginStatus.companyId,
-      // lead_id: selectedLeadData.id,
+      lead_id: selectedLeadData.id,
       name: leadContactForm.name,
       email: leadContactForm.email,
       mobilenumber: leadContactForm.mobileNumber,
@@ -393,7 +396,7 @@ const LeadContact = ({
   }, [selectedContactCard]);
 
   return (
-    <div className={`w-full  px-1 mb-1 `}>
+    <div className={`w-full z-10 px-1 mb-1 `}>
       {/* Header */}
 <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
         <span>Add</span>
