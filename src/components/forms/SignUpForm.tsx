@@ -80,7 +80,7 @@ function SignUpForm() {
     ) {
       if (captchaToken !== "") {
         const captchaRequest = {
-          token: captchaToken,
+          captchaToken: captchaToken,
         };
         axios
           .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {

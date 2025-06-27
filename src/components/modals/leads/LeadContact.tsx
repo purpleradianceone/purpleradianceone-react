@@ -395,7 +395,7 @@ const LeadContact = ({
   return (
     <div className={`w-full  px-1 mb-1 `}>
       {/* Header */}
-      <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+<div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
         <span>Add</span>
         <button
           disabled={!userHasAccessToUpdateLead}
@@ -416,6 +416,7 @@ const LeadContact = ({
           <Plus size={10} />
         </button>
       </div>
+      
 
       {/* Contacts List */}
       <div className="space-y-2">

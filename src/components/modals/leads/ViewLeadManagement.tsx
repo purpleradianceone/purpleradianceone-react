@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ArrowBigRightDash, ChevronLeft, History, Plus, X } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { ChevronLeft, History, Plus, X } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -39,6 +40,7 @@ import LeadAssignedTeams from "./LeadAssignedTeams";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
+import LeadTasksModal from "./lead-task/LeadTasksModal";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -627,7 +629,6 @@ const ViewLeadManagement = () => {
       if (response.status === STATUS_CODE.OK) {
         setInterestTypeData(response.data);
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -861,7 +862,7 @@ const ViewLeadManagement = () => {
     if (id === "meeting") {
       setIsOpenProductCard(false);
       setIsOpenMeetingsModal(true);
-      setIsOpenProductCard(false);
+      setIsOpenLeadTeamsCard(false);
     } else if (id === "contact") {
       setIsOpenProductCard(true);
       setIsOpenMeetingsModal(false);
@@ -872,6 +873,14 @@ const ViewLeadManagement = () => {
       setIsOpenLeadTeamsCard(true);
     }
   };
+
+  const getHeightAboveTasks = useCallback(() => {
+    if (isOpenMeetingsModal) {
+      return "min-h-14";
+    } else {
+      return "";
+    }
+  }, [isOpenMeetingsModal]);
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -898,13 +907,16 @@ const ViewLeadManagement = () => {
               title={
                 userHasAccessToUpdateLead
                   ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
               }
               className="text-lg font-semibold"
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
                   showMessageSnackbar({
-                    message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     type: "error",
                   });
                 }
@@ -930,15 +942,17 @@ const ViewLeadManagement = () => {
           {/* new code  */}
           <div className="relative inline-block">
             <button
-            disabled={!userHasAccessToUpdateLead}
+              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
-                if(userHasAccessToUpdateLead){
+                if (userHasAccessToUpdateLead) {
                   setIsAddProductModalOpen(true);
-                }else{
+                } else {
                   showMessageSnackbar({
-                    message : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
-                    type : "error"
-                  })
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                    type: "error",
+                  });
                 }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
@@ -981,13 +995,18 @@ const ViewLeadManagement = () => {
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
             }}
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
           >
             <Detail
@@ -1007,13 +1026,18 @@ const ViewLeadManagement = () => {
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message: MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
             }}
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
           >
             <Detail
@@ -1042,12 +1066,17 @@ const ViewLeadManagement = () => {
           <div
             className="flex"
             title={
-              userHasAccessToUpdateLead ? "" :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message
+              userHasAccessToUpdateLead
+                ? ""
+                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
             }
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
                 showMessageSnackbar({
-                  message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                  message:
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message,
                   type: "error",
                 });
               }
@@ -1131,7 +1160,9 @@ const ViewLeadManagement = () => {
                   setSelectedStatusId(item.id);
                 } else {
                   showMessageSnackbar({
-                    message:  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     type: "error",
                   });
                 }
@@ -1201,7 +1232,7 @@ const ViewLeadManagement = () => {
         {/* Column 2 */}
         <div className="w-full md:w-1/2 flex flex-col gap-0">
           {/* Meeting / Contact / Span Tabs */}
-          <div className="bg-slate-200 pl-1  flex  text-xs font-semibold text-gray-800 gap-4">
+          <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
             <span
               id="contact"
               className={`cursor-pointer ${
@@ -1237,21 +1268,29 @@ const ViewLeadManagement = () => {
               Lead Teams
             </span>
           </div>
-          <div className="flex flex-col mt-5 ml-4 min-h-32 gap-2">
+          <div
+            className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col mt-5 ml-4 gap-2 [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
+          >
             {isOpenMeetingsModal && (
               <div className="flec max-w-48">
-                 <Button 
-                 onClick={()=>{
-                  const leadDataSearchParams = JSON.parse(searchParams.get("leadData") || "{}");
-                  sessionStorage.setItem(
-                            "leadData",
-                            JSON.stringify(leadDataSearchParams!)
-                          );
-                  navigate(ROUTES_URL.SCHEDULE_MEETING)
-                 }}
-                 >Schedule Meeting</Button>
+                <Button
+                  onClick={() => {
+                    const leadDataSearchParams = JSON.parse(
+                      searchParams.get("leadData") || "{}"
+                    );
+                    sessionStorage.setItem(
+                      "leadData",
+                      JSON.stringify(leadDataSearchParams!)
+                    );
+                    navigate(ROUTES_URL.SCHEDULE_MEETING);
+                  }}
+                >
+                  Schedule Meeting
+                </Button>
               </div>
-             
             )}
             {isOpenProductCard && (
               <LeadContact
@@ -1268,7 +1307,7 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Activity */}
-          <div className="border p-4 bg-white shadow-sm rounded">
+          {/* <div className="border p-4 bg-white shadow-sm rounded">
             <div className=" top-0 bg-slate-100 font-sans text-sm font-semibold">
               Activity
             </div>
@@ -1286,7 +1325,9 @@ const ViewLeadManagement = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
+          <LeadTasksModal></LeadTasksModal>
+          {/* End Activity */}
         </div>
       </div>
 
