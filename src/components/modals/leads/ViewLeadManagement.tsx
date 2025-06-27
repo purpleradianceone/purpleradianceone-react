@@ -1139,44 +1139,44 @@ const ViewLeadManagement = () => {
             </span>
           </div>
           <div className="flex flex-col min-h-32 gap-2">
-          <div
-            className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col mt-5 ml-4 gap-2 [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-gray-50
-  [&::-webkit-scrollbar-thumb]:bg-gray-50
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
-          >
-            {isOpenMeetingsModal && (
-              <div className="flec max-w-48">
-                <Button
-                  onClick={() => {
-                    const leadDataSearchParams = JSON.parse(
-                      searchParams.get("leadData") || "{}"
-                    );
-                    sessionStorage.setItem(
-                      "leadData",
-                      JSON.stringify(leadDataSearchParams!)
-                    );
-                    navigate(ROUTES_URL.SCHEDULE_MEETING);
-                  }}
-                >
-                  Schedule Meeting
-                </Button>
-              </div>
-            )}
-            {isOpenProductCard && (
-              <LeadContact
-                leadContact={leadContact}
-                fetchLeadContact={fetchLeadContact}
-              />
-            )}
-            {isOpenLeadTeamsCard && (
-              <LeadAssignedTeams
-                selectedLeadData={selectedLeadData}
-                isOpen={isOpenLeadTeamsCard}
-              />
-            )}
+            <div
+              className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:bg-gray-50
+             [&::-webkit-scrollbar-thumb]:bg-gray-50
+              [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
+            >
+              {isOpenMeetingsModal && (
+                <div className="flec max-w-48">
+                  <Button
+                    onClick={() => {
+                      const leadDataSearchParams = JSON.parse(
+                        searchParams.get("leadData") || "{}"
+                      );
+                      sessionStorage.setItem(
+                        "leadData",
+                        JSON.stringify(leadDataSearchParams!)
+                      );
+                      navigate(ROUTES_URL.SCHEDULE_MEETING);
+                    }}
+                  >
+                    Schedule Meeting
+                  </Button>
+                </div>
+              )}
+              {isOpenProductCard && (
+                <LeadContact
+                  leadContact={leadContact}
+                  fetchLeadContact={fetchLeadContact}
+                />
+              )}
+              {isOpenLeadTeamsCard && (
+                <LeadAssignedTeams
+                  selectedLeadData={selectedLeadData}
+                  isOpen={isOpenLeadTeamsCard}
+                />
+              )}
+            </div>
           </div>
-
           {/* Activity */}
           {/* <div className="border p-4 bg-white shadow-sm rounded">
             <div className=" top-0 bg-slate-100 font-sans text-sm font-semibold">
@@ -1273,7 +1273,6 @@ const ViewLeadManagement = () => {
     </div>
   );
 };
-
 export default ViewLeadManagement;
 
 type DetailProps = {
@@ -1344,7 +1343,6 @@ const Detail: React.FC<DetailProps> = ({
       handleLeadInfoSave!();
     }
   };
-
   return (
     <div className="">
       <label className="text-xs text-gray-700 block  whitespace-nowrap overflow-hidden  ">
