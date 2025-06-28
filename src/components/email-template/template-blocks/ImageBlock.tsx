@@ -14,8 +14,8 @@ type ImageBlockProps = {
 
 export const ImageBlock: React.FC<ImageBlockProps> = ({
   src,
-  width = 600,
-  height = 200,
+  width = 200,
+  height = 100,
   alignment = "center",
 }) => {
   const {
@@ -26,6 +26,21 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
 
   const { actions } = useEditor();
   const [preview, setPreview] = useState<string>(src);
+
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     const base64 = reader.result as string;
+  //     setPreview(base64);
+  //     setProp((props: any) => {
+  //       props.src = base64;
+  //     }, 500);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value;

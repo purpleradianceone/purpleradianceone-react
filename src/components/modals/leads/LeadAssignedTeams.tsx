@@ -233,7 +233,7 @@ const LeadAssignedTeams = ({
     <>
       {/* NOTE : if there is no any team  */}
       {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
-        <div className="w-full h-full bg-slate-0">
+        <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <button
             disabled={!userHasAccessToUpdateLead}
@@ -332,7 +332,7 @@ const LeadAssignedTeams = ({
           {/* view in pop up card  */}
           {selectedCompanyTeamCard && (
             <div
-              className={` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}
+              className={` fixed z-10  inset-0  bg-opacity-0 flex justify-center items-center `}
             >
               <div
                 className={` ${
@@ -454,7 +454,7 @@ const LeadAssignedTeams = ({
       />
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
           <div className="bg-white mt-14 rounded-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-2xl sm:px-4 sm:py-4">
             {/* header */}
             <div className="border-b pb-1 mb-4 flex justify-between items-center">

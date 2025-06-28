@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useDynamicFields } from '../DynamicFieldsContext'; 
@@ -10,8 +9,6 @@ import {  STATUS_CODE } from '../../../constants/AppConstants';
 import { useNavigate, } from 'react-router-dom';
 import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
 import ROUTES_URL from '../../../constants/Routes';
-import ApiError from '../../../@types/error/ApiError';
-import RefreshToken from '../../../config/validations/RefreshToken';
 
 
 type TemplateSettingsPanelUpdateProps = {
@@ -39,7 +36,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettin
   
 
   const insertDynamicField = (field: string) => {
-    const placeholder = `{{${field}}}`;
+    const placeholder = `${field}`;
     const input = subjectInputRef.current;
 
     if (!input) return;
@@ -94,16 +91,19 @@ function getHtmlEmailBody(): string {
                     navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
                   }
                 })
-                .catch(async(error : ApiError | any) => {
-                  if(error.status === STATUS_CODE.UNATHORISED) {
-                  const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:updateEmailTemplate})
-                  if(refreshTokenResponse){
-                    updateEmailTemplate(emailBody);
-                  }
-                }
+                .catch((error) => {
+                  console.error(error.toString())
                 });
         }
-        
+        if (dynamicFields.length === 0) {
+          return (
+            <div
+              style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}
+            >
+              Loading dynamic fields...
+            </div>
+          );
+        }
   
   return (
     <>

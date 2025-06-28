@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, } from 'react';
 
@@ -9,8 +8,6 @@ import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
 import { useNavigate, } from 'react-router-dom';
 import ROUTES_URL from '../../../constants/Routes';
-import ApiError from '../../../@types/error/ApiError';
-import RefreshToken from '../../../config/validations/RefreshToken';
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -23,19 +20,16 @@ type TemplateSettingsPanelInsertProps = {
 };
 
 export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSettingsPanelInsertProps> = ({htmlBody, id, templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault }) => {
-
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState(emailTemplateName);
   const [subject, setSubject] = useState(emailTemplateSubject);
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const [isDefault, setIsDefault] = useState(emailTemplateIsDefault);
   const navigate = useNavigate();
-  const dynamicFields = useDynamicFields(); 
-
-
+  const dynamicFields = useDynamicFields();
 
   const insertDynamicField = (field: string) => {
-    const placeholder = `{{${field}}}`;
+    const placeholder = `${field}`;
     const input = subjectInputRef.current;
 
     if (!input) return;
@@ -48,47 +42,51 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSetting
 
     // Move cursor after inserted text
     setTimeout(() => {
-      input.setSelectionRange(start + placeholder.length, start + placeholder.length);
+      input.setSelectionRange(
+        start + placeholder.length,
+        start + placeholder.length
+      );
       input.focus();
     }, 0);
   };
 
-     const {loginStatus} = useLoggedInUserContext();
-    const updateEmailTemplateInsert = async(emailBody:string)=>{
+  const { loginStatus } = useLoggedInUserContext();
+  const updateEmailTemplateInsert = async (emailBody: string) => {
+    const postDataUpdateEmailTemplate = {
+      company_id: loginStatus.companyId,
+      updatedby_id: loginStatus.id,
+      id: id,
+      email_type_id: templateTypeId,
+      name: templateName,
+      email_subject: subject,
+      email_body_html: emailBody,
+      email_body_json: null,
+      is_default: isDefault,
+    };
 
-                    const postDataUpdateEmailTemplate = {
-                      company_id: loginStatus.companyId,
-                      updatedby_id: loginStatus.id,
-                      id:id,
-                      email_type_id: templateTypeId,
-                      name: templateName,
-                      email_subject: subject,
-                      email_body_html: emailBody,
-                      email_body_json: null,
-                      is_default: isDefault,
-                    };                   
-
-
-              await axios.post(POST_API.UPDATE_EMAIL_TEMPLATE,postDataUpdateEmailTemplate,{
-                        withCredentials:true
-                })
-                .then((response) =>{
-                      if(response.status === STATUS_CODE.OK){
-                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
-                        }
-                        
-                }).catch(async(error : ApiError | any) =>{
-                  if(error.status === STATUS_CODE.UNATHORISED){
-                    const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:updateEmailTemplateInsert});
-                    if(refreshTokenResponse){
-                      updateEmailTemplateInsert(emailBody);
-                    }
-                  }
-
-                })
+    await axios
+      .post(POST_API.UPDATE_EMAIL_TEMPLATE, postDataUpdateEmailTemplate, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          navigate(
+            `${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`
+          );
         }
+      })
+      .catch((error) => {
+        console.error(error.toString())
+      });
+  };
+  if (dynamicFields.length === 0) {
+    return (
+      <div style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}>
+        Loading dynamic fields...
+      </div>
+    );
+  }
 
-  
   return (
     <>
       {/* Fixed Button to Open Settings */}

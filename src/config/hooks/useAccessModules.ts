@@ -260,6 +260,23 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 16 && accessModule.update
   );
 
+  //company preferences setting
+   //email type setting 
+  const userHasAccessToAddCompanyPreferences = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 17 && accessModules.add
+  );
+
+   const userHasAccessToViewCompanyPreferences = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 17 && accessModule.view
+  );
+
+  const userHasAccessToUpdateCompanyPreferences = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 17 && accessModule.update
+  );
+
 
   return {
     userHasAccessToAddUser,
@@ -324,6 +341,10 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
 
     userHasAccessToAddEmailTypeSetting,
     userHasAccessToViewEmailTypeSetting,
-    userHasAccessToUpdateEmailTypeSetting
+    userHasAccessToUpdateEmailTypeSetting,
+
+    userHasAccessToAddCompanyPreferences,
+    userHasAccessToViewCompanyPreferences,
+    userHasAccessToUpdateCompanyPreferences
   };
 };

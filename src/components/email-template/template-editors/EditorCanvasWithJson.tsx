@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { Editor, Frame, Element } from "@craftjs/core";
+import { Editor, } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -10,7 +10,10 @@ import { HtmlPreviewModal } from "../HtmlPreviewModal";
 import { ColumnBlock } from "../template-blocks/ColumnBlock";
 import { HeadingBlock } from "../template-blocks/HeadingBlock";
 import { SubjectBlock } from "../template-blocks/SubjectBlock";
-import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import {
+  DynamicFieldOption,
+  DynamicFieldsContext,
+} from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -29,27 +32,31 @@ import ROUTES_URL from "../../../constants/Routes";
 import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
 import { TemplateSettingsPanelInsertTemplateUpdate } from "../template-panel/TemplateSettingsPanelInsertTemplateUpdate";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
+import {
+  convertPlaceholdersToFields,
+  convertPlaceholdersToObject,
+  PlaceholderItem,
+} from "../template-util/PlaceHolderDataToPlaceHolderRecord";
+import { CanvasWrapperWithJson } from "../canvas-wrapper/CanvasWrapperWithJson";
 
-
-interface DynamicField {
-  label: string;
-  value: string;
-}
 
 export const EditorCanvasWithJson = () => {
-  const canvasBgColor = "#f9f9f9";
+  const canvasBgColor="#f9f9f9";
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
   const [currentJson, setCurrentJson] = useState("");
-  const [emailTemplateName,setEmailTemplateName] = useState("");
-  const [emailTemplateSubject,setEmailTemplateSubject] = useState("");
+  const [emailTemplateName, setEmailTemplateName] = useState("");
+  const [emailTemplateSubject, setEmailTemplateSubject] = useState("");
 
-  const[emailTemplateDefault,setEmailTemplateDefault] = useState(false);
-  
-  const [isLoading,setIsLoading] = useState(false);
+  const [emailTemplateDefault, setEmailTemplateDefault] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
 
@@ -57,10 +64,42 @@ export const EditorCanvasWithJson = () => {
   const templateTypeId = searchParams.get("template_type_id");
   const emailTemplateId = searchParams.get("template_id");
 
-
   //Handaling HTML INSERT TEMPLATES
   const [htmlInput, setHtmlInput] = useState("");
-  
+  const [placeHolderData, setPlaceHolderData] = useState<PlaceholderItem[]>([]);
+
+  const getPlaceHolderDataFromDatabase = async ({
+    templateTypeId,
+  }: {
+    templateTypeId: number;
+  }) => {
+    setIsLoading(true);
+    await axios
+      .post(
+        POST_API.GET_EMAIL_PLACEHOLDER,
+        {
+          company_id: loginStatus.companyId,
+          id: null,
+          isactive: true,
+          email_type_id: templateTypeId,
+          requestedby: loginStatus.id,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          if (response.data.length > 0) {
+            console.log(response.data);
+            if (response.data) {
+              setPlaceHolderData(response.data);
+              console.log(
+                convertPlaceholdersToObject(response.data).toString()
+              );
+            }
+          }
+        }
+      });
+  };
 
   const getTemplateToUpdate = async ({
     emailTemplateId,
@@ -69,7 +108,6 @@ export const EditorCanvasWithJson = () => {
     emailTemplateId: number;
     templateTypeId: number;
   }) => {
-    setIsLoading(true);
     await axios
       .post(
         POST_API.GET_EMAIL_TEMPLATE,
@@ -90,12 +128,10 @@ export const EditorCanvasWithJson = () => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.length > 0) {
             setCurrentJson(response.data[0].email_body_json);
-            
-            setEmailTemplateName(response.data[0].name);
-            setEmailTemplateSubject( response.data[0].email_subject);
-            setHtmlInput(response.data[0].email_body_html);
-           
 
+            setEmailTemplateName(response.data[0].name);
+            setEmailTemplateSubject(response.data[0].email_subject);
+            setHtmlInput(response.data[0].email_body_html);
             setEmailTemplateDefault(response.data[0].is_default);
           } else {
             //
@@ -114,94 +150,28 @@ export const EditorCanvasWithJson = () => {
             setIsDialogueOpen(true);
           }
         }
-      }).finally(()=>{
-        setIsLoading(false);
       })
-
-     
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
     if (emailTemplateId && templateTypeId) {
-      getTemplateToUpdate({
-        emailTemplateId: parseInt(emailTemplateId),
+      setIsLoading(true);
+      getPlaceHolderDataFromDatabase({
         templateTypeId: parseInt(templateTypeId),
+      }).then(() => {
+        getTemplateToUpdate({
+          emailTemplateId: parseInt(emailTemplateId),
+          templateTypeId: parseInt(templateTypeId),
+        });
       });
     }
   }, []);
 
-  const jsonPlaceholdersMap: { [key: number]: string } = {
-    1: `{
-    "company.fullname":"PurpleRadiance",
-    "company_user.fullname":"Nitikesh Yewale",
-    "company_user.email":"nitikesh@g.co",
-    "company_user.mobilenumber":"9878987898",
-    "company_user.password":"abc#wio345",
-    "current_year":"2025",
-    "crm_url":"http://localhost:5173"
-    }`,
-
-    2: `{
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon ",
-    "lead.email":"elon@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }`,
-
-    3: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Mark3",
-    "lead.email":"Mark3@g.co",
-    "lead.mobilenumber":"+1 87889978998",
-    "lead.owner": "Pravin",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-
-    4: `
-    {
-    "company.fullname":"PurpleRadiance",
-    "lead.name":"Elon4",
-    "lead.email":"elon4@g.co",
-    "lead.mobilenumber":"+1 987889978998",
-    "lead.owner": "Suraj",
-    "lead.status":"on going",
-    "lead.source":"web",
-    "lead.createdby":"Pratik",
-    "lead.createdon":"12 May 2025 ",
-    "lead.updatedby":"Kundan",
-    "lead.updatedon":"01 June 2025",
-    "company_product.name":"CDR Analysis",
-    "crm_url":"http://localhost:5173",
-    "current_year":"2025"
-    }
-    `,
-  };
-
-  //   const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(dynamicVariables);
-  const json = jsonPlaceholdersMap[parseInt(templateTypeId!)];
-  const parsedPlaceHolders: Record<string, string> = JSON.parse(json);
-  const [dynamicVars, setDynamicVars] =
-    useState<Record<string, string>>(parsedPlaceHolders);
+  const parsedPlaceHolders: Record<string, string> = convertPlaceholdersToObject(placeHolderData);
+  const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(parsedPlaceHolders);
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleDialogueConfirm = () => {
     setIsDialogueOpen(false);
@@ -212,48 +182,23 @@ export const EditorCanvasWithJson = () => {
   const handlePreview = (html: string) => {
     let replacedHtml = html;
     Object.entries(dynamicVars).forEach(([key, value]) => {
-      const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
+      const regex = new RegExp(`${key}`, "g");
       replacedHtml = replacedHtml.replace(regex, value);
     });
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
   };
 
-  const parsedFields: DynamicField[] = Object.entries(dynamicVars).map(
-    ([key]) => ({
-      label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      value: key,
-    })
-  );
+  
 
-  useEffect(() => {
-    try {
-      JSON.parse(currentJson!);
-    } catch (e) {
-      console.error("Invalid Craft.js JSON:", e);
-      setCurrentJson(
-        JSON.stringify({
-          ROOT: {
-            type: { resolvedName: "Document" },
-            isCanvas: true,
-            props: {},
-            nodes: [],
-            linkedNodes: {},
-          },
-        })
-      );
-    }
-  }, [currentJson]);
-
-
+  const parsedFields: DynamicFieldOption[] = convertPlaceholdersToFields(placeHolderData);
 
   //FOR HANDALING INSERT HTML TEMPLATES
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setHtmlInput(e.target.value);
-    };
+    setHtmlInput(e.target.value);
+  };
 
-
-const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -271,12 +216,10 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   const setHtmlContent = (updatedHtml: string) => {
     setHtmlInput(updatedHtml);
-    setPreviewHtml(updatedHtml); 
+    setPreviewHtml(updatedHtml);
   };
 
-
-
-//message snakbar
+  //message snakbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
     message: "",
@@ -290,6 +233,8 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
   const handleMessageSnackbarClose = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
+
+  //for instruction
 
   return isLoading ? (
     <div className="flex justify-center items-center h-full">
@@ -340,10 +285,10 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         <div
           style={{
             position: "fixed",
-            top: 50,
+            top: 80, // Adjusted to appear below the toggle button
             right: 130,
             width: "260px",
-            height: "600px",
+            maxHeight: "600px",
             background: "white",
             padding: "10px",
             borderRadius: "8px",
@@ -361,9 +306,13 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
               background: "white",
               alignItems: "center",
               marginBottom: "10px",
+              paddingBottom: "8px",
+              borderBottom: "1px solid #eee",
             }}
           >
-            <h4 style={{ margin: 0, fontSize: "14px" }}>Dynamic Fields</h4>
+            <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600 }}>
+              Dynamic Fields
+            </h4>
             <button
               onClick={() => setShowDynamicEditor(false)}
               style={{
@@ -371,36 +320,74 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                 border: "none",
                 cursor: "pointer",
                 fontSize: "16px",
-                alignContent: "flex-end",
                 lineHeight: 1,
+                color: "#666",
+                padding: "4px",
               }}
             >
               ✖
             </button>
           </div>
 
-          {Object.entries(dynamicVars).map(([key, value]) => (
-            <div key={key} style={{ marginBottom: "8px" }}>
-              <label style={{ fontSize: "12px" }}>{key}</label>
-              <input
-                style={{
-                  marginTop: "2px",
-                  width: "100%",
-                  padding: "4px",
-                  fontSize: "12px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
-                value={value}
-                onChange={(e) =>
-                  setDynamicVars((prev) => ({
-                    ...prev,
-                    [key]: e.target.value,
-                  }))
-                }
-              />
+          {parsedFields.length === 0 ? (
+            <div
+              style={{
+                padding: "16px",
+                textAlign: "center",
+                color: "#666",
+                fontSize: "12px",
+              }}
+            >
+              {isLoading
+                ? "Loading dynamic fields..."
+                : "No dynamic fields available"}
             </div>
-          ))}
+          ) : (
+            parsedFields.map((field) => (
+              <div key={field.value} style={{ marginBottom: "12px" }}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    display: "block",
+                    marginBottom: "4px",
+                    fontWeight: 500,
+                    color: "#333",
+                  }}
+                >
+                  {field.label}
+                </label>
+                <input
+                  style={{
+                    width: "100%",
+                    padding: "6px 8px",
+                    fontSize: "12px",
+                    borderRadius: "4px",
+                    border: "1px solid #ddd",
+                    backgroundColor: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                  value={dynamicVars[field.value] || ""}
+                  onChange={(e) =>
+                    setDynamicVars((prev) => ({
+                      ...prev,
+                      [field.value]: e.target.value,
+                    }))
+                  }
+                  placeholder={`Enter value for ${field.label}`}
+                />
+                <div
+                  style={{
+                    fontSize: "10px",
+                    color: "#999",
+                    marginTop: "4px",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {field.value}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -454,7 +441,7 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                 onClick={() => {
                   const beautified = htmlInput;
                   navigator.clipboard.writeText(beautified);
-                  alert("Email Template copied to clipboard!");
+                  showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
                 }}
                 style={{ padding: "8px 14px" }}
               >
@@ -511,7 +498,7 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
               TableBlock,
               HeadingBlock,
               DynamicFieldBlock,
-              GenericBlock, // 👈 Don't forget
+              GenericBlock, 
             }}
             enabled={true}
           >
@@ -555,13 +542,13 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
                 <div
                   className="fixed inset-0 justify-self-end top-12"
-                  style={{ zIndex: 15, height: "fit-content" }}
+                  style={{ 
+                    zIndex: 10, 
+                    height: "fit-content" }}
                 >
                   <ExportPanel
                     onPreview={handlePreview}
-                   handleCopyHtml={(data) => {
-                    showMessageSnackbar({message : data.message,type : data.type})
-                   }}
+                    //   onSave={handleSave}
                   />
                 </div>
 
@@ -575,20 +562,8 @@ const handleHtmlFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                   />
                 </div>
                 <div id="CANVAS" style={{ top: 55 }}>
-                  <Frame data={currentJson}>
-                    <Element
-                      is="div"
-                      canvas
-                      id="ROOT"
-                      className="justify-self-start top-28"
-                      style={{
-                        minWidth: "700px",
-                        minHeight: "800px",
-                        border: "1px dashed #ccc",
-                        padding: "70px",
-                      }}
-                    />
-                  </Frame>
+                  <CanvasWrapperWithJson
+                  data={currentJson}/>
                 </div>
               </div>
             </div>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from 'react';
 
@@ -9,8 +8,6 @@ import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContex
 import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
 import ROUTES_URL from '../../../constants/Routes';
-import ApiError from '../../../@types/error/ApiError';
-import RefreshToken from '../../../config/validations/RefreshToken';
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -31,7 +28,7 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
   
 
   const insertDynamicField = (field: string) => {
-    const placeholder = `{{${field}}}`;
+    const placeholder = `${field}`;
     const input = subjectInputRef.current;
 
     if (!input) return;
@@ -73,17 +70,17 @@ export const TemplateSettingsPanelInsert: React.FC<TemplateSettingsPanelInsertPr
                           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
                         }
 
-                }).catch(async(error : ApiError | any) =>{
-                  if(error.status === STATUS_CODE.UNATHORISED){
-                    const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:createEmailTemplateInsert});
-                    if(refreshTokenResponse){
-                      createEmailTemplateInsert(emailBody);
-                    }
-                  }
-
+                }).catch((error)=>{
+                  console.error(error.toString())
                 })
         }
-  
+  if (dynamicFields.length === 0) {
+      return (
+        <div style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}>
+          Loading dynamic fields...
+        </div>
+      );
+    }
   return (
     <>
       {/* Fixed Button to Open Settings */}

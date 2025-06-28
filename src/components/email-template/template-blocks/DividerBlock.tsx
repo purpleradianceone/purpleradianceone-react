@@ -68,7 +68,7 @@ export const DividerBlock: React.FC = () => {
         maxConstraints={[1000, 1]} // Adjust max size if necessary
         axis="x"
         onResizeStop={(e, data) => {
-          e.preventDefault();
+          console.error(e);
           setProp((props: any) => {
             props.width = data.size.width;
           });

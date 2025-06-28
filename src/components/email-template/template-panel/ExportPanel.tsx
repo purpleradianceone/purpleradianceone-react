@@ -1,25 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // ExportPanel.tsx
 import React from "react";
 import { useEditor } from "@craftjs/core";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
-import { ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
-  handleCopyHtml? : ({message,type} : ShowMessageSnackbarProps) => void;
+  onCopyHtml?: (html: string) => void;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
   onPreview,
-  handleCopyHtml
 }) => {
   const { query } = useEditor();
 
   const handlePreview = async () => {
     const json = query.serialize();
     const html1 = craftJsonToHtml(json);
+    console.error(html1);
+    console.error(json);
     onPreview(html1);
   };
 
@@ -31,10 +30,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     navigator.clipboard
       .writeText(html)
       .then(() => {
-        handleCopyHtml!({message : "Copied To Clipboard" , type : "success"})
+        alert("HTML copied to clipboard!");
       })
       .catch(() => {
-        handleCopyHtml!({message : "Failed To Copy in Clipboard" , type : "error"})
+        alert("Failed to copy HTML");
       });
   };
 

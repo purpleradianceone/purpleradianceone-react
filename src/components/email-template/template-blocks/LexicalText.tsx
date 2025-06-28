@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useContext } from "react";
+import React, { useContext, } from "react";
 import { useEditor, useNode } from "@craftjs/core";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -119,6 +119,7 @@ const ToolbarSelect = ({
 
 const Toolbar = ({ editor }: { editor: any }) => {
   const dynamicFields = useContext(DynamicFieldsContext);
+   
   const [activeFormats, setActiveFormats] = React.useState<Record<string, boolean>>({
     bold: false,
     italic: false,
@@ -154,10 +155,17 @@ const Toolbar = ({ editor }: { editor: any }) => {
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        selection.insertText(`{{${fieldKey}}}`);
+        selection.insertText(`${fieldKey}`);
       }
     });
   };
+  if (dynamicFields.length === 0) {
+    return (
+      <div style={{ padding: '8px', background: '#f0f0f0', color: '#666' }}>
+        Loading dynamic fields...
+      </div>
+    );
+  }
 
   return (
     <div style={{
