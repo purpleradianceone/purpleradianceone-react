@@ -5,7 +5,7 @@ on:
     branches:
       - development
       - production
-      - main
+    
 
 jobs:
   build-and-deploy:
@@ -26,8 +26,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_REPORNAME }}/react-app:${{ github.ref_name }} .
-          docker push ${{ secrets.DOCKERHUB_REPORNAME }}/react-app:${{ github.ref_name }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
 
       - name: SSH and Deploy on Hostinger VPS
         uses: appleboy/ssh-action@v0.1.8
@@ -36,13 +36,15 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKERHUB_REPORNAME }}/react-app:${{ github.ref_name }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
+
             docker stop react-app || true
             docker rm react-app || true
+
             docker run -d \
               --name react-app \
               --network purple-net \
               -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
               -p 80:80 -p 443:443 \
               --restart always \
-              ${{ secrets.DOCKERHUB_REPORNAME }}/react-app:${{ github.ref_name }}
+              ${{ secrets.DOCKERHUB_USERNAME }}/react-app:${{ github.ref_name }}
