@@ -19,6 +19,8 @@ const RefreshToken = async (props : {
           withCredentials: true,
         }
       );
+       console.log(refreshResponse);
+       console.log("response Refresh");
       if (props.callFunction) {
         if (props.callFunction.length === 0) {
             // Call the function without arguments
