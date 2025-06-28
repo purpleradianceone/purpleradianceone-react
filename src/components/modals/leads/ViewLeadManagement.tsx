@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronLeft, History, Plus, X } from "lucide-react";
+import {  ChevronLeft, History, Plus, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
@@ -746,9 +746,9 @@ const ViewLeadManagement = () => {
 
   const getHeightAboveTasks = useCallback(() => {
     if (isOpenMeetingsModal) {
-      return "min-h-14";
+      return "min-h-40";
     } else {
-      return "";
+      return "min-h-40";
     }
   }, [isOpenMeetingsModal]);
 
@@ -1165,6 +1165,7 @@ const ViewLeadManagement = () => {
               )}
               {isOpenProductCard && (
                 <LeadContact
+                  selectedLeadData={selectedLeadData}
                   leadContact={leadContact}
                   fetchLeadContact={fetchLeadContact}
                 />
@@ -1197,6 +1198,7 @@ const ViewLeadManagement = () => {
               ))}
             </div>
           </div> */}
+          {}
           <LeadTasksModal></LeadTasksModal>
           {/* End Activity */}
         </div>
