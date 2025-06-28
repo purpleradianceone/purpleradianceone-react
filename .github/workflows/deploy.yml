@@ -37,10 +37,8 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKERHUB_REPORNAME }}/react-app:${{ github.ref_name }}
-
             docker stop react-app || true
             docker rm react-app || true
-
             docker run -d \
               --name react-app \
               --network purple-net \
