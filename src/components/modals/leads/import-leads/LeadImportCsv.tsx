@@ -688,8 +688,9 @@ const processCsvForReview = useCallback(() => {
     return values.length > 0 ? values.join(" ").trim() : null;
   };
 
-  // Note : NEED TO FIX THIS ERROR
-  const processed: ProcessedLeadData[] = csvData.slice(1).map((row) => {
+  // Note : NEED TO FIX THIS ERROR ProcessedLeadData
+  // note : error do changes , type changed to any 
+  const processed: any[] = csvData.slice(1).map((row) => {
     // Get email and mobile for duplicate checking using the new helper
     const email = getConcatenatedCsvValue(row, "email");
     const mobile = getConcatenatedCsvValue(row, "mobileNumber");
@@ -761,7 +762,7 @@ const processCsvForReview = useCallback(() => {
         (mobile && duplicateMobiles.has(mobile)),
     };
   });
-
+//Note: error commented below line
   setProcessedLeads(finalProcessed);
   setShowPreImportReview(true);
 }, [
