@@ -38,8 +38,8 @@ export const CanvasWrapper = () => {
           <div
             style={{
               position: "absolute",
-              top: "50%",
-              left: "50%",
+              top: "30%",
+              left: "20%",
               transform: "translate(-50%, -50%)",
               fontSize: "18px",
               color: "#999",
@@ -49,7 +49,7 @@ export const CanvasWrapper = () => {
               transition: "opacity 0.3s ease, z-index 0.3s ease",
             }}
           >
-            📦 Drag the blocks in this box
+            📦 Drag the blocks here 👉
           </div>
         )}
       </Element>

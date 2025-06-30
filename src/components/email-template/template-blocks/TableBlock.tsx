@@ -45,14 +45,14 @@ export const TableBlock: React.FC<TableBlockProps> = ({ width = 600, height = 30
     borderCollapse: "collapse",
     width: "100%",
     height: "100%",
-    backgroundColor: "transparent",
+    backgroundColor: "#f9f9f9",
   };
 
   const cellStyle: React.CSSProperties = {
     border: "1px solid #ccc",
     padding: "4px",
     textAlign: "center",
-    backgroundColor: "transparent",
+    backgroundColor: "#f9f9f9",
     minWidth: "100px",
     verticalAlign: "top",
   };
@@ -89,7 +89,7 @@ export const TableBlock: React.FC<TableBlockProps> = ({ width = 600, height = 30
           border: "1px dashed #aaa",
           padding: "40px",
           borderRadius: "8px",
-          background: "transparent",
+          background: "#f9f9f9",
           boxSizing: "border-box",
         }}
       >
