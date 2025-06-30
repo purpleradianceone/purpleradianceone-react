@@ -271,9 +271,9 @@ export const LexicalText = React.forwardRef<HTMLDivElement>((props, ref) => {
             }} />
           }
           placeholder={<div style={{
-            position: "absolute",
-            top: 60,
-            left: 12,
+            position: "relative",
+            top: -70,
+            left: 40,
             color: "#94a3b8",
             pointerEvents: "none",
           }}>Type your content here...</div>}
