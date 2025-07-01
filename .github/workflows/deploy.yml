@@ -53,7 +53,7 @@ jobs:
         run: echo "React frontend deployed successfully to Hostinger VPS."
 
 # Note: This workflow only handles the React frontend.
-# If you have separate backend services deployed via Docker (like your Spring/Java apps),
-# their deployment logic would need to be in a separate job or integrated here
-# if you decide to manage all Docker services from this same workflow.
-# This workflow will NOT stop/start any Docker containers on your VPS.
+# If you have separate backend services deployed via Docker, their deployment logic
+# would need to be in a separate job or integrated here if you decide to manage all
+# Docker services from this same workflow.
+# This workflow will NOT stop/start any Docker containers on your VPS for the frontend.
