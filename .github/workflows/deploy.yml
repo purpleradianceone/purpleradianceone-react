@@ -20,10 +20,11 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Dependencies and Build React App
-        run: |
-          npm install
-          npm run build
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build React App
+        run: npm run build
 
       - name: Verify Build Output Exists
         run: test -d build
@@ -34,7 +35,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          source: "./dist/*" # <--- CHANGE THIS LINE (e.g., if it's 'dist')
+          source: "./build/*"  # ✅ fixed: changed from 'dist' to 'build'
           target: "/usr/share/nginx/html"
 
       - name: SSH into Hostinger and Finalize Deployment
