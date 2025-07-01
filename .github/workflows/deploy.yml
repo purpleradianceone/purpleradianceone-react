@@ -1,50 +1,51 @@
-name: Deploy React App Frontend
+name: Build and Deploy React App via Docker
 
 on:
   push:
     branches:
       - development
       - production
-      - main
+    
 
 jobs:
-  build-and-deploy-frontend:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up Node.js Environment
-        uses: actions/setup-node@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          node-version: '18'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }} .
+          docker push ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
 
-      - name: Build React App
-        run: npm run build
-
-      - name: Upload Build Folder to Hostinger VPS
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          source: "./build/*"
-          target: "/usr/share/nginx/html"
-
-      - name: SSH into Hostinger and Finalize Deployment
+      - name: SSH and Deploy on Hostinger VPS
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            sudo chown -R www-data:www-data /usr/share/nginx/html
-            sudo chmod -R 755 /usr/share/nginx/html
-            sudo systemctl restart nginx
+            echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker pull ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
 
-      - name: Deployment Complete
-        run: echo "✅ React frontend deployed successfully to Hostinger VPS."
+            docker stop react-app || true
+            docker rm react-app || true
+
+            docker run -d \
+              --name react-app \
+              --network purple-net \
+              -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
+              -p 80:80 -p 443:443 \
+              --restart always \
+              ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
