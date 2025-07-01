@@ -30,11 +30,11 @@ const LeadDetails = ({
   leadDetailsData,
   setLeadDetailsData,
   selectedLeadData,
-  handleLeadActivityChange,
+  // handleLeadActivityChange,
   getLeadDetails,
   handleSaveEditLeadDetailsCallback,
 }: {
-  handleLeadActivityChange: (person: string, work: string) => void;
+  // handleLeadActivityChange: (person: string, work: string) => void;
   leadDetailsData: LeadDetailsData;
   setLeadDetailsData: React.Dispatch<React.SetStateAction<LeadDetailsData>>;
   selectedLeadData: any;
@@ -177,10 +177,6 @@ const LeadDetails = ({
             type: "success",
           });
           setShowSaveLeadButton(false);
-          handleLeadActivityChange(
-            loginStatus.fullName!,
-            response.data.message
-          );
           createNewDetailRef.current = false;
 
           handleSaveEditLeadDetailsCallback(editLeadDetails);
