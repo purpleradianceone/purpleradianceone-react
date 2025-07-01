@@ -34,7 +34,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          source: "./build/*"
+          source: "./dist/*" # <--- CHANGE THIS LINE (e.g., if it's 'dist')
           target: "/usr/share/nginx/html"
 
       - name: SSH into Hostinger and Finalize Deployment
