@@ -5,7 +5,7 @@ on:
     branches:
       - development
       - production
-      - main # Or whatever branch triggers your deployments
+      - main # Modify this if your default branch is different
 
 jobs:
   build-and-deploy-frontend:
@@ -18,42 +18,39 @@ jobs:
       - name: Set up Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Ensure this matches your project's Node.js version
+          node-version: '18'
 
       - name: Install Dependencies and Build React App
         run: |
           npm install
-          npm run build # This command creates your production-ready static files (usually in 'build/' or 'dist/')
+          npm run build
 
-      - name: SSH and Deploy Frontend to Hostinger VPS
+      - name: Verify Build Output Exists
+        run: test -d build
+
+      - name: SSH and Upload Build to Hostinger VPS
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            # Clean up the existing Nginx HTML directory to ensure a fresh deployment
+            # Remove old files
             sudo rm -rf /usr/share/nginx/html/*
-
-            # Create the directory if it doesn't exist (though Nginx usually ensures this)
-            sudo mkdir -p /usr/share/nginx/html/
-
-            # Set ownership and permissions for the Nginx web root
-            # This is crucial so Nginx (running as www-data) can serve the files
-            sudo chown -R www-data:www-data /usr/share/nginx/html/
-            sudo chmod -R 755 /usr/share/nginx/html/
           upload:
-            # Source: Path to your React app's build output on the GitHub Actions runner
-            # Adjust './build/' to './dist/' if your build command creates a 'dist' folder
             source: "./build/"
-            # Target: The directory on your VPS where Nginx is configured to serve files from
             target: "/usr/share/nginx/html/"
 
-      - name: Deployment Complete
-        run: echo "React frontend deployed successfully to Hostinger VPS."
+      - name: Set Permissions and Restart Nginx
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          script: |
+            sudo chown -R www-data:www-data /usr/share/nginx/html/
+            sudo chmod -R 755 /usr/share/nginx/html/
+            sudo systemctl restart nginx
 
-# Note: This workflow only handles the React frontend.
-# If you have separate backend services deployed via Docker, their deployment logic
-# would need to be in a separate job or integrated here if you decide to manage all
-# Docker services from this same workflow.
-# This workflow will NOT stop/start any Docker containers on your VPS for the frontend.
+      - name: Deployment Complete
+        run: echo "✅ React frontend deployed successfully to Hostinger VPS."
