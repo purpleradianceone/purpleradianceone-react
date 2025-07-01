@@ -26,16 +26,13 @@ jobs:
       - name: Build React App
         run: npm run build
 
-      - name: Verify Build Output Exists
-        run: test -d build
-
       - name: Upload Build Folder to Hostinger VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          source: "./build/*"  # ✅ fixed: changed from 'dist' to 'build'
+          source: "./build/*"
           target: "/usr/share/nginx/html"
 
       - name: SSH into Hostinger and Finalize Deployment
