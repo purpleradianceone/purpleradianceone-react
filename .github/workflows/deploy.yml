@@ -1,52 +1,59 @@
-name: Build and Deploy React App via Docker
+name: Deploy React App Frontend
 
 on:
   push:
     branches:
       - development
       - production
-      - main
-    
+      - main # Or whatever branch triggers your deployments
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          node-version: '18' # Ensure this matches your project's Node.js version
 
-      - name: Build and Push Docker Image
+      - name: Install Dependencies and Build React App
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }} .
-          docker push ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
+          npm install
+          npm run build # This command creates your production-ready static files (usually in 'build/' or 'dist/')
 
-      - name: SSH and Deploy on Hostinger VPS
+      - name: SSH and Deploy Frontend to Hostinger VPS
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            docker pull ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
+            # Clean up the existing Nginx HTML directory to ensure a fresh deployment
+            sudo rm -rf /usr/share/nginx/html/*
 
-            docker stop react-app || true
-            docker rm react-app || true
+            # Create the directory if it doesn't exist (though Nginx usually ensures this)
+            sudo mkdir -p /usr/share/nginx/html/
 
-            docker run -d \
-              --name react-app \
-              --network purple-net \
-              -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
-              -p 80:80 -p 443:443 \
-              --restart always \
-              ${{ secrets.DOCKERHUB_REPONAME }}/react-app:${{ github.ref_name }}
+            # Set ownership and permissions for the Nginx web root
+            # This is crucial so Nginx (running as www-data) can serve the files
+            sudo chown -R www-data:www-data /usr/share/nginx/html/
+            sudo chmod -R 755 /usr/share/nginx/html/
+          upload:
+            # Source: Path to your React app's build output on the GitHub Actions runner
+            # Adjust './build/' to './dist/' if your build command creates a 'dist' folder
+            source: "./build/"
+            # Target: The directory on your VPS where Nginx is configured to serve files from
+            target: "/usr/share/nginx/html/"
+
+      - name: Deployment Complete
+        run: echo "React frontend deployed successfully to Hostinger VPS."
+
+# Note: This workflow only handles the React frontend.
+# If you have separate backend services deployed via Docker (like your Spring/Java apps),
+# their deployment logic would need to be in a separate job or integrated here
+# if you decide to manage all Docker services from this same workflow.
+# This workflow will NOT stop/start any Docker containers on your VPS.
