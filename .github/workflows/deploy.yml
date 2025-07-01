@@ -5,7 +5,7 @@ on:
     branches:
       - development
       - production
-      - main # Modify this if your default branch is different
+      - main
 
 jobs:
   build-and-deploy-frontend:
@@ -28,28 +28,24 @@ jobs:
       - name: Verify Build Output Exists
         run: test -d build
 
-      - name: SSH and Upload Build to Hostinger VPS
-        uses: appleboy/ssh-action@v0.1.8
+      - name: Upload Build Folder to Hostinger VPS
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          script: |
-            # Remove old files
-            sudo rm -rf /usr/share/nginx/html/*
-          upload:
-            source: "./build/"
-            target: "/usr/share/nginx/html/"
+          source: "./build/*"
+          target: "/usr/share/nginx/html"
 
-      - name: Set Permissions and Restart Nginx
+      - name: SSH into Hostinger and Finalize Deployment
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            sudo chown -R www-data:www-data /usr/share/nginx/html/
-            sudo chmod -R 755 /usr/share/nginx/html/
+            sudo chown -R www-data:www-data /usr/share/nginx/html
+            sudo chmod -R 755 /usr/share/nginx/html
             sudo systemctl restart nginx
 
       - name: Deployment Complete
