@@ -1,9 +1,9 @@
 # Stage 1: Build
-FROM node:18-alpine AS builder
+#FROM node:18-alpine AS builder
 
-WORKDIR /app
-COPY . .
-RUN npm install && npm run build
+#WORKDIR /app
+#COPY . .
+#RUN npm install && npm run build
 
 # Stage 2: Serve with NGINX
 #FROM nginx:alpine
@@ -17,5 +17,5 @@ RUN npm install && npm run build
 #EXPOSE 80
 #CMD ["nginx", "-g", "daemon off;"]
 
-FROM alpine/git as final_builder
-COPY --from=builder /app/dist /app/dist
+#FROM alpine/git as final_builder
+#COPY --from=builder /app/dist /app/dist
