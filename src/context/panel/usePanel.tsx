@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useUserPreference } from '../user/UserPreference';
 
-type PanelPosition = 'top' | 'left';
+type PanelPosition = 'top' | 'left' | null;
 
 interface PanelContextType {
   position: PanelPosition;
@@ -13,7 +13,7 @@ const PanelContext = createContext<PanelContextType | undefined>(undefined);
 
 export const PanelProvider: React.FC<{ children: ReactNode  }> = ({ children }) => {
   const {userPreference}= useUserPreference();
-  const [position, setPosition] = useState<PanelPosition>("left");
+  const [position, setPosition] = useState<PanelPosition>(null);
 
   useEffect(()=>{
     if(userPreference && typeof userPreference.isLeftMenu ==="boolean"){

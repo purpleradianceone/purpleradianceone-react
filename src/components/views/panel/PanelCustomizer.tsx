@@ -31,7 +31,7 @@ const PanelCustomizer: React.FC = () => {
       id: userPreference.id,
       is_left_menu: position === "left" ? true : false,
       is_hamburger_menu_collapsed: userPreference.isHamburgerMenuCollapsed,
-      rows_in_grid: userPreference.rowsInGrid,
+      master_rows_in_grid_id: null,
       timezone_id: userPreference.timezoneId,
       updatedby: loginStatus.id,
     };
@@ -58,6 +58,7 @@ const PanelCustomizer: React.FC = () => {
           callFunction: handleUserPreferenceChange,
         });
         if (refreshTokenStatus) {
+          handleUserPreferenceChange();
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -69,7 +70,7 @@ const PanelCustomizer: React.FC = () => {
   };
 
   useEffect(()=>{
-    if(prevPositionRef.current !== position){
+    if(prevPositionRef.current !== position && position!== null){
       handleUserPreferenceChange();
     }
   },[position])
