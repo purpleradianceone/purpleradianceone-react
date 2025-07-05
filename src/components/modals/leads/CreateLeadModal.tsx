@@ -187,16 +187,17 @@ function CreateLeadModal({
       );
       if (response.status === STATUS_CODE.OK) {
         setLeadSource(response.data);
-        getLeadStatusOptions();
+        
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: getLeadStatusOptions,
+          callFunction: getLeadSourceOptions,
         });
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
+          getLeadSourceOptions()
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -234,6 +235,7 @@ function CreateLeadModal({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
+          getLeadStatusOptions()
           setIsDialogueOpen(false);
         } else {
           setIsDialogueOpen(true);
@@ -247,6 +249,7 @@ function CreateLeadModal({
   useEffect(() => {
     if (isOpen) {
       getLeadSourceOptions();
+      getLeadStatusOptions();
     }
   }, [isOpen]);
   //

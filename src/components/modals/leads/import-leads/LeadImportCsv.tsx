@@ -8,13 +8,13 @@ import React, {
   useRef,
   forwardRef,
 } from "react";
-import { FileUp, XCircle, ArrowRight, Search, Info } from "lucide-react";
+import { FileUp, XCircle, ArrowRight, Search, Info, ArrowLeft } from "lucide-react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,14 @@ import { DialogueBox } from "../../../dialogue-box/Dialogue";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserPreference } from "../../../../context/user/UserPreference";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import LeadImportResponse from "../../../../@types/lead-management/LeadImportResponse";
+import LeadImportResultPopUp from "./LeadImportResultPopUp";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../../ui/MessageSnackbar";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -242,7 +250,7 @@ const GenericValueMappingCard = forwardRef(
       crmId ? mapping[String(crmId)] : undefined;
 
     const handleSearch = () => {
-      if ( onSearch) {
+      if (onSearch) {
         onSearch(searchTerm, currentPage * itemsPerPage, itemsPerPage);
       }
     };
@@ -390,7 +398,13 @@ const GenericValueMappingCard = forwardRef(
 );
 
 // --- MAIN COMPONENT ---
-const LeadImportCsv = () => {
+const LeadImportCsv = ({
+  // isSelectCsvButtonClicked
+  handleButtonClicked 
+}:{
+  // isSelectCsvButtonClicked:boolean
+  handleButtonClicked: (value: boolean) => void; 
+}) => {
   const { userPreference } = useUserPreference();
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -405,6 +419,8 @@ const LeadImportCsv = () => {
   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
+  
+
 
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
@@ -437,6 +453,32 @@ const LeadImportCsv = () => {
   const [totalCompanyUsers, setTotalCompanyUsers] = useState<number>(0); // Total count for pagination
   const [companyUsersCurrentPage, setCompanyUsersCurrentPage] =
     useState<number>(0);
+  const [csvImportButtonClicked , setCsvImportButtonClicked] = useState<boolean>(false);
+  const [isLoadingSpinnerAfterSubmission, setIsLoadingSpinnerAfterSubmission] =
+    useState<boolean>(false);
+  const [showLeadImportResultPopUp, setShowLeadImportResultPopUp] =
+    useState<boolean>(false);
+  const [LeadImportReponse, setLeadImportResponse] =
+    useState<LeadImportResponse>({
+    
+      message: "",
+      status : false,
+    });
+
+  //note : Message Snackbar
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const handleCloseSnackbar = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
   // Processed CSV data for review
 
   interface ProcessedLeadData {
@@ -462,17 +504,17 @@ const LeadImportCsv = () => {
     () => [
       { id: "name", label: "Full Name", required: false },
       { id: "email", label: "Email", required: false },
-      { id: "mobileNumber", label: "Mobile Number", required: false },
+      { id: "mobilenumber", label: "Mobile Number", required: false },
 
-      { id: "jobTitle", label: "Job Title", required: false },
-      { id: "industryName", label: "Industry", required: false },
+      { id: "job_title", label: "Job Title", required: false },
+      { id: "industry_name", label: "Industry", required: false },
       { id: "country", label: "Country", required: false },
       { id: "state", label: "State", required: false },
       { id: "district", label: "District", required: false },
       { id: "website", label: "Website", required: false },
       { id: "leadStatus", label: "Lead Status", required: false },
       {
-        id: "AddiContactNumber",
+        id: "additional_contact_number",
         label: "Addi. Contact Number",
         required: false,
       },
@@ -631,10 +673,15 @@ const LeadImportCsv = () => {
 
   // --- HANDLERS ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    // true if button is clicked 
+    // setIsSelectCsvButtonClicked(true);
+    setCsvImportButtonClicked(true);
+    handleButtonClicked(true)
     setCsvFile(null);
     setCsvData(null);
     setOriginalCsvHeaders([]);
     setError(null);
+    handleCloseSnackbar();
     setFieldMappings({});
     setStatusValueMapping({});
     setSourceValueMapping({});
@@ -651,11 +698,33 @@ const LeadImportCsv = () => {
         setCsvFile(file);
         readCsv(file);
       } else {
-        setError("Please select a valid CSV file.");
+        // setError("Please select a valid CSV file.");
+        showMessageSnackbar({
+          message: "Please select a valid CSV file.",
+          type: "error",
+        });
       }
     }
   };
 
+  const resetState= ()=>{
+    setCsvImportButtonClicked(false);
+     handleButtonClicked(false)
+    setCsvFile(null);
+    setCsvData(null);
+    setOriginalCsvHeaders([]);
+    setError(null);
+    handleCloseSnackbar();
+    setFieldMappings({});
+    setStatusValueMapping({});
+    setSourceValueMapping({});
+    setOwnerValueMapping({});
+    setCsvUniqueStatuses([]);
+    setCsvUniqueSources([]);
+    setCsvUniqueOwners([]);
+    setProcessedLeads([]); // Clear processed leads on new file
+    setShowPreImportReview(false); // Hide review on new file
+  }
   const readCsv = (file: File) => {
     setIsParsing(true);
     const reader = new FileReader();
@@ -672,9 +741,14 @@ const LeadImportCsv = () => {
         );
         setCsvData(parsedData);
         setOriginalCsvHeaders(parsedData[0]);
-        setError(null);
+        // setError(null);
+        handleCloseSnackbar();
       } catch (err: any) {
-        setError(err.message || "Failed to parse CSV.");
+        showMessageSnackbar({
+          message: err.message || "Failed to parse CSV.",
+          type: "error",
+        });
+        // setError(err.message || "Failed to parse CSV.");
       } finally {
         setIsParsing(false);
       }
@@ -903,19 +977,44 @@ const LeadImportCsv = () => {
     );
   };
 
+  function generateUniqueTag() {
+    const randomString = Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase();
+    // const timeStamp = new Date().toISOString().slice(0,19);
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    const formmatedDate = `${yyyy}${mm}${dd}_${hh}${min}${seconds}`;
+    return `TG_${randomString}_${formmatedDate}`;
+  }
   // Note : api call for lead import
   const handleSubmitImport = async () => {
     if (!csvFile || !csvData) {
-      setError("No CSV data to import.");
+      // setError("No CSV data to import.");
+      showMessageSnackbar({
+        message: "No CSV data to import.",
+        type: "error",
+      });
       return;
     }
 
-    const isNameMapped = fieldMappings.name?.length > 0;
     const isContactMapped =
       fieldMappings.email?.length > 0 || fieldMappings.mobileNumber?.length > 0;
-
-    if (!isNameMapped || !isContactMapped) {
-      setError('Please map "Name" and either "Email" or "Mobile Number".');
+    // const isNameMapped = fieldMappings.name?.length > 0;
+    // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
+    if (!isContactMapped) {
+      // setError('Please map "Name" and either "Email" or "Mobile Number".');
+      showMessageSnackbar({
+        message: 'Please map "Name" and either "Email" or "Mobile Number.',
+        type: "error",
+      });
       return;
     }
     setError(null);
@@ -926,7 +1025,11 @@ const LeadImportCsv = () => {
     );
 
     if (leadsToImport.length === 0) {
-      setError("No leads selected for import.");
+      // setError("No leads selected for import.");
+      showMessageSnackbar({
+        message: "No leads selected for import.",
+        type: "error",
+      });
       return;
     }
 
@@ -934,6 +1037,8 @@ const LeadImportCsv = () => {
     // based on `leadsToImport` and your `fieldMappings`, `valueMappings`.
     // The `csvFile` itself would be sent as a FormData.
 
+    // Note : this function will return the unique import tag.
+    const importTag = generateUniqueTag();
     const payload = {
       // fieldMappings,
       // statusValueMapping,
@@ -945,6 +1050,7 @@ const LeadImportCsv = () => {
           ...lead.mappedData,
           createdby: loginStatus.id,
           company_id: loginStatus.companyId,
+          import_tag: importTag,
         },
       })), // Sending only necessary data
     };
@@ -955,20 +1061,46 @@ const LeadImportCsv = () => {
       // formData.append("csvFile", csvFile);
       // formData.append("mappings", JSON.stringify(payload)); // Send the structured payload
       // formData.append("mappings",payload );
-      const res = await axios.post(
-        POST_API.LEAD_IMPORT_VIA_CSV,
-        //  formData,
+      const response = await axios.post(POST_API.LEAD_IMPORT_VIA_CSV, payload, {
+        withCredentials: true,
+      });
 
-        payload,
-        {
-          withCredentials: true,
-        }
-      );
-      alert("Import simulated successfully! Check console for payload.");
-      console.log("API Response:", res.data); // Log actual API response
-      handleFileChange({ target: { files: null } } as any); // Reset form
+      // alert("Import simulated successfully! Check console for payload.");
+      setIsLoadingSpinnerAfterSubmission(true);
+      if (response.status === STATUS_CODE.OK) {
+        setIsLoadingSpinnerAfterSubmission(false);
+        // console.log("API Response:", response.data); // Log actual API response
+        const data: LeadImportResponse = response.data;
+        setLeadImportResponse(data);
+        setShowLeadImportResultPopUp(true);
+        // setTimeout(() => {
+        //   handleFileChange({ target: { files: null } } as any); // Reset form
+        // }, 1000);
+      }
     } catch (error: any) {
-      setError(error.message || "An unexpected error occurred during import.");
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: handleSubmitImport,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          setIsDialogueOpen(false);
+          handleSubmitImport();
+        } else {
+          setIsDialogueOpen(true);
+        }
+      } else if (error.status === STATUS_CODE.FORBIDDEN) {
+        setIsDialogueOpen(true);
+      } else {
+        showMessageSnackbar({
+          message:
+            error.message || "An unexpected error occurred during import.",
+          type: "error",
+        });
+      }
+    } finally {
+      setIsLoadingSpinnerAfterSubmission(false);
     }
   };
 
@@ -982,11 +1114,20 @@ const LeadImportCsv = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full h-full bg-gray-100 overflow-auto flex flex-col p-2 pl-5 space-y-2">
+      <div className="w-full h-full bg-gray-100 rounded-md overflow-auto flex flex-col p-1  space-y-2">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
+         {
+          csvImportButtonClicked &&(
+             <button onClick={
+            resetState
+            }>
+            <ArrowLeft/>
+          </button>
+          )
+         }
           <h2 className="text-base font-semibold text-gray-800">
-            Import Leads from CSV
+            Import Leads from CSV file.
           </h2>
           <label
             htmlFor="csv-upload"
@@ -1296,12 +1437,29 @@ const LeadImportCsv = () => {
           </div>
         )}
       </div>
+      {isLoadingSpinnerAfterSubmission && <LoadingSpinner />}
+      {showLeadImportResultPopUp && (
+        <LeadImportResultPopUp
+          data={LeadImportReponse}
+          onClose={() => {
+            setShowLeadImportResultPopUp(false);
+            handleFileChange({ target: { files: null } } as any);
+          }}
+        />
+      )}
       <DialogueBox
         isOpen={isDialogueOpen}
         onClose={() => setIsDialogueOpen(false)}
         onConfirm={handleDialogueConfirm}
         title="Session Expired!"
         message="Your session has expired. Please login again."
+      />
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </DndProvider>
   );
