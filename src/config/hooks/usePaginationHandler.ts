@@ -123,8 +123,12 @@ export const useSearchFilterPaginationDateHandlers = (
   useEffect(() => {
     if (dateRangeId === 8) {
       if (!startDate && !endDate) {
-        setConcatDate("");
-        setDateRangeId(0);
+        const todayDate = new Date();
+        const date10DaysAgo = new Date(todayDate);
+
+        date10DaysAgo.setDate(todayDate.getDate() -10);
+        setConcatDate(`${formatDate(date10DaysAgo)}@${formatDate(new Date())}`);
+        setDateRangeId(8);
       } else {
         let effectiveStartDate = startDate;
         const effectiveEndDate = endDate || getCurrentDate();

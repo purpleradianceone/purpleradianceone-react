@@ -61,7 +61,7 @@ function EditMeetingDetailsModal({
   isOpen: boolean;
   onClose: () => void;
   isAttendeesPresent: boolean;
-  handleMeetingDetailsUpdate: () => void;
+  handleMeetingDetailsUpdate : (date : string,summary : string) => void;
   meetingPlatform: MeetingPlatforms[];
 }) {
   const meetingStautsRadioButtonOptions = [
@@ -558,7 +558,7 @@ function EditMeetingDetailsModal({
                   type: "success",
                 });
                 setTimeout(() => {
-                  handleMeetingDetailsUpdate();
+                  handleMeetingDetailsUpdate(endDate + " " + endTime + ":00",title);
                   setIsCreating(false);
                   onClose();
                 }, 3000);
@@ -1037,7 +1037,7 @@ function EditMeetingDetailsModal({
                 <Button
                   onClick={() => {
                     if (
-                      !googleMeetStatus.isConnected ||
+                      googleMeetStatus.isConnected ||
                       zoomMeetingStatus.isConnected
                     ) {
                       updateMeetingDetails();

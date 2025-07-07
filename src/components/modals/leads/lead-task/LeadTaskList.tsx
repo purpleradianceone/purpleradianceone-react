@@ -1,1090 +1,635 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Phone,
   Mail,
   CalendarCheck,
   HeadsetIcon,
-  HandHelping,
   HandCoinsIcon,
   Notebook,
   Clipboard,
+  History,
+  LucideLaptop,
 } from "lucide-react"; // Corrected import for Lucide React icons
-
-interface Activity {
-  id: string;
-  tastStatusId : number
-  type:
-    | "phoneCall"
-    | "Email"
-    | "physicalMeeting"
-    | "onlineMeeting"
-    | "demoPresentation"
-    | "proposalQuotation"
-    | "notes"
-    | "other";
-  description: string;
-  date: string; // Could be Date object, but string for simplicity in dummy data
-  leadName: string;
-}
-
-// Define the props interface for the ActivitiesList component
-// interface ActivitiesListProps {
-//   activities: Activity[];
-// }
+import CustomDropdown from "../CustomDropdown";
+import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
+import LeadActivityType from "../../../../@types/lead-management/LeadActivityType";
+import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
+import { useState } from "react";
+import UpdateLeadTaskModal from "./UpdateLeadTaskModal";
+import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageType";
+import LeadContactType from "../../../../@types/lead-management/LeadContact";
+import LeadTaskHistoryModal from "./LeadTaskHistoryModal";
+import CalendarEventType from "../../../../@types/meeting/CalendarEventType";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import { useUserPreference } from "../../../../context/user/UserPreference";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import momentTimezone from "moment-timezone";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import EditMeetingDetailsModal from "../../meetings/EditMeetingDetailsModal";
+import { useMeetingPlatform } from "../../../../config/hooks/useMeetingPlatforms";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 
 function LeadTaskList({
-  tastStatusId
-} : {
-  tastStatusId : number
+  leadTaskPriority,
+  leadActivity,
+  leadTaskStage,
+  leadTasks,
+  handleLeadActivityFilterDropdownChange,
+  handleLeadPriorityFilterDropdownChange,
+  handleLeadTaskUpdate,
+  isLoading
+}: {
+  leadTaskPriority: LeadTaskPriorityType[];
+  leadActivity: LeadActivityType[];
+  leadTasks: LeadTaskType[];
+  leadTaskStage: LeadTaskStageType[];
+  handleLeadActivityFilterDropdownChange: (leadActivityId: number) => void;
+  handleLeadPriorityFilterDropdownChange: (leadTaskPriorityId: number) => void;
+  handleLeadTaskUpdate: () => void;
+  isLoading : boolean
 }) {
-  // Function to get the appropriate icon based on activity type
-  const getActivityIcon = (type: Activity["type"]) => {
+  const [isUpdateLeadTaskModalOpen, setIsUpdateLeadTaskModalOpen] =
+    useState<boolean>(false);
+  const [selecedLeadTask, setSelecedLeadTask] = useState<LeadTaskType>();
+  // State to manage expanded card
+  const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+  const [seletedLeadTaskForHistory, setSeletedLeadTaskForHistory] = useState<LeadTaskType>();
+  const [isLeadTaskHistoryModalOpen, setIsLeadTaskHistoryModalOpen] = useState<boolean>(false);
+  const {loginStatus} = useLoggedInUserContext();
+
+    const [googleMeetEventData, setGoogleMeetEventData] = useState<
+    CalendarEventType
+  >();
+
+    const {meetingPlatform} = useMeetingPlatform();
+      const [isEditMettingModalOpen, setIsEditMettingModalOpen] =
+    useState<boolean>(false);
+
+    const { userPreference } = useUserPreference();
+    const backEndDateFormat = "YYYY-MM-DD HH:mm:ss.S";
+
+  const getActivityIcon = (
+    type: LeadTaskType["leadActivityId"],
+    colorCode: string
+  ) => {
     switch (type) {
-      case "phoneCall":
-        return <Phone className="text-green-500" size={20} />;
-      case "Email":
-        return <Mail className="text-red-500" size={20} />;
-      case "physicalMeeting":
-        return <CalendarCheck className="text-yellow-500" size={20} />;
-      case "onlineMeeting":
-        return <HeadsetIcon className="text-green-500" size={20} />;
-      case "demoPresentation":
-        return <HandHelping className="text-yellow-500" size={20} />;
-      case "proposalQuotation":
-        return <HandCoinsIcon className="text-red-500" size={20} />;
-      case 'notes':
-        return <Notebook className='text-green-500' size={20}/>
-      case 'other':
-        return <Clipboard className='text-red-500' size={20}/>
+      case 1:
+        return (
+          <Phone
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 2:
+        return (
+          <Mail
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 3:
+        return (
+          <CalendarCheck
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 4:
+        return (
+          <HeadsetIcon
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 5:
+        return (
+          <LucideLaptop
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 6:
+        return (
+          <HandCoinsIcon
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 7:
+        return (
+          <Notebook
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
+      case 8:
+        return (
+          <Clipboard
+            style={{
+              color: colorCode,
+            }}
+            size={20}
+          />
+        );
       default:
         return null;
     }
   };
 
-  // const activities: Activity[] = [
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "9",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "10",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "11",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "12",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "1",
-  //     tastStatusId : 1,
-  //     type: "phoneCall",
-  //     description: "Initial discovery call to understand client needs",
-  //     date: "2024-06-25 10:00 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "Email",
-  //     tastStatusId : 2,
-  //     description: "Sent follow-up email with product brochure",
-  //     date: "2024-06-24 03:30 PM",
-  //     leadName: "Bob Williams",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "physicalMeeting",
-  //     tastStatusId : 3,
-  //     description: "Scheduled demo meeting for new software feature",
-  //     date: "2024-06-23 02:00 PM",
-  //     leadName: "Charlie Davis",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "onlineMeeting",
-  //     tastStatusId : 4,
-  //     description: "Follow-up call regarding pricing proposal",
-  //     date: "2024-06-22 11:45 AM",
-  //     leadName: "Alice Johnson",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "demoPresentation",
-  //     tastStatusId : 5 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "6",
-  //     type: "proposalQuotation",
-  //     tastStatusId : 6 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "7",
-  //     type: "notes",
-  //     tastStatusId : 7 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  //   {
-  //     id: "8",
-  //     type: "other",
-  //     tastStatusId : 8 ,
-  //     description: "Responded to inquiry about service customization",
-  //     date: "2024-06-21 09:15 AM",
-  //     leadName: "David Lee",
-  //   },
-  // ];
+  const toggleExpand = (id: number) => {
+    setExpandedCardId(expandedCardId === id ? null : id);
+  };
 
+  const getLeadTaskJsonData = (activity: LeadTaskType) => {
+    if (activity.leadActivityId !== 3 && activity.leadActivityId !== 4) {
+      return JSON.parse(activity.leadActivityDetails).leadContact;
+    } else {
+      if(activity.leadActivityId === 3){
+           return JSON.parse(activity.leadActivityDetails).address;
+      }
+      else if(activity.leadActivityId === 4){
+         const meetingDetails = JSON.parse(activity.leadActivityDetails).meetingDetails;
+          return meetingDetails;
+      }
+     
+    }
+  };
 
-  const activities: Activity[] = [
-  {
-    id: "1",
-    tastStatusId: 1,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 1)",
-    date: "2025-06-27 05:13 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "2",
-    tastStatusId: 1,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 2)",
-    date: "2025-06-27 05:14 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "3",
-    tastStatusId: 1,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 3)",
-    date: "2025-06-27 05:15 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "4",
-    tastStatusId: 1,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 4)",
-    date: "2025-06-27 05:16 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "5",
-    tastStatusId: 1,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 5)",
-    date: "2025-06-27 05:17 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "6",
-    tastStatusId: 1,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 6)",
-    date: "2025-06-27 05:18 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "7",
-    tastStatusId: 1,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 7)",
-    date: "2025-06-27 05:19 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "8",
-    tastStatusId: 1,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 8)",
-    date: "2025-06-27 05:20 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "9",
-    tastStatusId: 2,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 9)",
-    date: "2025-06-27 05:21 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "10",
-    tastStatusId: 2,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 10)",
-    date: "2025-06-27 05:22 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "11",
-    tastStatusId: 2,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 11)",
-    date: "2025-06-27 05:23 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "12",
-    tastStatusId: 2,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 12)",
-    date: "2025-06-27 05:24 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "13",
-    tastStatusId: 2,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 13)",
-    date: "2025-06-27 05:25 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "14",
-    tastStatusId: 2,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 14)",
-    date: "2025-06-27 05:26 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "15",
-    tastStatusId: 2,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 15)",
-    date: "2025-06-27 05:27 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "16",
-    tastStatusId: 2,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 16)",
-    date: "2025-06-27 05:28 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "17",
-    tastStatusId: 3,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 17)",
-    date: "2025-06-27 05:29 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "18",
-    tastStatusId: 3,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 18)",
-    date: "2025-06-27 05:30 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "19",
-    tastStatusId: 3,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 19)",
-    date: "2025-06-27 05:31 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "20",
-    tastStatusId: 3,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 20)",
-    date: "2025-06-27 05:32 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "21",
-    tastStatusId: 3,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 21)",
-    date: "2025-06-27 05:33 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "22",
-    tastStatusId: 3,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 22)",
-    date: "2025-06-27 05:34 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "23",
-    tastStatusId: 3,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 23)",
-    date: "2025-06-27 05:35 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "24",
-    tastStatusId: 3,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 24)",
-    date: "2025-06-27 05:36 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "25",
-    tastStatusId: 4,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 25)",
-    date: "2025-06-27 05:37 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "26",
-    tastStatusId: 4,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 26)",
-    date: "2025-06-27 05:38 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "27",
-    tastStatusId: 4,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 27)",
-    date: "2025-06-27 05:39 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "28",
-    tastStatusId: 4,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 28)",
-    date: "2025-06-27 05:40 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "29",
-    tastStatusId: 4,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 29)",
-    date: "2025-06-27 05:41 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "30",
-    tastStatusId: 4,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 30)",
-    date: "2025-06-27 05:42 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "31",
-    tastStatusId: 4,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 31)",
-    date: "2025-06-27 05:43 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "32",
-    tastStatusId: 4,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 32)",
-    date: "2025-06-27 05:44 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "33",
-    tastStatusId: 5,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 33)",
-    date: "2025-06-27 05:45 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "34",
-    tastStatusId: 5,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 34)",
-    date: "2025-06-27 05:46 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "35",
-    tastStatusId: 5,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 35)",
-    date: "2025-06-27 05:47 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "36",
-    tastStatusId: 5,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 36)",
-    date: "2025-06-27 05:48 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "37",
-    tastStatusId: 5,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 37)",
-    date: "2025-06-27 05:49 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "38",
-    tastStatusId: 5,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 38)",
-    date: "2025-06-27 05:50 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "39",
-    tastStatusId: 5,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 39)",
-    date: "2025-06-27 05:51 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "40",
-    tastStatusId: 5,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 40)",
-    date: "2025-06-27 05:52 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "41",
-    tastStatusId: 1,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 41)",
-    date: "2025-06-27 05:53 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "42",
-    tastStatusId: 2,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 42)",
-    date: "2025-06-27 05:54 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "43",
-    tastStatusId: 3,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 43)",
-    date: "2025-06-27 05:55 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "44",
-    tastStatusId: 4,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 44)",
-    date: "2025-06-27 05:56 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "45",
-    tastStatusId: 5,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 45)",
-    date: "2025-06-27 05:57 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "46",
-    tastStatusId: 1,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 46)",
-    date: "2025-06-27 05:58 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "47",
-    tastStatusId: 2,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 47)",
-    date: "2025-06-27 05:59 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "48",
-    tastStatusId: 3,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 48)",
-    date: "2025-06-27 06:00 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "49",
-    tastStatusId: 1,
-    type: "phoneCall",
-    description: "Initial discovery call to understand client needs (Modified 49)",
-    date: "2025-06-27 06:01 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "50",
-    tastStatusId: 2,
-    type: "Email",
-    description: "Sent follow-up email with product brochure (Modified 50)",
-    date: "2025-06-27 06:02 AM",
-    leadName: "Michael Green",
-  },
-  {
-    id: "51",
-    tastStatusId: 3,
-    type: "physicalMeeting",
-    description: "Scheduled demo meeting for new software feature (Modified 51)",
-    date: "2025-06-27 06:03 AM",
-    leadName: "Sarah White",
-  },
-  {
-    id: "52",
-    tastStatusId: 4,
-    type: "onlineMeeting",
-    description: "Follow-up call regarding pricing proposal (Modified 52)",
-    date: "2025-06-27 06:04 AM",
-    leadName: "James Black",
-  },
-  {
-    id: "53",
-    tastStatusId: 5,
-    type: "demoPresentation",
-    description: "Responded to inquiry about service customization (Modified 53)",
-    date: "2025-06-27 06:05 AM",
-    leadName: "Olivia Blue",
-  },
-  {
-    id: "54",
-    tastStatusId: 4,
-    type: "proposalQuotation",
-    description: "Responded to inquiry about service customization (Modified 54)",
-    date: "2025-06-27 06:06 AM",
-    leadName: "William Red",
-  },
-  {
-    id: "55",
-    tastStatusId: 5,
-    type: "notes",
-    description: "Responded to inquiry about service customization (Modified 55)",
-    date: "2025-06-27 06:07 AM",
-    leadName: "Emily Brown",
-  },
-  {
-    id: "56",
-    tastStatusId: 1,
-    type: "other",
-    description: "Responded to inquiry about service customization (Modified 56)",
-    date: "2025-06-27 06:08 AM",
-    leadName: "Michael Green",
-  },
-];
+   const getGoogleMeeting = async (activity : LeadTaskType) => {
+    
+   if(activity.leadActivityId === 4){
+   
+    const meetingDetails = getLeadTaskJsonData(activity).find((meetingDetails: any) => {
+                                      return meetingDetails.meetingId;
+                                    })
+     const getGoogleMeetingsPostData = {
+      company_id: loginStatus.companyId,
+      id : meetingDetails.meetingId,
+      company_user_id: loginStatus.id,
+      requestedby: loginStatus.id,
+    };
+    await axios
+      .post(POST_API.GET_GOOGLE_MEETINGS, getGoogleMeetingsPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status == STATUS_CODE.OK) {
+          response.data.map((res: any) => {
+            const startDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["Start Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+            const endDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["End Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+            setGoogleMeetEventData(
+              {
+                count: res.count,
+                companyId: res.company_id,
+                id: res.id,
+                companyUserId: res.company_user_id,
+                meetingIdFromGoogle: res.meeting_id_from_google,
+                meetingStatusFromGoogle: res.meeting_status_from_google,
+                meetingLink: res.meeting_link,
+                meetingConferenceId: res.meeting_conference_id,
+                title: res.summary_title,
+                description: res.description,
+                creatorEmail: res.creator_email,
+                organizerEmail: res.organizer_email,
+                startDateByIST: res["Start Date By Indian Time"],
+                endDateByIST: res["End Date By Indian Time"],
+                startDateByUserTimeZone: startDateByUserTimeZoneParsed.toDate(),
+                startDateByUserTimeZoneString: res["Start Date By User Time Zone"],
+                endDateByUserTimeZoneString: res["End Date By User Time Zone"],
+                endDateByUserTimeZone: endDateByUserTimeZoneParsed.toDate(),
+                colorCode : res.color_code,
+                creatorAttenting: res.creator_attending,
+                attendeesEmailAll: res.attendees_email_all,
+                attendeesCompanyUserId: res.attendees_company_user_id,
+                isAttendeePresent: res.attendees_email_all ? true : false,
+                platform: 1,
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                updatedBy: res.updatedby,
+                createdOn: res.createdon,
+                updatedOn: res.updatedon,
+              },
+            );
+            setIsEditMettingModalOpen(true);
+          });
+         
+        }
+      })
+      .catch(async (error: ApiError | any) => {
+        console.log(error);
+          setIsEditMettingModalOpen(false);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getGoogleMeeting,
+          });
+          if (refreshTokenStatus) {
+            getGoogleMeeting(activity);
+            // setIsSessionExpiredDialogueOpen(false);
+          } else {
+            // setIsSessionExpiredDialogueOpen(true);
+          }
+        } else if (error.status === STATUS_CODE.FORBIDDEN) {
+          // setIsSessionExpiredDialogueOpen(true);
+        }
+      });
+   }
+  };
+   const getZoomMeeting = async (activity : LeadTaskType) => {
 
-const filteredActivities = activities.filter((activity) => {
-  if (tastStatusId === 1) {
-    return true;
-  } else {
-    return (
-      (activity.tastStatusId === 2 ||
-        activity.tastStatusId === 3 ||
-        activity.tastStatusId === 4 ||
-        activity.tastStatusId === 5) &&
-      activity.tastStatusId === tastStatusId
-    );
-  }
-});
+      const meetingDetails = getLeadTaskJsonData(activity).find((meetingDetails: any) => {
+                                      return meetingDetails.meetingId;
+                                    })
+     const getZoomMeetingsPostData = {
+      company_id: loginStatus.companyId,
+      id : meetingDetails.meetingId,
+      company_user_id: loginStatus.id,
+      requestedby: loginStatus.id,
+    };
+    await axios
+      .post(POST_API.GET_ZOOM_MEETING, getZoomMeetingsPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          response.data.map((res: any) => {
+            const startDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["Start Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+            const endDateByUserTimeZoneParsed = momentTimezone.tz(
+              res["End Date By User Time Zone"],
+              backEndDateFormat,
+              userPreference.timezoneName
+            );
+
+            console.log("endDate By User Time Zone : ");
+            console.log(endDateByUserTimeZoneParsed);
+            setGoogleMeetEventData(
+              {
+                count: res.count,
+                companyId: res.company_id,
+                id: res.id,
+                companyUserId: res.company_user_id,
+                meetingHostIdFromZoom: res.meeting_host_id_from_zoom,
+                meetingStatusFromZoom: res.meeting_status_from_zoom,
+                title: res.summary_title,
+                description: res.description,
+                creatorEmail: res.creator_email,
+                meetingIdFromZoom: res.meeting_id_from_zoom,
+                zoomMeetingJoinLink: res.meeting_join_link,
+                zoomMeetingStartLink: res.meeting_start_link,
+                zoomMeetingPasswordGeneral: res.meeting_password_general,
+                zoomMeetingPasswordH323: res.meeting_h323_password,
+                zoomMeetingPassworsPstn: res.meeting_pstn_password,
+                startDateByIST: res["Start Date By Indian Time"],
+                endDateByIST: res["End Date By Indian Time"],
+                startDateByUserTimeZone: startDateByUserTimeZoneParsed.toDate(),
+                endDateByUserTimeZone: endDateByUserTimeZoneParsed.toDate(),
+                startDateByUserTimeZoneString:
+                  res["Start Date By User Time Zone"],
+                endDateByUserTimeZoneString: res["End Date By User Time Zone"],
+                colorCode : res.color_code,
+                attendeesEmailAll: res.attendees_email_all,
+                attendeesCompanyUserId: res.attendees_company_user_id,
+                isAttendeePresent: res.attendees_email_all ? true : false,
+                platform: 2,
+                isActive: res.isactive,
+                createdBy: res.createdby,
+                updatedBy: res.updatedby,
+                createdOn: res.createdon,
+                updatedOn: res.updatedon,
+                creatorAttenting: res.creator_attending,
+              },
+            );
+            setIsEditMettingModalOpen(true);
+          });
+        }
+      })
+      .catch(async (error: ApiError | any) => {
+        console.log(error);
+        setIsEditMettingModalOpen(false)
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getZoomMeeting,
+          });
+          if (refreshTokenStatus) {
+            getZoomMeeting(activity)
+          } 
+        } 
+        // else if (error.status === STATUS_CODE.FORBIDDEN) {
+        //   setIsSessionExpiredDialogueOpen(true);
+        // }
+      });
+  };
+
   return (
-    <div className="p-1 bg-gray-50 ">
-      <div className="max-w-4xl mx-auto">
-        
-        
-        
+    <>
+      <div className="flex mt=0 p-0">
+        <div className="flex justify-between w-full">
+          <div className="min-w-48">
+            <CustomDropdown
+              labelName="type"
+              onSelect={(e) => {
+                if (e) {
+                  handleLeadActivityFilterDropdownChange(e);
+                } else {
+                  handleLeadActivityFilterDropdownChange(0);
+                }
+              }}
+              options={leadActivity}
+            ></CustomDropdown>
+          </div>
 
-       {activities.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg py-10">No activities found for this lead.</p>
-        ) : (
-          <div className="space-y-2 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:w-2
+          <div className="min-w-48">
+            <CustomDropdown
+              labelName="priority"
+              onSelect={(e) => {
+                if (e) {
+                  handleLeadPriorityFilterDropdownChange(e);
+                } else {
+                  handleLeadPriorityFilterDropdownChange(0);
+                }
+              }}
+              options={leadTaskPriority}
+            ></CustomDropdown>
+          </div>
+        </div>
+      </div>
+      <div className="p-1 bg-gray-50 min-h-72">
+        <div className="max-w-4x mx-auto">
+          { isLoading ? (
+            <div className="flex justify-center py-10">
+                  <LoadingSpinner></LoadingSpinner>
+            </div>
+            
+          )
+          : leadTasks.length === 0 ? (
+            <p className="text-center  text-gray-600 text-lg py-10">
+              No activities found.
+            </p>
+          ) : (
+            <div
+              className="space-y-2 max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-50
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"> {/* Reduced space between items */}
-            {filteredActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className="bg-white px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 border border-gray-100" // Adjusted padding, rounded corners, shadow, spacing
-              >
-                {/* Activity Icon */}
-                <div className="flex-shrink-0 p-1 bg-blue-100 rounded-full"> {/* Smaller padding, subtle background */}
-                  {getActivityIcon(activity.type)}
-                </div>
+    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+            >
+              {leadTasks.map((activity) => (
+                <div
+                  key={activity.id}
+                  className={`bg-${activity.colorCode} min-h-16 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex items-start space-x-2 border border-gray-100 relative`}
+                >
+                  {/* Activity Icon */}
+                  <div className="flex-shrink-0 p-1 bg-blue-100 rounded-full">
+                    {" "}
+                    {getActivityIcon(
+                      activity.leadActivityId,
+                      activity.colorCode
+                    )}
+                  </div>
 
-                {/* Activity Details */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate"> {/* Smaller font, less bold */}
-                    {activity.description}
-                  </p>
-                  <p className="text-xs text-gray-600"> {/* Smaller font */}
-                    <span className="font-medium">{activity.type}</span> with{' '}
-                    <span className="font-medium text-blue-700">{activity.leadName}</span>
-                  </p>
-                </div>
+                  {/* Activity Details */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-800 truncate">
+                      {" "}
+                      {activity.subject}
+                    </p>
+                    {expandedCardId === activity.id ? (
+                      <div className="text-xs text-gray-600">
+                        <p className="pb-1 pt-2">
+                          <div>
+                            <span className="font-semibold text-blue-700">
+                              Description :{" "}
+                            </span>{" "}
+                            <span className="font-medium ">
+                              {activity.description}
+                            </span>{" "}
+                          </div>
+                          <div className="mt-1">
+                            <span className="font-semibold text-blue-700">
+                              Assignees :{" "}
+                            </span>{" "}
+                            <div className="grid grid-cols-3">
+                              {activity.assignedToName.map((name) => (
+                                <span
+                                  key={name} // Added key for list items
+                                  className="bg-blue-400 m-1 text-center rounded-full px-1 font-medium"
+                                  title={name} // Added title for better UX
+                                >
+                                  {name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mt-1">
+                              <span className="font-semibold text-blue-700">
+                                {activity.leadActivityId !== 3 && activity.leadActivityId !== 4
+                                  ? "Contact : "
+                                  : activity.leadActivityId !== 4 ? "Address : " : "Meeting : "}
+                              </span>{" "}
+                              <div
+                                className={
+                                  activity.leadActivityId !== 3 && activity.leadActivityId !== 4
+                                    ? "grid grid-cols-2 text-center"
+                                    : "inline-block"
+                                }
+                              >
+                                {activity.leadActivityId !== 3 && activity.leadActivityId !== 4 ? (
+                                  getLeadTaskJsonData(activity).map(
+                                    (contact: LeadContactType) => (
+                                      <span
+                                        key={contact.id} // Assuming contact has an id
+                                        className="bg-blue-400 m-1 rounded-full px-1 font-medium"
+                                      >
+                                        {contact.name}
+                                      </span>
+                                    )
+                                  )
+                                ) : activity.leadActivityId !== 4 ?(
+                                  
+                                  <span className="bg-white rounded-full font-medium">
+                                    {getLeadTaskJsonData(activity)}
+                                  </span>
+                                ) : (
+                                   <span className="bg-white rounded-full font-medium">
+                                    {getLeadTaskJsonData(activity).map((meetingDetails: any) => {
+                                      return meetingDetails.meetingSummary;
+                                    })}
+                                     <button
+                          onClick={() =>  {
+                            
+                            const platform = getLeadTaskJsonData(activity).map((meetingDetails: any) => {
+                                      return meetingDetails.platform;
+                                    })
+                                    // console.log(platform[0] === 1);
+                                  if(platform[0] === 1){
+                                    console.log(platform)
+                                    getGoogleMeeting(activity);
+                                  }
+                                  else if(platform[0] === 2){
+                                        getZoomMeeting(activity);
+                                  }
+                                  }}
+                          className="text-blue-500 hover:underline text-xs ml-3 focus:outline-none"
+                        >
+                          View Details
+                        </button>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="font-semibold text-blue-700">
+                              Outcome :{" "}
+                            </span>{" "}
+                            <span className="font-medium">
+                              {activity.resultOutcome}
+                            </span>{" "}
+                          </div>
+                        </p>
+                        <button
+                          onClick={() => toggleExpand(activity.id)}
+                          className="text-blue-500 hover:underline text-xs focus:outline-none"
+                        >
+                          View Less
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-600">
+                        <p className="truncate mt-1">
+                          <div className="mt-1">
+                            <span className="font-semibold text-blue-700">
+                              Description :{" "}
+                            </span>{" "}
+                            <span className="font-medium">
+                              {activity.description}
+                            </span>{" "}
+                          </div>
+                          <div className="mt-1">
+                            <span className="font-semibold text-blue-700">
+                              Assignees :{" "}
+                            </span>{" "}
+                            {activity.assignedToName.map((name) => (
+                              <span
+                                key={name} // Added key for list items
+                                className="bg-blue-400 mx-1 rounded-full px-1 font-medium"
+                                title={name} // Added title for better UX
+                              >
+                                {name}
+                              </span>
+                            ))}
+                          </div>
+                        </p>
+                        {activity.subject.length > 0 && ( // Adjust threshold as needed
+                          <button
+                            onClick={() => toggleExpand(activity.id)}
+                            className="text-blue-500 hover:underline text-xs focus:outline-none"
+                          >
+                            View More
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-                {/* Date */}
-                <div className="flex-shrink-0 text-xs text-gray-500 sm:text-right"> {/* Smallest font, lighter color */}
-                  {activity.date}
+                  {/* Date and Action Buttons */}
+                  <div className="absolute top-2 right-2 flex items-center space-x-1">
+                    <span className="text-xs text-gray-500">
+                      {activity.dueDateTime}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setIsUpdateLeadTaskModalOpen(true);
+                        setSelecedLeadTask(activity);
+                      }}
+                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsLeadTaskHistoryModalOpen(true);
+                        setSeletedLeadTaskForHistory(activity)
+                      }}
+                      className="px-2 py-1 bg-white text-gray-500 rounded hover:bg-gray-200 transition-colors text-xs"
+                    >
+                      <History size={16} /> {/* Adjusted size for better fit */}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {isUpdateLeadTaskModalOpen && (
+          <UpdateLeadTaskModal
+            isOpen={isUpdateLeadTaskModalOpen}
+            handleClose={(value: boolean) => {
+              setIsUpdateLeadTaskModalOpen(value);
+            }}
+            leadActivity={leadActivity}
+            leadTask={selecedLeadTask!}
+            leadTaskPriority={leadTaskPriority}
+            leadTaskStage={leadTaskStage}
+            handleLeadTaskUpdate={handleLeadTaskUpdate}
+          />
+
+          
         )}
+
+
+        <LeadTaskHistoryModal
+          isOpen = {isLeadTaskHistoryModalOpen}
+          handleClose={(status : boolean)=>{
+              setIsLeadTaskHistoryModalOpen(status)
+          }}
+          leadTask={seletedLeadTaskForHistory!}
+          ></LeadTaskHistoryModal>
+          
+          {isEditMettingModalOpen && (
+                <EditMeetingDetailsModal
+        meetingPlatform={meetingPlatform}
+          isOpen={isEditMettingModalOpen}
+          meetingDetails={googleMeetEventData!}
+          onClose={() => {
+            setIsEditMettingModalOpen(false);
+          }}
+          isAttendeesPresent={googleMeetEventData!.isAttendeePresent}
+          handleMeetingDetailsUpdate={(date : string , summary : string) => {
+            console.log(date);
+            console.log(summary);
+          }}
+        />
+          )}
+           
       </div>
-    </div>
+    </>
   );
 }
 

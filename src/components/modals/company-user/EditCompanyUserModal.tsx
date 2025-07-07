@@ -115,7 +115,7 @@ function EditCompanyUserModal({
             updatedby: loginStatus.id,
             company_id: loginStatus.companyId,
             fullname: updateUserformData.name,
-            mobileNumber: updateUserformData.mobileNumber,
+            mobilenumber: updateUserformData.mobileNumber,
             isactive : updateUserformData.isActive
           };
           await axios.put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
