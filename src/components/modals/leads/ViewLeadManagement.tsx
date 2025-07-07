@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronLeft, History, Plus, X } from "lucide-react";
+import { ChevronLeft, History, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
@@ -41,10 +41,11 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
+import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const { userHasAccessToUpdateLead, userHasAccessToViewLead } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
@@ -725,6 +726,7 @@ const ViewLeadManagement = () => {
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [isLeadSettingModalOpen,setIsLeadSettingModalOpen] = useState<boolean>(false);
   return (
     <div
       className={`${
@@ -779,19 +781,50 @@ const ViewLeadManagement = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-evenly w-48">
+        {/**Add Setting in lead details page here  */}
+        <div className="flex items-center min-w-20 justify-end gap-3 w-full">
           {/* new code  */}
           <div className="relative inline-block">
             <button
               disabled={!userHasAccessToUpdateLead}
+              onClick={()=>{
+                    if(userHasAccessToViewLead){
+                        setIsLeadSettingModalOpen(true);
+                    }
+                    else{
+                      showMessageSnackbar({message : "Your are not authorized",type : "error"})
+                    }
+                    
+              }}
+              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
+            >
+              <Settings size={12} />
+              <span>Settings</span>
+            </button>
+            {isLeadSettingModalOpen && (
+              <LeadSettingForLead
+              isOpen = {isLeadSettingModalOpen}
+              onClose={()=> {
+                setIsLeadSettingModalOpen(false);
+              }}
+              lead={selectedLeadData}
+              />
+            )}
+        </div>
+        </div>
+
+        <div className="flex items-center justify-evenly w-48">
+          {/* new code  */}
+          <div className="relative inline-block">
+            <button
+              disabled={!userHasAccessToViewLead}
               onClick={() => {
-                if (userHasAccessToUpdateLead) {
+                if (userHasAccessToViewLead) {
                   setIsAddProductModalOpen(true);
                 } else {
                   showMessageSnackbar({
                     message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                      MESSAGE.ERROR.NOT_ATHORISED,
                     type: "error",
                   });
                 }
@@ -812,6 +845,7 @@ const ViewLeadManagement = () => {
               interestTypeData={interestTypeData}
             />
           </div>
+          
           <button
             className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
             onClick={() => {
