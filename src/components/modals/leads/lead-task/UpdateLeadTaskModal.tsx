@@ -393,6 +393,9 @@ function UpdateLeadTaskModal({
                   if (e) {
                     setLeadActivityId(e);
                   }
+                  else{
+                     setLeadActivityId(0);
+                  }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
                   navigate(ROUTES_URL.SCHEDULE_MEETING);
@@ -407,6 +410,9 @@ function UpdateLeadTaskModal({
                 if (e) {
                   setLeadTaskPriorityId(e);
                 }
+                else{
+                   setLeadTaskPriorityId(0);
+                }
               }}
               options={leadTaskPriority}
               selectedValue={leadTask.leadTaskPriorityId}
@@ -416,6 +422,9 @@ function UpdateLeadTaskModal({
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
+                }
+                else{
+                  setLeadTaskStageId(0);
                 }
               }}
               options={leadTaskStage}

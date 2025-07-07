@@ -109,6 +109,7 @@ function CreateLeadTaskModal({
     setSelectedCompanyUsers([]);
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
+    handleCloseSnackbar();
   };
 
   const generateTimeOptions = () => {
@@ -339,6 +340,9 @@ function CreateLeadTaskModal({
                   if (e) {
                     setLeadActivityId(e);
                   }
+                  else{
+                     setLeadActivityId(0);
+                  }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
                   navigate(ROUTES_URL.SCHEDULE_MEETING);
@@ -352,6 +356,9 @@ function CreateLeadTaskModal({
                 if (e) {
                   setLeadTaskPriorityId(e);
                 }
+                else{
+                   setLeadTaskPriorityId(0);
+                }
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
@@ -360,6 +367,9 @@ function CreateLeadTaskModal({
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
+                }
+                else{
+                  setLeadTaskStageId(0);
                 }
               }}
               options={leadTaskStage}
