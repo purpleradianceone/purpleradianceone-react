@@ -485,6 +485,7 @@ function LeadMeetingsModal({
 
   const handleMeetingDetailsUpdate = () => {
     setMeetDetailsUpdateCount(meetingDetailsUpdateCount + 1);
+    
   };
 
   const handleSessionExpiredDialogueConfirm = () => {
@@ -495,7 +496,7 @@ function LeadMeetingsModal({
 
   useEffect(() => {
     getGoogleMeeting();
-    console.log(view);
+    console.log(googleMeetEventData);
   }, [meetingDetailsUpdateCount, concatDate]);
   return (
     <div className="bg-white w-full min-h-full">

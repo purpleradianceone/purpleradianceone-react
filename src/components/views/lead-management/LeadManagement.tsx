@@ -82,8 +82,8 @@ function LeadManagement() {
 
   const getLeadsData = async () => {
     const offset = (currentPage - 1) * pageSize;
-    const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+    
+    const effectiveDateRangeId = dateRangeId;
 
     //NOTE : need to work on this
     const postDataToGetLeads: PostDataToGetLeadData = {

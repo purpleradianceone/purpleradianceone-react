@@ -338,6 +338,7 @@ function SignInForm() {
             })
             .catch((error) => {
               console.log(error);
+              recaptchaRef.current!.reset();
               showMessageSnackbar({
                 message: MESSAGE.ERROR.WRONG_CREDENTIALS,
                 type: "error",

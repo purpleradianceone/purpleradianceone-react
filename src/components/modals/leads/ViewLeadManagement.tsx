@@ -719,7 +719,7 @@ const ViewLeadManagement = () => {
     if (isOpenMeetingsModal) {
       return "min-h-40";
     } else {
-      return "min-h-40";
+      return "min-h-72";
     }
   }, [isOpenMeetingsModal]);
 
