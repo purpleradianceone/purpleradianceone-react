@@ -33,6 +33,7 @@ import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadCont
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import { format, parse } from "date-fns";
+import { createPortal } from "react-dom";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -243,7 +244,21 @@ function UpdateLeadTaskModal({
       });
       return;
     }
-
+    else if (dueDate === "") {
+      showMessageSnackbar({
+        message: "Please select Due Date for Task",
+        type: "error",
+      });
+      return;
+    }
+    else if(dueTime === ""){
+       showMessageSnackbar({
+        message: "Please select Due Time for Task",
+        type: "error",
+      });
+      return;
+    }
+    
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();
 
@@ -352,7 +367,8 @@ function UpdateLeadTaskModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+    createPortal(
+      <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
       <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <div className="border-b pb-1 mb-4 flex justify-between items-center">
@@ -650,7 +666,9 @@ function UpdateLeadTaskModal({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
-    </div>
+    </div>,
+    document.body
+    )
   );
 }
 

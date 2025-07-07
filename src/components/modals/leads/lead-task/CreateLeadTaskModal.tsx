@@ -198,6 +198,20 @@ function CreateLeadTaskModal({
       });
       return;
     }
+    else if(dueDate === ""){
+       showMessageSnackbar({
+        message: "Please select Due Date for Task",
+        type: "error",
+      });
+      return;
+    }
+    else if(dueTime === ""){
+       showMessageSnackbar({
+        message: "Please select Due Time for Task",
+        type: "error",
+      });
+      return;
+    }
 
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();

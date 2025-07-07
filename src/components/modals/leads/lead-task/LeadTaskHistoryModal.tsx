@@ -10,6 +10,7 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import { createPortal } from "react-dom";
 
 interface LeadTaskHistoryModalProps {
   isOpen: boolean;
@@ -228,7 +229,8 @@ function LeadTaskHistoryModal({
   
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center  z-50 pt-24 pb-14">
+    createPortal(
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center  z-50 pt-24 pb-14">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl min-h-full p-6 relative">
         {/* Close Button */}
         <button
@@ -300,7 +302,9 @@ function LeadTaskHistoryModal({
          
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
+    )
   );
 }
 
