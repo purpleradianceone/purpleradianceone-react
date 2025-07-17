@@ -29,6 +29,8 @@ import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
 import { SIZE } from "../../../../constants/AppConstants";
 import NavItem from "./Component/NavItem";
 import { usePanel } from "../../../../context/panel/usePanel";
+import { useNotifications } from "../../../../context/notification/NotificationProvider";
+import NotificationPopup from "../../notification/NotificationManagement";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -106,6 +108,33 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const handleClickOnUserProfile = () => {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
   };
+
+  const notifications = useNotifications();
+
+  const [notificationCount, setNotificationCount] = useState<number>(0);
+
+  useEffect(() => {
+    console.log("something happened");
+    
+    if (notifications!.length >= 1) {
+      console.log(notifications.length);
+      console.log("this is the length");
+      
+      
+      setNotificationCount((prev) => prev + 1);
+    }
+    //  setNotificationCount(notifications?.length || 0);
+    // setNotificationCount(notificationCount+1)
+  }, [notifications!.length]);
+
+  const resetNotificationCount = () => {
+    setNotificationCount(0);
+  };
+
+  // let unreadCount = notifications?.length || 0;
+
+  const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
+    useState<boolean>(false);
 
   if (!loginStatus.status) {
     return (
@@ -401,9 +430,52 @@ function Navbar({ children }: { children: React.ReactNode }) {
                 <div className=" flex items-center space-x-4">
                   {!isSmallScreen && (
                     <>
-                      <button className="p-2 rounded-lg hover:bg-gray-100">
-                        <Bell className="h-5 w-5" />
-                      </button>
+                      {/* <Link to={ROUTES_URL.NOTIFICATION} className="relative">
+                        <button
+                          onClick={() => setIsOpenPopUpOfNotification(true)}
+                          className="p-2 rounded-lg hover:bg-gray-100"
+                        >
+                          <Bell className="h-5 w-5" />
+                          {unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
+                        {isOpenPopUpOfNotification && (
+                          <NotificationPopup
+                            // notifications={notifications}
+                            onClose={() => setIsOpenPopUpOfNotification(false)}
+                          />
+                        )}
+                      </Link> */}
+                      <div className="relative">
+                        <button
+                          onClick={() => {
+                            resetNotificationCount();
+                            setIsOpenPopUpOfNotification(
+                              !isOpenPopUpOfNotification
+                            );
+                            // unreadCount=0;
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-100"
+                        >
+                          <Bell className="h-5 w-5" />
+                          {notificationCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                              {notificationCount > 9 ? "9+" : notificationCount}
+                            </span>
+                          )}
+                        </button>
+
+                        {isOpenPopUpOfNotification && (
+                          <NotificationPopup
+                            // notifications={notifications}
+                            onClose={() => setIsOpenPopUpOfNotification(false)}
+                          />
+                        )}
+                      </div>
+
                       <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
                         <button className="p-2 rounded-lg hover:bg-gray-100">
                           <LayoutPanelLeft className="h-5 w-5" />
