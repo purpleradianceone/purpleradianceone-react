@@ -194,6 +194,19 @@ function LeadManagementList({
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
+                {/* Custom Date Picker Div Flex Box*/}
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
                 <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                   <CustomDropdown
                     labelName="source"
@@ -218,19 +231,7 @@ function LeadManagementList({
                   <User size={14} className="" />
                 </Button>
               </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
+              
             </>
           )}
 

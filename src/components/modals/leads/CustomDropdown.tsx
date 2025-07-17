@@ -1,20 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp, Delete } from 'lucide-react';
+import { MessageSnackbarState, ShowMessageSnackbarProps } from '../../../@types/ui/MessageSnackbarProps';
+import MessageSnackBar from '../../ui/MessageSnackbar';
+import { NUMBER_VALUES } from '../../../constants/AppConstants';
 
 
 interface DropdownProps {
   options: any[];
   onSelect: (selectedValue: number | undefined) => void;
   labelName: string;
+  selectedValue? :number
+  readOnly? : boolean
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
   options = [],
   onSelect,
   labelName,
+  selectedValue,
+  readOnly
 }) => {
-  const [selectedOption, setSelectedOption] = useState<number | undefined>(undefined);
+  const [selectedOption, setSelectedOption] = useState<number | undefined>((()=>{
+    if(selectedValue) return selectedValue;
+    else return undefined;
+  }));
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -42,18 +52,43 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     setShowDropdown(false);
   };
 
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+      open: false,
+      message: "",
+      type: "success" as "success" | "error",
+    });
+  
+    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+      setMessageSnackbar({ open: true, message, type });
+    };
+  
+    const handleCloseSnackbar = () => {
+      setMessageSnackbar((prev) => ({ ...prev, open: false }));
+    };
+
   return (
     <div className="relative w-auto " ref={dropdownRef}>
-      <label className="block  text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" ? "": labelName}</label>
+      <label className="block text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" || labelName === "type" || labelName === "priority" || labelName === "stage" ? "" : labelName}</label>
 
       <div
-        className="w-full flex justify-between py-1 px-1 border-2 bg-white border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none"
-        onClick={() => setShowDropdown((prev) => !prev)}
+        className={`w-full flex justify-between py-1 px-1 border-2 ${readOnly ? "bg-gray-300" : "bg-white"}  border-gray-300 bg-green-0 rounded-md cursor-pointer text-gray-700 focus:outline-none`}
+        onClick={() => {
+          if(!readOnly){
+              setShowDropdown((prev) => !prev)
+          }
+          else if(readOnly){
+              showMessageSnackbar({message : `Can't Update ${labelName}`, type : "error" })
+          }
+          }}
+       
       >
         <div className='text-xs'>
-          {labelName === "status" || labelName === "source" ?  
+          {labelName === "status" || labelName === "source" || labelName === "type" || labelName === "priority" || labelName === "stage" ?  
           selectedOption === undefined
-          ? labelName === "status" ? 'Status' : 'Source'
+          ? labelName === "status" ? 'Status' 
+          : labelName === "source" ? 'Source' 
+          : labelName === "type" ? 'Type' 
+          : labelName === "priority" ? 'Priority' : 'Stage'
           : options.find((o) => o.id === selectedOption)?.name
           :
           selectedOption === undefined
@@ -85,6 +120,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
           ))}
         </div>
       )}
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleCloseSnackbar}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </div>
   );
 };

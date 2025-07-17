@@ -18,6 +18,7 @@ type ButtonProps = {
     spinner? : EmailVerificationType;
     setSpinner? : (spinner : EmailVerificationType) => void;
     title? : string;
+    label? : string;
   };
   
   export default ButtonProps;
