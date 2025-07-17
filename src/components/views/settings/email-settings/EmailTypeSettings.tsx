@@ -93,7 +93,7 @@ function EmailTypeSettings() {
     const emailTypeSettingPostData = {
       company_id: loginStatus.companyId,
       id: id,
-      from_company_email: isChecked,
+      tosend_from_company_email: isChecked,
       updatedby_id: loginStatus.id,
     };
 

@@ -7,43 +7,103 @@ import {
   TabPanel,
 } from "@material-tailwind/react";
 import LeadTaskList from "../modals/leads/lead-task/LeadTaskList";
+import LeadTaskPriorityType from "../../@types/lead-management/LeadTaskPriorityType";
+import LeadActivityType from "../../@types/lead-management/LeadActivityType";
+import LeadTaskStageType from "../../@types/lead-management/LeadTaskStageType";
+import LeadTaskType from "../../@types/lead-management/LeadTaskType";
 
-function LeadTaskTabs() {
-  const [activeTab, setActiveTab] = useState("allTasks");
+function LeadTaskTabs({
+  leadTaskStage,
+  leadTaskPriority,
+  leadActivity,
+  leadTasks,
+  handleTaskTabChange,
+  handleLeadActivityFilterDropdownChange,
+  handleLeadPriorityFilterDropdownChange,
+   handleLeadTaskUpdate,
+   isLoading
+} : {
+  leadTaskStage: LeadTaskStageType[];
+  leadTaskPriority: LeadTaskPriorityType[];
+  leadActivity: LeadActivityType[];
+  leadTasks: LeadTaskType[];
+  handleTaskTabChange : (id : number) => void;
+  handleLeadActivityFilterDropdownChange : (leadActivityId : number) => void;
+   handleLeadPriorityFilterDropdownChange : (leadTaskPriorityId : number) => void;
+   handleLeadTaskUpdate : () => void;
+   isLoading: boolean;
+}) {
+
+   const [activeTab, setActiveTab] = useState("allTasks");
 
   const data = [
     {
       label: "All Tasks",
       value: "allTasks",
       desc: (
-        <LeadTaskList tastStatusId={1}></LeadTaskList>
+       <LeadTaskList 
+       isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+       handleLeadTaskUpdate={handleLeadTaskUpdate}
+       />
       ),
+      taskId : 0
     },
     {
-      label: "Upcoming",
-      value: "upcoming",
-      desc: <LeadTaskList tastStatusId={2}></LeadTaskList>
-    },
-    {
-      label: "Due",
-      value: "due",
+      label: leadTaskStage[0]?.name,
+      value: leadTaskStage[0]?.name,
       desc: (
-        <LeadTaskList tastStatusId={3}></LeadTaskList>
+       <LeadTaskList 
+        isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+       />
       ),
+       taskId : leadTaskStage[0]?.id,
     },
     {
-      label: "In Progress",
-      value: "inProgress",
+      label: leadTaskStage[1]?.name,
+      value: leadTaskStage[1]?.name,
       desc: (
-       <LeadTaskList tastStatusId={4}></LeadTaskList>
+     <LeadTaskList 
+      isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+       />
       ),
+      taskId : leadTaskStage[1]?.id,
     },
     {
-      label: "Completed",
-      value: "completed",
+      label: leadTaskStage[2]?.name,
+      value: leadTaskStage[2]?.name,
       desc: (
-       <LeadTaskList tastStatusId={5}></LeadTaskList>
+       <LeadTaskList 
+        isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+       />
       ),
+      taskId : leadTaskStage[2]?.id,
     },
   ];
 
@@ -61,14 +121,18 @@ function LeadTaskTabs() {
                 "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
             }}
           >
-            {data.map(({ label, value }) => (
+            {data.map(({ label, value , taskId}) => (
               <Tab
                 placeholder="All Tasks"
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 key={value}
                 value={value}
-                onClick={() => setActiveTab(value)}
+                onClick={() => {
+                  setActiveTab(value);
+                  handleTaskTabChange(taskId)
+                
+                }}
                 className={
                   activeTab === value ? "text-gray-900 text-sm" : "text-sm"
                 }

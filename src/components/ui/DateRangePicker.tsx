@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, {useState } from 'react';
 import DateRangePickerProps from '../../@types/ui/DateRangePickerProps';
 // import Button from './ui/Button';
 
@@ -7,8 +7,18 @@ import DateRangePickerProps from '../../@types/ui/DateRangePickerProps';
 
 
 function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePickerProps) {
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+
+  const getDefaultStartDate = () => {
+    const today = new Date();
+    const date10DaysAgo = new Date(today); // Create a new Date object to avoid modifying 'today'
+    date10DaysAgo.setDate(today.getDate() - 10); // Subtract 10 days
+
+    // Format the date to YYYY-MM-DD
+    return date10DaysAgo.toISOString().split('T')[0];
+  };
+
+  const [startDate, setStartDate] = useState<string>(getDefaultStartDate());
+  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value);
@@ -25,9 +35,9 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
     return today.toISOString().split('T')[0];
   };
   return (
-    <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-      <div className="relative flex gap-2 justify-center items-center">
-        <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 ">
+    <div className="flex  flex-col space-y-4 sm:flex-row sm:space-x-1 sm:space-y-0">
+      <div className="relative flex gap-1 justify-center items-center">
+        <label htmlFor="start-date" className=" text-xs font-medium text-gray-700 ">
           From :
         </label>
         <div className="relative">
@@ -38,14 +48,14 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
             onChange={handleStartDateChange}
             max={endDate ? endDate : getCurrentDate() }
             // min={endDate}
-            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full text-xs text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         
         </div>
       </div>
 
-      <div className="relative flex gap-2 justify-center items-center">
-        <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 ">
+      <div className="relative flex gap-1 justify-center items-center">
+        <label htmlFor="end-date" className="block text-xs font-medium text-gray-700 ">
            To :
         </label>
         <div className="relative">
@@ -57,7 +67,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
             min={startDate}
             max={getCurrentDate()}
             
-            className="block w-full  text-sm text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full  text-xs text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
          
         </div>

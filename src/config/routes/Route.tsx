@@ -36,10 +36,11 @@ import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthCon
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
 import Meetings from "../../components/views/meeting/Meetings";
 import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
-import LeadImportCsv from "../../components/modals/leads/import-leads/LeadImportCsv";
 import ZoomMeetingsOAuthConsentAndroid from "../../components/android-page/ZoomOAuthConsentAndrod";
 import { EditorCanvasWithJson } from "../../components/email-template/template-editors/EditorCanvasWithJson";
 import SettingsPage from "../../components/views/settings/company-settings/SettingsPage";
+import LeadImportCsvManagement from "../../components/modals/leads/import-leads/LeadImportCsvManagement";
+import NotificationManagement from "../../components/views/notification/NotificationManagement";
 
 
 
@@ -70,6 +71,19 @@ export const router = createBrowserRouter([
       <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
         <SignInForm />
       </AuthLayout>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.NOTIFICATION,
+    element: (
+   <PrivateRoute>
+        <div>
+          <Navbar>
+            <NotificationManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
     ),
   },
   {
@@ -350,7 +364,8 @@ export const router = createBrowserRouter([
     element :(
       <PrivateRoute>
         <Navbar>
-          <LeadImportCsv/>
+          {/* <LeadImportCsv/> */}
+          <LeadImportCsvManagement/>
         </Navbar>
       </PrivateRoute>
     )

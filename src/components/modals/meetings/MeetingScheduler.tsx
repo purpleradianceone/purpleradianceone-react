@@ -30,6 +30,7 @@ import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
+import Lead from "../../../@types/lead-management/LeadManagementProps";
 
 const MeetingScheduler = () => {
   const [title, setTitle] = useState<string>("");
@@ -92,6 +93,8 @@ const MeetingScheduler = () => {
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
 
+const [leadData,setLeadData] = useState<Lead>();
+
   const handleGoogleMeetAuth = () => {
     navigate(ROUTES_URL.GOOGLE_OAUTH);
   };
@@ -100,6 +103,15 @@ const MeetingScheduler = () => {
     const openedFrom = searchParams.get("from");
       if(!openedFrom){
         setIsModalForLead(true);
+        const data =  sessionStorage.getItem("leadData");
+        if(data){
+            const leadSearchParam = JSON.parse(
+                       data
+                      );
+                      console.log(leadSearchParam)
+          setLeadData(leadSearchParam);
+        }
+        
       }
   },[searchParams])
   const createGoogleMeetMeeting = async () => {
@@ -125,33 +137,48 @@ const MeetingScheduler = () => {
     
     if(title === ""){
       showMessageSnackbar({message:"Please give title to meeting",type:"error"});
+      setIsCreating(false);
       return;
     }
     else if(startDate === ""){
       showMessageSnackbar({message:"Please select start date",type:"error"});
+      setIsCreating(false);
       return;
     }
     else if(startTime === ""){
       showMessageSnackbar({message:"Please select start time",type:"error"});
+      setIsCreating(false);
       return;
     }
     else if(endDate === ""){
       showMessageSnackbar({message:"Please select end date",type:"error"});
+      setIsCreating(false);
       return;
     }
     else if(endTime === ""){
       showMessageSnackbar({message:"Please select end time",type:"error"});
+      setIsCreating(false);
       return;
     }
     else if(selectedMeetingPlatform === ""){
       showMessageSnackbar({message:"Please select meeting platform",type:"error"});
+      setIsCreating(false);
       return;
     }
-    else if (serverCurrentTime! > startDateTIme.toDate()) {
-     showMessageSnackbar({message:"Connot create meeting as start time is in the past",type:"error"});
+     else if(endDateTime.toDate() > startDateTIme.toDate()){
+        showMessageSnackbar({message:"End Time should be greater than start time",type:"error"});
+        setIsCreating(false);
       return;
     }
+    else if (serverCurrentTime! < startDateTIme.toDate()) {
+      console.log(serverCurrentTime! > startDateTIme.toDate());
+     showMessageSnackbar({message:"Connot create meeting as start time is in the past zoom",type:"error"});
+     setIsCreating(false);
+      return;
+    }
+    
 
+    
 
     if (
       title !== "" &&
@@ -163,6 +190,7 @@ const MeetingScheduler = () => {
     ) {
       setIsCreating(true);
 
+
       const postDataCreateGoogleMeetMeeting = {
         company_id: loginStatus.companyId,
         summary_title: title,
@@ -173,9 +201,10 @@ const MeetingScheduler = () => {
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
+        is_meeting_created_from_lead : isModalForLead ? true : false,
+        lead_id : isModalForLead ? leadData?.id : null,
         createdby: loginStatus.id,
       };
-
       axios
         .post(POST_API.CREATE_GOOGLE_MEETING, postDataCreateGoogleMeetMeeting, {
           withCredentials: true,
@@ -202,12 +231,76 @@ const MeetingScheduler = () => {
           if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
             handleGoogleMeetAuth();
           }
-        });
+        }).finally(() => {
+          setIsCreating(false);
+        })
     } else {
       showMessageSnackbar({message:"Please fill the required fields",type:"error"});
     }
   };
   const createZoomMeeting = async () => {
+
+        const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
+    const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
+    const pickerFormatString = "yyyy-MM-DD HH:mm";
+
+    const startDateTIme = momentTimezone.tz(
+      combinedPickerStartDateTimeString,
+      pickerFormatString,
+      userPreference.timezoneName
+    );
+    const endDateTime = momentTimezone.tz(
+      combinedPickerEndDateTimeString,
+      pickerFormatString,
+      userPreference.timezoneName
+    );
+
+    console.log(startDateTIme.toDate());
+    console.log(endDateTime.toDate());
+    if(title === ""){
+      showMessageSnackbar({message:"Please give title to meeting",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+    else if(startDate === ""){
+      showMessageSnackbar({message:"Please select start date",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+    else if(startTime === ""){
+      showMessageSnackbar({message:"Please select start time",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+    else if(endDate === ""){
+      showMessageSnackbar({message:"Please select end date",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+    else if(endTime === ""){
+      showMessageSnackbar({message:"Please select end time",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+    else if(selectedMeetingPlatform === ""){
+      showMessageSnackbar({message:"Please select meeting platform",type:"error"});
+      setIsCreating(false);
+      return;
+    }
+     else if(endDateTime.toDate() < startDateTIme.toDate()){
+        showMessageSnackbar({message:"End Time should be greater than start time",type:"error"});
+        setIsCreating(false);
+      return;
+    }
+    else if (serverCurrentTime! > startDateTIme.toDate()) {
+      console.log(serverCurrentTime! < startDateTIme.toDate());
+     showMessageSnackbar({message:"Connot create meeting as start time is in the past",type:"error"});
+     setIsCreating(false);
+      return;
+    }
+    
+
+
     if (
       title !== "" &&
       startDate !== "" &&
@@ -227,6 +320,8 @@ const MeetingScheduler = () => {
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
+        is_meeting_created_from_lead : isModalForLead ? true : false,
+        lead_id : isModalForLead ? leadData?.id : null,
         createdby: loginStatus.id,
       };
       await axios
@@ -270,7 +365,9 @@ const MeetingScheduler = () => {
           else if(error.status === STATUS_CODE.PERMANENT_REDIRECT){
            handleZoomMeetingsOAuth();
           }
-        });
+        }).finally(() => {
+          setIsCreating(false);
+        })
     }
   };
 
@@ -420,6 +517,7 @@ const MeetingScheduler = () => {
       setIsModalForLead(false);
     } else {
       const leadData = sessionStorage.getItem("leadData");
+      console.log(leadData);
       const newQueryString = qs.stringify({
         leadData: leadData,
       });
@@ -594,7 +692,7 @@ const MeetingScheduler = () => {
                   setIsAddCompanyUserEmailAttedeesModalOpen(true);
                 }}
               >
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-6 w-4" />
               </Button>
             </div>
             {isModalForLead && (
@@ -605,7 +703,7 @@ const MeetingScheduler = () => {
                 }}
               
               >
-                <Contact2 className="h-4 w-4" />
+                <Contact2 className="h-6 w-4" />
               </Button>
             </div>
             )}
@@ -616,7 +714,7 @@ const MeetingScheduler = () => {
                 }}
                 disabled={!newAttendeeEmail.trim()}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-6 w-4" />
               </Button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {  ChevronLeft, History, Plus, X } from "lucide-react";
+import { ChevronLeft, History, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
@@ -41,10 +41,11 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
+import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const { userHasAccessToUpdateLead, userHasAccessToViewLead } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
@@ -112,29 +113,7 @@ const ViewLeadManagement = () => {
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
-
-  type activity = {
-    work?: string;
-    person?: string;
-  };
-
-  // const UPDATE_LEAD_ACCESS_DENIED_message =MODULE_ACCESS_MESSAGE.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message;
-
-  const [activityData, setActivityData] = useState<activity[]>([
-    {
-      person: "Shrutika Kohalatkar ",
-      work: "changed lead deatils",
-    },
-    {
-      person: "Gaurav Chandel ",
-      work: "changed lead owner",
-    },
-    {
-      person: "hrutik sargar ",
-      work: "changed lead name",
-    },
-  ]);
-
+  
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -212,13 +191,7 @@ const ViewLeadManagement = () => {
           setReasonInputBoxOpen(false);
           setReasonText("");
           setSelectedStatusId(null);
-          setActivityData([
-            {
-              person: loginStatus.fullName,
-              work: response.data.message,
-            },
-            ...activityData,
-          ]);
+          
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
           showMessageSnackbar({
@@ -350,13 +323,6 @@ const ViewLeadManagement = () => {
             ...prev,
             leadOwner: selectedCompanyUser.fullname,
           }));
-          setActivityData([
-            {
-              person: loginStatus.fullName,
-              work: response.data.message,
-            },
-            ...activityData,
-          ]);
         } else {
           showMessageSnackbar({
             message: response.data.message,
@@ -383,6 +349,19 @@ const ViewLeadManagement = () => {
       } else if (error.status === STATUS_CODE.FORBIDDEN) {
         setIsDialogueOpen(true);
       }
+    } finally {
+      // selected company user should become null after this function runs
+      setSelectedCompanyUser({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
     }
   };
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
@@ -693,13 +672,6 @@ const ViewLeadManagement = () => {
           message: response.data.message,
           type: "success",
         });
-        setActivityData([
-          {
-            person: loginStatus.fullName,
-            work: response.data.message,
-          },
-          ...activityData,
-        ]);
         fetchLeadContact();
       } else if (response.data.status === false) {
         showMessageSnackbar({
@@ -748,12 +720,13 @@ const ViewLeadManagement = () => {
     if (isOpenMeetingsModal) {
       return "min-h-40";
     } else {
-      return "min-h-40";
+      return "min-h-72";
     }
   }, [isOpenMeetingsModal]);
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [isLeadSettingModalOpen,setIsLeadSettingModalOpen] = useState<boolean>(false);
   return (
     <div
       className={`${
@@ -808,19 +781,50 @@ const ViewLeadManagement = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-evenly w-48">
+        {/**Add Setting in lead details page here  */}
+        <div className="flex items-center min-w-20 justify-end gap-3 w-full">
           {/* new code  */}
           <div className="relative inline-block">
             <button
               disabled={!userHasAccessToUpdateLead}
+              onClick={()=>{
+                    if(userHasAccessToViewLead){
+                        setIsLeadSettingModalOpen(true);
+                    }
+                    else{
+                      showMessageSnackbar({message : "Your are not authorized",type : "error"})
+                    }
+                    
+              }}
+              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
+            >
+              <Settings size={12} />
+              <span>Settings</span>
+            </button>
+            {isLeadSettingModalOpen && (
+              <LeadSettingForLead
+              isOpen = {isLeadSettingModalOpen}
+              onClose={()=> {
+                setIsLeadSettingModalOpen(false);
+              }}
+              lead={selectedLeadData}
+              />
+            )}
+        </div>
+        </div>
+
+        <div className="flex items-center justify-evenly w-48">
+          {/* new code  */}
+          <div className="relative inline-block">
+            <button
+              disabled={!userHasAccessToViewLead}
               onClick={() => {
-                if (userHasAccessToUpdateLead) {
+                if (userHasAccessToViewLead) {
                   setIsAddProductModalOpen(true);
                 } else {
                   showMessageSnackbar({
                     message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                      MESSAGE.ERROR.NOT_ATHORISED,
                     type: "error",
                   });
                 }
@@ -841,6 +845,7 @@ const ViewLeadManagement = () => {
               interestTypeData={interestTypeData}
             />
           </div>
+          
           <button
             className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
             onClick={() => {
@@ -968,28 +973,57 @@ const ViewLeadManagement = () => {
           </div>
         </div>
         {reasonInputBoxOpenForLeadOwner && (
-          <div className="w-1/4 ">
-            <div className="  flex ml-2  gap-1 items-center">
-              <label className="text-xs text-gray-600 font-medium">
-                Reason(Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="Enter reason for Owner Update"
-                className=" border rounded px-3   text-xs "
-                value={reasonTextForLeadOwnerChange}
-                onChange={(e) =>
-                  setReasonTextForLeadOwnerChange(e.target.value)
-                }
-              />
-              <button
-                className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded w-fit"
-                onClick={() => {
-                  handleLeadOwnerChange();
-                }}
-              >
-                Save
-              </button>
+          // <div className="w-1/4 ">
+          // <div className="fixed w-full h-full bg-green-100  ">
+          //   <div className="  flex  items-center justify-center ml-2  gap-1 ">
+          //     <label className="text-xs text-gray-600 font-medium">
+          //       Reason(Optional)
+          //     </label>
+          //     <input
+          //       type="text"
+          //       placeholder="Enter reason for Owner Update"
+          //       className=" border rounded px-3   text-xs "
+          //       value={reasonTextForLeadOwnerChange}
+          //       onChange={(e) =>
+          //         setReasonTextForLeadOwnerChange(e.target.value)
+          //       }
+          //     />
+          //     <button
+          //       className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded w-fit"
+          //       onClick={() => {
+          //         handleLeadOwnerChange();
+          //       }}
+          //     >
+          //       Save
+          //     </button>
+          //   </div>
+          // </div>
+          <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-gray-700 font-medium">
+                  Reason (Optional)
+                </label>
+                <textarea
+                  rows={7}
+                  placeholder="Enter reason for lead owner update"
+                  className="border rounded  p-1 text-sm"
+                  value={reasonTextForLeadOwnerChange}
+                  onChange={(e) =>
+                    setReasonTextForLeadOwnerChange(e.target.value)
+                  }
+                />
+                <div className="flex justify-end">
+                  <button
+                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded self-end"
+                    onClick={() => {
+                      handleLeadOwnerChange();
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1075,12 +1109,6 @@ const ViewLeadManagement = () => {
               handleSaveEditLeadDetailsCallback={
                 handleSaveEditLeadDetailsCallback
               }
-              handleLeadActivityChange={(person: string, work: string) => {
-                setActivityData([
-                  { person: person, work: work },
-                  ...activityData,
-                ]);
-              }}
               leadDetailsData={leadDetailsData}
               setLeadDetailsData={setLeadDetailsData}
               selectedLeadData={selectedLeadData}
@@ -1252,8 +1280,17 @@ const ViewLeadManagement = () => {
               <button
                 onClick={() => {
                   setIsLeadOwnerPopUpOpen(false);
-                  //
-                  setReasonInputBoxOpenForLeadOwner(true);
+                  //Note : show reason card only if different lead owner is selected.
+                  console.log(selectedCompanyUser);
+                  console.log(persistedSelectedUserId);
+
+                  if (
+                    selectedCompanyUser.id !== 0 &&
+                    selectedCompanyUser.id !== null &&
+                    selectedCompanyUser.id === persistedSelectedUserId
+                  ) {
+                    setReasonInputBoxOpenForLeadOwner(true);
+                  }
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
