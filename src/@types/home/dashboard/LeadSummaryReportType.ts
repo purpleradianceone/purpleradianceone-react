@@ -1,0 +1,42 @@
+
+
+type LeadSummaryReportType = {
+  totalLeads : number,
+  totalOpenLeads : number,
+  totalContactedLeads : number,
+  totalWorkingLeads : number,
+  totalQualifiedLeads : number,
+  totalUnqualifiedLeads : number,
+  totalDemoMeetingScheduledLeads : number,
+  totalProposalSentLeads : number,
+  totalNegotiationLeads : number,
+  totalConvertedLeads : number,
+  totalLostLeads : number,
+  totalNurtureLeads : number,
+  totalActiveLeads : number,
+  conversionRate : number,
+  totalOpenLeadsPercentage : number,
+  totalContactedLeadsPercentage : number,
+  totalWorkingLeadsPercentage : number,
+  totalQualifiedLeadsPercentage : number,
+  totalUnqualifiedLeadsPercentage : number,
+  totalDemoMeetingScheduledLeadsPercentage : number,
+  totalProposalSentLeadsPercentage : number,
+  totalNegotiationLeadsPercentage : number,
+  totalConvertedLeadsPercentage : number,
+  totalLostLeadsPercentage : number,
+  totalNurtureLeadsPercentage : number,
+  openLeadStatusName : string,
+  contactedLeadStatusName : string,
+  workingLeadStatusName : string,
+  qualifiedLeadStatusName : string,
+  unqualifiedLeadStatusName : string,
+  demoMeetingScheduledLeadStatusName : string,
+  proposalSentLeadStatusName : string,
+  negotiationLeadStatusName : string,
+  convertedLeadStatusName : string,
+  LostLeadStatusName : string,
+  nurtureLeadStatusName : string
+}
+
+export default LeadSummaryReportType;

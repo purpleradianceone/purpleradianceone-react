@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
@@ -40,8 +39,11 @@ import ZoomMeetingsOAuthConsentAndroid from "../../components/android-page/ZoomO
 import { EditorCanvasWithJson } from "../../components/email-template/template-editors/EditorCanvasWithJson";
 import SettingsPage from "../../components/views/settings/company-settings/SettingsPage";
 import LeadImportCsvManagement from "../../components/modals/leads/import-leads/LeadImportCsvManagement";
+import CreateLeadModal from "../../components/modals/leads/CreateLeadModal";
+import AddCompanyUserModal from "../../components/modals/company-user/AddCompanyUserModal";
+import AddProductModal from "../../components/modals/products/AddProductModal";
+import AddTeamModal from "../../components/modals/teams/AddTeamModal";
 import NotificationManagement from "../../components/views/notification/NotificationManagement";
-
 
 
 export const router = createBrowserRouter([
@@ -180,7 +182,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: ROUTES_URL.LEAD_SETTINGS,
+    path: ROUTES_URL.COMPANY_SETTING,
     element: (
       <PrivateRoute>
         <div>
@@ -369,6 +371,68 @@ export const router = createBrowserRouter([
         </Navbar>
       </PrivateRoute>
     )
-  },
+  },{
+    path : ROUTES_URL.CREATE_LEAD,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          <CreateLeadModal
+          isOpen={true}
+          onClose={()=> {
+            window.history.back();
+          }}
+          ></CreateLeadModal>
+        </Navbar>
+      </PrivateRoute>
+    )
+  },{
+    path : ROUTES_URL.CREATE_COMPANY_USER,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+          <AddCompanyUserModal
+          isOpen={true}
+          onClose={()=> {
+            window.history.back();
+          }}
+          ></AddCompanyUserModal>
+        </Navbar>
+      </PrivateRoute>
+    )
+  },{
+    path : ROUTES_URL.CREATE_PRODUCT,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+         <AddProductModal
+        isOpen={true}
+          onClose={()=> {
+            window.history.back();
+          }}
+          handleProductChangeOnAdd={()=>{
+
+          }}
+         ></AddProductModal>
+        </Navbar>
+      </PrivateRoute>
+    )
+  },{
+    path : ROUTES_URL.CREATE_TEAM,
+    element : (
+      <PrivateRoute>
+        <Navbar>
+         <AddTeamModal
+        isOpen={true}
+          onClose={()=> {
+            window.history.back();
+          }}
+          handleCompanyTeamChangeOnAdd={()=>{
+
+          }}
+         ></AddTeamModal>
+        </Navbar>
+      </PrivateRoute>
+    )
+  }
 ]);
 export default router;

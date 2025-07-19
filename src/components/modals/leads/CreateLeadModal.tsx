@@ -362,9 +362,9 @@ function CreateLeadModal({
               type: "success",
             });
             // note : this callback will run to refresh the list of aggrid
-            onCreateLeadRefreshLeadData();
+            onCreateLeadRefreshLeadData!();
             setTimeout(() => {
-              onClose();
+              onClose!();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           } else if (response.data.status == false) {
             showMessageSnackbar({

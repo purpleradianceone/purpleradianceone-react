@@ -25,6 +25,7 @@ function LeadTasksModal() {
     const [leadActivity,setLeadActivity] = useState<LeadActivityType[]>([]);
    const [leadTaskPriority,setLeadTaskPriority] = useState<LeadTaskPriorityType[]>([]);
   const [leadTaskStage,setLeadTaskStage] = useState<LeadTaskStageType[]>([]);
+  const [visibleAssignUsersBtn,setVisibleAssignUsersBtn] = useState<boolean>(false);
 
   const [leadActivityId,setLeadActivityId] = useState<number>(0);
   const [leadTaskStageId,setLeadTaskStageId] = useState<number>(0);
@@ -212,6 +213,7 @@ const handleLeadPriorityFilterDropdownChange = (priorityId : number) => {
                         searchParams.get("leadData") || "{}"
                       );
           setLeadData(leadSearchParam);
+          setVisibleAssignUsersBtn(true);
   },[])
 useEffect(() => {
   if(leadData || leadTaskStageId !== 0){
@@ -235,7 +237,8 @@ useEffect(() => {
               <h2 className="text-base px-3 font-bold text-center text-gray-800 p-1">
                  Tasks
               </h2>
-              <div className="flex justify-end items-center text-xs gap-x-2 text-gray-500">
+              {visibleAssignUsersBtn && (
+                    <div className="flex justify-end items-center text-xs gap-x-2 text-gray-500">
                 <span>Add</span>
                 <button
                   disabled={false}
@@ -245,6 +248,8 @@ useEffect(() => {
                   <Plus size={10} />
                 </button>
               </div>
+              )}
+              
             </div>
           
         </div>
@@ -262,9 +267,12 @@ useEffect(() => {
           ></LeadTaskTabs>
         </div>
       </div>
-      <CreateLeadTaskModal
+      {
+        leadData && (
+<CreateLeadTaskModal
         leadActivity={leadActivity}
           leadTaskPriority={leadTaskPriority}
+          leadId={leadData!.id}
           leadTaskStage={leadTaskStage}
       isOpen={isCreateLeadTaskModalOpen}
       handleClose={()=> {
@@ -272,6 +280,9 @@ useEffect(() => {
       }}
       handleLeadTaskCreate={handleLeadTaskCreate}
       />
+        )
+      }
+      
       
     </div>
   );

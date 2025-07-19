@@ -42,8 +42,9 @@ const ROUTES_URL = {
     EMAIL_SETTING : "/email-setting",
 
     COMPANY_SETTING: "/settings/company-settings",
-
-
-    
+    CREATE_LEAD : "/create/lead",
+    CREATE_COMPANY_USER : "/create/company-user",
+    CREATE_PRODUCT : "/create/product",
+    CREATE_TEAM : "/create/team",
 }
 export default ROUTES_URL;

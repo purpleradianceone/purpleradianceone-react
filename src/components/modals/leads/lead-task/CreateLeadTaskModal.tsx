@@ -13,7 +13,6 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import AddCompanyUsersEmailAttendeesModal from "../../meetings/AddCompanyUsersEmailAttendeesModal";
 import {
   NUMBER_VALUES,
   SIZE,
@@ -30,6 +29,7 @@ import {
 import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
+import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -37,10 +37,12 @@ function CreateLeadTaskModal({
   leadTaskStage,
   leadTaskPriority,
   leadActivity,
+  leadId,
   handleLeadTaskCreate,
 }: {
   isOpen: boolean;
   handleClose: () => void;
+  leadId? : number;
   leadTaskStage: LeadTaskStageType[];
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
@@ -581,16 +583,17 @@ function CreateLeadTaskModal({
           </div>
         </div>
       </div>
-      <AddCompanyUsersEmailAttendeesModal
+      <LeadAssociatedUsersModal
         isOpen={isAssignUsersModalOpen}
         onClose={() => {
           setIsAssignUsersModalOpen(false);
         }}
+        leadId={leadId!}
         addCompanyTeamUserArray={assignedTo}
         handleAddCompanyUserEmailCheckboxChange={
           handleAddCompanyUserCheckboxChange
         }
-      ></AddCompanyUsersEmailAttendeesModal>
+      ></LeadAssociatedUsersModal>
 
       {isAddCompanyLeadContactModalOpen && (
         <CompanyLeadContactsSelectionAgGrid

@@ -22,7 +22,6 @@ function GoogleOAuthConsentAndroid() {
      const handleGoogleMeetCallback = async (code: string, state: string) => {
 
     const googleMeetCallbackPostData = {
-      
       code: code,
       state: state,
       redirect_url : window.location.origin + window.location.pathname
