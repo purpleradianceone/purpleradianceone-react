@@ -43,6 +43,7 @@ import CreateLeadModal from "../../components/modals/leads/CreateLeadModal";
 import AddCompanyUserModal from "../../components/modals/company-user/AddCompanyUserModal";
 import AddProductModal from "../../components/modals/products/AddProductModal";
 import AddTeamModal from "../../components/modals/teams/AddTeamModal";
+import NotificationManagement from "../../components/views/notification/NotificationManagement";
 
 
 export const router = createBrowserRouter([
@@ -72,6 +73,19 @@ export const router = createBrowserRouter([
       <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
         <SignInForm />
       </AuthLayout>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.NOTIFICATION,
+    element: (
+   <PrivateRoute>
+        <div>
+          <Navbar>
+            <NotificationManagement />
+          </Navbar>
+        </div>
+      </PrivateRoute>
     ),
   },
   {

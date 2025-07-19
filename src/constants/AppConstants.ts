@@ -34,8 +34,11 @@ export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
 
+// company captcha key
 export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
 
+// vaibhav captcha key
+// export const SITE_KEY = "6Lfk8W0rAAAAAOTUzGGWBnX9C0Jhta2zRZYt3fXf";
 export const STATUS_CODE = {
     OK : 200,
     UNATHORISED : 401,

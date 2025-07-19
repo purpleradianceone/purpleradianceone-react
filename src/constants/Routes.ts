@@ -15,7 +15,7 @@ const ROUTES_URL = {
     PRODUCT_MANAGEMENT : "/home/manage-products/products",
     LEAD_SETTINGS : "/settings/lead",
     LEAD_IMPORT_CSV : "/home/manage-leads/leads/import",
-
+    NOTIFICATION: "/home/notifications",
 
     TEAM_MANAGEMENT : "/home/manage-teams/teams",
     PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
