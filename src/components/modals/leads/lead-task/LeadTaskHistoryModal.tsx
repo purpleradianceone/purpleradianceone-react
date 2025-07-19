@@ -166,6 +166,9 @@ function LeadTaskHistoryModal({
       if (prevTask.resultOutcome !== currentTask.resultOutcome) {
         changes.push(`Outcome changed from "${currentTask.resultOutcome || 'N/A'}" to "${prevTask.resultOutcome || 'N/A'}"`);
       }
+      if (prevTask.isActive !== currentTask.isActive) {
+        changes.push(`Task Status Changed from "${currentTask.isActive ? 'Active' : 'Inactive'}" to "${prevTask.isActive ? 'Active' : 'Inactive'}"`);
+      }
 
       const prevDetails = getLeadTaskJsonData(currentTask);
       const currentDetails = getLeadTaskJsonData(prevTask);

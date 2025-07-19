@@ -207,7 +207,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
       <div>
         <header>
           <nav className="z-20 bg-white border-b border-gray-200 fixed w-full  top-0 h-12">
-            <div className="px-4 py-1 lg:px-6">
+            <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : ""
@@ -375,7 +375,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           )}
 
                           <NavItem
-                            to={ROUTES_URL.LEAD_SETTINGS}
+                            to={ROUTES_URL.COMPANY_SETTING}
                             icon={<SettingsIcon size={SIZE.TWENTY} />}
                             label=""
                             onClick={() => setIsDropdownOpen(false)}

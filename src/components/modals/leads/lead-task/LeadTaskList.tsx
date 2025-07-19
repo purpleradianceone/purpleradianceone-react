@@ -403,7 +403,7 @@ function LeadTaskList({
               {leadTasks.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`bg-${activity.colorCode} min-h-16 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex items-start space-x-2 border border-gray-100 relative`}
+                  className={`${activity.isActive ? "bg-green-100" : "bg-red-50"} min-h-16 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex items-start space-x-2 border border-gray-100 relative`}
                 >
                   {/* Activity Icon */}
                   <div className="flex-shrink-0 p-1 bg-blue-100 rounded-full">
