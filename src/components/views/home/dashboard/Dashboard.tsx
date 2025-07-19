@@ -196,7 +196,7 @@ function Dashboard() {
     const postDataToGetLeads = {
       company_id: loginStatus.companyId,
       year : currentYear,
-      ownerid: loginStatus.id,
+      ownerid: companyPipelineView ? null : loginStatus.id,
       requestedby_id: loginStatus.id,
     };
     try {
@@ -249,6 +249,7 @@ function Dashboard() {
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
       company_user_id:loginStatus.id,
+      isactive : true,
       requestedby_id: loginStatus.id,
     };
 
@@ -309,6 +310,7 @@ function Dashboard() {
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
       company_user_id:loginStatus.id,
+      isactive : true,
       requestedby_id: loginStatus.id,
     };
 
@@ -369,6 +371,7 @@ function Dashboard() {
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
       company_user_id:loginStatus.id,
+      isactive : true,
       requestedby_id: loginStatus.id,
     };
 
@@ -430,8 +433,7 @@ function Dashboard() {
     window.history.pushState(null, document.title, window.location.href);
 
     setDashboardLayout([
-      "metricCards",//
-      
+      "metricCards",
        "salesChart",
       "pipelineChart",
       "pendingTasks",
@@ -494,7 +496,7 @@ function Dashboard() {
   useEffect(() => {
      setMonthlyAverageLeads([]);
     getLeadsMonthlyAverage();
-  },[currentYear])
+  },[currentYear,companyPipelineView])
 
   useEffect(() => {
     // console.log("current time "); // Removed for cleaner console
@@ -630,7 +632,7 @@ function Dashboard() {
       </div>
     ),
     salesChart: (
-      <div key="salesChart" className="min-h-[700px]">
+      <div key="salesChart" className="min-h-[500px]">
         <SalesChart 
         leadsData={monthlyAverageLeads}
         currentYear={currentYear}
@@ -642,7 +644,10 @@ function Dashboard() {
     pendingTasks: (
       <div
         key="pendingTasks"
-        className="h-full overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <UpcomingTasks
           isLoading={isTasksLoading}
