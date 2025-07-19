@@ -21,6 +21,7 @@ const SalesChart = ({
 }, 0);
 
 const totalConvertedLeads = leadsData.reduce((sum, data) => {
+  console.log(sum)
   return sum + data.monthlyConvertedLeads;
 }, 0);
 
@@ -32,20 +33,20 @@ const ongoingCurrentYear = new Date().getFullYear()
   const maxValue = Math.max(...salesData, ...revenueData);
 
   return (
-    <div className="min-h-full bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="min-h-full bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Sales Performance</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Sales Performance</h3>
           <p className="text-gray-600">Monthly sales and revenue trends</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center">
             <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Average Monthly Leads</span>
+            <span className="text-xs font-medium text-gray-700">Average Monthly Leads</span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Monthly Converted Leads</span>
+            <span className="text-xs font-medium text-gray-700">Monthly Converted Leads</span>
           </div>
            <div className="flex items-center text-gray-800 bg-gray-100 px-3 py-1 rounded-full space-x-2">
       <button
@@ -56,7 +57,7 @@ const ongoingCurrentYear = new Date().getFullYear()
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
-      <span className="text-sm font-semibold">{currentYear}</span>
+      <span className="text-xs font-semibold">{currentYear}</span>
       <button
         onClick={handleNextYear}
         className="p-1 rounded-full hover:bg-gray-200 transition-colors"
@@ -101,17 +102,17 @@ const ongoingCurrentYear = new Date().getFullYear()
         </div>
       </div>
       
-      <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-gray-100">
+      <div className="grid grid-cols-3 gap-3 mt-4 pt-6 border-t border-gray-100">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">{totalLeads}</p>
+          <p className="text-xl font-bold text-gray-900">{totalLeads}</p>
           <p className="text-sm text-gray-600">Total Leads</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-emerald-600">{totalConvertedLeads}</p>
+          <p className="text-xl font-bold text-emerald-600">{totalConvertedLeads}</p>
           <p className="text-sm text-gray-600">Total Converted Leads</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-blue-600">{conversionRate.toFixed(2)}%</p>
+          <p className="text-xl font-bold text-blue-600">{conversionRate.toFixed(2)}%</p>
           <p className="text-sm text-gray-600">Conversion Rate</p>
         </div>
       </div>
