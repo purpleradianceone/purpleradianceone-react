@@ -11,7 +11,7 @@ type LeadTaskType = {
   assignedToId : number[];
   assignedToName : string[];
   dueDateTime : string;
-  completedAtDateTime : string;
+  completedAtDateTime? : string;
   leadActivityDetails : any;
   isActive : boolean;
   createdOn : string;
@@ -22,6 +22,8 @@ type LeadTaskType = {
   leadTaskActivityName : string;
   leadTaskPriorityName : string;
   leadTaskStageName : string;
+  overdueStatus? : string;
+  completedAt? : string;
 }
 
 export default LeadTaskType;

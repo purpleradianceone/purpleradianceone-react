@@ -14,7 +14,6 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import AddCompanyUsersEmailAttendeesModal from "../../meetings/AddCompanyUsersEmailAttendeesModal";
 import {
   NUMBER_VALUES,
   SIZE,
@@ -34,6 +33,7 @@ import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import { format, parse } from "date-fns";
 import { createPortal } from "react-dom";
+import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -98,6 +98,7 @@ function UpdateLeadTaskModal({
   const [selectedCompanyUsers, setSelectedCompanyUsers] = useState<
     CompanyUsersSearchProps[]
   >([]);
+  const [isActive , setIsActive] = useState<boolean>(leadTask.isActive);
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -119,22 +120,16 @@ function UpdateLeadTaskModal({
       const leadContacts = leadDetailsJsonData.leadContact;
 
       if (leadContacts.length !== 0) {
-        console.log("inside If");
-        console.log(leadContacts);
         setLeadContactDataSelectedArray(leadContacts);
         leadContacts.map((data: LeadContactType) => {
           setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
         });
       } else {
-        console.log("inside else");
-        console.log(leadContacts);
         setLeadContactDataSelectedArray([]);
         setAddCompanyLeadContactIdArray([]);
       }
     } else if (leadDetailsJsonData.address) {
       const leadAddress = leadDetailsJsonData.address;
-      console.log("Address Found");
-      console.log(leadAddress);
       setPhysicalMeetingAddress(leadAddress);
     }
 
@@ -204,7 +199,6 @@ function UpdateLeadTaskModal({
 
   const generateTaskDetailsJson = () => {
     if (leadActivityId !== 3) {
-      console.log(leadContactDataSelectedArray);
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -219,6 +213,16 @@ function UpdateLeadTaskModal({
   };
 
   const UpdateLeadTask = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const jsonData = generateTaskDetailsJson();
+
+    const originalLeadActivityDetailsString = leadTask.leadActivityDetails;
+
+// If leadTask.leadActivityDetails is an object (after parsing in useEffect):
+// This is safer if you've already parsed it and use the parsed object
+const originalLeadDetailsObject = JSON.parse(originalLeadActivityDetailsString);
+const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+
     if (leadActivityId === 0) {
       showMessageSnackbar({
         message: "Please Select Lead Task Activity",
@@ -258,9 +262,22 @@ function UpdateLeadTaskModal({
       });
       return;
     }
+    else if(
+      (subject === leadTask.subject) && 
+      (description === leadTask.description) &&
+      (leadTaskStageId === leadTask.leadTaskStageId) &&
+      (leadTaskPriorityId === leadTask.leadTaskPriorityId) &&
+      (dueDate === dueDateValue) &&
+      (dueTime === dueTimeValue) &&
+      (resultOutcome === leadTask.resultOutcome) &&
+      (assignedTo === leadTask.assignedToId) &&
+      (jsonData === stringifiedOriginalData)
+    ){
+      showMessageSnackbar({message : "Not made changes to task", type : "error"});
+      return;
+    }
+
     
-    event.preventDefault();
-    const jsonData = generateTaskDetailsJson();
 
     const updateLeadTaskPostData = {
       company_id: loginStatus.companyId,
@@ -273,15 +290,10 @@ function UpdateLeadTaskModal({
       assignedto: assignedTo,
       due_date_time: `${dueDate} ${dueTime}:00`,
       lead_activity_details: jsonData,
-      isactive: leadTask.isActive,
+      isactive: isActive,
       updatedby_id: loginStatus.id,
     };
-    console.log(updateLeadTaskPostData);
-    if (leadTask.leadActivityId === 3) {
-      console.log(physicalMeetingAddress);
-    } else {
-      console.log(leadContactDataSelectedArray);
-    }
+
     axios
       .post(POST_API.UPDATE_LEAD_TASK, updateLeadTaskPostData, {
         withCredentials: true,
@@ -307,7 +319,6 @@ function UpdateLeadTaskModal({
       })
       .catch(async (error) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
-          console.log(error);
           const refreshTokenResponse = await RefreshToken({
             callFunctionWithEvent: UpdateLeadTask,
           });
@@ -353,6 +364,63 @@ function UpdateLeadTaskModal({
     }
   };
   const timeOptions = generateTimeOptions();
+
+  const handleIsActiveCheckboxChange = async(event : React.ChangeEvent<HTMLInputElement> ) => {
+    const { checked } = event.target;
+
+    const jsonData = generateTaskDetailsJson();
+
+    const updateLeadTaskPostData = {
+      company_id: loginStatus.companyId,
+      id: leadTask.id,
+      lead_task_priority_id: leadTaskPriorityId,
+      lead_task_stage_id: leadTaskStageId,
+      subject: subject,
+      description: description,
+      result_outcome: resultOutcome,
+      assignedto: assignedTo,
+      due_date_time: `${dueDate} ${dueTime}:00`,
+      lead_activity_details: jsonData,
+      isactive: checked,
+      updatedby_id: loginStatus.id,
+    };
+
+    axios
+      .post(POST_API.UPDATE_LEAD_TASK, updateLeadTaskPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          if (response.data.status) {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "success",
+            });
+            setIsActive(checked);
+            handleLeadTaskUpdate();
+            // setTimeout(() => {
+            //   handleClose(false);
+            // }, 2000);
+          } else {
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "error",
+            });
+          }
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithEvent: handleIsActiveCheckboxChange,
+          });
+          if (refreshTokenResponse) {
+            handleIsActiveCheckboxChange(event);
+          }
+        }
+      });
+
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -578,6 +646,25 @@ function UpdateLeadTaskModal({
                 }}
               ></TextAreaInput>
             </div>
+            <div className="flex items-center col-span-2 justify-between py-1 border-b border-blue-100">
+              <label
+                htmlFor="isActive"
+                className="text-lg text-gray-700 cursor-pointer"
+              >
+                Active
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={isActive}
+                  onChange={handleIsActiveCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
           </div>
             
             {selectedCompanyUsers.length != 0 && (
@@ -643,16 +730,17 @@ function UpdateLeadTaskModal({
           </div>
         </div>
       </div>
-      <AddCompanyUsersEmailAttendeesModal
+      <LeadAssociatedUsersModal
         isOpen={isAssignUsersModalOpen}
         onClose={() => {
           setIsAssignUsersModalOpen(false);
         }}
+        leadId={leadTask.leadId}
         addCompanyTeamUserArray={assignedTo}
         handleAddCompanyUserEmailCheckboxChange={
           handleAddCompanyUserCheckboxChange
         }
-      ></AddCompanyUsersEmailAttendeesModal>
+      ></LeadAssociatedUsersModal>
 
       {isAddCompanyLeadContactModalOpen && (
         <CompanyLeadContactsSelectionAgGrid

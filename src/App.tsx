@@ -13,6 +13,7 @@ import { ZoomMeetingContextProvider } from "./context/meeting/ZoomMeetingContext
 import { UserPreferenceContextProvider } from "./context/user/UserPreference";
 import { NotificationProvider } from "./context/notification/NotificationProvider";
 import { Toaster } from "react-hot-toast";
+import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
 
 /**
  *
@@ -20,7 +21,8 @@ import { Toaster } from "react-hot-toast";
  */
 function App() {
   return (
-   
+   <NotificationCountContextProvider>
+    
       <UserPreferenceContextProvider>
         <PanelProvider>
           <ZoomMeetingContextProvider>
@@ -37,6 +39,7 @@ function App() {
           </ZoomMeetingContextProvider>
         </PanelProvider>
       </UserPreferenceContextProvider>
+      </NotificationCountContextProvider>
     
   );
 }

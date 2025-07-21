@@ -65,6 +65,9 @@ function CompanyPreferenceSetting() {
             id: response.data.id,
             companyId: response.data.companyId,
             isEmailServiceOn: response.data.is_email_service_on,
+            isNotificationServiceMobileOn : response.data.is_notification_service_mobile_on,
+            isNotificatonServiceWebOn : response.data.is_notification_service_web_on,
+            uIdWebLeadCapture : response.data.uid_web_lead_capture,
             createdBy: response.data.createdby,
             createdOn: response.data.createdon,
             updatedBy: response.data.updatedby,
@@ -98,7 +101,9 @@ function CompanyPreferenceSetting() {
 
     const updateCompanyPreferencesPostData = {
       company_id: loginStatus.companyId,
-      is_email_service_on: checked,
+      is_email_service_on: name === "isEmailServiceOn" ? checked : companyPreferences!.isEmailServiceOn,
+      is_notification_service_mobile_on : name === "isNotificationServiceMobileOn" ? checked : companyPreferences!.isNotificationServiceMobileOn,
+      is_notification_service_web_on : name === "isNotificatonServiceWebOn" ? checked : companyPreferences!.isNotificatonServiceWebOn,
       updatedby_id: loginStatus.id,
     };
     await axios
@@ -171,6 +176,46 @@ function CompanyPreferenceSetting() {
                   id="isEmailServiceOn"
                   name="isEmailServiceOn"
                   checked={companyPreferences?.isEmailServiceOn}
+                  onChange={handleCompanyPreferenceCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-blue-100">
+              <label
+                htmlFor="isNotificationServiceMobileOn"
+                className="text-lg text-gray-700 cursor-pointer"
+              >
+                Mobile App Notifications
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isNotificationServiceMobileOn"
+                  name="isNotificationServiceMobileOn"
+                  checked={companyPreferences?.isNotificationServiceMobileOn}
+                  onChange={handleCompanyPreferenceCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-blue-100">
+              <label
+                htmlFor="isNotificatonServiceWebOn"
+                className="text-lg text-gray-700 cursor-pointer"
+              >
+                Web App Notifications
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isNotificatonServiceWebOn"
+                  name="isNotificatonServiceWebOn"
+                  checked={companyPreferences?.isNotificatonServiceWebOn}
                   onChange={handleCompanyPreferenceCheckboxChange}
                   className="sr-only peer"
                 />
