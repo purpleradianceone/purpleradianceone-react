@@ -31,6 +31,8 @@ import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import Lead from "../../../@types/lead-management/LeadManagementProps";
+import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
+import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
 
 const MeetingScheduler = () => {
   const [title, setTitle] = useState<string>("");
@@ -42,12 +44,16 @@ const MeetingScheduler = () => {
   const [newAttendeeEmail, setNewAttendeeEmail] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isCreating, setIsCreating] = useState<boolean>(false); // Simulate meeting creation
-  const [selectedMeetingPlatform, setSelectedMeetingPlatform] = useState<string>();
+  const [selectedMeetingPlatform, setSelectedMeetingPlatform] =
+    useState<string>();
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
+  useGoogleMeetStatus();
+  useZoomMeetingsStatus();
+
   const { userPreference } = useUserPreference();
-  const {meetingPlatform} = useMeetingPlatform();
+  const { meetingPlatform } = useMeetingPlatform();
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -55,7 +61,10 @@ const MeetingScheduler = () => {
 
   const { currentTime } = useServerCurrentTime();
   const [serverCurrentTime, setServerCurrentTime] = useState<Date>();
-  const [isAddCompanyLeadContactModalOpen,setIsAddCompanyLeadContactModalOpen] = useState<boolean>(false);
+  const [
+    isAddCompanyLeadContactModalOpen,
+    setIsAddCompanyLeadContactModalOpen,
+  ] = useState<boolean>(false);
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -84,16 +93,16 @@ const MeetingScheduler = () => {
     useState<number[]>([loginStatus.id]);
   const [selectedCompanyUserDetailArray, setSelectedCompanyUserDetailArray] =
     useState<{ email: string; id: number }[]>([]);
-  const [isModalForLead,setIsModalForLead] = useState<boolean>(false);
+  const [isModalForLead, setIsModalForLead] = useState<boolean>(false);
 
-  const [addCompanyLeadContactIdArray,setAddCompanyLeadContactIdArray] = useState<number[]>([]);
-
+  const [addCompanyLeadContactIdArray, setAddCompanyLeadContactIdArray] =
+    useState<number[]>([]);
 
   const navigate = useNavigate();
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
 
-const [leadData,setLeadData] = useState<Lead>();
+  const [leadData, setLeadData] = useState<Lead>();
 
   const handleGoogleMeetAuth = () => {
     navigate(ROUTES_URL.GOOGLE_OAUTH);
@@ -101,21 +110,17 @@ const [leadData,setLeadData] = useState<Lead>();
 
   useEffect(() => {
     const openedFrom = searchParams.get("from");
-      if(!openedFrom){
-        setIsModalForLead(true);
-        const data =  sessionStorage.getItem("leadData");
-        if(data){
-            const leadSearchParam = JSON.parse(
-                       data
-                      );
-                      console.log(leadSearchParam)
-          setLeadData(leadSearchParam);
-        }
-        
+    if (!openedFrom) {
+      setIsModalForLead(true);
+      const data = sessionStorage.getItem("leadData");
+      if (data) {
+        const leadSearchParam = JSON.parse(data);
+        console.log(leadSearchParam);
+        setLeadData(leadSearchParam);
       }
-  },[searchParams])
+    }
+  }, [searchParams]);
   const createGoogleMeetMeeting = async () => {
-
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
     const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
     const pickerFormatString = "yyyy-MM-DD HH:mm";
@@ -134,51 +139,58 @@ const [leadData,setLeadData] = useState<Lead>();
     console.log(startDateTIme.toDate());
     console.log(endDateTime.toDate());
 
-    
-    if(title === ""){
-      showMessageSnackbar({message:"Please give title to meeting",type:"error"});
+    if (title === "") {
+      showMessageSnackbar({
+        message: "Please give title to meeting",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(startDate === ""){
-      showMessageSnackbar({message:"Please select start date",type:"error"});
+    } else if (startDate === "") {
+      showMessageSnackbar({
+        message: "Please select start date",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(startTime === ""){
-      showMessageSnackbar({message:"Please select start time",type:"error"});
+    } else if (startTime === "") {
+      showMessageSnackbar({
+        message: "Please select start time",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(endDate === ""){
-      showMessageSnackbar({message:"Please select end date",type:"error"});
+    } else if (endDate === "") {
+      showMessageSnackbar({ message: "Please select end date", type: "error" });
       setIsCreating(false);
       return;
-    }
-    else if(endTime === ""){
-      showMessageSnackbar({message:"Please select end time",type:"error"});
+    } else if (endTime === "") {
+      showMessageSnackbar({ message: "Please select end time", type: "error" });
       setIsCreating(false);
       return;
-    }
-    else if(selectedMeetingPlatform === ""){
-      showMessageSnackbar({message:"Please select meeting platform",type:"error"});
+    } else if (selectedMeetingPlatform === "") {
+      showMessageSnackbar({
+        message: "Please select meeting platform",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-     else if(endDateTime.toDate() > startDateTIme.toDate()){
-        showMessageSnackbar({message:"End Time should be greater than start time",type:"error"});
-        setIsCreating(false);
+    } else if (endDateTime.toDate() > startDateTIme.toDate()) {
+      showMessageSnackbar({
+        message: "End Time should be greater than start time",
+        type: "error",
+      });
+      setIsCreating(false);
       return;
-    }
-    else if (serverCurrentTime! < startDateTIme.toDate()) {
+    } else if (serverCurrentTime! < startDateTIme.toDate()) {
       console.log(serverCurrentTime! > startDateTIme.toDate());
-     showMessageSnackbar({message:"Connot create meeting as start time is in the past zoom",type:"error"});
-     setIsCreating(false);
+      showMessageSnackbar({
+        message: "Connot create meeting as start time is in the past zoom",
+        type: "error",
+      });
+      setIsCreating(false);
       return;
     }
-    
-
-    
 
     if (
       title !== "" &&
@@ -190,7 +202,6 @@ const [leadData,setLeadData] = useState<Lead>();
     ) {
       setIsCreating(true);
 
-
       const postDataCreateGoogleMeetMeeting = {
         company_id: loginStatus.companyId,
         summary_title: title,
@@ -201,8 +212,8 @@ const [leadData,setLeadData] = useState<Lead>();
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
-        is_meeting_created_from_lead : isModalForLead ? true : false,
-        lead_id : isModalForLead ? leadData?.id : null,
+        is_meeting_created_from_lead: isModalForLead ? true : false,
+        lead_id: isModalForLead ? leadData?.id : null,
         createdby: loginStatus.id,
       };
       axios
@@ -231,16 +242,19 @@ const [leadData,setLeadData] = useState<Lead>();
           if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
             handleGoogleMeetAuth();
           }
-        }).finally(() => {
-          setIsCreating(false);
         })
+        .finally(() => {
+          setIsCreating(false);
+        });
     } else {
-      showMessageSnackbar({message:"Please fill the required fields",type:"error"});
+      showMessageSnackbar({
+        message: "Please fill the required fields",
+        type: "error",
+      });
     }
   };
   const createZoomMeeting = async () => {
-
-        const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
+    const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
     const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
     const pickerFormatString = "yyyy-MM-DD HH:mm";
 
@@ -257,49 +271,58 @@ const [leadData,setLeadData] = useState<Lead>();
 
     console.log(startDateTIme.toDate());
     console.log(endDateTime.toDate());
-    if(title === ""){
-      showMessageSnackbar({message:"Please give title to meeting",type:"error"});
+    if (title === "") {
+      showMessageSnackbar({
+        message: "Please give title to meeting",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(startDate === ""){
-      showMessageSnackbar({message:"Please select start date",type:"error"});
+    } else if (startDate === "") {
+      showMessageSnackbar({
+        message: "Please select start date",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(startTime === ""){
-      showMessageSnackbar({message:"Please select start time",type:"error"});
+    } else if (startTime === "") {
+      showMessageSnackbar({
+        message: "Please select start time",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-    else if(endDate === ""){
-      showMessageSnackbar({message:"Please select end date",type:"error"});
+    } else if (endDate === "") {
+      showMessageSnackbar({ message: "Please select end date", type: "error" });
       setIsCreating(false);
       return;
-    }
-    else if(endTime === ""){
-      showMessageSnackbar({message:"Please select end time",type:"error"});
+    } else if (endTime === "") {
+      showMessageSnackbar({ message: "Please select end time", type: "error" });
       setIsCreating(false);
       return;
-    }
-    else if(selectedMeetingPlatform === ""){
-      showMessageSnackbar({message:"Please select meeting platform",type:"error"});
+    } else if (selectedMeetingPlatform === "") {
+      showMessageSnackbar({
+        message: "Please select meeting platform",
+        type: "error",
+      });
       setIsCreating(false);
       return;
-    }
-     else if(endDateTime.toDate() < startDateTIme.toDate()){
-        showMessageSnackbar({message:"End Time should be greater than start time",type:"error"});
-        setIsCreating(false);
+    } else if (endDateTime.toDate() < startDateTIme.toDate()) {
+      showMessageSnackbar({
+        message: "End Time should be greater than start time",
+        type: "error",
+      });
+      setIsCreating(false);
       return;
-    }
-    else if (serverCurrentTime! > startDateTIme.toDate()) {
+    } else if (serverCurrentTime! > startDateTIme.toDate()) {
       console.log(serverCurrentTime! < startDateTIme.toDate());
-     showMessageSnackbar({message:"Connot create meeting as start time is in the past",type:"error"});
-     setIsCreating(false);
+      showMessageSnackbar({
+        message: "Connot create meeting as start time is in the past",
+        type: "error",
+      });
+      setIsCreating(false);
       return;
     }
-    
-
 
     if (
       title !== "" &&
@@ -320,8 +343,8 @@ const [leadData,setLeadData] = useState<Lead>();
         attendees_email_all: attendees,
         attendees_company_user_id: selectedCompanyUsersIdArray,
         company_user_id: loginStatus.id,
-        is_meeting_created_from_lead : isModalForLead ? true : false,
-        lead_id : isModalForLead ? leadData?.id : null,
+        is_meeting_created_from_lead: isModalForLead ? true : false,
+        lead_id: isModalForLead ? leadData?.id : null,
         createdby: loginStatus.id,
       };
       await axios
@@ -355,19 +378,21 @@ const [leadData,setLeadData] = useState<Lead>();
           setSelectedMeetingPlatform("");
           handleCloseMeetingModal();
         })
-        .catch(async(error : ApiError | any) => {
-          if(error.status === STATUS_CODE.UNATHORISED){
-            const refreshTokenResponse = await RefreshToken({callFunction:createZoomMeeting})
-            if(refreshTokenResponse){
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: createZoomMeeting,
+            });
+            if (refreshTokenResponse) {
               createZoomMeeting();
             }
+          } else if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+            handleZoomMeetingsOAuth();
           }
-          else if(error.status === STATUS_CODE.PERMANENT_REDIRECT){
-           handleZoomMeetingsOAuth();
-          }
-        }).finally(() => {
-          setIsCreating(false);
         })
+        .finally(() => {
+          setIsCreating(false);
+        });
     }
   };
 
@@ -396,7 +421,7 @@ const [leadData,setLeadData] = useState<Lead>();
         if (response.data.length === 0) {
           return 0;
         }
-        
+
         setSelectedCompanyUserDetailArray((prev) => [
           ...prev,
           {
@@ -413,7 +438,7 @@ const [leadData,setLeadData] = useState<Lead>();
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
         });
-        if(refreshTokenStatus){
+        if (refreshTokenStatus) {
           isEmailIsOfCompanyUser(email);
         }
       }
@@ -432,7 +457,6 @@ const [leadData,setLeadData] = useState<Lead>();
         setNewAttendeeEmail("");
         return;
       } else {
-        
         setAttendees([...attendees, newAttendeeEmail.trim()]);
         setNewAttendeeEmail("");
         return;
@@ -458,7 +482,6 @@ const [leadData,setLeadData] = useState<Lead>();
     }
     return options;
   };
-
 
   const handleZoomMeetingsOAuth = () => {
     navigate(ROUTES_URL.ZOOM_OAUTH);
@@ -494,21 +517,25 @@ const [leadData,setLeadData] = useState<Lead>();
     }
   };
 
-  const handleCompanyLeadContactCheckBoxChange = (data : LeadContactType, event : React.ChangeEvent<HTMLInputElement>) => {
-      if(event.target.checked && data.email){
-        setAddCompanyLeadContactIdArray((prev) => [...prev,data.id])
-        setAttendees((prev) => [...prev,data.email])
-      }
-      else if(event.target.checked && !data.email){
-        showMessageSnackbar({message : "please add email for contact and then try again",type : "error"})
-      }
-      else if(!event.target.checked && data.email){
-        setAddCompanyLeadContactIdArray((prev) => prev.filter((id) => id !== data.id));
-        setAttendees((prev) =>
-          prev.filter((email) => email !== data.email)
+  const handleCompanyLeadContactCheckBoxChange = (
+    data: LeadContactType,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked && data.email) {
+      setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
+      setAttendees((prev) => [...prev, data.email]);
+    } else if (event.target.checked && !data.email) {
+      showMessageSnackbar({
+        message: "please add email for contact and then try again",
+        type: "error",
+      });
+    } else if (!event.target.checked && data.email) {
+      setAddCompanyLeadContactIdArray((prev) =>
+        prev.filter((id) => id !== data.id)
       );
-      }
-  }
+      setAttendees((prev) => prev.filter((email) => email !== data.email));
+    }
+  };
 
   const handleCloseMeetingModal = () => {
     const openedFrom = searchParams.get("from");
@@ -662,8 +689,7 @@ const [leadData,setLeadData] = useState<Lead>();
           </div>
         </div>
         <div className="mb-1"></div>
-        <div className="mb-1 grid grid-cols-3 gap-4">
-        </div>
+        <div className="mb-1 grid grid-cols-3 gap-4"></div>
         <div className="mb-1">
           <TextAreaInput
             cols={2}
@@ -675,7 +701,13 @@ const [leadData,setLeadData] = useState<Lead>();
           />
         </div>
         <div className="mb-1">
-          <div className={isModalForLead ? "grid grid-cols-8 gap-2" : "grid grid-cols-7 gap-2"}>
+          <div
+            className={
+              isModalForLead
+                ? "grid grid-cols-8 gap-2"
+                : "grid grid-cols-7 gap-2"
+            }
+          >
             <div className="col-span-5">
               <FormInput
                 type="email"
@@ -696,16 +728,15 @@ const [leadData,setLeadData] = useState<Lead>();
               </Button>
             </div>
             {isModalForLead && (
-               <div className="col-span-1 mt-7">
-              <Button
-                onClick={() => {
-                  setIsAddCompanyLeadContactModalOpen(true);
-                }}
-              
-              >
-                <Contact2 className="h-6 w-4" />
-              </Button>
-            </div>
+              <div className="col-span-1 mt-7">
+                <Button
+                  onClick={() => {
+                    setIsAddCompanyLeadContactModalOpen(true);
+                  }}
+                >
+                  <Contact2 className="h-6 w-4" />
+                </Button>
+              </div>
             )}
             <div className="col-span-1 mt-7">
               <Button
@@ -733,7 +764,6 @@ const [leadData,setLeadData] = useState<Lead>();
                     <Button
                       size="sm"
                       onClick={() => {
-                   
                         selectedCompanyUserDetailArray.map((user) => {
                           if (user.email === attendee) {
                             handleRemoveAttendee(attendee, user.id);
@@ -775,15 +805,26 @@ const [leadData,setLeadData] = useState<Lead>();
                   } else {
                     handleGoogleMeetAuth();
                   }
-                } else if (selectedMeetingPlatform === meetingPlatform[1].name) {
+                } else if (
+                  selectedMeetingPlatform === meetingPlatform[1].name
+                ) {
                   if (zoomMeetingStatus.isConnected) {
                     createZoomMeeting();
                   } else {
                     handleZoomMeetingsOAuth();
                   }
-                }
-                else{
-                  showMessageSnackbar({message : "select the meeting platform first",type:"error"})
+                } else if (
+                  selectedMeetingPlatform === meetingPlatform[2].name
+                ) {
+                  showMessageSnackbar({
+                    message: "Microsofft teams is coming soon...!",
+                    type: "error",
+                  });
+                } else {
+                  showMessageSnackbar({
+                    message: "select the meeting platform first",
+                    type: "error",
+                  });
                 }
               }}
               disabled={
@@ -811,19 +852,19 @@ const [leadData,setLeadData] = useState<Lead>();
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
       />
       {isAddCompanyLeadContactModalOpen && (
-<CompanyLeadContactsSelectionAgGrid
-      isOpen={isAddCompanyLeadContactModalOpen}
-      onClose={()=> {
-        setIsAddCompanyLeadContactModalOpen(false);
-      }}
-      selectedLeadId={JSON.parse(sessionStorage.getItem("leadData")!).id}
-      addCompanyLeadContactIdArray={addCompanyLeadContactIdArray}
-      handleCompanyLeadContactCheckBoxChange={handleCompanyLeadContactCheckBoxChange}
-      />
-      )
+        <CompanyLeadContactsSelectionAgGrid
+          isOpen={isAddCompanyLeadContactModalOpen}
+          onClose={() => {
+            setIsAddCompanyLeadContactModalOpen(false);
+          }}
+          selectedLeadId={JSON.parse(sessionStorage.getItem("leadData")!).id}
+          addCompanyLeadContactIdArray={addCompanyLeadContactIdArray}
+          handleCompanyLeadContactCheckBoxChange={
+            handleCompanyLeadContactCheckBoxChange
+          }
+        />
+      )}
 
-      }
-      
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
