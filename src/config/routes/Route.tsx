@@ -44,12 +44,17 @@ import AddCompanyUserModal from "../../components/modals/company-user/AddCompany
 import AddProductModal from "../../components/modals/products/AddProductModal";
 import AddTeamModal from "../../components/modals/teams/AddTeamModal";
 import NotificationManagement from "../../components/views/notification/NotificationManagement";
-
+import MobileRedirectWrapper from "./MobileRedirectWrapper";
+import DownloadAppPage from "../../components/views/mobile/DownloadApp";
 
 export const router = createBrowserRouter([
   {
     path: ROUTES_URL.NOT_FOUND,
     element: <NotFoundPage></NotFoundPage>,
+  },
+  {
+    path: ROUTES_URL.DOWNLOAD_APP,
+    element: <DownloadAppPage></DownloadAppPage>,
   },
   {
     path: ROUTES_URL.LANDING_PAGE,
@@ -70,22 +75,26 @@ export const router = createBrowserRouter([
   {
     path: ROUTES_URL.SIGN_IN,
     element: (
-      <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
-        <SignInForm />
-      </AuthLayout>
+      <MobileRedirectWrapper>
+        <AuthLayout title="Welcome back!" subtitle="Sign in to your account">
+          <SignInForm />
+        </AuthLayout>
+      </MobileRedirectWrapper>
     ),
   },
 
   {
     path: ROUTES_URL.NOTIFICATION,
     element: (
-   <PrivateRoute>
-        <div>
-          <Navbar>
-            <NotificationManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <NotificationManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
@@ -133,306 +142,356 @@ export const router = createBrowserRouter([
   {
     path: ROUTES_URL.HOME,
     element: (
-      <PrivateRoute>
-        <div className="min-h-95vh">
-          <Navbar>
-            <Dashboard></Dashboard>
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div className="min-h-95vh">
+            <Navbar>
+              <Dashboard></Dashboard>
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
 
   {
     path: ROUTES_URL.GET_COMPANY_USERS,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <GetCompanyUsers />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <GetCompanyUsers />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
 
   {
     path: ROUTES_URL.GET_LEAD_MANAGEMENT,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <LeadManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <LeadManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
 
   {
     path: ROUTES_URL.PRODUCT_MANAGEMENT,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <ProductManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ProductManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.COMPANY_SETTING,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <SettingsPage />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <SettingsPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.TEAM_MANAGEMENT,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <TeamManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <TeamManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <ProductTeamManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ProductTeamManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.CREATE_SUBSCRIPTION,
     element: (
-      <PrivateRoute>
-        <div>
-          <AuthLayout
-            title="Activate Subscription!"
-            subtitle="Enter the number of users and subscription duration to proceed"
-          >
-            <CreateSubscription
-              isOpen={true}
-              isSubscrptionFromLoginPage={true}
-            />
-          </AuthLayout>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <AuthLayout
+              title="Activate Subscription!"
+              subtitle="Enter the number of users and subscription duration to proceed"
+            >
+              <CreateSubscription
+                isOpen={true}
+                isSubscrptionFromLoginPage={true}
+              />
+            </AuthLayout>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.GET_SUBSCRIPTION,
     element: (
-      <PrivateRoute>
-        <div>
-          <Navbar>
-            <SubscriptionManagement />
-          </Navbar>
-        </div>
-      </PrivateRoute>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <SubscriptionManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
     path: ROUTES_URL.PANEL_CUSTOMIZER,
     element: (
-      <PrivateRoute>
-        <div>
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <PanelCustomizer />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.LEAD_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
           <Navbar>
-            <PanelCustomizer />
+            <ViewLeadManagement />
           </Navbar>
-        </div>
-      </PrivateRoute>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
-    path :ROUTES_URL.LEAD_DETAILS,
-    element : (
-      <PrivateRoute>
-        <Navbar>
-          <ViewLeadManagement/>
-        </Navbar>
-      </PrivateRoute>
-    )
-  },
-  {
-    path:ROUTES_URL.SCHEDULE_MEETING,
-    element : (
-      <PrivateRoute>
-        <Navbar>
-          <MeetingScheduler>
-          </MeetingScheduler>
-        </Navbar>
-      </PrivateRoute>
-    )
-  },
-  {
-    path :ROUTES_URL.EMAIL_TEMPLATE,
-    element : (
-      <PrivateRoute>
-      <Navbar>
-        <TemplatesPage/>
-      </Navbar>
-      </PrivateRoute>
-    )
-  },
-  {
-    path :ROUTES_URL.EMAIL_TEMPLATE_CREATE,
-    element : (
-      <PrivateRoute>
-         <Navbar>
-        <EditorCanvas/>
-        </Navbar>
-      </PrivateRoute>
+    path: ROUTES_URL.SCHEDULE_MEETING,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <MeetingScheduler></MeetingScheduler>
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
-    path :ROUTES_URL.EMAIL_TEMPLATE_UPDATE,
-    element : (
-      <PrivateRoute>
-         <Navbar>
-        <EditorCanvasWithJson />
-        </Navbar>
-      </PrivateRoute>
-    ),
-  },
-   {
-    path :ROUTES_URL.EMAIL_SETTING,
-    element : (
-      <PrivateRoute>
-         <Navbar>
-        <EmailSetting/>
-        </Navbar>
-      </PrivateRoute>
+    path: ROUTES_URL.EMAIL_TEMPLATE,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <TemplatesPage />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
     ),
   },
   {
-    path :ROUTES_URL.USER_PROFILE_SETTING,
-    element : (
-      <PrivateRoute>
-        <Navbar>
-          <UserPrerefenceManagement/>
-        </Navbar>
-      </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.GOOGLE_OAUTH,
-    element : (
+    path: ROUTES_URL.EMAIL_TEMPLATE_CREATE,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <EditorCanvas />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.EMAIL_TEMPLATE_UPDATE,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <EditorCanvasWithJson />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.EMAIL_SETTING,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <EmailSetting />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.USER_PROFILE_SETTING,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <UserPrerefenceManagement />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.GOOGLE_OAUTH,
+    element: (
+      <MobileRedirectWrapper>
         <GoogleOAuthConsent></GoogleOAuthConsent>
-    )
+      </MobileRedirectWrapper>
+    ),
   },
   {
-    path : ROUTES_URL.ZOOM_OAUTH,
-    element : (
+    path: ROUTES_URL.ZOOM_OAUTH,
+    element: (
+      <MobileRedirectWrapper>
         <ZoomMeetingsOAuthConsent></ZoomMeetingsOAuthConsent>
-    )
+      </MobileRedirectWrapper>
+    ),
   },
   {
-    path : ROUTES_URL.GOOGLE_OAUTH_ANDROID,
-    element : (
-      <GoogleOAuthConsentAndroid></GoogleOAuthConsentAndroid>
-    )
+    path: ROUTES_URL.GOOGLE_OAUTH_ANDROID,
+    element: <GoogleOAuthConsentAndroid></GoogleOAuthConsentAndroid>,
   },
   {
-    path : ROUTES_URL.ZOOM_OAUTH_ANDROID,
-    element : (
+    path: ROUTES_URL.ZOOM_OAUTH_ANDROID,
+    element: (
       <ZoomMeetingsOAuthConsentAndroid></ZoomMeetingsOAuthConsentAndroid>
-    )
-  },{
-    path : ROUTES_URL.MEETINGS,
-    element : (
+    ),
+  },
+  {
+    path: ROUTES_URL.MEETINGS,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
           <Meetings></Meetings>
         </Navbar>
       </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.LEAD_IMPORT_CSV,
-    element :(
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.LEAD_IMPORT_CSV,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
           {/* <LeadImportCsv/> */}
-          <LeadImportCsvManagement/>
+          <LeadImportCsvManagement />
         </Navbar>
       </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.CREATE_LEAD,
-    element : (
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.CREATE_LEAD,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
           <CreateLeadModal
-          isOpen={true}
-          onClose={()=> {
-            window.history.back();
-          }}
+            isOpen={true}
+            onClose={() => {
+              window.history.back();
+            }}
           ></CreateLeadModal>
         </Navbar>
       </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.CREATE_COMPANY_USER,
-    element : (
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.CREATE_COMPANY_USER,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
           <AddCompanyUserModal
-          isOpen={true}
-          onClose={()=> {
-            window.history.back();
-          }}
+            isOpen={true}
+            onClose={() => {
+              window.history.back();
+            }}
           ></AddCompanyUserModal>
         </Navbar>
       </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.CREATE_PRODUCT,
-    element : (
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.CREATE_PRODUCT,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
-         <AddProductModal
-        isOpen={true}
-          onClose={()=> {
-            window.history.back();
-          }}
-          handleProductChangeOnAdd={()=>{
-
-          }}
-         ></AddProductModal>
+          <AddProductModal
+            isOpen={true}
+            onClose={() => {
+              window.history.back();
+            }}
+            handleProductChangeOnAdd={() => {}}
+          ></AddProductModal>
         </Navbar>
       </PrivateRoute>
-    )
-  },{
-    path : ROUTES_URL.CREATE_TEAM,
-    element : (
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.CREATE_TEAM,
+    element: (
+      <MobileRedirectWrapper>
       <PrivateRoute>
         <Navbar>
-         <AddTeamModal
-        isOpen={true}
-          onClose={()=> {
-            window.history.back();
-          }}
-          handleCompanyTeamChangeOnAdd={()=>{
-
-          }}
-         ></AddTeamModal>
+          <AddTeamModal
+            isOpen={true}
+            onClose={() => {
+              window.history.back();
+            }}
+            handleCompanyTeamChangeOnAdd={() => {}}
+          ></AddTeamModal>
         </Navbar>
       </PrivateRoute>
-    )
-  }
+      </MobileRedirectWrapper>
+    ),
+  },
 ]);
 export default router;
