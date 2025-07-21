@@ -46,5 +46,6 @@ const ROUTES_URL = {
     CREATE_COMPANY_USER : "/create/company-user",
     CREATE_PRODUCT : "/create/product",
     CREATE_TEAM : "/create/team",
+    DOWNLOAD_APP : "/download/app",
 }
 export default ROUTES_URL;
