@@ -104,8 +104,8 @@ function ZoomMeetingsOAuthConsent() {
         </button>
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In With Google</h2>
-          <p className="text-gray-600">Do you want to signin with your google account for managing meetings</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In With Zoom Meetings</h2>
+          <p className="text-gray-600">Do you want to signin with your Zoom account for managing meetings</p>
         </div>
 
         <div className="flex justify-end gap-3">

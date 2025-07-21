@@ -88,7 +88,7 @@ const PipelineChart = ({
 ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -98,15 +98,6 @@ const PipelineChart = ({
             Current pipeline status and conversion rates
           </p>
         </div>
-        {/* <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-            <Filter className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Filter</span>
-          </button>
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <MoreHorizontal className="w-5 h-5 text-gray-600" />
-          </button>
-        </div> */}
          <div className="flex items-center text-gray-800 min-w-38 bg-gray-100 px-3 py-1 rounded-full space-x-2">
       <button
       type="button"
@@ -128,13 +119,13 @@ const PipelineChart = ({
     </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {pipelineData.map((stage, index) => (
           <div key={index} className="">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <div className={`w-4 h-4 ${stage.color} rounded-full`}></div>
-                <span className="font-semibold text-gray-900">
+                <span className="font-medium text-xs text-gray-900">
                   {stage.stage}
                 </span>
               </div>
@@ -164,19 +155,19 @@ const PipelineChart = ({
         ))}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-gray-100">
-        <div className="grid grid-cols-2 gap-6">
+      <div className="mt-2 pt-1 border-t border-gray-100">
+        <div className="grid grid-cols-2 gap-3">
           <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-4">
             <p className="text-sm font-medium text-emerald-700 mb-1">
               Conversion Rate
             </p>
-            <p className="text-2xl font-bold text-emerald-800">{leadSummaryData.conversionRate}</p>
+            <p className="text-xl font-bold text-emerald-800">{leadSummaryData.conversionRate}</p>
           </div>
           <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4">
             <p className="text-sm font-medium text-blue-700 mb-1">
               Total Converted Leads
             </p>
-            <p className="text-2xl font-bold text-blue-800">{leadSummaryData.totalConvertedLeads}</p>
+            <p className="text-xl font-bold text-blue-800">{leadSummaryData.totalConvertedLeads}</p>
           </div>
         </div>
       </div>

@@ -30,18 +30,12 @@ import {
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
-import { useGoogleMeetContext } from "../../context/meeting/GoogleMeetContext";
-import { useZoomMeetingContext } from "../../context/meeting/ZoomMeetingContext";
 import { useUserPreference } from "../../context/user/UserPreference";
-
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
-
-  const {setGoogleMeetStatus} = useGoogleMeetContext();
-  const {setZoomMeetingStatus} = useZoomMeetingContext();
   const { setUserPreference } = useUserPreference();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
@@ -111,15 +105,6 @@ function SignInForm() {
       }
     }
 
-    if (
-      localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME) === STRING_VALUES.TRUE
-    ) {
-      localStorage.setItem(
-        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
-        JSON.stringify(loginUserCredentials)
-      );
-    }
-
     if (!captchaToken) {
       showMessageSnackbar({
         message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
@@ -133,227 +118,166 @@ function SignInForm() {
       message: MESSAGE.INPROCESS.LOGGING_IN,
     });
 
-    const captchaRequest = { token: captchaToken };
-
+    const user = {
+      email: loginUserCredentials.email,
+      captcha_token: captchaToken,
+      password: loginUserCredentials.password,
+    };
     axios
-      .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {
-        withCredentials: true,
-      })
+      .post(POST_API.SIGN_IN, user, { withCredentials: true })
       .then((response) => {
-        if (response) {
-          const user = {
-            email: loginUserCredentials.email,
-            password: loginUserCredentials.password,
+        if (response.data.status) {
+          loginStatusRef.current = response.data;
+          setLoginStatus({
+            id: response.data.id,
+            companyId: response.data.company_id,
+            companyName: response.data.company_name,
+            fullName: response.data.fullname,
+            email: response.data.email,
+            mobileNumber: response.data.mobilenumber,
+            message: response.data.message,
+            token: response.data.token,
+            status: response.data.status,
+            createdOn: response.data.createdon,
+            isActiveSubscription: response.data.isactive_subscription,
+            subscriptionAllowedUsers: response.data.subscription_allowed_users,
+            activeUsersInCompany: response.data.active_users_in_company,
+            subscriptionId: response.data.subscription_id,
+            startDateSubscription: response.data.start_date_subscription,
+            endDateSubscription: response.data.end_date_subscription,
+          });
+
+          // note: is status false , then it will navigate to create subscription page
+          if (!response.data.isactive_subscription) {
+            setTimeout(() => {
+              showMessageSnackbar({
+                message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+                type: "error",
+              });
+              navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+            }, 1500);
+            return; // ⬅️ Stops further execution
+          }
+
+          const getCrmModuleAccessData = {
+            company_id: response.data.company_id,
+            company_user_id: response.data.id,
+            requestedby: response.data.id,
           };
+
           axios
-            .post(POST_API.SIGN_IN, user, { withCredentials: true })
+            .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
+              withCredentials: true,
+            })
             .then((response) => {
-              if (response.data.status) {
-                loginStatusRef.current = response.data;
-                setLoginStatus({
-                  id: response.data.id,
-                  companyId: response.data.company_id,
-                  companyName: response.data.company_name,
-                  fullName: response.data.fullname,
-                  email: response.data.email,
-                  mobileNumber: response.data.mobilenumber,
-                  message: response.data.message,
-                  token: response.data.token,
-                  status: response.data.status,
-                  createdOn: response.data.createdon,
-                  isActiveSubscription: response.data.isactive_subscription,
-                  subscriptionAllowedUsers:
-                    response.data.subscription_allowed_users,
-                  activeUsersInCompany: response.data.active_users_in_company,
-                  subscriptionId: response.data.subscription_id,
-                  startDateSubscription: response.data.start_date_subscription,
-                  endDateSubscription: response.data.end_date_subscription,
-                });
+              setAccessModules(response.data);
+              setSpinnerAnimation({
+                status: "success",
+                message: MESSAGE.SUCCESS.LOGGED_IN,
+              });
+              showMessageSnackbar({
+                message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+                type: "success",
+              });
 
-                // note: is status false , then it will navigate to create subscription page
-                if (!response.data.isactive_subscription) {
-                  setTimeout(() => {
-                    showMessageSnackbar({
-                      message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
-                      type: "error",
-                    });
-                    navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
-                  }, 1500);
-                  return; // ⬅️ Stops further execution
-                }
+              // //note : temporary fix
+              // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
+              //   setShowSubscriptionOrInActivePopUp(true);
+              //   return;
+              // }
 
-                const getCrmModuleAccessData = {
-                  company_id: response.data.company_id,
-                  company_user_id: response.data.id,
-                  requestedby: response.data.id,
-                };
-
+              //note :
+              if (
+                loginStatusRef.current.active_users_in_company >
+                loginStatusRef.current.subscription_allowed_users
+              ) {
+                setShowSubscriptionOrInActivePopUp(true);
+                return;
+              }
+              if (!loginStatusRef.current.isactive_subscription) {
+                navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+                return;
+              } else if (
+                loginStatusRef.current.isactive_subscription &&
+                loginStatusRef.current.active_users_in_company <=
+                  loginStatusRef.current.subscription_allowed_users
+              ) {
                 axios
-                  .post(
-                    POST_API.GET_CRM_MODULE_ACCESS,
-                    getCrmModuleAccessData,
-                    { withCredentials: true }
-                  )
-                  .then((response) => {
-                    setAccessModules(response.data);
-                    setSpinnerAnimation({
-                      status: "success",
-                      message: MESSAGE.SUCCESS.LOGGED_IN,
-                    });
-                    showMessageSnackbar({
-                      message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-                      type: "success",
-                    });
-                    const validateGoogleMeetConnection = {
-                      company_id : loginStatusRef.current.company_id,
-                      company_user_id : loginStatusRef.current.id ,
-                      requestedby : loginStatusRef.current.id 
-                    }
-                    axios.post(POST_API.VALIDATE_GOOGLE_MEET_CONNECTION,validateGoogleMeetConnection,{
-                      withCredentials: true
-                    })
-                    .then((response) => {
-                      console.log(response)
-                      if(response.status === STATUS_CODE.OK){
-                          setGoogleMeetStatus({
-                            isConnected : response.data.status
-                          })  
-
-                      const validateZoomMeetingsConnection = {
-                        company_id : loginStatusRef.current.company_id,
-                      company_user_id : loginStatusRef.current.id ,
-                      requestedby : loginStatusRef.current.id 
-                      }
-                      axios.post(POST_API.VALIDATE_ZOOM_MEETINGS_CONNECTION,validateZoomMeetingsConnection,{
-                        withCredentials : true
-                      }).then((response) => {
-                        console.log(response)
-                        if(response.status === STATUS_CODE.OK){
-                          setZoomMeetingStatus({
-                              isConnected : response.data.status  
-                          });
-                        }
-                      })
-                      .catch((error) => {
-                        console.log(error)
-                      })
-                      }
-                    })
-                    .catch((error) => {
-                      console.log(error)
-                    })
-                    // //note : temporary fix
-                    // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
-                    //   setShowSubscriptionOrInActivePopUp(true);
-                    //   return;
-                    // }
-
-
-                    //note : 
-                    if (
-                      loginStatusRef.current.active_users_in_company >
-                      loginStatusRef.current.subscription_allowed_users
-                    ) {
-                      setShowSubscriptionOrInActivePopUp(true);
-                      return;
-                    }
-                    if (!loginStatusRef.current.isactive_subscription) {
-                      navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
-                      return;
-                    } else if (
-                      loginStatusRef.current.isactive_subscription &&
-                      loginStatusRef.current.active_users_in_company <=
-                      loginStatusRef.current.subscription_allowed_users
-                    ) {
-                       axios
-                          .get(POST_API.GET_COMPANY_USER_PREFERENCE, {
-                            params: {
-                              companyId: loginStatusRef.current.company_id,
-                              companyUserId: loginStatusRef.current.id,
-                              requestedBy: loginStatusRef.current.id,
-                            },
-                            withCredentials: true,
-                          })
-                          .then((response) => {
-                            if (response.status === STATUS_CODE.OK) {
-                              const res = response.data;
-                              setUserPreference({
-                                companyUserId: res.company_user_id,
-                                createdBy: res.createdby,
-                                createdOn: res.createdon,
-                                id: res.id,
-                                timezoneId: res.timezone_id,
-                                updatedBy: res.updatedby,
-                                updatedOn: res.updatedon,
-                                isHamburgerMenuCollapsed:
-                                  res.is_hamburger_menu_collapsed,
-                                isLeftMenu: res.is_left_menu,
-                                rowsInGrid: res.rows_in_grid,
-                                timezone: res.Timezone,
-                                timezoneName: res["Timezone Name"],
-                                timezoneUTCOffset: res["Timezone UTC Offset"],
-                              });
-                            }
-                          });
-                      setTimeout(() => {
-                        navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
-                      }, 1000);
-                    }
+                  .get(POST_API.GET_COMPANY_USER_PREFERENCE, {
+                    params: {
+                      companyId: loginStatusRef.current.company_id,
+                      companyUserId: loginStatusRef.current.id,
+                      requestedBy: loginStatusRef.current.id,
+                    },
+                    withCredentials: true,
                   })
-                  .catch((error) => {
-                    console.error(error);
-                    setSpinnerAnimation({
-                      status: "idle",
-                      message: "",
-                    });
+                  .then((response) => {
+                    if (response.status === STATUS_CODE.OK) {
+                      const res = response.data;
+                      setUserPreference({
+                        companyUserId: res.company_user_id,
+                        createdBy: res.createdby,
+                        createdOn: res.createdon,
+                        id: res.id,
+                        timezoneId: res.timezone_id,
+                        updatedBy: res.updatedby,
+                        updatedOn: res.updatedon,
+                        isHamburgerMenuCollapsed:
+                          res.is_hamburger_menu_collapsed,
+                        isLeftMenu: res.is_left_menu,
+                        rowsInGrid: res.rows_in_grid,
+                        timezone: res.Timezone,
+                        timezoneName: res["Timezone Name"],
+                        timezoneUTCOffset: res["Timezone UTC Offset"],
+                      });
+                    }
                   });
-              } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.WRONG_CREDENTIALS,
-                  type: "error",
-                });
-                setSpinnerAnimation({
-                  status: "idle",
-                  message: "",
-                });
-                setLoginStatus({
-                  companyId: 0,
-                  companyName: "",
-                  createdOn: "",
-                  email: "",
-                  fullName: "",
-                  id: 0,
-                  message: "",
-                  mobileNumber: "",
-                  status: false,
-                  token: "",
-                  isActiveSubscription: false,
-                  subscriptionAllowedUsers: 0,
-                  activeUsersInCompany: 0,
-                  subscriptionId: 0,
-                  startDateSubscription: "",
-                  endDateSubscription: "",
-                });
+                setTimeout(() => {
+                  navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
+                }, 1000);
               }
             })
             .catch((error) => {
-              console.log(error);
-              recaptchaRef.current!.reset();
-              showMessageSnackbar({
-                message: MESSAGE.ERROR.WRONG_CREDENTIALS,
-                type: "error",
-              });
+              console.error(error);
               setSpinnerAnimation({
                 status: "idle",
                 message: "",
               });
             });
+        } else {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "error",
+          });
+          setSpinnerAnimation({
+            status: "idle",
+            message: "",
+          });
+          setLoginStatus({
+            companyId: 0,
+            companyName: "",
+            createdOn: "",
+            email: "",
+            fullName: "",
+            id: 0,
+            message: "",
+            mobileNumber: "",
+            status: false,
+            token: "",
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            activeUsersInCompany: 0,
+            subscriptionId: 0,
+            startDateSubscription: "",
+            endDateSubscription: "",
+          });
         }
       })
       .catch((error) => {
         console.log(error);
+        recaptchaRef.current!.reset();
         showMessageSnackbar({
-          message: MESSAGE.ERROR.INVALID_CAPTCHA,
+          message: error.response.data.message,
           type: "error",
         });
         setSpinnerAnimation({
@@ -388,22 +312,20 @@ function SignInForm() {
     localStorage.clear();
   }, []);
 
+  useEffect(() => {
+    window.history.pushState(null, document.title, window.location.href);
 
-    useEffect(() => {
-      window.history.pushState(null, document.title, window.location.href);
-  
-      const handleBackButton = (event: PopStateEvent) => {
-        event.preventDefault();
-        navigate(ROUTES_URL.SIGN_IN, { replace: true }); 
+    const handleBackButton = (event: PopStateEvent) => {
+      event.preventDefault();
+      navigate(ROUTES_URL.SIGN_IN, { replace: true });
+    };
 
-      };
-  
-      window.addEventListener('popstate', handleBackButton);
+    window.addEventListener("popstate", handleBackButton);
 
-      return () => {
-        window.removeEventListener('popstate', handleBackButton);
-      };
-    }, [navigate]);
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [navigate]);
 
   const handleRememberMeCheckBoxChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -464,7 +386,6 @@ function SignInForm() {
             ref={recaptchaRef}
             sitekey={SITE_KEY}
             onChange={handleRecaptcha}
-            
           />
 
           <Button

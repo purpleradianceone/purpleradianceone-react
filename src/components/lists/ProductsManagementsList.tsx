@@ -356,7 +356,7 @@ function ProductsManagementList({
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
             className="ag-theme-alpine w-full"
-            style={{ height: 505, width: "100%" }}
+            style={{ height: "90vh", width: "100%" }}
           >
             <ProductsManagementGrid 
             products={products}

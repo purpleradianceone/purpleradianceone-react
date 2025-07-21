@@ -437,7 +437,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
   return (
     createPortal(
       <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-green-200 mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+      <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <div className="border-b pb-1 mb-4 flex justify-between items-center">
           <h2 className="text-base font-semibold text-gray-800">Update Task</h2>
