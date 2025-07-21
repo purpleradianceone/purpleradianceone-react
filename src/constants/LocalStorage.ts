@@ -9,7 +9,8 @@ const LOCALSTORAGE_KEYS = {
     ZOOM_MEETING_STATUS : "zoomMeetingStatus",
     USER_PREFERENCE : "userpreference",
     REDIRECT_PLATFORM : "redirectPlatform",
-    MASTER_ROWS_IN_GRID : "masterrowsingrid"
+    MASTER_ROWS_IN_GRID : "masterrowsingrid",
+    NOTIFICATION_COUNT : "notificationCount"
 
 }
 export default LOCALSTORAGE_KEYS;
