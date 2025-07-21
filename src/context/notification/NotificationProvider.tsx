@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { createContext, useEffect, useState, useContext, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { WEB_SOCKET_CONNECTION_URL } from "../../constants/PostApi";
 import toast, { Toaster } from "react-hot-toast";
 import { useLoggedInUserContext } from "../user/LoggedInUserContext";
+import { useNotificationCountContext } from "./NotificationCountContext";
 
 type Notification = {
   notificationSubject: string;
@@ -16,6 +18,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
 
   const {loginStatus} = useLoggedInUserContext();
   // useEffect(() => {
@@ -86,6 +89,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Use useRef to hold the client instance across renders without triggering re-renders
   const clientRef = useRef<Client | null>(null);
+  const {notificationCount,setNotificationCount} = useNotificationCountContext();
 
   useEffect(() => {
     // Only connect if authenticated AND no existing client is active
@@ -134,12 +138,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
           newClient.subscribe("/topic/users/notifications", (message) => {
             const body: Notification = JSON.parse(message.body);
             setNotifications((prev) => [body, ...prev]);
+
             showToast(body);
           });
 
           newClient.subscribe("/user/queue/notifications", (message) => {
             const body: Notification = JSON.parse(message.body);
             setNotifications((prev) => [body, ...prev]);
+
+            console.log("inside User queue");
+            console.log(notificationCount);
+            setNotificationCount((prev) => prev+1);
             showToast(body);
           });
         },
@@ -170,6 +179,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
   }, [loginStatus.id]); // Dependency array includes isAuthenticated
+
 
   return (
     <NotificationContext.Provider value={notifications}>

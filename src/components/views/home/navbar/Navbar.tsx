@@ -29,8 +29,8 @@ import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
 import { SIZE } from "../../../../constants/AppConstants";
 import NavItem from "./Component/NavItem";
 import { usePanel } from "../../../../context/panel/usePanel";
-import { useNotifications } from "../../../../context/notification/NotificationProvider";
 import NotificationPopup from "../../notification/NotificationManagement";
+import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -109,25 +109,23 @@ function Navbar({ children }: { children: React.ReactNode }) {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
   };
 
-  const notifications = useNotifications();
+  // const notifications = useNotifications();
 
-  const [notificationCount, setNotificationCount] = useState<number>(0);
+  const {notificationCount,setNotificationCount} = useNotificationCountContext();
 
-  useEffect(() => {
-    console.log("something happened");
-    
-    if (notifications!.length >= 1) {
-      console.log(notifications.length);
-      console.log("this is the length");
-      
-      
-      setNotificationCount((prev) => prev + 1);
-    }
-    //  setNotificationCount(notifications?.length || 0);
-    // setNotificationCount(notificationCount+1)
-  }, [notifications!.length]);
+  // useEffect(() => {
+  //   console.log("something happened");
+  //   console.log(notificationCount);
+  //   console.log(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT)!));
+
+  //   if (notifications!.length >= 1) {
+  //     setNotificationCount(notifications!.length);
+  //   }
+  // }, [notifications]);
 
   const resetNotificationCount = () => {
+
+
     setNotificationCount(0);
   };
 

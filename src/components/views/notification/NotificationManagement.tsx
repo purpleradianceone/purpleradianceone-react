@@ -1,4 +1,5 @@
-import React, {  useEffect, useRef, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -6,6 +7,9 @@ import NotificationListForWeb from "../../../@types/notification/NotificationLis
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 type NotificationPopupProps = {
   onClose?: () => void;
@@ -76,15 +80,27 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
           setTotalCount(fetchedData[0].count);
         }
       })
-      .catch((error) => {
+      .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
         setShowLoadingSpinner(false);
-        console.log(error);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: getNotificationListForWeb,
+          });
+          if (refreshTokenResponse) {
+            getNotificationListForWeb(currentOffset);
+          }
+        } else if (error.response.status === 503) {
+          toast.error("Service is down.");
+        } else if (error.response.status === 500) {
+          toast.error("Internal Server Error");
+        }
       });
   };
 
   //Note : api call to get notifications
   useEffect(() => {
-    setNotificationList([])
+    setNotificationList([]);
     getNotificationListForWeb(0);
   }, []);
 
@@ -146,18 +162,28 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => {
-        console.log(error);
-        if (error.response.status === 503) {
+      // .catch((error: any) => {
+      // console.log(error);
+
+      .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithEvent: handleUpdateNotificationListWebClear,
+          });
+          if (refreshTokenResponse) {
+            handleUpdateNotificationListWebClear(event);
+          }
+        } else if (error.response.status === 503) {
           toast.error("Service is down.");
         } else if (error.response.status === 500) {
           toast.error("Internal Server Error");
         }
       });
+    // });
   };
 
   const handleUpdateNotificationListWeb = async (id: number) => {
-    
     const postDataToUpdateNotificationListWeb = {
       company_id: loginStatus.companyId,
       id: id,
@@ -176,16 +202,34 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
         const res = response.data;
         if (res.status) {
           toast.success(res.message);
-          setNotificationList(prev => prev.map(item => item.id === id ? {
-            ...item , is_read : true
-          } : item))
+          setNotificationList((prev) =>
+            prev.map((item) =>
+              item.id === id
+                ? {
+                    ...item,
+                    is_read: true,
+                  }
+                : item
+            )
+          );
         }
       })
-      .catch((error)=>{
-        console.log(error);
-
-        
-      })
+      .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
+        setShowLoadingSpinner(false);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: handleUpdateNotificationListWeb,
+          });
+          if (refreshTokenResponse) {
+            handleUpdateNotificationListWeb(id);
+          }
+        } else if (error.response.status === 503) {
+          toast.error("Service is down.");
+        } else if (error.response.status === 500) {
+          toast.error("Internal Server Error");
+        }
+      });
   };
   return (
     <div
@@ -197,9 +241,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
         <span>Notifications!</span>
         <button
           type="button"
-          onClick={
-            handleUpdateNotificationListWebClear
-          }
+          onClick={handleUpdateNotificationListWebClear}
           className="text-xs text-red-600 hover:text-red-700"
         >
           Clear All
@@ -271,7 +313,6 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
           </div>
         )}
       </div>
-     
     </div>
   );
 
