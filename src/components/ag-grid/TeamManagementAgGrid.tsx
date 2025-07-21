@@ -227,7 +227,7 @@ function TeamManagementAgGrid({
       style={
         isGridForProductTeam || isGridForLeadProductTeam
           ? { height: "300px", width: "100%" }
-          : { height: 505, width: "100%" }
+          : { height: "90vh", width: "100%" }
       }
     >
       <AgGridReact
