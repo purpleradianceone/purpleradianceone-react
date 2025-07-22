@@ -136,8 +136,6 @@ const MeetingScheduler = () => {
       userPreference.timezoneName
     );
 
-    console.log(startDateTIme.toDate());
-    console.log(endDateTime.toDate());
 
     if (title === "") {
       showMessageSnackbar({
@@ -175,17 +173,17 @@ const MeetingScheduler = () => {
       });
       setIsCreating(false);
       return;
-    } else if (endDateTime.toDate() > startDateTIme.toDate()) {
+    } else if (endDateTime.toDate() < startDateTIme.toDate()) {
       showMessageSnackbar({
         message: "End Time should be greater than start time",
         type: "error",
       });
       setIsCreating(false);
       return;
-    } else if (serverCurrentTime! < startDateTIme.toDate()) {
-      console.log(serverCurrentTime! > startDateTIme.toDate());
+    } else if (serverCurrentTime! > startDateTIme.toDate()) {
+      
       showMessageSnackbar({
-        message: "Connot create meeting as start time is in the past zoom",
+        message: "Connot create meeting as start time is in the past",
         type: "error",
       });
       setIsCreating(false);
@@ -237,9 +235,15 @@ const MeetingScheduler = () => {
           setSelectedMeetingPlatform("");
           handleCloseMeetingModal();
         })
-        .catch((error) => {
+        .catch(async(error) => {
           console.log(error);
-          if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+          if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenResponse = await RefreshToken({callFunction:createGoogleMeetMeeting});
+            if(refreshTokenResponse){
+              createGoogleMeetMeeting();
+            }
+          }
+          else if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
             handleGoogleMeetAuth();
           }
         })
@@ -268,9 +272,6 @@ const MeetingScheduler = () => {
       pickerFormatString,
       userPreference.timezoneName
     );
-
-    console.log(startDateTIme.toDate());
-    console.log(endDateTime.toDate());
     if (title === "") {
       showMessageSnackbar({
         message: "Please give title to meeting",
@@ -315,7 +316,7 @@ const MeetingScheduler = () => {
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      console.log(serverCurrentTime! < startDateTIme.toDate());
+      
       showMessageSnackbar({
         message: "Connot create meeting as start time is in the past",
         type: "error",
