@@ -138,7 +138,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     return (
       <div>
         <header>
-          <nav className=" relative w-full bg-white shadow-sm z-50 py-3">
+          <nav className="bg-gradient-to-d from-white via-blue-50 to-bluee-100 shadow-sm z-50 py-3">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
@@ -155,16 +155,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
                     Features
                   </a>
                   <a
-                    href="#solutions"
+                    href="#aboutUs"
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Solutions
+                    About Us
                   </a>
                   <a
-                    href="#pricing"
+                    href="#contactUs"
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Products
+                    Contact Us
                   </a>
                   <Link to={ROUTES_URL.SIGN_UP}>
                     <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
@@ -226,7 +226,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </header>
-        <main className="min-h-screen overflow-x-hidden">{children}</main>
+        <main className="min-h-screen overflow-y-scroll border border-gray-400
+            [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-transparent">{children}</main>
       </div>
     );
   } else {

@@ -46,6 +46,11 @@ import AddTeamModal from "../../components/modals/teams/AddTeamModal";
 import NotificationManagement from "../../components/views/notification/NotificationManagement";
 import MobileRedirectWrapper from "./MobileRedirectWrapper";
 import DownloadAppPage from "../../components/views/mobile/DownloadApp";
+import Footer from "../../components/views/home/landing-page/Footer";
+import PrivacyPolicy from "../../components/views/home/landing-page/PrivacyPolicy";
+import TermsOfService from "../../components/views/home/landing-page/TermsOfService";
+import CookiePolicy from "../../components/views/home/landing-page/CookiePolicy";
+import AboutUs from "../../components/views/home/landing-page/AboutUs";
 
 export const router = createBrowserRouter([
   {
@@ -63,14 +68,28 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Hero />
+            <AboutUs/>
             <Features />
             <Testimonials />
             <ContactUs />
             <CallToAction />
+            <Footer></Footer>
           </Navbar>
         </div>
       </LoggedInRoute>
     ),
+  },
+  {
+    path: ROUTES_URL.PRIVACY_POLICY,
+    element: <PrivacyPolicy></PrivacyPolicy>,
+  },
+  {
+    path: ROUTES_URL.TERMS_OF_SERVICE,
+    element: <TermsOfService></TermsOfService>,
+  },
+  {
+    path: ROUTES_URL.COOKIE_POLICY,
+    element: <CookiePolicy></CookiePolicy>,
   },
   {
     path: ROUTES_URL.SIGN_IN,
