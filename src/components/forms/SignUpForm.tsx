@@ -125,6 +125,7 @@ function SignUpForm() {
           label="Full Name"
           type="text"
           name="name"
+          required={true}
           placeholder="Enter full name"
           value={SignUpFormData.name}
           onChange={handleSignUpFormDataChange}
@@ -145,6 +146,7 @@ function SignUpForm() {
           label="Email"
           type="email"
           name="email"
+          required={true}
           placeholder="Enter your email"
           value={SignUpFormData.email}
           onChange={handleSignUpFormDataChange}

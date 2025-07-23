@@ -632,13 +632,14 @@ const ViewLeadManagement = () => {
   }, []);
 
   const handleLeadInfoSave = async () => {
+    alert();
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT
       name: selectedLeadData.name,
       email: selectedLeadData.email,
       mobilenumber: selectedLeadData.mobileNumber,
-      updatedby: loginStatus.id,
+      updatedby_id: loginStatus.id,
     };
     try {
       const response = await axios.post(

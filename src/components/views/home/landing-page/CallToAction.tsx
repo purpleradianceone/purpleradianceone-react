@@ -7,12 +7,12 @@ function CallToAction() {
   const navigate = useNavigate();
 
   return (
+    <div className="w-full bg-blue-600 py-20">
     <motion.div
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.15 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full bg-blue-600 py-20"
     >
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
@@ -37,6 +37,7 @@ function CallToAction() {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }
 

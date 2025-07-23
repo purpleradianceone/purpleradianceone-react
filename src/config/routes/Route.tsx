@@ -51,6 +51,8 @@ import PrivacyPolicy from "../../components/views/home/landing-page/PrivacyPolic
 import TermsOfService from "../../components/views/home/landing-page/TermsOfService";
 import CookiePolicy from "../../components/views/home/landing-page/CookiePolicy";
 import AboutUs from "../../components/views/home/landing-page/AboutUs";
+import Pricing from "../../components/views/home/landing-page/Pricing";
+import CareersPage from "../../components/views/home/landing-page/Carrers";
 
 export const router = createBrowserRouter([
   {
@@ -73,7 +75,33 @@ export const router = createBrowserRouter([
             <Testimonials />
             <ContactUs />
             <CallToAction />
-            <Footer></Footer>
+            <Footer/>
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.CAREERS,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <CareersPage/>
+            <Footer/>
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.PRICING,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <Pricing/>
+            <Footer/>
           </Navbar>
         </div>
       </LoggedInRoute>

@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 
 function Footer() {
   return (
+    <div className="bg-gray-900 text-white">
     <motion.footer
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="bg-gray-900 text-white"
+      viewport={{ once: false, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: "easeOut" }} 
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -43,12 +43,12 @@ function Footer() {
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="#features" className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.FEATURES} className="hover:text-white transition-colors">
                   Features
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.PRICING} className="hover:text-white transition-colors">
                   Pricing
                 </a>
               </li>
@@ -59,17 +59,17 @@ function Footer() {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="#aboutUs" className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.ABOUT_US} className="hover:text-white transition-colors">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#careers" className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.CAREERS} className="hover:text-white transition-colors">
                   Careers
                 </a>
               </li>
               <li>
-                <a href="#contactUs" className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.CONTACT_US} className="hover:text-white transition-colors">
                   Contact
                 </a>
               </li>
@@ -117,6 +117,7 @@ function Footer() {
         </div>
       </div>
     </motion.footer>
+    </div>
   );
 }
 

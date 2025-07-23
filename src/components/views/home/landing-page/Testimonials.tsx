@@ -1,12 +1,16 @@
 import { Star, Users, MessageCircle, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
 import { useInView } from 'react-intersection-observer';
+import ShareStoryModal from './ShareStoryModal';
+
+
 
 function Testimonials() {
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
   const [clickedStar, setClickedStar] = useState<number | null>(null);
-  const [ref, inView] = useInView({ fallbackInView: true,threshold: 0.1 });
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
 
   const earlyAdopterContent = {
     title: "Join Our Growing Community",
@@ -83,7 +87,13 @@ function Testimonials() {
             We'd love to hear how our CRM is helping transform your business.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={() => {
+                setIsModalOpen(true)
+                
+              }}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Share Your Story
             </button>
             <button className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
@@ -115,7 +125,7 @@ function Testimonials() {
                   key={i}
                   onMouseEnter={() => setHoveredStar(i)}
                   onMouseLeave={() => setHoveredStar(null)}
-                  onClick={()=> {
+                  onClick={() => {
                     setClickedStar(i)
                   }}
                   className={`h-8 w-8 mx-1 cursor-pointer transition-colors duration-200 ${
@@ -133,6 +143,9 @@ function Testimonials() {
           </div>
         </motion.div>
       </div>
+      <AnimatePresence>
+        {isModalOpen && <ShareStoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

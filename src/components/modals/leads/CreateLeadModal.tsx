@@ -30,6 +30,7 @@ import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
+import ApiError from "../../../@types/error/ApiError";
 
 function CreateLeadModal({
   isOpen,
@@ -284,7 +285,7 @@ function CreateLeadModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if( error.mobileNumber!==""){
       showMessageSnackbar({
@@ -342,7 +343,7 @@ function CreateLeadModal({
           createLeadModalFormData.email === ""
             ? null
             : createLeadModalFormData.email,
-        createdby: loginStatus.id,
+        createdby_id: loginStatus.id,
         lead_source_id: selectedSource!,
         lead_status_id: selectedStatus!,
         mobilenumber:
@@ -351,7 +352,7 @@ function CreateLeadModal({
             : createLeadModalFormData.mobileNumber,
       };
 
-      axios
+      await axios
         .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
           withCredentials: true,
         })
@@ -373,7 +374,14 @@ function CreateLeadModal({
             });
           }
           console.log(response.data);
-        });
+        }).catch(async(error : ApiError | any) => {
+          if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleSubmit});
+            if(refreshTokenStatus){
+              handleSubmit(e);
+            }
+          }
+        })
     }
   };
 

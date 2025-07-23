@@ -221,9 +221,10 @@ function EditCompanyUserModal({
 
             <form className="space-y-8" onSubmit={handleEditUserSubmit}>
               <FormInput
-                label="Name : "
+                label="Name"
                 type="text"
                 name="name"
+                 required={true}
                 value={updateUserformData.name}
                 placeholder="Enter User Name"
                 defaultValue={initialUpdateUserformData.name}
@@ -233,7 +234,7 @@ function EditCompanyUserModal({
                 onBlur={handleBlur}
               />
               <FormInput
-                label="Mobile Number : "
+                label="Mobile Number"
                 type="tel"
                 name="mobileNumber"
                 placeholder="Enter Mobile Number"
@@ -249,9 +250,10 @@ function EditCompanyUserModal({
               options={CompanyUserIsActiveRadioButtonOptions}
               />
               <FormInput
-                label="Email : "
+                label="Email"
                 type="email"
                 name="email"
+                required={true}
                 placeholder="Enter Email Address"
                 defaultValue={user.email}
                 readonly={true}
