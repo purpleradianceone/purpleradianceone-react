@@ -4,6 +4,6 @@ type PostDataLeadUpdate = {
     name?: string |null,
     email?: string | null,
     mobilenumber?: string | null,
-    updatedby:number
+    updatedby_id:number
 }
 export default PostDataLeadUpdate;

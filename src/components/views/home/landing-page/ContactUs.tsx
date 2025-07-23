@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 function ContactUs() {
   return (
-    <div className="bg-gradient-to-b from-blue-200 via-blue-100 to-blue-50 py-2">
+    <div id="contactUs" className="bg-gradient-to-t from-blue-200 via-blue-100 to-blue-50 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -20,13 +20,13 @@ function ContactUs() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 60 }}
+          initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           className="flex justify-center"
         >
-          <div id="contactUs" className="bg-transparent p-1 min-w-full flex justify-center rounded-xl">
+          <div  className="bg-transparent p-1 min-w-full flex justify-center rounded-xl">
             {/* <iframe
               src="http://127.0.0.1:5500/contact-us-form.html?client_id=React"
               width="900px"

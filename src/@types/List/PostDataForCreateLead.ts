@@ -6,7 +6,7 @@ type PostDataForCreateLead = {
     mobilenumber : string | null;
     lead_source_id : number | null;
     lead_status_id : number | null;
-    createdby: number ;
+    createdby_id: number ;
 }
 
 export default PostDataForCreateLead;

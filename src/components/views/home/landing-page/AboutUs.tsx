@@ -6,14 +6,14 @@ function AboutUs() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   return (
-    <div className="w-full pt-20 bg-gradient-to-t from-blue-200 via-blue-100 to-blue-50">
+    <section id="aboutUs" className="w-full bg-gradient-to-t from-blue-200 via-blue-100 to-blue-50 py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
     <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      id="aboutUs"
+      
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
@@ -91,7 +91,7 @@ function AboutUs() {
       </div>
     </motion.section>
     </div>
-    </div>
+    </section>
   );
 }
 
