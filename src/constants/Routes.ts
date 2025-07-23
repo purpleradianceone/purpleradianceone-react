@@ -47,5 +47,14 @@ const ROUTES_URL = {
     CREATE_PRODUCT : "/create/product",
     CREATE_TEAM : "/create/team",
     DOWNLOAD_APP : "/download/app",
+    PRIVACY_POLICY : "/policy/privacy-policy",
+    TERMS_OF_SERVICE : "/policy/terms-of-service",
+    COOKIE_POLICY : "/policy/cookie-policy",
+    CAREERS : "/careers",
+    ABOUT_US : "/#aboutUs",
+    CONTACT_US : "/#contactUs",
+    FEATURES : "/#features",
+    PRICING : "/pricing",
+
 }
 export default ROUTES_URL;

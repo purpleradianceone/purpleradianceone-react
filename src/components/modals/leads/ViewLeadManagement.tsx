@@ -638,7 +638,7 @@ const ViewLeadManagement = () => {
       name: selectedLeadData.name,
       email: selectedLeadData.email,
       mobilenumber: selectedLeadData.mobileNumber,
-      updatedby: loginStatus.id,
+      updatedby_id: loginStatus.id,
     };
     try {
       const response = await axios.post(

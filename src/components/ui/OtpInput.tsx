@@ -6,6 +6,7 @@ interface OTPInputProps {
   onChange: (otp: string[]) => void;
   error?: string;
   autoFocus?: boolean;
+  required:boolean;
 }
 
 export function OTPInput({
@@ -14,6 +15,7 @@ export function OTPInput({
   onChange,
   error,
   autoFocus = true,
+  required
 }: OTPInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -66,7 +68,7 @@ export function OTPInput({
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        Enter your OTP:
+        Enter your OTP{required && <span className="text-red-500 align-top">*</span>}
       </label>
       <div className="flex gap-2 justify-between">
         {Array.from({ length }, (_, index) => (

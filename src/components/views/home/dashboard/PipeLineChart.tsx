@@ -119,19 +119,19 @@ const PipelineChart = ({
     </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         {pipelineData.map((stage, index) => (
           <div key={index} className="">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4 ">
               <div className="flex items-center space-x-3">
-                <div className={`w-4 h-4 ${stage.color} rounded-full`}></div>
+                <div className={`w-3 h-3 ${stage.color} rounded-full`}></div>
                 <span className="font-medium text-xs text-gray-900">
                   {stage.stage}
                 </span>
               </div>
               <div className="flex items-center space-x-6">
                 <span className="text-sm font-medium text-gray-600">
-                  {stage.count} deals
+                  {stage.count + " "}deals
                 </span>
                 {/* <span className="text-lg font-bold text-gray-900">{stage.value}</span> */}
               </div>

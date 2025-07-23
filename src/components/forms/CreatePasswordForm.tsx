@@ -136,6 +136,7 @@ function CreatePasswordForm() {
     <>
       <form onSubmit={handleCreatePasswordSubmit} className="space-y-6">
       <OTPInput
+         required={true}
           length={6}
           value={createPasswordFormData.otp}
           onChange={handleOtpChange}
@@ -143,8 +144,9 @@ function CreatePasswordForm() {
           autoFocus
         />
         <FormInput
+
           type={showPassword ? "text" : "password"}
-          label="Enter new password :"
+          label="Enter new password"
           placeholder="New password"
           value={createPasswordFormData.newPassword}
           name="newPassword"
@@ -163,7 +165,7 @@ function CreatePasswordForm() {
 
         <FormInput
           type={showConfirmPassword ? "text" : "password"}
-          label="Re-enter new password :"
+          label="Re-enter new password"
           placeholder="Confirm password"
           value={createPasswordFormData.confirmPassword}
           name="confirmPassword"

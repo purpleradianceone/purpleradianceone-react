@@ -33,7 +33,16 @@ const MobileRedirectWrapper = ({ children } : {children : React.ReactNode}) => {
     ROUTES_URL.EMAIL_VERIFICATION,
     ROUTES_URL.GOOGLE_OAUTH_ANDROID,
     ROUTES_URL.ZOOM_OAUTH_ANDROID,
-    ROUTES_URL.LANDING_PAGE
+    ROUTES_URL.LANDING_PAGE,
+    ROUTES_URL.PRIVACY_POLICY,
+    ROUTES_URL.TERMS_OF_SERVICE,
+    ROUTES_URL.COOKIE_POLICY,
+    ROUTES_URL.CAREERS,
+    ROUTES_URL.ABOUT_US,
+    ROUTES_URL.FEATURES,
+    ROUTES_URL.PRICING,
+    ROUTES_URL.CONTACT_US,
+
   ];
 
   if (isMobileOrTablet && !excludedPaths.includes(location.pathname)) {

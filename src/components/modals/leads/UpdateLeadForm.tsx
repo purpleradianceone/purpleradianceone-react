@@ -87,7 +87,7 @@ function UpdateLeadForm({
       name: createLeadModalFormData.name,
       email: createLeadModalFormData.email,
       mobilenumber: createLeadModalFormData.mobileNumber,
-      updatedby: loginStatus.id,
+      updatedby_id: loginStatus.id,
     };
     try {
       const response = await axios.post(
