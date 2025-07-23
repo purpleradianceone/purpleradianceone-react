@@ -632,7 +632,6 @@ const ViewLeadManagement = () => {
   }, []);
 
   const handleLeadInfoSave = async () => {
-    alert();
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT

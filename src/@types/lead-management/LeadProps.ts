@@ -13,5 +13,7 @@ type LeadDataProps = {
     mobileNumber? : string ,
     createdBy : string ,
     createdOn : string ,
+    updatedBy? : string ,
+    updatedOn? : string ,
 }
 export default LeadDataProps;

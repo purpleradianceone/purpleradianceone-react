@@ -78,6 +78,18 @@ function LeadManagementAgGrid({
         sortable: true,
         filter: true,
       },
+       {
+        field: "updatedBy",
+        headerName: "Updated By",
+        sortable: true,
+        filter: true,
+      },
+       {
+        field: "updatedOn",
+        headerName: "Updated On",
+        sortable: true,
+        filter: true,
+      },
       {
         hide: true,
         headerName: "Actions",

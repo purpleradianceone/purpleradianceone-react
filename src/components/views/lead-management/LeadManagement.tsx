@@ -126,6 +126,8 @@ function LeadManagement() {
             leadSourceId: item.lead_source_id,
             leadStatus: item["Lead Status"],
             leadStatusId: item.lead_status_id,
+            updatedBy : item.updatedby,
+            updatedOn : item.updatedon,
           })
         );
         setLeadData(formattedData);
