@@ -144,8 +144,13 @@ export const TemplatesPage: React.FC = () => {
           setHasMoreTemplates(false);
         }
       }
-    } catch (error) {
-      console.error("Error fetching template types:", error);
+    } catch (error : ApiError | any) {
+      if(error.status === STATUS_CODE.UNATHORISED){
+        const refreshTokenResponse = await RefreshToken({callFunction:getTemplateTypes});
+        if(refreshTokenResponse){
+          getTemplateTypes();
+        }
+      }
     } finally {
       setLoadingTemplatesPage(false);
     }
@@ -193,12 +198,17 @@ export const TemplatesPage: React.FC = () => {
             reset ? newTemplates : [...prev, ...newTemplates]
           );
         } else {
-          console.warn("API response not OK:", response.status);
           setHasMoreTemplates(false);
         }
-      } catch (error) {
-        console.error("Error fetching templates:", error);
+      } catch (error : ApiError | any) {
+        
         setHasMoreTemplates(false);
+        if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenResponse = await RefreshToken({callFunctionWithTwoParamsNotEvent:getTemplatesOfCompany})
+            if(refreshTokenResponse){
+              getTemplatesOfCompany({typeId, reset})
+            }
+        }
       } finally {
         setLoadingTemplates(false);
       }

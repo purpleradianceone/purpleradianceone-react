@@ -33,7 +33,6 @@ function GoogleOAuthConsentAndroid() {
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          console.log(response);
           setGoogleMeetStatus({
             isConnected: true,
           });
@@ -42,9 +41,6 @@ function GoogleOAuthConsentAndroid() {
         }
        window.location.href = "com.purpleradiance.crm://oauth";
        
-      })
-      .catch((error) => {
-        console.log(error);
       });
   };
 

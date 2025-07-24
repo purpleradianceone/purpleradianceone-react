@@ -119,7 +119,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
           type: "error",
         });
-        console.log(error);
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({

@@ -97,7 +97,6 @@ export default function UpdateSubscription({
           { withCredentials: true }
         )
         .then((response) => {
-          console.log(response.data);
 
           if (response.status === STATUS_CODE.OK) {
             setResponseSusbcriptionAmtOrderID({
@@ -116,7 +115,6 @@ export default function UpdateSubscription({
       setUpdateSubscriptionErrors({
         companyUserCountForUpdateSubscription: "",
       });
-      console.log(existingUserCount);
       
     }
     

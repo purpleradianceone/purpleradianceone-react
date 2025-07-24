@@ -50,7 +50,6 @@ function LeadTaskHistoryModal({
     await axios.post(POST_API.GET_LEAD_TASK_HISTORY,getLeadTaskHistoryPostData,{
         withCredentials : true
     }).then((response) =>{
-        console.log(response.data);
          response.data.map((res : any) => {
         setLeadTaskHistory((prev) => [...prev,{
           id : res.id,
@@ -191,10 +190,7 @@ function LeadTaskHistoryModal({
       }
 
 
-      console.log(currentTask.createdBy)
       if (changes.length > 0) {
-        console.log("ids OF task and : " + prevTask.id);
-        console.log(prevTask);
         logEntries.push({
           id: prevTask.id,
           timestamp: prevTask.updatedOn || "N/A", // Using dueDateTime as a proxy for timestamp

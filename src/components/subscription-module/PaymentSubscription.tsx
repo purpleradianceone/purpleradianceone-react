@@ -78,10 +78,7 @@ export default function PaymentSubscription({
       description: "Subscription Payment",
       order_id: orderId, // Order ID from backend
       handler: function (response: any) {
-        console.log("Payment Successful:", response);
-        // alert(
-        //   `Payment Successful!\nPayment ID: ${response.razorpay_payment_id}\nOrder ID: ${response.razorpay_order_id}\nSignature: ${response.razorpay_signature}`
-        // );
+       
         if (response.razorpay_payment_id !== null) {
           setIsPaymentSuccessfull(true);
           const createSubscriptionPostData = {
@@ -150,7 +147,6 @@ export default function PaymentSubscription({
       },
       modal: {
         ondismiss: function () {
-          console.log("Payment modal closed by user or payment failed.");
           setIsPaymentSuccessfull(false);
           onCancel();
         },

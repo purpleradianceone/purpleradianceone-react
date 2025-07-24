@@ -388,7 +388,6 @@ const LeadDetails = ({
         id: state.id,
       }))
     })
-    console.log(stateData);
     
   } , [stateData])
 

@@ -26,11 +26,16 @@ import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
 import Button from "../../../ui/Button";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
-import { SIZE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import NavItem from "./Component/NavItem";
 import { usePanel } from "../../../../context/panel/usePanel";
 import NotificationPopup from "../../notification/NotificationManagement";
 import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import toast, { Toaster } from "react-hot-toast";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -78,21 +83,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.hash) {
-      const element = document.getElementById(location.hash.substring(1));
-      if (element) {
-        
-        element.scrollIntoView({ behavior: 'instant' });
-      }
-    }
-  }, [location]);
-
-  const handleLogout = () => {
-    Navigate(ROUTES_URL.SIGN_IN);
-    setLoginStatus({
+  const handleLogout = async() => {
+    await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
+    .then((response ) =>{
+      if(response.status === 200){
+        toast.success(response.data)
+        Navigate(ROUTES_URL.SIGN_IN);
+         setLoginStatus({
       id: 0,
       companyId: 0,
       message: "",
@@ -110,7 +107,35 @@ function Navbar({ children }: { children: React.ReactNode }) {
       startDateSubscription: "",
       subscriptionId: 0,
     });
-  };
+      }
+    })
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleLogout,
+          });
+          if (refreshTokenResponse) {
+            handleLogout();
+          }
+        }
+      });
+
+  }
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        
+        element.scrollIntoView({ behavior: 'instant' });
+      }
+    }
+  }, [location]);
+
+
 
   //WRITE SUBSCRIPTION LOGIC HERE
   const handleSubscription = () => {
@@ -631,6 +656,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             }}
           />
         )}
+        <Toaster position="top-center" />
       </div>
     );
   }

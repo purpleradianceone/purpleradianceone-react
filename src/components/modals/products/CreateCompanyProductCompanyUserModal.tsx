@@ -79,7 +79,6 @@ function CreateCompanyProductCompanyUserModal({
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch(async (error: ApiError | any) => {
-          console.error(error);
           if (error.status == STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({ callFunction: fetchCompanyUsers });
             if (refreshTokenResponse) {
@@ -96,7 +95,6 @@ function CreateCompanyProductCompanyUserModal({
 
   const handleCreateCompanyProductCompanyUserSubmit = async () => {
     if (userHasAccessToAddProduct) {
-      console.log(product);
       showMessageSnackbar({ message: "User Assigned Successfully", type: "success" });
     }
   };
