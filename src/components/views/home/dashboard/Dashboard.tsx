@@ -207,7 +207,6 @@ function Dashboard() {
           withCredentials: true,
         }
       ).then((response) => {
-        console.log(response.data)
         if(response.status === STATUS_CODE.OK){
           response.data.map((res : any) => {
             setMonthlyAverageLeads((prev) => [...prev,{
@@ -499,7 +498,6 @@ function Dashboard() {
   },[currentYear,companyPipelineView])
 
   useEffect(() => {
-    // console.log("current time "); // Removed for cleaner console
     if (currentTime) {
       getUpcomingLeadTasks();
       getPendingLeadTasks();
@@ -705,7 +703,6 @@ function Dashboard() {
         (visibility) => visibility.key === currentSectionId
       )!.value;
 
-      console.log(layoutIterator);
 
       if (currentComponent && cond) {
         if (currentSectionId !== "metricCards") {

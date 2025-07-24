@@ -89,7 +89,6 @@ const LeadAssignedTeams = ({
         }
       )
       .then((response) => {
-        console.log(response.data);
         if (response.status === STATUS_CODE.OK) {
           const responseData = response.data;
           const companyTeam: LeadCompanyTeam[] = responseData.map(

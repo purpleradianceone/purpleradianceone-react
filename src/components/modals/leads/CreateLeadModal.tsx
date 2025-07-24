@@ -373,7 +373,6 @@ function CreateLeadModal({
               type: "warning",
             });
           }
-          console.log(response.data);
         }).catch(async(error : ApiError | any) => {
           if(error.status === STATUS_CODE.UNATHORISED){
             const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleSubmit});

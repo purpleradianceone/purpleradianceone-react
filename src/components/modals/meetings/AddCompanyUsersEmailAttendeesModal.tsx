@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UserPlus, X } from "lucide-react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { SIZE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useEffect, useRef, useState } from "react";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
@@ -12,6 +12,7 @@ import POST_API from "../../../constants/PostApi";
 import ApiError from "../../../@types/error/ApiError";
 import { createPortal } from "react-dom";
 import SearchInput from "../../ui/SearchInput";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 
 function AddCompanyUsersEmailAttendeesModal({
@@ -77,6 +78,7 @@ function AddCompanyUsersEmailAttendeesModal({
                 ? 0
                 : 50 * companyUsersFetchedCount,
             search_company_specific_date_range_id: 0,
+            isactive : true,
             search_parameter: comapnyUserSearchParameter,
             search_parameter_date: "",
           };
@@ -142,7 +144,13 @@ function AddCompanyUsersEmailAttendeesModal({
             }
           }
         } catch (error: ApiError | any) {
-          console.error(error);
+         if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent : fetchCompanyUsers});
+          if(refreshTokenResponse){
+            companyUsersFetchingRef.current=false;
+            fetchCompanyUsers(comapnyUserSearchParameter);
+          }
+         }
         } finally {
           if (comapnyUserSearchParameter.length > 0) {
             setIsCompanyUsersLoading(false);

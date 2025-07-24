@@ -328,6 +328,7 @@ function EditCompanyProductModal({
                   label="Product Name : "
                   type="text"
                   name="name"
+                  required={true}
                   value={updateCompanyProductFormData.name}
                   placeholder="Enter Product Name"
                   defaultValue={intialEditCompanyProductFormData.name}
@@ -340,6 +341,7 @@ function EditCompanyProductModal({
                   label="Item Code : "
                   type="text"
                   name="code"
+                  required={true}
                   placeholder="Enter Item Code"
                   onChange={handleEditCompanyProductFormDataChange}
                   defaultValue={intialEditCompanyProductFormData.code}
@@ -370,6 +372,7 @@ function EditCompanyProductModal({
                 cols={5}
                 rows={3}
                 name="description"
+                required={true}
                 placeholder="Enter Product Description"
                 defaultValue={intialEditCompanyProductFormData.description}
                 onChange={handleEditCompanyProductFormDataChange}
