@@ -345,6 +345,7 @@ function SignInForm() {
             label="Email"
             type="email"
             name="email"
+            required={true}
             placeholder="Enter your email"
             value={loginUserCredentials.email}
             onChange={handleSignInFormDatachange}
@@ -355,6 +356,7 @@ function SignInForm() {
             label="Password"
             type={showPassword ? "text" : "password"}
             name="password"
+            required={true}
             placeholder="Enter your password"
             value={loginUserCredentials.password}
             onChange={handleSignInFormDatachange}

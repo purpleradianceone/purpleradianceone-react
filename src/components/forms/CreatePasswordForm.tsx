@@ -51,7 +51,6 @@ function CreatePasswordForm() {
 
   const handleOtpChange = (newOtp: string[]) => {
     setCreatePasswordFormData((prev) => ({ ...prev, otp: newOtp }));
-    console.log(createPasswordFormData.otp);
     if(createPasswordFormError.otp){
       setCreatePasswordFormError((prev) => ({...prev,otp:DATA_TYPE.UNDEFINED}))
     }
@@ -60,7 +59,6 @@ function CreatePasswordForm() {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCreatePasswordFormData((prev) => ({ ...prev, [name]: value }));
-    console.log(e.target.value)
     // Clear password error if exists
     if (createPasswordFormError.password) {
       setCreatePasswordFormError((prev) => ({ ...prev, password: undefined }));
@@ -111,7 +109,6 @@ function CreatePasswordForm() {
       .then((response) => {
         if (response.data.status) {
           setIsSubmitting(true);
-          console.log(response);
 
           localStorage.removeItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL);
           showMessageSnackbar({
@@ -136,6 +133,7 @@ function CreatePasswordForm() {
     <>
       <form onSubmit={handleCreatePasswordSubmit} className="space-y-6">
       <OTPInput
+         required={true}
           length={6}
           value={createPasswordFormData.otp}
           onChange={handleOtpChange}
@@ -143,8 +141,9 @@ function CreatePasswordForm() {
           autoFocus
         />
         <FormInput
+
           type={showPassword ? "text" : "password"}
-          label="Enter new password :"
+          label="Enter new password"
           placeholder="New password"
           value={createPasswordFormData.newPassword}
           name="newPassword"
@@ -163,7 +162,7 @@ function CreatePasswordForm() {
 
         <FormInput
           type={showConfirmPassword ? "text" : "password"}
-          label="Re-enter new password :"
+          label="Re-enter new password"
           placeholder="Confirm password"
           value={createPasswordFormData.confirmPassword}
           name="confirmPassword"

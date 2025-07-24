@@ -17,7 +17,7 @@ import {
   Store,
   X,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SideNavBar from "./SideNavBar";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -105,25 +105,19 @@ function Navbar({ children }: { children: React.ReactNode }) {
       });
 
     
-    setLoginStatus({
-      id: 0,
-      companyId: 0,
-      message: "",
-      token: "",
-      status: false,
-      email: "",
-      fullName: "",
-      companyName: "",
-      createdOn: "",
-      mobileNumber: "",
-      activeUsersInCompany: 0,
-      isActiveSubscription: false,
-      subscriptionAllowedUsers: 0,
-      endDateSubscription: "",
-      startDateSubscription: "",
-      subscriptionId: 0,
-    });
-  };
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        
+        element.scrollIntoView({ behavior: 'instant' });
+      }
+    }
+  }, [location]);
+
+
 
   //WRITE SUBSCRIPTION LOGIC HERE
   const handleSubscription = () => {
@@ -162,8 +156,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
   if (!loginStatus.status) {
     return (
       <div>
-        <header>
-          <nav className=" relative w-full bg-white shadow-sm z-50 py-3">
+        <header className="fixed bg-white w-full shadow-sm z-50 py-5">
+          <nav className="">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
@@ -174,23 +168,36 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                 <div className="hidden md:flex items-center space-x-8">
                   <a
-                    href="#features"
+                    href={ROUTES_URL.FEATURES}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Features
                   </a>
                   <a
-                    href="#solutions"
+                    href={ROUTES_URL.PRICING}
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Solutions
+                    Pricing
                   </a>
                   <a
-                    href="#pricing"
+                    href={ROUTES_URL.ABOUT_US}
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Products
+                    About Us
                   </a>
+                  <a
+                    href={ROUTES_URL.CONTACT_US}
+                    className="text-gray-700 hover:text-blue-600"
+                  >
+                    Contact Us
+                  </a>
+                  <a
+                    href={ROUTES_URL.CAREERS}
+                    className="text-gray-700 hover:text-blue-600"
+                  >
+                    Careers
+                  </a>
+                  
                   <Link to={ROUTES_URL.SIGN_UP}>
                     <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
                       Get Started
@@ -251,21 +258,23 @@ function Navbar({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </header>
-        <main className="min-h-screen overflow-x-hidden">{children}</main>
+        <main className="min-h-screen overflow-y-scroll border border-gray-400
+            [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-transparent">{children}</main>
       </div>
     );
   } else {
     return (
       <div>
         <header>
-          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full  top-0 h-12">
+          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 h-12">
             <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : ""
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-sm   font-bold text-blue-700 cursor-pointer">
+                <div className="flex items-center justify-between text-lg   font-bold text-blue-700 cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
                     <h2 className="font-sora ">{loginStatus.companyName}</h2>
                   </Link>
@@ -485,7 +494,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         >
                           <Bell className="h-5 w-5" />
                           {notificationCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                            <span className="absolute -top-0.5 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                               {notificationCount > 9 ? "9+" : notificationCount}
                             </span>
                           )}

@@ -257,7 +257,6 @@ function CreateLeadTaskModal({
       })
       .catch(async (error) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
-          console.log(error);
           const refreshTokenResponse = await RefreshToken({
             callFunctionWithEvent: createLeadTask,
           });

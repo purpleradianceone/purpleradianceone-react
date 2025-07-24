@@ -119,7 +119,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
           type: "error",
         });
-        console.log(error);
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({
@@ -195,9 +194,10 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
               <form className="space-y-8" onSubmit={handleAddUserSubmit}>
                 <FormInput
-                  label="Name : "
+                  label="Name"
                   type="text"
                   name="name"
+                   required={true}
                   placeholder="Enter User Name"
                   value={addCompanyUserFormData.name}
                   onChange={handleAddComapnyUserFormDataChange}
@@ -206,7 +206,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   maxLength={100}
                 />
                 <FormInput
-                  label="Mobile Number : "
+                  label="Mobile Number"
                   type="tel"
                   name="mobilenumber"
                   placeholder="Enter Mobile Number"
@@ -217,9 +217,10 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   maxLength={15}
                 />
                 <FormInput
-                  label="Email : "
+                  label="Email"
                   type="email"
                   name="email"
+                   required={true}
                   placeholder="Enter Email Address"
                   value={addCompanyUserFormData.email}
                   onChange={handleAddComapnyUserFormDataChange}

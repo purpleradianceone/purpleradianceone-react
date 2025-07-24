@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
-import {  useEffect, useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import {  INNERHTML, NUMBER_VALUES, STATUS_CODE, } from "../../constants/AppConstants";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Trash2 } from "lucide-react";
@@ -34,9 +34,6 @@ function ProductTaxManagementAgGrid({
     false
   );
 
-    useEffect(()=> {
-        console.log(productTax);
-    })
  
 const {userHasAccessToUpdateProductTax} = useUserAccessModules();
 const {loginStatus} = useLoggedInUserContext();
@@ -61,11 +58,6 @@ const {loginStatus} = useLoggedInUserContext();
     localStorage.clear();
     navigate(ROUTES_URL.SIGN_IN);
   };
-
-  useEffect(()=> {
-    console.log("Product Tax");
-    console.log(productTax)
-  })
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -141,11 +133,11 @@ const {loginStatus} = useLoggedInUserContext();
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch(async(error : ApiError | any) => {
-                        console.log(error);
                         if(error.status === STATUS_CODE.UNATHORISED){
                             const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
                             if(refreshTokenResponse){
                               setIsDialogueOpen(false);
+                              handleCompanyProductTaxDelete();
                             }
                             else {
                                 setIsDialogueOpen(true)

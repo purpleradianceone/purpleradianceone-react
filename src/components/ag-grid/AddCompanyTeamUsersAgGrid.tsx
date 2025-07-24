@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -6,7 +7,7 @@
 
 import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
+import { INNERHTML, STATUS_CODE } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -14,6 +15,8 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function AddCompanyTeamUsersAgGrid({
   companyUsers,
@@ -136,9 +139,7 @@ function AddCompanyTeamUsersAgGrid({
             const [localDelta, setLocalDelta] = useState<number>(0);
 
             const handleCompanyUserUpdateToggle = async (event: React.FormEvent<HTMLButtonElement>) => {
-              //NOTE CHANGES ARE DONE HERE
-              // alert("called from here1")
-              // if (userHasAccessToUpdateUser) {
+
 
                 const userId = parseInt(event.currentTarget.id);
                 const updateCompanyUserPostData = {
@@ -159,24 +160,24 @@ function AddCompanyTeamUsersAgGrid({
                     setIsActive(newStatus);
                     params.node.setDataValue("isactive", newStatus);
                     
-
-                    // Determine what the new delta should be.
-                    // If the new status is the same as the original, delta is 0.
-                    // Otherwise, if original was inactive (false) and now active, delta is +1.
-                    // Or if original was active (true) and now inactive, delta is -1.
                     const original = originalStatusRef.current;
                     const newDelta = newStatus === original ? 0 : (original ? -1 : 1);
-                    // Update the global counter by the change in this row’s delta.
                     updateGlobalCount(newDelta - localDelta);
                     // Save the new delta locally.
                     setLocalDelta(newDelta);
                   
                   }
                   handleCompanyUserToggleChange!(res.data.message, res.data.status)
-                } catch (error) {
-                  console.error("Error updating user status:", error);
+                } catch (error :ApiError | any) {
+                  if(error.status === STATUS_CODE.UNATHORISED){
+                    const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleCompanyUserUpdateToggle})
+                    if(refreshTokenStatus){
+                      handleCompanyUserUpdateToggle(event);
+                    }
+                  }
+                  
                 }
-              // }
+              
             };
 
             return (

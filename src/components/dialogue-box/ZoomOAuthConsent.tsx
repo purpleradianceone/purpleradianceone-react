@@ -24,7 +24,6 @@ function ZoomMeetingsOAuthConsent() {
 
 
     const handleClose = (isFlowCompleted : boolean) => {
-      console.log(window.history)
         if(isFlowCompleted){
             window.history.go(-7);
         }
@@ -41,7 +40,6 @@ function ZoomMeetingsOAuthConsent() {
     params.append("company_user_id", loginStatus.id.toString());
     params.append("createdby", loginStatus.id.toString());
     params.append("redirect_url" , window.location.origin + window.location.pathname )
-    // console.log(window.location.origin + window.location.pathname);
     window.location.href = `${baseUrl}?${params}`;
     }
 
@@ -67,9 +65,6 @@ function ZoomMeetingsOAuthConsent() {
         window.history.replaceState(null, "", newUrl);
         }
         handleClose(true);
-      })
-      .catch((error) => {
-        console.log(error);
       });
     }
 

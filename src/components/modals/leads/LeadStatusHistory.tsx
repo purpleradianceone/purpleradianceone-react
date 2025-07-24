@@ -47,7 +47,6 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
-        console.log(responseData);
 
         const transformedData: LeadStatusHistoryData[] = responseData.map(
           (item: any) => ({

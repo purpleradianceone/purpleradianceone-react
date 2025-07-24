@@ -90,7 +90,7 @@ function UpcomingTasks({
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 h-full flex flex-col">
       <div className="flex items-center justify-between mb-8 flex-shrink-0">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">{taskType}</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">{taskType === 'upcoming' ? "Upcoming Tasks" : taskType === 'pending' ? "Pending Tasks" : "Completed Tasks"}</h3>
           <p className="text-gray-700">{taskType === 'upcoming' ? "Your scheduled activities and deadlines" : taskType === "pending" ? "Your Pending activities and deadlines" : "Your completed activities and deadlines"}</p>
         </div>
       </div>

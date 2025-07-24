@@ -241,7 +241,6 @@ function LeadTaskList({
         }
       })
       .catch(async (error: ApiError | any) => {
-        console.log(error);
           setIsEditMettingModalOpen(false);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
@@ -287,9 +286,6 @@ function LeadTaskList({
               backEndDateFormat,
               userPreference.timezoneName
             );
-
-            console.log("endDate By User Time Zone : ");
-            console.log(endDateByUserTimeZoneParsed);
             setGoogleMeetEventData(
               {
                 count: res.count,
@@ -332,7 +328,6 @@ function LeadTaskList({
         }
       })
       .catch(async (error: ApiError | any) => {
-        console.log(error);
         setIsEditMettingModalOpen(false)
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
@@ -488,9 +483,7 @@ function LeadTaskList({
                             const platform = getLeadTaskJsonData(activity).map((meetingDetails: any) => {
                                       return meetingDetails.platform;
                                     })
-                                    // console.log(platform[0] === 1);
                                   if(platform[0] === 1){
-                                    console.log(platform)
                                     getGoogleMeeting(activity);
                                   }
                                   else if(platform[0] === 2){

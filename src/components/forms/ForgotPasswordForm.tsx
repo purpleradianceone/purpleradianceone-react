@@ -105,6 +105,7 @@ function ForgotPasswordForm(){
           label="Email"
           type="email"
           name="email"
+          required={true}
           placeholder="Enter your Registered Email"
           onBlur={handleBlur}
           onChange={handleForgotPasswordFormDataChange}

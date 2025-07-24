@@ -638,7 +638,7 @@ const ViewLeadManagement = () => {
       name: selectedLeadData.name,
       email: selectedLeadData.email,
       mobilenumber: selectedLeadData.mobileNumber,
-      updatedby: loginStatus.id,
+      updatedby_id: loginStatus.id,
     };
     try {
       const response = await axios.post(
@@ -1280,9 +1280,7 @@ const ViewLeadManagement = () => {
               <button
                 onClick={() => {
                   setIsLeadOwnerPopUpOpen(false);
-                  //Note : show reason card only if different lead owner is selected.
-                  console.log(selectedCompanyUser);
-                  console.log(persistedSelectedUserId);
+              
 
                   if (
                     selectedCompanyUser.id !== 0 &&

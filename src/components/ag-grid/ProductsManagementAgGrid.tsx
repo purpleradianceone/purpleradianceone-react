@@ -223,8 +223,6 @@ function ProductsManagementGrid({
                             onClick={() => {
                               setIsActionsDropDownOpen(false);
                               handleEditCompanyProductModalOpen(true);
-                              console.log("selected Product");
-                              console.log(params.data);
                               handleSelectedProductChange(params.data);
                             }}
                           >

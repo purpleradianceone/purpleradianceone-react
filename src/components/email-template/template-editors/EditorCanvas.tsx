@@ -98,6 +98,7 @@ export const EditorCanvas: React.FC = () => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
             callFunctionWithParamsNotEvent: getPlaceHolderDataFromDatabase,
+            
           });
           if (refreshTokenResponse) {
             getPlaceHolderDataFromDatabase({ templateTypeId });

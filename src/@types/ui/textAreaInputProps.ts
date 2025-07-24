@@ -14,6 +14,7 @@ type TextAreaInputProps = {
     className?: string,
     maxLength? : number,
     error? : string;
+    required? : boolean;
 }
 
 export default TextAreaInputProps;

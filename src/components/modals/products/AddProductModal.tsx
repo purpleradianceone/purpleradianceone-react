@@ -152,7 +152,6 @@ function AddProductModal({
             withCredentials: true,
           })
           .then((response) => {
-            console.log(response.data);
             if (response.data) {
               showMessageSnackbar({
                 message: "Product Added Successfully",
@@ -167,7 +166,6 @@ function AddProductModal({
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch(async (error : ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: handleAddProductFormSubmit,
@@ -231,6 +229,7 @@ function AddProductModal({
                 type="text"
                 name="name"
                 placeholder="Product Name"
+                required={true}
                 value={addProductFormData.name}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
@@ -240,6 +239,7 @@ function AddProductModal({
                 label="Item Code : "
                 type="text"
                 name="code"
+                required={true}
                 value={addProductFormData.code}
                 placeholder="Product Item Code"
                 onChange={handleAddProductFormDataChange}
@@ -261,6 +261,7 @@ function AddProductModal({
                 value={addProductFormData.description}
                 cols={5}
                 rows={3}
+                required={true}
                 maxLength={256}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}

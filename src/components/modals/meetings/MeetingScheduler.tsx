@@ -81,7 +81,6 @@ const MeetingScheduler = () => {
   };
 
   useEffect(() => {
-    console.log(new Date());
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
   }, [currentTime]);
 
@@ -115,7 +114,6 @@ const MeetingScheduler = () => {
       const data = sessionStorage.getItem("leadData");
       if (data) {
         const leadSearchParam = JSON.parse(data);
-        console.log(leadSearchParam);
         setLeadData(leadSearchParam);
       }
     }
@@ -136,141 +134,7 @@ const MeetingScheduler = () => {
       userPreference.timezoneName
     );
 
-    console.log(startDateTIme.toDate());
-    console.log(endDateTime.toDate());
 
-    if (title === "") {
-      showMessageSnackbar({
-        message: "Please give title to meeting",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    } else if (startDate === "") {
-      showMessageSnackbar({
-        message: "Please select start date",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    } else if (startTime === "") {
-      showMessageSnackbar({
-        message: "Please select start time",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    } else if (endDate === "") {
-      showMessageSnackbar({ message: "Please select end date", type: "error" });
-      setIsCreating(false);
-      return;
-    } else if (endTime === "") {
-      showMessageSnackbar({ message: "Please select end time", type: "error" });
-      setIsCreating(false);
-      return;
-    } else if (selectedMeetingPlatform === "") {
-      showMessageSnackbar({
-        message: "Please select meeting platform",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    } else if (endDateTime.toDate() > startDateTIme.toDate()) {
-      showMessageSnackbar({
-        message: "End Time should be greater than start time",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    } else if (serverCurrentTime! < startDateTIme.toDate()) {
-      console.log(serverCurrentTime! > startDateTIme.toDate());
-      showMessageSnackbar({
-        message: "Connot create meeting as start time is in the past zoom",
-        type: "error",
-      });
-      setIsCreating(false);
-      return;
-    }
-
-    if (
-      title !== "" &&
-      startDate !== "" &&
-      endDate !== "" &&
-      startTime !== "" &&
-      endTime !== "" &&
-      selectedMeetingPlatform === meetingPlatform[0].name
-    ) {
-      setIsCreating(true);
-
-      const postDataCreateGoogleMeetMeeting = {
-        company_id: loginStatus.companyId,
-        summary_title: title,
-        description: description,
-        start_date_string: startDate + "T" + startTime + ":00",
-        end_date_string: endDate + "T" + endTime + ":00",
-        time_zone: userPreference.timezoneName,
-        attendees_email_all: attendees,
-        attendees_company_user_id: selectedCompanyUsersIdArray,
-        company_user_id: loginStatus.id,
-        is_meeting_created_from_lead: isModalForLead ? true : false,
-        lead_id: isModalForLead ? leadData?.id : null,
-        createdby: loginStatus.id,
-      };
-      axios
-        .post(POST_API.CREATE_GOOGLE_MEETING, postDataCreateGoogleMeetMeeting, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            console.log(response);
-          }
-
-          setTitle("");
-          setEndTime("");
-          setStartTime("");
-          // setTimeZone("");
-          setAttendees([]);
-          setDescription("");
-          setIsCreating(false);
-          setStartDate("");
-          setEndDate("");
-          setSelectedMeetingPlatform("");
-          handleCloseMeetingModal();
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
-            handleGoogleMeetAuth();
-          }
-        })
-        .finally(() => {
-          setIsCreating(false);
-        });
-    } else {
-      showMessageSnackbar({
-        message: "Please fill the required fields",
-        type: "error",
-      });
-    }
-  };
-  const createZoomMeeting = async () => {
-    const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
-    const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
-    const pickerFormatString = "yyyy-MM-DD HH:mm";
-
-    const startDateTIme = momentTimezone.tz(
-      combinedPickerStartDateTimeString,
-      pickerFormatString,
-      userPreference.timezoneName
-    );
-    const endDateTime = momentTimezone.tz(
-      combinedPickerEndDateTimeString,
-      pickerFormatString,
-      userPreference.timezoneName
-    );
-
-    console.log(startDateTIme.toDate());
-    console.log(endDateTime.toDate());
     if (title === "") {
       showMessageSnackbar({
         message: "Please give title to meeting",
@@ -315,7 +179,154 @@ const MeetingScheduler = () => {
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      console.log(serverCurrentTime! < startDateTIme.toDate());
+      
+      showMessageSnackbar({
+        message: "Connot create meeting as start time is in the past",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    }
+
+    if (
+      title !== "" &&
+      startDate !== "" &&
+      endDate !== "" &&
+      startTime !== "" &&
+      endTime !== "" &&
+      selectedMeetingPlatform === meetingPlatform[0].name
+    ) {
+      setIsCreating(true);
+
+      const postDataCreateGoogleMeetMeeting = {
+        company_id: loginStatus.companyId,
+        summary_title: title,
+        description: description,
+        start_date_string: startDate + "T" + startTime + ":00",
+        end_date_string: endDate + "T" + endTime + ":00",
+        time_zone: userPreference.timezoneName,
+        attendees_email_all: attendees,
+        attendees_company_user_id: selectedCompanyUsersIdArray,
+        company_user_id: loginStatus.id,
+        is_meeting_created_from_lead: isModalForLead ? true : false,
+        lead_id: isModalForLead ? leadData?.id : null,
+        createdby: loginStatus.id,
+      };
+      axios
+        .post(POST_API.CREATE_GOOGLE_MEETING, postDataCreateGoogleMeetMeeting, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+           setTitle("");
+          setEndTime("");
+          setStartTime("");
+          // setTimeZone("");
+          setAttendees([]);
+          setDescription("");
+          setIsCreating(false);
+          setStartDate("");
+          setEndDate("");
+          setSelectedMeetingPlatform("");
+          if(response.data.status){
+              showMessageSnackbar({message : response.data.message,type : "success"});
+              setTimeout(() => {
+                handleCloseMeetingModal();
+              },2000)
+          
+          }
+          else{
+            showMessageSnackbar({message : response.data.message,type : "error"});
+          setTimeout(() => {
+                handleCloseMeetingModal();
+              },2000)
+          }
+          
+          }
+
+          
+        })
+        .catch(async(error) => {
+          if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenResponse = await RefreshToken({callFunction:createGoogleMeetMeeting});
+            if(refreshTokenResponse){
+              createGoogleMeetMeeting();
+            }
+          }
+          else if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+            handleGoogleMeetAuth();
+          }
+        })
+        .finally(() => {
+          setIsCreating(false);
+        });
+    } else {
+      showMessageSnackbar({
+        message: "Please fill the required fields",
+        type: "error",
+      });
+    }
+  };
+  const createZoomMeeting = async () => {
+    const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
+    const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
+    const pickerFormatString = "yyyy-MM-DD HH:mm";
+
+    const startDateTIme = momentTimezone.tz(
+      combinedPickerStartDateTimeString,
+      pickerFormatString,
+      userPreference.timezoneName
+    );
+    const endDateTime = momentTimezone.tz(
+      combinedPickerEndDateTimeString,
+      pickerFormatString,
+      userPreference.timezoneName
+    );
+    if (title === "") {
+      showMessageSnackbar({
+        message: "Please give title to meeting",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    } else if (startDate === "") {
+      showMessageSnackbar({
+        message: "Please select start date",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    } else if (startTime === "") {
+      showMessageSnackbar({
+        message: "Please select start time",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    } else if (endDate === "") {
+      showMessageSnackbar({ message: "Please select end date", type: "error" });
+      setIsCreating(false);
+      return;
+    } else if (endTime === "") {
+      showMessageSnackbar({ message: "Please select end time", type: "error" });
+      setIsCreating(false);
+      return;
+    } else if (selectedMeetingPlatform === "") {
+      showMessageSnackbar({
+        message: "Please select meeting platform",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    } else if (endDateTime.toDate() < startDateTIme.toDate()) {
+      showMessageSnackbar({
+        message: "End Time should be greater than start time",
+        type: "error",
+      });
+      setIsCreating(false);
+      return;
+    } else if (serverCurrentTime! > startDateTIme.toDate()) {
+      
       showMessageSnackbar({
         message: "Connot create meeting as start time is in the past",
         type: "error",
@@ -417,7 +428,6 @@ const MeetingScheduler = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        console.log("length : " + response.data.length);
         if (response.data.length === 0) {
           return 0;
         }
@@ -433,7 +443,6 @@ const MeetingScheduler = () => {
         return response.data[0].id;
       }
     } catch (error: ApiError | any) {
-      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
@@ -493,9 +502,6 @@ const MeetingScheduler = () => {
     params: CompanyUsersSearchProps,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log("from add email to meeting");
-    console.log(params);
-    console.log(selectedCompanyUsersIdArray);
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
       setAttendees((prev) => [...prev, params.email]);
@@ -544,7 +550,6 @@ const MeetingScheduler = () => {
       setIsModalForLead(false);
     } else {
       const leadData = sessionStorage.getItem("leadData");
-      console.log(leadData);
       const newQueryString = qs.stringify({
         leadData: leadData,
       });

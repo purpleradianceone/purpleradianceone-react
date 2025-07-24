@@ -105,15 +105,15 @@ const ongoingCurrentYear = new Date().getFullYear()
       <div className="grid grid-cols-3 gap-3 mt-4 pt-6 border-t border-gray-100">
         <div className="text-center">
           <p className="text-xl font-bold text-gray-900">{totalLeads}</p>
-          <p className="text-sm text-gray-600">Total Leads</p>
+          <p className="text-sm text-gray-600">Total Leads In {currentYear}</p>
         </div>
         <div className="text-center">
           <p className="text-xl font-bold text-emerald-600">{totalConvertedLeads}</p>
-          <p className="text-sm text-gray-600">Total Converted Leads</p>
+          <p className="text-sm text-gray-600">Total Converted Leads In {currentYear}</p>
         </div>
         <div className="text-center">
           <p className="text-xl font-bold text-blue-600">{conversionRate.toFixed(2)}%</p>
-          <p className="text-sm text-gray-600">Conversion Rate</p>
+          <p className="text-sm text-gray-600">Conversion Rate In {currentYear}</p>
         </div>
       </div>
     </div>

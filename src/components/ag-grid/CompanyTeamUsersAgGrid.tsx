@@ -101,7 +101,6 @@ function CompanyTeamUsersAgGrid({
     const fetchCompanyUsersNotAssigned = async (
     companyUserNotAssignedSearchParameter: string
   ) => {
-    console.log("inside users if : 1");
     if (
       !userHasAccessToViewUser ||
       isCompanyUsersLoading ||
@@ -109,10 +108,9 @@ function CompanyTeamUsersAgGrid({
         companyUserNotAssignedSearchParameter.length === 0) ||
       companyUserFetchingRef.current
     )
-      return console.log("inside users if : 2");
+      return 
     try {
       
-      console.log("inside users if : 3");
       companyUsersNotAssignedSearchParameterRef.current =
         companyUserNotAssignedSearchParameter;
       companyUserFetchingRef.current = true;
@@ -120,11 +118,9 @@ function CompanyTeamUsersAgGrid({
 
       // Save current scroll position before fetching
       if (companyUserGridApiRef.current) {
-        console.log("inside users if : 4");
         const rowIndex =
           companyUserGridApiRef.current.getLastDisplayedRowIndex();
         if (rowIndex !== null) {
-          console.log("inside users if : 5");
           companyUserLastScrollPositionRef.current = rowIndex;
         }
       }
@@ -138,6 +134,7 @@ function CompanyTeamUsersAgGrid({
           companyUserNotAssignedSearchParameter.length > 0
             ? 0
             : 50 * isCompanyUsersFetchedCount,
+        isactive : true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
@@ -152,6 +149,7 @@ function CompanyTeamUsersAgGrid({
             ? 0
             : 50 * isCompanyUsersFetchedCount,
         search_company_specific_date_range_id: 0,
+        isactive : true,
         search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
       };
@@ -173,12 +171,8 @@ function CompanyTeamUsersAgGrid({
           );
 
       if (response.data) {
-        console.log("inside users if : 6");
-       
-
         const newUsers = response.data;
         if (newUsers.length === 0) {
-          console.log("inside users if : 7");
           setCompanyUserHasMore(false);
 
           return;
@@ -187,7 +181,6 @@ function CompanyTeamUsersAgGrid({
           newUsers.length > 0 &&
           newUsers?.count > companyUsersNotAssigned.length + newUsers.length
         ) {
-          console.log("inside users if : 8");
           setCompanyUserHasMore(true); // Explicitly set to true after clearing search
         }
         if (companyUserNotAssignedSearchParameter.length === 0) {
@@ -230,7 +223,6 @@ function CompanyTeamUsersAgGrid({
           companyUserGridApiRef.current &&
           companyUserLastScrollPositionRef.current > 0
         ) {
-          console.log("inside users if : 9");
           setTimeout(() => {
             if (companyUserGridApiRef.current) {
               companyUserGridApiRef.current.ensureIndexVisible(
@@ -247,39 +239,36 @@ function CompanyTeamUsersAgGrid({
               newUsers[0]?.count &&
             isCompanyUserSearchCleared
           ) {
-            console.log("inside users if : 10");
             setCompanyUserHasMore(false);
           }
         }
       }
     } catch (error: ApiError | any) {
-      console.log("inside users if : 11");
-      console.error(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyUsersNotAssigned,
         });
+        
+
         if (!refreshTokenResponse) {
           // setIsDialogueOpen(true);
         } else {
           // setIsDialogueOpen(false);
-          fetchCompanyUsersNotAssigned("");
+          companyUserFetchingRef.current = false;
+          fetchCompanyUsersNotAssigned(companyUserNotAssignedSearchParameter);
         }
       }
     } finally {
       if (companyUserNotAssignedSearchParameter.length > 0) {
-        console.log("inside users if : 12");
         setIsCompanyUsersLoading(false);
         companyUserFetchingRef.current = false;
         if (companyUsersNotAssignedSearchParameterRef.current.length === 1) {
-          console.log("inside users if : 13");
           setCompanyUserHasMore(true);
           companyUserGridApiRef.current = null;
           companyUserLastScrollPositionRef.current = 0;
           setIsCompanyUsersFetched(0);
         }
       } else if (companyUserNotAssignedSearchParameter.length === 0) {
-        console.log("inside users if : 14");
         setIsCompanyUsersLoading(false);
         companyUserFetchingRef.current = false;
       }
@@ -290,12 +279,7 @@ function CompanyTeamUsersAgGrid({
     params: ViewportChangedEvent
   ) => {
     if (!companyUsersNotAssigned.length || !companyUserHasMore)
-      return console.log(
-        "return from viewport changed : " +
-          companyUsersNotAssigned.length +
-          " has more : " +
-          companyUserHasMore
-      );
+      return 
 
     // Store the grid API reference
     if (!companyUserGridApiRef.current && params.api) {
@@ -424,7 +408,6 @@ function CompanyTeamUsersAgGrid({
                   params.data.isActive = !isActive;
                 })
                 .catch(async (error: ApiError | any) => {
-                  console.log(error);
                   if (error.status === STATUS_CODE.UNATHORISED) {
                     const refreshTokenResponse = await RefreshToken({
                       callFunctionWithEvent: handleCompanyTeamUsersToggle,
@@ -557,7 +540,9 @@ function CompanyTeamUsersAgGrid({
           columnDefs={companyTeamColumnDefs}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
-          overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          overlayNoRowsTemplate={ isGridForProductUser
+              ? companyProductUsersList!.length === 0 ? "No users assigned to this product" : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
+              : companyTeamUsersList!.length === 0 ? "No users assigned to this product" : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
           theme={themeAlpine}
           onViewportChanged={handleViewPortChanged}
           onGridReady={onGridReady}
