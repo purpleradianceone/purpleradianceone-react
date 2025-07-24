@@ -89,6 +89,24 @@ function Navbar({ children }: { children: React.ReactNode }) {
       if(response.status === 200){
         toast.success(response.data)
         Navigate(ROUTES_URL.SIGN_IN);
+         setLoginStatus({
+      id: 0,
+      companyId: 0,
+      message: "",
+      token: "",
+      status: false,
+      email: "",
+      fullName: "",
+      companyName: "",
+      createdOn: "",
+      mobileNumber: "",
+      activeUsersInCompany: 0,
+      isActiveSubscription: false,
+      subscriptionAllowedUsers: 0,
+      endDateSubscription: "",
+      startDateSubscription: "",
+      subscriptionId: 0,
+    });
       }
     })
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -104,7 +122,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
         }
       });
 
-    
+  }
   const location = useLocation();
 
   useEffect(() => {
