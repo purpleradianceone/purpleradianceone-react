@@ -226,8 +226,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               type: "success",
             });
             handleLeadProductUpdate(updatedProduct);
-            console.log("this is the updated product");
-            console.log(updatedProduct);
           }
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

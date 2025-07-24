@@ -93,7 +93,6 @@ function CompanyUserAccessManagementModal({
           setChangedAccessModules([]);
         })
         .catch(async (error: ApiError | any) => {
-          console.error(error);
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({ callFunction: fetchUserAccessModules });
             if (refreshTokenStatus) {
@@ -228,7 +227,6 @@ function CompanyUserAccessManagementModal({
         }, 2000);
       })
       .catch(async (error: ApiError | any) => {
-        console.error(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({ callFunction: handleSaveAccessModule });
           if (refreshTokenStatus) {

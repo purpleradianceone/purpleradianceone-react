@@ -201,6 +201,7 @@ function AddTeamModal({
         requestedby: loginStatus.id,
         limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
         offset: companyUsersSearchParameter.length > 0 ? 0 : 50 * isCompanyUsersFetchedCount,
+        isactive : true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyUsersSearchParameter,
         search_parameter_date: "",
@@ -244,7 +245,6 @@ function AddTeamModal({
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
-      console.error(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyUsers,
@@ -254,6 +254,7 @@ function AddTeamModal({
         }
         else{
           setIsDialogueOpen(false);
+          companyUsersFetchingRef.current = false;
           fetchCompanyUsers(companyUsersSearchParameter);
         }
       }
@@ -380,6 +381,7 @@ function AddTeamModal({
                 label="Team Name : "
                 type="text"
                 name="name"
+                required={true}
                 value={AddTeamFormData.name}
                 placeholder="Product Name"
                 onBlur={handleBlur}

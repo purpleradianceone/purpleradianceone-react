@@ -1280,9 +1280,7 @@ const ViewLeadManagement = () => {
               <button
                 onClick={() => {
                   setIsLeadOwnerPopUpOpen(false);
-                  //Note : show reason card only if different lead owner is selected.
-                  console.log(selectedCompanyUser);
-                  console.log(persistedSelectedUserId);
+              
 
                   if (
                     selectedCompanyUser.id !== 0 &&

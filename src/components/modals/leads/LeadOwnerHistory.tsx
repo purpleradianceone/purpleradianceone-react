@@ -45,7 +45,6 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
-        console.log(responseData);
 
         const transformedData: LeadOwnerHistoryData[] = responseData.map(
           (item: any) => ({

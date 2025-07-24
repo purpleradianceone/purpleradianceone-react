@@ -154,7 +154,6 @@ const getLeadTasks = async() => {
     withCredentials:true
   }).then((response) => {
     if(response.status === STATUS_CODE.OK){
-      console.log(response.data);
       response.data.map((res : any) => {
         setLeadTasks((prev) => [...prev,{
           id : res.id,

@@ -66,7 +66,6 @@ function LeadMeetingsModal({
 
   useEffect(() => {
     moment.tz.setDefault(userPreference.timezoneName);
-    console.log(currentViewDate);
   }, []);
 
   const [meetingDetailsUpdateCount, setMeetDetailsUpdateCount] =
@@ -179,7 +178,6 @@ function LeadMeetingsModal({
         }
       })
       .catch(async (error: ApiError | any) => {
-        console.log(error);
 
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
@@ -222,8 +220,6 @@ function LeadMeetingsModal({
               userPreference.timezoneName
             );
 
-            console.log("endDate By User Time Zone : ");
-            console.log(endDateByUserTimeZoneParsed);
             setGoogleMeetEventData((prev) => [
               ...prev,
               {
@@ -266,7 +262,6 @@ function LeadMeetingsModal({
         }
       })
       .catch(async (error: ApiError | any) => {
-        console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunction: getZoomMeeting,
@@ -314,11 +309,7 @@ function LeadMeetingsModal({
           .format("DD-MMM-YYYY")}`
       );
     } else if (view === "day") {
-      console.log(
-        `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(
-          new Date()
-        ).format("DD-MMM-YYYY")}`
-      );
+      
       setConcatDate(
         `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(
           new Date()
@@ -479,7 +470,6 @@ function LeadMeetingsModal({
     }
   };
   const onDateChange = useCallback((newDate: Date) => {
-    console.log(currentViewDate + " - " + newDate);
     setCurrentViewDate(newDate);
   }, []);
 
@@ -496,7 +486,6 @@ function LeadMeetingsModal({
 
   useEffect(() => {
     getGoogleMeeting();
-    console.log(googleMeetEventData);
   }, [meetingDetailsUpdateCount, concatDate]);
   return (
     <div className="bg-white w-full min-h-full">
@@ -830,7 +819,6 @@ function LeadMeetingsModal({
                   toolbar={false}
                   eventPropGetter={eventStyleGetter}
                   onSelectEvent={(event) => {
-                    console.log(event);
                     setSelectedMeetingEvent(event);
                     setIsEditMettingModalOpen(true);
                   }}

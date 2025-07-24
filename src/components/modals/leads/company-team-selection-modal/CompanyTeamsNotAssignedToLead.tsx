@@ -140,7 +140,6 @@ function CompanyTeamsNotAssignedToLead({
       company_team_array: addCompanyProductTeamArray,
       createdbyid: loginStatus.id,
     };
-    console.log(createLeadCompanyTeamPostData);
 
     await axios
       .post(POST_API.CREATE_LEAD_COMPANY_TEAM, createLeadCompanyTeamPostData, {
@@ -222,6 +221,7 @@ function CompanyTeamsNotAssignedToLead({
           companyTeamsNotAssignedSearchParameter.length > 0
             ? 0
             : 40 * companyTeamsNotAssignedFetchedCount,
+        
         search_company_specific_date_range_id: null,
         search_parameter: companyTeamsNotAssignedSearchParameter,
 
@@ -306,7 +306,8 @@ function CompanyTeamsNotAssignedToLead({
         });
 
         if (refreshTokenResponse) {
-          fetchCompanyTeamsNotAssigned("");
+          companyTeamsNotAssignedFetchingRef.current = false;
+          fetchCompanyTeamsNotAssigned(companyTeamsNotAssignedSearchParameter);
         }
       }
     } finally {

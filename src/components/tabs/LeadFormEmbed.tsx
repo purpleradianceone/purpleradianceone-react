@@ -12,7 +12,6 @@ function LeadFormEmbed() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(iframeCode);
-    console.log(navigator.geolocation);
     setCopied(true);
     setTimeout(() => setCopied(false), 10000); // Reset after 10 seconds
   };

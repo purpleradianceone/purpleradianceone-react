@@ -139,7 +139,6 @@ function CreateSubscription({
         setIsPaymentSubscriptionOpen(true);
       }
     } catch (error: any) {
-      // console.error("Error creating subscription:", error);
       showMessageSnackbar({
         message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
         type: "error",

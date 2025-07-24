@@ -27,10 +27,6 @@ function TeamManagementAgGrid({
 }: TeamManagementAgGridProps) {
   const { userHasAccessToUpdateTeamManagement } = useUserAccessModules();
 
-  useEffect(() => {
-    console.log("inGrid");
-    console.log(companyTeamList);
-  }, [companyTeamList]);
 
   const columnDefs = useMemo<ColDef[]>(
     () => [

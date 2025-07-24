@@ -212,7 +212,6 @@ function EditCompanyTeamModal({
           }
         })
         .catch(async (error: ApiError | any) => {
-          console.log(error);
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
               callFunction: handleAddCompanyTeamUsers,
@@ -255,7 +254,7 @@ function EditCompanyTeamModal({
         company_id: loginStatus.companyId,
         company_team_id: companyTeam!.id,
         company_user_id: 0,
-        isactive: null,
+        isactive: true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyTeamsUserSearchParameter,
         search_parameter_date: "",
@@ -344,13 +343,13 @@ function EditCompanyTeamModal({
         }
       }
     } catch (error: ApiError | any) {
-      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
-          callFunctionWithParamsNotEvent: fetchCompanyTeamUsers,
+          callFunctionWithParamsNotEvent: fetchCompanyTeamUsers
         });
         if (refreshTokenResponse) {
-          fetchCompanyTeamUsers("");
+          companyTeamUsersFetchingRef.current = false;
+          fetchCompanyTeamUsers(companyTeamsUserSearchParameter);
         }
       }
     } finally {
@@ -430,7 +429,6 @@ function EditCompanyTeamModal({
             }
           })
           .catch(async (error: ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: handleUpdateCompanyTeam,
@@ -517,6 +515,7 @@ function EditCompanyTeamModal({
                   defaultValue={intialUpdateCompanyTeamFormData.name}
                   placeholder="Product Name"
                   onBlur={handleBlur}
+                  required={true}
                   error={errors.name}
                   onChange={handleUpdateCompanyFormDataChange}
                 />
@@ -536,6 +535,7 @@ function EditCompanyTeamModal({
                 cols={5}
                 rows={3}
                 maxLength={256}
+                required={true}
                 onBlur={handleBlur}
                 error={errors.description}
                 onChange={handleUpdateCompanyFormDataChange}

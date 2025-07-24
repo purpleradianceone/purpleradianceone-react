@@ -81,7 +81,6 @@ const MeetingScheduler = () => {
   };
 
   useEffect(() => {
-    console.log(new Date());
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
   }, [currentTime]);
 
@@ -115,7 +114,6 @@ const MeetingScheduler = () => {
       const data = sessionStorage.getItem("leadData");
       if (data) {
         const leadSearchParam = JSON.parse(data);
-        console.log(leadSearchParam);
         setLeadData(leadSearchParam);
       }
     }
@@ -220,10 +218,7 @@ const MeetingScheduler = () => {
         })
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-            console.log(response);
-          }
-
-          setTitle("");
+           setTitle("");
           setEndTime("");
           setStartTime("");
           // setTimeZone("");
@@ -233,10 +228,25 @@ const MeetingScheduler = () => {
           setStartDate("");
           setEndDate("");
           setSelectedMeetingPlatform("");
-          handleCloseMeetingModal();
+          if(response.data.status){
+              showMessageSnackbar({message : response.data.message,type : "success"});
+              setTimeout(() => {
+                handleCloseMeetingModal();
+              },2000)
+          
+          }
+          else{
+            showMessageSnackbar({message : response.data.message,type : "error"});
+          setTimeout(() => {
+                handleCloseMeetingModal();
+              },2000)
+          }
+          
+          }
+
+          
         })
         .catch(async(error) => {
-          console.log(error);
           if(error.status === STATUS_CODE.UNATHORISED){
             const refreshTokenResponse = await RefreshToken({callFunction:createGoogleMeetMeeting});
             if(refreshTokenResponse){
@@ -418,7 +428,6 @@ const MeetingScheduler = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        console.log("length : " + response.data.length);
         if (response.data.length === 0) {
           return 0;
         }
@@ -434,7 +443,6 @@ const MeetingScheduler = () => {
         return response.data[0].id;
       }
     } catch (error: ApiError | any) {
-      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
@@ -494,9 +502,6 @@ const MeetingScheduler = () => {
     params: CompanyUsersSearchProps,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log("from add email to meeting");
-    console.log(params);
-    console.log(selectedCompanyUsersIdArray);
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
       setAttendees((prev) => [...prev, params.email]);
@@ -545,7 +550,6 @@ const MeetingScheduler = () => {
       setIsModalForLead(false);
     } else {
       const leadData = sessionStorage.getItem("leadData");
-      console.log(leadData);
       const newQueryString = qs.stringify({
         leadData: leadData,
       });

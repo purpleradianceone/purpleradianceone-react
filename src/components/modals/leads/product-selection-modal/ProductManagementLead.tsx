@@ -127,7 +127,6 @@ function ProductManagementLead({
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError| any) {
-        console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunction: fetchCompanyProducts,
@@ -151,13 +150,6 @@ function ProductManagementLead({
     navigate(ROUTES_URL.SIGN_IN);
   };
 
-
-  useEffect(()=>{
-    console.log("this is lead id ");
-    
-    console.log(leadId);
-    
-  },[])
 
   useEffect(() => {
     setTimeout(() => {

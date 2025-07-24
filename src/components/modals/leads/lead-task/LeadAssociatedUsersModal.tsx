@@ -9,9 +9,10 @@ import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { createPortal } from "react-dom";
 import { UserPlus, X } from "lucide-react";
-import { SIZE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import SearchInput from "../../../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "../../../ag-grid/AddCompanyTeamUsersAgGrid";
+import RefreshToken from "../../../../config/validations/RefreshToken";
 
 
 
@@ -113,6 +114,7 @@ function LeadAssociatedUsersModal({
                   updatedby: user.upadtedby,
                   updatedon: user.updatedon,
                   count: user.count,
+                  
                 },
               ]);
             });
@@ -139,7 +141,14 @@ function LeadAssociatedUsersModal({
             }
           }
         } catch (error: ApiError | any) {
-          console.error(error);
+          if(error.status === STATUS_CODE.OK){
+            
+            const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:fetchCompanyUsers})
+            if(refreshTokenResponse){
+              companyUsersFetchingRef.current = false;
+              fetchCompanyUsers(comapnyUserSearchParameter);
+            }
+          }
         } finally {
           if (comapnyUserSearchParameter.length > 0) {
             setIsCompanyUsersLoading(false);

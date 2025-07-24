@@ -111,13 +111,11 @@ function CreateCompanyProductTaxModal({
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
         };
-        console.log(updateProductPostData);
         await axios
           .post(POST_API.CREATE_PRODUCT_TAX, updateProductPostData, {
             withCredentials: true,
           })
           .then((response) => {
-            console.log(response);
             if (
               response.data.status === true &&
               response.status === STATUS_CODE.OK
@@ -140,7 +138,6 @@ function CreateCompanyProductTaxModal({
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch(async (error: ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,

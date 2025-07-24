@@ -86,7 +86,6 @@ function SignUpForm() {
                   withCredentials: true,
                 })
                 .then((respone) => {
-                  console.log(respone);
 
                   if (respone.data.status) {
                     if (
