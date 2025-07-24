@@ -1,3 +1,4 @@
+
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
 const WEB_SOCKET_URL = import.meta.env.VITE_WEB_SOCKET_URL!;
 export const WEB_SOCKET_CONNECTION_URL =` ${WEB_SOCKET_URL}${import.meta.env.VITE_WEB_SOCKET_CONNECTION_URL!}`;
@@ -130,7 +131,8 @@ const POST_API = {
     GET_COMPLETED_LEAD_TASKS :`${BASE_URL}${import.meta.env.VITE_GET_COMPLETED_LEAD_TASKS!}`,
     GET_LEAD_ASSOCIATED_USERS :`${BASE_URL}${import.meta.env.VITE_GET_LEAD_ASSOCIATED_USERS!}`,
     
-    
+    LOGOUT:`${BASE_URL}${import.meta.env.VITE_LOGOUT}`
+
 }
 
 export default POST_API;
