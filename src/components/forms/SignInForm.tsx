@@ -85,6 +85,28 @@ function SignInForm() {
 
   // const isActiveSubscriptionUseRef =useRef<boolean>(false);
 
+  const resetLoginStatus = () => {
+    console.log("reset from login component");
+    setLoginStatus({
+            companyId: 0,
+            companyName: "",
+            createdOn: "",
+            email: "",
+            fullName: "",
+            id: 0,
+            message: "",
+            mobileNumber: "",
+            status: false,
+            token: "",
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            activeUsersInCompany: 0,
+            subscriptionId: 0,
+            startDateSubscription: "",
+            endDateSubscription: "",
+          });
+  }
+
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -128,6 +150,7 @@ function SignInForm() {
       .then((response) => {
         if (response.data.status) {
           loginStatusRef.current = response.data;
+          console.log("value set from login");
           setLoginStatus({
             id: response.data.id,
             companyId: response.data.company_id,
@@ -149,11 +172,13 @@ function SignInForm() {
 
           // note: is status false , then it will navigate to create subscription page
           if (!response.data.isactive_subscription) {
+            
             setTimeout(() => {
               showMessageSnackbar({
                 message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
                 type: "error",
               });
+              
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
             }, 1500);
             return; // ⬅️ Stops further execution
@@ -180,21 +205,16 @@ function SignInForm() {
                 type: "success",
               });
 
-              // //note : temporary fix
-              // if ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers)) {
-              //   setShowSubscriptionOrInActivePopUp(true);
-              //   return;
-              // }
-
-              //note :
               if (
                 loginStatusRef.current.active_users_in_company >
                 loginStatusRef.current.subscription_allowed_users
               ) {
                 setShowSubscriptionOrInActivePopUp(true);
+                
                 return;
               }
               if (!loginStatusRef.current.isactive_subscription) {
+                
                 navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
                 return;
               } else if (
@@ -239,6 +259,7 @@ function SignInForm() {
             })
             .catch((error) => {
               console.error(error);
+              resetLoginStatus();
               setSpinnerAnimation({
                 status: "idle",
                 message: "",
@@ -252,24 +273,6 @@ function SignInForm() {
           setSpinnerAnimation({
             status: "idle",
             message: "",
-          });
-          setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isActiveSubscription: false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
           });
         }
       })
@@ -289,25 +292,8 @@ function SignInForm() {
 
   //when sign in page loads resets the contexts and local storage
   useEffect(() => {
-    setLoginStatus({
-      companyId: 0,
-      companyName: "",
-      createdOn: "",
-      email: "",
-      fullName: "",
-      id: 0,
-      message: "",
-      mobileNumber: "",
-      status: false,
-      token: "",
-      isActiveSubscription: false,
-      subscriptionAllowedUsers: 0,
-      activeUsersInCompany: 0,
-      subscriptionId: 0,
-      startDateSubscription: "",
-      endDateSubscription: "",
-    });
-
+    console.log("inside useeffect reset login page")
+    resetLoginStatus();
     setAccessModules([]);
     localStorage.clear();
   }, []);
@@ -417,6 +403,25 @@ function SignInForm() {
           onClose={() => {
             setShowSubscriptionOrInActivePopUp(false);
             localStorage.clear();
+            console.log("reset from subscription dialogue box used in login");
+            setLoginStatus({
+            companyId: 0,
+            companyName: "",
+            createdOn: "",
+            email: "",
+            fullName: "",
+            id: 0,
+            message: "",
+            mobileNumber: "",
+            status: false,
+            token: "",
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            activeUsersInCompany: 0,
+            subscriptionId: 0,
+            startDateSubscription: "",
+            endDateSubscription: "",
+          });
             navigate(ROUTES_URL.SIGN_IN);
             setSpinnerAnimation({
               status: "idle",

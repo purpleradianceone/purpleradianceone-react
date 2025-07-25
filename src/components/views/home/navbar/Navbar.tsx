@@ -83,6 +83,19 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        
+        element.scrollIntoView({ behavior: 'instant' });
+      }
+    }
+  }, [location]);
+
   const handleLogout = async() => {
     await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
     .then((response ) =>{
@@ -171,7 +184,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
-  if (!loginStatus.status) {
+    // useEffect(() => {
+    //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    //   console.log("loginstatus : " + loginStatus.status);
+    //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
+    //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
+    //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
+    //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    // },[loginStatus])
+
+  if (!loginStatus.status || ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers))) {
     return (
       <div>
         <header className="fixed bg-white w-full shadow-sm z-50 py-5">
