@@ -21,9 +21,6 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 const LeadDetails = ({
@@ -103,13 +100,6 @@ const LeadDetails = ({
 
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
   const { loginStatus } = useLoggedInUserContext();
@@ -199,13 +189,8 @@ const LeadDetails = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleSave(e);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -235,13 +220,8 @@ const LeadDetails = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           fetchIndustryType();
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -270,12 +250,7 @@ const LeadDetails = ({
         });
         if (refreshTokenStatus) {
           getAllCountries();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -311,12 +286,7 @@ const LeadDetails = ({
           });
           if (refreshTokenStatus) {
             getAllState(countryId);
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
     }
   };
@@ -355,12 +325,7 @@ const LeadDetails = ({
           });
           if (refreshTokenStatus) {
             getAllDistrict(stateId);
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       }
   };
@@ -640,13 +605,6 @@ const LeadDetails = ({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
     </div>
   );

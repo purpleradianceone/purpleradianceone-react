@@ -20,9 +20,6 @@ import {
 } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import RadioButtons from "../../ui/RadioButton";
 
@@ -35,27 +32,24 @@ function EditCompanyUserModal({
   const initialUpdateUserformData = {
     name: user.fullname,
     mobileNumber: user.mobilenumber,
-    isActive : user.isactive,
+    isActive: user.isactive,
   };
   const CompanyUserIsActiveRadioButtonOptions = [
     {
-      label : "Active",
-      value : "true",
-      id : "active",
-      name : "isActive",
-      checked : user.isactive 
-      },
-      {
-        label : "Inactive",
-        value : 'false',
-        id : "inActive",
-        name : "isActive",
-        checked : !user.isactive
-    }
-  ]
-
-  
-
+      label: "Active",
+      value: "true",
+      id: "active",
+      name: "isActive",
+      checked: user.isactive,
+    },
+    {
+      label: "Inactive",
+      value: "false",
+      id: "inActive",
+      name: "isActive",
+      checked: !user.isactive,
+    },
+  ];
 
   const {
     formData: updateUserformData,
@@ -66,18 +60,12 @@ function EditCompanyUserModal({
     "registration"
   );
 
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
     message: "",
     type: "success" as "success" | "error",
   });
   const { loginStatus } = useLoggedInUserContext();
-
-  
 
   useEffect(() => {
     if (isOpen) {
@@ -88,20 +76,13 @@ function EditCompanyUserModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-
-
-
   const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
-      updateUserformData.mobileNumber !== initialUpdateUserformData.mobileNumber ||
+      updateUserformData.mobileNumber !==
+        initialUpdateUserformData.mobileNumber ||
       updateUserformData.isActive !== initialUpdateUserformData.isActive
     ) {
       if (updateUserformData.name != "") {
@@ -116,46 +97,39 @@ function EditCompanyUserModal({
             company_id: loginStatus.companyId,
             fullname: updateUserformData.name,
             mobilenumber: updateUserformData.mobileNumber,
-            isactive : updateUserformData.isActive
+            isactive: updateUserformData.isActive,
           };
-          await axios.put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+          await axios
+            .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
               withCredentials: true,
             })
             .then((response) => {
-              if(response.data.status){
+              if (response.data.status) {
                 showMessageSnackbar({
                   message: response.data.message,
                   type: "success",
                 });
-              }
-              else if(!response.data.status){
+              } else if (!response.data.status) {
                 showMessageSnackbar({
                   message: response.data.message,
                   type: "error",
                 });
               }
               handleCompanyUserChange(user);
-                setTimeout(() => {
-                  onClose();
-                }, 2000);
-             
-             
+              setTimeout(() => {
+                onClose();
+              }, 2000);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (error: ApiError | any) => {
               if (error.status === STATUS_CODE.UNATHORISED) {
-                const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleEditUserSubmit });
-                if(refreshTokenStatus){
-                  setIsDialogueOpen(false)
+                const refreshTokenStatus = await RefreshToken({
+                  callFunctionWithEvent: handleEditUserSubmit,
+                });
+                if (refreshTokenStatus) {
+                  handleEditUserSubmit(event);
                 }
-                else{
-                  setIsDialogueOpen(true);
-                }
-              } 
-              else if(error.status === STATUS_CODE.FORBIDDEN){
-                          setIsDialogueOpen(false);
-                        }
-                        else {
+              } else {
                 showMessageSnackbar({
                   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
                   type: "error",
@@ -189,8 +163,6 @@ function EditCompanyUserModal({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-
-
   useEffect(() => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   }, [isOpen]);
@@ -199,87 +171,82 @@ function EditCompanyUserModal({
   return (
     <>
       <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-45">
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+        <div className="flex min-h-screen items-center justify-center">
+          <div
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
-            <X size={SIZE.TWENTY} />
-          </button>
+            <button
+              onClick={onClose}
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+            >
+              <X size={SIZE.TWENTY} />
+            </button>
 
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Edit {user.fullname}
-              </h2>
-            </div>
-
-            <form className="space-y-8" onSubmit={handleEditUserSubmit}>
-              <FormInput
-                label="Name"
-                type="text"
-                name="name"
-                 required={true}
-                value={updateUserformData.name}
-                placeholder="Enter User Name"
-                defaultValue={initialUpdateUserformData.name}
-                maxLength={256}
-                onChange={handleEditUserFormChange}
-                error={errors.name}
-                onBlur={handleBlur}
-              />
-              <FormInput
-                label="Mobile Number"
-                type="tel"
-                name="mobileNumber"
-                placeholder="Enter Mobile Number"
-                defaultValue={initialUpdateUserformData.mobileNumber}
-                onChange={handleEditUserFormChange}
-                onBlur={handleBlur}
-                error = {errors.mobileNumber}
-              />
-
-              <RadioButtons
-              label="isActive"
-              onChange={handleEditUserFormChange}
-              options={CompanyUserIsActiveRadioButtonOptions}
-              />
-              <FormInput
-                label="Email"
-                type="email"
-                name="email"
-                required={true}
-                placeholder="Enter Email Address"
-                defaultValue={user.email}
-                readonly={true}
-              />
-              <div className="flex justify-self-center m-2 min-w-60 pb-10">
-              <Button type="submit">Update Company User</Button>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Edit {user.fullname}
+                </h2>
               </div>
-            </form>
+
+              <form className="space-y-8" onSubmit={handleEditUserSubmit}>
+                <FormInput
+                  label="Name"
+                  type="text"
+                  name="name"
+                  required={true}
+                  value={updateUserformData.name}
+                  placeholder="Enter User Name"
+                  defaultValue={initialUpdateUserformData.name}
+                  maxLength={256}
+                  onChange={handleEditUserFormChange}
+                  error={errors.name}
+                  onBlur={handleBlur}
+                />
+                <FormInput
+                  label="Mobile Number"
+                  type="tel"
+                  name="mobileNumber"
+                  placeholder="Enter Mobile Number"
+                  defaultValue={initialUpdateUserformData.mobileNumber}
+                  onChange={handleEditUserFormChange}
+                  onBlur={handleBlur}
+                  error={errors.mobileNumber}
+                />
+
+                <RadioButtons
+                  label="isActive"
+                  onChange={handleEditUserFormChange}
+                  options={CompanyUserIsActiveRadioButtonOptions}
+                />
+                <FormInput
+                  label="Email"
+                  type="email"
+                  name="email"
+                  required={true}
+                  placeholder="Enter Email Address"
+                  defaultValue={user.email}
+                  readonly={true}
+                />
+                <div className="flex justify-self-center m-2 min-w-60 pb-10">
+                  <Button type="submit">Update Company User</Button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleCloseSnackbar}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+          <MessageSnackBar
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleCloseSnackbar}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION}
+          />
         </div>
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </>
   );
 }

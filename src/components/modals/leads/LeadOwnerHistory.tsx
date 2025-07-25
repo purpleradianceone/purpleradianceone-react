@@ -5,9 +5,6 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import LeadOwnerHistoryProp from "../../../@types/lead-management/LeadOwnerHistoryProp";
 import LeadOwnerHistoryData from "../../../@types/lead-management/LeadOwnerHistoryData";
 import LeadOwnerHistoryAgGrid from "../../ag-grid/LeadOwnerHistoryAgGrid";
@@ -28,9 +25,7 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
       reason: "",
     },
   ]);
-  const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const getLeadOwnerHistory = async () => {
     const PostDataToGetLeadOwnerHistory = {
       company_id: loginStatus.companyId,
@@ -65,13 +60,8 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           getLeadOwnerHistory();
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -81,11 +71,6 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
     }
   }, [isOpen]);
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   if (!isOpen) return null;
   return (
@@ -107,13 +92,6 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
           />
         </div>
       </div>
-       <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            />
     </div>
   );
 };

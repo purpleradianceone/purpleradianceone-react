@@ -45,7 +45,6 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import MeetingPlatforms from "../../../@types/meeting/MeetingPlatform";
 import { useUserPreference } from "../../../context/user/UserPreference";
 
@@ -137,7 +136,6 @@ function EditMeetingDetailsModal({
     meetingDetails!.description
   );
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -208,11 +206,6 @@ function EditMeetingDetailsModal({
     "idle"
   );
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
@@ -1050,13 +1043,6 @@ function EditMeetingDetailsModal({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.

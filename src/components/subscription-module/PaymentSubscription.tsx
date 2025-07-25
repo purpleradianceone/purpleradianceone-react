@@ -125,6 +125,7 @@ export default function PaymentSubscription({
                   setTimeout(() => {
                     localStorage.clear();
                     navigate(ROUTES_URL.SIGN_IN);
+                    
                   }, 3000); //animation Time
                 } else {
                   setTimeout(() => {

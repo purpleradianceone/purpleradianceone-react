@@ -17,9 +17,6 @@ import {
 import MessageSnackBar from "../../../ui/MessageSnackbar";
 import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
 
 const LeadImportData = ({ 
@@ -29,7 +26,6 @@ const LeadImportData = ({
     selectedLeadTag: string
     getLeadImportTags : () => Promise<void>
  }) => {
-  const navigate = useNavigate();
   const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -45,12 +41,6 @@ const LeadImportData = ({
   const [totalCount, setTotalCount] = useState<number>(0);
   const [responseCame, setResponeCame] = useState<boolean>(true);
   const [showLoadingSpinner , setShowLoadingSpinner] = useState<boolean>(false);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
   const [openFinalPopup, setOpenFinalPopup] = useState<boolean>(false);
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -109,12 +99,7 @@ const LeadImportData = ({
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           getLeadImportData();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -196,12 +181,7 @@ const LeadImportData = ({
           });
           if (refreshTokenStatus) {
             getLeadImportData();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       })
       .finally(() => {
@@ -247,12 +227,7 @@ const LeadImportData = ({
           });
           if (refreshTokenStatus) {
             handleCreateMoveLeadsToLeadTable();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }else if (error.status === 500){
             showMessageSnackbar({
                 message : error.response.data,
@@ -353,13 +328,6 @@ const LeadImportData = ({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
       <FinalConfirmationModal
       showLoadingSpinner ={showLoadingSpinner}

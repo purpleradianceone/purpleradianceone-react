@@ -5,7 +5,6 @@ type DialogueBoxProps =  {
     title: string;
     message: string;
     confirmText?: string;
-    cancelText?: string;
   }
 
   export default DialogueBoxProps;

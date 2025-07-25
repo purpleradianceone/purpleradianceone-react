@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Network, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
@@ -12,17 +12,13 @@ import FormInput from "../../ui/FormInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import Button from "../../ui/Button";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import ROUTES_URL from "../../../constants/Routes";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import AddTeamFormDataState from "../../../@types/team-management/AddTeamFormDataState";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import {
@@ -35,6 +31,7 @@ import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
+import ApiError from "../../../@types/error/ApiError";
 
 
 function AddTeamModal({
@@ -75,15 +72,6 @@ function AddTeamModal({
   const onGridReady = (params: { api: GridApi }) => {
     companyUsersGridApiRef.current = params.api;
 };
-
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -148,19 +136,14 @@ function AddTeamModal({
               type: "error",
             });
           }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: ApiError | any) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
               callFunctionWithEvent: handleAddTeamFormSubmit,
             });
             if (refreshTokenResponse) {
-              setIsDialogueOpen(false);
-            } else {
-              setIsDialogueOpen(true);
+              handleAddTeamFormSubmit(event);
             }
-          } else if (error.status === STATUS_CODE.FORBIDDEN) {
-            setIsDialogueOpen(true);
           }
         }
       } else {
@@ -243,19 +226,14 @@ function AddTeamModal({
           setCompanyUsersHasMore(false);
         }
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyUsers,
         });
-        if (!refreshTokenResponse) {
-          setIsDialogueOpen(true);
-        }
-        else{
-          setIsDialogueOpen(false);
+        if (refreshTokenResponse) {
           companyUsersFetchingRef.current = false;
-          fetchCompanyUsers(companyUsersSearchParameter);
+          fetchCompanyUsers(companyUsersSearchParameter)
         }
       }
     } finally {
@@ -451,13 +429,6 @@ function AddTeamModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

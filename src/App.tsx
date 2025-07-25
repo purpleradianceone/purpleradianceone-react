@@ -14,12 +14,16 @@ import { UserPreferenceContextProvider } from "./context/user/UserPreference";
 import { NotificationProvider } from "./context/notification/NotificationProvider";
 import { Toaster } from "react-hot-toast";
 import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
+import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
+import { DialogueBox } from "./components/dialogue-box/Dialogue";
 
 /**
  *
  * @returns JSX.Element of all html elements to be rendered as child element of root element in index.html
  */
 function App() {
+
+  const {closeDialog,confirmHandler,dialogMessage,isDialogOpen} = useAxiosForbiddenHandler()
   return (
    <NotificationCountContextProvider>
     
@@ -31,6 +35,13 @@ function App() {
                 <LoggedInUserContextProvider>
                    <NotificationProvider>
                      <Toaster position="top-center" reverseOrder={false} />
+                     <DialogueBox
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={confirmHandler}
+        title="Session Expired !"
+        message={dialogMessage}
+      />
                   <RouterProvider router={router} />
                    </NotificationProvider>
                 </LoggedInUserContextProvider>
@@ -39,6 +50,7 @@ function App() {
           </ZoomMeetingContextProvider>
         </PanelProvider>
       </UserPreferenceContextProvider>
+      
       </NotificationCountContextProvider>
     
   );

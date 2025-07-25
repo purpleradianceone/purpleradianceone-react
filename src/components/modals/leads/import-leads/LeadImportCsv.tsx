@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
   useState,
@@ -16,9 +17,6 @@ import POST_API from "../../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserPreference } from "../../../../context/user/UserPreference";
@@ -406,7 +404,6 @@ const LeadImportCsv = ({
   handleButtonClicked: (value: boolean) => void; 
 }) => {
   const { userPreference } = useUserPreference();
-  const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
   // --- STATE ---
@@ -416,7 +413,6 @@ const LeadImportCsv = ({
   const [error, setError] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [isParsing, setIsParsing] = useState<boolean>(false);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
   
@@ -551,10 +547,10 @@ const LeadImportCsv = ({
           const refreshTokenStatus = await RefreshToken({
             callFunction: callFn,
           });
-          setIsDialogueOpen(!refreshTokenStatus);
-        } else if (error.response?.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
-        }
+          if(refreshTokenStatus){
+            callFn();
+          }
+        } 
       }
     };
     await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
@@ -601,12 +597,7 @@ const LeadImportCsv = ({
         });
         if (refreshTokenStatus) {
           fetchCompanyUsers(searchParameter, offset, limit);
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.response?.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -615,12 +606,6 @@ const LeadImportCsv = ({
     fetchApiData();
     fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   // --- EFFECTS ---
   useEffect(() => {
@@ -1083,15 +1068,9 @@ const LeadImportCsv = ({
           callFunctionWithEvent: handleSubmitImport,
         });
 
-        // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleSubmitImport();
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       } else {
         showMessageSnackbar({
           message:
@@ -1447,13 +1426,6 @@ const LeadImportCsv = ({
           }}
         />
       )}
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired!"
-        message="Your session has expired. Please login again."
-      />
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
