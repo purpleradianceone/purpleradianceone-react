@@ -15,9 +15,6 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import MESSAGE from "../../constants/Messages";
-import { DialogueBox } from "../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import ProductTaxManagementAgGridProps from "../../@types/ag-grid/ProductTaxManagementAgGridProps";
 
@@ -29,10 +26,6 @@ function ProductTaxManagementAgGrid({
 
   const {isSmallScreen} = useScreenSize();
 
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
  
 const {userHasAccessToUpdateProductTax} = useUserAccessModules();
@@ -51,13 +44,6 @@ const {loginStatus} = useLoggedInUserContext();
     const handleCloseSnackbar = () => {
       setMessageSnackbar((prev) => ({ ...prev, open: false }));
     };
-
-    
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -136,16 +122,11 @@ const {loginStatus} = useLoggedInUserContext();
                         if(error.status === STATUS_CODE.UNATHORISED){
                             const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
                             if(refreshTokenResponse){
-                              setIsDialogueOpen(false);
                               handleCompanyProductTaxDelete();
                             }
-                            else {
-                                setIsDialogueOpen(true)
+                          
                             }
-                            }
-                            else if(error.status === STATUS_CODE.FORBIDDEN){
-                              setIsDialogueOpen(true)
-                            }
+                           
                         
                     })
                 }
@@ -198,14 +179,6 @@ const {loginStatus} = useLoggedInUserContext();
               type={messageSnackbar.type}
               onClose={handleCloseSnackbar}
               duration={NUMBER_VALUES.SNACKBAR_DURATION} />
-
-              <DialogueBox
-                      isOpen={isDialogueOpen}
-                      onClose={() => setIsDialogueOpen(false)}
-                      onConfirm={handleDialogueConfirm}
-                      title="Session Expired !"
-                      message="Session Expired. Please login again."
-                    />
               </>
   );
 

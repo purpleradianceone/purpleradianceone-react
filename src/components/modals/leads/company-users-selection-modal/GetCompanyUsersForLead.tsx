@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
 import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
-import ROUTES_URL from "../../../../constants/Routes";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
@@ -12,7 +10,6 @@ import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import GetCompanyUserListForLeadAssignment from "./GetCompanyUserListForLeadAssignment";
 // import ApiError from "../../../../@types/error/ApiError";
@@ -30,10 +27,6 @@ function GetCompanyUsersForLead({
   );
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
     false
   );
 
@@ -82,6 +75,7 @@ function GetCompanyUsersForLead({
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
+      isactive : true,
     };
 
     try {
@@ -103,21 +97,12 @@ function GetCompanyUsersForLead({
           callFunction: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+         fetchCompanyUsers(); 
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -168,13 +153,6 @@ function GetCompanyUsersForLead({
               users={companyUsers}
             />
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

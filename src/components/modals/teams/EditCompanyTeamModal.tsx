@@ -17,9 +17,6 @@ import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import RadioButtons from "../../ui/RadioButton";
@@ -93,8 +90,6 @@ function EditCompanyTeamModal({
   const handleMessageSnackbarClose = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
     CompanyTeamUsers[]
   >([]);
@@ -166,11 +161,6 @@ function EditCompanyTeamModal({
   };
   const companyTeamUserOnGridReady = (params: { api: GridApi }) => {
     companyTeamUsersGridApiRef.current = params.api;
-  };
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
   const handleCompanyTeamUsersUpdateChange = () => {
@@ -435,10 +425,7 @@ function EditCompanyTeamModal({
               });
               if (refreshTokenResponse) {
                 handleUpdateCompanyTeam(event);
-                setIsDialogueOpen(false);
               }
-            } else if (error.status === STATUS_CODE.FORBIDDEN) {
-              setIsDialogueOpen(true);
             }
           });
       } else {
@@ -457,7 +444,6 @@ function EditCompanyTeamModal({
         description: "",
       });
       handleMessageSnackbarClose();
-      setIsDialogueOpen(false);
       setCompanyTeamUsersList([]);
       setAddCompanyTeamUserArray([]);
       setssCompanyTeamUsersFetchedForFirstTime(true);
@@ -582,13 +568,6 @@ function EditCompanyTeamModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

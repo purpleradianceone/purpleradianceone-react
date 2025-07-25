@@ -24,7 +24,6 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
 import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
@@ -92,12 +91,6 @@ const ViewLeadManagement = () => {
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -144,12 +137,7 @@ const ViewLeadManagement = () => {
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           fetchLeadStatus();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -212,12 +200,7 @@ const ViewLeadManagement = () => {
         });
         if (refreshTokenStatus) {
           handleSaveStatusUpdate();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -342,12 +325,7 @@ const ViewLeadManagement = () => {
         });
         if (refreshTokenStatus) {
           handleLeadOwnerChange();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     } finally {
       // selected company user should become null after this function runs
@@ -433,12 +411,7 @@ const ViewLeadManagement = () => {
         });
         if (refreshTokenStatus) {
           getLeadDetails();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -472,12 +445,7 @@ const ViewLeadManagement = () => {
         });
         if (refreshTokenStatus) {
           getLeadInterestData();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   }
@@ -524,12 +492,7 @@ const ViewLeadManagement = () => {
         });
         if (refreshTokenStatus) {
           fetchLeadCompanyProduct();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -609,12 +572,7 @@ const ViewLeadManagement = () => {
           });
           if (refreshTokenStatus) {
             fetchLeadContact();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       });
   };
@@ -687,12 +645,8 @@ const ViewLeadManagement = () => {
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          handleLeadInfoSave();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -1261,13 +1215,6 @@ const ViewLeadManagement = () => {
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
       {isLeadOwnerPopUpOpen && (
         <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">

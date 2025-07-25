@@ -27,9 +27,6 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import DatePickerInput from "../../ui/DatePickerInput";
 import AddProductModalProps from "../../../@types/modal/AddProductModalProps";
 import MESSAGE from "../../../constants/Messages";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ApiError from "../../../@types/error/ApiError";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 
@@ -45,17 +42,7 @@ function AddProductModal({
     type: "success",
   });
 
-
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
   const {isSmallScreen} = useScreenSize()
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -171,15 +158,10 @@ function AddProductModal({
                 callFunctionWithEvent: handleAddProductFormSubmit,
               });
               if(refreshTokenResponse){
-                setIsDialogueOpen(false);
-              }
-              else{
-                setIsDialogueOpen(true);
+                handleAddProductFormSubmit(event);
               }
             }
-            else if(error.status === STATUS_CODE.FORBIDDEN){
-              setIsDialogueOpen(true);
-            }
+           
           });
       }
     }
@@ -348,13 +330,6 @@ function AddProductModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

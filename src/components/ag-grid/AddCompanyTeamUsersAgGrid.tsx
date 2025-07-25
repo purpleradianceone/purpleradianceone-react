@@ -1,7 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -23,9 +22,6 @@ import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
-import { DialogueBox } from "../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
 
 function AddCompanyTeamUsersAgGrid({
   companyUsers,
@@ -151,14 +147,7 @@ function AddCompanyTeamUsersAgGrid({
             );
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
-            const navigate = useNavigate();
-            const [isDialogueOpen, setIsDialogueOpen] =
-              useState<boolean>(false);
-            const handleDialogueConfirm = () => {
-              setIsDialogueOpen(false);
-              localStorage.clear();
-              navigate(ROUTES_URL.SIGN_IN);
-            };
+
 
             const handleCompanyUserUpdateToggle = async (
               event: React.FormEvent<HTMLButtonElement>
@@ -203,15 +192,10 @@ function AddCompanyTeamUsersAgGrid({
                     callFunctionWithEvent: handleCompanyUserUpdateToggle,
                   });
                   if (refreshTokenStatus) {
-                    setIsDialogueOpen(false);
                     handleCompanyUserUpdateToggle(event);
-                  } else {
-                    setIsDialogueOpen(true);
-                  }
+                  } 
                 }
-                if (error.status === STATUS_CODE.FORBIDDEN) {
-                  setIsDialogueOpen(true);
-                }
+
               }
             };
 
@@ -234,13 +218,6 @@ function AddCompanyTeamUsersAgGrid({
                     }`}
                   ></div>
                 </button>
-                <DialogueBox
-                  isOpen={isDialogueOpen}
-                  onClose={() => setIsDialogueOpen(false)}
-                  onConfirm={handleDialogueConfirm}
-                  title="Session Expired !"
-                  message="Session Expired. Please login again."
-                />
               </div>
             );
           }

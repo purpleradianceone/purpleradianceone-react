@@ -8,11 +8,8 @@ import POST_API from "../../../constants/PostApi";
 import {
   STATUS_CODE,
 } from "../../../constants/AppConstants";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
@@ -24,10 +21,6 @@ function GetCompanyUsers() {
   );
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
     false
   );
 
@@ -99,21 +92,13 @@ function GetCompanyUsers() {
           callFunction: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          fetchCompanyUsers();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
+
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -160,13 +145,6 @@ function GetCompanyUsers() {
               users={companyUsers}
             />
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

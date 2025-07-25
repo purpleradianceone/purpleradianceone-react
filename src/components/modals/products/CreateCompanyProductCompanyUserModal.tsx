@@ -5,9 +5,6 @@ import CreateCompanyProductCompanyUserModalProps from "../../../@types/modal/Cre
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 import { useEffect, useState } from "react";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -33,18 +30,11 @@ function CreateCompanyProductCompanyUserModal({
   const { loginStatus } = useLoggedInUserContext();
   const [compnayUsers, setCompnayUsers] = useState<CompanyUsersSearchProps[]>([]);
 
-  const navigate = useNavigate();
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
   };
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
+
 
   const handleMessageSnackbarClose = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
@@ -82,12 +72,8 @@ function CreateCompanyProductCompanyUserModal({
           if (error.status == STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({ callFunction: fetchCompanyUsers });
             if (refreshTokenResponse) {
-              setIsDialogueOpen(false);
-            } else {
-              setIsDialogueOpen(true);
+              fetchCompanyUsers();
             }
-          } else if (error.status === STATUS_CODE.FORBIDDEN) {
-            setIsDialogueOpen(true);
           }
         });
     }
@@ -195,13 +181,6 @@ function CreateCompanyProductCompanyUserModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired!"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

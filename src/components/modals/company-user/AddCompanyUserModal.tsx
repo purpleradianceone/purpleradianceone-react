@@ -24,8 +24,6 @@ import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 
@@ -39,10 +37,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   };
 
   const {isSmallScreen} = useScreenSize()
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
   const {
     formData: addCompanyUserFormData,
@@ -125,14 +119,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               callFunctionWithEvent: handleAddUserSubmit,
             });
             if (refreshTokenStatus) {
-              setIsDialogueOpen(false);
-            } else {
-              setIsDialogueOpen(true);
-            }
+              handleAddUserSubmit(event);            }
           } 
-          else if(error.status === STATUS_CODE.FORBIDDEN){
-            setIsDialogueOpen(true);
-          }
           else {
             showMessageSnackbar({
               message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
@@ -149,11 +137,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     }
   };
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   useEffect(()=>{
     if(!isOpen){
@@ -241,13 +224,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           />
         </div>
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </>
   );
 }

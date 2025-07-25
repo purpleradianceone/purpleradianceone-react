@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
@@ -9,8 +8,6 @@ import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../../constants/Routes";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
 import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import ProductsManagementListLead from "./ProductManagementListLead";
 import ApiError from "../../../../@types/error/ApiError";
@@ -35,10 +32,6 @@ function ProductManagementLead({
 }) {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     false
@@ -133,21 +126,11 @@ function ProductManagementLead({
           });
 
           if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
+           fetchCompanyProducts();
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       }
     }
-  };
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
 
@@ -198,13 +181,6 @@ function ProductManagementLead({
 
             />                      
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

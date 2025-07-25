@@ -31,7 +31,6 @@ import EditMeetingDetailsModal from "./EditMeetingDetailsModal";
 import CalendarEventType from "../../../@types/meeting/CalendarEventType";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import LiveTimezoneClock from "../../clock/LiveTimeZoneClock";
 import "../../../assets/styles/CustomCalendarCSS.css";
@@ -70,9 +69,6 @@ function LeadMeetingsModal({
 
   const [meetingDetailsUpdateCount, setMeetDetailsUpdateCount] =
     useState<number>(0);
-
-  const [isSessionExpiredDialogueOpen, setIsSessionExpiredDialogueOpen] =
-    useState<boolean>(false);
 
   const leadDataSearchParams = JSON.parse(searchParams.get("leadData") || "{}");
   const [isEditMettingModalOpen, setIsEditMettingModalOpen] =
@@ -184,12 +180,8 @@ function LeadMeetingsModal({
             callFunction: getGoogleMeeting,
           });
           if (refreshTokenStatus) {
-            setIsSessionExpiredDialogueOpen(false);
-          } else {
-            setIsSessionExpiredDialogueOpen(true);
+            getGoogleMeeting();
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsSessionExpiredDialogueOpen(true);
         }
       });
   };
@@ -267,13 +259,9 @@ function LeadMeetingsModal({
             callFunction: getZoomMeeting,
           });
           if (refreshTokenStatus) {
-            setIsSessionExpiredDialogueOpen(false);
-          } else {
-            setIsSessionExpiredDialogueOpen(true);
+            getZoomMeeting();
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsSessionExpiredDialogueOpen(true);
-        }
+        } 
       });
   };
 
@@ -476,12 +464,6 @@ function LeadMeetingsModal({
   const handleMeetingDetailsUpdate = () => {
     setMeetDetailsUpdateCount(meetingDetailsUpdateCount + 1);
     
-  };
-
-  const handleSessionExpiredDialogueConfirm = () => {
-    setIsSessionExpiredDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
   useEffect(() => {
@@ -885,14 +867,6 @@ function LeadMeetingsModal({
           handleMeetingDetailsUpdate={handleMeetingDetailsUpdate}
         />
       )}
-
-      <DialogueBox
-        isOpen={isSessionExpiredDialogueOpen}
-        onClose={() => setIsSessionExpiredDialogueOpen(false)}
-        onConfirm={handleSessionExpiredDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

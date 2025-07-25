@@ -11,7 +11,6 @@ import {
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-// import { DialogueBox } from "../../dialogue-box/Dialogue";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useEffect, useState } from "react";
 import {
@@ -31,9 +30,6 @@ import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
 import ProductTax from "../../../@types/products/ProductTaxManagementProps";
 import { Product } from "../../../@types/products/ProductsManagementProps";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CreateCompanyProductCompanyUserModal from "./CreateCompanyProductCompanyUserModal";
 
@@ -91,15 +87,6 @@ function EditCompanyProductModal({
     },
   ];
 
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
@@ -181,7 +168,6 @@ function EditCompanyProductModal({
                   type: "success",
                 });
                 handleCompanyProductChange(product);
-                setIsDialogueOpen(false);
                 setTimeout(() => {
                   onClose();
                   setIsCreateCompanyProductTaxModalOpen(false)
@@ -195,14 +181,8 @@ function EditCompanyProductModal({
                   callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
                 });
                 if(refreshTokenResponse){
-                  setIsDialogueOpen(false)
+                  hanldeUpdateCompanyProductFormSubmit(event);
                 }
-                else{
-                  setIsDialogueOpen(  true)
-                }
-              }
-              else if(error.status === STATUS_CODE.FORBIDDEN){
-                setIsDialogueOpen(true)
               }
             });
         }
@@ -263,14 +243,8 @@ function EditCompanyProductModal({
         if(error.status === STATUS_CODE.UNATHORISED){
           const refreshTokenResponse = await RefreshToken({callFunction :fetchCompanyroductTax})
           if(refreshTokenResponse){
-            setIsDialogueOpen(false)
+            fetchCompanyroductTax()
           }
-          else{
-            setIsDialogueOpen(true)
-          }
-        }
-        else if(error.status === STATUS_CODE.FORBIDDEN){
-          setIsDialogueOpen(true)
         }
       });
     }
@@ -453,13 +427,7 @@ function EditCompanyProductModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            /> 
+
     </div>
   );
 }
