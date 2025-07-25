@@ -92,6 +92,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     Navigate(ROUTES_URL.SIGN_IN);
+    console.log("reset from logout function")
     setLoginStatus({
       id: 0,
       companyId: 0,
@@ -146,7 +147,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
-  if (!loginStatus.status) {
+    // useEffect(() => {
+    //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    //   console.log("loginstatus : " + loginStatus.status);
+    //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
+    //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
+    //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
+    //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    // },[loginStatus])
+
+  if (!loginStatus.status || ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers))) {
     return (
       <div>
         <header className="fixed bg-white w-full shadow-sm z-50 py-5">

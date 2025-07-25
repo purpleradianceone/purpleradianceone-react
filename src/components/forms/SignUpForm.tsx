@@ -18,6 +18,7 @@ import {
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
+import REGEX from "../../constants/Regex";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -65,6 +66,11 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+        if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim()) && SignUpFormData.mobileNumber!.trim() !== "") {
+          showMessageSnackbar("Invalid mobile number", "error");
+          return;
+        }
 
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
@@ -77,7 +83,11 @@ function SignUpForm() {
     if (
       signupDataPost.email !== "" &&
       signupDataPost.password !== "" &&
-      SignUpFormData.confirmPassword !== ""
+      SignUpFormData.confirmPassword !== "" &&
+      errors.email !== "" && 
+      errors.password !== "" &&
+      errors.confirmPassword !== "" &&
+      errors.mobileNumber !== ""
     ) {
       if (captchaToken !== "") {
         

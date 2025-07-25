@@ -9,7 +9,16 @@ function LoggedInRoute({children} : RouteChildrenNode){
     const storedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
-  return isLoggedIn.status ? <Navigate to={ROUTES_URL.HOME}/>: <>{children}</>;
+  console.log("inside logged in route : " + isLoggedIn.status && isLoggedIn.isActiveSubscription && (isLoggedIn.active >
+                isLoggedIn.subscriptionAllowedUsers));
+
+  console.log("is logged in : " + isLoggedIn.status);
+  console.log("is active subscription : " + !isLoggedIn.isActiveSubscription);
+  console.log("isActive");
+  console.log(isLoggedIn.activeUsersInCompany < isLoggedIn.subscriptionAllowedUsers);
+
+  return isLoggedIn.status && (isLoggedIn.activeUsersInCompany <
+                isLoggedIn.subscriptionAllowedUsers)  ? <Navigate to={ROUTES_URL.HOME}/>: <>{children}</>;
 }
 
 export default LoggedInRoute;
