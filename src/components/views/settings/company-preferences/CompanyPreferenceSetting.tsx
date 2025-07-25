@@ -13,9 +13,6 @@ import {
 } from "../../../../@types/ui/MessageSnackbarProps";
 import { useEffect, useState } from "react";
 import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferences";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 
 function CompanyPreferenceSetting() {
   const { loginStatus } = useLoggedInUserContext();
@@ -23,18 +20,6 @@ function CompanyPreferenceSetting() {
   const [companyPreferences, setCompanyPreferences] =
     useState<CompanyPreferencesType>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
-
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    sessionStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
     message: "",
@@ -82,9 +67,6 @@ function CompanyPreferenceSetting() {
           });
           if (refreshTokenStatus) {
             getCompanyPreferences();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
         }
       })
@@ -137,14 +119,9 @@ function CompanyPreferenceSetting() {
           });
           if (refreshTokenStatus) {
             handleCompanyPreferenceCheckboxChange(event);
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
         }
-        if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
-        }
+        
       })
       .finally(() => {
         setIsLoading(false);
@@ -229,13 +206,6 @@ function CompanyPreferenceSetting() {
               type={messageSnackbar.type}
               onClose={handleMessageSnackbarClose}
               duration={NUMBER_VALUES.SNACKBAR_DURATION}
-            />
-            <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
             />
           </>
            )}

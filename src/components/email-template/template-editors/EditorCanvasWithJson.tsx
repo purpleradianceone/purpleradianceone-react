@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { Editor, } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
@@ -16,7 +16,7 @@ import {
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { TemplateSettingsPanelCreateTemplateUpdate } from "../template-panel/TemplateSettingsPanelCreateTemplateUpdate";
@@ -27,8 +27,6 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
 import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
 import { TemplateSettingsPanelInsertTemplateUpdate } from "../template-panel/TemplateSettingsPanelInsertTemplateUpdate";
@@ -58,7 +56,6 @@ export const EditorCanvasWithJson = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const { loginStatus } = useLoggedInUserContext();
-  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const templateTypeId = searchParams.get("template_type_id");
@@ -145,10 +142,7 @@ export const EditorCanvasWithJson = () => {
           });
           if (refreshTokenResponse) {
             getTemplateToUpdate({ emailTemplateId, templateTypeId });
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
-          }
+          } 
         }
       })
       .finally(() => {
@@ -172,12 +166,6 @@ export const EditorCanvasWithJson = () => {
 
   const parsedPlaceHolders: Record<string, string> = convertPlaceholdersToObject(placeHolderData);
   const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(parsedPlaceHolders);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const handlePreview = (html: string) => {
     let replacedHtml = html;
@@ -579,13 +567,7 @@ export const EditorCanvasWithJson = () => {
           </Editor>
         )}
       </DynamicFieldsContext.Provider>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
+
     </>
   );
 };

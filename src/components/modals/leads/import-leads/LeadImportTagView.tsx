@@ -8,13 +8,9 @@ import LeadImportData from "./LeadImportData";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
 
 const LeadImportTagView = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const navigate = useNavigate();
   const [leadImportTagData, setLeadImportTagData] = useState<
     LeadImportTagData[]
   >([]);
@@ -22,12 +18,6 @@ const LeadImportTagView = () => {
   const[leadimportTagDataCame , setLeadImportTagDataCame]= useState<boolean>(true);
 
 
-   const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const getLeadImportTags = async () => {
     const postDataToGetLeadImportTags = {
@@ -52,12 +42,7 @@ const LeadImportTagView = () => {
           });
           if (refreshTokenStatus) {
             getLeadImportTags();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       });
   };
@@ -119,13 +104,6 @@ const LeadImportTagView = () => {
           </div>
         </div>
       )}
-        <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            />
     </div>
   );
 };

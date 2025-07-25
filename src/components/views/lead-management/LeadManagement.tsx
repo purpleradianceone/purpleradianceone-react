@@ -12,9 +12,6 @@ import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 
@@ -30,10 +27,8 @@ function LeadManagement() {
   >(null);
 
   const { loginStatus } = useLoggedInUserContext();
-  const navigate = useNavigate();
 
   const [leadsUpdateCount, setLeadsUpdateCount] = useState<number>(0);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const [selectedLeadStatus, setSelectedLeadStatus] = useState<number | null>(
     null
@@ -42,11 +37,6 @@ function LeadManagement() {
     null
   );
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const {
     currentPage,
@@ -141,12 +131,8 @@ function LeadManagement() {
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadsData();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -179,12 +165,7 @@ function LeadManagement() {
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           fetchLeadStatus();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -210,12 +191,7 @@ function LeadManagement() {
           });
           if (refreshTokenStatus) {
             fetchLeadSource();
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       });
   };
@@ -334,13 +310,6 @@ function LeadManagement() {
           />
         </div>
       )}
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

@@ -16,7 +16,7 @@ import "tinymce";
 import { DynamicFieldOption, DynamicFieldsContext } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
 import { LucideCode, LucideMail } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {  useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { GenericBlock } from "../template-blocks/GenericBlock";
@@ -30,8 +30,6 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
-import ROUTES_URL from "../../../constants/Routes";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -47,14 +45,7 @@ export const EditorCanvas: React.FC = () => {
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
   const [mode, setMode] = useState<"editor" | "insert">("editor");
   const [htmlInput, setHtmlInput] = useState("");
-  const navigate = useNavigate();
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -102,9 +93,6 @@ export const EditorCanvas: React.FC = () => {
           });
           if (refreshTokenResponse) {
             getPlaceHolderDataFromDatabase({ templateTypeId });
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
         }
       }).finally(()=>{
@@ -588,13 +576,6 @@ export const EditorCanvas: React.FC = () => {
             </Editor>
           )}
         </DynamicFieldsContext.Provider>
-        <DialogueBox
-          isOpen={isDialogueOpen}
-          onClose={() => setIsDialogueOpen(false)}
-          onConfirm={handleDialogueConfirm}
-          title="Session Expired !"
-          message="Session Expired. Please login again."
-        />
       </>
     </>
   );

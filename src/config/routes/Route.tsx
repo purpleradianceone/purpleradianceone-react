@@ -291,7 +291,7 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_SUBSCRIPTION,
     element: (
       <MobileRedirectWrapper>
-        <PrivateRoute>
+
           <div>
             <AuthLayout
               title="Activate Subscription!"
@@ -303,7 +303,7 @@ export const router = createBrowserRouter([
               />
             </AuthLayout>
           </div>
-        </PrivateRoute>
+       
       </MobileRedirectWrapper>
     ),
   },

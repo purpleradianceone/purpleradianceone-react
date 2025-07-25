@@ -136,17 +136,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
       });
 
   }
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.hash) {
-      const element = document.getElementById(location.hash.substring(1));
-      if (element) {
-        
-        element.scrollIntoView({ behavior: 'instant' });
-      }
-    }
-  }, [location]);
 
 
 

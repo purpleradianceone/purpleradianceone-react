@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +21,6 @@ import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../../dialogue-box/Dialogue";
 import LeadSummaryReportType from "../../../../@types/home/dashboard/LeadSummaryReportType";
 import ApiError from "../../../../@types/error/ApiError";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
@@ -34,7 +33,6 @@ function Dashboard() {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const { currentTime } = useServerCurrentTime();
   const [isTasksLoading, setIsTasksLoading] = useState<boolean>(true); // Set to true initially
   const [upcomingTask, setUpcomingTasks] = useState<LeadTaskType[]>([]);
@@ -89,13 +87,6 @@ function Dashboard() {
   const [dashboardVisiblity, setDasboardVisibility] = useState<
     { key: string; value: boolean }[]
   >([]);
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-
   const getLeadSummaryReport = async () => {
     
     const postDataToGetLeads = {
@@ -172,12 +163,8 @@ function Dashboard() {
         });
 
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadSummaryReport();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -233,12 +220,8 @@ function Dashboard() {
         });
 
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadSummaryReport();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -747,14 +730,6 @@ function Dashboard() {
           {renderDashboardSections()}
         </div>
       )}
-
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

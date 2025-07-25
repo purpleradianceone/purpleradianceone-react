@@ -8,9 +8,6 @@ import axios from "axios";
 import ApiError from "../../@types/error/ApiError";
 import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../../config/validations/RefreshToken";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
-import { DialogueBox } from "../dialogue-box/Dialogue";
 import { useUserPreference } from "../../context/user/UserPreference";
 import CustomTimezoneDropdown from "./custom-dropdown-timezonedata/CustomTimezoneDropdown";
 import {
@@ -22,14 +19,7 @@ import REGEX from "../../constants/Regex";
 import { useMasterRowsInGrid } from "../../config/hooks/useMasterRowsInGrid";
 
 const UserPreference = () => {
-  const navigate = useNavigate();
   const { userPreference, setUserPreference } = useUserPreference();
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-  const [isDialogueOpen, setIsDialogueOpen] = React.useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
 
@@ -143,12 +133,8 @@ const UserPreference = () => {
           callFunction: handleTimezonePreferenceChange,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          handleTimezonePreferenceChange();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -263,12 +249,8 @@ const UserPreference = () => {
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          updateUserProfile();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -602,13 +584,6 @@ const UserPreference = () => {
           </div>
         </div>
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
       {/* Snackbar */}
       <MessageSnackBar
         isOpen={messageSnackbar.open}

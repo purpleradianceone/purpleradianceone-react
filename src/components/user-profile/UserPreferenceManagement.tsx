@@ -2,26 +2,13 @@
 
 import { useEffect, useState } from "react";
 import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
-import ROUTES_URL from "../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-import { DialogueBox } from "../dialogue-box/Dialogue";
 import UserPreference from "./UserPreference";
 
 const UserPrerefenceManagement = () => {
-  const navigate = useNavigate();
   const { userHasAccessToViewUser } = useUserAccessModules();
 
 
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
@@ -40,13 +27,6 @@ const UserPrerefenceManagement = () => {
            
             />
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

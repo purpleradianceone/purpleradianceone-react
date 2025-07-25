@@ -1,4 +1,5 @@
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handshake, UserRoundPlus, X } from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -26,9 +27,6 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
 import ApiError from "../../../@types/error/ApiError";
 
@@ -37,8 +35,6 @@ function CreateLeadModal({
   onClose,
   onCreateLeadRefreshLeadData,
 }: CreateLeadModalProps) {
-  const navigate = useNavigate();
-
   const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
@@ -137,7 +133,6 @@ function CreateLeadModal({
     generate_password: "",
   });
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
@@ -188,7 +183,6 @@ function CreateLeadModal({
       );
       if (response.status === STATUS_CODE.OK) {
         setLeadSource(response.data);
-        
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -198,13 +192,8 @@ function CreateLeadModal({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          getLeadSourceOptions()
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadSourceOptions();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -236,13 +225,8 @@ function CreateLeadModal({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          getLeadStatusOptions()
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadStatusOptions();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -285,20 +269,20 @@ function CreateLeadModal({
     }
   };
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if( error.mobileNumber!==""){
+    if (error.mobileNumber !== "") {
       showMessageSnackbar({
-        message : "Please enter a valid mobile number.",
-        type : "error"
-      })
+        message: "Please enter a valid mobile number.",
+        type: "error",
+      });
       return;
     }
-     if(error.email!=="" ){
+    if (error.email !== "") {
       showMessageSnackbar({
-        message : "Please enter a valid email address.",
-        type : "error"
-      })
+        message: "Please enter a valid email address.",
+        type: "error",
+      });
       return;
     }
     const isEmailFilled = createLeadModalFormData.email !== "";
@@ -373,14 +357,17 @@ function CreateLeadModal({
               type: "warning",
             });
           }
-        }).catch(async(error : ApiError | any) => {
-          if(error.status === STATUS_CODE.UNATHORISED){
-            const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handleSubmit});
-            if(refreshTokenStatus){
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunctionWithEvent: handleSubmit,
+            });
+            if (refreshTokenStatus) {
               handleSubmit(e);
             }
           }
-        })
+        });
     }
   };
 
@@ -417,12 +404,6 @@ function CreateLeadModal({
       setSelectedStatus(undefined);
     }
   }, [isOpen]);
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   if (!isOpen) return null;
   return (
@@ -625,13 +606,6 @@ function CreateLeadModal({
           </div>
         </div>
       )}
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }
