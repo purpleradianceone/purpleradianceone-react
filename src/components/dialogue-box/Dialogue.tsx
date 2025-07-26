@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom';
 
 export function DialogueBox({
   isOpen,
-  onClose,
   onConfirm,
   title,
   message,
@@ -50,9 +49,8 @@ export function DialogueBox({
          <div className="flex">
          <Button
             onClick={() => {
-              
               onConfirm();
-              onClose();
+              
             }}
           >
             {confirmText}

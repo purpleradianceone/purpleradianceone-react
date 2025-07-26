@@ -161,7 +161,7 @@ const PipelineChart = ({
             <p className="text-sm font-medium text-emerald-700 mb-1">
               Conversion Rate
             </p>
-            <p className="text-xl font-bold text-emerald-800">{leadSummaryData.conversionRate}</p>
+            <p className="text-xl font-bold text-emerald-800">{leadSummaryData.conversionRate}%</p>
           </div>
           <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4">
             <p className="text-sm font-medium text-blue-700 mb-1">

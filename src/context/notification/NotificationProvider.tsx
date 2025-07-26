@@ -93,7 +93,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // Only connect if authenticated AND no existing client is active
-    if (loginStatus.id !==0 && !clientRef.current?.active) { // Check if not active or doesn't exist
+    if (loginStatus.id !==0 && !clientRef.current?.active && loginStatus.activeUsersInCompany <= loginStatus.subscriptionAllowedUsers) { // Check if not active or doesn't exist
       console.log("User is authenticated. Attempting WebSocket connection...");
       const socket = new SockJS(WEB_SOCKET_CONNECTION_URL);
       const newClient = new Client({ // Create a new client
