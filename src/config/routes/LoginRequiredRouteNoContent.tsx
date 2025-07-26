@@ -5,7 +5,7 @@ import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import RouteChildrenNode from "../../@types/config/RoutesChildrenNode";
 
 
-function PrivateRoute({ children }:RouteChildrenNode){
+function LoginRequiredRouteNoContent({ children }:RouteChildrenNode){
   const storedLoginStatus = localStorage.getItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
@@ -20,8 +20,7 @@ function PrivateRoute({ children }:RouteChildrenNode){
 
   // note : this condtion is changed
   // && (isLoggedIn.subscriptionAllowedUsers >= isLoggedIn.activeUsersInCompany  || !isLoggedIn.isActiveSubscription)
-  return isLoggedIn.status  && (isLoggedIn.activeUsersInCompany <=
-                isLoggedIn.subscriptionAllowedUsers) ? <>{children}</> : <Navigate to={ROUTES_URL.SIGN_IN} />;
+  return isLoggedIn.status ? <>{children}</> : <Navigate to={ROUTES_URL.SIGN_IN} />;
 };
 
-export default PrivateRoute;
+export default LoginRequiredRouteNoContent;

@@ -86,7 +86,6 @@ function GetCompanyUsers() {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
-      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunction: fetchCompanyUsers,

@@ -7,17 +7,25 @@ import { STATUS_CODE } from '../../constants/AppConstants';
 import RefreshToken from '../validations/RefreshToken';
 import POST_API from '../../constants/PostApi';
 import ROUTES_URL from '../../constants/Routes';
+import toast from 'react-hot-toast';
 
 export function useAxiosForbiddenHandler() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dialogMessage = 'Session Expired. Please login again.';
+
+
 
    const handleLogout = async() => {
     await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
     .then((response ) =>{
       if(response.status === 200){
         localStorage.clear();
+        toast.success(response.data)
+        setTimeout(() => {
+          setIsDialogOpen(false);
+        },2000)
         window.location.href = ROUTES_URL.SIGN_IN;
+        
       }
     })
    .catch(async (error: ApiError | any) => {
@@ -40,7 +48,7 @@ export function useAxiosForbiddenHandler() {
       error => {
         console.log("error from interceptor");
         console.log(error);
-        if (error.response?.status === 403) {
+        if (error.status === STATUS_CODE.FORBIDDEN) {
           setIsDialogOpen(true);
         }
         return Promise.reject(error);
@@ -52,15 +60,14 @@ export function useAxiosForbiddenHandler() {
     };
   }, []);
 
-  const closeDialog = () => setIsDialogOpen(false);
   const confirmHandler = () => {
       handleLogout();
   };
+  
 
   return {
     isDialogOpen,
     dialogMessage,
-    closeDialog,
     confirmHandler,
   };
 }

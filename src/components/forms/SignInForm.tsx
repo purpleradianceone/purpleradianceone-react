@@ -86,7 +86,6 @@ function SignInForm() {
   // const isActiveSubscriptionUseRef =useRef<boolean>(false);
 
   const resetLoginStatus = () => {
-    console.log("reset from login component");
     setLoginStatus({
             companyId: 0,
             companyName: "",
@@ -150,7 +149,6 @@ function SignInForm() {
       .then((response) => {
         if (response.data.status) {
           loginStatusRef.current = response.data;
-          console.log("value set from login");
           setLoginStatus({
             id: response.data.id,
             companyId: response.data.company_id,
@@ -277,7 +275,6 @@ function SignInForm() {
         }
       })
       .catch((error) => {
-        console.log(error);
         recaptchaRef.current!.reset();
         showMessageSnackbar({
           message: error.response.data.message,
@@ -292,7 +289,6 @@ function SignInForm() {
 
   //when sign in page loads resets the contexts and local storage
   useEffect(() => {
-    console.log("inside useeffect reset login page")
     resetLoginStatus();
     setAccessModules([]);
     localStorage.clear();
@@ -403,7 +399,6 @@ function SignInForm() {
           onClose={() => {
             setShowSubscriptionOrInActivePopUp(false);
             localStorage.clear();
-            console.log("reset from subscription dialogue box used in login");
             setLoginStatus({
             companyId: 0,
             companyName: "",
