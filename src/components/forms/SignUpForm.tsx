@@ -67,11 +67,12 @@ function SignUpForm() {
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
      const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-        if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim()) && SignUpFormData.mobileNumber!.trim() !== "") {
-          showMessageSnackbar("Invalid mobile number", "error");
+        if(SignUpFormData.mobileNumber!.trim() !== ""){
+         if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
+          showMessageSnackbar("Invalid mobile number","error");
           return;
         }
-
+     }
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
@@ -84,10 +85,10 @@ function SignUpForm() {
       signupDataPost.email !== "" &&
       signupDataPost.password !== "" &&
       SignUpFormData.confirmPassword !== "" &&
-      errors.email !== "" && 
-      errors.password !== "" &&
-      errors.confirmPassword !== "" &&
-      errors.mobileNumber !== ""
+      errors.email === "" &&
+      errors.password === "" &&
+      errors.confirmPassword === "" &&
+      errors.mobileNumber === ""
     ) {
       if (captchaToken !== "") {
         
