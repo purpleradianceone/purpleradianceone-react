@@ -53,6 +53,7 @@ import CookiePolicy from "../../components/views/home/landing-page/CookiePolicy"
 import AboutUs from "../../components/views/home/landing-page/AboutUs";
 import Pricing from "../../components/views/home/landing-page/Pricing";
 import CareersPage from "../../components/views/home/landing-page/Carrers";
+import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
 
 export const router = createBrowserRouter([
   {
@@ -291,6 +292,7 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_SUBSCRIPTION,
     element: (
       <MobileRedirectWrapper>
+        <LoginRequiredRouteNoContent>
 
           <div>
             <AuthLayout
@@ -303,6 +305,7 @@ export const router = createBrowserRouter([
               />
             </AuthLayout>
           </div>
+          </LoginRequiredRouteNoContent>
        
       </MobileRedirectWrapper>
     ),

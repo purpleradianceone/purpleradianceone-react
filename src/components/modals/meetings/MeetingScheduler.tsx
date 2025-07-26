@@ -119,6 +119,10 @@ const MeetingScheduler = () => {
     }
   }, [searchParams]);
   const createGoogleMeetMeeting = async () => {
+
+    if(isCreating){
+      return;
+    }
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
     const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
     const pickerFormatString = "yyyy-MM-DD HH:mm";
@@ -268,6 +272,10 @@ const MeetingScheduler = () => {
     }
   };
   const createZoomMeeting = async () => {
+
+    if(isCreating){
+      return;
+    }
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
     const combinedPickerEndDateTimeString = `${endDate} ${endTime}`;
     const pickerFormatString = "yyyy-MM-DD HH:mm";

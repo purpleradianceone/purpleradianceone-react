@@ -23,7 +23,7 @@ import { DialogueBox } from "./components/dialogue-box/Dialogue";
  */
 function App() {
 
-  const {closeDialog,confirmHandler,dialogMessage,isDialogOpen} = useAxiosForbiddenHandler()
+  const {confirmHandler,dialogMessage,isDialogOpen} = useAxiosForbiddenHandler()
   return (
    <NotificationCountContextProvider>
     
@@ -37,7 +37,7 @@ function App() {
                      <Toaster position="top-center" reverseOrder={false} />
                      <DialogueBox
         isOpen={isDialogOpen}
-        onClose={closeDialog}
+        // onClose={closeDialog}
         onConfirm={confirmHandler}
         title="Session Expired !"
         message={dialogMessage}

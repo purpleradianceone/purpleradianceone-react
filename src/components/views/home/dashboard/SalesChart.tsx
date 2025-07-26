@@ -21,7 +21,6 @@ const SalesChart = ({
 }, 0);
 
 const totalConvertedLeads = leadsData.reduce((sum, data) => {
-  console.log(sum)
   return sum + data.monthlyConvertedLeads;
 }, 0);
 
