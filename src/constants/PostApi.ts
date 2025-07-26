@@ -130,8 +130,8 @@ const POST_API = {
     GET_PENDING_LEAD_TASKS :`${BASE_URL}${import.meta.env.VITE_GET_PENDING_LEAD_TASKS!}`,
     GET_COMPLETED_LEAD_TASKS :`${BASE_URL}${import.meta.env.VITE_GET_COMPLETED_LEAD_TASKS!}`,
     GET_LEAD_ASSOCIATED_USERS :`${BASE_URL}${import.meta.env.VITE_GET_LEAD_ASSOCIATED_USERS!}`,
-    
-    LOGOUT:`${BASE_URL}${import.meta.env.VITE_LOGOUT}`
+    LOGOUT:`${BASE_URL}${import.meta.env.VITE_LOGOUT}`,
+    CHECK_USER_IS_VALID : `${BASE_URL}${import.meta.env.VITE_CHECK_USER_IS_VALID!}`,
 
 }
 

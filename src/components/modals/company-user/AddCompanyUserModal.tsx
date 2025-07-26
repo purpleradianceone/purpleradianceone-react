@@ -78,9 +78,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       addCompanyUserFormData.email !== "" &&
       addCompanyUserFormData.name != "" &&
       addCompanyUserFormData.email !== null &&
-      addCompanyUserFormData.name !== null &&
-      errors.email === "" && 
-      errors.name === ""
+      addCompanyUserFormData.name !== null 
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),

@@ -21,7 +21,6 @@ import {
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import RadioButtons from "../../ui/RadioButton";
 
 function EditCompanyUserModal({
   isOpen,
@@ -32,25 +31,9 @@ function EditCompanyUserModal({
   const initialUpdateUserformData = {
     name: user.fullname,
     mobileNumber: user.mobilenumber,
-    isActive: user.isactive,
   };
-  const CompanyUserIsActiveRadioButtonOptions = [
-    {
-      label: "Active",
-      value: "true",
-      id: "active",
-      name: "isActive",
-      checked: user.isactive,
-    },
-    {
-      label: "Inactive",
-      value: "false",
-      id: "inActive",
-      name: "isActive",
-      checked: !user.isactive,
-    },
-  ];
 
+  
   const {
     formData: updateUserformData,
     handleChange: handleEditUserFormChange,
@@ -59,6 +42,8 @@ function EditCompanyUserModal({
     updateUserformData,
     "registration"
   );
+
+  const [userIsActive, setUserIsActive] = useState<boolean>(user.isactive);
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -72,6 +57,7 @@ function EditCompanyUserModal({
       setErrors({
         name: "",
       });
+     setUserIsActive(user.isactive);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -83,13 +69,13 @@ function EditCompanyUserModal({
       initialUpdateUserformData.name !== updateUserformData.name ||
       updateUserformData.mobileNumber !==
         initialUpdateUserformData.mobileNumber ||
-      updateUserformData.isActive !== initialUpdateUserformData.isActive
+      userIsActive !== user.isactive
     ) {
       if (updateUserformData.name != "") {
         if (
           user.fullname !== updateUserformData.name ||
           user.mobilenumber !== updateUserformData.mobileNumber ||
-          updateUserformData.isActive !== user.isactive
+          userIsActive !== user.isactive
         ) {
           const postUpdateUserData = {
             id: user.id,
@@ -97,7 +83,7 @@ function EditCompanyUserModal({
             company_id: loginStatus.companyId,
             fullname: updateUserformData.name,
             mobilenumber: updateUserformData.mobileNumber,
-            isactive: updateUserformData.isActive,
+            isactive: userIsActive,
           };
           await axios
             .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
@@ -155,6 +141,66 @@ function EditCompanyUserModal({
       showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
     }
   };
+
+  const handleCompanyUserToggle = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    handleCloseSnackbar();
+    const {  checked } = event.target;
+
+    if(user.id === loginStatus.id){
+        setUserIsActive(checked);
+        showMessageSnackbar({message : "Can't change your own status", type : "error"});
+        setTimeout(() => {
+          setUserIsActive(user.isactive);
+        },200);
+        return;
+    }
+
+    const postUpdateUserData = {
+            id: user.id,
+            updatedby: loginStatus.id,
+            company_id: loginStatus.companyId,
+            fullname: updateUserformData.name,
+            mobilenumber: updateUserformData.mobileNumber,
+            isactive: checked ,
+          };
+          await axios
+            .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (response.data.status) {
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "success",
+                });
+              } else if (!response.data.status) {
+                showMessageSnackbar({
+                  message: response.data.message,
+                  type: "error",
+                });
+              }
+              handleCompanyUserChange(user);
+              setUserIsActive(checked);
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenStatus = await RefreshToken({
+                  callFunctionWithEvent: handleCompanyUserToggle,
+                });
+                if (refreshTokenStatus) {
+                  handleCompanyUserToggle(event);
+                }
+              } else {
+                showMessageSnackbar({
+                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+                  type: "error",
+                });
+              }
+            });
+
+
+  }
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
   };
@@ -218,11 +264,26 @@ function EditCompanyUserModal({
                   error={errors.mobileNumber}
                 />
 
-                <RadioButtons
-                  label="isActive"
-                  onChange={handleEditUserFormChange}
-                  options={CompanyUserIsActiveRadioButtonOptions}
-                />
+                <div className="flex items-center justify-between">
+      <label htmlFor="isActive" className="block text-sm font-medium text-gray-700">
+        Status
+      </label>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          id="isActive"
+          name="isActive"
+          checked={userIsActive}
+          onChange={handleCompanyUserToggle}
+          className="sr-only peer"
+        />
+        <div
+          className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
+                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
+        ></div>
+      </label>
+    </div>
                 <FormInput
                   label="Email"
                   type="email"

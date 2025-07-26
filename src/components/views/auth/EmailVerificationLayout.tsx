@@ -42,6 +42,7 @@ const decodeEmail = (encodedString : string) => {
 
     axios.get(POST_API.SIGN_UP_EMAIL_VERIFICATION + verificationCode)
     .then(response => {
+
       
       if (response.data.status === true) {
         setVerificationState({ status: 'success', message: 'Email verified successfully' });
