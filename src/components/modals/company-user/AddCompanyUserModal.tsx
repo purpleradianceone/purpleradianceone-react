@@ -26,6 +26,7 @@ import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import useScreenSize from "../../../config/hooks/useScreenSize";
+import REGEX from "../../../constants/Regex";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -64,16 +65,25 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+     if(addCompanyUserFormData.mobilenumber!.trim() !== ""){
+         if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
+          showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+          return;
+        }
+     }
+       
 
     if (
       addCompanyUserFormData.email !== "" &&
       addCompanyUserFormData.name != "" &&
       addCompanyUserFormData.email !== null &&
-      addCompanyUserFormData.name !== null
+      addCompanyUserFormData.name !== null &&
+      errors.email === "" && 
+      errors.name === ""
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),
-        //NOTE : CHAGES NEEDED
 
         mobilenumber: "+91-"+ addCompanyUserFormData.mobilenumber.trim(),
         email: addCompanyUserFormData.email.trim(),
