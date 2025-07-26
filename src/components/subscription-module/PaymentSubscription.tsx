@@ -160,6 +160,7 @@ export default function PaymentSubscription({
       console.error("Payment Failed", response);
     });
 
+
     razorpayInstance.open();
   };
   return createPortal(

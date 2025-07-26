@@ -84,11 +84,7 @@ function SignUpForm() {
     if (
       signupDataPost.email !== "" &&
       signupDataPost.password !== "" &&
-      SignUpFormData.confirmPassword !== "" &&
-      errors.email === "" &&
-      errors.password === "" &&
-      errors.confirmPassword === "" &&
-      errors.mobileNumber === ""
+      SignUpFormData.confirmPassword !== "" 
     ) {
       if (captchaToken !== "") {
         
