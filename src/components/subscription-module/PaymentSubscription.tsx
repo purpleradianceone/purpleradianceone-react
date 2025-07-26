@@ -163,6 +163,24 @@ export default function PaymentSubscription({
 
     razorpayInstance.open();
   };
+
+  // const handlePaymentProceed = async(event : React.FormEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  //   await axios.post(POST_API.CHECK_USER_IS_VALID,{},{
+  //     withCredentials : true
+  //   }).then((response) => {
+  //     if(response.status === STATUS_CODE.OK){
+  //       handlePayment();
+  //     }
+  //   }).catch(async(error : ApiError | any) => {
+  //     if(error.response.status === STATUS_CODE.UNATHORISED){
+  //         const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
+  //         if(refreshTokenStatus){
+  //           handlePaymentProceed(event);
+  //         }
+  //     }
+  //   })
+  // }
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
