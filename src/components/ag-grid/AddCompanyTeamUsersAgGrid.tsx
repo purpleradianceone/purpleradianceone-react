@@ -1,12 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, GridApi, themeAlpine, ViewportChangedEvent } from "ag-grid-community";
+import {
+  AllCommunityModule,
+  ColDef,
+  GridApi,
+  themeAlpine,
+  ViewportChangedEvent,
+} from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
+import { INNERHTML, STATUS_CODE } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -14,6 +20,8 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function AddCompanyTeamUsersAgGrid({
   companyUsers,
@@ -25,17 +33,20 @@ function AddCompanyTeamUsersAgGrid({
   // You can still call this if needed
   handleCompanyUserStatusChange,
   isGridForSubscription,
-  handleCompanyUserToggleChange
+  handleCompanyUserToggleChange,
 }: {
   companyUsers: companyUsersSearchProps[];
   handleViewPortChanged: (params: ViewportChangedEvent) => void;
   onGridReady: (params: { api: GridApi }) => void;
-  handleCompanyUserCheckBoxChange?: (params: companyUsersSearchProps, event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCompanyUserCheckBoxChange?: (
+    params: companyUsersSearchProps,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
   addCompanyTeamUserArray?: number[];
   isGridForUpdateCompanyUser?: boolean;
   handleCompanyUserStatusChange?: (statusChangeCount: number) => void;
   isGridForSubscription: boolean;
-  handleCompanyUserToggleChange? : (message : string , status : boolean)=> void;
+  handleCompanyUserToggleChange?: (message: string, status: boolean) => void;
 }) {
   const { userHasAccessToUpdateUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -113,6 +124,7 @@ function AddCompanyTeamUsersAgGrid({
             const isChecked = addCompanyTeamUserArray
               ? addCompanyTeamUserArray.includes(params.data.id)
               : false;
+
             return (
               <div className="flex flex-col ml-2 items-center">
                 <input
@@ -120,63 +132,71 @@ function AddCompanyTeamUsersAgGrid({
                   checked={isChecked}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   onChange={(event) => {
-                       handleCompanyUserCheckBoxChange!(params.data, event);
+                    handleCompanyUserCheckBoxChange!(params.data, event);
                   }}
-                  
                 />
               </div>
             );
-          } else  {
+          } else {
             // When updating, manage a toggle button that updates status.
             // Each row remembers its original status.
             const originalStatusRef = useRef<boolean>(params.data.isactive);
             // Local state for the current status.
-            const [isActive, setIsActive] = useState<boolean>(params.data.isactive);
+            const [isActive, setIsActive] = useState<boolean>(
+              params.data.isactive
+            );
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
 
-            const handleCompanyUserUpdateToggle = async (event: React.FormEvent<HTMLButtonElement>) => {
-              //NOTE CHANGES ARE DONE HERE
-              // alert("called from here1")
-              // if (userHasAccessToUpdateUser) {
 
-                const userId = parseInt(event.currentTarget.id);
-                const updateCompanyUserPostData = {
-                  company_id: loginStatus.companyId,
-                  id: userId,
-                  // Toggle the status
-                  isactive: !isActive,
-                  updatedby: loginStatus.id,
-                };
-                // alert("called from here")
-                try {
-                  const res = await axios.put(POST_API.UPDATE_COMPANY_USER, updateCompanyUserPostData, {
+            const handleCompanyUserUpdateToggle = async (
+              event: React.FormEvent<HTMLButtonElement>
+            ) => {
+              const userId = parseInt(event.currentTarget.id);
+              const updateCompanyUserPostData = {
+                company_id: loginStatus.companyId,
+                id: userId,
+                // Toggle the status
+                isactive: !isActive,
+                updatedby: loginStatus.id,
+              };
+              // alert("called from here")
+              try {
+                const res = await axios.put(
+                  POST_API.UPDATE_COMPANY_USER,
+                  updateCompanyUserPostData,
+                  {
                     withCredentials: true,
-                  });
-                  if (res.data.status) {
-                    // Toggle the local state.
-                    const newStatus = !isActive;
-                    setIsActive(newStatus);
-                    params.node.setDataValue("isactive", newStatus);
-                    
-
-                    // Determine what the new delta should be.
-                    // If the new status is the same as the original, delta is 0.
-                    // Otherwise, if original was inactive (false) and now active, delta is +1.
-                    // Or if original was active (true) and now inactive, delta is -1.
-                    const original = originalStatusRef.current;
-                    const newDelta = newStatus === original ? 0 : (original ? -1 : 1);
-                    // Update the global counter by the change in this row’s delta.
-                    updateGlobalCount(newDelta - localDelta);
-                    // Save the new delta locally.
-                    setLocalDelta(newDelta);
-                  
                   }
-                  handleCompanyUserToggleChange!(res.data.message, res.data.status)
-                } catch (error) {
-                  console.error("Error updating user status:", error);
+                );
+                if (res.data.status) {
+                  // Toggle the local state.
+                  const newStatus = !isActive;
+                  setIsActive(newStatus);
+                  params.node.setDataValue("isactive", newStatus);
+
+                  const original = originalStatusRef.current;
+                  const newDelta =
+                    newStatus === original ? 0 : original ? -1 : 1;
+                  updateGlobalCount(newDelta - localDelta);
+                  // Save the new delta locally.
+                  setLocalDelta(newDelta);
                 }
-              // }
+                handleCompanyUserToggleChange!(
+                  res.data.message,
+                  res.data.status
+                );
+              } catch (error: ApiError | any) {
+                if (error.status === STATUS_CODE.UNATHORISED) {
+                  const refreshTokenStatus = await RefreshToken({
+                    callFunctionWithEvent: handleCompanyUserUpdateToggle,
+                  });
+                  if (refreshTokenStatus) {
+                    handleCompanyUserUpdateToggle(event);
+                  } 
+                }
+
+              }
             };
 
             return (
@@ -187,7 +207,9 @@ function AddCompanyTeamUsersAgGrid({
                     handleCompanyUserUpdateToggle(event);
                   }}
                   className={`w-6 h-3 rounded-md transition-colors duration-200 ${
-                    isActive ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
+                    isActive
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-red-500 hover:bg-red-600"
                   } text-white font-semibold`}
                 >
                   <div
@@ -204,9 +226,16 @@ function AddCompanyTeamUsersAgGrid({
     ],
     // Include dependencies that affect the rendering.
 
-    [addCompanyTeamUserArray, companyUsers, isGridForUpdateCompanyUser, handleCompanyUserCheckBoxChange, userHasAccessToUpdateUser, loginStatus,  ]
+    [
+      addCompanyTeamUserArray,
+      companyUsers,
+      isGridForUpdateCompanyUser,
+      handleCompanyUserCheckBoxChange,
+      userHasAccessToUpdateUser,
+      loginStatus,
+    ]
     //[addCompanyTeamUserArray, companyUsers]
-    //need to check the above code 
+    //need to check the above code
   );
 
   const defaultColDef = useMemo(() => {
@@ -223,12 +252,12 @@ function AddCompanyTeamUsersAgGrid({
     <>
       {/* Optional: display the global change count */}
       <div className="mb-2">
-        {isGridForSubscription &&
-        (
-          <><span className="font-semibold">Net Status Change Count: </span><span>{statusChangeCount}</span></>
-        )
-        }
-        
+        {isGridForSubscription && (
+          <>
+            <span className="font-semibold">Net Status Change Count: </span>
+            <span>{statusChangeCount}</span>
+          </>
+        )}
       </div>
       <AgGridReact
         rowData={companyUsers}
@@ -239,7 +268,6 @@ function AddCompanyTeamUsersAgGrid({
         theme={themeAlpine}
         onViewportChanged={handleViewPortChanged}
         onGridReady={onGridReady}
-
       />
     </>
   );

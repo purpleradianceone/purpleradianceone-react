@@ -21,20 +21,17 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 const LeadDetails = ({
   leadDetailsData,
   setLeadDetailsData,
   selectedLeadData,
-  handleLeadActivityChange,
+  // handleLeadActivityChange,
   getLeadDetails,
   handleSaveEditLeadDetailsCallback,
 }: {
-  handleLeadActivityChange: (person: string, work: string) => void;
+  // handleLeadActivityChange: (person: string, work: string) => void;
   leadDetailsData: LeadDetailsData;
   setLeadDetailsData: React.Dispatch<React.SetStateAction<LeadDetailsData>>;
   selectedLeadData: any;
@@ -104,13 +101,6 @@ const LeadDetails = ({
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
@@ -177,10 +167,6 @@ const LeadDetails = ({
             type: "success",
           });
           setShowSaveLeadButton(false);
-          handleLeadActivityChange(
-            loginStatus.fullName!,
-            response.data.message
-          );
           createNewDetailRef.current = false;
 
           handleSaveEditLeadDetailsCallback(editLeadDetails);
@@ -203,13 +189,8 @@ const LeadDetails = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleSave(e);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -239,13 +220,8 @@ const LeadDetails = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           fetchIndustryType();
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -274,12 +250,7 @@ const LeadDetails = ({
         });
         if (refreshTokenStatus) {
           getAllCountries();
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -315,12 +286,7 @@ const LeadDetails = ({
           });
           if (refreshTokenStatus) {
             getAllState(countryId);
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
     }
   };
@@ -359,12 +325,7 @@ const LeadDetails = ({
           });
           if (refreshTokenStatus) {
             getAllDistrict(stateId);
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       }
   };
@@ -392,7 +353,6 @@ const LeadDetails = ({
         id: state.id,
       }))
     })
-    console.log(stateData);
     
   } , [stateData])
 
@@ -646,13 +606,6 @@ const LeadDetails = ({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 };
@@ -710,7 +663,7 @@ const FormField = ({
       >
         {!isEditing  ? (
           <span
-            className="text-gray-800 font-semibold  text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="text-gray-800   text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
               // selectOptions
               //   ?.find((opt) => opt.value === value)
@@ -724,9 +677,9 @@ const FormField = ({
               //       Select {label.toLowerCase()}
               //     </span>
               //   )
-              <span>{value?.toLocaleString()}</span>
+              <span className="font-semibold">{value?.toLocaleString()}</span>
             ) : (
-              <span className="text-sm text-gray-500">Add here...</span>
+              <span className="text-[12px] text-gray-500">Add here...</span>
             )}
           </span>
         ) : type === "select" ? (

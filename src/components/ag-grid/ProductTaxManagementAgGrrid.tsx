@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
-import {  useEffect, useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import {  INNERHTML, NUMBER_VALUES, STATUS_CODE, } from "../../constants/AppConstants";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Trash2 } from "lucide-react";
@@ -15,9 +15,6 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../ui/MessageSnackbar";
 import MESSAGE from "../../constants/Messages";
-import { DialogueBox } from "../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import ProductTaxManagementAgGridProps from "../../@types/ag-grid/ProductTaxManagementAgGridProps";
 
@@ -29,14 +26,7 @@ function ProductTaxManagementAgGrid({
 
   const {isSmallScreen} = useScreenSize();
 
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
-    useEffect(()=> {
-        console.log(productTax);
-    })
  
 const {userHasAccessToUpdateProductTax} = useUserAccessModules();
 const {loginStatus} = useLoggedInUserContext();
@@ -54,18 +44,6 @@ const {loginStatus} = useLoggedInUserContext();
     const handleCloseSnackbar = () => {
       setMessageSnackbar((prev) => ({ ...prev, open: false }));
     };
-
-    
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-
-  useEffect(()=> {
-    console.log("Product Tax");
-    console.log(productTax)
-  })
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -141,19 +119,14 @@ const {loginStatus} = useLoggedInUserContext();
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch(async(error : ApiError | any) => {
-                        console.log(error);
                         if(error.status === STATUS_CODE.UNATHORISED){
                             const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
                             if(refreshTokenResponse){
-                              setIsDialogueOpen(false);
+                              handleCompanyProductTaxDelete();
                             }
-                            else {
-                                setIsDialogueOpen(true)
+                          
                             }
-                            }
-                            else if(error.status === STATUS_CODE.FORBIDDEN){
-                              setIsDialogueOpen(true)
-                            }
+                           
                         
                     })
                 }
@@ -206,14 +179,6 @@ const {loginStatus} = useLoggedInUserContext();
               type={messageSnackbar.type}
               onClose={handleCloseSnackbar}
               duration={NUMBER_VALUES.SNACKBAR_DURATION} />
-
-              <DialogueBox
-                      isOpen={isDialogueOpen}
-                      onClose={() => setIsDialogueOpen(false)}
-                      onConfirm={handleDialogueConfirm}
-                      title="Session Expired !"
-                      message="Session Expired. Please login again."
-                    />
               </>
   );
 

@@ -10,9 +10,6 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
@@ -30,7 +27,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   interestTypeData,
   handleLeadProductUpdate,
 }) => {
-  const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -65,12 +61,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const handleUpdateLeadCompanyProductStatus = async (
     product: LeadAssignedCompanyProduct
@@ -119,13 +109,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         });
 
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleUpdateLeadCompanyProductStatus(product);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -226,8 +211,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
               type: "success",
             });
             handleLeadProductUpdate(updatedProduct);
-            console.log("this is the updated product");
-            console.log(updatedProduct);
           }
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,13 +221,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           });
 
           if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
             handleSaveClick(product);
-          } else {
-            setIsDialogueOpen(true);
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       }
       setEditingProductId(null);
@@ -411,13 +389,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
     </div>
   );

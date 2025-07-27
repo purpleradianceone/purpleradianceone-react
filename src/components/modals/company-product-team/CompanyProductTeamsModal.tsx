@@ -243,7 +243,6 @@ function CompanyProductTeamsModal({
         setIsCompanyProductTeamsFetchedForFirstTime(false);
 
         if (newCompanyProductTeams.length === 0) {
-          console.log("condition 1");
           setCompanyProductTeamsHasMore(false);
         }
         if(companyProductTeamsSearchParameter.length === 0){
@@ -300,8 +299,6 @@ function CompanyProductTeamsModal({
           companyProductTeamsList.length + newCompanyProductTeams.length >=
             newCompanyProductTeams[0].count
         ) {
-          console.log("condition 2");
-          // add flag to set has more like company users
           setCompanyProductTeamsHasMore(false);
         }
       }
@@ -311,7 +308,8 @@ function CompanyProductTeamsModal({
           callFunctionWithParamsNotEvent: fetchCompanyProductTeams,
         });
         if (refreshTokenResponse) {
-          fetchCompanyProductTeams("");
+          companyProductTeamsFetchingRef.current = false;
+          fetchCompanyProductTeams(companyProductTeamsSearchParameter);
         }
       }
     } finally {
@@ -454,7 +452,8 @@ function CompanyProductTeamsModal({
         });
 
         if (refreshTokenResponse) {
-          fetchCompanyTeamsNotAssigned("");
+          companyTeamsNotAssignedFetchingRef.current = false;
+          fetchCompanyTeamsNotAssigned(companyTeamsNotAssignedSearchParameter);
         }
       }
     } finally {

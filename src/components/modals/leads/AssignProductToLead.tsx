@@ -1,14 +1,10 @@
 import { X } from "lucide-react";
-
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import React, { useEffect, useState } from "react";
 import InterestType from "../../../@types/lead-management/InterestType";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ProductManagementLead from "./product-selection-modal/ProductManagementLead";
 import { usePanel } from "../../../context/panel/usePanel";
 import AssignProductToLeadType, {
@@ -40,17 +36,10 @@ const AssignProductToLead = ({
   fetchLeadCompanyProduct: () => void;
   interestTypeData: InterestType[];
 }) => {
-  const navigate = useNavigate();
   const { position } = usePanel();
   const { loginStatus } = useLoggedInUserContext();
 
   const [showSaveButton, SetShowSaveButton] = useState<boolean>(false);
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -116,13 +105,8 @@ const AssignProductToLead = ({
           callFunctionWithEvent: handleProductAddToLead,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleProductAddToLead(event);
-        } else {
-          setIsDialogueOpen(true);
-        }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
+        } 
       }
     }
   };
@@ -217,13 +201,6 @@ const AssignProductToLead = ({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
     </div>
   );

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Globe, Plus, X, XIcon } from "lucide-react";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
@@ -34,9 +35,11 @@ type LeadContactFormType = {
 const LeadContact = ({
   leadContact,
   fetchLeadContact,
+  selectedLeadData 
 }: {
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
+  selectedLeadData: any;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
@@ -256,7 +259,7 @@ const LeadContact = ({
     //  Proceed with form submission logic here
     const postData = {
       company_id: loginStatus.companyId,
-      // lead_id: selectedLeadData.id,
+      lead_id: selectedLeadData.id,
       name: leadContactForm.name,
       email: leadContactForm.email,
       mobilenumber: leadContactForm.mobileNumber,
@@ -393,9 +396,9 @@ const LeadContact = ({
   }, [selectedContactCard]);
 
   return (
-    <div className={`w-full  px-1 mb-1 `}>
+    <div className={`w-full z-10 px-1 mb-1 `}>
       {/* Header */}
-      <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+<div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
         <span>Add</span>
         <button
           disabled={!userHasAccessToUpdateLead}
@@ -416,6 +419,7 @@ const LeadContact = ({
           <Plus size={10} />
         </button>
       </div>
+      
 
       {/* Contacts List */}
       <div className="space-y-2">
@@ -689,7 +693,7 @@ const LeadContact = ({
 
       {/* Add Contact Form Modal */}
       {isOpenAddLeadContactForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
             <div className="border-b pb-1 mb-4 flex justify-between items-center">

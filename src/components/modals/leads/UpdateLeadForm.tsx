@@ -20,9 +20,6 @@ import UpdateLeadProps from "../../../@types/lead-management/UpdateLeadProps";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
 
@@ -32,7 +29,6 @@ function UpdateLeadForm({
   selectedLeadForEdit,
   
 }: UpdateLeadProps) {
-  const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
   const initialCreatLeadFormData = {
@@ -64,7 +60,6 @@ function UpdateLeadForm({
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -87,7 +82,7 @@ function UpdateLeadForm({
       name: createLeadModalFormData.name,
       email: createLeadModalFormData.email,
       mobilenumber: createLeadModalFormData.mobileNumber,
-      updatedby: loginStatus.id,
+      updatedby_id: loginStatus.id,
     };
     try {
       const response = await axios.post(
@@ -116,20 +111,10 @@ function UpdateLeadForm({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           handleSubmit(event);
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
-  };
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
   useEffect(() => {
@@ -215,13 +200,6 @@ function UpdateLeadForm({
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
 
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

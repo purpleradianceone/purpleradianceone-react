@@ -18,6 +18,7 @@ import {
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
+import REGEX from "../../constants/Regex";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -65,35 +66,33 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+        if(SignUpFormData.mobileNumber!.trim() !== ""){
+         if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
+          showMessageSnackbar("Invalid mobile number","error");
+          return;
+        }
+     }
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
       email: SignUpFormData.email.trim(),
+      captcha_token : captchaToken,
       password: SignUpFormData.password.trim(),
     };
 
     if (
       signupDataPost.email !== "" &&
       signupDataPost.password !== "" &&
-      SignUpFormData.confirmPassword !== ""
+      SignUpFormData.confirmPassword !== "" 
     ) {
       if (captchaToken !== "") {
-        const captchaRequest = {
-          token: captchaToken,
-        };
-        axios
-          .post(POST_API.VERIFIY_CAPTCHA, captchaRequest, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.data.status) {
+        
               axios
                 .post(POST_API.SIGN_UP, signupDataPost, {
                   withCredentials: true,
                 })
                 .then((respone) => {
-                  console.log(respone);
 
                   if (respone.data.status) {
                     if (
@@ -114,13 +113,9 @@ function SignUpForm() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  recaptchaRef.current!.reset();
                 });
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            showMessageSnackbar(MESSAGE.ERROR.INVALID_CAPTCHA, "error");
-          });
+          
       } else {
         showMessageSnackbar(MESSAGE.ERROR.COMPLETE_CAPTCHA, "error");
       }
@@ -136,6 +131,7 @@ function SignUpForm() {
           label="Full Name"
           type="text"
           name="name"
+          required={true}
           placeholder="Enter full name"
           value={SignUpFormData.name}
           onChange={handleSignUpFormDataChange}
@@ -156,6 +152,7 @@ function SignUpForm() {
           label="Email"
           type="email"
           name="email"
+          required={true}
           placeholder="Enter your email"
           value={SignUpFormData.email}
           onChange={handleSignUpFormDataChange}

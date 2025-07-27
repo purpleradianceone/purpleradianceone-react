@@ -234,7 +234,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
           isOpen={isOpen}
           children={[
             <Link
-              to={ROUTES_URL.LEAD_SETTINGS}
+              to={ROUTES_URL.COMPANY_SETTING}
               onClick={() => {
                 if (isSmallScreen) {
                   onNextTab();

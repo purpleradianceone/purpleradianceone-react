@@ -45,7 +45,6 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import MeetingPlatforms from "../../../@types/meeting/MeetingPlatform";
 import { useUserPreference } from "../../../context/user/UserPreference";
 
@@ -61,7 +60,7 @@ function EditMeetingDetailsModal({
   isOpen: boolean;
   onClose: () => void;
   isAttendeesPresent: boolean;
-  handleMeetingDetailsUpdate: () => void;
+  handleMeetingDetailsUpdate : (date : string,summary : string) => void;
   meetingPlatform: MeetingPlatforms[];
 }) {
   const meetingStautsRadioButtonOptions = [
@@ -137,7 +136,6 @@ function EditMeetingDetailsModal({
     meetingDetails!.description
   );
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -184,7 +182,6 @@ function EditMeetingDetailsModal({
   const [parsedEndDateTime, setParsedEndDateTime] = useState<Date>();
 
   useEffect(() => {
-    // console.log(currentTime);
     const pickerFormatString = "yyyy-MM-dd HH:mm";
 
     const combinedPickerStartDateTimeString = `${startDateValueIST} ${startTimeValueIST}`;
@@ -199,12 +196,6 @@ function EditMeetingDetailsModal({
     );
   }, [currentTime]);
 
-  useEffect(() => {
-    console.log(meetingPlatform);
-    console.log(serverCurrentTime);
-    console.log(parsedStartDateTime);
-    console.log(parsedEndDateTime);
-  }, [parsedEndDateTime]);
 
   const [
     isAddCompanyUserEmailAttedeesModalOpen,
@@ -215,11 +206,6 @@ function EditMeetingDetailsModal({
     "idle"
   );
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
@@ -286,11 +272,9 @@ function EditMeetingDetailsModal({
         );
 
         if (response.status === STATUS_CODE.OK) {
-          console.log("length : " + response.data.length);
           if (response.data.length === 0) {
             return 0;
           }
-          console.log(response.data[0]);
           setSelectedCompanyUserDetailArray((prev) => [
             ...prev,
             {
@@ -302,7 +286,6 @@ function EditMeetingDetailsModal({
           return response.data[0].id;
         }
       } catch (error: ApiError | any) {
-        console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithParamsNotEvent: isEmailIsOfCompanyUser,
@@ -323,13 +306,11 @@ function EditMeetingDetailsModal({
       ) {
         const id = await isEmailIsOfCompanyUser(newAttendeeEmail.trim());
         if (id !== 0) {
-          console.log("company user id returned from check : " + id);
           setSelectedCompanyUsersIdArray((prev) => [...prev, id]);
           setAttendees([...attendees, newAttendeeEmail.trim()]);
           setNewAttendeeEmail("");
           return;
         } else {
-          console.log("in else : " + id);
           setAttendees([...attendees, newAttendeeEmail.trim()]);
           setNewAttendeeEmail("");
           return;
@@ -340,14 +321,12 @@ function EditMeetingDetailsModal({
         setIsAttendeeNotPresentAddedNew(true);
         const id = await isEmailIsOfCompanyUser(newAttendeeEmail.trim());
         if (id !== 0) {
-          console.log("company user id returned from check : " + attendees);
           setSelectedCompanyUsersIdArray((prev) => [...prev, id]);
 
           setAttendees([...attendees, newAttendeeEmail.trim()]);
           setNewAttendeeEmail("");
           return;
         } else {
-          console.log("in else : " + id);
           setAttendees([...attendees, newAttendeeEmail.trim()]);
           setNewAttendeeEmail("");
           return;
@@ -375,7 +354,6 @@ function EditMeetingDetailsModal({
         setCopyStatus("copied");
         setTimeout(() => setCopyStatus("idle"), 2000); // Reset status after 2 seconds
       } else {
-        alert("Clipboard API not available. Please copy manually.");
         setCopyStatus("failed");
         setTimeout(() => setCopyStatus("idle"), 3000); // Reset status after 3 seconds
       }
@@ -427,13 +405,14 @@ function EditMeetingDetailsModal({
             }
           })
           .catch(async (error) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenStatus = await RefreshToken({
                 callFunctionWithParamsNotEvent:
                   getCompanyUsersPresentInAttendeesArray,
               });
-              console.log(refreshTokenStatus);
+              if(refreshTokenStatus){
+                getCompanyUsersPresentInAttendeesArray(attendees);
+              }
             }
           });
       }
@@ -550,7 +529,6 @@ function EditMeetingDetailsModal({
             }
           )
           .then((response) => {
-            console.log(response);
             if (response.status == STATUS_CODE.OK) {
               if (response.data.status) {
                 showMessageSnackbar({
@@ -558,7 +536,7 @@ function EditMeetingDetailsModal({
                   type: "success",
                 });
                 setTimeout(() => {
-                  handleMeetingDetailsUpdate();
+                  handleMeetingDetailsUpdate(endDate + " " + endTime + ":00",title);
                   setIsCreating(false);
                   onClose();
                 }, 3000);
@@ -571,7 +549,6 @@ function EditMeetingDetailsModal({
             }
           })
           .catch(async (error: ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
               handleOAuthConsent();
             } else if (error.status === STATUS_CODE.UNATHORISED) {
@@ -585,40 +562,32 @@ function EditMeetingDetailsModal({
           });
       }
     } else {
-      console.log(
-        "___________________Start Comparision_____________________________"
-      );
-      console.log(meetingDetails.title + " === " + title);
-      console.log(meetingDetails.title === title);
-      console.log("________________________________________________");
-      console.log(meetingDetails.description + " === " + description);
-      console.log(description === meetingDetails.description);
-      console.log("________________________________________________");
-      console.log(startDate + "=== " + startDateValue);
-      console.log(startDate === startDateValue);
-      console.log("________________________________________________");
-      console.log(endDate + "=== " + endDateValue);
-      console.log(endDate === endDateValue);
-      console.log("________________________________________________");
-      console.log(startTime + "=== " + startTimeValue.substring(0, 5));
-      console.log(startTime === startTimeValue.substring(0, 5));
-      console.log("________________________________________________");
-      console.log(endTime + "=== " + endTimeValue.substring(0, 5));
-      console.log(endTime === endTimeValue.substring(0, 5));
-      console.log("________________________________________________");
-      console.log(meetingDetails.attendeesEmailAll);
-      console.log(attendees);
-      console.log(attendees !== meetingDetails.attendeesEmailAll!);
-      console.log("________________________________________________");
-      console.log("is Attendees present : " + isAttendeeNotPresentAddedNew);
-
-      // meetingDetails.title === title
-      // && meetingDetails.description === description
-      // && startDate ===  startDateValue
-      // && endDate === endDateValue
-      // && startTime === startTimeValue.substring(0, 5)
-      // && endTime === endTimeValue.substring(0, 5)
-      // && meetingDetails.attendeesEmailAll === attendees
+      // console.log(
+      //   "___________________Start Comparision_____________________________"
+      // );
+      // console.log(meetingDetails.title + " === " + title);
+      // console.log(meetingDetails.title === title);
+      // console.log("________________________________________________");
+      // console.log(meetingDetails.description + " === " + description);
+      // console.log(description === meetingDetails.description);
+      // console.log("________________________________________________");
+      // console.log(startDate + "=== " + startDateValue);
+      // console.log(startDate === startDateValue);
+      // console.log("________________________________________________");
+      // console.log(endDate + "=== " + endDateValue);
+      // console.log(endDate === endDateValue);
+      // console.log("________________________________________________");
+      // console.log(startTime + "=== " + startTimeValue.substring(0, 5));
+      // console.log(startTime === startTimeValue.substring(0, 5));
+      // console.log("________________________________________________");
+      // console.log(endTime + "=== " + endTimeValue.substring(0, 5));
+      // console.log(endTime === endTimeValue.substring(0, 5));
+      // console.log("________________________________________________");
+      // console.log(meetingDetails.attendeesEmailAll);
+      // console.log(attendees);
+      // console.log(attendees !== meetingDetails.attendeesEmailAll!);
+      // console.log("________________________________________________");
+      // console.log("is Attendees present : " + isAttendeeNotPresentAddedNew);
       showMessageSnackbar({
         message: "You are not Authorised to Update the Meeting details!",
         type: "error",
@@ -824,7 +793,6 @@ function EditMeetingDetailsModal({
               defaultValue={startDate}
               onChange={(e) => {
                 setStartDate(e.target.value);
-                console.log(e.target.value);
               }}
               readonly={
                 !meetingDetails.isActive ||
@@ -969,7 +937,6 @@ function EditMeetingDetailsModal({
                 <div className="col-span-1 mt-7">
                   <Button
                     onClick={() => {
-                      console.log(newAttendeeEmail);
                       handleAddAttendee();
                     }}
                     disabled={!newAttendeeEmail.trim()}
@@ -1037,7 +1004,7 @@ function EditMeetingDetailsModal({
                 <Button
                   onClick={() => {
                     if (
-                      !googleMeetStatus.isConnected ||
+                      googleMeetStatus.isConnected ||
                       zoomMeetingStatus.isConnected
                     ) {
                       updateMeetingDetails();
@@ -1076,13 +1043,6 @@ function EditMeetingDetailsModal({
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
       />
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.

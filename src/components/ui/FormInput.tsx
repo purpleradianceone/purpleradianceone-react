@@ -43,8 +43,8 @@ function FormInput({
   const {isSmallScreen} = useScreenSize();
   return (
     <div className={isSmallScreen ? "mt-1" : "mt-2"}>
-      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-xs font-medium text-gray-700'}>
-        {label}
+      <label htmlFor={name} className={( center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
+        {label}{required && <span className="text-red-500 align-top">*</span>}
       </label>
       <div className={isSmallScreen ? "mt-1 relative" : "mt-0 relative"}>
         <input 

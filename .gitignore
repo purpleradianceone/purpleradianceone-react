@@ -1,10 +1,12 @@
 # Dependencies
+node_modules
 node_modules/
 /node_modules
 node_modules\*
 node_modules/*
 
-
+_metadata.json
+@lexical*
 # Build output
 build/
 /build

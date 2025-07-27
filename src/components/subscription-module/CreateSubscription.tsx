@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import CreateSubscrtionState from "../../@types/subscription/CreateSubscriptionState";
@@ -44,6 +45,7 @@ function CreateSubscription({
     initialCreateSubscriptionFormData
   );
 
+  const {setLoginStatus} = useLoggedInUserContext();
   const [isPaymentSubscriptionOpen, setIsPaymentSubscriptionOpen] =
     useState(false);
 
@@ -139,11 +141,28 @@ function CreateSubscription({
         setIsPaymentSubscriptionOpen(true);
       }
     } catch (error: any) {
-      // console.error("Error creating subscription:", error);
       showMessageSnackbar({
         message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
         type: "error",
       });
+      setLoginStatus({
+            companyId: 0,
+            companyName: "",
+            createdOn: "",
+            email: "",
+            fullName: "",
+            id: 0,
+            message: "",
+            mobileNumber: "",
+            status: false,
+            token: "",
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            activeUsersInCompany: 0,
+            subscriptionId: 0,
+            startDateSubscription: "",
+            endDateSubscription: "",
+          }); 
     } finally {
       setIsLoading(false);
     }

@@ -22,7 +22,6 @@ function GoogleOAuthConsentAndroid() {
      const handleGoogleMeetCallback = async (code: string, state: string) => {
 
     const googleMeetCallbackPostData = {
-      
       code: code,
       state: state,
       redirect_url : window.location.origin + window.location.pathname
@@ -34,7 +33,6 @@ function GoogleOAuthConsentAndroid() {
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          console.log(response);
           setGoogleMeetStatus({
             isConnected: true,
           });
@@ -43,9 +41,6 @@ function GoogleOAuthConsentAndroid() {
         }
        window.location.href = "com.purpleradiance.crm://oauth";
        
-      })
-      .catch((error) => {
-        console.log(error);
       });
   };
 

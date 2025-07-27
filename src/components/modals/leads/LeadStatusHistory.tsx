@@ -8,9 +8,6 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import LeadStatusHistoryData from "../../../@types/lead-management/LeadStatusHistoryData";
 import LeadStatusHistoryAgGrid from "../../ag-grid/LeadStatusHistoryAgGrid";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 
 const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
   isOpen,
@@ -30,9 +27,7 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
       reason: "",
     },
   ]);
-  const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const getLeadHistory = async () => {
     const PostDataToGetLeadStatusHistory = {
       company_id: loginStatus.companyId,
@@ -47,7 +42,6 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
-        console.log(responseData);
 
         const transformedData: LeadStatusHistoryData[] = responseData.map(
           (item: any) => ({
@@ -70,13 +64,8 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
           getLeadHistory();
-        } else {
-          setIsDialogueOpen(true);
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -86,11 +75,6 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
     }
   }, [isOpen]);
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   if (!isOpen) return null;
   return (
@@ -112,13 +96,6 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
           />
         </div>
       </div>
-       <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            />
     </div>
   );
 };

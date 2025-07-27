@@ -20,7 +20,6 @@ function ZoomMeetingsOAuthConsentAndroid() {
 
 
     const handleClose = (isFlowCompleted : boolean) => {
-      console.log(window.history)
         if(isFlowCompleted){
             window.location.href = "com.purpleradiance.crm://oauth";
         }
@@ -50,9 +49,6 @@ function ZoomMeetingsOAuthConsentAndroid() {
         window.history.replaceState(null, "", newUrl);
         }
         handleClose(true);
-      })
-      .catch((error) => {
-        console.log(error);
       });
     }
 

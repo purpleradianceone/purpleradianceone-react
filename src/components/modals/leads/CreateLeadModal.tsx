@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handshake, UserRoundPlus, X } from "lucide-react";
 import {
@@ -26,18 +27,14 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
+import ApiError from "../../../@types/error/ApiError";
 
 function CreateLeadModal({
   isOpen,
   onClose,
   onCreateLeadRefreshLeadData,
 }: CreateLeadModalProps) {
-  const navigate = useNavigate();
-
   const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
@@ -136,7 +133,6 @@ function CreateLeadModal({
     generate_password: "",
   });
 
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
@@ -187,22 +183,17 @@ function CreateLeadModal({
       );
       if (response.status === STATUS_CODE.OK) {
         setLeadSource(response.data);
-        getLeadStatusOptions();
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: getLeadStatusOptions,
+          callFunction: getLeadSourceOptions,
         });
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadSourceOptions();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -234,12 +225,8 @@ function CreateLeadModal({
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          getLeadStatusOptions();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
@@ -247,6 +234,7 @@ function CreateLeadModal({
   useEffect(() => {
     if (isOpen) {
       getLeadSourceOptions();
+      getLeadStatusOptions();
     }
   }, [isOpen]);
   //
@@ -281,8 +269,22 @@ function CreateLeadModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (error.mobileNumber !== "") {
+      showMessageSnackbar({
+        message: "Please enter a valid mobile number.",
+        type: "error",
+      });
+      return;
+    }
+    if (error.email !== "") {
+      showMessageSnackbar({
+        message: "Please enter a valid email address.",
+        type: "error",
+      });
+      return;
+    }
     const isEmailFilled = createLeadModalFormData.email !== "";
     const isMobileNumberFilled = createLeadModalFormData.mobileNumber !== "";
     if (selectedSource === undefined) {
@@ -325,7 +327,7 @@ function CreateLeadModal({
           createLeadModalFormData.email === ""
             ? null
             : createLeadModalFormData.email,
-        createdby: loginStatus.id,
+        createdby_id: loginStatus.id,
         lead_source_id: selectedSource!,
         lead_status_id: selectedStatus!,
         mobilenumber:
@@ -334,7 +336,7 @@ function CreateLeadModal({
             : createLeadModalFormData.mobileNumber,
       };
 
-      axios
+      await axios
         .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
           withCredentials: true,
         })
@@ -345,9 +347,9 @@ function CreateLeadModal({
               type: "success",
             });
             // note : this callback will run to refresh the list of aggrid
-            onCreateLeadRefreshLeadData();
+            onCreateLeadRefreshLeadData!();
             setTimeout(() => {
-              onClose();
+              onClose!();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           } else if (response.data.status == false) {
             showMessageSnackbar({
@@ -355,7 +357,16 @@ function CreateLeadModal({
               type: "warning",
             });
           }
-          console.log(response.data);
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunctionWithEvent: handleSubmit,
+            });
+            if (refreshTokenStatus) {
+              handleSubmit(e);
+            }
+          }
         });
     }
   };
@@ -393,12 +404,6 @@ function CreateLeadModal({
       setSelectedStatus(undefined);
     }
   }, [isOpen]);
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   if (!isOpen) return null;
   return (
@@ -601,13 +606,6 @@ function CreateLeadModal({
           </div>
         </div>
       )}
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

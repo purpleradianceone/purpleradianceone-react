@@ -17,7 +17,7 @@ import {
   Store,
   X,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SideNavBar from "./SideNavBar";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -26,9 +26,16 @@ import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
 import Button from "../../../ui/Button";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
-import { SIZE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import NavItem from "./Component/NavItem";
 import { usePanel } from "../../../../context/panel/usePanel";
+import NotificationPopup from "../../notification/NotificationManagement";
+import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import toast, { Toaster } from "react-hot-toast";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -40,7 +47,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
-    userHasAccessToViewMeeting
+    userHasAccessToViewMeeting,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -76,9 +83,26 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const handleLogout = () => {
-    Navigate(ROUTES_URL.SIGN_IN);
-    setLoginStatus({
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        
+        element.scrollIntoView({ behavior: 'instant' });
+      }
+    }
+  }, [location]);
+
+  const handleLogout = async() => {
+    await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
+    .then((response ) =>{
+      if(response.status === 200){
+        toast.success(response.data)
+        Navigate(ROUTES_URL.SIGN_IN);
+         setLoginStatus({
       id: 0,
       companyId: 0,
       message: "",
@@ -96,7 +120,24 @@ function Navbar({ children }: { children: React.ReactNode }) {
       startDateSubscription: "",
       subscriptionId: 0,
     });
-  };
+      }
+    })
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   .catch(async (error: ApiError | any) => {
+        //if exception occurs then rollback to previous state
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleLogout,
+          });
+          if (refreshTokenResponse) {
+            handleLogout();
+          }
+        }
+      });
+
+  }
+
+
 
   //WRITE SUBSCRIPTION LOGIC HERE
   const handleSubscription = () => {
@@ -107,11 +148,45 @@ function Navbar({ children }: { children: React.ReactNode }) {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
   };
 
-  if (!loginStatus.status) {
+  // const notifications = useNotifications();
+
+  const {notificationCount,setNotificationCount} = useNotificationCountContext();
+
+  // useEffect(() => {
+  //   console.log("something happened");
+  //   console.log(notificationCount);
+  //   console.log(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT)!));
+
+  //   if (notifications!.length >= 1) {
+  //     setNotificationCount(notifications!.length);
+  //   }
+  // }, [notifications]);
+
+  const resetNotificationCount = () => {
+
+
+    setNotificationCount(0);
+  };
+
+  // let unreadCount = notifications?.length || 0;
+
+  const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
+    useState<boolean>(false);
+
+    // useEffect(() => {
+    //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    //   console.log("loginstatus : " + loginStatus.status);
+    //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
+    //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
+    //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
+    //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+    // },[loginStatus])
+
+  if (!loginStatus.status || ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers))) {
     return (
       <div>
-        <header>
-          <nav className=" relative w-full bg-white shadow-sm z-50 py-3">
+        <header className="fixed bg-white w-full shadow-sm z-50 py-5">
+          <nav className="">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
@@ -122,29 +197,46 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                 <div className="hidden md:flex items-center space-x-8">
                   <a
-                    href="#features"
+                    href={ROUTES_URL.FEATURES}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Features
                   </a>
                   <a
-                    href="#solutions"
+                    href={ROUTES_URL.PRICING}
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Solutions
+                    Pricing
                   </a>
                   <a
-                    href="#pricing"
+                    href={ROUTES_URL.ABOUT_US}
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Products
+                    About Us
                   </a>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                    <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-                  </button>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                    <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
-                  </button>
+                  <a
+                    href={ROUTES_URL.CONTACT_US}
+                    className="text-gray-700 hover:text-blue-600"
+                  >
+                    Contact Us
+                  </a>
+                  <a
+                    href={ROUTES_URL.CAREERS}
+                    className="text-gray-700 hover:text-blue-600"
+                  >
+                    Careers
+                  </a>
+                  
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                      Get Started
+                    </button>
+                  </Link>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                      Login
+                    </button>
+                  </Link>
                 </div>
 
                 <div className="md:hidden flex justify-center">
@@ -180,32 +272,38 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Pricing
                   </a>
-                  <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                    <Link to={ROUTES_URL.SIGN_UP}>Get Started</Link>
-                  </Button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                    <Link to={ROUTES_URL.SIGN_IN}>Login</Link>
-                  </button>
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                      Get Started
+                    </Button>
+                  </Link>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
+                      Login
+                    </button>
+                  </Link>
                 </div>
               </div>
             )}
           </nav>
         </header>
-        <main className="min-h-screen overflow-x-hidden">{children}</main>
+        <main className="min-h-screen overflow-y-scroll border border-gray-400
+            [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-transparent">{children}</main>
       </div>
     );
   } else {
     return (
       <div>
         <header>
-          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full  top-0 h-12">
-            <div className="px-4 py-1 lg:px-6">
+          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 h-12">
+            <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : ""
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-sm   font-bold text-blue-700 cursor-pointer">
+                <div className="flex items-center justify-between text-lg   font-bold text-blue-700 cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
                     <h2 className="font-sora ">{loginStatus.companyName}</h2>
                   </Link>
@@ -358,7 +456,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           )}
 
                           {userHasAccessToViewMeeting && (
-                             <NavItem
+                            <NavItem
                               to={ROUTES_URL.MEETINGS}
                               icon={<Calendar size={SIZE.TWENTY} />}
                               label=""
@@ -367,7 +465,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           )}
 
                           <NavItem
-                            to={ROUTES_URL.LEAD_SETTINGS}
+                            to={ROUTES_URL.COMPANY_SETTING}
                             icon={<SettingsIcon size={SIZE.TWENTY} />}
                             label=""
                             onClick={() => setIsDropdownOpen(false)}
@@ -393,14 +491,57 @@ function Navbar({ children }: { children: React.ReactNode }) {
                 <div className=" flex items-center space-x-4">
                   {!isSmallScreen && (
                     <>
-                      <button className="p-2 rounded-lg hover:bg-gray-100">
-                        <Bell className="h-5 w-5" />
-                      </button>
-                      <button className="p-2 rounded-lg hover:bg-gray-100">
-                        <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                      {/* <Link to={ROUTES_URL.NOTIFICATION} className="relative">
+                        <button
+                          onClick={() => setIsOpenPopUpOfNotification(true)}
+                          className="p-2 rounded-lg hover:bg-gray-100"
+                        >
+                          <Bell className="h-5 w-5" />
+                          {unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
+                        {isOpenPopUpOfNotification && (
+                          <NotificationPopup
+                            // notifications={notifications}
+                            onClose={() => setIsOpenPopUpOfNotification(false)}
+                          />
+                        )}
+                      </Link> */}
+                      <div className="relative">
+                        <button
+                          onClick={() => {
+                            resetNotificationCount();
+                            setIsOpenPopUpOfNotification(
+                              !isOpenPopUpOfNotification
+                            );
+                            // unreadCount=0;
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-100"
+                        >
+                          <Bell className="h-5 w-5" />
+                          {notificationCount > 0 && (
+                            <span className="absolute -top-0.5 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                              {notificationCount > 9 ? "9+" : notificationCount}
+                            </span>
+                          )}
+                        </button>
+
+                        {isOpenPopUpOfNotification && (
+                          <NotificationPopup
+                            // notifications={notifications}
+                            onClose={() => setIsOpenPopUpOfNotification(false)}
+                          />
+                        )}
+                      </div>
+
+                      <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                        <button className="p-2 rounded-lg hover:bg-gray-100">
                           <LayoutPanelLeft className="h-5 w-5" />
-                        </Link>
-                      </button>
+                        </button>
+                      </Link>
                     </>
                   )}
                   {/* paste code here */}
@@ -526,6 +667,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             }}
           />
         )}
+        <Toaster position="top-center" />
       </div>
     );
   }

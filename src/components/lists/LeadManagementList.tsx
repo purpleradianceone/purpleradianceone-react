@@ -46,7 +46,7 @@ function LeadManagementList({
   handleLeadSelectedSource,
 }: LeadManagementListProps) {
   const navigate = useNavigate();
-  const {position} = usePanel();
+  const { position } = usePanel();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
@@ -125,10 +125,9 @@ function LeadManagementList({
     });
     navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
   };
-  const handleShowImportModule =() =>{
-   navigate(ROUTES_URL.LEAD_IMPORT_CSV);
-  }
-
+  const handleShowImportModule = () => {
+    navigate(ROUTES_URL.LEAD_IMPORT_CSV);
+  };
 
   if (userHasAccessToViewLead) {
     const handleCreateLeadModalClose = () => {
@@ -136,8 +135,9 @@ function LeadManagementList({
     };
 
     return (
-      <div className={`w-full ${position ==="left" ? "pl-5" : "pl-1"} pr-1 gap-1`}>
-        
+      <div
+        className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
+      >
         <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex">
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
@@ -186,7 +186,7 @@ function LeadManagementList({
                 <div className="flex ">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar  />
+                      <Calendar />
                     </div>
                     <DateRangeFilterDropdown
                       dropdownOptions={dateRangeDropdownOptions}
@@ -194,6 +194,19 @@ function LeadManagementList({
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
+                {/* Custom Date Picker Div Flex Box*/}
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
                 <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                   <CustomDropdown
                     labelName="source"
@@ -218,19 +231,7 @@ function LeadManagementList({
                   <User size={14} className="" />
                 </Button>
               </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
+              
             </>
           )}
 
@@ -371,12 +372,24 @@ function LeadManagementList({
               )}
             </>
           )}
-          <div className="flex float-end mx-1">
-          <Button onClick={handleShowImportModule}>
-           <Plus size={16} className="text-white"/>
-            <span className="text-xs">Import </span>
-          </Button>
-        </div>
+          
+            
+              <div className="flex float-end mx-1">
+              <Button
+              disabled={!userHasAccessToAddLead}
+              onClick={
+                ()=>{
+                  if(userHasAccessToAddLead){
+                    handleShowImportModule()
+                  }
+                }
+                }>
+                <Plus className="text-white h-2 w-3 md:h-4 md:w-4" />
+                <span className="hidden md:inline md:text-xs">Import </span>
+              </Button>
+               </div>
+            
+         
           <div className="flex gap-1">
             {userHasAccessToAddLead && (
               <Button
@@ -385,27 +398,26 @@ function LeadManagementList({
                 }}
               >
                 <span className="text-xs flex">
-                {!isSmallScreen && <ClipboardPlus size={16} />}
-                {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                  {!isSmallScreen && <ClipboardPlus size={16} />}
+                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                 </span>
               </Button>
             )}
             {!userHasAccessToAddLead && (
               <Button disabled={true}>
-                 <span className="text-xs flex">
-                {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
-                {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                <span className="text-xs flex">
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.TWENTY} />}
+                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                 </span>
               </Button>
             )}
           </div>
-          
         </div>
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-         <div
+          <div
             className="ag-theme-alpine w-full"
             style={{ height: "90vh", width: "100%" }}
           >
@@ -416,7 +428,6 @@ function LeadManagementList({
               leads={leadData}
             />
           </div>
-          {/* </div> */}
           <CreateLeadModal
             isOpen={isCreateLeadModalOpen}
             onClose={handleCreateLeadModalClose}

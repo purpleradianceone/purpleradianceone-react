@@ -100,11 +100,6 @@ function CompanyProductUsersModal({
         )
         .then((response) => {
           if (response.data.status) {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "success",
-            // });
-            
             setIsCompanyProductUsersAddCompleted(true);
             handleCompanyProductUserUpdateChange();
             setCompanyProductUsersList([]);
@@ -118,7 +113,6 @@ function CompanyProductUsersModal({
           }
         })
         .catch(async (error: ApiError | any) => {
-          console.log(error);
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
               callFunction: handleAddCompanyProductUsers,
@@ -257,14 +251,15 @@ function CompanyProductUsersModal({
         }
       }
     } catch (error: ApiError | any) {
-      console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyProductUsers,
         });
+ 
 
         if (refreshTokenResponse) {
-          fetchCompanyProductUsers("");
+          companyProductUsersFetchingRef.current = false;
+          fetchCompanyProductUsers(companyProductUsersSearchParameter);
         }
       }
     } finally {

@@ -1,9 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useEffect, useState } from "react";
 import { STATUS_CODE } from "../../../constants/AppConstants";
-import ROUTES_URL from "../../../constants/Routes";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import TeamManagementList from "../../lists/TeamManagementList";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
@@ -19,27 +16,17 @@ function TeamManagement(){
 
     const {userHasAccessToViewTeamManagement} = useUserAccessModules();
 
-    const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
   const [companyTeamUpdateCount,setCompanyTeamUpdateCount] = useState<number>(0);
   const [companyTeamAddCount,setCompanyTeamAddCount] = useState<number>(0);
   const {loginStatus} = useLoggedInUserContext();
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
+    userHasAccessToViewTeamManagement
   );
 
   const [companyTeamList,setCompanyTeamList] = useState<CompanyTeamSearchProps[]>([]);
 
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
     const {
       currentPage,
@@ -112,13 +99,8 @@ function TeamManagement(){
             if(error.status === STATUS_CODE.UNATHORISED){
               const refreshTokenStatus = await RefreshToken({callFunction:fetchCompanyTeam})
               if (refreshTokenStatus) {
-                setIsDialogueOpen(false);
-              } else {
-                setIsDialogueOpen(true);
+               fetchCompanyTeam();
               }
-            }
-            else if(error.status === STATUS_CODE.FORBIDDEN){
-              setAccessDeniedPopUpOpen(true);
             }
             
         })
@@ -173,13 +155,6 @@ function TeamManagement(){
               }}
            ></TeamManagementList>
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

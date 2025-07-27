@@ -25,6 +25,7 @@ import {
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../../constants/Messages";
 import EmailTypeSettings from "./EmailTypeSettings";
+import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
 
 interface CompanyEmailSetting {
   id: number;
@@ -76,7 +77,12 @@ export default function EmailSettingsTabs() {
   const [modalType, setModalType] = useState<"company" | "user">("company");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { userHasAccessToAddEmailSetting, userHasAccessToUpdateEmailSetting } =
+  const { userHasAccessToAddEmailSetting, 
+          userHasAccessToUpdateEmailSetting,
+          userHasAccessToViewEmailSetting,
+          userHasAccessToViewEmailSettingCompany,
+          userHasAccessToViewEmailTypeSetting
+   } =
     useUserAccessModules();
 
   const handleModalSubmit = async (data: any) => {
@@ -152,119 +158,112 @@ export default function EmailSettingsTabs() {
     setting: CompanyEmailSetting,
     index: number
   ) => (
-    <>
-      <div className="flex justify-between">
-        <div
-          key={index}
-          className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
-        >
-          <Button
-            disabled={!userHasAccessToUpdateEmailSetting}
-            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
-            onClick={() => {
-              if (userHasAccessToUpdateEmailSetting) {
-                setModalType("company");
-                setEditData(setting);
-                setIsModalOpen(true);
-              } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.NOT_ATHORISED,
-                  type: "error",
-                });
-              }
-            }}
+        <><div className="flex justify-between">
+          <div
+            key={index}
+            className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
           >
-            Edit
-          </Button>
+            <Button
+              disabled={!userHasAccessToUpdateEmailSetting}
+              className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
+              onClick={() => {
+                if (userHasAccessToUpdateEmailSetting) {
+                  setModalType("company");
+                  setEditData(setting);
+                  setIsModalOpen(true);
+                } else {
+                  showMessageSnackbar({
+                    message: MESSAGE.ERROR.NOT_ATHORISED,
+                    type: "error",
+                  });
+                }
+              } }
+            >
+              Edit
+            </Button>
 
-          <div className="flex items-center space-x-2 mb-2">
-            <Mail className="text-blue-600 w-5 h-5" />
-            <p className="text-gray-700 text-sm">
-              <strong>Company Email:</strong> {setting.email}
-            </p>
+            <div className="flex items-center space-x-2 mb-2">
+              <Mail className="text-blue-600 w-5 h-5" />
+              <p className="text-gray-700 text-sm">
+                <strong>Company Email:</strong> {setting.email}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <KeyRound className="text-gray-500 w-5 h-5" />
+              <p className="text-gray-700 text-sm">
+                <strong>Email Password:</strong> ********
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <Server className="text-green-600 w-5 h-5" />
+              <p className="text-gray-700 text-sm">
+                <strong>SMTP Host:</strong> {setting.smtp_host}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <Server className="text-purple-600 w-5 h-5" />
+              <p className="text-gray-700 text-sm">
+                <strong>SMTP Port:</strong> {setting.smtp_port}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <Lock className="text-orange-500 w-5 h-5" />
+              <p className="text-gray-700 text-sm">
+                <strong>Security Type:</strong>{" "}
+                {setting.email_security_type_id === 1
+                  ? "SSL"
+                  : setting.email_security_type_id === 2
+                    ? "TLS"
+                    : "Unknown"}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <ShieldCheck
+                className={`w-5 h-5 ${setting.authentication_required
+                    ? "text-emerald-600"
+                    : "text-gray-400"}`} />
+              <p className="text-gray-700 text-sm">
+                <strong>Authentication Required:</strong>{" "}
+                {setting.authentication_required ? "Yes" : "No"}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 mb-4">
+              {setting.isactive ? (
+                <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
+              ) : (
+                <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
+              )}
+              <p className="text-gray-700 text-sm">
+                <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <p className="text-gray-700 text-sm">
+                <strong>Created By:</strong> {setting.createdby}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <p className="text-gray-700 text-sm">
+                <strong>Created On:</strong> {setting.createdon}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <p className="text-gray-700 text-sm">
+                <strong>Updated By:</strong> {setting.updatedby}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <p className="text-gray-700 text-sm">
+                <strong>Updated On:</strong> {setting.updatedon}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <KeyRound className="text-gray-500 w-5 h-5" />
-            <p className="text-gray-700 text-sm">
-              <strong>Email Password:</strong> ********
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <Server className="text-green-600 w-5 h-5" />
-            <p className="text-gray-700 text-sm">
-              <strong>SMTP Host:</strong> {setting.smtp_host}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <Server className="text-purple-600 w-5 h-5" />
-            <p className="text-gray-700 text-sm">
-              <strong>SMTP Port:</strong> {setting.smtp_port}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <Lock className="text-orange-500 w-5 h-5" />
-            <p className="text-gray-700 text-sm">
-              <strong>Security Type:</strong>{" "}
-              {setting.email_security_type_id === 1
-                ? "SSL"
-                : setting.email_security_type_id === 2
-                ? "TLS"
-                : "Unknown"}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <ShieldCheck
-              className={`w-5 h-5 ${
-                setting.authentication_required
-                  ? "text-emerald-600"
-                  : "text-gray-400"
-              }`}
-            />
-            <p className="text-gray-700 text-sm">
-              <strong>Authentication Required:</strong>{" "}
-              {setting.authentication_required ? "Yes" : "No"}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 mb-4">
-            {setting.isactive ? (
-              <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
-            ) : (
-              <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
-            )}
-            <p className="text-gray-700 text-sm">
-              <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <p className="text-gray-700 text-sm">
-              <strong>Created By:</strong> {setting.createdby}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <p className="text-gray-700 text-sm">
-              <strong>Created On:</strong> {setting.createdon}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <p className="text-gray-700 text-sm">
-              <strong>Updated By:</strong> {setting.updatedby}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <p className="text-gray-700 text-sm">
-              <strong>Updated On:</strong> {setting.updatedon}
-            </p>
-          </div>
-        </div>
-      </div>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-    </>
+        </div><MessageSnackBar
+            isOpen={messageSnackbar.open}
+            message={messageSnackbar.message}
+            type={messageSnackbar.type}
+            onClose={handleMessageSnackbarClose}
+            duration={NUMBER_VALUES.SNACKBAR_DURATION} /></>
   );
 
   const renderUserEmailCard = (
@@ -272,6 +271,8 @@ export default function EmailSettingsTabs() {
     index: number
   ) => (
     <>
+    {userHasAccessToViewEmailSetting ? (
+      <>
       <div className="flex justify-between">
         <div
           key={index}
@@ -383,6 +384,11 @@ export default function EmailSettingsTabs() {
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
+      </>
+    ) : (
+      <AccessDeniedMessagePage></AccessDeniedMessagePage>
+    )}
+      
     </>
   );
 
@@ -493,7 +499,8 @@ export default function EmailSettingsTabs() {
       <div>
         {activeTab === "company" ? (
           <div className="w-full">
-            {isLoading ? (
+            {userHasAccessToViewEmailSettingCompany ? 
+            (isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
               </div>
@@ -527,11 +534,16 @@ export default function EmailSettingsTabs() {
                   </div>
                 )}
               </div>
+            )) : 
+            (
+              <AccessDeniedMessagePage></AccessDeniedMessagePage>
             )}
+            
           </div>
         ) : activeTab === "user" ? (
           <div className="w-full">
-            {isLoading ? (
+            {userHasAccessToViewEmailSetting ? (
+              isLoading ? (
               <div className="flex justify-center items-center h-[40vh]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
               </div>
@@ -565,11 +577,18 @@ export default function EmailSettingsTabs() {
                   </div>
                 )}
               </div>
+            )
+            ) : (
+              <AccessDeniedMessagePage></AccessDeniedMessagePage>
             )}
           </div>
         ) : (
           <div>
-            <EmailTypeSettings></EmailTypeSettings>
+            {userHasAccessToViewEmailTypeSetting ? (
+                <EmailTypeSettings></EmailTypeSettings>
+            ) : (
+              <AccessDeniedMessagePage></AccessDeniedMessagePage>
+            )}
           </div>
         )}
       </div>

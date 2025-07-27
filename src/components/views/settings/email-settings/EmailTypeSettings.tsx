@@ -9,6 +9,8 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import EmailTypeSettingsType from "../../../../@types/settings/EmailTypeSettingsType";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../../@types/ui/MessageSnackbarProps";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
 
 function EmailTypeSettings() {
   const [emailTypeSettings, setEmailTypeSettings] = useState<
@@ -16,6 +18,8 @@ function EmailTypeSettings() {
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
+
+  const {userHasAccessToViewEmailTypeSetting} = useUserAccessModules();
 
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
       open: false,
@@ -57,7 +61,7 @@ function EmailTypeSettings() {
                 id: res.id,
                 companyId: res.company_id,
                 name: res.name,
-                fromCompanyEmail: res.from_company_email,
+                fromCompanyEmail: res.tosend_from_company_email,
                 emailTypeId: res.email_type_id,
                 createdBy: res.createdby,
                 createdOn: res.createdon,
@@ -89,7 +93,7 @@ function EmailTypeSettings() {
     const emailTypeSettingPostData = {
       company_id: loginStatus.companyId,
       id: id,
-      from_company_email: isChecked,
+      tosend_from_company_email: isChecked,
       updatedby_id: loginStatus.id,
     };
 
@@ -136,7 +140,9 @@ function EmailTypeSettings() {
 
   return (
     <div className="w-full h-fit bg-gray-50 px-2 py-2">
-      {isLoading ? (
+      {userHasAccessToViewEmailTypeSetting && (
+        <>
+{isLoading ? (
         <div className="flex justify-center items-center mt-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-800"></div>
         </div>
@@ -198,6 +204,11 @@ function EmailTypeSettings() {
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
+        </>
+      )}
+      {!userHasAccessToViewEmailTypeSetting && (
+        <AccessDeniedMessagePage></AccessDeniedMessagePage>
+      ) }
     </div>
   );
 }

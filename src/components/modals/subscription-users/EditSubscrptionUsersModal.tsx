@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { NUMBER_VALUES, SIZE } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
 
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
@@ -18,6 +18,7 @@ import {  useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -174,7 +175,12 @@ function EditSubscriptionUsersModal({
         }
       }
     } catch (error: ApiError | any) {
-      console.error(error);
+      if(error.status === STATUS_CODE.UNATHORISED){
+        const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent :fetchCompanyUsers});
+        if(refreshTokenResponse){
+          fetchCompanyUsers(comapnyUserSearchParameter);
+        }
+      }
     } finally {
       if (comapnyUserSearchParameter.length > 0) {
         setIsCompanyUsersLoading(false);

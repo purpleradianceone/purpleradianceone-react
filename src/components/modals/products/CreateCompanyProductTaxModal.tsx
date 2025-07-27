@@ -10,7 +10,6 @@ import {
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import MessageSnackBar from "../../ui/MessageSnackbar";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import { useEffect, useState } from "react";
 import {
   MessageSnackbarState,
@@ -27,8 +26,6 @@ import CreateCompanyProductTaxModalProps from "../../../@types/modal/CreateCompa
 import RadioButtons from "../../ui/RadioButton";
 import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 
 function CreateCompanyProductTaxModal({
@@ -46,7 +43,7 @@ function CreateCompanyProductTaxModal({
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
-  const {isSmallScreen} = useScreenSize();
+  const { isSmallScreen } = useScreenSize();
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
 
@@ -65,16 +62,6 @@ function CreateCompanyProductTaxModal({
     createCompanyProductTaxFormData,
     "registration"
   );
-
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
     setMessageSnackbar({ open: true, message, type });
@@ -96,8 +83,7 @@ function CreateCompanyProductTaxModal({
     event.preventDefault();
     if (
       createCompanyProductTaxFormData.taxRate !== 0 &&
-      createCompanyProductTaxFormData.validFrom !==
-        "" &&
+      createCompanyProductTaxFormData.validFrom !== "" &&
       (createCompanyProductTaxFormData.hsn !== "" ||
         createCompanyProductTaxFormData.sac !== "")
     ) {
@@ -111,13 +97,11 @@ function CreateCompanyProductTaxModal({
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
         };
-        console.log(updateProductPostData);
         await axios
           .post(POST_API.CREATE_PRODUCT_TAX, updateProductPostData, {
             withCredentials: true,
           })
           .then((response) => {
-            console.log(response);
             if (
               response.data.status === true &&
               response.status === STATUS_CODE.OK
@@ -130,32 +114,27 @@ function CreateCompanyProductTaxModal({
 
               setTimeout(() => {
                 onClose();
-                
               }, 2000);
-            }
-            else if(response.status === STATUS_CODE.OK && !response.data.status){
-                  showMessageSnackbar({message:response.data.message,type : "error"});
-                  setIsDialogueOpen(false)
+            } else if (
+              response.status === STATUS_CODE.OK &&
+              !response.data.status
+            ) {
+              showMessageSnackbar({
+                message: response.data.message,
+                type: "error",
+              });
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch(async (error: ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
               });
-              if(refreshTokenResponse){
-                  setIsDialogueOpen(false)
-              }
-              else{
-                setIsDialogueOpen(true)
+              if (refreshTokenResponse) {
+                hanldeUpdateCompanyProductFormSubmit(event);
               }
             }
-            else if(error.status === STATUS_CODE.FORBIDDEN){
-              setIsDialogueOpen(true)
-            }
-            
           });
       }
     } else {
@@ -183,8 +162,13 @@ function CreateCompanyProductTaxModal({
   return (
     <>
       <div className="flex justify-center items-center w-full">
-        <div className={isSmallScreen ? "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn " : "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn px-3 "}>
-
+        <div
+          className={
+            isSmallScreen
+              ? "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn "
+              : "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn px-3 "
+          }
+        >
           <div className="p-6">
             <div className="flex items-center gap-3 mb-6">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
@@ -192,11 +176,11 @@ function CreateCompanyProductTaxModal({
                 Create Tax For : {product.name}
               </h2>
               <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-900 hover:text-gray-600"
-          >
-            <X size={SIZE.TWENTY} />
-          </button>
+                onClick={onClose}
+                className="absolute right-4 top-4 text-gray-900 hover:text-gray-600"
+              >
+                <X size={SIZE.TWENTY} />
+              </button>
             </div>
 
             <form
@@ -208,8 +192,7 @@ function CreateCompanyProductTaxModal({
                 onChange={handleTaxRadioButtonChange}
               />
 
-              {(selectedTaxCode === TAX_CODE.HSN ||
-                selectedTaxCode === "") && (
+              {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
                   type="text"
@@ -257,7 +240,7 @@ function CreateCompanyProductTaxModal({
               />
               <div className="flex justify-center">
                 <div className="max-w-80 min-w-72">
-                <Button type="submit">Create Product Tax</Button>
+                  <Button type="submit">Create Product Tax</Button>
                 </div>
               </div>
             </form>
@@ -271,13 +254,6 @@ function CreateCompanyProductTaxModal({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
-       <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      /> 
     </>
   );
 }

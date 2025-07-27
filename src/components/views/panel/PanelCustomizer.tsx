@@ -6,9 +6,6 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 
 const PanelCustomizer: React.FC = () => {
 
@@ -16,14 +13,7 @@ const PanelCustomizer: React.FC = () => {
   const {position, setPosition}= usePanel();
   const prevPositionRef = React.useRef(position);
   const {userPreference , setUserPreference}= useUserPreference();
-  const navigate = useNavigate();
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
-  const [isDialogueOpen, setIsDialogueOpen] = React.useState<boolean>(false);
 
    const handleUserPreferenceChange = async () => {
     const postData = {
@@ -31,7 +21,7 @@ const PanelCustomizer: React.FC = () => {
       id: userPreference.id,
       is_left_menu: position === "left" ? true : false,
       is_hamburger_menu_collapsed: userPreference.isHamburgerMenuCollapsed,
-      rows_in_grid: userPreference.rowsInGrid,
+      master_rows_in_grid_id: null,
       timezone_id: userPreference.timezoneId,
       updatedby: loginStatus.id,
     };
@@ -58,18 +48,14 @@ const PanelCustomizer: React.FC = () => {
           callFunction: handleUserPreferenceChange,
         });
         if (refreshTokenStatus) {
-          setIsDialogueOpen(false);
-        } else {
-          setIsDialogueOpen(true);
+          handleUserPreferenceChange();
         }
-      } else if (error.status === STATUS_CODE.FORBIDDEN) {
-        setIsDialogueOpen(true);
       }
     }
   };
 
   useEffect(()=>{
-    if(prevPositionRef.current !== position){
+    if(prevPositionRef.current !== position && position!== null){
       handleUserPreferenceChange();
     }
   },[position])
@@ -141,13 +127,6 @@ const PanelCustomizer: React.FC = () => {
           </div>
         </div>
       </div>
-      <DialogueBox
-              isOpen={isDialogueOpen}
-              onClose={() => setIsDialogueOpen(false)}
-              onConfirm={handleDialogueConfirm}
-              title="Session Expired !"
-              message="Session Expired. Please login again."
-            />
     </div>
   );
 };

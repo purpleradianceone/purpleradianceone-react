@@ -24,10 +24,9 @@ import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { useNavigate } from "react-router-dom";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import useScreenSize from "../../../config/hooks/useScreenSize";
+import REGEX from "../../../constants/Regex";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -39,10 +38,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   };
 
   const {isSmallScreen} = useScreenSize()
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
   const {
     formData: addCompanyUserFormData,
@@ -70,16 +65,23 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+     if(addCompanyUserFormData.mobilenumber!.trim() !== ""){
+         if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
+          showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+          return;
+        }
+     }
+       
 
     if (
       addCompanyUserFormData.email !== "" &&
       addCompanyUserFormData.name != "" &&
       addCompanyUserFormData.email !== null &&
-      addCompanyUserFormData.name !== null
+      addCompanyUserFormData.name !== null 
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),
-        //NOTE : CHAGES NEEDED
 
         mobilenumber: "+91-"+ addCompanyUserFormData.mobilenumber.trim(),
         email: addCompanyUserFormData.email.trim(),
@@ -119,21 +121,14 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
           type: "error",
         });
-        console.log(error);
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({
               callFunctionWithEvent: handleAddUserSubmit,
             });
             if (refreshTokenStatus) {
-              setIsDialogueOpen(false);
-            } else {
-              setIsDialogueOpen(true);
-            }
+              handleAddUserSubmit(event);            }
           } 
-          else if(error.status === STATUS_CODE.FORBIDDEN){
-            setIsDialogueOpen(true);
-          }
           else {
             showMessageSnackbar({
               message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
@@ -150,11 +145,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     }
   };
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   useEffect(()=>{
     if(!isOpen){
@@ -195,9 +185,10 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
               <form className="space-y-8" onSubmit={handleAddUserSubmit}>
                 <FormInput
-                  label="Name : "
+                  label="Name"
                   type="text"
                   name="name"
+                   required={true}
                   placeholder="Enter User Name"
                   value={addCompanyUserFormData.name}
                   onChange={handleAddComapnyUserFormDataChange}
@@ -206,7 +197,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   maxLength={100}
                 />
                 <FormInput
-                  label="Mobile Number : "
+                  label="Mobile Number"
                   type="tel"
                   name="mobilenumber"
                   placeholder="Enter Mobile Number"
@@ -217,9 +208,10 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   maxLength={15}
                 />
                 <FormInput
-                  label="Email : "
+                  label="Email"
                   type="email"
                   name="email"
+                   required={true}
                   placeholder="Enter Email Address"
                   value={addCompanyUserFormData.email}
                   onChange={handleAddComapnyUserFormDataChange}
@@ -240,13 +232,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           />
         </div>
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </>
   );
 }

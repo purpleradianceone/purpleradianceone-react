@@ -7,7 +7,7 @@ function TextAreaInput(props: TextAreaInputProps) {
         htmlFor={props.name}
         className="block text-sm font-semibold text-gray-700"
       >
-        {props.label}
+        {props.label}{props.required && <span className="text-red-500 align-top">*</span>}
       </label>
       <textarea
         name={props.name}

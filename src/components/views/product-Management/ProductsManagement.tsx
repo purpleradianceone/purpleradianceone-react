@@ -13,17 +13,10 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate } from "react-router-dom";
 
 function ProductManagement() {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     false
@@ -148,21 +141,11 @@ function ProductManagement() {
           });
 
           if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
+            fetchCompanyProducts();
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         }
       }
     }
-  };
-
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
   };
 
   useEffect(() => {
@@ -212,13 +195,6 @@ function ProductManagement() {
               isListForProductUser={false}
             />                      
           </div>
-          <DialogueBox
-            isOpen={isDialogueOpen}
-            onClose={() => setIsDialogueOpen(false)}
-            onConfirm={handleDialogueConfirm}
-            title="Session Expired !"
-            message="Session Expired. Please login again."
-          />
         </>
       ) : (
         <div className="flex-none mx-96 mt-14">

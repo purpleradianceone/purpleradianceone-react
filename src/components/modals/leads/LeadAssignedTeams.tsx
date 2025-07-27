@@ -17,6 +17,7 @@ import {
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
 import MESSAGE from "../../../constants/Messages";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 // import { MODULE_ACCESS_MESSAGE } from "../../../constants/Messages";
 
 type LeadAssignedTeamsProps = {
@@ -42,6 +43,10 @@ const LeadAssignedTeams = ({
   const [companyTeamCompanyUsers, setCompanyTeamCompanyUser] = useState<
     CompanyTeamUsers[]
   >([]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
+    useState<boolean>(true);
   function handleXIconClick() {
     setOpenCreateLeadCompanyTeam(false);
   }
@@ -84,7 +89,6 @@ const LeadAssignedTeams = ({
         }
       )
       .then((response) => {
-        console.log(response.data);
         if (response.status === STATUS_CODE.OK) {
           const responseData = response.data;
           const companyTeam: LeadCompanyTeam[] = responseData.map(
@@ -116,6 +120,9 @@ const LeadAssignedTeams = ({
             getLeadAssignedCompanyteam();
           }
         }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -141,6 +148,7 @@ const LeadAssignedTeams = ({
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          setIsLoadingCompanyTeamCompanyUser(false);
           const res = response.data;
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -199,7 +207,7 @@ const LeadAssignedTeams = ({
           getLeadAssignedCompanyteam();
         } else {
           setIsActive(prevStatus);
-           showMessageSnackbar({
+          showMessageSnackbar({
             message: response.data.message,
             type: "error",
           });
@@ -229,22 +237,33 @@ const LeadAssignedTeams = ({
   }, []);
 
   if (!isOpen) return null;
+
+  if (isLoading)
+    return (
+      <>
+        <div className="w-full h-full  flex justify-center items-center">
+          <LoadingSpinner />
+        </div>
+      </>
+    );
   return (
     <>
       {/* NOTE : if there is no any team  */}
       {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
-        <div className="w-full h-full bg-slate-0">
+        <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <button
-            disabled={!userHasAccessToUpdateLead}
+              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
-                if(userHasAccessToUpdateLead){
+                if (userHasAccessToUpdateLead) {
                   setOpenCreateLeadCompanyTeam(true);
-                }else{
+                } else {
                   showMessageSnackbar({
-                    message : MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
-                    type : "error"
-                  })
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                    type: "error",
+                  });
                 }
               }}
               className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
@@ -267,7 +286,9 @@ const LeadAssignedTeams = ({
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
                   showMessageSnackbar({
-                    message :  MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                    message:
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     type: "error",
                   });
                 } else {
@@ -293,6 +314,7 @@ const LeadAssignedTeams = ({
                       onClick={() => {
                         setSelectedCompanyTeamCard(companyTeam);
                         getComapnyTeamUsers(companyTeam);
+                        setIsLoadingCompanyTeamCompanyUser(true);
                       }}
                       className="text-xs font-medium text-gray-800 hover:text-blue-500 cursor-pointer"
                     >
@@ -332,7 +354,7 @@ const LeadAssignedTeams = ({
           {/* view in pop up card  */}
           {selectedCompanyTeamCard && (
             <div
-              className={` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}
+              className={` fixed z-10  inset-0  bg-opacity-0 flex justify-center items-center `}
             >
               <div
                 className={` ${
@@ -343,6 +365,7 @@ const LeadAssignedTeams = ({
                   onClick={() => {
                     setSelectedCompanyTeamCard(null);
                     setCompanyTeamCompanyUser([]);
+                    setIsLoadingCompanyTeamCompanyUser(false);
                   }}
                   className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
                 >
@@ -385,7 +408,8 @@ const LeadAssignedTeams = ({
                           } else {
                             showMessageSnackbar({
                               message:
-                                 MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                  .UPDATE_LEAD_ACCESS_DENIED_message,
                               type: "error",
                             });
                           }
@@ -411,7 +435,13 @@ const LeadAssignedTeams = ({
                   <div className="text-lg font-semibold text-gray-800 col-span-2">
                     Team Members
                   </div>
-                  {Array.isArray(companyTeamCompanyUsers) &&
+                  {isLoadingCompanyTeamCompanyUser && (
+                    <div className="w-full h-full col-span-2   flex justify-center items-center">
+                      <LoadingSpinner />
+                    </div>
+                  )}
+                  {isLoadingCompanyTeamCompanyUser === false &&
+                    Array.isArray(companyTeamCompanyUsers) &&
                     companyTeamCompanyUsers.map((userData, index) => (
                       <div
                         key={index}
@@ -454,7 +484,7 @@ const LeadAssignedTeams = ({
       />
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
           <div className="bg-white mt-14 rounded-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-2xl sm:px-4 sm:py-4">
             {/* header */}
             <div className="border-b pb-1 mb-4 flex justify-between items-center">

@@ -20,9 +20,6 @@ import {
 } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
 
@@ -49,9 +46,6 @@ function CompanyUserAccessManagementModal({
     status: "idle",
     message: "",
   });
-
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(false);
 
   const [modules, setModules] = React.useState<AccessManagementType[]>([
     {
@@ -93,17 +87,12 @@ function CompanyUserAccessManagementModal({
           setChangedAccessModules([]);
         })
         .catch(async (error: ApiError | any) => {
-          console.error(error);
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({ callFunction: fetchUserAccessModules });
             if (refreshTokenStatus) {
-              setIsDialogueOpen(false);
-            } else {
-              setIsDialogueOpen(true);
+              fetchUserAccessModules();
             }
-          } else if (error.status === STATUS_CODE.FORBIDDEN) {
-            setIsDialogueOpen(true);
-          }
+          } 
         });
     } else {
       setModules([]);
@@ -228,16 +217,11 @@ function CompanyUserAccessManagementModal({
         }, 2000);
       })
       .catch(async (error: ApiError | any) => {
-        console.error(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({ callFunction: handleSaveAccessModule });
           if (refreshTokenStatus) {
-            setIsDialogueOpen(false);
-          } else {
-            setIsDialogueOpen(true);
+            handleSaveAccessModule();
           }
-        } else if (error.status === STATUS_CODE.FORBIDDEN) {
-          setIsDialogueOpen(true);
         } else {
           showMessageSnackbar({
             message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
@@ -247,11 +231,6 @@ function CompanyUserAccessManagementModal({
       });
   };
 
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
@@ -423,13 +402,6 @@ function CompanyUserAccessManagementModal({
           />
         </div>
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired!"
-        message="Session Expired. Please login again."
-      />
     </>
   );
 }

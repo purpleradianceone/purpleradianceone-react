@@ -27,9 +27,6 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import DatePickerInput from "../../ui/DatePickerInput";
 import AddProductModalProps from "../../../@types/modal/AddProductModalProps";
 import MESSAGE from "../../../constants/Messages";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
-import { DialogueBox } from "../../dialogue-box/Dialogue";
 import ApiError from "../../../@types/error/ApiError";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 
@@ -45,17 +42,7 @@ function AddProductModal({
     type: "success",
   });
 
-
-  const navigate = useNavigate();
-  const [isDialogueOpen, setIsDialogueOpen] = useState<boolean>(
-    false
-  );
   const {isSmallScreen} = useScreenSize()
-  const handleDialogueConfirm = () => {
-    setIsDialogueOpen(false);
-    localStorage.clear();
-    navigate(ROUTES_URL.SIGN_IN);
-  };
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -152,7 +139,6 @@ function AddProductModal({
             withCredentials: true,
           })
           .then((response) => {
-            console.log(response.data);
             if (response.data) {
               showMessageSnackbar({
                 message: "Product Added Successfully",
@@ -167,21 +153,15 @@ function AddProductModal({
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch(async (error : ApiError | any) => {
-            console.log(error);
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: handleAddProductFormSubmit,
               });
               if(refreshTokenResponse){
-                setIsDialogueOpen(false);
-              }
-              else{
-                setIsDialogueOpen(true);
+                handleAddProductFormSubmit(event);
               }
             }
-            else if(error.status === STATUS_CODE.FORBIDDEN){
-              setIsDialogueOpen(true);
-            }
+           
           });
       }
     }
@@ -231,6 +211,7 @@ function AddProductModal({
                 type="text"
                 name="name"
                 placeholder="Product Name"
+                required={true}
                 value={addProductFormData.name}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
@@ -240,6 +221,7 @@ function AddProductModal({
                 label="Item Code : "
                 type="text"
                 name="code"
+                required={true}
                 value={addProductFormData.code}
                 placeholder="Product Item Code"
                 onChange={handleAddProductFormDataChange}
@@ -261,6 +243,7 @@ function AddProductModal({
                 value={addProductFormData.description}
                 cols={5}
                 rows={3}
+                required={true}
                 maxLength={256}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
@@ -347,13 +330,6 @@ function AddProductModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-      <DialogueBox
-        isOpen={isDialogueOpen}
-        onClose={() => setIsDialogueOpen(false)}
-        onConfirm={handleDialogueConfirm}
-        title="Session Expired !"
-        message="Session Expired. Please login again."
-      />
     </div>
   );
 }

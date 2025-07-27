@@ -78,10 +78,7 @@ export default function PaymentSubscription({
       description: "Subscription Payment",
       order_id: orderId, // Order ID from backend
       handler: function (response: any) {
-        console.log("Payment Successful:", response);
-        // alert(
-        //   `Payment Successful!\nPayment ID: ${response.razorpay_payment_id}\nOrder ID: ${response.razorpay_order_id}\nSignature: ${response.razorpay_signature}`
-        // );
+       
         if (response.razorpay_payment_id !== null) {
           setIsPaymentSuccessfull(true);
           const createSubscriptionPostData = {
@@ -128,6 +125,7 @@ export default function PaymentSubscription({
                   setTimeout(() => {
                     localStorage.clear();
                     navigate(ROUTES_URL.SIGN_IN);
+                    
                   }, 3000); //animation Time
                 } else {
                   setTimeout(() => {
@@ -150,7 +148,6 @@ export default function PaymentSubscription({
       },
       modal: {
         ondismiss: function () {
-          console.log("Payment modal closed by user or payment failed.");
           setIsPaymentSuccessfull(false);
           onCancel();
         },
@@ -163,8 +160,27 @@ export default function PaymentSubscription({
       console.error("Payment Failed", response);
     });
 
+
     razorpayInstance.open();
   };
+
+  // const handlePaymentProceed = async(event : React.FormEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  //   await axios.post(POST_API.CHECK_USER_IS_VALID,{},{
+  //     withCredentials : true
+  //   }).then((response) => {
+  //     if(response.status === STATUS_CODE.OK){
+  //       handlePayment();
+  //     }
+  //   }).catch(async(error : ApiError | any) => {
+  //     if(error.response.status === STATUS_CODE.UNATHORISED){
+  //         const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
+  //         if(refreshTokenStatus){
+  //           handlePaymentProceed(event);
+  //         }
+  //     }
+  //   })
+  // }
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
