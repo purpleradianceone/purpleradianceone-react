@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useState } from "react";
 import axios from "axios";
-import { NUMBER_VALUES, SUBSCRIPTION } from "../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE, SUBSCRIPTION } from "../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import MessageSnackBar from "../ui/MessageSnackbar";
@@ -16,6 +16,8 @@ import {
 import POST_API from "../../constants/PostApi";
 import COLORS from "../../constants/Colors";
 import PaymentSuccess from "../../assets/animations/PaymentSuccessfull";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 declare global {
   interface Window {
@@ -164,23 +166,23 @@ export default function PaymentSubscription({
     razorpayInstance.open();
   };
 
-  // const handlePaymentProceed = async(event : React.FormEvent<HTMLButtonElement>) => {
-  //   event.preventDefault();
-  //   await axios.post(POST_API.CHECK_USER_IS_VALID,{},{
-  //     withCredentials : true
-  //   }).then((response) => {
-  //     if(response.status === STATUS_CODE.OK){
-  //       handlePayment();
-  //     }
-  //   }).catch(async(error : ApiError | any) => {
-  //     if(error.response.status === STATUS_CODE.UNATHORISED){
-  //         const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
-  //         if(refreshTokenStatus){
-  //           handlePaymentProceed(event);
-  //         }
-  //     }
-  //   })
-  // }
+  const handlePaymentProceed = async(event : React.FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    await axios.post(POST_API.CHECK_USER_IS_VALID,{},{
+      withCredentials : true
+    }).then((response) => {
+      if(response.status === STATUS_CODE.OK){
+        handlePayment();
+      }
+    }).catch(async(error : ApiError | any) => {
+      if(error.response.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
+          if(refreshTokenStatus){
+            handlePaymentProceed(event);
+          }
+      }
+    })
+  }
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
@@ -238,7 +240,7 @@ export default function PaymentSubscription({
             </button>
 
             <Button
-              onClick={handlePayment}
+              onClick={handlePaymentProceed}
               className={`flex items-center gap-2  text-white px-3 rounded-lg ${COLORS.BG_BLUE_600_COLOR}  ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
             >
               {/* <CheckCircle2 className="h-5 w-5" /> */}
