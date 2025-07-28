@@ -137,6 +137,26 @@ export default function PaymentSubscription({
                   }, 2000);
                 }
               }
+              else{
+                  showMessageSnackbar({
+                  message: "Error creating subscription.",
+                  type: "error",
+                });
+
+                if (isSubscrptionFromLoginPage) {
+                  setTimeout(() => {
+                    localStorage.clear();
+                    navigate(ROUTES_URL.SIGN_IN);
+                    
+                  }, 3000);
+                } else {
+                  setTimeout(() => {
+                    onClose();
+                    setIsPaymentSuccessfull(false);
+                    handleSubscriptionListChange();
+                  }, 2000);
+                }
+              }
             });
         }
       },
@@ -159,7 +179,26 @@ export default function PaymentSubscription({
     // NOTE : ADD SNACKBAR HERE FOR ERROR
     const razorpayInstance = new window.Razorpay(options);
     razorpayInstance.on("payment.failed", function (response: any) {
-      console.error("Payment Failed", response);
+      console.log(response);
+      console.log("payment Falied");
+       showMessageSnackbar({
+                  message: "payment Falied . If money debited from your account please contact us.",
+                  type: "success",
+                });
+
+                if (isSubscrptionFromLoginPage) {
+                  setTimeout(() => {
+                    localStorage.clear();
+                    navigate(ROUTES_URL.SIGN_IN);
+                    
+                  }, 3000);
+                } else {
+                  setTimeout(() => {
+                    onClose();
+                    setIsPaymentSuccessfull(false);
+                    handleSubscriptionListChange();
+                  }, 2000);
+                }
     });
 
 
