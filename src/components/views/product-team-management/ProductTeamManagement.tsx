@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import {
@@ -72,11 +73,8 @@ function ProductTeamManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          response.data.map((res : any) => {
-            setProductsData((prev) => [
-              ...prev,
-              {
+ const formattedData: Product[] = response.data.map(
+          (res: any) => ({
                 code: res.code,
                 companyId: res.company_id,
                 cost: res.cost,
@@ -91,17 +89,15 @@ function ProductTeamManagement() {
                 sac: res.sac,
                 taxRate: res.tax_rate,
                 validFrom: res.valid_from,
-              },
-            ]);
-          });
-
+            })
+        );
+          setProductsData(formattedData)
           if (response.data[0]?.count) {
             setTotalPages(
               Math.ceil(response.data[0].count / pageSize)
             );
           }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError | any) {
         console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
