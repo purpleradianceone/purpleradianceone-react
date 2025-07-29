@@ -1,3 +1,4 @@
+import Country from "../general/Country";
 
 /**
  * @typedef FormInputProps defines the props and its data types of a FormInput component
@@ -22,6 +23,7 @@ type FormInputProps = {
     max?:number,
     size?:number | undefined,
     step? : string,
+    dialCodeValue? : string,
     // required?: boolean | undefined,
     defaultValue?: string | number | readonly string[] | undefined,
     pattern? : string, 
@@ -30,6 +32,10 @@ type FormInputProps = {
     ref?:React.LegacyRef<HTMLInputElement> | undefined,
     inputMode?:"search" | "email" | "tel" | "text" | "url" | "none" | "numeric" | "decimal" | undefined,
     maxDate? : string
+    selectOnChange? : (event : React.ChangeEvent<HTMLSelectElement>) => void ,
+    selectOnBlur? : (event : React.FocusEvent<HTMLSelectElement> ) => void;
+    countries? : Country[];
+    useCountry? : boolean;
   }
 
   /**
