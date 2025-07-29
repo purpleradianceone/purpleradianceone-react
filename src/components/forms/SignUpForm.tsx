@@ -19,6 +19,8 @@ import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import REGEX from "../../constants/Regex";
+import { useCountries } from "../../config/hooks/useCountries";
+import CustomDropdown from "../modals/leads/CustomDropdown";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -29,6 +31,7 @@ function SignUpForm() {
     confirmPassword: "",
   };
 
+  const {countries} = useCountries();
   const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
     useFormChange(initialSignUpFormState);
   const { errors, handleBlur } = useFormValidation(
@@ -44,6 +47,7 @@ function SignUpForm() {
     false
   );
 
+  const [countryId , setCountryId] = useState<number>(52);
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
 
   const [messageSnackbar, setMessageSnackbar] = useState<{
@@ -66,7 +70,7 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+     const mobileRegex = REGEX.MOBILE_NUMBER;
         if(SignUpFormData.mobileNumber!.trim() !== ""){
          if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
           showMessageSnackbar("Invalid mobile number","error");
@@ -77,9 +81,11 @@ function SignUpForm() {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
       email: SignUpFormData.email.trim(),
+      country_id : countryId ,
       captcha_token : captchaToken,
       password: SignUpFormData.password.trim(),
     };
+    console.log(signupDataPost);
 
     if (
       signupDataPost.email !== "" &&
@@ -159,6 +165,17 @@ function SignUpForm() {
           onBlur={handleBlur}
           error={errors.email}
         />
+
+        <CustomDropdown
+        labelName="Country"
+        onSelect={(selectedValue) =>{
+          if(selectedValue){
+              setCountryId(selectedValue);
+          }
+        }}
+        options={countries}
+        selectedValue={countryId}
+        />
         <FormInput
           label="Password"
           type={showPassword ? "text" : "password"}
@@ -167,6 +184,7 @@ function SignUpForm() {
           value={SignUpFormData.password}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
+         
           minLength={8}
           maxLength={15}
           required

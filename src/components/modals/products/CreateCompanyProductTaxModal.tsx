@@ -201,6 +201,7 @@ function CreateCompanyProductTaxModal({
                   placeholder="Enter HSN Code"
                   onChange={handleCreateCompanyProductTaxChange}
                   onBlur={handleBlur}
+                  required={true}
                   error={errors.hsn}
                 />
               )}
@@ -210,6 +211,7 @@ function CreateCompanyProductTaxModal({
                   label="SAC : "
                   type="text"
                   name="sac"
+                  required={true}
                   value={createCompanyProductTaxFormData.sac}
                   placeholder="Enter SAC Code"
                   onChange={handleCreateCompanyProductTaxChange}
@@ -222,6 +224,7 @@ function CreateCompanyProductTaxModal({
                 label="Tax Rate : "
                 type="text"
                 name="taxRate"
+                required={true}
                 placeholder="Enter Product Cost"
                 value={createCompanyProductTaxFormData.taxRate.toString()}
                 onChange={handleCreateCompanyProductTaxChange}
@@ -232,6 +235,7 @@ function CreateCompanyProductTaxModal({
               <DatePickerInput
                 label="Valid From :"
                 name="validFrom"
+                required={true}
                 value={createCompanyProductTaxFormData.validFrom}
                 placeholder="Select Date"
                 onChange={handleCreateCompanyProductTaxChange}
