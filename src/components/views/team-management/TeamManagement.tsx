@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { useEffect, useState } from "react";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -78,9 +79,7 @@ function TeamManagement(){
                 Math.ceil(response.data[0].count / pageSize)
               );
             }
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              response.data.map((res : any) => {
-                setCompanyTeamList((prev => [...prev,{
+              const formattedData : CompanyTeamSearchProps[] = response.data.map((res : any) => ( {
                   companyId : res.company_id,
                   count : res.count,
                   createdBy : res.createdby,
@@ -89,11 +88,11 @@ function TeamManagement(){
                   id : res.id,
                   isActive : res.isactive,
                   name : res.name
-                }]))
-              })
+                })
+              );
+              setCompanyTeamList(formattedData);
           }
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch( async(error : ApiError|any) =>{
             console.log(error)
             if(error.status === STATUS_CODE.UNATHORISED){

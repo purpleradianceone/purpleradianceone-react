@@ -173,6 +173,7 @@ function EditCompanyUserModal({
                   message: response.data.message,
                   type: "success",
                 });
+                setUserIsActive(checked);
               } else if (!response.data.status) {
                 showMessageSnackbar({
                   message: response.data.message,
@@ -180,7 +181,7 @@ function EditCompanyUserModal({
                 });
               }
               handleCompanyUserChange(user);
-              setUserIsActive(checked);
+              
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (error: ApiError | any) => {

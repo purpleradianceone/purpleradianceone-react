@@ -28,13 +28,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   if (Array.isArray(options) && options.length > 0) {
-  //     setSelectedOption(undefined); // Initially unselected
-  //   }
-  // }, [options]);
-
-  // Close dropdown if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

@@ -11,10 +11,11 @@ import QuickActions from "./Actions";
 import UpcomingTasks from "./UpcomingTasks";
 import {
   AlertCircleIcon,
+  ShieldAlert,
   Target,
   TrendingUp,
   Users,
-  WineIcon,
+  WineIcon
 } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
@@ -492,7 +493,7 @@ function Dashboard() {
     // Changed to ensure JSX.Element, not null
     metricCards: (
       <div key="metricCards" className="grid grid-cols-1 xl:grid-cols-1 gap-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
           <MetricCard
             title="Total Leads"
             value={
@@ -501,8 +502,8 @@ function Dashboard() {
                 : "0"
             }
             icon={Users}
-            color="bg-gradient-to-r from-blue-500 to-blue-600"
-            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+            color="bg-gradient-to-r from-cyan-500 to-cyan-600"
+            gradient="bg-gradient-to-r from-cyan-500 to-cyan-600"
             visibility={
               dashboardVisiblity.length !== 0
                 ? dashboardVisiblity.find(
@@ -548,15 +549,15 @@ function Dashboard() {
             }
           />
           <MetricCard
-            title="Lost Deals"
+            title="Unqualified Deals"
             value={
               leadSummaryReportData
-                ? leadSummaryReportData.totalLostLeads.toString()
+                ? leadSummaryReportData.totalUnqualifiedLeads.toString()
                 : "0"
             }
-            icon={AlertCircleIcon}
-            color="bg-gradient-to-r from-red-500 to-red-600"
-            gradient="bg-gradient-to-r from-purple-500 to-purple-600"
+            icon={ShieldAlert}
+            color="bg-gradient-to-r from-teal-500 to-teal-600"
+            gradient="bg-gradient-to-r from-teal-500 to-teal-600"
             visibility={
               dashboardVisiblity.length !== 0
                 ? dashboardVisiblity.find(
@@ -565,6 +566,25 @@ function Dashboard() {
                 : false
             }
           />
+          <MetricCard
+            title="Lost Deals"
+            value={
+              leadSummaryReportData
+                ? leadSummaryReportData.totalLostLeads.toString()
+                : "0"
+            }
+            icon={AlertCircleIcon}
+            color="bg-gradient-to-r from-red-500 to-red-600"
+            gradient="bg-gradient-to-r from-red-500 to-red-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "metricCards"
+                  )!.value
+                : false
+            }
+          />
+          
           <MetricCard
             title="Conversion Rate"
             value={`${

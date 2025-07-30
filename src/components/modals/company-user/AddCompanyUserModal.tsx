@@ -82,8 +82,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),
-
-        mobilenumber: "+91-"+ addCompanyUserFormData.mobilenumber.trim(),
+        mobilenumber: addCompanyUserFormData.mobilenumber.trim(),
         email: addCompanyUserFormData.email.trim(),
         createdby: loginStatus.id,
         company_id: loginStatus.companyId,

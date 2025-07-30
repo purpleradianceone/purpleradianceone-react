@@ -230,7 +230,7 @@ const LeadDetails = ({
   const getAllCountries = async () => {
     const PostData: Country = {
       id: null,
-      dailcode: null,
+      dialcode: null,
       name: null,
       description: null,
       isactive: true,

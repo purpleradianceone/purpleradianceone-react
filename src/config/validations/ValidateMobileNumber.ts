@@ -1,7 +1,7 @@
 import REGEX from "../../constants/Regex";
 
 const validateMobileNumber = (number: string): boolean => {
-    const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+    const mobileRegex = REGEX.MOBILE_NUMBER;
     return mobileRegex.test(number);
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -51,7 +52,6 @@ function EmailTypeSettings() {
         }
       )
       .then((response) => {
-        console.log(response);
         if (response.status === STATUS_CODE.OK) {
           response.data.map((res: any) => {
             console.log(res);

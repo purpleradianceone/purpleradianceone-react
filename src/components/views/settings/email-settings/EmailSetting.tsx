@@ -88,7 +88,6 @@ export default function EmailSettingsTabs() {
   const handleModalSubmit = async (data: any) => {
     console.log("Submitted data:", data);
     await getEmailSettings();
-    // TODO: Update state or send to backend here
   };
 
   const { loginStatus } = useLoggedInUserContext();
