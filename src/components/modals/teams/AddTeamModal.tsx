@@ -344,7 +344,7 @@ function AddTeamModal({
             <div className="flex items-center gap-3 mb-6">
               <Network className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
-                Add New Product
+                Create New Team
               </h2>
               <button
                 onClick={onClose}

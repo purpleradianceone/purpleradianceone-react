@@ -214,7 +214,7 @@ export default function PaymentSubscription({
         handlePayment();
       }
     }).catch(async(error : ApiError | any) => {
-      if(error.response.status === STATUS_CODE.UNATHORISED){
+      if(error.status === STATUS_CODE.UNATHORISED){
           const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
           if(refreshTokenStatus){
             handlePaymentProceed(event);
