@@ -356,7 +356,7 @@ function CompanyProductTeamsModal({
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
         company_product_id: companyProduct.id,
-        isactive: null,
+        isactive: true,
         limit: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40,
         offset: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40 * companyTeamsNotAssignedFetchedCount,
         searcsearch_company_specific_date_range_id: 0,

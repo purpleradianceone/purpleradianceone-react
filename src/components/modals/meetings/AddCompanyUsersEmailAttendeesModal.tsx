@@ -19,12 +19,14 @@ function AddCompanyUsersEmailAttendeesModal({
     isOpen,
     onClose,
     handleAddCompanyUserEmailCheckboxChange,
-    addCompanyTeamUserArray
+    addCompanyTeamUserArray,
+    isModalForMeeting
 } : {
     isOpen: boolean;
     onClose: () => void;
     handleAddCompanyUserEmailCheckboxChange?: (params: CompanyUsersSearchProps, event: React.ChangeEvent<HTMLInputElement>) => void;
     addCompanyTeamUserArray?: number[]; 
+    isModalForMeeting : boolean;
 }){
     
     const {loginStatus} = useLoggedInUserContext();
@@ -243,7 +245,7 @@ function AddCompanyUsersEmailAttendeesModal({
                 <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
                   <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                   <h2 className="text-xl font-semibold text-gray-800">
-                    Add Users To Meeting
+                    {isModalForMeeting ? "Add Users To Meeting" : "Assign Users" }
                   </h2>
                   <button
                 onClick={() => {

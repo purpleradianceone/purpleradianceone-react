@@ -241,7 +241,7 @@ function LeadAssociatedUsersModal({
                 <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
                   <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                   <h2 className="text-xl font-semibold text-gray-800">
-                    Add Users To Meeting
+                    Assign Users
                   </h2>
                   <button
                 onClick={() => {

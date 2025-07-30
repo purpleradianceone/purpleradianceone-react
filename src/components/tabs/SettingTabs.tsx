@@ -13,6 +13,7 @@ import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
 import CompanyPreferenceSetting from "../views/settings/company-preferences/CompanyPreferenceSetting";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
+import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -83,11 +84,7 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewSettingGeneral ? (
-            <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                General Settings
-              </h2>
-            </div>
+            <UserPrerefenceManagement />
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}

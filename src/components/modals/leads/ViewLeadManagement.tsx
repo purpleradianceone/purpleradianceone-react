@@ -44,7 +44,8 @@ import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead, userHasAccessToViewLead } = useUserAccessModules();
+  const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
+    useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
@@ -106,7 +107,7 @@ const ViewLeadManagement = () => {
   const handleCloseSnackbar = () => {
     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
-  
+
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -179,7 +180,7 @@ const ViewLeadManagement = () => {
           setReasonInputBoxOpen(false);
           setReasonText("");
           setSelectedStatusId(null);
-          
+
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
           showMessageSnackbar({
@@ -680,12 +681,15 @@ const ViewLeadManagement = () => {
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const [isLeadSettingModalOpen,setIsLeadSettingModalOpen] = useState<boolean>(false);
+  const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
+    useState<boolean>(false);
   return (
     <div
       className={`${
         position === "left" ? " ml-14" : "ml-1"
-      } fixed top-8 inset-0 z-10 bg-white mt-4   overflow-auto`}
+      } fixed top-8 inset-0 z-10 bg-white ${
+        position === "left" ? "mt-4" : "mt-6"
+      } overflow-auto`}
     >
       {/* Header */}
       <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 ">
@@ -741,14 +745,15 @@ const ViewLeadManagement = () => {
           <div className="relative inline-block">
             <button
               disabled={!userHasAccessToUpdateLead}
-              onClick={()=>{
-                    if(userHasAccessToViewLead){
-                        setIsLeadSettingModalOpen(true);
-                    }
-                    else{
-                      showMessageSnackbar({message : "Your are not authorized",type : "error"})
-                    }
-                    
+              onClick={() => {
+                if (userHasAccessToViewLead) {
+                  setIsLeadSettingModalOpen(true);
+                } else {
+                  showMessageSnackbar({
+                    message: "Your are not authorized",
+                    type: "error",
+                  });
+                }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
             >
@@ -757,14 +762,14 @@ const ViewLeadManagement = () => {
             </button>
             {isLeadSettingModalOpen && (
               <LeadSettingForLead
-              isOpen = {isLeadSettingModalOpen}
-              onClose={()=> {
-                setIsLeadSettingModalOpen(false);
-              }}
-              lead={selectedLeadData}
+                isOpen={isLeadSettingModalOpen}
+                onClose={() => {
+                  setIsLeadSettingModalOpen(false);
+                }}
+                lead={selectedLeadData}
               />
             )}
-        </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-evenly w-48">
@@ -777,8 +782,7 @@ const ViewLeadManagement = () => {
                   setIsAddProductModalOpen(true);
                 } else {
                   showMessageSnackbar({
-                    message:
-                      MESSAGE.ERROR.NOT_ATHORISED,
+                    message: MESSAGE.ERROR.NOT_ATHORISED,
                     type: "error",
                   });
                 }
@@ -799,7 +803,7 @@ const ViewLeadManagement = () => {
               interestTypeData={interestTypeData}
             />
           </div>
-          
+
           <button
             className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
             onClick={() => {
@@ -1227,7 +1231,6 @@ const ViewLeadManagement = () => {
               <button
                 onClick={() => {
                   setIsLeadOwnerPopUpOpen(false);
-              
 
                   if (
                     selectedCompanyUser.id !== 0 &&
