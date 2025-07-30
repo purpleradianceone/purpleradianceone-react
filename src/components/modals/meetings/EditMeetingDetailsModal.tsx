@@ -1036,6 +1036,7 @@ function EditMeetingDetailsModal({
           handleAddCompanyUserEmailCheckboxChange
         }
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
+        isModalForMeeting={true}
       />
       <MessageSnackBar
         isOpen={messageSnackbar.open}

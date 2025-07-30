@@ -17,11 +17,16 @@ import {
 import MessageSnackBar from "../ui/MessageSnackbar";
 import REGEX from "../../constants/Regex";
 import { useMasterRowsInGrid } from "../../config/hooks/useMasterRowsInGrid";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { alphabets, backgroundColors } from "../../constants/Colors";
 
 const UserPreference = () => {
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
+
+  const navigate = useNavigate();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid
@@ -117,11 +122,20 @@ const UserPreference = () => {
 
           setUserPreference({
             ...userPreference,
-            timezoneId: selectedTimezoneId ,
-            timezoneUTCOffset: selectedTimeZoneData.utc_offset === "" ? userPreference.timezoneUTCOffset : selectedTimeZoneData.utc_offset,
-            timezoneName: selectedTimeZoneData.name === "" ? userPreference.timezoneName : selectedTimeZoneData.name,
-            timezone: selectedTimeZoneData.timezone===  "" ? userPreference.timezone : selectedTimeZoneData.timezone,
-            rowsInGrid :parseInt(selectedMasterRowInGrid!.rowsInGrid)
+            timezoneId: selectedTimezoneId,
+            timezoneUTCOffset:
+              selectedTimeZoneData.utc_offset === ""
+                ? userPreference.timezoneUTCOffset
+                : selectedTimeZoneData.utc_offset,
+            timezoneName:
+              selectedTimeZoneData.name === ""
+                ? userPreference.timezoneName
+                : selectedTimeZoneData.name,
+            timezone:
+              selectedTimeZoneData.timezone === ""
+                ? userPreference.timezone
+                : selectedTimeZoneData.timezone,
+            rowsInGrid: parseInt(selectedMasterRowInGrid!.rowsInGrid),
           });
           setShowTimeZoneData(false);
         }
@@ -350,6 +364,13 @@ const UserPreference = () => {
     }
   };
 
+  const getColor = (email: string) => {
+    if (!email) return backgroundColors[0];
+    const emailChar = email.charAt(0);
+    const index = alphabets.indexOf(emailChar.toLowerCase());
+    return backgroundColors[index];
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
@@ -357,11 +378,13 @@ const UserPreference = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <img
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt="Profile picture"
-            className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
-          />
+          <div
+            className={`w-32 h-32 rounded-full grid place-content-center text-white text-8xl font-semibold pb-3 border-2 border-gray-300 ${getColor(
+              loginStatus.email
+            )}`}
+          >
+            {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
+          </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
             <h2 className="text-3xl font-bold text-gray-900">
               {formData.fullName}
@@ -568,6 +591,14 @@ const UserPreference = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-semibold text-gray-800">Subscription</h3>
+          <button
+            onClick={() => {
+              navigate(ROUTES_URL.GET_SUBSCRIPTION);
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          >
+            Update Subscription
+          </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import {
+  Aperture,
   Bell,
   BoxesIcon,
   Building2,
@@ -36,6 +37,7 @@ import POST_API from "../../../../constants/PostApi";
 import toast, { Toaster } from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import { alphabets, backgroundColors } from "../../../../constants/Colors";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -83,47 +85,46 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-
   const location = useLocation();
 
   useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
-        
-        element.scrollIntoView({ behavior: 'instant' });
+        element.scrollIntoView({ behavior: "instant" });
       }
     }
   }, [location]);
 
-  const handleLogout = async() => {
-    await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
-    .then((response ) =>{
-      if(response.status === 200){
-        toast.success(response.data)
-        Navigate(ROUTES_URL.SIGN_IN);
-         setLoginStatus({
-      id: 0,
-      companyId: 0,
-      message: "",
-      token: "",
-      status: false,
-      email: "",
-      fullName: "",
-      companyName: "",
-      createdOn: "",
-      mobileNumber: "",
-      activeUsersInCompany: 0,
-      isActiveSubscription: false,
-      subscriptionAllowedUsers: 0,
-      endDateSubscription: "",
-      startDateSubscription: "",
-      subscriptionId: 0,
-    });
-      }
-    })
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   .catch(async (error: ApiError | any) => {
+  const handleLogout = async () => {
+    await axios
+      .post(POST_API.LOGOUT, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.status === 200) {
+          toast.success(response.data);
+          Navigate(ROUTES_URL.SIGN_IN);
+          setLoginStatus({
+            id: 0,
+            companyId: 0,
+            message: "",
+            token: "",
+            status: false,
+            email: "",
+            fullName: "",
+            companyName: "",
+            createdOn: "",
+            mobileNumber: "",
+            activeUsersInCompany: 0,
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            endDateSubscription: "",
+            startDateSubscription: "",
+            subscriptionId: 0,
+          });
+        }
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
         //if exception occurs then rollback to previous state
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
@@ -134,10 +135,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
           }
         }
       });
-
-  }
-
-
+  };
 
   //WRITE SUBSCRIPTION LOGIC HERE
   const handleSubscription = () => {
@@ -150,7 +148,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
   // const notifications = useNotifications();
 
-  const {notificationCount,setNotificationCount} = useNotificationCountContext();
+  const { notificationCount, setNotificationCount } =
+    useNotificationCountContext();
 
   // useEffect(() => {
   //   console.log("something happened");
@@ -163,8 +162,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
   // }, [notifications]);
 
   const resetNotificationCount = () => {
-
-
     setNotificationCount(0);
   };
 
@@ -173,16 +170,27 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
-    // useEffect(() => {
-    //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
-    //   console.log("loginstatus : " + loginStatus.status);
-    //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
-    //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
-    //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
-    //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
-    // },[loginStatus])
+  // useEffect(() => {
+  //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+  //   console.log("loginstatus : " + loginStatus.status);
+  //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
+  //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
+  //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
+  //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+  // },[loginStatus])
 
-  if (!loginStatus.status || ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers))) {
+
+  const getColor = (email: string) => {
+    if (!email) return backgroundColors[0];
+    const emailChar = email.charAt(0);
+    const index = alphabets.indexOf(emailChar.toLowerCase());
+    return backgroundColors[index];
+  };
+
+  if (
+    !loginStatus.status ||
+    loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers
+  ) {
     return (
       <div>
         <header className="fixed bg-white w-full shadow-sm z-50 py-5">
@@ -226,7 +234,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Careers
                   </a>
-                  
+
                   <Link to={ROUTES_URL.SIGN_UP}>
                     <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
                       Get Started
@@ -287,20 +295,24 @@ function Navbar({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </header>
-        <main className="min-h-screen overflow-y-scroll border border-gray-400
+        <main
+          className="min-h-screen overflow-y-scroll border border-gray-400
             [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:bg-transparent
-            [&::-webkit-scrollbar-thumb]:bg-transparent">{children}</main>
+            [&::-webkit-scrollbar-thumb]:bg-transparent"
+        >
+          {children}
+        </main>
       </div>
     );
   } else {
     return (
       <div>
         <header>
-          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 h-12">
+          <nav className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${position === "left" ? "h-12" : "h-14"}`}>
             <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
-                  position === "left" ? "ml-10" : ""
+                  position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
                 <div className="flex items-center justify-between text-lg   font-bold text-blue-700 cursor-pointer">
@@ -376,24 +388,28 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                         )}
 
+                         {userHasAccessToViewMeeting && (
+                            <NavItem
+                              to={ROUTES_URL.MEETINGS}
+                              icon={<Calendar size={SIZE.TWENTY} />}
+                              label="Meetings"
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+
                         <NavItem
                           icon={<Settings />}
                           label="Crm Settings"
                           dropdownItems={[
                             {
-                              icon: <Handshake size={SIZE.TWENTY} />,
-                              to: ROUTES_URL.LEAD_SETTINGS,
-                              label: "Lead",
+                              icon: <Settings size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.COMPANY_SETTING,
+                              label: "Settings",
                             },
                             {
-                              icon: <MessageCircle size={SIZE.TWENTY} />,
+                              icon: <Aperture size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
                               label: "Email Template",
-                            },
-                            {
-                              icon: <LucideSettings size={SIZE.TWENTY} />,
-                              to: ROUTES_URL.EMAIL_SETTING,
-                              label: "Email Setting",
                             },
                           ]}
                         />
@@ -481,6 +497,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<LucideSettings size={SIZE.TWENTY} />}
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
+
                           />
                         </div>
                       )}
@@ -544,17 +561,19 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link>
                     </>
                   )}
-                  {/* paste code here */}
                   <div
                     className="flex items-center cursor-pointer relative"
                     onClick={toggleCard}
                   >
-                    {/* Profile Image */}
-                    <img
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt="Profile"
-                      className="h-9 w-9 rounded-full border border-gray-300"
-                    />
+                    <div
+                      className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
+                        loginStatus.email
+                      )}`}
+                    >
+                      {loginStatus.fullName
+                        ? loginStatus.fullName.charAt(0)
+                        : ""}
+                    </div>
 
                     {/* Name & Email */}
                     <div className="ml-3 min-w-0">
@@ -653,7 +672,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
               ? sidebarOpen && !isSmallScreen
                 ? "mt-16 ml-60 flex justify-center items-center"
                 : "mt-12 ml-10 flex justify-center items-center"
-              : "mt-12 ml-0 flex justify-center items-center"
+              : "mt-14 ml-0 flex justify-center items-center"
           }
         >
           {children}
