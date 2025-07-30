@@ -35,12 +35,14 @@ import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
 
 const MeetingScheduler = () => {
+  
+  const { loginStatus } = useLoggedInUserContext();
   const [title, setTitle] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("");
   // const [timeZone, setTimeZone] = useState<string>("");
   // const [duration, setDuration] = useState<number>(60); // in minutes
-  const [attendees, setAttendees] = useState<string[]>([]);
+  const [attendees, setAttendees] = useState<string[]>([loginStatus.email]);
   const [newAttendeeEmail, setNewAttendeeEmail] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isCreating, setIsCreating] = useState<boolean>(false); // Simulate meeting creation
@@ -55,7 +57,6 @@ const MeetingScheduler = () => {
   const { userPreference } = useUserPreference();
   const { meetingPlatform } = useMeetingPlatform();
 
-  const { loginStatus } = useLoggedInUserContext();
 
   const [searchParams] = useSearchParams();
 
@@ -91,7 +92,7 @@ const MeetingScheduler = () => {
   const [selectedCompanyUsersIdArray, setSelectedCompanyUsersIdArray] =
     useState<number[]>([loginStatus.id]);
   const [selectedCompanyUserDetailArray, setSelectedCompanyUserDetailArray] =
-    useState<{ email: string; id: number }[]>([]);
+    useState<{ email: string; id: number }[]>([loginStatus]);
   const [isModalForLead, setIsModalForLead] = useState<boolean>(false);
 
   const [addCompanyLeadContactIdArray, setAddCompanyLeadContactIdArray] =
