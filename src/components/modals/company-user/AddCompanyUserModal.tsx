@@ -65,7 +65,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+     const mobileRegex = REGEX.MOBILE_NUMBER;
      if(addCompanyUserFormData.mobilenumber!.trim() !== ""){
          if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
           showMessageSnackbar({message : "Invalid mobile number", type : "error"});

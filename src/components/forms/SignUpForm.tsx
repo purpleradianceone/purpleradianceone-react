@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SignUpFormDataType from "../../@types/auth/forms/SignUpFormDataType";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
@@ -11,16 +11,14 @@ import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import {
-  NUMBER_VALUES,
-  SITE_KEY,
-} from "../../constants/AppConstants";
+import { NUMBER_VALUES, SITE_KEY } from "../../constants/AppConstants";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import REGEX from "../../constants/Regex";
 import { useCountries } from "../../config/hooks/useCountries";
 import CustomDropdown from "../modals/leads/CustomDropdown";
+import { useGeoLocationData } from "../../config/hooks/useGeoLocation";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -31,7 +29,18 @@ function SignUpForm() {
     confirmPassword: "",
   };
 
-  const {countries} = useCountries();
+  const { countries } = useCountries();
+  const { countryName, dialCode, error, loading } = useGeoLocationData({
+    countryList: countries,
+  });
+  useEffect(() => {
+    console.log("*****************************************************");
+    console.log(countryName);
+    console.log(dialCode);
+    console.log(error);
+    console.log(loading);
+    console.log("*****************************************************");
+  }, [countryName]);
   const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
     useFormChange(initialSignUpFormState);
   const { errors, handleBlur } = useFormValidation(
@@ -39,15 +48,12 @@ function SignUpForm() {
     "registration"
   );
 
-  const [showEmailSentAnimation, setShowEmailSentAnimation] = useState<boolean>(
-    false
-  );
+  const [showEmailSentAnimation, setShowEmailSentAnimation] =
+    useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setConfirmPassword] = useState(
-    false
-  );
+  const [showConfirmPassword, setConfirmPassword] = useState(false);
 
-  const [countryId , setCountryId] = useState<number>(52);
+  const [countryId, setCountryId] = useState<number>(52);
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
 
   const [messageSnackbar, setMessageSnackbar] = useState<{
@@ -70,19 +76,19 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-     const mobileRegex = REGEX.MOBILE_NUMBER;
-        if(SignUpFormData.mobileNumber!.trim() !== ""){
-         if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
-          showMessageSnackbar("Invalid mobile number","error");
-          return;
-        }
-     }
+    const mobileRegex = REGEX.MOBILE_NUMBER;
+    if (SignUpFormData.mobileNumber!.trim() !== "") {
+      if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
+        showMessageSnackbar("Invalid mobile number", "error");
+        return;
+      }
+    }
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
       email: SignUpFormData.email.trim(),
-      country_id : countryId ,
-      captcha_token : captchaToken,
+      country_id: countryId,
+      captcha_token: captchaToken,
       password: SignUpFormData.password.trim(),
     };
     console.log(signupDataPost);
@@ -90,38 +96,35 @@ function SignUpForm() {
     if (
       signupDataPost.email !== "" &&
       signupDataPost.password !== "" &&
-      SignUpFormData.confirmPassword !== "" 
+      SignUpFormData.confirmPassword !== ""
     ) {
       if (captchaToken !== "") {
-        
-              axios
-                .post(POST_API.SIGN_UP, signupDataPost, {
-                  withCredentials: true,
-                })
-                .then((respone) => {
-
-                  if (respone.data.status) {
-                    if (
-                      respone.data.message ==
-                      MESSAGE.SUCCESS.ACCOUNT_ALREADY_REGISTERED
-                    ) {
-                      showMessageSnackbar(respone.data.message, "error");
-                    } else {
-                      showMessageSnackbar(respone.data.message, "success");
-                      setShowEmailSentAnimation(!showEmailSentAnimation);
-                    }
-                    setTimeout(() => {
-                      window.location.href = ROUTES_URL.SIGN_IN;
-                    }, 5000);
-                  } else {
-                    showMessageSnackbar(respone.data.message, "error");
-                  }
-                })
-                .catch((error) => {
-                  console.log(error);
-                  recaptchaRef.current!.reset();
-                });
-          
+        axios
+          .post(POST_API.SIGN_UP, signupDataPost, {
+            withCredentials: true,
+          })
+          .then((respone) => {
+            if (respone.data.status) {
+              if (
+                respone.data.message ==
+                MESSAGE.SUCCESS.ACCOUNT_ALREADY_REGISTERED
+              ) {
+                showMessageSnackbar(respone.data.message, "error");
+              } else {
+                showMessageSnackbar(respone.data.message, "success");
+                setShowEmailSentAnimation(!showEmailSentAnimation);
+              }
+              setTimeout(() => {
+                window.location.href = ROUTES_URL.SIGN_IN;
+              }, 5000);
+            } else {
+              showMessageSnackbar(respone.data.message, "error");
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            recaptchaRef.current!.reset();
+          });
       } else {
         showMessageSnackbar(MESSAGE.ERROR.COMPLETE_CAPTCHA, "error");
       }
@@ -130,9 +133,17 @@ function SignUpForm() {
     }
   };
 
+  useEffect(() => {
+    const country = countries.find((country) => country.name === countryName);
+        const id =  country ? country.id : 52;
+    if(id){
+      setCountryId(id);
+    }
+  },[countryName])
+
   return (
     <>
-      <form className="space-y-5">
+      <form className="space-y-3">
         <FormInput
           label="Full Name"
           type="text"
@@ -167,14 +178,14 @@ function SignUpForm() {
         />
 
         <CustomDropdown
-        labelName="Country"
-        onSelect={(selectedValue) =>{
-          if(selectedValue){
+          labelName="Country"
+          onSelect={(selectedValue) => {
+            if (selectedValue) {
               setCountryId(selectedValue);
-          }
-        }}
-        options={countries}
-        selectedValue={countryId}
+            }
+          }}
+          options={countries}
+          selectedValue={countryId}
         />
         <FormInput
           label="Password"
@@ -184,7 +195,6 @@ function SignUpForm() {
           value={SignUpFormData.password}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
-         
           minLength={8}
           maxLength={15}
           required

@@ -21,6 +21,7 @@ import {
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import REGEX from "../../../constants/Regex";
 
 function EditCompanyUserModal({
   isOpen,
@@ -64,6 +65,15 @@ function EditCompanyUserModal({
 
   const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+     const mobileRegex = REGEX.MOBILE_NUMBER;
+     if(updateUserformData.mobileNumber!.trim() !== ""){
+         if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
+          showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+          return;
+        }
+     }
+       
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
