@@ -74,6 +74,7 @@ function ProductManagementLead({
         requestedby: loginStatus.id,
         limit: pageSize,
         offset: offset,
+        isactive : true,
         search_company_specific_date_range_id: effectiveDateRangeId,
         search_parameter: searchParameter,
         search_parameter_date: concatDate,

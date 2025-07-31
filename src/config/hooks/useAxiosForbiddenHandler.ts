@@ -15,6 +15,7 @@ export function useAxiosForbiddenHandler() {
 
 
 
+
    const handleLogout = async() => {
     await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
     .then((response ) =>{
@@ -24,6 +25,7 @@ export function useAxiosForbiddenHandler() {
         setTimeout(() => {
           setIsDialogOpen(false);
         },2000)
+        
         window.location.href = ROUTES_URL.SIGN_IN;
         
       }

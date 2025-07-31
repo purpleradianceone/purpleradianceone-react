@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import LeadCompanyTeam from "../../../@types/lead-management/LeadCompanyTeam";
-import { Plus, X, XIcon } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import CompanyTeamsNotAssignedToLead from "./company-team-selection-modal/CompanyTeamsNotAssignedToLead";
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import ApiError from "../../../@types/error/ApiError";
@@ -22,7 +23,6 @@ import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedLeadData: any;
 };
 
@@ -47,9 +47,6 @@ const LeadAssignedTeams = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
     useState<boolean>(true);
-  function handleXIconClick() {
-    setOpenCreateLeadCompanyTeam(false);
-  }
 
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -92,7 +89,6 @@ const LeadAssignedTeams = ({
         if (response.status === STATUS_CODE.OK) {
           const responseData = response.data;
           const companyTeam: LeadCompanyTeam[] = responseData.map(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (item: any) => ({
               count: item.count,
               id: item.id,
@@ -127,7 +123,6 @@ const LeadAssignedTeams = ({
   };
 
   // Note : Get Company team company User
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getComapnyTeamUsers = async (companyTeam: any) => {
     const postDataToGetCompanyTeamUsers = {
       company_id: loginStatus.companyId,
@@ -151,7 +146,6 @@ const LeadAssignedTeams = ({
           setIsLoadingCompanyTeamCompanyUser(false);
           const res = response.data;
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const signleData: CompanyTeamUsers[] = res.map((item: any) => ({
             count: item.count,
             id: item.id,
@@ -212,7 +206,7 @@ const LeadAssignedTeams = ({
             type: "error",
           });
         }
-      }) // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
@@ -485,19 +479,6 @@ const LeadAssignedTeams = ({
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
         <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
-          <div className="bg-white mt-14 rounded-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-2xl sm:px-4 sm:py-4">
-            {/* header */}
-            <div className="border-b pb-1 mb-4 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-800">
-                Assign team to lead
-              </h2>
-              <XIcon
-                onClick={() => {
-                  handleXIconClick();
-                }}
-                className="text-gray-400 hover:text-gray-600 cursor-pointer"
-              />
-            </div>
             <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
               <div>
                 {/* note : need to make changes in the isopen and onclose */}
@@ -511,7 +492,6 @@ const LeadAssignedTeams = ({
                 />
               </div>
             </div>
-          </div>
         </div>
       )}
     </>

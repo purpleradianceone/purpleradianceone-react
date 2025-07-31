@@ -864,6 +864,7 @@ const MeetingScheduler = () => {
           handleAddCompanyUserEmailCheckboxChange
         }
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
+        isModalForMeeting={true}
       />
       {isAddCompanyLeadContactModalOpen && (
         <CompanyLeadContactsSelectionAgGrid
