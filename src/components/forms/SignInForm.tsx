@@ -31,12 +31,15 @@ import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
 import { useUserPreference } from "../../context/user/UserPreference";
+import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
+    const { setNotificationCount } =
+      useNotificationCountContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
@@ -104,6 +107,7 @@ function SignInForm() {
             startDateSubscription: "",
             endDateSubscription: "",
           });
+          setNotificationCount(0);
   }
 
   const handleLoginSubmit = (event: React.FormEvent) => {

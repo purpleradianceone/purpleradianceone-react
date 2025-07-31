@@ -1011,6 +1011,10 @@ const ViewLeadManagement = () => {
                 selectedLeadData.leadStatus === item.name
                   ? "bg-blue-700 text-white hover:bg-blue-900"
                   : "hover:bg-blue-700 hover:text-white"
+              }
+              ${selectedStatusId === item.id
+                && "bg-sky-400 text-white hover:bg-sky-500"
+               
               } text-gray-800 font-medium text-center`}
               style={{
                 clipPath:

@@ -29,14 +29,16 @@ const RefreshToken = async (props: {
       console.log(response.status === STATUS_CODE.OK);
 
       // Call functions after successful token refresh
-      if (props.callFunction) {
-        if (props.callFunction.length === 0) {
-          await props.callFunction();
-        }
-      } else if (props.callFunctionWithEvent) {
-        const event = new Event("refresh") as unknown as React.FormEvent;
-        await props.callFunctionWithEvent(event);
-      }
+      // if (props.callFunction) {
+      //   if (props.callFunction.length === 0) {
+      //     console.log(props.callFunction());
+      //     // await props.callFunction();
+      //   }
+      // } else if (props.callFunctionWithEvent) {
+      //   const event = new Event("refresh") as unknown as React.FormEvent;
+      //   console.log(props.callFunctionWithEvent(event))
+      // }
+      console.log(props);
       // You might want to handle callFunctionWithParamsNotEvent and callFunctionWithTwoParamsNotEvent here as well
 
       return true; // Return true on success

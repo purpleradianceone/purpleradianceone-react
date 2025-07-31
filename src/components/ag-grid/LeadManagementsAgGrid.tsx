@@ -18,7 +18,7 @@ function LeadManagementAgGrid({
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        hide: true,
+        hide: false,
         field:"id",
         headerName : "leadid"
       },
