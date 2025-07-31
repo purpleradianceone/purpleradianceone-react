@@ -121,6 +121,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
             startDateSubscription: "",
             subscriptionId: 0,
           });
+
+          setNotificationCount(0);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
