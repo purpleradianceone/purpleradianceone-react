@@ -55,6 +55,8 @@ const ROUTES_URL = {
     CONTACT_US : "/#contactUs",
     FEATURES : "/#features",
     PRICING : "/pricing",
+    NOT_AUTHORIZED : "/not-authorized",
+    SETTINGS_ALREADY_EXISTS : "/meeting/settings/already-exists",
 
 }
 export default ROUTES_URL;

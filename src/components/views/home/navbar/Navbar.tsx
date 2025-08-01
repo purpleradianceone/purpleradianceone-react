@@ -200,7 +200,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
-                  <div className="w-32 h-auto">
+                  <div className="w-12 h-12 justify-self-start">
                     <img src={IMAGE_SOURCE.PR_LOGO} alt="Logo" />
                   </div>
                 </div>
@@ -595,11 +595,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       >
                         {/* Profile Section */}
                         <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
-                          <img
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt="User"
-                            className="rounded-full w-12 h-12 border border-gray-300"
-                          />
+                          <div
+                      className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
+                        loginStatus.email
+                      )}`}
+                    >
+                      {loginStatus.fullName
+                        ? loginStatus.fullName.charAt(0)
+                        : ""}
+                    </div>
                           <div className="min-w-0">
                             <span className="text-sm font-semibold text-gray-800 block truncate w-40">
                               {loginStatus?.fullName || "User Name"}
@@ -629,9 +633,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               👤 Profile
                             </button>
                           )}
-                          <button className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                            ⚙️ Account Setting
+                          <Link to={ROUTES_URL.COMPANY_SETTING}>
+                          <button className="px-4 py-2 w-full hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                            ⚙️ Settings
                           </button>
+                          </Link>
 
                           {userHasAccessToViewSubscription ? (
                             <button

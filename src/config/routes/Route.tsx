@@ -54,6 +54,8 @@ import AboutUs from "../../components/views/home/landing-page/AboutUs";
 import Pricing from "../../components/views/home/landing-page/Pricing";
 import CareersPage from "../../components/views/home/landing-page/Carrers";
 import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
+import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
+import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +65,14 @@ export const router = createBrowserRouter([
   {
     path: ROUTES_URL.DOWNLOAD_APP,
     element: <DownloadAppPage></DownloadAppPage>,
+  },
+   {
+    path: ROUTES_URL.NOT_AUTHORIZED,
+    element: <NotAuthorized></NotAuthorized>,
+  },
+  {
+    path: ROUTES_URL.SETTINGS_ALREADY_EXISTS,
+    element: <SettingsAlreadyExists></SettingsAlreadyExists>,
   },
   {
     path: ROUTES_URL.LANDING_PAGE,
