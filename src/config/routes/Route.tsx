@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
@@ -56,6 +57,7 @@ import CareersPage from "../../components/views/home/landing-page/Carrers";
 import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
 import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
 import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
+import Home from "../../components/views/home/dashboard/Home";
 
 export const router = createBrowserRouter([
   {
@@ -204,7 +206,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div className="min-h-95vh">
             <Navbar>
-              <Dashboard></Dashboard>
+              <Home/>
             </Navbar>
           </div>
         </PrivateRoute>
