@@ -2,7 +2,7 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
+import { CheckCircle2, Edit, LucideLayoutDashboard, UserCheck, XCircle } from "lucide-react";
 import { createPortal } from "react-dom";
 import {
   INNERHTML,
@@ -18,6 +18,8 @@ function CompanyUserAgGrid({
   handleSelectedCompanyUserChange,
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
+  handleIsDashboardModalOpen
+ 
 }: CompanyUserAgGridProps) {
   const { userHasAccessToViewAccess, userHasAccessToUpdateUser } =
     useUserAccessModules();
@@ -160,7 +162,7 @@ function CompanyUserAgGrid({
                 createPortal(
                   <div
                     ref={dropdownRef}
-                    className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
+                    className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
                     {userHasAccessToViewAccess && (
@@ -190,6 +192,24 @@ function CompanyUserAgGrid({
                         {JSX_CHILDREN_NAME.EDIT}
                       </ActionsDropdownButton>
                     )}
+
+
+                     {userHasAccessToUpdateUser && (
+                      <ActionsDropdownButton
+                        onClick={() => {
+
+                          handleSelectedCompanyUserChange(params.data);
+
+                          handleIsDashboardModalOpen(true);
+
+                          setIsActionsDropDownOpen(false);
+                        }}
+                      >
+                        <LucideLayoutDashboard className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                        {JSX_CHILDREN_NAME.DASHBOARD}
+                      </ActionsDropdownButton>
+                    )}
+
                     {!userHasAccessToViewAccess && (
                       <ActionsDropdownButton disabled>
                         <UserCheck
