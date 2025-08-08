@@ -50,6 +50,7 @@ export const JSX_CHILDREN_NAME = {
     ADD_SUBSCRIPTION: "Upfront Purchase",
     ACCESS : "Access",
     EDIT : "Edit",
+    DASHBOARD: "Dashboard",
     ACTIONS : "Actions ▾",
     ADD_USER : "Add User",
     CREATE_LEAD : "Create",
