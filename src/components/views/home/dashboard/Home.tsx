@@ -64,8 +64,10 @@ const Home: React.FC = () => {
         )
         .then((response) => {
           if (response.data != null) {
-            const fetchedModules: Module[] = response.data;
-            setModules(fetchedModules.filter((m) => m.isactive));
+            let fetchedModules: Module[] = response.data;
+            fetchedModules = fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id);
+            setModules(fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id));
+
             if (fetchedModules.length > 0) {
               setActiveTab(fetchedModules[0].dashboard_id);
             }
