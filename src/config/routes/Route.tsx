@@ -22,7 +22,6 @@ import LeadManagement from "../../components/views/lead-management/LeadManagemen
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
 import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
-import Dashboard from "../../components/views/home/dashboard/Dashboard";
 import CreateSubscription from "../../components/subscription-module/CreateSubscription";
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
