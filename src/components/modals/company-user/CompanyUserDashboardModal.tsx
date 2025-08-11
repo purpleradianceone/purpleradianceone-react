@@ -4,8 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MESSAGE from "../../../constants/Messages";
+import Button from "../../ui/Button";
+import MessageSnackBar from "../../ui/MessageSnackbar";
+// import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { X } from "lucide-react";
 
 interface CompanyUserDashboard {
   id: number;
@@ -40,10 +49,38 @@ function CompanyUserDashboardModal({
 
   const initialDataRef = useRef<CompanyUserDashboard[]>([]);
 
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
+
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
+
+  const [spinnerAnimation, setSpinnerAnimation] = useState<{
+    status: "idle" | "loading" | "success" | "error";
+    message: string;
+  }>({
+    status: "idle",
+    message: "",
+  });
+
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  // const { userHasAccessToUpdateAccess } = useUserAccessModules();
+
   const handleSave = async () => {
     try {
-    
-    const postDataForUpdateCompanyUserDashboard =
+      setSpinnerAnimation({
+        status: "loading",
+        message: MESSAGE.INPROCESS.SAVING,
+      });
+
+      const postDataForUpdateCompanyUserDashboard =
         companyUserDashboardChange.map((d) => ({
           company_id: loginStatus.companyId,
           id: d.id,
@@ -52,24 +89,45 @@ function CompanyUserDashboardModal({
           updatedby_id: loginStatus.id,
         }));
 
+      await axios
+        .post(
+          POST_API.UPDATE_COMPANY_USER_DASHBOARD,
+          postDataForUpdateCompanyUserDashboard,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          showMessageSnackbar({
+            message: response.data.message,
+            type: "success",
+          });
 
-      await axios.post(
-        POST_API.UPDATE_COMPANY_USER_DASHBOARD,
-        postDataForUpdateCompanyUserDashboard,
-        {
-          withCredentials: true,
-        }
-      );
+          setSpinnerAnimation({
+            status: "success",
+            message: MESSAGE.SUCCESS.SAVED,
+          });
 
-      console.log('---------------------------');
+          setTimeout(() => {
+            setSpinnerAnimation({
+              status: "idle",
+              message: "",
+            });
+          }, 1000);
+
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+        });
+
+      console.log("---------------------------");
       console.log(POST_API.UPDATE_COMPANY_USER_DASHBOARD);
-      console.log('---------------------------');
+      console.log("---------------------------");
 
       // Update original data to match new state
       initialDataRef.current = [...companyUserDashboard];
 
       await fetchCompanyUserDashboard();
-      
     } catch (e) {
       alert(e);
     }
@@ -93,7 +151,13 @@ function CompanyUserDashboardModal({
           )
           .then((response) => {
             if (response.data != null) {
-              setCompanyUserDashboard(response.data);
+
+              const companyUserDashboard : CompanyUserDashboard[] = response.data.sort((a:CompanyUserDashboard , b:CompanyUserDashboard)=>a.dashboard_id - b.dashboard_id);
+
+              setCompanyUserDashboard(companyUserDashboard);
+
+              // setCompanyUserDashboard(response.data);
+
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,7 +189,6 @@ function CompanyUserDashboardModal({
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-
     if (isOpen) {
       dialog.showModal();
       // fetchCompanyUserDashboard();
@@ -140,9 +203,15 @@ function CompanyUserDashboardModal({
       onClose={onClose}
       className="w-[600px] p-6 rounded-lg shadow-lg border border-gray-300 bg-white"
     >
-      <h2 className="text-xl font-semibold mb-4">
-        {users.fullname}'s Dashboard{" "}
-      </h2>
+      <div className="flex justify-between items-center p-6 border-6">
+        <h2 className="text-xl font-semibold mb-4">
+          {users.fullname}'s Dashboard{" "}
+        </h2>
+
+        <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>
+          <X size={20}></X>
+        </button>
+      </div>
 
       <ul className="mb-4 space-y-2">
         {companyUserDashboard.map((dashboard) => (
@@ -167,7 +236,6 @@ function CompanyUserDashboardModal({
 
                   setCompanyUserDashboard(updateDashboard);
                   setCompanyUserDashboardChange(updateDashboard);
-                
                 }}
                 className="w-4 h-4 cursor-pointer"
               ></input>
@@ -176,19 +244,39 @@ function CompanyUserDashboardModal({
         ))}
       </ul>
 
-      <button
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        onClick={onClose}
-      >
-        Cancel
-      </button>
+      <div className="p-6 border-t bg-white">
+        <div className="flex justify-end">
 
-      <button
-        className=" ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg:blue 700"
-        onClick={handleSave}
-      >
-        Save
-      </button>
+          {/* {userHasAccessToUpdateAccess ? (
+            users.id === loginStatus.id ? (
+              <Button disabled={true}>Save</Button>
+            ) : (
+              <Button onClick={handleSave} spinner={spinnerAnimation}>
+                Save
+              </Button>
+            )
+          ) : (
+            <Button disabled={true}>Save</Button>
+          )} */}
+
+          <Button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={handleSave}
+            spinner={spinnerAnimation}
+          >
+            Save
+          </Button>
+
+        </div>
+      </div>
+
+      <MessageSnackBar
+        isOpen={messageSnackbar.open}
+        message={messageSnackbar.message}
+        type={messageSnackbar.type}
+        onClose={handleMessageSnackbarClose}
+        duration={NUMBER_VALUES.SNACKBAR_DURATION}
+      />
     </dialog>
   );
 }
