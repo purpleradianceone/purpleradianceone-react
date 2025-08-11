@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import ApiError from "../../../../@types/error/ApiError";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import RefreshToken from "../../../../config/validations/RefreshToken";
 
 // ======= Dashboard Components =======
-const CRM: React.FC = () => <Dashboard/>;
+const CRM: React.FC = () => <Dashboard />;
 const Support: React.FC = () => <div className="p-4">Support Dashboard Content</div>;
 const Inventory: React.FC = () => <div className="p-4">Inventory Dashboard Content</div>;
 const Finance: React.FC = () => <div className="p-4">Finance Dashboard Content</div>;
@@ -12,23 +18,16 @@ const HRMS: React.FC = () => <div className="p-4">HRMS Dashboard Content</div>;
 type Module = {
   id: number;
   company_user_id: number;
-  dashboard_id: number; // replaced "order"
+  dashboard_id: number;
   dashboard_name: string;
   isactive: boolean;
 };
 
-// ======= Data =======
-const modules: Module[] = [
-  { id: 86, company_user_id: 6, dashboard_id: 1, dashboard_name: "CRM", isactive: true },
-  { id: 87, company_user_id: 6, dashboard_id: 2, dashboard_name: "Support", isactive: true },
-  { id: 88, company_user_id: 6, dashboard_id: 3, dashboard_name: "Inventory", isactive: true },
-  { id: 89, company_user_id: 6, dashboard_id: 4, dashboard_name: "Finance", isactive: true },
-  { id: 90, company_user_id: 6, dashboard_id: 5, dashboard_name: "HRMS", isactive: true },
-];
-
 const Home: React.FC = () => {
-  const activeModules = modules.filter((m) => m.isactive);
-  const [activeTab, setActiveTab] = useState(activeModules[0]?.dashboard_id ?? 0);
+  const { loginStatus } = useLoggedInUserContext();
+  const [modules, setModules] = useState<Module[]>([]);
+  const [activeTab, setActiveTab] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -47,7 +46,83 @@ const Home: React.FC = () => {
     }
   };
 
-  if (activeModules.length === 0) {
+  const fetchCompanyUserDashboardAssigned = async () => {
+    setLoading(true);
+    try {
+      const getCompanyUserDashboardPostData = {
+        company_id: loginStatus.companyId,
+        company_user_id: loginStatus.id,
+        isactive: true,
+        requestedby_id: loginStatus.id,
+      };
+
+      await axios
+        .post(
+          POST_API.GET_COMPANY_USER_DASHBOARD_ASSIGNED,
+          getCompanyUserDashboardPostData,
+          { withCredentials: true }
+        )
+        .then((response) => {
+          if (response.data != null) {
+            const fetchedModules: Module[] = response.data;
+            setModules(fetchedModules.filter((m) => m.isactive));
+            if (fetchedModules.length > 0) {
+              setActiveTab(fetchedModules[0].dashboard_id);
+            }
+          }
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: fetchCompanyUserDashboardAssigned,
+            });
+            if (refreshTokenStatus) {
+              fetchCompanyUserDashboardAssigned();
+            }
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanyUserDashboardAssigned();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
+        {/* Simple loading spinner */}
+        <svg
+          className="animate-spin h-8 w-8 text-blue-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 00-8 8h4z"
+          />
+        </svg>
+        <span className="ml-3">Loading dashboards...</span>
+      </div>
+    );
+  }
+
+  if (modules.length === 0) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-100 text-gray-500">
         No modules available
@@ -60,7 +135,7 @@ const Home: React.FC = () => {
       {/* Horizontal Tabs */}
       <div className="bg-white border-b border-gray-300">
         <div className="flex justify-start">
-          {activeModules.map((module) => (
+          {modules.map((module) => (
             <button
               key={module.dashboard_id}
               onClick={() => setActiveTab(module.dashboard_id)}
