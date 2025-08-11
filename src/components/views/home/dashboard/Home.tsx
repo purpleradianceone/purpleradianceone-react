@@ -6,13 +6,18 @@ import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import SupportDashboard from "../dashboards/SupportDashboard";
+import InventoryDashboard from "../dashboards/InventoryDashboard";
+import FinanceDashboard from "../dashboards/FinanceDashboard";
+import HRMSDashboard from "../dashboards/HRMSDashboard";
+
 
 // ======= Dashboard Components =======
 const CRM: React.FC = () => <Dashboard />;
-const Support: React.FC = () => <div className="p-4">Support Dashboard Content</div>;
-const Inventory: React.FC = () => <div className="p-4">Inventory Dashboard Content</div>;
-const Finance: React.FC = () => <div className="p-4">Finance Dashboard Content</div>;
-const HRMS: React.FC = () => <div className="p-4">HRMS Dashboard Content</div>;
+const Support: React.FC = () => <SupportDashboard/>;
+const Inventory: React.FC = () => <InventoryDashboard/>;
+const Finance: React.FC = () => <FinanceDashboard/>;
+const HRMS: React.FC = () => <HRMSDashboard/>;
 
 // ======= Types =======
 type Module = {
@@ -141,7 +146,7 @@ const Home: React.FC = () => {
             <button
               key={module.dashboard_id}
               onClick={() => setActiveTab(module.dashboard_id)}
-              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors
+              className={`px-6 py-1 text-sm font-medium border-b-2 transition-colors
                 ${
                   activeTab === module.dashboard_id
                     ? "border-blue-500 text-blue-600"
@@ -155,7 +160,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 p-6 overflow-y-auto bg-gray-50">{renderContent()}</div>
+      <div className="flex-1 overflow-y-auto bg-gray-50">{renderContent()}</div>
     </div>
   );
 };
