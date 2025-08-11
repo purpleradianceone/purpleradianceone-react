@@ -99,7 +99,7 @@ const Home: React.FC = () => {
         {/* Simple loading spinner */}
         <svg
           className="animate-spin h-8 w-8 text-blue-500"
-          xmlns="http://www.w3.org/2000/svg"
+          // xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -124,8 +124,8 @@ const Home: React.FC = () => {
 
   if (modules.length === 0) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-100 text-gray-500">
-        No modules available
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
+        No Dashboard available
       </div>
     );
   }
