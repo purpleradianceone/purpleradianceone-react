@@ -78,7 +78,7 @@ function CompanyUserDashboardModal({
         const getCompanyUserDashboardPostData = {
           company_id: loginStatus.companyId,
           company_user_id: users.id,
-          isactive: false,
+          isactive: null,
           requestedby_id: loginStatus.id,
         };
 
