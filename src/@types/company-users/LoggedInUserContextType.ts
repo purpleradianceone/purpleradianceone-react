@@ -8,7 +8,8 @@ export type LoggedInUserType = {
     message : string,
     mobileNumber : string,
     status : boolean,
-    token : string
+    token : string,
+    isSuperUser:boolean,
     //subscription fields
     activeUsersInCompany:number,
     subscriptionAllowedUsers:number,
