@@ -11,17 +11,14 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
-  NUMBER_VALUES,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+
 import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLeadDetails";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../constants/Messages";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -41,8 +38,7 @@ const LeadDetails = ({
     editLeadDetailsData: LeadDetailsData
   ) => void;
 }) => {
-
-  const {userHasAccessToUpdateLead} = useUserAccessModules();
+  const { userHasAccessToUpdateLead } = useUserAccessModules();
 
   const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
     additional_contact_number: "",
@@ -87,25 +83,16 @@ const LeadDetails = ({
   }, [leadDetailsData]);
 
   const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+
+  
 
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
 
-  // Note : Create or Edit save api call 
+  // Note : Create or Edit save api call
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -116,16 +103,16 @@ const LeadDetails = ({
         MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
       )
     ) {
-      setMessageSnackbar({
-        open: true,
-        message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
-        type: "error",
-      });
+      // setMessageSnackbar({
+      //   open: true,
+      //   message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
+      //   type: "error",
+      // });
+      toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN)
       return;
     }
-    
+
     if (leadDetailsData.id === null || leadDetailsData.id === 0) {
-      
       createNewDetailRef.current = true;
     } else {
       createNewDetailRef.current = false;
@@ -162,10 +149,11 @@ const LeadDetails = ({
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message)
           setShowSaveLeadButton(false);
           createNewDetailRef.current = false;
 
@@ -174,10 +162,11 @@ const LeadDetails = ({
           return;
         }
         if (response.data.status === false) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "warning",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "warning",
+          // });
+          toast.error(response.data.message)
           return;
         }
       }
@@ -195,7 +184,7 @@ const LeadDetails = ({
     }
   };
 
-  // Note : function to get industry type 
+  // Note : function to get industry type
   const fetchIndustryType = async () => {
     const postData = {
       id: null,
@@ -226,7 +215,7 @@ const LeadDetails = ({
     }
   };
 
-  // Note : function to get countries 
+  // Note : function to get countries
   const getAllCountries = async () => {
     const PostData: Country = {
       id: null,
@@ -255,7 +244,7 @@ const LeadDetails = ({
     }
   };
 
-  //Note : function to get state 
+  //Note : function to get state
   const getAllState = async (countryId: number | null) => {
     if (!countryId) return;
     const PostDataForState: State = {
@@ -265,9 +254,7 @@ const LeadDetails = ({
       description: null,
       isactive: true,
     };
-    try{
-
-  
+    try {
       const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
         withCredentials: true,
         headers: {
@@ -279,19 +266,19 @@ const LeadDetails = ({
       } else {
         throw new Error("Failed to fetch states");
       }
-    }catch(error : any){
-       if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithParamsNotEvent: getAllState,
-          });
-          if (refreshTokenStatus) {
-            getAllState(countryId);
-          }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: getAllState,
+        });
+        if (refreshTokenStatus) {
+          getAllState(countryId);
         }
+      }
     }
   };
 
-  //Note : function to get district 
+  //Note : function to get district
   const getAllDistrict = async (stateId: number | null) => {
     if (!stateId) return;
     const PostDataForDistrict: District = {
@@ -302,32 +289,31 @@ const LeadDetails = ({
       isactive: true,
     };
 
-
-      try {
-        const response = await axios.post(
-          POST_API.GET_DISTRICT,
-          PostDataForDistrict,
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.status === STATUS_CODE.OK) {
-          setDistrict(response.data);
+    try {
+      const response = await axios.post(
+        POST_API.GET_DISTRICT,
+        PostDataForDistrict,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      } catch (error: any) {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithParamsNotEvent: getAllDistrict,
-          });
-          if (refreshTokenStatus) {
-            getAllDistrict(stateId);
-          }
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        setDistrict(response.data);
+      }
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: getAllDistrict,
+        });
+        if (refreshTokenStatus) {
+          getAllDistrict(stateId);
         }
       }
+    }
   };
 
   const districtOptions = Array.isArray(district)
@@ -338,23 +324,23 @@ const LeadDetails = ({
       }))
     : [];
 
-  const [stateOptions , setStateOptions ] = useState<{
-    label: string | null;
-    value: string | null;
-    id: number | null;
+  const [stateOptions, setStateOptions] = useState<
+    {
+      label: string | null;
+      value: string | null;
+      id: number | null;
+    }[]
+  >([]);
 
-  }[]>([])
-
-  useEffect(()=>{
-    setStateOptions(()=>{
+  useEffect(() => {
+    setStateOptions(() => {
       return stateData.map((state) => ({
         label: state.name,
         value: state.name,
         id: state.id,
-      }))
-    })
-    
-  } , [stateData])
+      }));
+    });
+  }, [stateData]);
 
   // const stateOptions = Array.isArray(stateData)
   //   ? stateData.map((state) => ({
@@ -372,7 +358,6 @@ const LeadDetails = ({
       }))
     : [];
 
-  
   const industryOptions = Array.isArray(industryType)
     ? industryType.map((val) => ({
         label: val.name,
@@ -397,7 +382,7 @@ const LeadDetails = ({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Job title"
             value={editLeadDetails.job_title}
@@ -411,7 +396,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="textarea"
             label="Address"
             value={editLeadDetails.address}
@@ -425,10 +410,10 @@ const LeadDetails = ({
             }}
           />
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="Industry"
-            handleGetDropdownData={()=>{
+            handleGetDropdownData={() => {
               fetchIndustryType();
             }}
             selectOptions={industryOptions}
@@ -447,7 +432,7 @@ const LeadDetails = ({
           />
 
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Add. Contact number"
             value={editLeadDetails.additional_contact_number}
@@ -461,11 +446,11 @@ const LeadDetails = ({
           />
 
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="Country"
-            handleGetDropdownData={() =>{
-              getAllCountries()
+            handleGetDropdownData={() => {
+              getAllCountries();
             }}
             selectOptions={countryOptions}
             value={editLeadDetails.country_name}
@@ -476,14 +461,13 @@ const LeadDetails = ({
 
               const selectedCountryId = parseInt(e.target.value);
 
-              
               const selectedCountryName =
                 countryOptions.find((option) => option.id === selectedCountryId)
                   ?.value || "";
-              
+
               // check if changed or not
               const isCountryChanged =
-                changedCountryId !==parseInt( e.target.value);
+                changedCountryId !== parseInt(e.target.value);
 
               const updatedDetails = {
                 ...editLeadDetails,
@@ -497,9 +481,9 @@ const LeadDetails = ({
                 updatedDetails.district_id = 0; // optional
                 updatedDetails.district_name = ""; // optional
                 setStateId("");
-                setDistrictId("")
-                setDistrict([])
-                setStateData([])
+                setDistrictId("");
+                setDistrict([]);
+                setStateData([]);
               }
 
               setEditLeadDetails(updatedDetails);
@@ -507,7 +491,7 @@ const LeadDetails = ({
           />
           {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Industry Name"
             value={editLeadDetails.industry_name}
@@ -520,11 +504,11 @@ const LeadDetails = ({
             }}
           />
           <FormField
-           userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="State"
-            handleGetDropdownData={()=>{
-              getAllState(editLeadDetails.country_id)
+            handleGetDropdownData={() => {
+              getAllState(editLeadDetails.country_id);
             }}
             selectOptions={stateOptions}
             value={editLeadDetails.state_name}
@@ -552,16 +536,15 @@ const LeadDetails = ({
               if (isStateChanged) {
                 updatedDetails.district_id = 0;
                 updatedDetails.district_name = "";
-                setDistrictId("")
-                setDistrict([])
+                setDistrictId("");
+                setDistrict([]);
               }
               setEditLeadDetails(updatedDetails);
             }}
           />
 
-
           <FormField
-          userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Website"
             value={editLeadDetails.website}
@@ -574,11 +557,11 @@ const LeadDetails = ({
             }}
           />
           <FormField
-          userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="select"
             label="District"
-            handleGetDropdownData={()=>{
-              getAllDistrict(editLeadDetails.state_id)
+            handleGetDropdownData={() => {
+              getAllDistrict(editLeadDetails.state_id);
             }}
             selectOptions={districtOptions}
             selectedId={districtId}
@@ -599,20 +582,20 @@ const LeadDetails = ({
         </div>
       </form>
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 };
 
 type OptionType = {
   label: string | null;
-  value: string | null ;
+  value: string | null;
   id: number | null;
 };
 
@@ -627,8 +610,8 @@ type FormFieldProps = {
   type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
   selectedId?: string;
-  handleGetDropdownData ?: () => void | null
-  userHasAccessToUpdate : boolean;
+  handleGetDropdownData?: () => void | null;
+  userHasAccessToUpdate: boolean;
 };
 
 const FormField = ({
@@ -639,12 +622,12 @@ const FormField = ({
   selectOptions,
   selectedId,
   handleGetDropdownData,
-  userHasAccessToUpdate
+  userHasAccessToUpdate,
 }: FormFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleBlur = () => {
-    setTimeout(() => setIsEditing(false), 100); 
+    setTimeout(() => setIsEditing(false), 100);
   };
 
   return (
@@ -652,16 +635,19 @@ const FormField = ({
       <div className="text-gray-700 w-[50%] text-xs">{label}</div>
       <div
         className="flex items-center w-[50%]   min-w-[150px]"
-        onClick={
-          () =>{
-            if(userHasAccessToUpdate){
-              setIsEditing(true)
-              handleGetDropdownData!()
-            }
-          } 
-        }
+        onClick={() => {
+          if (userHasAccessToUpdate) {
+            setIsEditing(true);
+            handleGetDropdownData!();
+          } else {
+            toast.error(
+              MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                .UPDATE_LEAD_ACCESS_DENIED_message
+            );
+          }
+        }}
       >
-        {!isEditing  ? (
+        {!isEditing ? (
           <span
             className="text-gray-800   text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
             title={
