@@ -20,6 +20,7 @@
         SUBSCRIPTION_MONTH: "Minimum 1 or Max 48 month .",
         SUBSCRIPTION_CREATION_ERROR: "Error creating subscription",
         SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade/inActive Users.",
+        PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE : "Updating name, email, or phone number is not permitted for the primary lead contact from this section.",
         
     },
     SUCCESS : {
@@ -34,7 +35,7 @@
     }, 
     MODULE_ACCESS : {
         LEAD_MODULE : {
-            UPDATE_LEAD_ACCESS_DENIED_message : "Dont have an access to update the lead."
+            UPDATE_LEAD_ACCESS_DENIED_message : "You do not have permission to update this lead."
         }
     }
 }

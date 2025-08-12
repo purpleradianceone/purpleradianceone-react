@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Settings, X } from "lucide-react";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../../constants/AppConstants";
@@ -11,15 +10,11 @@ import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useEffect, useState } from "react";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 function LeadSettingForLead({
   isOpen,
@@ -33,20 +28,6 @@ function LeadSettingForLead({
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   const getLeadSetting = async () => {
     setIsLoading(true);
@@ -127,9 +108,9 @@ function LeadSettingForLead({
                 setting.id === id ? { ...setting, isActive: isChecked } : setting
               )
             );
-            showMessageSnackbar({ message: response.data.message, type: "success" });
+            toast.success(response.data.message);
           } else {
-            showMessageSnackbar({ message: response.data.message, type: "error" });
+            toast.error(response.data.message);
           }
         }
       })
@@ -232,14 +213,6 @@ function LeadSettingForLead({
             )}
           </div>
         </div>
-
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
       </div>
     </div>,
     document.body

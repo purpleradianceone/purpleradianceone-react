@@ -6,22 +6,17 @@ import { useEffect, useState } from "react";
 import Button from "../../ui/Button";
 import {
   MOBILE_NUMBER_VALIDATION,
-  NUMBER_VALUES,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
+import toast from "react-hot-toast";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -35,7 +30,7 @@ type LeadContactFormType = {
 const LeadContact = ({
   leadContact,
   fetchLeadContact,
-  selectedLeadData 
+  selectedLeadData,
 }: {
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
@@ -72,20 +67,7 @@ const LeadContact = ({
     mobileNumber: "",
   });
 
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+ 
 
   const inputClass =
     "border border-gray-100 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
@@ -192,16 +174,18 @@ const LeadContact = ({
       .then((response) => {
         const data = response.data;
         if (response.data.status === true) {
-          showMessageSnackbar({
-            message: data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: data.message,
+          //   type: "success",
+          // });
+          toast.success(data.message);
           fetchLeadContact();
         } else {
-          showMessageSnackbar({
-            message: data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: data.message,
+          //   type: "error",
+          // });
+          toast.error(data.message);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -292,19 +276,20 @@ const LeadContact = ({
         withCredentials: true,
       })
       .then((response) => {
-        if (response.data.status === true) {
-          const data = response.data;
-          showMessageSnackbar({
-            message: data.message,
-            type: "success",
-          });
+        const data = response.data;
+        if (data.status === true) {
+          // showMessageSnackbar({
+          //   message: data.message,
+          //   type: "success",
+          // });
+          toast.success(data.message);
           fetchLeadContact();
         } else {
-          const data = response.data;
-          showMessageSnackbar({
-            message: data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: data.message,
+          //   type: "error",
+          // });
+          toast.error(data.message);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -398,20 +383,17 @@ const LeadContact = ({
   return (
     <div className={`w-full z-10 px-1 mb-1 `}>
       {/* Header */}
-<div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+      <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
         <span>Add</span>
         <button
-          disabled={!userHasAccessToUpdateLead}
           onClick={() => {
             if (userHasAccessToUpdateLead) {
               setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
             } else {
-              showMessageSnackbar({
-                message:
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message,
-                type: "error",
-              });
+              toast.error(
+                MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  .UPDATE_LEAD_ACCESS_DENIED_message
+              );
             }
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
@@ -419,7 +401,6 @@ const LeadContact = ({
           <Plus size={10} />
         </button>
       </div>
-      
 
       {/* Contacts List */}
       <div className="space-y-2">
@@ -515,17 +496,14 @@ const LeadContact = ({
               <div>
                 {/* Edit Button */}
                 <button
-                  disabled={!userHasAccessToUpdateLead}
                   onClick={() => {
                     if (userHasAccessToUpdateLead) {
                       handleEditLeadContactClick(selectedContactCard);
                     } else {
-                      showMessageSnackbar({
-                        message:
-                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                            .UPDATE_LEAD_ACCESS_DENIED_message,
-                        type: "error",
-                      });
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
                     }
                   }}
                   className="top-4 left-4 text-sm bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
@@ -634,23 +612,16 @@ const LeadContact = ({
                           }
                         : () => {
                             if (selectedContactCard.isPrimary) {
-                              showMessageSnackbar({
-                                message:
-                                  "Cannot Change , User is Primary Contact",
-                                type: "error",
-                              });
+                              toast.error(
+                                "Update request denied — the user is designated as the Primary Contact."
+                              );
                             } else {
-                              showMessageSnackbar({
-                                message:
-                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                    .UPDATE_LEAD_ACCESS_DENIED_message,
-                                type: "error",
-                              });
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                  .UPDATE_LEAD_ACCESS_DENIED_message
+                              );
                             }
                           }
-                    }
-                    disabled={
-                      !userHasAccessToUpdateLead
                     }
                     title={
                       selectedContactCard.isPrimary
@@ -738,6 +709,13 @@ const LeadContact = ({
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
                     }
+                    onClick={
+                      ()=>{
+                        if(editContactData?.isPrimary && editContactData !== null) {
+                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
+                        }
+                      }
+                    }
                   />
                   {errors.name && (
                     <p className="text-xs text-red-600 mt-1">{errors.name}</p>
@@ -758,6 +736,13 @@ const LeadContact = ({
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
                     }
+                    onClick={
+                      ()=>{
+                        if(editContactData?.isPrimary && editContactData !== null) {
+                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
+                        }
+                      }
+                    }
                   />
                   {errors.email && (
                     <p className="text-xs text-red-600 mt-1">{errors.email}</p>
@@ -777,6 +762,13 @@ const LeadContact = ({
                     defaultValue={editContactData?.mobileNumber || ""}
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
+                    }
+                     onClick={
+                      ()=>{
+                        if(editContactData?.isPrimary && editContactData !== null) {
+                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
+                        }
+                      }
                     }
                   />
                   {errors.mobileNumber && (
@@ -927,13 +919,7 @@ const LeadContact = ({
           </div>
         </div>
       )}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+     
     </div>
   );
 };
