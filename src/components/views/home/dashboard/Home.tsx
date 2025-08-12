@@ -6,13 +6,18 @@ import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import SupportDashboard from "../dashboards/SupportDashboard";
+import InventoryDashboard from "../dashboards/InventoryDashboard";
+import FinanceDashboard from "../dashboards/FinanceDashboard";
+import HRMSDashboard from "../dashboards/HRMSDashboard";
+
 
 // ======= Dashboard Components =======
 const CRM: React.FC = () => <Dashboard />;
-const Support: React.FC = () => <div className="p-4">Support Dashboard Content</div>;
-const Inventory: React.FC = () => <div className="p-4">Inventory Dashboard Content</div>;
-const Finance: React.FC = () => <div className="p-4">Finance Dashboard Content</div>;
-const HRMS: React.FC = () => <div className="p-4">HRMS Dashboard Content</div>;
+const Support: React.FC = () => <SupportDashboard/>;
+const Inventory: React.FC = () => <InventoryDashboard/>;
+const Finance: React.FC = () => <FinanceDashboard/>;
+const HRMS: React.FC = () => <HRMSDashboard/>;
 
 // ======= Types =======
 type Module = {
@@ -64,8 +69,10 @@ const Home: React.FC = () => {
         )
         .then((response) => {
           if (response.data != null) {
-            const fetchedModules: Module[] = response.data;
-            setModules(fetchedModules.filter((m) => m.isactive));
+            let fetchedModules: Module[] = response.data;
+            fetchedModules = fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id);
+            setModules(fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id));
+
             if (fetchedModules.length > 0) {
               setActiveTab(fetchedModules[0].dashboard_id);
             }
