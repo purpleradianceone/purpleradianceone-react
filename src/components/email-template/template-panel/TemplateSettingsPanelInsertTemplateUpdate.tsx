@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, } from 'react';
 
 import axios from 'axios';
