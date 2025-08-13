@@ -15,7 +15,7 @@ import {
   Target,
   TrendingUp,
   Users,
-  WineIcon
+  WineIcon,
 } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
@@ -29,6 +29,9 @@ import { useServerCurrentTime } from "../../../../config/hooks/useServerCurrentT
 import SalesChart from "./SalesChart";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverageLeads";
+import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
+
+type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -40,7 +43,66 @@ function Dashboard() {
   const [completedTasks, setCompletedTasks] = useState<LeadTaskType[]>([]);
   const [pendingTasks, setPendingTasks] = useState<LeadTaskType[]>([]);
 
-  const [companyPipelineView,setCompanyPipelineView] = useState<boolean>(false);
+  const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
+
+  const getDashboardData = async () => {
+    const postData = {
+      company_id: loginStatus.companyId,
+      owner_id: companyPipelineView ? null : loginStatus.id,
+      requestedby_id: loginStatus.id,
+    };
+
+    try {
+      const response = await axios.post(
+        POST_API.GET_COMPANY_USER_DASHBOARD_CRM,
+        postData,
+        { withCredentials: true }
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        const formattedDashboardData: DashboardDataType = response.data;
+
+        setDashboardData(formattedDashboardData);
+      
+        // setDashboardData(formattedDashboardData);
+      }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getDashboardData,
+        });
+
+        if (refreshTokenStatus) {
+          getDashboardData();
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!dashboardData) return;
+
+    console.log("-------------------------------------------------");
+    console.log(
+      dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_ACTIVE_LEADS]?.[0]
+        ?.active_leads ?? 0
+    );
+  }, [dashboardData]);
+
+  const [companyPipelineView, setCompanyPipelineView] =
+    useState<boolean>(false);
+
+  // useEffect(() => {
+  //   if (loginStatus?.companyId && loginStatus?.id) {
+  //     getDashboardData();
+  //   }
+  // }, [loginStatus, companyPipelineView]);
+
+  useEffect(() => {
+    if (loginStatus?.companyId && loginStatus?.id) {
+      getDashboardData();
+    }
+  }, []);
 
   const [leadSummaryReportData, setLeadSummaryReportData] =
     useState<LeadSummaryReportType>({
@@ -81,15 +143,19 @@ function Dashboard() {
       LostLeadStatusName: "",
       nurtureLeadStatusName: "",
     });
-    const [monthlyAverageLeads,setMonthlyAverageLeads] = useState<MonthlyAverageLeads[]>([])
-     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+  const [monthlyAverageLeads, setMonthlyAverageLeads] = useState<
+    MonthlyAverageLeads[]
+  >([]);
+  const [currentYear, setCurrentYear] = useState<number>(
+    new Date().getFullYear()
+  );
 
   const [dashboardLayout, setDashboardLayout] = useState<string[]>([]);
   const [dashboardVisiblity, setDasboardVisibility] = useState<
     { key: string; value: boolean }[]
   >([]);
+  
   const getLeadSummaryReport = async () => {
-    
     const postDataToGetLeads = {
       company_id: loginStatus.companyId,
       ownerid: companyPipelineView ? null : loginStatus.id,
@@ -172,48 +238,50 @@ function Dashboard() {
 
   const handleNextYear = () => {
     setCurrentYear((prev) => prev + 1);
-  }
+  };
 
   const handlePrevYear = () => {
     setCurrentYear((prev) => prev - 1);
-  }
+  };
 
-  
   const getLeadsMonthlyAverage = async () => {
-    setMonthlyAverageLeads([])
+    setMonthlyAverageLeads([]);
     const postDataToGetLeads = {
       company_id: loginStatus.companyId,
-      year : currentYear,
+      year: currentYear,
       ownerid: companyPipelineView ? null : loginStatus.id,
       requestedby_id: loginStatus.id,
     };
     try {
-      await axios.post(
-        POST_API.GET_LEADS_MONTHLY_AVERAGE,
-        postDataToGetLeads,
-        {
+      await axios
+        .post(POST_API.GET_LEADS_MONTHLY_AVERAGE, postDataToGetLeads, {
           withCredentials: true,
-        }
-      ).then((response) => {
-        if(response.status === STATUS_CODE.OK){
-          response.data.map((res : any) => {
-            setMonthlyAverageLeads((prev) => [...prev,{
-              averageMonthlyLeads : res.average_monthly_leads,
-              monthlyConvertedLeads: res.monthly_converted_leads,
-              month: res.month,
-              year: res.year
-            }]);
-          })
-        }
-
-      }).catch(async(error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({callFunction : getLeadsMonthlyAverage});
-          if(refreshTokenStatus){
-            getLeadsMonthlyAverage();
+        })
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            response.data.map((res: any) => {
+              setMonthlyAverageLeads((prev) => [
+                ...prev,
+                {
+                  averageMonthlyLeads: res.average_monthly_leads,
+                  monthlyConvertedLeads: res.monthly_converted_leads,
+                  month: res.month,
+                  year: res.year,
+                },
+              ]);
+            });
           }
-        }
-      })
+        })
+        .catch(async (error) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: getLeadsMonthlyAverage,
+            });
+            if (refreshTokenStatus) {
+              getLeadsMonthlyAverage();
+            }
+          }
+        });
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -231,8 +299,8 @@ function Dashboard() {
     setIsTasksLoading(true);
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
-      company_user_id:loginStatus.id,
-      isactive : true,
+      company_user_id: loginStatus.id,
+      isactive: true,
       requestedby_id: loginStatus.id,
     };
 
@@ -267,10 +335,9 @@ function Dashboard() {
           leadTaskActivityName: res.lead_activity_name,
           leadTaskPriorityName: res.lead_task_priority_name,
           leadTaskStageName: res.lead_task_stage_name,
-          overdueStatus : res.overdue_status,
+          overdueStatus: res.overdue_status,
         }));
         setUpcomingTasks(fetchedTasks);
-
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -288,12 +355,12 @@ function Dashboard() {
     }
   };
 
-   const getPendingLeadTasks = async () => {
+  const getPendingLeadTasks = async () => {
     setIsTasksLoading(true);
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
-      company_user_id:loginStatus.id,
-      isactive : true,
+      company_user_id: loginStatus.id,
+      isactive: true,
       requestedby_id: loginStatus.id,
     };
 
@@ -328,10 +395,9 @@ function Dashboard() {
           leadTaskActivityName: res.lead_activity_name,
           leadTaskPriorityName: res.lead_task_priority_name,
           leadTaskStageName: res.lead_task_stage_name,
-          overdueStatus : res.overdue_status,
+          overdueStatus: res.overdue_status,
         }));
         setPendingTasks(fetchedTasks);
-
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -353,8 +419,8 @@ function Dashboard() {
     setIsTasksLoading(true);
     const getLeadTaskPostData = {
       company_id: loginStatus.companyId,
-      company_user_id:loginStatus.id,
-      isactive : true,
+      company_user_id: loginStatus.id,
+      isactive: true,
       requestedby_id: loginStatus.id,
     };
 
@@ -389,12 +455,11 @@ function Dashboard() {
           leadTaskActivityName: res.lead_activity_name,
           leadTaskPriorityName: res.lead_task_priority_name,
           leadTaskStageName: res.lead_task_stage_name,
-          completedAt : res.completed_at,
-          completedAtDateTime : res.completed_at_due_date_time,     
-          overdueStatus : res.overdue_status, 
+          completedAt: res.completed_at,
+          completedAtDateTime: res.completed_at_due_date_time,
+          overdueStatus: res.overdue_status,
         }));
         setCompletedTasks(fetchedTasks);
-
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -417,11 +482,11 @@ function Dashboard() {
 
     setDashboardLayout([
       "metricCards",
-       "salesChart",
+      "salesChart",
       "pipelineChart",
       "pendingTasks",
       "upcomingTasks",
-       "quickActions",
+      "quickActions",
       "completedTasks",
     ]);
 
@@ -471,15 +536,15 @@ function Dashboard() {
       window.removeEventListener("popstate", handleBackButton);
     };
   }, [navigate]);
-  
-  useEffect(() => {
-     getLeadSummaryReport();
-  },[companyPipelineView])
 
   useEffect(() => {
-     setMonthlyAverageLeads([]);
+    getLeadSummaryReport();
+  }, [companyPipelineView]);
+
+  useEffect(() => {
+    setMonthlyAverageLeads([]);
     getLeadsMonthlyAverage();
-  },[currentYear,companyPipelineView])
+  }, [currentYear, companyPipelineView]);
 
   useEffect(() => {
     if (currentTime) {
@@ -495,12 +560,11 @@ function Dashboard() {
       <div key="metricCards" className="grid grid-cols-1 xl:grid-cols-1 gap-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
           <MetricCard
-            title="Total Leads"
-            value={
-              leadSummaryReportData
-                ? leadSummaryReportData.totalLeads.toString()
-                : "0"
-            }
+            title="Total Lead"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_LEADS]?.[0]
+                ?.total_leads ?? 0
+            ).toString()}
             icon={Users}
             color="bg-gradient-to-r from-cyan-500 to-cyan-600"
             gradient="bg-gradient-to-r from-cyan-500 to-cyan-600"
@@ -514,11 +578,10 @@ function Dashboard() {
           />
           <MetricCard
             title="Active Deals"
-            value={
-              leadSummaryReportData
-                ? leadSummaryReportData.totalActiveLeads.toString()
-                : "0"
-            }
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_ACTIVE_LEADS]?.[0]
+                ?.active_leads ?? 0
+            ).toString()}
             icon={Target}
             color="bg-gradient-to-r from-emerald-500 to-emerald-600"
             gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
@@ -531,12 +594,12 @@ function Dashboard() {
             }
           />
           <MetricCard
-            title="Closed Won Leads"
-            value={
-              leadSummaryReportData
-                ? leadSummaryReportData.totalConvertedLeads.toString()
-                : "0"
-            }
+            title="Converted Leads"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERTED_LEADS
+              ]?.[0]?.converted_leads ?? 0
+            ).toString()}
             icon={WineIcon}
             color="bg-gradient-to-r from-blue-500 to-blue-600"
             gradient="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -550,11 +613,11 @@ function Dashboard() {
           />
           <MetricCard
             title="Unqualified Deals"
-            value={
-              leadSummaryReportData
-                ? leadSummaryReportData.totalUnqualifiedLeads.toString()
-                : "0"
-            }
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_UNQUALIFIED_LEADS
+              ]?.[0]?.unqualified_leads ?? 0
+            ).toString()}
             icon={ShieldAlert}
             color="bg-gradient-to-r from-teal-500 to-teal-600"
             gradient="bg-gradient-to-r from-teal-500 to-teal-600"
@@ -569,9 +632,8 @@ function Dashboard() {
           <MetricCard
             title="Lost Deals"
             value={
-              leadSummaryReportData
-                ? leadSummaryReportData.totalLostLeads.toString()
-                : "0"
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_LOST_LEADS]?.[0]
+                ?.lost_leads ?? 0
             }
             icon={AlertCircleIcon}
             color="bg-gradient-to-r from-red-500 to-red-600"
@@ -584,14 +646,14 @@ function Dashboard() {
                 : false
             }
           />
-          
+
           <MetricCard
             title="Conversion Rate"
-            value={`${
-              leadSummaryReportData
-                ? leadSummaryReportData.conversionRate.toString()
-                : "0.0"
-            }%`}
+            value={`${(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERSION_RATE
+              ]?.[0]?.conversion_rate ?? 0
+            ).toString()}%`}
             icon={TrendingUp}
             color="bg-gradient-to-r from-orange-500 to-orange-600"
             gradient="bg-gradient-to-r from-orange-500 to-orange-600"
@@ -606,6 +668,7 @@ function Dashboard() {
         </div>
       </div>
     ),
+
     pipelineChart: (
       <div
         key="pipelineChart"
@@ -614,10 +677,10 @@ function Dashboard() {
         <div className="min-h-0">
           {leadSummaryReportData && (
             <PipelineChart
-            view={companyPipelineView ? "Company" : "Self"}
-            handleViewChange={() => {
-              setCompanyPipelineView(!companyPipelineView);
-            }}
+              view={companyPipelineView ? "Company" : "Self"}
+              handleViewChange={() => {
+                setCompanyPipelineView(!companyPipelineView);
+              }}
               leadSummaryData={leadSummaryReportData}
             />
           )}
@@ -634,11 +697,11 @@ function Dashboard() {
     ),
     salesChart: (
       <div key="salesChart" className="min-h-[500px]">
-        <SalesChart 
-        leadsData={monthlyAverageLeads}
-        currentYear={currentYear}
-        handleNextYear={handleNextYear}
-        handlePrevYear={handlePrevYear}
+        <SalesChart
+          leadsData={monthlyAverageLeads}
+          currentYear={currentYear}
+          handleNextYear={handleNextYear}
+          handlePrevYear={handlePrevYear}
         />
       </div>
     ),
@@ -706,7 +769,6 @@ function Dashboard() {
         (visibility) => visibility.key === currentSectionId
       )!.value;
 
-
       if (currentComponent && cond) {
         if (currentSectionId !== "metricCards") {
           const nextId = layoutIterator.next().value;
@@ -739,18 +801,20 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
-      {isTasksLoading && (
-        <div className="flex min-w-full justify-center items-center mt-16 pt-48 text-gray-600 text-lg">
-       <LoadingSpinner></LoadingSpinner>
-        </div>
-      )}
-      {!isTasksLoading && (
-        <div className="max-w-full p-6 mx-auto space-y-14">
-          {renderDashboardSections()}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+        {isTasksLoading && (
+          <div className="flex min-w-full justify-center items-center mt-16 pt-48 text-gray-600 text-lg">
+            <LoadingSpinner></LoadingSpinner>
+          </div>
+        )}
+        {!isTasksLoading && (
+          <div className="max-w-full p-6 mx-auto space-y-14">
+            {renderDashboardSections()}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
