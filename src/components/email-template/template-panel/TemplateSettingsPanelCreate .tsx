@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef } from "react";
 import { useEditor } from "@craftjs/core";
 import axios from "axios";
