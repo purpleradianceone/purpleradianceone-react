@@ -120,6 +120,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             endDateSubscription: "",
             startDateSubscription: "",
             subscriptionId: 0,
+            isSuperUser: false,
           });
 
           setNotificationCount(0);
