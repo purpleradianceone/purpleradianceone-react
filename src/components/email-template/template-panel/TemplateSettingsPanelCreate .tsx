@@ -1,24 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef } from 'react';
-import { useEditor } from '@craftjs/core';
-import axios from 'axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDynamicFields } from '../DynamicFieldsContext';
-import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
-import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
-import POST_API from '../../../constants/PostApi';
-import {  STATUS_CODE } from '../../../constants/AppConstants';
-import ROUTES_URL from '../../../constants/Routes';
-
+import React, { useState, useRef } from "react";
+import { useEditor } from "@craftjs/core";
+import axios from "axios";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useDynamicFields } from "../DynamicFieldsContext";
+import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import POST_API from "../../../constants/PostApi";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import ROUTES_URL from "../../../constants/Routes";
+import toast from "react-hot-toast";
 
 type TemplateSettingsPanelEditProps = {
   htmlTemplateTypeSubjectPlaceholder: string;
 };
 
-export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditProps>  = ({htmlTemplateTypeSubjectPlaceholder}) => {
+export const TemplateSettingsPanelCreate: React.FC<
+  TemplateSettingsPanelEditProps
+> = ({ htmlTemplateTypeSubjectPlaceholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [subject, setSubject] = useState('');
+  const [templateName, setTemplateName] = useState("");
+  const [subject, setSubject] = useState("");
   const subjectInputRef = useRef<HTMLInputElement>(null);
   const [isDefault, setIsDefault] = useState(false);
 
@@ -26,8 +27,6 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
   const navigate = useNavigate();
 
   const { query } = useEditor();
-  
-  
 
   const insertDynamicField = (field: string) => {
     const placeholder = `${field}`;
@@ -43,7 +42,10 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
 
     // Move cursor after inserted text
     setTimeout(() => {
-      input.setSelectionRange(start + placeholder.length, start + placeholder.length);
+      input.setSelectionRange(
+        start + placeholder.length,
+        start + placeholder.length
+      );
       input.focus();
     }, 0);
   };
@@ -53,56 +55,66 @@ export const TemplateSettingsPanelCreate : React.FC<TemplateSettingsPanelEditPro
     return json;
   }
 
-function getHtmlEmailBody(): string {
+  function getHtmlEmailBody(): string {
     const canvasElement = document.getElementById("CANVAS");
-    if (!canvasElement) return "" ;
+    if (!canvasElement) return "";
     const json = query.serialize();
-  
 
     const html = craftJsonToHtml(json).trim();
-      return html;
+    return html;
+  }
+
+  const { loginStatus } = useLoggedInUserContext();
+  const [searchParams] = useSearchParams();
+  const params = searchParams.get("type");
+
+  const createEmailTemplateCreate = async (
+    emailBody: string,
+    resultJson: string
+  ) => {
+    const postDataCreateEmailTemplate = {
+      company_id: loginStatus.companyId,
+      createdby_id: loginStatus.id,
+      email_type_id: JSON.parse(params!).id,
+      name: templateName,
+      email_subject: subject,
+      email_body_html: emailBody,
+      email_body_json: resultJson,
+      is_default: isDefault,
     };
 
-    const {loginStatus} = useLoggedInUserContext();
-    const [searchParams] = useSearchParams();
-    const params = searchParams.get("type");
-
-       const createEmailTemplateCreate = async(emailBody:string, resultJson:string)=>{
-                    const postDataCreateEmailTemplate = {
-                          "company_id":loginStatus.companyId,
-                          "createdby_id":loginStatus.id,
-                          "email_type_id":JSON.parse(params!).id,
-                          "name":templateName,
-                          "email_subject":subject,
-                          "email_body_html":emailBody,
-                          "email_body_json":resultJson,
-                          "is_default":isDefault
-                    }                   
-
-              await axios.post(POST_API.CREATE_EMAIL_TEMPLATE,postDataCreateEmailTemplate,{
-                        withCredentials:true
-                })
-                .then((response) =>{
-                      if(response.status === STATUS_CODE.OK){
-                          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`)
-                        }
-                        // alert(response.data.message);
-                        
-                }).catch((error)=>{
-                  console.error(error.toString())
-                })
-        }
-  
-        if (dynamicFields.length === 0) {
-          return (
-            <div
-              style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}
-            >
-              Loading dynamic fields...
-            </div>
+    await axios
+      .post(POST_API.CREATE_EMAIL_TEMPLATE, postDataCreateEmailTemplate, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          if (response.data.status) {
+            toast.success(response.data.message);
+          } else {
+            toast.error(response.data.message);
+          }
+          navigate(
+            `${ROUTES_URL.EMAIL_TEMPLATE}`
           );
+          // navigate(
+          //   `${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`
+          // );
         }
+        // alert(response.data.message);
+      })
+      .catch((error) => {
+        console.error(error.toString());
+      });
+  };
 
+  if (dynamicFields.length === 0) {
+    return (
+      <div style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}>
+        Loading dynamic fields...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -350,9 +362,6 @@ function getHtmlEmailBody(): string {
           </form>
         </div>
       )}
-      
     </>
-    
   );
-  
 };

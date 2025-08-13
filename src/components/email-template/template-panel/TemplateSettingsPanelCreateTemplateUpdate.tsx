@@ -1,27 +1,32 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef } from 'react';
-import { useDynamicFields } from '../DynamicFieldsContext'; 
-import { useEditor } from '@craftjs/core';
-import { useLoggedInUserContext } from '../../../context/user/LoggedInUserContext';
-import POST_API from '../../../constants/PostApi';
-import axios from 'axios';
-import {  STATUS_CODE } from '../../../constants/AppConstants';
-import { useNavigate, } from 'react-router-dom';
-import { craftJsonToHtml } from '../template-util/CraftJsonToHtml';
-import ROUTES_URL from '../../../constants/Routes';
-
+import React, { useState, useRef } from "react";
+import { useDynamicFields } from "../DynamicFieldsContext";
+import { useEditor } from "@craftjs/core";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import POST_API from "../../../constants/PostApi";
+import axios from "axios";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import { useNavigate } from "react-router-dom";
+import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
+import ROUTES_URL from "../../../constants/Routes";
+import toast from "react-hot-toast";
 
 type TemplateSettingsPanelUpdateProps = {
   id: number;
   templateTypeId: number;
   emailTemplateName: string;
-  emailTemplateSubject:string;
-  emailTemplateIsDefault:boolean;
-
-
+  emailTemplateSubject: string;
+  emailTemplateIsDefault: boolean;
 };
 
-export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettingsPanelUpdateProps>  = ({id,templateTypeId, emailTemplateName, emailTemplateSubject, emailTemplateIsDefault}) => {
+export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
+  TemplateSettingsPanelUpdateProps
+> = ({
+  id,
+  templateTypeId,
+  emailTemplateName,
+  emailTemplateSubject,
+  emailTemplateIsDefault,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [templateName, setTemplateName] = useState(emailTemplateName);
   const [subject, setSubject] = useState(emailTemplateSubject);
@@ -31,9 +36,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettin
 
   const dynamicFields = useDynamicFields();
 
-    const { query } = useEditor();
-  
-  
+  const { query } = useEditor();
 
   const insertDynamicField = (field: string) => {
     const placeholder = `${field}`;
@@ -49,62 +52,66 @@ export const TemplateSettingsPanelCreateTemplateUpdate : React.FC<TemplateSettin
 
     // Move cursor after inserted text
     setTimeout(() => {
-      input.setSelectionRange(start + placeholder.length, start + placeholder.length);
+      input.setSelectionRange(
+        start + placeholder.length,
+        start + placeholder.length
+      );
       input.focus();
     }, 0);
   };
-function getHtmlEmailBody(): string {
+  function getHtmlEmailBody(): string {
     const canvasElement = document.getElementById("CANVAS");
-    if (!canvasElement) return "" ;
+    if (!canvasElement) return "";
     const json = query.serialize();
     const html = craftJsonToHtml(json).trim();
-      return html;
+    return html;
+  }
+
+  const { loginStatus } = useLoggedInUserContext();
+  const updateEmailTemplate = async (emailBody: string) => {
+    const json = query.serialize();
+    const postDataUpdateEmailTemplate = {
+      company_id: loginStatus.companyId,
+      updatedby_id: loginStatus.id,
+      id: id,
+      email_type_id: templateTypeId,
+      name: templateName,
+      email_subject: subject,
+      email_body_html: emailBody,
+      email_body_json: json,
+      is_default: isDefault,
     };
 
-    const {loginStatus} = useLoggedInUserContext();
-    const updateEmailTemplate = async(emailBody:string)=>{
-
-                    const json = query.serialize();
-                    const postDataUpdateEmailTemplate = {
-                      company_id: loginStatus.companyId,
-                      updatedby_id: loginStatus.id,
-                      id:id,
-                      email_type_id: templateTypeId,
-                      name: templateName,
-                      email_subject: subject,
-                      email_body_html: emailBody,
-                      email_body_json: json,
-                      is_default: isDefault,
-                    };                   
-
-              await axios
-                .post(
-                  POST_API.UPDATE_EMAIL_TEMPLATE,
-                  postDataUpdateEmailTemplate,
-                  {
-                    withCredentials: true,
-                  }
-                )
-                .then((response) => {
-                  
-                  if (response.status === STATUS_CODE.OK) {
-                    navigate(`${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`);
-                  }
-                })
-                .catch((error) => {
-                  console.error(error.toString())
-                });
+    await axios
+      .post(POST_API.UPDATE_EMAIL_TEMPLATE, postDataUpdateEmailTemplate, {
+        withCredentials: true,
+      })
+      .then((response) => {
+       
+        navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
+        if (response.status === STATUS_CODE.OK) {
+           if (response.data.status) {
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
         }
-        if (dynamicFields.length === 0) {
-          return (
-            <div
-              style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}
-            >
-              Loading dynamic fields...
-            </div>
+          navigate(
+            `${ROUTES_URL.EMAIL_TEMPLATE}`
           );
         }
-  
+      })
+      .catch((error) => {
+        console.error(error.toString());
+      });
+  };
+  if (dynamicFields.length === 0) {
+    return (
+      <div style={{ padding: "8px", background: "#f0f0f0", color: "#666" }}>
+        Loading dynamic fields...
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Fixed Button to Open Settings */}
@@ -349,7 +356,6 @@ function getHtmlEmailBody(): string {
           </form>
         </div>
       )}
-      
     </>
   );
 };
