@@ -6,6 +6,7 @@ type CompanyUserAgGridProps = {
   handleSelectedCompanyUserChange: (params: CompanyUser) => void;
   handleIdIsEditModalOpen: (params: boolean) => void;
   handleIsAccessModalOpen: (params: boolean) => void;
+  handleIsDashboardModalOpen: (params: boolean) => void;
 };
 
 export default CompanyUserAgGridProps;

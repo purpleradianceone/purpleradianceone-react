@@ -11,14 +11,13 @@ import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
-import {
-  JSX_CHILDREN_NAME,
-  SIZE,
-} from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
+
+import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
 
 function GetCompanyUsersList({
   users,
@@ -28,31 +27,29 @@ function GetCompanyUsersList({
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
 }: GetCompanyUsersListProps) {
-  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
-    false
-  );
-  const [isEditCompanyUserModalOpen, setIsEditModalOpen] = useState<boolean>(
-    false
-  );
+  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
+
+  const [isDashboardModalOpen, setIsDashboardModalOpen] =
+    useState<boolean>(false);
+
+  const [isEditCompanyUserModalOpen, setIsEditModalOpen] =
+    useState<boolean>(false);
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
     useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
     useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    false
-  );
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState(false);
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const {
-    userHasAccessToAddUser,
-    userHasAccessToViewUser,
-  } = useUserAccessModules();
+  const { userHasAccessToAddUser, userHasAccessToViewUser } =
+    useUserAccessModules();
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -88,6 +85,9 @@ function GetCompanyUsersList({
     setIsAccessModalOpen(status);
   };
 
+  const handleIsDashboardModalOpen = (status: boolean) => {
+    setIsDashboardModalOpen(status);
+  };
   return (
     userHasAccessToViewUser && (
       <div className="w-full h-screen pt-1 pl-5 pr-1 gap-1">
@@ -107,7 +107,6 @@ function GetCompanyUsersList({
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
                     onChange={(e) => {
-                      
                       handleSearchOption.handleSearchParameterChange(
                         e.target.value
                       );
@@ -151,7 +150,6 @@ function GetCompanyUsersList({
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
-                    
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value
                     );
@@ -290,11 +288,7 @@ function GetCompanyUsersList({
           {userHasAccessToAddUser ? (
             <>
               <div className="flex gap-1">
-                <Button
-                  onClick={() =>
-                    setIsAddCompanyUserModalOpen(true)
-                  }
-                >
+                <Button onClick={() => setIsAddCompanyUserModalOpen(true)}>
                   {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                   {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
@@ -302,9 +296,7 @@ function GetCompanyUsersList({
               </div>
               <AddCompanyUserModal
                 isOpen={isAddCompanyUserModalOpen}
-                onClose={() =>
-                  setIsAddCompanyUserModalOpen(false)
-                }
+                onClose={() => setIsAddCompanyUserModalOpen(false)}
               />
               <EditCompanyUserModal
                 handleCompanyUserChange={handleCompanyUserChangeOnEdit}
@@ -313,6 +305,14 @@ function GetCompanyUsersList({
                   setIsEditModalOpen(false);
                 }}
                 user={selectedCompanyUser}
+              />
+
+              <CompanyUserDashboardModal
+                isOpen={isDashboardModalOpen}
+                onClose={() => {
+                  setIsDashboardModalOpen(false);
+                }}
+                users={selectedCompanyUser}
               />
             </>
           ) : (
@@ -327,18 +327,17 @@ function GetCompanyUsersList({
           )}
         </div>
 
-
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
             className="ag-theme-alpine w-full"
             style={{ height: "80%", width: "100%" }}
           >
-
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               users={users}
               handleIdIsEditModalOpen={handleIdIsEditModalOpen}
               handleIsAccessModalOpen={handleIsAccessModalOpen}
+              handleIsDashboardModalOpen={handleIsDashboardModalOpen}
             />
           </div>
           <CompanyUserAccessManagementModal
@@ -349,7 +348,6 @@ function GetCompanyUsersList({
         </div>
         {/* pagination component */}
         <div className="flex items-center justify-end ">
-
           <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}

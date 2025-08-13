@@ -120,12 +120,16 @@ function LeadTaskTabs({
               className:
                 "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
             }}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {data.map(({ label, value , taskId}) => (
               <Tab
                 placeholder="All Tasks"
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+            onResizeCapture={undefined}
                 key={value}
                 value={value}
                 onClick={() => {
@@ -149,6 +153,8 @@ function LeadTaskTabs({
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {data.map(({ value, desc }) => (
               <TabPanel key={value} value={value}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
@@ -21,7 +22,6 @@ import LeadManagement from "../../components/views/lead-management/LeadManagemen
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
 import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
-import Dashboard from "../../components/views/home/dashboard/Dashboard";
 import CreateSubscription from "../../components/subscription-module/CreateSubscription";
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
@@ -54,6 +54,9 @@ import AboutUs from "../../components/views/home/landing-page/AboutUs";
 import Pricing from "../../components/views/home/landing-page/Pricing";
 import CareersPage from "../../components/views/home/landing-page/Carrers";
 import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
+import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
+import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
+import Home from "../../components/views/home/dashboard/Home";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +66,14 @@ export const router = createBrowserRouter([
   {
     path: ROUTES_URL.DOWNLOAD_APP,
     element: <DownloadAppPage></DownloadAppPage>,
+  },
+   {
+    path: ROUTES_URL.NOT_AUTHORIZED,
+    element: <NotAuthorized></NotAuthorized>,
+  },
+  {
+    path: ROUTES_URL.SETTINGS_ALREADY_EXISTS,
+    element: <SettingsAlreadyExists></SettingsAlreadyExists>,
   },
   {
     path: ROUTES_URL.LANDING_PAGE,
@@ -194,7 +205,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div className="min-h-95vh">
             <Navbar>
-              <Dashboard></Dashboard>
+              <Home/>
             </Navbar>
           </div>
         </PrivateRoute>

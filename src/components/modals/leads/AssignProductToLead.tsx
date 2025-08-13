@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import React, { useEffect, useState } from "react";
 import InterestType from "../../../@types/lead-management/InterestType";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -11,14 +11,11 @@ import AssignProductToLeadType, {
   ItemData,
 } from "../../../@types/lead-management/AssignProductToLeadType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
+import toast from "react-hot-toast";
 
 const AssignProductToLead = ({
   selectedLeadData,
@@ -40,20 +37,6 @@ const AssignProductToLead = ({
   const { loginStatus } = useLoggedInUserContext();
 
   const [showSaveButton, SetShowSaveButton] = useState<boolean>(false);
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   //this state is used for getting data
   const [itemData, setItemData] = React.useState<ItemData[]>([]);
@@ -80,17 +63,11 @@ const AssignProductToLead = ({
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          toast.success(response.data.message)
            fetchLeadCompanyProduct();
         }
         if (response.data.status === false) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
         //delay before closing
         setTimeout(() => {
@@ -194,14 +171,6 @@ const AssignProductToLead = ({
           </div>
         </div>
       </div>
-
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </div>
   );
 };
