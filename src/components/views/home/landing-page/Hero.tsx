@@ -30,6 +30,7 @@ function Hero() {
       endDateSubscription: "",
       startDateSubscription: "",
       subscriptionId: 0,
+      isSuperUser : false
     });
   },[])
 
