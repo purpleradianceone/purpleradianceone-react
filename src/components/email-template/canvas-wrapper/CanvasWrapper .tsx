@@ -8,70 +8,86 @@ export const CanvasWrapper = () => {
 
   useEffect(() => {
     const checkCanvasEmpty = () => {
-      const serialized = query.serialize(); // returns a string
-      const data = JSON.parse(serialized); // convert to object
-      const result = isCanvasTrulyEmpty(data);
+      const serialized = query.serialize();
+      const data = JSON.parse(serialized);
+      const result = isCanvasTrulyEmpty(data, "ROOT");
       setIsEmpty(result);
     };
 
     checkCanvasEmpty();
-    const interval = setInterval(checkCanvasEmpty, 500); // keep checking
-
+    const interval = setInterval(checkCanvasEmpty, 500);
     return () => clearInterval(interval);
   }, [query]);
 
   return (
-    <Frame>
-      <Element
-        is="div"
-        canvas
-        id="ROOT"
+    <div style={{ position: "relative" }}>
+      {/* Canvas frame */}
+      <Frame>
+        <Element
+          is="div"
+          canvas
+          id="ROOT"
+          style={{
+            minWidth: "700px",
+            minHeight: "800px",
+            border: "1px dashed #ccc",
+            padding: "70px",
+            position: "relative",
+          }}
+        />
+      </Frame>
+
+      {/* Floating overlay message outside the Element */}
+      <div
         style={{
-          minWidth: "700px",
-          minHeight: "800px",
-          border: "1px dashed #ccc",
-          padding: "70px",
-          position: "relative",
+          position: "absolute",
+          top: "30%",
+          left: "20%",
+          transform: "translate(-50%, -50%)",
+          fontSize: "18px",
+          color: "#999",
+          textAlign: "center",
+          pointerEvents: "none",
+          opacity: isEmpty ? 1 : 0,
+          transition: "opacity 0.3s ease",
+          zIndex: isEmpty ? 1 : -1, // hide from interaction when invisible
         }}
       >
-        {isEmpty && (
-          <div
-            style={{
-              position: "absolute",
-              top: "30%",
-              left: "20%",
-              transform: "translate(-50%, -50%)",
-              fontSize: "18px",
-              color: "#999",
-              textAlign: "center",
-              pointerEvents: "none",
-              opacity: isEmpty?1:0,
-              transition: "opacity 0.3s ease, z-index 0.3s ease",
-            }}
-          >
-            📦 Drag the blocks here 👉
-          </div>
-        )}
-      </Element>
-    </Frame>
+        📦 Drag the blocks here 👉
+      </div>
+    </div>
   );
 };
 
-function isCanvasTrulyEmpty(data: any): boolean {
-  const childNodeIds = data?.ROOT?.nodes || [];
+/**
+ * Recursively checks whether a given node ID has any non-placeholder children.
+ */
+function isCanvasTrulyEmpty(data: any, nodeId: string): boolean {
+  const node = data[nodeId];
+  if (!node || !node.nodes) return true;
 
-  // Check if there are only placeholders
-  const realNodes = childNodeIds.filter((id: string) => {
-    const node = data[id];
-    const children = node?.props?.children;
+  for (const childId of node.nodes) {
+    const child = data[childId];
+    if (!child) continue;
 
-    // If this is the placeholder, skip it
-    if (typeof children === "string" && children.includes("Drag the blocks in this box")) {
+    // If child has text content that's not placeholder
+    const children = child?.props?.children;
+    if (
+      typeof children === "string" &&
+      children.trim() !== "" &&
+      !children.includes("Drag the blocks in this box")
+    ) {
       return false;
     }
 
-    return true; // keep real nodes
-  });
+    // If this child has deeper children, check them recursively
+    if (child.nodes && child.nodes.length > 0) {
+      if (!isCanvasTrulyEmpty(data, childId)) {
+        return false;
+      }
+    }
+  }
 
-  return realNodes.length === 0;
+  // If we looped through all children and found nothing
+  return node.nodes.length === 0;
 }

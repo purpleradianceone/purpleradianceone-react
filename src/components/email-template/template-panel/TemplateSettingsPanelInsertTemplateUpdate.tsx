@@ -8,6 +8,7 @@ import POST_API from '../../../constants/PostApi';
 import { STATUS_CODE } from '../../../constants/AppConstants';
 import { useNavigate, } from 'react-router-dom';
 import ROUTES_URL from '../../../constants/Routes';
+import toast from 'react-hot-toast';
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -70,8 +71,13 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<TemplateSetting
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          if(response.data.status){
+            toast.success(response.data.message);
+          }else{
+            toast.error(response.data.message);
+          }
           navigate(
-            `${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`
+            `${ROUTES_URL.EMAIL_TEMPLATE}`
           );
         }
       })
