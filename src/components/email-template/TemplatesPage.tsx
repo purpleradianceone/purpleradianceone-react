@@ -7,7 +7,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
-import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import {
   Eye,
   Edit2,
@@ -33,14 +33,10 @@ import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePag
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import EmailTemplate from "../../@types/email-template/EmailTemplateType";
 import { Switch } from "@headlessui/react"; // Or use your own styled switch
-import MessageSnackBar from "../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../constants/Messages";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 type TemplateType = {
   id: number;
@@ -93,20 +89,7 @@ export const TemplatesPage: React.FC = () => {
       },
     });
 
-  //message snakbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  
 
   const handleTemplateCreate = (type: string) => {
     setShowModal(false);
@@ -144,10 +127,20 @@ export const TemplatesPage: React.FC = () => {
           setHasMoreTemplates(false);
         }
       }
-    } catch (error : ApiError | any) {
-      if(error.status === STATUS_CODE.UNATHORISED){
-        const refreshTokenResponse = await RefreshToken({callFunction:getTemplateTypes});
-        if(refreshTokenResponse){
+      if (response.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunction: getTemplateTypes,
+        });
+        if (refreshTokenResponse) {
+          getTemplateTypes();
+        }
+      }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunction: getTemplateTypes,
+        });
+        if (refreshTokenResponse) {
           getTemplateTypes();
         }
       }
@@ -200,14 +193,23 @@ export const TemplatesPage: React.FC = () => {
         } else {
           setHasMoreTemplates(false);
         }
-      } catch (error : ApiError | any) {
-        
+        if (response.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: getTemplatesOfCompany,
+          });
+          if (refreshTokenResponse) {
+            getTemplatesOfCompany({ typeId, reset });
+          }
+        }
+      } catch (error: ApiError | any) {
         setHasMoreTemplates(false);
-        if(error.status === STATUS_CODE.UNATHORISED){
-            const refreshTokenResponse = await RefreshToken({callFunctionWithTwoParamsNotEvent:getTemplatesOfCompany})
-            if(refreshTokenResponse){
-              getTemplatesOfCompany({typeId, reset})
-            }
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: getTemplatesOfCompany,
+          });
+          if (refreshTokenResponse) {
+            getTemplatesOfCompany({ typeId, reset });
+          }
         }
       } finally {
         setLoadingTemplates(false);
@@ -238,15 +240,18 @@ export const TemplatesPage: React.FC = () => {
     }
   };
 
-
   const [searchParams] = useSearchParams();
   const message = searchParams.get("message");
   const status = searchParams.get("status");
 
   useEffect(() => {
     getTemplateTypes();
-    if(message && status){
-      showMessageSnackbar({message:message,type:status==="true"?"success":"error"})
+    if (message && status) {
+      toast.success(message);
+    } else {
+      if (message && !status) {
+        toast.error(message);
+      }
     }
   }, []); // Dependency on loginStatus is appropriate here
 
@@ -497,15 +502,8 @@ export const TemplatesPage: React.FC = () => {
           <Sidebar
             onCreate={() => setShowModal(true)}
             handleAccessDenied={(message: string) => {
-              showMessageSnackbar({ message: message, type: "error" });
+              toast.error(message);
             }}
-          />
-          <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
           />
         </div>
       </div>
@@ -530,12 +528,7 @@ export const TemplatesPage: React.FC = () => {
               hasmore={hasMoreTemplates}
               selectedTypeId={selectedTypeId}
               reset={refresh}
-              handleAccessDenied={({
-                message,
-                type,
-              }: ShowMessageSnackbarProps) => {
-                showMessageSnackbar({ message: message, type: type });
-              }}
+            
             />
           </div>
           {showModal && (
@@ -604,14 +597,12 @@ const Tabs: React.FC<TabsProps> = ({
   </div>
 );
 
-
 type TemplateListProps = {
   templates: EmailTemplate[];
   loading: boolean;
   hasmore: boolean;
   selectedTypeId: number;
   reset: () => void;
-  handleAccessDenied: ({ message, type }: ShowMessageSnackbarProps) => void;
 };
 
 const TemplateList: React.FC<TemplateListProps> = ({
@@ -619,7 +610,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
   loading,
   hasmore,
   reset,
-  handleAccessDenied,
 }) => {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
     null
@@ -639,10 +629,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
   const { loginStatus } = useLoggedInUserContext();
   const handleDefaultToggle = async (template: EmailTemplate) => {
     if (!userHasAccessToUpdateEmailTemplateSetting) {
-      handleAccessDenied({
-        message: "You don't have access to update the default status.",
-        type: "error",
-      });
+      toast.error("You don't have access to update the default status.")
       return;
     }
 
@@ -667,26 +654,24 @@ const TemplateList: React.FC<TemplateListProps> = ({
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
             reset();
-            handleAccessDenied({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
+            
           }
         })
-        .catch(async(error : ApiError | any) => {
-            if(error.status === STATUS_CODE.UNATHORISED) {
-              const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent:handleDefaultToggle});
-              if(refreshTokenResponse){
-                handleDefaultToggle(template);
-              }
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunctionWithParamsNotEvent: handleDefaultToggle,
+            });
+            if (refreshTokenResponse) {
+              handleDefaultToggle(template);
             }
+          }
         });
     } catch (error) {
       console.error("Failed to update default status:", error);
-      handleAccessDenied({
-        message: "Failed to update default status.",
-        type: "error",
-      });
+      toast.error("Failed to update default status.");
+     
     } finally {
       // setUpdatingDefaultId(null);
     }
@@ -722,7 +707,8 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   className="text-green-500 hover:text-green-700 transition"
                   aria-label={`Edit ${template.name}`}
                   disabled={
-                    !userHasAccessToUpdateEmailTemplateSetting || template.is_master
+                    !userHasAccessToUpdateEmailTemplateSetting ||
+                    template.is_master
                   }
                   onClick={() => {
                     if (
@@ -731,12 +717,10 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     ) {
                       handleEditTemplate(template);
                     } else {
-                      handleAccessDenied({
-                        message: template.is_master
+                      toast.error( template.is_master
                           ? "Can't Update Master Templates!"
-                          : "You don't have access!",
-                        type: "error",
-                      });
+                          : "You don't have access!",);
+                      
                     }
                   }}
                 >
@@ -880,6 +864,14 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
           // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
           // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
         }
+        if (response.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: fetchTypes,
+          });
+          if (refreshTokenResponse) {
+            fetchTypes();
+          }
+        }
       } catch (error) {
         console.error("Error fetching template types for modal:", error);
       } finally {
@@ -900,7 +892,7 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
     <div className="flex justify-center items-center h-full">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
-  ) :(
+  ) : (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>

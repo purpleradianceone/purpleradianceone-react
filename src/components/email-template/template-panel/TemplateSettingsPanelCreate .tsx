@@ -122,15 +122,11 @@ export const TemplateSettingsPanelCreate: React.FC<
       <button
         onClick={() => setIsOpen(true)}
         style={{
-          position: "fixed",
-          top: "125px",
-          right: 0,
           padding: "3px 8px",
           backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
-          zIndex: 1,
         }}
       >
         Save Template
