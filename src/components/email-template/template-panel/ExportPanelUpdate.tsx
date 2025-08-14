@@ -1,16 +1,22 @@
-
 // ExportPanel.tsx
 import React from "react";
 import { useEditor } from "@craftjs/core";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
+import toast from "react-hot-toast";
+import {
+  TemplateSettingsPanelCreateTemplateUpdate,
+  TemplateSettingsPanelUpdateProps,
+} from "./TemplateSettingsPanelCreateTemplateUpdate";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
   onCopyHtml?: (html: string) => void;
+  templateSettingsPanelUpdateProps: TemplateSettingsPanelUpdateProps;
 }
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({
+export const ExportPanelUpdate: React.FC<ExportPanelProps> = ({
   onPreview,
+  templateSettingsPanelUpdateProps,
 }) => {
   const { query } = useEditor();
 
@@ -30,10 +36,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     navigator.clipboard
       .writeText(html)
       .then(() => {
-        alert("HTML copied to clipboard!");
+        toast.success("HTML copied to clipboard!");
       })
       .catch(() => {
-        alert("Failed to copy HTML");
+        toast.error("Failed to copy HTML");
       });
   };
 
@@ -67,6 +73,20 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
       >
         Copy HTML
       </button>
+
+      {templateSettingsPanelUpdateProps.templateTypeId && (
+        <TemplateSettingsPanelCreateTemplateUpdate
+          id={templateSettingsPanelUpdateProps.id}
+          templateTypeId={templateSettingsPanelUpdateProps.templateTypeId}
+          emailTemplateName={templateSettingsPanelUpdateProps.emailTemplateName}
+          emailTemplateSubject={
+            templateSettingsPanelUpdateProps.emailTemplateSubject
+          }
+          emailTemplateIsDefault={
+            templateSettingsPanelUpdateProps.emailTemplateIsDefault
+          }
+        />
+      )}
     </div>
   );
 };

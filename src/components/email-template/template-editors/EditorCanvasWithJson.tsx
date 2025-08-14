@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { Editor, } from "@craftjs/core";
+import { Editor } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -19,32 +19,26 @@ import { LucideCode, LucideMail } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
-import { TemplateSettingsPanelCreateTemplateUpdate } from "../template-panel/TemplateSettingsPanelCreateTemplateUpdate";
 import { GenericBlock } from "../template-blocks/GenericBlock";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
 import { TemplateSettingsPanelInsertTemplateUpdate } from "../template-panel/TemplateSettingsPanelInsertTemplateUpdate";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import {
   convertPlaceholdersToFields,
   convertPlaceholdersToObject,
   PlaceholderItem,
 } from "../template-util/PlaceHolderDataToPlaceHolderRecord";
 import { CanvasWrapperWithJson } from "../canvas-wrapper/CanvasWrapperWithJson";
-
+import toast from "react-hot-toast";
+import { ExportPanelUpdate } from "../template-panel/ExportPanelUpdate";
 
 export const EditorCanvasWithJson = () => {
-  const canvasBgColor="#f9f9f9";
+  const canvasBgColor = "#f9f9f9";
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
@@ -142,7 +136,7 @@ export const EditorCanvasWithJson = () => {
           });
           if (refreshTokenResponse) {
             getTemplateToUpdate({ emailTemplateId, templateTypeId });
-          } 
+          }
         }
       })
       .finally(() => {
@@ -164,8 +158,10 @@ export const EditorCanvasWithJson = () => {
     }
   }, []);
 
-  const parsedPlaceHolders: Record<string, string> = convertPlaceholdersToObject(placeHolderData);
-  const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(parsedPlaceHolders);
+  const parsedPlaceHolders: Record<string, string> =
+    convertPlaceholdersToObject(placeHolderData);
+  const [dynamicVars, setDynamicVars] =
+    useState<Record<string, string>>(parsedPlaceHolders);
 
   const handlePreview = (html: string) => {
     let replacedHtml = html;
@@ -177,9 +173,8 @@ export const EditorCanvasWithJson = () => {
     setIsPreviewOpen(true);
   };
 
-  
-
-  const parsedFields: DynamicFieldOption[] = convertPlaceholdersToFields(placeHolderData);
+  const parsedFields: DynamicFieldOption[] =
+    convertPlaceholdersToFields(placeHolderData);
 
   //FOR HANDALING INSERT HTML TEMPLATES
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -207,30 +202,13 @@ export const EditorCanvasWithJson = () => {
     setPreviewHtml(updatedHtml);
   };
 
-  //message snakbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  //for instruction
-
   return isLoading ? (
     <div className="flex justify-center items-center h-full">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
     <>
-      <div className="fixed z-10 top-12 left-14 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm mb-1.5 w-fit p-2">
+      <div className="fixed z-10 top-14 left-14 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm mb-1.5 w-fit p-2">
         <div className="flex gap-1">
           <LucideMail className="w-6 h-6 text-blue-600" />
           <LucideCode className="w-4 h-4 text-blue-600" />
@@ -241,20 +219,13 @@ export const EditorCanvasWithJson = () => {
             </span>
           )}
         </div>
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
       </div>
 
       <button
         onClick={() => setShowDynamicEditor(!showDynamicEditor)}
         style={{
           position: "fixed",
-          top: 50,
+          top: 56,
           right: 130,
           zIndex: 10,
           color: "white",
@@ -429,7 +400,8 @@ export const EditorCanvasWithJson = () => {
                 onClick={() => {
                   const beautified = htmlInput;
                   navigator.clipboard.writeText(beautified);
-                  showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
+                  toast.success("Html copied to clipboard!");
+                  // showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
                 }}
                 style={{ padding: "8px 14px" }}
               >
@@ -486,7 +458,7 @@ export const EditorCanvasWithJson = () => {
               TableBlock,
               HeadingBlock,
               DynamicFieldBlock,
-              GenericBlock, 
+              GenericBlock,
             }}
             enabled={true}
           >
@@ -529,14 +501,21 @@ export const EditorCanvasWithJson = () => {
                 </div> */}
 
                 <div
-                  className="fixed inset-0 justify-self-end top-12"
-                  style={{ 
-                    zIndex: 10, 
-                    height: "fit-content" }}
+                  className="fixed inset-0 justify-self-end top-14"
+                  style={{
+                    zIndex: 10,
+                    height: "fit-content",
+                  }}
                 >
-                  <ExportPanel
+                  <ExportPanelUpdate
                     onPreview={handlePreview}
-                    //   onSave={handleSave}
+                    templateSettingsPanelUpdateProps={{
+                      id: parseInt(emailTemplateId!),
+                      templateTypeId: parseInt(templateTypeId!),
+                      emailTemplateName: emailTemplateName,
+                      emailTemplateSubject: emailTemplateSubject,
+                      emailTemplateIsDefault: emailTemplateDefault,
+                    }}
                   />
                 </div>
 
@@ -550,24 +529,13 @@ export const EditorCanvasWithJson = () => {
                   />
                 </div>
                 <div id="CANVAS" style={{ top: 55 }}>
-                  <CanvasWrapperWithJson
-                  data={currentJson}/>
+                  <CanvasWrapperWithJson data={currentJson} />
                 </div>
               </div>
             </div>
-            {templateTypeId && (
-              <TemplateSettingsPanelCreateTemplateUpdate
-                id={parseInt(emailTemplateId!)}
-                templateTypeId={parseInt(templateTypeId!)}
-                emailTemplateName={emailTemplateName}
-                emailTemplateSubject={emailTemplateSubject}
-                emailTemplateIsDefault={emailTemplateDefault}
-              />
-            )}
           </Editor>
         )}
       </DynamicFieldsContext.Provider>
-
     </>
   );
 };
