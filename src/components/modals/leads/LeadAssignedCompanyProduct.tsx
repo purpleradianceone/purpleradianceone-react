@@ -4,15 +4,12 @@ import InterestType from "../../../@types/lead-management/InterestType";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
+import toast from "react-hot-toast";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -46,20 +43,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { userHasAccessToUpdateLead } = useUserAccessModules();
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  
 
 
   const handleUpdateLeadCompanyProductStatus = async (
@@ -88,16 +72,12 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       if (response) {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            
+            toast.success(response.data.message)
             handleLeadProductStatusUpdate(product);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            toast.error(response.data.message)
+            
           }
         }
       }
@@ -163,18 +143,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       const parsedCost = parseFloat(editedValues.costExpected);
 
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-        showMessageSnackbar({
-          message: "Quantity Required must be greater than 0.",
-          type: "error",
-        });
+       
+        toast.error("Quantity Required must be greater than 0.")
         return;
       }
 
       if (isNaN(parsedCost)) {
-        showMessageSnackbar({
-          message: "Expected Cost must be a valid number.",
-          type: "error",
-        });
+        toast.error("Expected Cost must be a valid number.")
         return;
       }
 
@@ -206,10 +181,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         );
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             handleLeadProductUpdate(updatedProduct);
           }
         }
@@ -309,12 +281,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         if (userHasAccessToUpdateLead) {
                           handleSaveClick(product);
                         } else {
-                          showMessageSnackbar({
-                            message:
-                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                .UPDATE_LEAD_ACCESS_DENIED_message,
-                            type: "error",
-                          });
+                          toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
                         }
                       }}
                     >
@@ -360,12 +327,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         if (userHasAccessToUpdateLead) {
                           handleUpdateLeadCompanyProductStatus(product);
                         } else {
-                          showMessageSnackbar({
-                            message:
-                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                .UPDATE_LEAD_ACCESS_DENIED_message,
-                            type: "error",
-                          });
+                          toast.error( MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
                         }
                       }}
                     >
@@ -382,14 +344,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           </form>
         )
       )}
-
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </div>
   );
 };

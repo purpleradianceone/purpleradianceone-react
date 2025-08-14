@@ -20,7 +20,7 @@ const Finance: React.FC = () => <FinanceDashboard/>;
 const HRMS: React.FC = () => <HRMSDashboard/>;
 
 // ======= Types =======
-type Module = {
+type DashboardType = {
   id: number;
   company_user_id: number;
   dashboard_id: number;
@@ -30,7 +30,7 @@ type Module = {
 
 const Home: React.FC = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const [modules, setModules] = useState<Module[]>([]);
+  const [modules, setModules] = useState<DashboardType[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
@@ -69,7 +69,7 @@ const Home: React.FC = () => {
         )
         .then((response) => {
           if (response.data != null) {
-            let fetchedModules: Module[] = response.data;
+            let fetchedModules: DashboardType[] = response.data;
             fetchedModules = fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id);
             setModules(fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id));
 
@@ -160,7 +160,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">{renderContent()}</div>
+      <div className="flex-1  overflow-y-auto bg-gray-50">{renderContent()}</div>
     </div>
   );
 };

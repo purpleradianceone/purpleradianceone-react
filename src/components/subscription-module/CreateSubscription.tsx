@@ -162,6 +162,7 @@ function CreateSubscription({
             subscriptionId: 0,
             startDateSubscription: "",
             endDateSubscription: "",
+            isSuperUser : false
           }); 
     } finally {
       setIsLoading(false);

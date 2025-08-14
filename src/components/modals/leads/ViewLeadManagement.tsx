@@ -9,7 +9,6 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
-  NUMBER_VALUES,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -19,11 +18,6 @@ import LeadStatusHistory from "./LeadStatusHistory";
 import LeadDetails from "./LeadDetails";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
 import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
@@ -41,6 +35,7 @@ import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
+import toast from "react-hot-toast";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -92,21 +87,7 @@ const ViewLeadManagement = () => {
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
 
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  // const UPDATE_LEAD_ACCESS_DENIED_message = "oamd;slm"
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  
 
   const fetchLeadStatus = async () => {
     try {
@@ -183,15 +164,11 @@ const ViewLeadManagement = () => {
 
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          
+          toast.success(response.data.message)
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          
+          toast.error(response.data.message)
         }
       }
     } catch (error: any) {
@@ -264,10 +241,11 @@ const ViewLeadManagement = () => {
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
-      showMessageSnackbar({
-        message: "Select new lead owner before procedding.",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Select new lead owner before procedding.",
+      //   type: "error",
+      // });
+      toast.error("Select new lead owner before procedding.")
       return;
     }
     const PostDataLeadOwnerChange = {
@@ -286,11 +264,7 @@ const ViewLeadManagement = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
-
+          toast.success(response.data.message)
           const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
           parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
           const newQueryString = qs.stringify({
@@ -308,16 +282,10 @@ const ViewLeadManagement = () => {
             leadOwner: selectedCompanyUser.fullname,
           }));
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message)
         }
       } else {
-        showMessageSnackbar({
-          message: response.data.status,
-          type: "error",
-        });
+        toast.error(response.data.message)
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -627,16 +595,10 @@ const ViewLeadManagement = () => {
         const newPath = `${window.location.pathname}?${newQueryString}`;
         navigate(newPath, { replace: true });
 
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        toast.success(response.data.message);
         fetchLeadContact();
       } else if (response.data.status === false) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "error",
-        });
+        toast.error(response.data.message)
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -714,12 +676,16 @@ const ViewLeadManagement = () => {
               className="text-lg font-semibold"
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message:
+                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                  //   type: "error",
+                  // });
+                   toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                 }
               }}
             >
@@ -744,15 +710,18 @@ const ViewLeadManagement = () => {
           {/* new code  */}
           <div className="relative inline-block">
             <button
-              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
-                if (userHasAccessToViewLead) {
+                if (userHasAccessToUpdateLead) {
                   setIsLeadSettingModalOpen(true);
                 } else {
-                  showMessageSnackbar({
-                    message: "Your are not authorized",
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message: "Your are not authorized",
+                  //   type: "error",
+                  // });
+                   toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                 }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
@@ -778,13 +747,17 @@ const ViewLeadManagement = () => {
             <button
               disabled={!userHasAccessToViewLead}
               onClick={() => {
-                if (userHasAccessToViewLead) {
+                if (userHasAccessToUpdateLead) {
                   setIsAddProductModalOpen(true);
                 } else {
-                  showMessageSnackbar({
-                    message: MESSAGE.ERROR.NOT_ATHORISED,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message: MESSAGE.ERROR.NOT_ATHORISED,
+                  //   type: "error",
+                  // });
+                   toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                 }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
@@ -827,12 +800,16 @@ const ViewLeadManagement = () => {
           <div
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message:
+                //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                //   type: "error",
+                // });
+                 toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
               }
             }}
             title={
@@ -858,12 +835,16 @@ const ViewLeadManagement = () => {
           <div
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message:
+                //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                //   type: "error",
+                // });
+                 toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
               }
             }}
             title={
@@ -906,12 +887,16 @@ const ViewLeadManagement = () => {
             }
             onClick={() => {
               if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message:
+                //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                //   type: "error",
+                // });
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
               }
             }}
           >
@@ -1005,16 +990,15 @@ const ViewLeadManagement = () => {
           {leadStatus!.map((item: any) => (
             <button
               title={item.name}
-              disabled={!userHasAccessToUpdateLead}
               key={item.id}
               className={`flex-1 text-xs text-ellipsis  overflow-hidden ${
                 selectedLeadData.leadStatus === item.name
                   ? "bg-blue-700 text-white hover:bg-blue-900"
                   : "hover:bg-blue-700 hover:text-white"
               }
-              ${selectedStatusId === item.id
-                && "bg-sky-400 text-white hover:bg-sky-500"
-               
+              ${
+                selectedStatusId === item.id &&
+                "bg-sky-400 text-white hover:bg-sky-500"
               } text-gray-800 font-medium text-center`}
               style={{
                 clipPath:
@@ -1025,12 +1009,16 @@ const ViewLeadManagement = () => {
                   setReasonInputBoxOpen(true);
                   setSelectedStatusId(item.id);
                 } else {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message:
+                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                  //   type: "error",
+                  // });
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
             >
@@ -1217,13 +1205,7 @@ const ViewLeadManagement = () => {
           setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
         }}
       />
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+     
       {isLeadOwnerPopUpOpen && (
         <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
@@ -1288,20 +1270,9 @@ const Detail: React.FC<DetailProps> = ({
   handleClickLeadOwnerChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+ 
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+ 
   const prevValueRef = useRef(value);
 
   const handleClick = () => {
@@ -1323,10 +1294,8 @@ const Detail: React.FC<DetailProps> = ({
         } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 
         onChange?.(syntheticEvent);
-        showMessageSnackbar({
-          message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
-          type: "error",
-        });
+
+        toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN)
         return;
       }
     }
@@ -1396,13 +1365,6 @@ const Detail: React.FC<DetailProps> = ({
           {value || "-"}
         </div>
       )}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </div>
   );
 };

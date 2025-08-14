@@ -12,11 +12,6 @@ import Button from "../../ui/Button";
 import React, { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
@@ -29,6 +24,7 @@ import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
 import ApiError from "../../../@types/error/ApiError";
+import toast from "react-hot-toast";
 
 function CreateLeadModal({
   isOpen,
@@ -86,20 +82,6 @@ function CreateLeadModal({
 
   const handleCompanyUserPopUp = () => {
     setOpenPopUpOfCompanyUserModal(true);
-  };
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   //note : these 3 functions that handles changed values from dropdown
@@ -272,17 +254,19 @@ function CreateLeadModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (error.mobileNumber !== "") {
-      showMessageSnackbar({
-        message: "Please enter a valid mobile number.",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please enter a valid mobile number.",
+      //   type: "error",
+      // });
+      toast.error("Please enter a valid mobile number.");
       return;
     }
     if (error.email !== "") {
-      showMessageSnackbar({
-        message: "Please enter a valid email address.",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please enter a valid email address.",
+      //   type: "error",
+      // });
+      toast.error("Please enter a valid email address.");
       return;
     }
     const isEmailFilled = createLeadModalFormData.email !== "";
@@ -301,10 +285,11 @@ function CreateLeadModal({
       return;
     }
     if (selectedSource === undefined || selectedStatus === undefined) {
-      showMessageSnackbar({
-        message: "please select source and status",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "please select source and status",
+      //   type: "error",
+      // });
+      toast.error("Please select source and status");
       return;
     }
     if (
@@ -342,20 +327,15 @@ function CreateLeadModal({
         })
         .then((response) => {
           if (response.data.status === true) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            
+            toast.success(response.data.message);
             // note : this callback will run to refresh the list of aggrid
             onCreateLeadRefreshLeadData!();
             setTimeout(() => {
               onClose!();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           } else if (response.data.status == false) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "warning",
-            });
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -393,7 +373,6 @@ function CreateLeadModal({
         mobileNumber: "",
       });
 
-      handleCloseSnackbar();
       setShowErrorAtLeadStatus(false);
       setshowErrorAtLeadSource(false);
       //resetting the form data
@@ -571,14 +550,6 @@ function CreateLeadModal({
         </form>
       </div>
 
-      {/* Snackbar */}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
       {openPopUpOfCompanyUserModal && (
         <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">

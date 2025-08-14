@@ -9,16 +9,12 @@ import { Plus, X } from "lucide-react";
 import CompanyTeamsNotAssignedToLead from "./company-team-selection-modal/CompanyTeamsNotAssignedToLead";
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import ApiError from "../../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import MESSAGE from "../../../constants/Messages";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import toast from "react-hot-toast";
 // import { MODULE_ACCESS_MESSAGE } from "../../../constants/Messages";
 
 type LeadAssignedTeamsProps = {
@@ -48,19 +44,7 @@ const LeadAssignedTeams = ({
   const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
     useState<boolean>(true);
 
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  
 
   //   Note : Get Lead assigned company team
   const getLeadAssignedCompanyteam = async () => {
@@ -194,17 +178,11 @@ const LeadAssignedTeams = ({
       })
       .then((response) => {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          toast.success(response.data.message)
           getLeadAssignedCompanyteam();
         } else {
           setIsActive(prevStatus);
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message)
         }
       })
       .catch(async (error: ApiError | any) => {
@@ -247,17 +225,21 @@ const LeadAssignedTeams = ({
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <button
-              disabled={!userHasAccessToUpdateLead}
+              // disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (userHasAccessToUpdateLead) {
                   setOpenCreateLeadCompanyTeam(true);
                 } else {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message:
+                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                  //   type: "error",
+                  // });
+                  toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                 }
               }}
               className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
@@ -276,15 +258,19 @@ const LeadAssignedTeams = ({
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
             <span>Add</span>
             <button
-              disabled={!userHasAccessToUpdateLead}
+              // disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message:
+                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                  //   type: "error",
+                  // });
+                   toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                 } else {
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
@@ -394,18 +380,22 @@ const LeadAssignedTeams = ({
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        disabled={!userHasAccessToUpdateLead}
+                        // disabled={!userHasAccessToUpdateLead}
                         checked={isActive}
                         onChange={() => {
                           if (userHasAccessToUpdateLead) {
                             updateLeadCompanyTeam(selectedCompanyTeamCard);
                           } else {
-                            showMessageSnackbar({
-                              message:
-                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                  .UPDATE_LEAD_ACCESS_DENIED_message,
-                              type: "error",
-                            });
+                            // showMessageSnackbar({
+                            //   message:
+                            //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                            //   type: "error",
+                            // });
+                             toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
                           }
                         }}
                         className="sr-only peer"
@@ -469,13 +459,6 @@ const LeadAssignedTeams = ({
           )}
         </div>
       )}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
         <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">

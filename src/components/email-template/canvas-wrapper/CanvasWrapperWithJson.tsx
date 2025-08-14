@@ -1,59 +1,80 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Frame, Element } from "@craftjs/core";
+import { useEffect } from "react";
 
 export const CanvasWrapperWithJson = ({ data }: { data: string }) => {
-  const isEmpty = isCanvasTrulyEmpty(data);
+  let isEmpty = isCanvasTrulyEmpty(data, "ROOT");
+
+  useEffect(() => {
+    isEmpty = isCanvasTrulyEmpty(data, "ROOT");
+  }, [data]);
 
   return (
-    <Frame data={data}>
-      <Element
-        is="div"
-        canvas
-        id="ROOT"
-        style={{
-          border: "1px dashed #ccc",
-          padding: "70px",
-          minWidth: "800px",
-          position: "relative",
-          minHeight: "800px",
-        }}
-      >
-        {isEmpty && (
-          <div
-            style={{
-              position: "absolute",
-              top: "30%",
-              left: "20%",
-              transform: "translate(-50%, -50%)",
-              fontSize: "18px",
-              color: "#999",
-              textAlign: "center",
-              pointerEvents: "none",
-              opacity: 1,
-              transition: "opacity 0.3s ease, z-index 0.3s ease",
-            }}
-          >
-            📦 Drag the blocks here 👉
-          </div>
-        )}
-      </Element>
-    </Frame>
+    <div style={{ position: "relative" }}>
+      <Frame data={data}>
+        <Element
+          is="div"
+          canvas
+          id="ROOT"
+          style={{
+            minWidth: "700px",
+            minHeight: "800px",
+            border: "1px dashed #ccc",
+            padding: "70px",
+            position: "relative",
+          }}
+        />
+      </Frame>
+      {!isEmpty ? (
+        <div
+          style={{
+            position: "absolute",
+            top: "30%",
+            left: "20%",
+            transform: "translate(-50%, -50%)",
+            fontSize: "18px",
+            color: "#999",
+            textAlign: "center",
+            pointerEvents: "none",
+            opacity: isEmpty ? 1 : 0,
+            transition: "opacity 0.3s ease",
+            zIndex: isEmpty ? 1 : -1, // hide from interaction when invisible
+          }}
+        >
+          📦 Drag the blocks here 👉
+        </div>
+      ) : null}
+    </div>
   );
 };
 
-function isCanvasTrulyEmpty(data: any): boolean {
-  const childNodeIds = data?.ROOT?.nodes || [];
+function isCanvasTrulyEmpty(data: any, nodeId: string): boolean {
+  const node = data[nodeId];
+  if (!node || !node.nodes) return true;
 
-  const actualContentNodes = childNodeIds.filter((id: string) => {
-    const node = data[id];
-    const children = node?.props?.children;
+  for (const childId of node.nodes) {
+    const child = data[childId];
+    if (!child) continue;
 
-    return !(typeof children === "string" && children.includes("Drag the blocks in this box"));
-  });
+    // If child has text content that's not placeholder
+    const children = child?.props?.children;
+    if (
+      typeof children === "string" &&
+      children.trim() !== "" &&
+      !children.includes("Drag the blocks in this box")
+    ) {
+      return false;
+    }
 
-  return actualContentNodes.length === 0;
+    // If this child has deeper children, check them recursively
+    if (child.nodes && child.nodes.length > 0) {
+      if (!isCanvasTrulyEmpty(data, childId)) {
+        return false;
+      }
+    }
+  }
+
+  // If we looped through all children and found nothing
+  return node.nodes.length === 0;
 }
-
-
-
-
