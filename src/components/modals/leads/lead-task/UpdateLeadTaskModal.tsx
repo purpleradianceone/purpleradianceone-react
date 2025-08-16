@@ -78,7 +78,7 @@ function UpdateLeadTaskModal({
     leadTask.leadTaskStageId
   );
   const [leadData, setLeadData] = useState<Lead>();
-  const [assignedTo, setAssignedTo] = useState<number[]>(leadTask.assignedToId);
+  const [assignedTo, setAssignedTo] = useState<number[]>(leadTask.assignedToId!);
   const [physicalMeetingAddress, setPhysicalMeetingAddress] =
     useState<string>("");
   const [resultOutcome, setResultOutcome] = useState<string>(
@@ -331,10 +331,10 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
 
   const getComapnyUsers = async () => {
     setSelectedCompanyUsers([]);
-    for (let i = 0; i < leadTask.assignedToId.length; i++) {
+    for (let i = 0; i < leadTask.assignedToId!.length; i++) {
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
-        id: leadTask.assignedToId[i],
+        id: leadTask.assignedToId![i],
         search_company_specific_date_range_id: 0,
         requestedby: loginStatus.id,
       };

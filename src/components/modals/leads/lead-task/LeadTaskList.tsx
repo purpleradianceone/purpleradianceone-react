@@ -431,7 +431,7 @@ function LeadTaskList({
                               Assignees :{" "}
                             </span>{" "}
                             <div className="grid grid-cols-3">
-                              {activity.assignedToName.map((name) => (
+                              {activity.assignedToName!.map((name) => (
                                 <span
                                   key={name} // Added key for list items
                                   className="bg-blue-400 m-1 text-center rounded-full px-1 font-medium"
@@ -528,7 +528,7 @@ function LeadTaskList({
                             <span className="font-semibold text-blue-700">
                               Assignees :{" "}
                             </span>{" "}
-                            {activity.assignedToName.map((name) => (
+                            {activity.assignedToName!.map((name) => (
                               <span
                                 key={name} // Added key for list items
                                 className="bg-blue-400 mx-1 rounded-full px-1 font-medium"

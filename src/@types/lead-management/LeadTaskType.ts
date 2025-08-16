@@ -8,16 +8,16 @@ type LeadTaskType = {
   subject : string,
   description: string;
   colorCode : string;
-  assignedToId : number[];
-  assignedToName : string[];
+  assignedToId? : number[];
+  assignedToName? : string[];
   dueDateTime : string;
   completedAtDateTime? : string;
   leadActivityDetails : any;
   isActive : boolean;
-  createdOn : string;
-  createdBy : string;
-  updatedOn : string;
-  updatedBy : string;
+  createdOn? : string;
+  createdBy? : string;
+  updatedOn? : string;
+  updatedBy? : string;
   resultOutcome : string;
   leadTaskActivityName : string;
   leadTaskPriorityName : string;
