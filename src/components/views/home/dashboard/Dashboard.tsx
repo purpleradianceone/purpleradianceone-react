@@ -29,6 +29,16 @@ import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverag
 import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
 import PieChart from "./PieChart";
+import { DashboardChartComponent } from "../../../dashboarcrmcomponents/DashboardChartComponent";
+import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
+import { BarDataItem } from "../../../../@types/dashboard/BarDataItem";
+import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
+import { PendingTaskList } from "../../../../@types/dashboard/PendingTaskList";
+
+// import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
+// import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
+// import { BarDataItem } from "../../../../@types/dashboard/BarDataItem";
+// import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
@@ -142,7 +152,6 @@ function Dashboard() {
           }]);
         })
         setDashboardData(formattedDashboardData);
-
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -165,9 +174,6 @@ function Dashboard() {
       getDashboardData();
     }
   }, []);
-
-  
-
 
 
 
@@ -462,6 +468,95 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      <div className="grid grid-cols-3">
+        <div className="p-10 ">
+          <h1 className="ml-10 text-xl font-bold ">Lead By Source</h1>
+          <DashboardChartComponent
+            type="Pie"
+            data={
+              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_LEAD_BY_SOURCE] ??
+                []) as PieDataItem[]
+            }
+            colors={["#8884d8", "#82ca9d", "#ffc658"]}
+          />
+        </div>
+
+        <div className="p-10">
+          <h1 className="ml-10 text-xl font-bold">Lead By Status</h1>
+          <DashboardChartComponent
+            type="Bar"
+            data={
+              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_LEAD_BY_STATUS] ??
+                []) as BarDataItem[]
+            }
+            colors={["#8884d8", "#82ca9d", "#ffc658"]}
+          />
+        </div>
+
+        <div className="p-10">
+          <h1 className="ml-10 text-xl font-bold">12 Month Performance</h1>
+          <DashboardChartComponent
+            type="Bar"
+            data={
+              (dashboardData[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_12_MONTH_PERFORMANCE
+              ] ?? []) as BarDataItemFor12MonthPerformance[]
+            }
+            colors={["#8884d8", "#82ca9d", "#ffc658"]}
+          />
+        </div>
+      </div>
+
+      <div className="p-10">
+        <h1 className="ml-10 text-xl font-bold">12 Month Performance</h1>
+        <DashboardChartComponent
+          type="Bar"
+          data={
+            (dashboardData[
+              REFCURSOR_KEY.MY_FIXED_CURSOR_12_MONTH_PERFORMANCE
+            ] ?? []) as BarDataItemFor12MonthPerformance[]
+          }
+          colors={["#8884d8", "#82ca9d", "#ffc658"]}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 h-[calc(100vh-90px)] w-full px-6">
+        {/* Pending Tasks */}
+        <div className="flex flex-col bg-white rounded-lg shadow p-4">
+          <h2 className="text-xl font-bold mb-1">Pending Tasks</h2>
+          <p className="text-gray-500 mb-4">
+            Your Pending activities and deadlines
+          </p>
+        
+        <DashboardChartComponent
+            type="List"
+            data={
+              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_PENDING_TASK] ??
+                []) as PendingTaskList[]
+            }
+            colors={["#8884d8", "#82ca9d", "#ffc658"]}
+          />
+        </div>
+
+        {/* Upcoming Tasks */}
+        <div className="flex flex-col bg-white rounded-lg shadow p-4">
+          <h2 className="text-xl font-bold mb-1">Upcoming Tasks</h2>
+          <p className="text-gray-500 mb-4">
+            Your scheduled activities and deadlines
+          </p>
+
+          <DashboardChartComponent
+            type="List"
+            data={
+              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_UPCOMING_TASK] ??
+                []) as PendingTaskList[]
+            }
+            colors={["#8884d8", "#82ca9d", "#ffc658"]}
+          />
+        </div>
+      </div>
+      
     </>
   );
 }

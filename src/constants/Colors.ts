@@ -7,6 +7,17 @@ const COLORS={
     WHITE : "white",
 }
 
+export const chartColors = [
+  "#1976d2", // blue
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff8042",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042"
+];
+
  export const backgroundColors = [
     "bg-red-500",//a
     "bg-blue-500",//b
