@@ -159,8 +159,8 @@ function LeadTaskHistoryModal({
       if (prevTask.leadTaskStageName !== currentTask.leadTaskStageName) {
         changes.push(`Stage changed from ${currentTask.leadTaskStageName} to ${prevTask.leadTaskStageName}`);
       }
-      if (!areArraysEqual(prevTask.assignedToName, currentTask.assignedToName)) {
-        changes.push(`Assignees changed from ${currentTask.assignedToName.join(" , ")} to ${prevTask.assignedToName.join(" , ")}`);
+      if (!areArraysEqual(prevTask.assignedToName!, currentTask.assignedToName!)) {
+        changes.push(`Assignees changed from ${currentTask.assignedToName!.join(" , ")} to ${prevTask.assignedToName!.join(" , ")}`);
       }
       if (prevTask.resultOutcome !== currentTask.resultOutcome) {
         changes.push(`Outcome changed from "${currentTask.resultOutcome || 'N/A'}" to "${prevTask.resultOutcome || 'N/A'}"`);

@@ -19,7 +19,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 }) => {
   if(!visibility) return null;
   return (
-    <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    <div className="relative overflow-hidden min-w-44 bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <div className={`absolute inset-0 ${gradient} opacity-5`}></div>
       <div className="relative p-6">
         <div className="flex items-center justify-between mb-4">
