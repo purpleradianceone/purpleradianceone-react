@@ -73,6 +73,7 @@ function Dashboard() {
         const formattedDashboardData: DashboardDataType = response.data;
 
         setDashboardData(formattedDashboardData);
+
         // setDashboardData(formattedDashboardData);
       }
     } catch (error: ApiError | any) {
