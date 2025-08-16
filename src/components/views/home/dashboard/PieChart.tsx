@@ -175,7 +175,7 @@ const PieChart = ({
                   stroke="white"
                   strokeWidth="2"
                   className={`transition-all duration-300 cursor-pointer ${
-                    hoveredSlice === index ? 'opacity-90 filter brightness-110' : 'opacity-100'
+                    hoveredSlice === index ? 'opacity-65 filter brightness-110' : 'opacity-100'
                   }`}
                   onMouseEnter={() => setHoveredSlice(index)}
                   onMouseLeave={() => setHoveredSlice(null)}
@@ -212,7 +212,7 @@ const PieChart = ({
             
             {/* Tooltip for hovered slice */}
             {hoveredSlice !== null && (
-              <div className="absolute flex gap-2 top-4 left-full ml-4 bg-gray-900 text-white px-3 py-2 rounded-lg text-xs font-medium z-10 shadow-lg">
+              <div className="absolute flex gap-2 -top-6 left-8 place-self-center min-w-60 justify-between bg-gray-900 text-white px-3 py-2 rounded-lg text-xs font-medium z-10 shadow-lg">
                 <div className="font-semibold">{pieSlices[hoveredSlice].name}</div>
                 <div>{pieSlices[hoveredSlice].count}</div>
               </div>
@@ -220,13 +220,13 @@ const PieChart = ({
           </div>
 
           {/* Legend */}
-          <div className="space-y-1 grid grid-cols-2 gap-2 max-h-72 overflow-y-auto">
+          <div className="space-y-1 grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
             {filteredData.map((item, index) => (
               <div
                 key={item.sourceId}
                 className={`flex items-center gap-1  justify-between p-1 rounded-lg transition-all cursor-pointer border ${
                   hoveredSlice === index 
-                    ? 'bg-gray-50 shadow-sm border-gray-200' 
+                    ? 'bg-gray-50 shadow-sm border-gray-400' 
                     : 'hover:bg-gray-50 border-transparent'
                 }`}
                 onMouseEnter={() => setHoveredSlice(index)}
