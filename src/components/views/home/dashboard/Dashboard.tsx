@@ -435,17 +435,11 @@ function Dashboard() {
       // console.log(dashboardVisiblity);
       // console.log("+++++++++++++++++");
       if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" )) {
-        console.log("****************************");
-         console.log(currentSectionId)
-          console.log("****************************");
       
           renderedSections.push(currentComponentBarChart);
         
       }
       else if (currentCompanonentPieChart && cond && chartType === "Pie") {
-        console.log("+++++++++++++++++++++++++++++++");
-         console.log(currentSectionId)
-          console.log("+++++++++++++++++++++++++++++");
           renderedSections.push(currentCompanonentPieChart);
         
       }
@@ -469,7 +463,7 @@ function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-3">
+      {/* <div className="grid grid-cols-3">
         <div className="p-10 ">
           <h1 className="ml-10 text-xl font-bold ">Lead By Source</h1>
           <DashboardChartComponent
@@ -522,7 +516,6 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 h-[calc(100vh-90px)] w-full px-6">
-        {/* Pending Tasks */}
         <div className="flex flex-col bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-bold mb-1">Pending Tasks</h2>
           <p className="text-gray-500 mb-4">
@@ -539,7 +532,6 @@ function Dashboard() {
           />
         </div>
 
-        {/* Upcoming Tasks */}
         <div className="flex flex-col bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-bold mb-1">Upcoming Tasks</h2>
           <p className="text-gray-500 mb-4">
@@ -555,7 +547,7 @@ function Dashboard() {
             colors={["#8884d8", "#82ca9d", "#ffc658"]}
           />
         </div>
-      </div>
+      </div> */}
       
     </>
   );
