@@ -29,11 +29,6 @@ import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverag
 import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
 import PieChart from "./PieChart";
-import { DashboardChartComponent } from "../../../dashboarcrmcomponents/DashboardChartComponent";
-import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
-import { BarDataItem } from "../../../../@types/dashboard/BarDataItem";
-import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
-import { PendingTaskList } from "../../../../@types/dashboard/PendingTaskList";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
