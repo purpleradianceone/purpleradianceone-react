@@ -63,7 +63,7 @@ function Dashboard() {
         const formattedDashboardData: DashboardDataType = response.data;
 
         setDashboardData(formattedDashboardData);
-      
+
         // setDashboardData(formattedDashboardData);
       }
     } catch (error: ApiError | any) {
@@ -154,7 +154,7 @@ function Dashboard() {
   const [dashboardVisiblity, setDasboardVisibility] = useState<
     { key: string; value: boolean }[]
   >([]);
-  
+
   const getLeadSummaryReport = async () => {
     const postDataToGetLeads = {
       company_id: loginStatus.companyId,
