@@ -135,8 +135,8 @@ export const TemplateSettingsPanelCreate: React.FC<
       {isOpen && (
         <div
           style={{
-            position: "fixed",
-            top: "120px",
+            position: "absolute",
+            top: 0,
             right: 2,
             backgroundColor: "white",
             padding: "20px",

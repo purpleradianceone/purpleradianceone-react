@@ -220,13 +220,11 @@ export const EditorCanvasWithJson = () => {
           )}
         </div>
       </div>
-
-      <button
-        onClick={() => setShowDynamicEditor(!showDynamicEditor)}
-        style={{
+      <div
+      style={{
           position: "fixed",
-          top: 56,
-          right: 130,
+          top: 100,
+          right: 2,
           zIndex: 10,
           color: "white",
           background: "#007bff",
@@ -236,6 +234,10 @@ export const EditorCanvasWithJson = () => {
           cursor: "pointer",
           fontSize: "12px",
         }}
+        >
+        <button
+        onClick={() => setShowDynamicEditor(!showDynamicEditor)}
+        
       >
         ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
       </button>
@@ -243,9 +245,9 @@ export const EditorCanvasWithJson = () => {
       {showDynamicEditor && (
         <div
           style={{
-            position: "fixed",
-            top: 80, // Adjusted to appear below the toggle button
-            right: 130,
+            position: "absolute",
+            top: 0, // Adjusted to appear below the toggle button
+            right: 2,
             width: "260px",
             maxHeight: "600px",
             background: "white",
@@ -269,7 +271,7 @@ export const EditorCanvasWithJson = () => {
               borderBottom: "1px solid #eee",
             }}
           >
-            <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600 }}>
+            <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600, color:"black" }}>
               Dynamic Fields
             </h4>
             <button
@@ -349,6 +351,8 @@ export const EditorCanvasWithJson = () => {
           )}
         </div>
       )}
+        </div>    
+      
 
       <DynamicFieldsContext.Provider value={parsedFields}>
         {currentJson == null || currentJson === "" ? (
@@ -503,7 +507,7 @@ export const EditorCanvasWithJson = () => {
                 <div
                   className="fixed inset-0 justify-self-end top-14"
                   style={{
-                    zIndex: 10,
+                    zIndex: 11,
                     height: "fit-content",
                   }}
                 >
