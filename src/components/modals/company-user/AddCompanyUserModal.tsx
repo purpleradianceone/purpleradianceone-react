@@ -1,22 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { UserPlus, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import AddCompanyUserStateType from "../../../@types/modal/AddCompanyUserStateType";
 import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalProps";
 import POST_API from "../../../constants/PostApi";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
@@ -27,6 +25,7 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import REGEX from "../../../constants/Regex";
+import toast from "react-hot-toast";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -49,26 +48,28 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     "registration"
   );
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
      const mobileRegex = REGEX.MOBILE_NUMBER;
      if(addCompanyUserFormData.mobilenumber!.trim() !== ""){
          if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
-          showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+          // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+
+          toast.error("Invalid mobile number");
           return;
         }
      }
@@ -97,10 +98,11 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           }
         );
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message);
           setAddCompanyUserFormData({
             name: "",
             mobilenumber: "",
@@ -109,17 +111,19 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           onClose();
           window.location.href = ROUTES_URL.GET_COMPANY_USERS;
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError | any) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG)
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({
@@ -129,18 +133,20 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               handleAddUserSubmit(event);            }
           } 
           else {
-            showMessageSnackbar({
-              message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+            //   type: "error",
+            // });
+            toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG)
           }
         }
       }
     } else {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.REQUIRED_FIELDS,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
     }
   };
 
@@ -218,17 +224,17 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   error={errors.email}
                   maxLength={256}
                 />
-                <Button type="submit">{isSmallScreen ? "Create" : "Create Company CompanyUser"}</Button>
+                <Button type="submit">Create</Button>
               </form>
             </div>
           </div>
-          <MessageSnackBar
+          {/* <MessageSnackBar
             isOpen={messageSnackbar.open}
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleCloseSnackbar}
             duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
+          /> */}
         </div>
       </div>
     </>

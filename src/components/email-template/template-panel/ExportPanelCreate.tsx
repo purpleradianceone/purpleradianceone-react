@@ -41,7 +41,7 @@ export const ExportPanelCreate: React.FC<ExportPanelProps> = ({
   };
 
   return (
-    <div style={{ display: "grid", gap: 10 }}>
+    <div style={{ display: "flex", gap: 10 }}>
       <button
         onClick={handlePreview}
         style={{

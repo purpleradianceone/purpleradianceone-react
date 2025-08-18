@@ -87,8 +87,6 @@ const ViewLeadManagement = () => {
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
 
-  
-
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -164,11 +162,10 @@ const ViewLeadManagement = () => {
 
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
-          
-          toast.success(response.data.message)
+
+          toast.success(response.data.message);
         } else {
-          
-          toast.error(response.data.message)
+          toast.error(response.data.message);
         }
       }
     } catch (error: any) {
@@ -245,7 +242,7 @@ const ViewLeadManagement = () => {
       //   message: "Select new lead owner before procedding.",
       //   type: "error",
       // });
-      toast.error("Select new lead owner before procedding.")
+      toast.error("Select new lead owner before procedding.");
       return;
     }
     const PostDataLeadOwnerChange = {
@@ -264,7 +261,7 @@ const ViewLeadManagement = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          toast.success(response.data.message)
+          toast.success(response.data.message);
           const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
           parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
           const newQueryString = qs.stringify({
@@ -282,10 +279,10 @@ const ViewLeadManagement = () => {
             leadOwner: selectedCompanyUser.fullname,
           }));
         } else {
-          toast.error(response.data.message)
+          toast.error(response.data.message);
         }
       } else {
-        toast.error(response.data.message)
+        toast.error(response.data.message);
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -598,7 +595,7 @@ const ViewLeadManagement = () => {
         toast.success(response.data.message);
         fetchLeadContact();
       } else if (response.data.status === false) {
-        toast.error(response.data.message)
+        toast.error(response.data.message);
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -682,10 +679,10 @@ const ViewLeadManagement = () => {
                   //       .UPDATE_LEAD_ACCESS_DENIED_message,
                   //   type: "error",
                   // });
-                   toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
             >
@@ -706,7 +703,7 @@ const ViewLeadManagement = () => {
         </div>
 
         {/**Add Setting in lead details page here  */}
-        <div className="flex items-center min-w-20 justify-end gap-3 w-full">
+        <div className=" flex items-center min-w-20 justify-end mr-2  w-full">
           {/* new code  */}
           <div className="relative inline-block">
             <button
@@ -718,10 +715,10 @@ const ViewLeadManagement = () => {
                   //   message: "Your are not authorized",
                   //   type: "error",
                   // });
-                   toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
               className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
@@ -741,7 +738,7 @@ const ViewLeadManagement = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-evenly w-48">
+        <div className="hidden items-center justify-evenly w-48">
           {/* new code  */}
           <div className="relative inline-block">
             <button
@@ -754,27 +751,18 @@ const ViewLeadManagement = () => {
                   //   message: MESSAGE.ERROR.NOT_ATHORISED,
                   //   type: "error",
                   // });
-                   toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
-              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
+              className="hidden px-1 py-1 text-xs  gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
             >
               <Plus size={8} />
               <span>Product</span>
             </button>
-            <AssignProductToLead
-              selectedLeadData={selectedLeadData}
-              isOpen={isAddProductModalOpen}
-              onClose={() => {
-                setIsAddProductModalOpen(false);
-              }}
-              leadAssignedComponyProduct={leadAssignedCompanyProduct}
-              fetchLeadCompanyProduct={fetchLeadCompanyProduct}
-              interestTypeData={interestTypeData}
-            />
+           
           </div>
 
           <button
@@ -785,13 +773,12 @@ const ViewLeadManagement = () => {
           >
             Edit
           </button>
-
-          <Detail
-            type="none"
-            label="Created On"
-            value={selectedLeadData?.createdOn}
-          />
         </div>
+        <Detail
+          type="none"
+          label="Created On"
+          value={selectedLeadData?.createdOn}
+        />
       </div>
 
       {/* Lead Basic Info */}
@@ -806,7 +793,7 @@ const ViewLeadManagement = () => {
                 //       .UPDATE_LEAD_ACCESS_DENIED_message,
                 //   type: "error",
                 // });
-                 toast.error(
+                toast.error(
                   MESSAGE.MODULE_ACCESS.LEAD_MODULE
                     .UPDATE_LEAD_ACCESS_DENIED_message
                 );
@@ -841,7 +828,7 @@ const ViewLeadManagement = () => {
                 //       .UPDATE_LEAD_ACCESS_DENIED_message,
                 //   type: "error",
                 // });
-                 toast.error(
+                toast.error(
                   MESSAGE.MODULE_ACCESS.LEAD_MODULE
                     .UPDATE_LEAD_ACCESS_DENIED_message
                 );
@@ -1069,6 +1056,7 @@ const ViewLeadManagement = () => {
           {/* Assigned Company Product */}
           <div className=" shadow-md rounded">
             <LeadAssignedComponyProducts
+              setIsAddProductModalOpen={setIsAddProductModalOpen}
               data={leadAssignedCompanyProduct}
               interestTypeData={interestTypeData}
               handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
@@ -1205,7 +1193,7 @@ const ViewLeadManagement = () => {
           setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
         }}
       />
-     
+
       {isLeadOwnerPopUpOpen && (
         <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
@@ -1243,6 +1231,16 @@ const ViewLeadManagement = () => {
           </div>
         </div>
       )}
+       <AssignProductToLead
+              selectedLeadData={selectedLeadData}
+              isOpen={isAddProductModalOpen}
+              onClose={() => {
+                setIsAddProductModalOpen(false);
+              }}
+              leadAssignedComponyProduct={leadAssignedCompanyProduct}
+              fetchLeadCompanyProduct={fetchLeadCompanyProduct}
+              interestTypeData={interestTypeData}
+            />
     </div>
   );
 };
@@ -1270,9 +1268,7 @@ const Detail: React.FC<DetailProps> = ({
   handleClickLeadOwnerChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
- 
 
- 
   const prevValueRef = useRef(value);
 
   const handleClick = () => {
@@ -1295,7 +1291,9 @@ const Detail: React.FC<DetailProps> = ({
 
         onChange?.(syntheticEvent);
 
-        toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN)
+        toast.error(
+          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+        );
         return;
       }
     }

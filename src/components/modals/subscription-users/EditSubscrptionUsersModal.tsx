@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
 
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
@@ -16,9 +16,8 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {  useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -67,19 +66,19 @@ function EditSubscriptionUsersModal({
   const companyUserSearchParameterRef = useRef<string>("");
 
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-      open: false,
-      message: "",
-      type: "success",
-    });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //     open: false,
+  //     message: "",
+  //     type: "success",
+  //   });
   
-    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-      setMessageSnackbar({ open: true, message, type });
-    };
+  //   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //     setMessageSnackbar({ open: true, message, type });
+  //   };
   
-    const handleMessageSnackbarClose = () => {
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
-    };
+  //   const handleMessageSnackbarClose = () => {
+  //     setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  //   };
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
    
@@ -246,10 +245,15 @@ function EditSubscriptionUsersModal({
   };
 
   const handleCompanyUserToggleChange =(message :string, status : boolean)=>{
-    showMessageSnackbar({
-      message: message,
-      type : status ? 'success' : 'error',
-    })
+    // showMessageSnackbar({
+    //   message: message,
+    //   type : status ? 'success' : 'error',
+    // })
+    if(status) {
+      toast.success(message)
+    }else{
+      toast.error(message)
+    }
   }
 
   useEffect(() => {
@@ -365,13 +369,13 @@ function EditSubscriptionUsersModal({
           </div>
         </div>
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 }

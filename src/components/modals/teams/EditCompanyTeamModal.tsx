@@ -2,7 +2,6 @@
 import { Edit, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
@@ -11,12 +10,7 @@ import { useFormChange } from "../../../config/hooks/useFormChange";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useEffect, useRef, useState } from "react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import RadioButtons from "../../ui/RadioButton";
@@ -30,6 +24,7 @@ import EditCompanyTeamModalProps from "../../../@types/modal/EditCompanyTeamModa
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import toast from "react-hot-toast";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -77,19 +72,19 @@ function EditCompanyTeamModal({
     "registration"
   );
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
   const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
     CompanyTeamUsers[]
   >([]);
@@ -185,10 +180,11 @@ function EditCompanyTeamModal({
         )
         .then((response) => {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message);
             setIsCompanyTeamUsersAddCompleted(true);
             handleCompanyTeamUsersUpdateChange();
             setCompanyTeamUsersList([]);
@@ -199,6 +195,8 @@ function EditCompanyTeamModal({
             companyTeamUsersLastScrollPositionRef.current = 0;
             setIsCompanyTeamUsersFetchedCount(0);
             setAddCompanyTeamUserArray([]);
+          }else{
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -408,14 +406,17 @@ function EditCompanyTeamModal({
           })
           .then((response) => {
             if (response.data.status) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
+              // showMessageSnackbar({
+              //   message: response.data.message,
+              //   type: "success",
+              // });
+              toast.success(response.data.message);
               handleCompanyTeamChangeOnUpdate(companyTeam.id);
               setTimeout(() => {
                 onClose();
               }, 3000);
+            }else{
+              toast.error(response.data.message);
             }
           })
           .catch(async (error: ApiError | any) => {
@@ -429,10 +430,11 @@ function EditCompanyTeamModal({
             }
           });
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.NO_CHANGES,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.NO_CHANGES,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.NO_CHANGES)
       }
     }
   };
@@ -443,7 +445,7 @@ function EditCompanyTeamModal({
         name: "",
         description: "",
       });
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
       setCompanyTeamUsersList([]);
       setAddCompanyTeamUserArray([]);
       setssCompanyTeamUsersFetchedForFirstTime(true);
@@ -560,13 +562,13 @@ function EditCompanyTeamModal({
             ></CompanyTeamUsersAgGrid>
           </div>
         </div>
-        <MessageSnackBar
+        {/* <MessageSnackBar
           isOpen={messageSnackbar.open}
           message={messageSnackbar.message}
           type={messageSnackbar.type}
           onClose={handleMessageSnackbarClose}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        /> */}
       </div>
     </div>
   );

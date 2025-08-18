@@ -3,20 +3,16 @@ import { ClipboardPlus, EditIcon, X } from "lucide-react";
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+// import MessageSnackBar from "../../ui/MessageSnackbar";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useEffect, useState } from "react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -32,6 +28,7 @@ import ProductTax from "../../../@types/products/ProductTaxManagementProps";
 import { Product } from "../../../@types/products/ProductsManagementProps";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CreateCompanyProductCompanyUserModal from "./CreateCompanyProductCompanyUserModal";
+import toast from "react-hot-toast";
 
 function EditCompanyProductModal({
   isOpen,
@@ -51,24 +48,27 @@ function EditCompanyProductModal({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
 
-  const {isSmallScreen} = useScreenSize();
+  const { isSmallScreen } = useScreenSize();
 
-  const [companyProductTax,setCompanyProductTax] = useState<ProductTax[]>([]);
-  const [companyProductTaxChangeCount,setCompanyProductTaxChangeCount] = useState<number>(0);
+  const [companyProductTax, setCompanyProductTax] = useState<ProductTax[]>([]);
+  const [companyProductTaxChangeCount, setCompanyProductTaxChangeCount] =
+    useState<number>(0);
 
   const [
     isCreateCompanyProductTaxModalOpen,
     setIsCreateCompanyProductTaxModalOpen,
   ] = useState<boolean>(false);
 
-  const [isCreateCompanyProductCompanyUserModalOpen,setIsCreateCompanyProductCompanyUserModalOpen] = useState<boolean>(false);
+  const [
+    isCreateCompanyProductCompanyUserModalOpen,
+    setIsCreateCompanyProductCompanyUserModalOpen,
+  ] = useState<boolean>(false);
 
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
   const CompanyProductIsActiveRadioButtonOptions = [
     {
@@ -87,7 +87,6 @@ function EditCompanyProductModal({
     },
   ];
 
-
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
   };
@@ -101,25 +100,24 @@ function EditCompanyProductModal({
     updateCompanyProductFormData,
     "registration"
   );
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
-  const handleCompanyProductTaxChange = (status : boolean) => {
-    if(status){
+  const handleCompanyProductTaxChange = (status: boolean) => {
+    if (status) {
       setCompanyProductTaxChangeCount((prev) => prev + 1);
     }
-  }
+  };
 
-  const handleCreateCompanyProductTax = (product : Product) => {
-    handleCreateCompanyProductTaxAdd(product)
+  const handleCreateCompanyProductTax = (product: Product) => {
+    handleCreateCompanyProductTaxAdd(product);
     setCompanyProductTaxChangeCount((prev) => prev + 1);
-  }
-
+  };
 
   const hanldeUpdateCompanyProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -140,8 +138,7 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
           intialEditCompanyProductFormData.cost ||
-          updateCompanyProductFormData.isActive !== 
-          product.isActive
+        updateCompanyProductFormData.isActive !== product.isActive
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -163,14 +160,15 @@ function EditCompanyProductModal({
                 response.data.status === true &&
                 response.status === STATUS_CODE.OK
               ) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
+                // showMessageSnackbar({
+                //   message: response.data.message,
+                //   type: "success",
+                // });
+                toast.success(response.data.message);
                 handleCompanyProductChange(product);
                 setTimeout(() => {
                   onClose();
-                  setIsCreateCompanyProductTaxModalOpen(false)
+                  setIsCreateCompanyProductTaxModalOpen(false);
                 }, 2000);
               }
             })
@@ -180,7 +178,7 @@ function EditCompanyProductModal({
                 const refreshTokenResponse = await RefreshToken({
                   callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
                 });
-                if(refreshTokenResponse){
+                if (refreshTokenResponse) {
                   hanldeUpdateCompanyProductFormSubmit(event);
                 }
               }
@@ -189,66 +187,69 @@ function EditCompanyProductModal({
 
         handleCompanyProductChange(product);
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.NO_CHANGES,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.NO_CHANGES,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.NO_CHANGES);
       }
     } else {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.REQUIRED_FIELDS,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
   };
 
   const fetchCompanyroductTax = async () => {
-    if(isOpen){
+    if (isOpen) {
       const getProductTaxPostData = {
-        company_id : loginStatus.companyId,
-        company_product_id : product.id,
-        requestedby : loginStatus.id,
-      }
+        company_id: loginStatus.companyId,
+        company_product_id: product.id,
+        requestedby: loginStatus.id,
+      };
 
-      await axios.post(POST_API.GET_PRODUCT_TAX,getProductTaxPostData , {
-        withCredentials : true
-      })
-      .then((response) => {
-        setCompanyProductTax([]);
-        if(response.data &&
-          response.status === STATUS_CODE.OK){
-           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-           response.data.map((res : any) => (
-            
-            setCompanyProductTax(
-              (prev) => [...prev, {
-                id : res.id,
-                companyProductId:res.company_product_id,
-                hsn : res.hsn,
-                sac : res.sac,
-                taxRate : res.tax_rate,
-                validFrom : res.valid_from,
-                createdBy : res.createdby,
-                createdOn : res.createdon,
-                updatedBy : res.updatedby,
-                updatedOn : res.updatedon, 
-              }]
-            )
-          )
-        )
+      await axios
+        .post(POST_API.GET_PRODUCT_TAX, getProductTaxPostData, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          setCompanyProductTax([]);
+          if (response.data && response.status === STATUS_CODE.OK) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            response.data.map((res: any) =>
+              setCompanyProductTax((prev) => [
+                ...prev,
+                {
+                  id: res.id,
+                  companyProductId: res.company_product_id,
+                  hsn: res.hsn,
+                  sac: res.sac,
+                  taxRate: res.tax_rate,
+                  validFrom: res.valid_from,
+                  createdBy: res.createdby,
+                  createdOn: res.createdon,
+                  updatedBy: res.updatedby,
+                  updatedOn: res.updatedon,
+                },
+              ])
+            );
           }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch(async (error : ApiError | any) => {
-        if(error.status === STATUS_CODE.UNATHORISED){
-          const refreshTokenResponse = await RefreshToken({callFunction :fetchCompanyroductTax})
-          if(refreshTokenResponse){
-            fetchCompanyroductTax()
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: fetchCompanyroductTax,
+            });
+            if (refreshTokenResponse) {
+              fetchCompanyroductTax();
+            }
           }
-        }
-      });
+        });
     }
-  }  
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -257,25 +258,30 @@ function EditCompanyProductModal({
         description: "",
         name: "",
       });
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
       fetchCompanyroductTax();
-    }
-    else{
+    } else {
       setCompanyProductTax([]);
     }
-  }, [companyProductTaxChangeCount,isOpen]);
+  }, [companyProductTaxChangeCount, isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className={isSmallScreen ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"}>
+    <div
+      className={
+        isSmallScreen
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
+          : "fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"
+      }
+    >
       <div className="flex min-h-screen items-center justify-center">
-        <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+        <div
+          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-         
-
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+        >
           <div className="p-6">
             <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
@@ -283,14 +289,14 @@ function EditCompanyProductModal({
                 Edit {product.name}
               </h2>
               <button
-            onClick={() => {
-              onClose();
-              setIsCreateCompanyProductTaxModalOpen(false)
-            }}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 z-10"
-          >
-            <X size={SIZE.TWENTY} />
-          </button>
+                onClick={() => {
+                  onClose();
+                  setIsCreateCompanyProductTaxModalOpen(false);
+                }}
+                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 z-10"
+              >
+                <X size={SIZE.TWENTY} />
+              </button>
             </div>
 
             <form
@@ -341,23 +347,22 @@ function EditCompanyProductModal({
               </div>
 
               <div className="grid gap-4">
-              <TextAreaInput
-                label="Description : "
-                cols={5}
-                rows={3}
-                name="description"
-                required={true}
-                placeholder="Enter Product Description"
-                defaultValue={intialEditCompanyProductFormData.description}
-                onChange={handleEditCompanyProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.description}
-              />
+                <TextAreaInput
+                  label="Description : "
+                  cols={5}
+                  rows={3}
+                  name="description"
+                  required={true}
+                  placeholder="Enter Product Description"
+                  defaultValue={intialEditCompanyProductFormData.description}
+                  onChange={handleEditCompanyProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.description}
+                />
               </div>
 
               <div className="flex justify-self-center m-2 min-w-80 gap-2">
                 <Button type="submit">Update Product</Button>
-               
               </div>
             </form>
 
@@ -367,7 +372,13 @@ function EditCompanyProductModal({
                 Product Tax
               </span>
             </div>
-            <div className={isSmallScreen ? "flex justify-self-end max-w-full px-2 mb-2" : "flex justify-self-end max-w-36 m-3"}>
+            <div
+              className={
+                isSmallScreen
+                  ? "flex justify-self-end max-w-full px-2 mb-2"
+                  : "flex justify-self-end max-w-36 m-3"
+              }
+            >
               <Button
                 type="button"
                 onClick={() => {
@@ -379,13 +390,16 @@ function EditCompanyProductModal({
                 ></ClipboardPlus>
                 Add TAX
               </Button>
-              
             </div>
 
-            
-
             {isCreateCompanyProductTaxModalOpen && (
-              <div className={isSmallScreen ? "flex justify-center items-center min-w-full" : "flex justify-center items-center min-w-fit"}>
+              <div
+                className={
+                  isSmallScreen
+                    ? "flex justify-center items-center min-w-full"
+                    : "flex justify-center items-center min-w-fit"
+                }
+              >
                 <CreateCompanyProductTaxModal
                   isOpen={isCreateCompanyProductTaxModalOpen}
                   handleCreateCompanyProductTax={handleCreateCompanyProductTax}
@@ -398,36 +412,34 @@ function EditCompanyProductModal({
             )}
 
             <CreateCompanyProductCompanyUserModal
-            isOpen={isCreateCompanyProductCompanyUserModalOpen}
-            onClose={()=> {
-              setIsCreateCompanyProductCompanyUserModalOpen(false)
-              
-            }}
-            product={product}
+              isOpen={isCreateCompanyProductCompanyUserModalOpen}
+              onClose={() => {
+                setIsCreateCompanyProductCompanyUserModalOpen(false);
+              }}
+              product={product}
             />
 
-
-<div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
-          <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "440px", width: "100%" }}
-          >
-            <ProductTaxManagementAgGrid productTax={companyProductTax} 
-              handleCompanyProductTaxChange={handleCompanyProductTaxChange}
-            />
+            <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
+              <div
+                className="ag-theme-alpine w-full"
+                style={{ height: "440px", width: "100%" }}
+              >
+                <ProductTaxManagementAgGrid
+                  productTax={companyProductTax}
+                  handleCompanyProductTaxChange={handleCompanyProductTaxChange}
+                />
+              </div>
+            </div>
           </div>
         </div>
-          </div>
-        </div>
-        <MessageSnackBar
+        {/* <MessageSnackBar
           isOpen={messageSnackbar.open}
           message={messageSnackbar.message}
           type={messageSnackbar.type}
           onClose={handleMessageSnackbarClose}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        /> */}
       </div>
-
     </div>
   );
 }

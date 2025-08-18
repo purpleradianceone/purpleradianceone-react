@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../../constants/AppConstants";
@@ -22,14 +21,15 @@ import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUse
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
+import toast from "react-hot-toast";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -42,7 +42,7 @@ function CreateLeadTaskModal({
 }: {
   isOpen: boolean;
   handleClose: () => void;
-  leadId? : number;
+  leadId?: number;
   leadTaskStage: LeadTaskStageType[];
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
@@ -79,25 +79,29 @@ function CreateLeadTaskModal({
   const [leadContactDataSelectedArray, setLeadContactDataSelectedArray] =
     useState<LeadContactType[]>([]);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   useEffect(() => {
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
   }, [leadActivityId]);
 
+  useEffect(() =>{
+    console.log(leadData);
+    
+  },[leadData])
   const resetStates = () => {
     setSubject("");
     setDescription("");
@@ -111,7 +115,7 @@ function CreateLeadTaskModal({
     setSelectedCompanyUsers([]);
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
-    handleCloseSnackbar();
+    // handleCloseSnackbar();
   };
 
   const generateTimeOptions = () => {
@@ -177,42 +181,48 @@ function CreateLeadTaskModal({
 
   const createLeadTask = async (event: React.FormEvent) => {
     if (leadActivityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Activity",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Activity",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Activity");
+
       return;
     } else if (leadTaskPriorityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Priority",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Priority",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Priority");
+
       return;
     } else if (leadTaskStageId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Stage",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Stage",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Stage");
       return;
     } else if (subject === "") {
-      showMessageSnackbar({
-        message: "Please provide Subject To Task",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please provide Subject To Task",
+      //   type: "error",
+      // });
+      toast.error("Please provide Subject To Task");
       return;
-    }
-    else if(dueDate === ""){
-       showMessageSnackbar({
-        message: "Please select Due Date for Task",
-        type: "error",
-      });
+    } else if (dueDate === "") {
+      // showMessageSnackbar({
+      //   message: "Please select Due Date for Task",
+      //   type: "error",
+      // });
+      toast.error("Please select Due Date for Task");
       return;
-    }
-    else if(dueTime === ""){
-       showMessageSnackbar({
-        message: "Please select Due Time for Task",
-        type: "error",
-      });
+    } else if (dueTime === "") {
+      // showMessageSnackbar({
+      //   message: "Please select Due Time for Task",
+      //   type: "error",
+      // });
+      toast.error("Please select Due Time for Task");
       return;
     }
 
@@ -240,19 +250,21 @@ function CreateLeadTaskModal({
       })
       .then((response) => {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message)
           handleLeadTaskCreate();
           setTimeout(() => {
             handleClose();
           }, 2000);
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message)
         }
       })
       .catch(async (error) => {
@@ -267,38 +279,36 @@ function CreateLeadTaskModal({
       });
   };
 
-   const getComapnyUsers = async () => {
+  const getComapnyUsers = async () => {
     setSelectedCompanyUsers([]);
-      const getCompanyUserPostData = {
-        company_id: loginStatus.companyId,
-        id: loginStatus.id,
-        search_company_specific_date_range_id: 0,
-        requestedby: loginStatus.id,
-      };
+    const getCompanyUserPostData = {
+      company_id: loginStatus.companyId,
+      id: loginStatus.id,
+      search_company_specific_date_range_id: 0,
+      requestedby: loginStatus.id,
+    };
 
-      await axios
-        .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            response.data.map((res : any) => {
-                    setSelectedCompanyUsers((prev) => [...prev, res]);
-            })
-            
+    await axios
+      .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          response.data.map((res: any) => {
+            setSelectedCompanyUsers((prev) => [...prev, res]);
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.ststus === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: getComapnyUsers,
+          });
+          if (refreshTokenResponse) {
+            getComapnyUsers();
           }
-        })
-        .catch(async (error) => {
-          if (error.ststus === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({
-              callFunction: getComapnyUsers,
-            });
-            if (refreshTokenResponse) {
-              getComapnyUsers();
-            }
-          }
-        });
-    
+        }
+      });
   };
 
   const timeOptions = generateTimeOptions();
@@ -308,7 +318,6 @@ function CreateLeadTaskModal({
       getComapnyUsers();
       const leadSearchParam = JSON.parse(searchParams.get("leadData") || "{}");
       setLeadData(leadSearchParam);
-
     }
     if (!isOpen) {
       resetStates();
@@ -340,9 +349,8 @@ function CreateLeadTaskModal({
                 if (e !== 4) {
                   if (e) {
                     setLeadActivityId(e);
-                  }
-                  else{
-                     setLeadActivityId(0);
+                  } else {
+                    setLeadActivityId(0);
                   }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
@@ -353,30 +361,30 @@ function CreateLeadTaskModal({
             ></CustomDropdown>
             <CustomDropdown
               labelName="Priority"
+              preselectedOption={2} // id of medium
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
+                } else {
+                  setLeadTaskPriorityId(0);
                 }
-                else{
-                   setLeadTaskPriorityId(0);
-                }
+
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
             <CustomDropdown
               labelName="Stage"
+              preselectedOption={2}
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
-                }
-                else{
+                } else {
                   setLeadTaskStageId(0);
                 }
               }}
               options={leadTaskStage}
             ></CustomDropdown>
-            {leadActivityId !== 3
-            && (
+            {leadActivityId !== 3 && (
               <div className="flex justify-between col-span-3 mb-0">
                 <label
                   htmlFor="phoneCallBtn"
@@ -608,13 +616,13 @@ function CreateLeadTaskModal({
         />
       )}
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
@@ -8,21 +9,16 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
+
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
 import {
-  NUMBER_VALUES,
   SITE_KEY,
   STATUS_CODE,
   STRING_VALUES,
@@ -32,6 +28,7 @@ import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
 import { useUserPreference } from "../../context/user/UserPreference";
 import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
+import toast from "react-hot-toast";
 
 function SignInForm() {
   const navigate = useNavigate();
@@ -72,19 +69,19 @@ function SignInForm() {
     message: "",
   });
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   // const isActiveSubscriptionUseRef =useRef<boolean>(false);
 
@@ -116,26 +113,29 @@ function SignInForm() {
 
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
       if (!loginUserCredentials.email) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.EMAIL_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.EMAIL_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error( MESSAGE.ERROR.EMAIL_REQUIRED);
         return;
       }
       if (!loginUserCredentials.password) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.PASSWORD_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.PASSWORD_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.PASSWORD_REQUIRED);
         return;
       }
     }
 
     if (!captchaToken) {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.COMPLETE_CAPTCHA);
       return;
     }
 
@@ -178,10 +178,11 @@ function SignInForm() {
           if (!response.data.isactive_subscription) {
             
             setTimeout(() => {
-              showMessageSnackbar({
-                message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
-                type: "error",
-              });
+              // showMessageSnackbar({
+              //   message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+              //   type: "error",
+              // });
+              toast.error(MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR);
               
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
             }, 1500);
@@ -204,10 +205,11 @@ function SignInForm() {
                 status: "success",
                 message: MESSAGE.SUCCESS.LOGGED_IN,
               });
-              showMessageSnackbar({
-                message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-                type: "success",
-              });
+              // showMessageSnackbar({
+              //   message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+              //   type: "success",
+              // });
+              toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
 
               if (
                 loginStatusRef.current.active_users_in_company >
@@ -270,10 +272,11 @@ function SignInForm() {
               });
             });
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message)
           setSpinnerAnimation({
             status: "idle",
             message: "",
@@ -282,10 +285,11 @@ function SignInForm() {
       })
       .catch((error) => {
         recaptchaRef.current!.reset();
-        showMessageSnackbar({
-          message: error.response.data.message,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: error.response.data.message,
+        //   type: "error",
+        // });
+        toast.error(error.response.data.message)
         setSpinnerAnimation({
           status: "idle",
           message: "",
@@ -433,13 +437,13 @@ function SignInForm() {
         />
       </div>
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </>
   );
 }

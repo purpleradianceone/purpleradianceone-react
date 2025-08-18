@@ -14,11 +14,11 @@ import React, { useEffect, useState } from "react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { Product } from "../../../@types/products/ProductsManagementProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -29,6 +29,7 @@ import AddProductModalProps from "../../../@types/modal/AddProductModalProps";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import useScreenSize from "../../../config/hooks/useScreenSize";
+import toast from "react-hot-toast";
 
 function AddProductModal({
   isOpen,
@@ -36,11 +37,11 @@ function AddProductModal({
   handleProductChangeOnAdd,
 } : AddProductModalProps) {
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
   const {isSmallScreen} = useScreenSize()
   function handleTaxRadioButtonChange(
@@ -49,13 +50,13 @@ function AddProductModal({
     setSelectedTaxCode(event.target.value);
   }
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const [intialAddProductFormData,setInitialAddProductFormData] =  useState<Product>({
     name: "",
@@ -82,9 +83,9 @@ function AddProductModal({
     "registration"
   );
 
-  useEffect(() => {
-    handleMessageSnackbarClose();
-  }, []);
+  // useEffect(() => {
+  //   handleMessageSnackbarClose();
+  // }, []);
 
 
   const handleAddProductFormSubmit = async (
@@ -102,10 +103,11 @@ function AddProductModal({
         (addProductFormData.taxRate === 0 ||
           addProductFormData.validFrom === "")
       ) {
-        showMessageSnackbar({
-          message: "Please insert Tax Rate and Valid From",
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: "Please insert Tax Rate and Valid From",
+        //   type: "error",
+        // });
+        toast.error("Please insert Tax Rate and Valid From")
         return;
       } else {
         let formattedDate: string = "";
@@ -139,16 +141,19 @@ function AddProductModal({
             withCredentials: true,
           })
           .then((response) => {
-            if (response.data) {
-              showMessageSnackbar({
-                message: "Product Added Successfully",
-                type: "success",
-              });
+            if (response.data.success) {
+              // showMessageSnackbar({
+              //   message: "Product Added Successfully",
+              //   type: "success",
+              // });
+              toast.success(response.data.message)
 
               handleProductChangeOnAdd(addProductFormData);
               setTimeout(() => {
                 onClose();
               }, NUMBER_VALUES.SNACKBAR_DURATION);
+            }else{
+              toast.success(response.data.message)
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -307,10 +312,11 @@ function AddProductModal({
                   <Button
                     type="submit"
                     onClick={() => {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
+                      // showMessageSnackbar({
+                      //   message: MESSAGE.ERROR.NOT_ATHORISED,
+                      //   type: "error",
+                      // });
+                      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
                     }}
                     disabled
                   >
@@ -322,13 +328,13 @@ function AddProductModal({
             </form>
           </div>
         </div>
-        <MessageSnackBar
+        {/* <MessageSnackBar
           isOpen={messageSnackbar.open}
           message={messageSnackbar.message}
           type={messageSnackbar.type}
           onClose={handleMessageSnackbarClose}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        /> */}
       </div>
     </div>
   );

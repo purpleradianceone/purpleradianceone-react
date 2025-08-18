@@ -104,7 +104,7 @@ const LeadContact = ({
     if (name === "email" && !VALIDATIONS.EMAIL.test(value) && value !== "") {
       setErrors((prev) => ({
         ...prev,
-        email: "please enter invalid email address.",
+        email: "please enter valid email address.",
       }));
     } else {
       setErrors((prev) => ({
@@ -217,8 +217,8 @@ const LeadContact = ({
     }
 
     if (!email.trim() && !mobileNumber.trim()) {
-      newErrors.email = "Eigther email or mobile number is required.";
-      newErrors.mobileNumber = "Eigther email or mobile number is required.";
+      newErrors.email = "Either an email address or a mobile number is mandatory.";
+      newErrors.mobileNumber = "Either an email address or a mobile number is mandatory.";
       isValid = false;
     }
     if (email.trim() && !VALIDATIONS.EMAIL.test(email)) {
@@ -408,14 +408,15 @@ const LeadContact = ({
           leadContact.map((contact, index) => (
             <div
               key={index}
-              className="bg-blue-50 border border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
+              className="bg-blue-50 border cursor-pointer border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
+               onClick={() => {
+                    setSelectedContactCard(contact);
+                  }}
             >
               <div>
                 <p
-                  onClick={() => {
-                    setSelectedContactCard(contact);
-                  }}
-                  className="text-xs font-medium text-gray-800 hover:text-blue-500 cursor-pointer"
+                 
+                  className="text-xs font-medium text-gray-800 hover:text-blue-500 "
                 >
                   {contact.name}
                 </p>
@@ -481,7 +482,10 @@ const LeadContact = ({
                   isActive ? "bg-green-300" : "bg-red-300"
                 } w-20 h-20 rounded-full  flex items-center justify-center text-2xl font-bold text-white bg-gray-300`}
               >
-                {selectedContactCard.name.charAt(0).toUpperCase()}
+                {
+                selectedContactCard.name ?
+                selectedContactCard.name.charAt(0).toUpperCase() : "" 
+                }
               </div>
               <div>
                 <h2 className="text-2xl font-semibold text-gray-800">
@@ -702,7 +706,7 @@ const LeadContact = ({
                     type="text"
                     name="name"
                     onBlur={handleBlur}
-                    placeholder=" Enter Full Name"
+                    placeholder="Enter Full Name"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     defaultValue={editContactData?.name || ""}
@@ -755,7 +759,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="mobileNumber"
-                    placeholder="98********"
+                    placeholder="Mobile number"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
