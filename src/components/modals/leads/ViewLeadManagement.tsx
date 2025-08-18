@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChevronLeft, History, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
@@ -36,6 +35,7 @@ import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 import toast from "react-hot-toast";
+import { useUserPreference } from "../../../context/user/UserPreference";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const ViewLeadManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
     useState<boolean>(false);
-  const { position } = usePanel();
+  const {userPreference} =useUserPreference();
   const [searchParams] = useSearchParams();
   const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState<boolean>(false);
   const [reasonInputBoxOpenForLeadOwner, setReasonInputBoxOpenForLeadOwner] =
@@ -644,10 +644,14 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
   return (
     <div
-      className={`${
-        position === "left" ? " ml-14" : "ml-1"
-      } fixed top-8 inset-0 z-10 bg-white ${
-        position === "left" ? "mt-4" : "mt-6"
+      // className={`${
+      //   position === "left" ? " ml-14" : "ml-1"
+      // } fixed top-8 inset-0 z-10 bg-white ${
+      //   position === "left" ? "mt-4" : "mt-6"
+      // } overflow-auto`}
+
+       className={` fixed top-8 inset-0 z-10 bg-white ${
+        userPreference.isLeftMenu  ? "ml-[54px] mt-4" : " mt-6"
       } overflow-auto`}
     >
       {/* Header */}
