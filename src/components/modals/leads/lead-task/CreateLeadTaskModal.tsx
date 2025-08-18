@@ -98,6 +98,10 @@ function CreateLeadTaskModal({
     setAddCompanyLeadContactIdArray([]);
   }, [leadActivityId]);
 
+  useEffect(() =>{
+    console.log(leadData);
+    
+  },[leadData])
   const resetStates = () => {
     setSubject("");
     setDescription("");
@@ -357,17 +361,20 @@ function CreateLeadTaskModal({
             ></CustomDropdown>
             <CustomDropdown
               labelName="Priority"
+              preselectedOption={2} // id of medium
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
                 } else {
                   setLeadTaskPriorityId(0);
                 }
+
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
             <CustomDropdown
               labelName="Stage"
+              preselectedOption={2}
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);

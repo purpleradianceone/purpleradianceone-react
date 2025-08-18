@@ -106,7 +106,7 @@ const AssignProductToLead = ({
         {
           company_product_id: params.id!,
           cost_expected: params.expectedCost,
-          lead_interest_id: params.interest,
+          lead_interest_id: params.interest ?? 2,
           quantity_required: params.requiredQuantity,
         },
       ]);

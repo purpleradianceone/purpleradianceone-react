@@ -224,7 +224,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   error={errors.email}
                   maxLength={256}
                 />
-                <Button type="submit">{isSmallScreen ? "Create" : "Create Company CompanyUser"}</Button>
+                <Button type="submit">Create</Button>
               </form>
             </div>
           </div>
