@@ -37,6 +37,7 @@ import MESSAGE from "../../constants/Messages";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 type TemplateType = {
   id: number;
@@ -46,6 +47,7 @@ type TemplateType = {
 };
 
 export const TemplatesPage: React.FC = () => {
+  const { userPreference} = useUserPreference();
   const [activeTab, setActiveTab] = useState<string>("");
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -313,7 +315,7 @@ export const TemplatesPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full pt-1 pl-5 pr-1 gap-1 h-screen flex flex-col ">
+    <div className={`w-full pt-1 ${userPreference.isLeftMenu ? "pl-5" : "px-1"}  gap-1 h-screen flex flex-col `}>
       {/* Header */}
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
         <div className="flex  justify-between w-full h-12 items-center">
