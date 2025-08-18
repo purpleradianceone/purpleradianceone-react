@@ -116,8 +116,10 @@ export const EditorCanvas: React.FC = () => {
   const handlePreview = (html: string) => {
     let replacedHtml = html;
     Object.entries(dynamicVars).forEach(([key, value]) => {
-      const regex = new RegExp(`${key}`, "g");
-      replacedHtml = replacedHtml.replace(regex, value);
+      if (value !== null && value !== "") {
+        const regex = new RegExp(`${key}`, "g");
+        replacedHtml = replacedHtml.replace(regex, value);
+      }
     });
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
@@ -236,24 +238,23 @@ export const EditorCanvas: React.FC = () => {
         </div>
       </div>
       <>
-        <div style={{
-              position: "fixed",
-              top: 100,
-              right: 2,
-              zIndex: 10,
-              color: "white",
-              background: "#007bff",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              padding: "6px 10px",
-              cursor: "pointer",
-              fontSize: "12px",
-            }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 100,
+            right: 2,
+            zIndex: 10,
+            color: "white",
+            background: "#007bff",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            padding: "6px 10px",
+            cursor: "pointer",
+            fontSize: "12px",
+          }}
+        >
           {/* Show Fields Button - Always Visible */}
-          <button
-            onClick={() => setShowDynamicEditor(!showDynamicEditor)}
-            
-          >
+          <button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
             ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
           </button>
 
@@ -286,7 +287,14 @@ export const EditorCanvas: React.FC = () => {
                   borderBottom: "1px solid #eee",
                 }}
               >
-                <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600, color:"black" }}>
+                <h4
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    color: "black",
+                  }}
+                >
                   Dynamic Fields
                 </h4>
                 <button
@@ -341,14 +349,15 @@ export const EditorCanvas: React.FC = () => {
                         border: "1px solid #ddd",
                         backgroundColor: "#fff",
                         boxSizing: "border-box",
+                        color: "black",
                       }}
                       value={dynamicVars[field.value] || ""}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setDynamicVars((prev) => ({
                           ...prev,
                           [field.value]: e.target.value,
-                        }))
-                      }
+                        }));
+                      }}
                       placeholder={`Enter value for ${field.label}`}
                     />
                     <div
@@ -545,12 +554,6 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <>
-                {/* Settings panel */}
-                {/* <TemplateSettingsPanelCreate
-                  htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
-                /> */}
-              </>
             </Editor>
           )}
         </DynamicFieldsContext.Provider>
