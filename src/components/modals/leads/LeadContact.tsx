@@ -67,8 +67,6 @@ const LeadContact = ({
     mobileNumber: "",
   });
 
- 
-
   const inputClass =
     "border border-gray-100 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
   const formInputLabelClassName =
@@ -217,8 +215,10 @@ const LeadContact = ({
     }
 
     if (!email.trim() && !mobileNumber.trim()) {
-      newErrors.email = "Either an email address or a mobile number is mandatory.";
-      newErrors.mobileNumber = "Either an email address or a mobile number is mandatory.";
+      newErrors.email =
+        "Either an email address or a mobile number is mandatory.";
+      newErrors.mobileNumber =
+        "Either an email address or a mobile number is mandatory.";
       isValid = false;
     }
     if (email.trim() && !VALIDATIONS.EMAIL.test(email)) {
@@ -408,26 +408,22 @@ const LeadContact = ({
           leadContact.map((contact, index) => (
             <div
               key={index}
-              className="bg-blue-50 border cursor-pointer border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
-               onClick={() => {
-                    setSelectedContactCard(contact);
-                  }}
+              className="bg-blue-50 border cursor-pointer text-xs font-medium text-gray-800 hover:text-blue-500 border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
+              onClick={() => {
+                setSelectedContactCard(contact);
+              }}
             >
               <div>
-                <p
-                 
-                  className="text-xs font-medium text-gray-800 hover:text-blue-500 "
-                >
-                  {contact.name}
-                </p>
+                <p>{contact.name}</p>
                 <p className="text-xs text-gray-600">
-                  {contact.jobTitle
-                    ? ` ${contact.jobTitle} ${
-                        contact.email || contact.mobileNumber ? "|" : null
-                      }`
-                    : null}{" "}
-                  {contact.email ? ` ${contact.email} | ` : null}{" "}
-                  {contact.mobileNumber}
+                  {contact.jobTitle && <span>{contact.jobTitle}</span>}
+                  {contact.jobTitle &&
+                    (contact.email || contact.mobileNumber) && <span> | </span>}
+
+                  {contact.email && <span>{contact.email}</span>}
+                  {contact.email && contact.mobileNumber && <span> | </span>}
+
+                  {contact.mobileNumber && <span>{contact.mobileNumber}</span>}
                 </p>
               </div>
               <div className="flex text-[10px] font-semibold items-center gap-1">
@@ -482,10 +478,9 @@ const LeadContact = ({
                   isActive ? "bg-green-300" : "bg-red-300"
                 } w-20 h-20 rounded-full  flex items-center justify-center text-2xl font-bold text-white bg-gray-300`}
               >
-                {
-                selectedContactCard.name ?
-                selectedContactCard.name.charAt(0).toUpperCase() : "" 
-                }
+                {selectedContactCard.name
+                  ? selectedContactCard.name.charAt(0).toUpperCase()
+                  : ""}
               </div>
               <div>
                 <h2 className="text-2xl font-semibold text-gray-800">
@@ -713,13 +708,17 @@ const LeadContact = ({
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
                     }
-                    onClick={
-                      ()=>{
-                        if(editContactData?.isPrimary && editContactData !== null) {
-                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
-                        }
+                    onClick={() => {
+                      if (
+                        editContactData?.isPrimary &&
+                        editContactData !== null
+                      ) {
+                        toast.error(
+                          MESSAGE.ERROR
+                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                        );
                       }
-                    }
+                    }}
                   />
                   {errors.name && (
                     <p className="text-xs text-red-600 mt-1">{errors.name}</p>
@@ -740,13 +739,17 @@ const LeadContact = ({
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
                     }
-                    onClick={
-                      ()=>{
-                        if(editContactData?.isPrimary && editContactData !== null) {
-                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
-                        }
+                    onClick={() => {
+                      if (
+                        editContactData?.isPrimary &&
+                        editContactData !== null
+                      ) {
+                        toast.error(
+                          MESSAGE.ERROR
+                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                        );
                       }
-                    }
+                    }}
                   />
                   {errors.email && (
                     <p className="text-xs text-red-600 mt-1">{errors.email}</p>
@@ -767,13 +770,17 @@ const LeadContact = ({
                     readOnly={
                       editContactData?.isPrimary && editContactData !== null
                     }
-                     onClick={
-                      ()=>{
-                        if(editContactData?.isPrimary && editContactData !== null) {
-                          toast.error(MESSAGE.ERROR.PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE)
-                        }
+                    onClick={() => {
+                      if (
+                        editContactData?.isPrimary &&
+                        editContactData !== null
+                      ) {
+                        toast.error(
+                          MESSAGE.ERROR
+                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                        );
                       }
-                    }
+                    }}
                   />
                   {errors.mobileNumber && (
                     <p className="text-xs text-red-600 mt-1">
@@ -923,7 +930,6 @@ const LeadContact = ({
           </div>
         </div>
       )}
-     
     </div>
   );
 };

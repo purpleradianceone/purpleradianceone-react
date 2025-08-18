@@ -15,6 +15,7 @@ import TeamManagementAgGrid from "../ag-grid/TeamManagementAgGrid";
 import Pagination from "../ag-grid/Pagination";
 import EditCompanyTeamModal from "../modals/teams/EditCompanyTeamModal";
 import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 
 function TeamManagementList({
@@ -26,6 +27,7 @@ function TeamManagementList({
     handleCompanyTeamChangeOnUpdate,
     handleCompanyTeamChangeOnAdd,
 }: TeamManagementListProps){
+  const { userPreference} = useUserPreference();
     const {isLargeScreen,isMediumScreen,isSmallScreen} = useScreenSize();
     const {userHasAccessToAddTeamManagement} = useUserAccessModules();
 
@@ -62,7 +64,7 @@ function TeamManagementList({
       }
 
     return (
-        <div className="w-full pt-1 pl-5 pr-1 gap-1">
+        <div className={`w-full pt-1 ${userPreference.isLeftMenu? "pl-5" : "pl-1"} pr-1 gap-1`}>
         <div className="sticky z-10 top-9 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Network className="w-6 h-6 text-blue-600" />}

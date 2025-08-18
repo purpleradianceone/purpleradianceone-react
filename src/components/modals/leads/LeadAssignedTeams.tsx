@@ -44,8 +44,6 @@ const LeadAssignedTeams = ({
   const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
     useState<boolean>(true);
 
-  
-
   //   Note : Get Lead assigned company team
   const getLeadAssignedCompanyteam = async () => {
     const postDataForLeadAssignedCompanyTeam = {
@@ -178,11 +176,11 @@ const LeadAssignedTeams = ({
       })
       .then((response) => {
         if (response.data.status) {
-          toast.success(response.data.message)
+          toast.success(response.data.message);
           getLeadAssignedCompanyteam();
         } else {
           setIsActive(prevStatus);
-          toast.error(response.data.message)
+          toast.error(response.data.message);
         }
       })
       .catch(async (error: ApiError | any) => {
@@ -237,9 +235,9 @@ const LeadAssignedTeams = ({
                   //   type: "error",
                   // });
                   toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
               className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
@@ -267,10 +265,10 @@ const LeadAssignedTeams = ({
                   //       .UPDATE_LEAD_ACCESS_DENIED_message,
                   //   type: "error",
                   // });
-                   toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 } else {
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
@@ -286,20 +284,15 @@ const LeadAssignedTeams = ({
               leadCompanyTeam.map((companyTeam, index) => (
                 <div
                   key={index}
-                  className="bg-blue-50 border border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
+                  onClick={() => {
+                    setSelectedCompanyTeamCard(companyTeam);
+                    getComapnyTeamUsers(companyTeam);
+                    setIsLoadingCompanyTeamCompanyUser(true);
+                  }}
+                  className="bg-blue-50 border cursor-pointer text-xs font-medium  text-gray-800 border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md hover:text-blue-500"
                 >
-                  {/* User Name */}
                   <div>
-                    <p
-                      onClick={() => {
-                        setSelectedCompanyTeamCard(companyTeam);
-                        getComapnyTeamUsers(companyTeam);
-                        setIsLoadingCompanyTeamCompanyUser(true);
-                      }}
-                      className="text-xs font-medium text-gray-800 hover:text-blue-500 cursor-pointer"
-                    >
-                      {companyTeam.teamName}
-                    </p>
+                    <p>{companyTeam.teamName}</p>
                   </div>
                   {/* isactive */}
                   <div className="flex text-[10px] font-semibold items-center gap-1">
@@ -392,10 +385,10 @@ const LeadAssignedTeams = ({
                             //       .UPDATE_LEAD_ACCESS_DENIED_message,
                             //   type: "error",
                             // });
-                             toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                .UPDATE_LEAD_ACCESS_DENIED_message
+                            );
                           }
                         }}
                         className="sr-only peer"
@@ -462,19 +455,19 @@ const LeadAssignedTeams = ({
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
         <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
-            <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
-              <div>
-                {/* note : need to make changes in the isopen and onclose */}
-                <CompanyTeamsNotAssignedToLead
-                  getLeadAssignedCompanyteam={getLeadAssignedCompanyteam}
-                  isOpen={openCreateLeadCompanyTeam}
-                  onClose={() => {
-                    setOpenCreateLeadCompanyTeam(false);
-                  }}
-                  selectedLeadData={selectedLeadData}
-                />
-              </div>
+          <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
+            <div>
+              {/* note : need to make changes in the isopen and onclose */}
+              <CompanyTeamsNotAssignedToLead
+                getLeadAssignedCompanyteam={getLeadAssignedCompanyteam}
+                isOpen={openCreateLeadCompanyTeam}
+                onClose={() => {
+                  setOpenCreateLeadCompanyTeam(false);
+                }}
+                selectedLeadData={selectedLeadData}
+              />
             </div>
+          </div>
         </div>
       )}
     </>
