@@ -6,22 +6,20 @@ import POST_API from "../../constants/PostApi";
 import axios from "axios";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { useUserPreference } from "../../context/user/UserPreference";
 import CustomTimezoneDropdown from "./custom-dropdown-timezonedata/CustomTimezoneDropdown";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
+
 import REGEX from "../../constants/Regex";
 import { useMasterRowsInGrid } from "../../config/hooks/useMasterRowsInGrid";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import { alphabets, backgroundColors } from "../../constants/Colors";
+import toast from "react-hot-toast";
 
 const UserPreference = () => {
+  const classnameForParagragh= "text-gray-800 font-semibold";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
@@ -65,19 +63,19 @@ const UserPreference = () => {
   );
 
   //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   // timezone states
   const limitForGrid = userPreference.rowsInGrid;
@@ -115,10 +113,11 @@ const UserPreference = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success( response.data.message)
 
           setUserPreference({
             ...userPreference,
@@ -244,10 +243,11 @@ const UserPreference = () => {
       });
 
       if (response.status === STATUS_CODE.OK) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        // showMessageSnackbar({
+        //   message: response.data.message,
+        //   type: "success",
+        // });
+        toast.success(response.data.message)
         setLoginStatus({
           ...loginStatus,
           fullName: formData.fullName.trim(),
@@ -411,7 +411,7 @@ const UserPreference = () => {
         {/* Basic Info Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Name</h4>
+            <h4 className="text-sm font-semibold text-gray-700">Name</h4>
             {isEditing ? (
               <>
                 <input
@@ -429,24 +429,24 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p className="text-gray-800">
+              <p className={classnameForParagragh}>
                 {formData.fullName || "Not Provided"}
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Email</h4>
-            <p className="text-gray-800">{formData.email || "Not Provided"}</p>
+            <h4 className="text-sm font-semibold text-gray-700">Email</h4>
+            <p className={classnameForParagragh}>{formData.email || "Not Provided"}</p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Company</h4>
-            <p className="text-gray-800">{loginStatus.companyName}</p>
+            <h4 className="text-sm font-semibold text-gray-700">Company</h4>
+            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">
+            <h4 className="text-sm font-semibold text-gray-700">
               Contact Number
             </h4>
             {isEditing ? (
@@ -466,17 +466,17 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p className="text-gray-800">
+              <p className={classnameForParagragh}>
                 {formData.mobileNumber || "Not Provided"}
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">
+            <h4 className="text-sm font-semibold text-gray-700">
               Profile Status
             </h4>
-            <p className="text-gray-800">
+            <p className={classnameForParagragh}>
               {loginStatus.status === true ? "Active" : "Inactive"}
             </p>
           </div>
@@ -486,8 +486,10 @@ const UserPreference = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
         {/* button */}
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">Preferences</h3>
-          <button
+          <h3 className="text-2xl font-semibold text-gray-800">Preferences <span className="text-sm">(Click to change)</span></h3>
+         { (((prevTimezoneId.current !== selectedTimezoneId) ||
+            userPreference.rowsInGrid != selectedRowsPerPage))
+            && <button
             onClick={() => {
               if (prevTimezoneId.current !== selectedTimezoneId) {
                 handleTimezonePreferenceChange();
@@ -498,11 +500,13 @@ const UserPreference = () => {
             }}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
-            {showTimeZoneData ||
-            userPreference.rowsInGrid != selectedRowsPerPage
-              ? "Save"
-              : "Change"}
-          </button>
+            {/* {showTimeZoneData ||
+            userPreference.rowsInGrid != selectedRowsPerPage */}
+              {/* ? */}
+               Save
+              {/* : "Change" */}
+               {/* } */}
+          </button>}
         </div>
         {/* time zone */}
         <div className="flex items-center space-x-4 border-b pb-1">
@@ -603,26 +607,26 @@ const UserPreference = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <h4 className="text-sm font-semibold text-gray-500">Started On</h4>
-            <p className="text-gray-800">
+            <p className={classnameForParagragh}>
               {loginStatus.startDateSubscription || "-"}
             </p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-gray-500">Ending On</h4>
-            <p className="text-gray-800">
+            <p className={classnameForParagragh}>
               {loginStatus.endDateSubscription || "Not Provided"}
             </p>
           </div>
         </div>
       </div>
       {/* Snackbar */}
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 };

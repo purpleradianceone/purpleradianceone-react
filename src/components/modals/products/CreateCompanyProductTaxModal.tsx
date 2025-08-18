@@ -2,19 +2,17 @@ import { EditIcon, X } from "lucide-react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
   TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useEffect, useState } from "react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -27,6 +25,7 @@ import RadioButtons from "../../ui/RadioButton";
 import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
 import useScreenSize from "../../../config/hooks/useScreenSize";
+import toast from "react-hot-toast";
 
 function CreateCompanyProductTaxModal({
   isOpen,
@@ -47,11 +46,11 @@ function CreateCompanyProductTaxModal({
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
   const {
     formData: createCompanyProductTaxFormData,
@@ -63,13 +62,13 @@ function CreateCompanyProductTaxModal({
     "registration"
   );
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
@@ -106,10 +105,11 @@ function CreateCompanyProductTaxModal({
               response.data.status === true &&
               response.status === STATUS_CODE.OK
             ) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
+              // showMessageSnackbar({
+              //   message: response.data.message,
+              //   type: "success",
+              // });
+              toast.success(response.data.message);
               handleCreateCompanyProductTax(product);
 
               setTimeout(() => {
@@ -119,10 +119,11 @@ function CreateCompanyProductTaxModal({
               response.status === STATUS_CODE.OK &&
               !response.data.status
             ) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "error",
-              });
+              // showMessageSnackbar({
+              //   message: response.data.message,
+              //   type: "error",
+              // });
+              toast.error(response.data.message);
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,10 +139,11 @@ function CreateCompanyProductTaxModal({
           });
       }
     } else {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.REQUIRED_FIELDS,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
     }
   };
 
@@ -153,7 +155,7 @@ function CreateCompanyProductTaxModal({
         taxRate: "",
         validFrom: "",
       });
-      handleCloseSnackbar();
+      // handleCloseSnackbar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -251,13 +253,13 @@ function CreateCompanyProductTaxModal({
           </div>
         </div>
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </>
   );
 }

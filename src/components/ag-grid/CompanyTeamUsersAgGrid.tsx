@@ -10,7 +10,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   INNERHTML,
-  NUMBER_VALUES,
+  // NUMBER_VALUES,
   STATUS_CODE,
 } from "../../constants/AppConstants";
 import { UserPlus2 } from "lucide-react";
@@ -26,12 +26,13 @@ import Button from "../ui/Button";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import SearchInput from "../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../@types/ui/MessageSnackbarProps";
 import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
+import toast from "react-hot-toast";
 
 function CompanyTeamUsersAgGrid({
   companyTeam,
@@ -82,19 +83,19 @@ function CompanyTeamUsersAgGrid({
     companyUserGridApiRef.current = params.api;
   };
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
   const [isCompanyUserSearchCleared, setIsCompanyUserSearchCleared] =
     useState<boolean>(true);
 
@@ -344,7 +345,7 @@ function CompanyTeamUsersAgGrid({
       companyUserLastScrollPositionRef.current = 0;
       companyUsersNotAssignedSearchParameterRef.current = "";
       setCompanyUsersToAddToTeamsOrProduct([]);
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
       setIsCompanyUserSearchCleared(true);
     } else if (isOpen && isCompanyUserNotAssignedReadyToFetch && companyUsersNotAssignedSearchParameterRef.current.length === 0) {
       fetchCompanyUsersNotAssigned("");
@@ -400,12 +401,15 @@ function CompanyTeamUsersAgGrid({
                 .then((response) => {
                   if (response.data.status) {
                     setIsActive(!isActive);
-                    showMessageSnackbar({
-                      message: response.data.message,
-                      type: "success",
-                    });
+                    // showMessageSnackbar({
+                    //   message: response.data.message,
+                    //   type: "success",
+                    // });
+                    toast.success(response.data.message);
+                    params.data.isActive = !isActive;
+                  }else{
+                    toast.error(response.data.message);
                   }
-                  params.data.isActive = !isActive;
                 })
                 .catch(async (error: ApiError | any) => {
                   if (error.status === STATUS_CODE.UNATHORISED) {
@@ -443,12 +447,15 @@ function CompanyTeamUsersAgGrid({
                 .then((response) => {
                   if (response.data.status) {
                     setIsActive(!isActive);
-                    showMessageSnackbar({
-                      message: response.data.message,
-                      type: "success",
-                    });
+                    // showMessageSnackbar({
+                    //   message: response.data.message,
+                    //   type: "success",
+                    // });
+                    toast.success(response.data.message);
+                    params.data.isActive = !isActive;
+                  }else{
+                    toast.error(response.data.message);
                   }
-                  params.data.isActive = !isActive;
                 })
                 .catch(async (error: ApiError | any) => {
                   if (error.status === STATUS_CODE.UNATHORISED) {
@@ -594,13 +601,13 @@ function CompanyTeamUsersAgGrid({
         />
 
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 }

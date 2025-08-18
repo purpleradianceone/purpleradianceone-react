@@ -6,17 +6,18 @@ import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../ui/MessageSnackbar";
+import {  STATUS_CODE } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import PaymentSubscription from "./PaymentSubscription";
 import POST_API from "../../constants/PostApi";
+import toast from "react-hot-toast";
 
 function CreateSubscription({
   isSubscrptionFromLoginPage,
@@ -57,19 +58,19 @@ function CreateSubscription({
     setErrors: setCreateSubscriptionErrors,
   } = useFormValidation(createSubscriptionFormData, "registration");
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const handleOnCancelPaymentPage = () => {
     setIsPaymentSubscriptionOpen(false);
@@ -87,10 +88,11 @@ function CreateSubscription({
         createSubscriptionFormData.monthsToPurchase <= 0 &&
         createSubscriptionFormData.numberOfUsers <= 0
       ) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.REQUIRED_FIELDS,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
         setCreateSubscriptionErrors({
           monthsToPurchase: "fill this field",
           companyUserCount: "fill this field",
@@ -98,17 +100,19 @@ function CreateSubscription({
         return;
       }
       if (createSubscriptionFormData.numberOfUsers <= 0) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED);
         return;
       }
       if (createSubscriptionFormData.monthsToPurchase <= 0 || createSubscriptionFormData.monthsToPurchase >48) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SUBSCRIPTION_MONTH,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.SUBSCRIPTION_MONTH,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.SUBSCRIPTION_MONTH)
         return;
       }
     }
@@ -141,10 +145,11 @@ function CreateSubscription({
         setIsPaymentSubscriptionOpen(true);
       }
     } catch (error: any) {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR+ error.message);
       setLoginStatus({
             companyId: 0,
             companyName: "",
@@ -217,13 +222,13 @@ function CreateSubscription({
           {isLoading ? "Generating Order Id..." : "Continue Payment"}
         </Button>
       </form>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
       {isPaymentSubscriptionOpen && (
         <PaymentSubscription 
         isSubscriptionForUpdate={false}

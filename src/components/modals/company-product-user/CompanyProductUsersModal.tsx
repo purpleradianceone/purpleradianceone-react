@@ -15,6 +15,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import axios from "axios";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
 function CompanyProductUsersModal({
   isOpen,
   onClose,
@@ -110,6 +111,7 @@ function CompanyProductUsersModal({
             companyProductUsersLastScrollPositionRef.current = 0;
             setIsCompanyProductUsersFetchedCount(0);
             setAddCompanyProductUserArray([]);
+            toast.success(response.data.message)
           }
         })
         .catch(async (error: ApiError | any) => {

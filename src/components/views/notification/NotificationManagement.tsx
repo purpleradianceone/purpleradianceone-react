@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-
+import { Loader2Icon } from "lucide-react";
 type NotificationPopupProps = {
   onClose?: () => void;
 };
@@ -28,7 +28,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
   const [notificationList, setNotificationList] = useState<
     NotificationListForWeb[]
   >([]);
-
+  const [loadingId, setLoadingId] = useState<number | null>(null);
   //   const [pageFetched , setPageFetched] = useState<Set<number>>(new Set())
 
   // Close when clicked outside
@@ -184,6 +184,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
   };
 
   const handleUpdateNotificationListWeb = async (id: number) => {
+    setLoadingId(id);
+
     const postDataToUpdateNotificationListWeb = {
       company_id: loginStatus.companyId,
       id: id,
@@ -229,6 +231,9 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
         } else if (error.response.status === 500) {
           toast.error("Internal Server Error");
         }
+      })
+      .finally(() => {
+        setLoadingId(null);
       });
   };
   return (
@@ -268,29 +273,33 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
                     ? lastNotificationRef
                     : null
                 }
-                className={`p-2   transition-all border-gray-100
+                className={`p-2 transition-all border-gray-100
                 ${notification.is_read ? "bg-white" : "bg-blue-50"}
               `}
               >
                 {/* Subject and Date */}
-                <div className="flex justify-between items-center mb-1">
+                <div className="flex justify-between items-center ">
                   <p className="font-medium text-sm text-gray-900">
                     {notification.notification_subject}
                   </p>
                   {/* Mark as Read Button */}
-                  {!notification.is_read && (
-                    <button
-                      onClick={() => {
-                        handleUpdateNotificationListWeb(notification.id);
-                        // Example: marking locally as read
 
-                        // Optional: trigger backend call to mark as read here
-                      }}
-                      className="text-xs underline p-0.5  text-gray-400   bg-blue-00"
-                    >
-                      Mark as Read
-                    </button>
-                  )}
+                  {!notification.is_read ? (
+                    loadingId === notification.id ? (
+                      <div className="w-auto mr-7 h-auto flex items-center justify-end ">
+                        <Loader2Icon className="w-4 h-4 text-gray-600 animate-spin " />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          handleUpdateNotificationListWeb(notification.id)
+                        }
+                        className="text-xs underline  text-gray-400 bg-blue-00"
+                      >
+                        Mark as Read
+                      </button>
+                    )
+                  ) : null}
                 </div>
 
                 {/* Body */}
@@ -315,52 +324,6 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
       </div>
     </div>
   );
-
-  // return (
-  //   <div
-  //     ref={popupRef}
-  //     className="absolute -right-72 mt-1  w-96 bg-white border border-gray-300 rounded-2xl shadow-2xl z-50"
-  //   >
-  //     <div className="p-1 border-b text-sm font-semibold text-gray-800 bg-gray-100 rounded-t-2xl">
-  //       Notifications!
-  //     </div>
-
-  //     <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-  //       {notificationList.length === 0 && !showLoadingSpinner ? (
-  //         <div className="p-6 text-center text-gray-500 text-sm">No notifications to display</div>
-  //       ) : showLoadingSpinner && notificationList.length === 0 ? (
-  //         <div className="p-5 flex justify-center">
-  //           <LoadingSpinner />
-  //         </div>
-  //       ) : (
-  //         <>
-  //           {notificationList.map((notification, index) => (
-  //             <div
-  //               key={index}
-  //               ref={index === notificationList.length - 1 ? lastNotificationRef : null}
-  //               className="p-1 hover:bg-blue-50 transition-all cursor-pointer border-b border-gray-100"
-  //             >
-  //               <p className="font-medium text-sm flex justify-between text-gray-900 ">
-  //                 {notification.notification_subject}
-  //                  <span  className="text-xs text-gray-500">{notification.notification_request_date}</span>
-  //               </p>
-  //               <p className="text-xs text-gray-600 mb-1">
-  //                 {notification.notification_body}
-  //                 {notification.is_read === true ? "yes": "no"}
-  //               </p>
-  //             </div>
-  //           ))}
-
-  //           {showLoadingSpinner && (
-  //             <div className="p-4 flex justify-center text-sm text-gray-500 animate-pulse">
-  //               <span>Loading more data...</span>
-  //             </div>
-  //           )}
-  //         </>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default NotificationPopup;

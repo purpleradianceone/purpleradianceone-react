@@ -26,7 +26,6 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
@@ -40,13 +39,9 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import { useServerCurrentTime } from "../../../config/hooks/useServerCurrentTime";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import MeetingPlatforms from "../../../@types/meeting/MeetingPlatform";
 import { useUserPreference } from "../../../context/user/UserPreference";
+import toast from "react-hot-toast";
 
 function EditMeetingDetailsModal({
   meetingDetails,
@@ -87,14 +82,7 @@ function EditMeetingDetailsModal({
   ];
 
   const { userHasAccessToUpdateMeeting } = useUserAccessModules();
-
   const { userPreference } = useUserPreference();
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
 
   const startDateArray =
     meetingDetails.startDateByUserTimeZoneString.split(" ");
@@ -207,13 +195,13 @@ function EditMeetingDetailsModal({
   );
 
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
   const generateTimeOptions = () => {
     const options = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -430,10 +418,11 @@ function EditMeetingDetailsModal({
 
   const updateMeetingDetails = async () => {
     if (serverCurrentTime! > parsedStartDateTime!) {
-      showMessageSnackbar({
-        message: "cannot Update meeting details as it is already started",
-        type: "warning",
-      });
+      // showMessageSnackbar({
+      //   message: "cannot Update meeting details as it is already started",
+      //   type: "warning",
+      // });
+      toast.error("Cannot Update meeting details as it is already started.");
       return;
     }
 
@@ -449,10 +438,11 @@ function EditMeetingDetailsModal({
         (meetingStatus === meetingDetails.meetingStatusFromGoogle ||
           meetingStatus === meetingDetails.meetingStatusFromZoom)
       ) {
-        showMessageSnackbar({
-          message: "No changes made to mesgvs",
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: "No changes made to mesgvs",
+        //   type: "error",
+        // });
+        toast.error("No changes made to meeting.");
         return;
       }
     } else if (!isAttendeeNotPresentAddedNew) {
@@ -471,10 +461,11 @@ function EditMeetingDetailsModal({
           meetingStatus === meetingDetails.meetingStatusFromGoogle ||
             meetingStatus === meetingDetails.meetingStatusFromZoom
         );
-        showMessageSnackbar({
-          message: "No changes made to meeting details",
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: "No changes made to meeting details",
+        //   type: "error",
+        // });
+        toast.error("No changes made to meeting details")
         return;
       }
     }
@@ -531,20 +522,22 @@ function EditMeetingDetailsModal({
           .then((response) => {
             if (response.status == STATUS_CODE.OK) {
               if (response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
+                // showMessageSnackbar({
+                //   message: response.data.message,
+                //   type: "success",
+                // });
+                toast.success(response.data.message);
                 setTimeout(() => {
                   handleMeetingDetailsUpdate(endDate + " " + endTime + ":00",title);
                   setIsCreating(false);
                   onClose();
                 }, 3000);
               } else if (!response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message: response.data.message,
+                //   type: "error",
+                // });
+                toast.error(response.data.message);
               }
             }
           })
@@ -588,10 +581,11 @@ function EditMeetingDetailsModal({
       // console.log(attendees !== meetingDetails.attendeesEmailAll!);
       // console.log("________________________________________________");
       // console.log("is Attendees present : " + isAttendeeNotPresentAddedNew);
-      showMessageSnackbar({
-        message: "You are not Authorised to Update the Meeting details!",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "You are not Authorised to Update the Meeting details!",
+      //   type: "error",
+      // });
+      toast.error("You are not Authorised to Update the Meeting details!")
     }
   };
 
@@ -763,11 +757,12 @@ function EditMeetingDetailsModal({
               }
               onChange={(e) => {
                 e.preventDefault();
-                showMessageSnackbar({
-                  message:
-                    "cannot Change Platform to create new meeting meeting with different platform",
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message:
+                //     "cannot Change Platform to create new meeting meeting with different platform",
+                //   type: "error",
+                // });
+                toast.error("cannot Change Platform to create new meeting meeting with different platform")
               }}
               className={
                 meetingDetails.isActive
@@ -1037,13 +1032,6 @@ function EditMeetingDetailsModal({
         }
         addCompanyTeamUserArray={selectedCompanyUsersIdArray}
         isModalForMeeting={true}
-      />
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.

@@ -4,17 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-// import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { X } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface CompanyUserDashboard {
   id: number;
@@ -26,7 +21,6 @@ interface CompanyUserDashboard {
   updatedby: string;
   createdon: string;
   updatedon: string;
-
   updatedby_id: number;
 }
 
@@ -49,15 +43,15 @@ function CompanyUserDashboardModal({
 
   const initialDataRef = useRef<CompanyUserDashboard[]>([]);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
@@ -67,9 +61,9 @@ function CompanyUserDashboardModal({
     message: "",
   });
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   // const { userHasAccessToUpdateAccess } = useUserAccessModules();
 
@@ -98,10 +92,11 @@ function CompanyUserDashboardModal({
           }
         )
         .then((response) => {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message);
 
           setSpinnerAnimation({
             status: "success",
@@ -151,13 +146,15 @@ function CompanyUserDashboardModal({
           )
           .then((response) => {
             if (response.data != null) {
-
-              const companyUserDashboard : CompanyUserDashboard[] = response.data.sort((a:CompanyUserDashboard , b:CompanyUserDashboard)=>a.dashboard_id - b.dashboard_id);
+              const companyUserDashboard: CompanyUserDashboard[] =
+                response.data.sort(
+                  (a: CompanyUserDashboard, b: CompanyUserDashboard) =>
+                    a.dashboard_id - b.dashboard_id
+                );
 
               setCompanyUserDashboard(companyUserDashboard);
 
               // setCompanyUserDashboard(response.data);
-
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -246,7 +243,6 @@ function CompanyUserDashboardModal({
 
       <div className="p-6 border-t bg-white">
         <div className="flex justify-end">
-
           {/* {userHasAccessToUpdateAccess ? (
             users.id === loginStatus.id ? (
               <Button disabled={true}>Save</Button>
@@ -266,17 +262,17 @@ function CompanyUserDashboardModal({
           >
             Save
           </Button>
-
         </div>
       </div>
 
-      <MessageSnackBar
+
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </dialog>
   );
 }
