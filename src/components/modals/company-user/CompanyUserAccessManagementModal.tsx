@@ -6,22 +6,15 @@ import Button from "../../ui/Button";
 import AccessRightsModalProps from "../../../@types/company-users/AccessRightsModalProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import POST_API from "../../../constants/PostApi";
 import { AccessManagementType } from "../../../@types/company-users/AccessManagementContextType";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import {
-  NUMBER_VALUES,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -29,15 +22,12 @@ function CompanyUserAccessManagementModal({
   users,
 }: AccessRightsModalProps) {
   const [dataStatus, setDataStatus] = useState(false);
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
 
   const { userHasAccessToUpdateAccess } = useUserAccessModules();
 
-  const [changedAccessModules, setChangedAccessModules] = useState<AccessManagementType[]>([]);
+  const [changedAccessModules, setChangedAccessModules] = useState<
+    AccessManagementType[]
+  >([]);
   const initialModulesRef = useRef<AccessManagementType[]>([]);
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
@@ -88,16 +78,17 @@ function CompanyUserAccessManagementModal({
         })
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenStatus = await RefreshToken({ callFunction: fetchUserAccessModules });
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: fetchUserAccessModules,
+            });
             if (refreshTokenStatus) {
               fetchUserAccessModules();
             }
-          } 
+          }
         });
     } else {
       setModules([]);
       setChangedAccessModules([]);
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
     }
   };
 
@@ -107,13 +98,18 @@ function CompanyUserAccessManagementModal({
 
   if (!isOpen) return null;
 
-  const handleCheckboxChange = (moduleId: number, field: "add" | "view" | "update") => {
+  const handleCheckboxChange = (
+    moduleId: number,
+    field: "add" | "view" | "update"
+  ) => {
     setModules((prevModules) => {
       const updatedModules = prevModules.map((module) =>
         module.id === moduleId ? { ...module, [field]: !module[field] } : module
       );
 
-      const initialModule = initialModulesRef.current.find((m) => m.id === moduleId);
+      const initialModule = initialModulesRef.current.find(
+        (m) => m.id === moduleId
+      );
       const updatedModule = updatedModules.find((m) => m.id === moduleId);
 
       if (!updatedModule || !initialModule) return updatedModules;
@@ -125,7 +121,9 @@ function CompanyUserAccessManagementModal({
 
       setChangedAccessModules((prevChanges) => {
         const filteredChanges = prevChanges.filter((m) => m.id !== moduleId);
-        return hasChanged ? [...filteredChanges, updatedModule] : filteredChanges;
+        return hasChanged
+          ? [...filteredChanges, updatedModule]
+          : filteredChanges;
       });
 
       return updatedModules;
@@ -159,17 +157,18 @@ function CompanyUserAccessManagementModal({
     });
   };
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const handleSaveAccessModule = async () => {
     if (changedAccessModules.length === 0) {
-      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      // showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      toast.error(MESSAGE.ERROR.NO_CHANGES);
       return;
     }
 
@@ -192,10 +191,11 @@ function CompanyUserAccessManagementModal({
         withCredentials: true,
       })
       .then((response) => {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        // showMessageSnackbar({
+        //   message: response.data.message,
+        //   type: "success",
+        // });
+        toast.success(response.data.message);
 
         setSpinnerAnimation({
           status: "success",
@@ -218,19 +218,21 @@ function CompanyUserAccessManagementModal({
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({ callFunction: handleSaveAccessModule });
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: handleSaveAccessModule,
+          });
           if (refreshTokenStatus) {
             handleSaveAccessModule();
           }
         } else {
-          showMessageSnackbar({
-            message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+          //   type: "error",
+          // });
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         }
       });
   };
-
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
@@ -333,7 +335,10 @@ function CompanyUserAccessManagementModal({
                         {modules
                           .sort((a, b) => a.id - b.id)
                           .map((module) => (
-                            <tr key={module.id} className="border-t hover:bg-gray-50">
+                            <tr
+                              key={module.id}
+                              className="border-t hover:bg-gray-50"
+                            >
                               <td className="p-4">{module.crm_module_id}</td>
                               <td className="p-4">{module.module_name}</td>
                               <td className="p-4">
@@ -341,7 +346,9 @@ function CompanyUserAccessManagementModal({
                                   <input
                                     type="checkbox"
                                     checked={module.add}
-                                    onChange={() => handleCheckboxChange(module.id, "add")}
+                                    onChange={() =>
+                                      handleCheckboxChange(module.id, "add")
+                                    }
                                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                                   />
                                 </div>
@@ -351,7 +358,9 @@ function CompanyUserAccessManagementModal({
                                   <input
                                     type="checkbox"
                                     checked={module.view}
-                                    onChange={() => handleCheckboxChange(module.id, "view")}
+                                    onChange={() =>
+                                      handleCheckboxChange(module.id, "view")
+                                    }
                                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                                   />
                                 </div>
@@ -361,7 +370,9 @@ function CompanyUserAccessManagementModal({
                                   <input
                                     type="checkbox"
                                     checked={module.update}
-                                    onChange={() => handleCheckboxChange(module.id, "update")}
+                                    onChange={() =>
+                                      handleCheckboxChange(module.id, "update")
+                                    }
                                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                                   />
                                 </div>
@@ -378,28 +389,51 @@ function CompanyUserAccessManagementModal({
             {/* Footer */}
             <div className="p-6 border-t bg-white">
               <div className="flex justify-self-end min-w-36 max-w-44">
-                {userHasAccessToUpdateAccess ? (
+                {/* {userHasAccessToUpdateAccess ? (
                   users.id === loginStatus.id ? (
                     <Button disabled={true}>Save</Button>
                   ) : (
-                    <Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>
+                    <Button  onClick={handleSaveAccessModule} spinner={spinnerAnimation}>
                       Save
                     </Button>
                   )
                 ) : (
                   <Button disabled={true}>Save</Button>
-                )}
+                )} */}
+                <Button
+                  onClick={
+                    userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                      ? handleSaveAccessModule
+                      : ()=>{
+                         if (users.id === loginStatus.id) {
+                          toast.error("Updating your own Access Module is not allowed.");
+                        }else if(!userHasAccessToUpdateAccess){
+                          toast.error("You do not have permission to Update the access module of Another user.");
+                        }
+                      }
+                  }
+                  disabled={
+                    !userHasAccessToUpdateAccess || users.id === loginStatus.id
+                  }
+                  spinner={
+                    userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                      ? spinnerAnimation
+                      : undefined
+                  }
+                >
+                  Save
+                </Button>
               </div>
             </div>
           </div>
 
-          <MessageSnackBar
+          {/* <MessageSnackBar
             isOpen={messageSnackbar.open}
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleMessageSnackbarClose}
             duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
+          /> */}
         </div>
       </div>
     </>

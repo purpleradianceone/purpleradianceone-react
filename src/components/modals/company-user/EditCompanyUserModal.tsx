@@ -4,25 +4,16 @@ import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import POST_API from "../../../constants/PostApi";
 import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import REGEX from "../../../constants/Regex";
-
+import toast from "react-hot-toast";
 function EditCompanyUserModal({
   isOpen,
   onClose,
@@ -34,7 +25,6 @@ function EditCompanyUserModal({
     mobileNumber: user.mobilenumber,
   };
 
-  
   const {
     formData: updateUserformData,
     handleChange: handleEditUserFormChange,
@@ -46,11 +36,11 @@ function EditCompanyUserModal({
 
   const [userIsActive, setUserIsActive] = useState<boolean>(user.isactive);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
   const { loginStatus } = useLoggedInUserContext();
 
   useEffect(() => {
@@ -58,7 +48,7 @@ function EditCompanyUserModal({
       setErrors({
         name: "",
       });
-     setUserIsActive(user.isactive);
+      setUserIsActive(user.isactive);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -66,14 +56,14 @@ function EditCompanyUserModal({
   const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-     const mobileRegex = REGEX.MOBILE_NUMBER;
-     if(updateUserformData.mobileNumber!.trim() !== ""){
-         if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
-          showMessageSnackbar({message : "Invalid mobile number", type : "error"});
-          return;
-        }
-     }
-       
+    const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+    if (updateUserformData.mobileNumber!.trim() !== "") {
+      if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
+        // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+        toast.error("Invalid mobile number");
+        return;
+      }
+    }
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
@@ -101,15 +91,17 @@ function EditCompanyUserModal({
             })
             .then((response) => {
               if (response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
+                // showMessageSnackbar({
+                //   message: response.data.message,
+                //   type: "success",
+                // });
+                toast.success(response.data.message);
               } else if (!response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message: response.data.message,
+                //   type: "error",
+                // });
+                toast.error(response.data.message);
               }
               handleCompanyUserChange(user);
               setTimeout(() => {
@@ -126,103 +118,110 @@ function EditCompanyUserModal({
                   handleEditUserSubmit(event);
                 }
               } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-                  type: "error",
-                });
+                // showMessageSnackbar({
+                //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+                //   type: "error",
+                // });
+                toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
               }
             });
         } else {
-          showMessageSnackbar({
-            message: MESSAGE.ERROR.NO_CHANGES,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: MESSAGE.ERROR.NO_CHANGES,
+          //   type: "error",
+          // });
+          toast.error(MESSAGE.ERROR.NO_CHANGES);
         }
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.NAME_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.NAME_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.NAME_REQUIRED);
         setErrors({
           name: MESSAGE.ERROR.NAME_REQUIRED,
         });
       }
     } else {
-      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      // showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      toast.error(MESSAGE.ERROR.NO_CHANGES);
     }
   };
 
-  const handleCompanyUserToggle = async(event: React.ChangeEvent<HTMLInputElement>) => {
-    handleCloseSnackbar();
-    const {  checked } = event.target;
+  const handleCompanyUserToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // handleCloseSnackbar();
+    const { checked } = event.target;
 
-    if(user.id === loginStatus.id){
-        setUserIsActive(checked);
-        showMessageSnackbar({message : "Can't change your own status", type : "error"});
-        setTimeout(() => {
-          setUserIsActive(user.isactive);
-        },200);
-        return;
+    if (user.id === loginStatus.id) {
+      setUserIsActive(checked);
+      // showMessageSnackbar({message : "Can't change your own status", type : "error"});
+      toast.error("Can't change your own status");
+      setTimeout(() => {
+        setUserIsActive(user.isactive);
+      }, 200);
+      return;
     }
 
     const postUpdateUserData = {
-            id: user.id,
-            updatedby: loginStatus.id,
-            company_id: loginStatus.companyId,
-            fullname: updateUserformData.name,
-            mobilenumber: updateUserformData.mobileNumber,
-            isactive: checked ,
-          };
-          await axios
-            .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
-              withCredentials: true,
-            })
-            .then((response) => {
-              if (response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
-                setUserIsActive(checked);
-              } else if (!response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "error",
-                });
-              }
-              handleCompanyUserChange(user);
-              
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch(async (error: ApiError | any) => {
-              if (error.status === STATUS_CODE.UNATHORISED) {
-                const refreshTokenStatus = await RefreshToken({
-                  callFunctionWithEvent: handleCompanyUserToggle,
-                });
-                if (refreshTokenStatus) {
-                  handleCompanyUserToggle(event);
-                }
-              } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-                  type: "error",
-                });
-              }
-            });
-
-
-  }
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+      id: user.id,
+      updatedby: loginStatus.id,
+      company_id: loginStatus.companyId,
+      fullname: updateUserformData.name,
+      mobilenumber: updateUserformData.mobileNumber,
+      isactive: checked,
+    };
+    await axios
+      .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message);
+          setUserIsActive(checked);
+        } else if (!response.data.status) {
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message);
+        }
+        handleCompanyUserChange(user);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: handleCompanyUserToggle,
+          });
+          if (refreshTokenStatus) {
+            handleCompanyUserToggle(event);
+          }
+        } else {
+          // showMessageSnackbar({
+          //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
+          //   type: "error",
+          // });
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
+        }
+      });
   };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
-  useEffect(() => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  }, [isOpen]);
+  // useEffect(() => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // }, [isOpen]);
   if (!isOpen) return null;
 
   return (
@@ -242,8 +241,8 @@ function EditCompanyUserModal({
               <X size={SIZE.TWENTY} />
             </button>
 
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
+            <div className="p-5">
+              <div className="flex items-center gap-4 mb-5 border-b pb-1">
                 <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                 <h2 className="text-xl font-semibold text-gray-800">
                   Edit {user.fullname}
@@ -275,26 +274,29 @@ function EditCompanyUserModal({
                   error={errors.mobileNumber}
                 />
 
-                <div className="flex items-center justify-between">
-      <label htmlFor="isActive" className="block text-sm font-medium text-gray-700">
-        Status
-      </label>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          id="isActive"
-          name="isActive"
-          checked={userIsActive}
-          onChange={handleCompanyUserToggle}
-          className="sr-only peer"
-        />
-        <div
-          className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
+                <div className="flex items-center gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status : 
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={userIsActive}
+                      onChange={handleCompanyUserToggle}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
                      after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
                      peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
-        ></div>
-      </label>
-    </div>
+                    ></div>
+                  </label>
+                </div>
                 <FormInput
                   label="Email"
                   type="email"
@@ -304,19 +306,19 @@ function EditCompanyUserModal({
                   defaultValue={user.email}
                   readonly={true}
                 />
-                <div className="flex justify-self-center m-2 min-w-60 pb-10">
+                <div className="flex justify-self-center min-w-60 ">
                   <Button type="submit">Update Company User</Button>
                 </div>
               </form>
             </div>
           </div>
-          <MessageSnackBar
+          {/* <MessageSnackBar
             isOpen={messageSnackbar.open}
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleCloseSnackbar}
             duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
+          /> */}
         </div>
       </div>
     </>
