@@ -169,7 +169,7 @@ function EditCompanyProductModal({
                 setTimeout(() => {
                   onClose();
                   setIsCreateCompanyProductTaxModalOpen(false);
-                }, 2000);
+                }, 500);
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

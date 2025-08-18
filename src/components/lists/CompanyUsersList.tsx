@@ -18,6 +18,7 @@ import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
 
 import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 function GetCompanyUsersList({
   users,
@@ -27,6 +28,7 @@ function GetCompanyUsersList({
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
 }: GetCompanyUsersListProps) {
+  const {userPreference} = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
 
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
@@ -90,8 +92,8 @@ function GetCompanyUsersList({
   };
   return (
     userHasAccessToViewUser && (
-      <div className="w-full h-screen pt-1 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-9 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+      <div className={`w-full h-screen pt-1  ${userPreference.isLeftMenu ? "pl-5" : "pl-1"} pr-1 gap-1`}>
+        <div className="sticky z-10 top-9 py-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
 
