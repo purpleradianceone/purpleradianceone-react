@@ -116,8 +116,10 @@ export const EditorCanvas: React.FC = () => {
   const handlePreview = (html: string) => {
     let replacedHtml = html;
     Object.entries(dynamicVars).forEach(([key, value]) => {
-      const regex = new RegExp(`${key}`, "g");
-      replacedHtml = replacedHtml.replace(regex, value);
+      if (value !== null && value !== "") {
+        const regex = new RegExp(`${key}`, "g");
+        replacedHtml = replacedHtml.replace(regex, value);
+      }
     });
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
@@ -157,16 +159,16 @@ export const EditorCanvas: React.FC = () => {
     </div>
   ) : (
     <>
-      <div className="fixed z-10 top-14 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
+      <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex  gap-1">
           {<LucideMail className="w-6 h-6 text-blue-600" />}
           {<LucideCode className="w-4 h-4 text-blue-600" />}
           <span className="text-1xl font-bold">Email Template</span>
           <span className="text-1xl font-bold">
-            : : : {JSON.parse(params!).name} Template
+            : {JSON.parse(params!).name} Template
           </span>
           <div
-            className="fixed  inset-0 justify-center top-12"
+            className="fixed  inset-0 justify-center top-14"
             style={{ height: "fit-content" }}
           >
             <div className="flex-col gap-2 justify-center justify-items-center ">
@@ -236,13 +238,11 @@ export const EditorCanvas: React.FC = () => {
         </div>
       </div>
       <>
-        {/* Show Fields Button - Always Visible */}
-        <button
-          onClick={() => setShowDynamicEditor(!showDynamicEditor)}
+        <div
           style={{
             position: "fixed",
-            top: 56,
-            right: 130,
+            top: 100,
+            right: 2,
             zIndex: 10,
             color: "white",
             background: "#007bff",
@@ -253,118 +253,129 @@ export const EditorCanvas: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
-        </button>
+          {/* Show Fields Button - Always Visible */}
+          <button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
+            ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
+          </button>
 
-        {showDynamicEditor && (
-          <div
-            style={{
-              position: "fixed",
-              top: 80, // Adjusted to appear below the toggle button
-              right: 130,
-              width: "260px",
-              maxHeight: "600px",
-              background: "white",
-              padding: "10px",
-              borderRadius: "8px",
-              boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-              zIndex: 11,
-              overflowY: "auto",
-            }}
-          >
+          {showDynamicEditor && (
             <div
               style={{
-                position: "sticky",
-                display: "flex",
-                top: 0,
-                justifyContent: "space-between",
+                position: "absolute",
+                top: 0, // Adjusted to appear below the toggle button
+                right: 2,
+                width: "260px",
+                maxHeight: "600px",
                 background: "white",
-                alignItems: "center",
-                marginBottom: "10px",
-                paddingBottom: "8px",
-                borderBottom: "1px solid #eee",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+                zIndex: 11,
+                overflowY: "auto",
               }}
             >
-              <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600 }}>
-                Dynamic Fields
-              </h4>
-              <button
-                onClick={() => setShowDynamicEditor(false)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  lineHeight: 1,
-                  color: "#666",
-                  padding: "4px",
-                }}
-              >
-                ✖
-              </button>
-            </div>
-
-            {parsedFields.length === 0 ? (
               <div
                 style={{
-                  padding: "16px",
-                  textAlign: "center",
-                  color: "#666",
-                  fontSize: "12px",
+                  position: "sticky",
+                  display: "flex",
+                  top: 0,
+                  justifyContent: "space-between",
+                  background: "white",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                  paddingBottom: "8px",
+                  borderBottom: "1px solid #eee",
                 }}
               >
-                {isLoading
-                  ? "Loading dynamic fields..."
-                  : "No dynamic fields available"}
+                <h4
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    color: "black",
+                  }}
+                >
+                  Dynamic Fields
+                </h4>
+                <button
+                  onClick={() => setShowDynamicEditor(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    lineHeight: 1,
+                    color: "#666",
+                    padding: "4px",
+                  }}
+                >
+                  ✖
+                </button>
               </div>
-            ) : (
-              parsedFields.map((field) => (
-                <div key={field.value} style={{ marginBottom: "12px" }}>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      display: "block",
-                      marginBottom: "4px",
-                      fontWeight: 500,
-                      color: "#333",
-                    }}
-                  >
-                    {field.label}
-                  </label>
-                  <input
-                    style={{
-                      width: "100%",
-                      padding: "6px 8px",
-                      fontSize: "12px",
-                      borderRadius: "4px",
-                      border: "1px solid #ddd",
-                      backgroundColor: "#fff",
-                      boxSizing: "border-box",
-                    }}
-                    value={dynamicVars[field.value] || ""}
-                    onChange={(e) =>
-                      setDynamicVars((prev) => ({
-                        ...prev,
-                        [field.value]: e.target.value,
-                      }))
-                    }
-                    placeholder={`Enter value for ${field.label}`}
-                  />
-                  <div
-                    style={{
-                      fontSize: "10px",
-                      color: "#999",
-                      marginTop: "4px",
-                      fontFamily: "monospace",
-                    }}
-                  >
-                    {field.value}
-                  </div>
+
+              {parsedFields.length === 0 ? (
+                <div
+                  style={{
+                    padding: "16px",
+                    textAlign: "center",
+                    color: "#666",
+                    fontSize: "12px",
+                  }}
+                >
+                  {isLoading
+                    ? "Loading dynamic fields..."
+                    : "No dynamic fields available"}
                 </div>
-              ))
-            )}
-          </div>
-        )}
+              ) : (
+                parsedFields.map((field) => (
+                  <div key={field.value} style={{ marginBottom: "12px" }}>
+                    <label
+                      style={{
+                        fontSize: "12px",
+                        display: "block",
+                        marginBottom: "4px",
+                        fontWeight: 500,
+                        color: "#333",
+                      }}
+                    >
+                      {field.label}
+                    </label>
+                    <input
+                      style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        fontSize: "12px",
+                        borderRadius: "4px",
+                        border: "1px solid #ddd",
+                        backgroundColor: "#fff",
+                        boxSizing: "border-box",
+                        color: "black",
+                      }}
+                      value={dynamicVars[field.value] || ""}
+                      onChange={(e) => {
+                        setDynamicVars((prev) => ({
+                          ...prev,
+                          [field.value]: e.target.value,
+                        }));
+                      }}
+                      placeholder={`Enter value for ${field.label}`}
+                    />
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        color: "#999",
+                        marginTop: "4px",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {field.value}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
 
         <DynamicFieldsContext.Provider value={parsedFields}>
           {mode === "insert" ? (
@@ -417,10 +428,6 @@ export const EditorCanvas: React.FC = () => {
                     const beautified = DOMPurify.sanitize(htmlInput);
                     navigator.clipboard.writeText(beautified);
                     toast.success("Email Template copied to clipboard!");
-                    // showMessageSnackbar({
-                    //   message: "Email Template copied to clipboard!",
-                    //   type: "success",
-                    // });
                   }}
                   style={{ padding: "8px 14px" }}
                 >
@@ -517,7 +524,7 @@ export const EditorCanvas: React.FC = () => {
                   <div
                     className="fixed inset-0 justify-self-end top-14 "
                     style={{
-                      zIndex: 10,
+                      zIndex: 11,
                       height: "fit-content",
                     }}
                   >
@@ -543,12 +550,6 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <>
-                {/* Settings panel */}
-                {/* <TemplateSettingsPanelCreate
-                  htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
-                /> */}
-              </>
             </Editor>
           )}
         </DynamicFieldsContext.Provider>
