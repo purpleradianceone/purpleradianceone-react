@@ -1,17 +1,10 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MonthlyAverageLeads from '../../../../@types/home/dashboard/MonthlyAverageLeads';
 import { useState } from 'react';
 
 const SalesChart = ({
-  leadsData,
-  currentYear,
-  handlePrevYear,
-  handleNextYear,
+  leadsData
 } : {
   leadsData:  MonthlyAverageLeads[];
-  currentYear: number;
-  handlePrevYear : () => void;
-  handleNextYear : () => void;
 }) => {
  const [hoveredBar, setHoveredBar] = useState<{
     monthIndex: number;
@@ -21,19 +14,9 @@ const SalesChart = ({
   } | null>(null);
 
   const months = leadsData.map((data) => data.month);
-  const salesData = leadsData.map((data) => data.averageMonthlyLeads);
-  const revenueData = leadsData.map((data) => data.monthlyConvertedLeads);
-  
-  const totalLeads = leadsData.reduce((sum, data) => {
-    return sum + data.averageMonthlyLeads;
-  }, 0);
+  const salesData = leadsData.map((data) => data.createdLeads);
+  const revenueData = leadsData.map((data) => data.convertedLeads);
 
-  const totalConvertedLeads = leadsData.reduce((sum, data) => {
-    return sum + data.monthlyConvertedLeads;
-  }, 0);
-
-  const conversionRate = (totalConvertedLeads / totalLeads) * 100 || 0;
-  const ongoingCurrentYear = new Date().getFullYear();
   const maxValue = Math.max(...salesData, ...revenueData);
 
   const handleBarHover = (
@@ -64,12 +47,12 @@ const SalesChart = ({
   const getTooltipLabel = () => {
     if (!hoveredBar) return '';
     return hoveredBar.barType === 'sales'
-      ? 'Average Monthly Leads'
-      : 'Monthly Converted Leads';
+      ? 'Created Leads'
+      : 'Converted Leads';
   };
 
   return (
-     <div className="min-h-full bg-white rounded-2xl shadow-lg border border-gray-100 p-4 relative">
+     <div className="min-h-full bg-white grid rounded-2xl shadow-lg border border-gray-100 p-4 relative">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Annual Performance</h3>
@@ -79,35 +62,17 @@ const SalesChart = ({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-              <span className="text-xs font-medium text-gray-700">Average Monthly Leads</span>
+              <span className="text-xs font-medium text-gray-700">Created Leads</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"></div>
-              <span className="text-xs font-medium text-gray-700">Monthly Converted Leads</span>
+              <span className="text-xs font-medium text-gray-700">Converted Leads</span>
             </div>
-          </div>
-          <div className="flex items-center text-gray-800 bg-gray-100 px-3 py-1 rounded-full space-x-2">
-            <button
-              onClick={handlePrevYear}
-              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label="Previous Year"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-xs font-semibold">{currentYear}</span>
-            <button
-              onClick={handleNextYear}
-              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label="Next Year"
-              disabled={ongoingCurrentYear === currentYear}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="relative h-80">
+      <div className="relative h-96">
         <div className="absolute inset-0 flex items-end justify-between space-x-1">
           {months.map((month, index) => (
             <div key={index} className="flex-1 flex flex-col items-center space-y-1">
@@ -117,7 +82,7 @@ const SalesChart = ({
                   <div
                     className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all duration-1000 ease-out shadow-sm cursor-pointer hover:from-blue-600 hover:to-blue-500"
                     style={{
-                      height: `${(salesData[index] / maxValue) * 280}px`,
+                      height: `${(salesData[index] / maxValue) * 380}px`,
                       animationDelay: `${index * 0.1}s`,
                     }}
                     onMouseEnter={(e) => handleBarHover(index, 'sales', e)}
@@ -132,19 +97,19 @@ const SalesChart = ({
                   <div
                     className="bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg transition-all duration-1000 ease-out shadow-sm cursor-pointer hover:from-emerald-600 hover:to-emerald-500"
                     style={{
-                      height: `${(revenueData[index] / maxValue) * 280}px`,
+                      height: `${(revenueData[index] / maxValue) * 380}px`,
                       animationDelay: `${index * 0.1 + 0.05}s`,
                     }}
                     
                   ></div>
                 </div>
               </div>
-              <span className="text-xs font-medium text-gray-600">{month}</span>
+              <span className="text-xs font-extralight text-gray-600">{month}</span>
             </div>
           ))}
         </div>
       </div>
-
+      
       {/* Tooltip */}
       {hoveredBar && (
         <div
@@ -154,8 +119,8 @@ const SalesChart = ({
             top: hoveredBar.y - 10,
           }}
         >
-          <div className="text-center">
-            <div className="font-base">{months[hoveredBar.monthIndex]}</div>
+          <div className="text-center min-w-24">
+            <div className="font-base text-xs">{months[hoveredBar.monthIndex]}</div>
             <div className="text-xs text-gray-700">{getTooltipLabel()}</div>
             <div className="font-base text-xs">{getTooltipValue()}</div>
           </div>
@@ -163,21 +128,6 @@ const SalesChart = ({
           {/* <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div> */}
         </div>
       )}
-
-      <div className="grid grid-cols-3 gap-3 mt-4 pt-6 border-t border-gray-100">
-        <div className="text-center">
-          <p className="text-xl font-bold text-gray-900">{totalLeads}</p>
-          <p className="text-sm text-gray-600">Total Leads In {currentYear}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-xl font-bold text-emerald-600">{totalConvertedLeads}</p>
-          <p className="text-sm text-gray-600">Total Converted Leads In {currentYear}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-xl font-bold text-blue-600">{conversionRate.toFixed(2)}%</p>
-          <p className="text-sm text-gray-600">Conversion Rate In {currentYear}</p>
-        </div>
-      </div>
     </div>
   );
 

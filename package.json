@@ -26,6 +26,8 @@
     "@tinymce/tinymce-react": "^6.1.0",
     "@types/lodash": "^4.17.17",
     "@types/moment": "^2.11.29",
+    "ag-charts-community": "^12.1.1",
+    "ag-charts-react": "^12.1.1",
     "ag-grid-community": "^33.0.4",
     "ag-grid-react": "^33.0.4",
     "axios": "^1.7.9",
@@ -55,6 +57,7 @@
     "react-router-dom": "^7.1.1",
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.1.2",
     "sockjs-client": "^1.6.1",
     "tinymce": "^7.8.0",
     "uuid": "^11.1.0"

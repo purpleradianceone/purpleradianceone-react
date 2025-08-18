@@ -1,6 +1,16 @@
-import { Plus, UserPlus, Calendar, Mail, BarChart3, LayoutPanelLeft, Store, Network, Settings } from 'lucide-react';
-import ROUTES_URL from '../../../../constants/Routes';
-import { useNavigate } from 'react-router-dom';
+import {
+  Plus,
+  UserPlus,
+  Calendar,
+  Mail,
+  BarChart3,
+  LayoutPanelLeft,
+  Store,
+  Network,
+  Settings,
+} from "lucide-react";
+import ROUTES_URL from "../../../../constants/Routes";
+import { useNavigate } from "react-router-dom";
 
 // const actions = [
 //   {
@@ -512,107 +522,117 @@ import { useNavigate } from 'react-router-dom';
 //   }
 // ];
 
-
 const actions = [
   {
     id: 1,
-    title: 'New Deal',
-    description: 'Create opportunity',
+    title: "New Deal",
+    description: "Create opportunity",
     icon: Plus,
-    color: 'bg-gradient-to-r from-blue-600 to-blue-700 min-h-40 hover:from-blue-700 hover:to-blue-800', // Classic Business Blue
-    shortcut: 'Lead',
-    route: ROUTES_URL.CREATE_LEAD
+    color:
+      "bg-gradient-to-r from-blue-600 to-blue-700 min-h-40 hover:from-blue-700 hover:to-blue-800", // Classic Business Blue
+    shortcut: "Lead",
+    route: ROUTES_URL.CREATE_LEAD,
   },
   {
     id: 2,
-    title: 'Add User',
-    description: 'New User',
+    title: "Add User",
+    description: "New User",
     icon: UserPlus,
-    color: 'bg-gradient-to-r from-teal-600 to-teal-700 min-h-40 hover:from-teal-700 hover:to-teal-800', // Friendly Teal
-    shortcut: 'Users',
-    route: ROUTES_URL.CREATE_COMPANY_USER
+    color:
+      "bg-gradient-to-r from-teal-600 to-teal-700 min-h-40 hover:from-teal-700 hover:to-teal-800", // Friendly Teal
+    shortcut: "Users",
+    route: ROUTES_URL.CREATE_COMPANY_USER,
   },
   {
     id: 3,
-    title: 'Schedule',
-    description: 'Book meeting',
+    title: "Schedule",
+    description: "Book meeting",
     icon: Calendar,
-    color: 'bg-gradient-to-r from-violet-500 to-violet-600 min-h-40 hover:from-violet-600 hover:to-violet-700', // Bright but Muted Violet
-    shortcut: 'Meetings',
-    route: ROUTES_URL.SCHEDULE_MEETING
+    color:
+      "bg-gradient-to-r from-violet-500 to-violet-600 min-h-40 hover:from-violet-600 hover:to-violet-700", // Bright but Muted Violet
+    shortcut: "Meetings",
+    route: ROUTES_URL.SCHEDULE_MEETING,
   },
   {
     id: 4,
-    title: 'Email Template',
-    description: 'Create Email Template',
+    title: "Email Template",
+    description: "Create Email Template",
     icon: Mail,
-    color: 'bg-gradient-to-r from-orange-500 to-orange-600 min-h-40 hover:from-orange-600 hover:to-orange-700', // Energetic Orange
-    shortcut: 'Templates',
-    route: ROUTES_URL.EMAIL_TEMPLATE
+    color:
+      "bg-gradient-to-r from-orange-500 to-orange-600 min-h-40 hover:from-orange-600 hover:to-orange-700", // Energetic Orange
+    shortcut: "Templates",
+    route: ROUTES_URL.EMAIL_TEMPLATE,
   },
   {
     id: 5,
-    title: 'Settings',
-    description: 'Manage Settings',
+    title: "Settings",
+    description: "Manage Settings",
     icon: Settings,
-    color: 'bg-gradient-to-r from-gray-600 to-gray-700 min-h-40 hover:from-gray-700 hover:to-gray-800', // Warm Gray
-    shortcut: 'Settings',
-    route: ROUTES_URL.COMPANY_SETTING
+    color:
+      "bg-gradient-to-r from-gray-600 to-gray-700 min-h-40 hover:from-gray-700 hover:to-gray-800", // Warm Gray
+    shortcut: "Settings",
+    route: ROUTES_URL.COMPANY_SETTING,
   },
   {
     id: 6,
-    title: 'Prefrences',
-    description: 'Manage Prefrences',
+    title: "Prefrences",
+    description: "Manage Prefrences",
     icon: LayoutPanelLeft,
-    color: 'bg-gradient-to-r from-stone-500 to-stone-600 min-h-40 hover:from-stone-600 hover:to-stone-700', // Earthy Stone
-    shortcut: 'Preferences',
-    route: ROUTES_URL.USER_PROFILE_SETTING
+    color:
+      "bg-gradient-to-r from-stone-500 to-stone-600 min-h-40 hover:from-stone-600 hover:to-stone-700", // Earthy Stone
+    shortcut: "Preferences",
+    route: ROUTES_URL.USER_PROFILE_SETTING,
   },
   {
     id: 7,
-    title: 'Products',
-    description: 'Manage Products',
+    title: "Products",
+    description: "Manage Products",
     icon: Store,
-    color: 'bg-gradient-to-r from-green-600 to-green-700 min-h-40 hover:from-green-700 hover:to-green-800', // Lively Green
-    shortcut: 'Product',
-    route: ROUTES_URL.PRODUCT_MANAGEMENT
+    color:
+      "bg-gradient-to-r from-green-600 to-green-700 min-h-40 hover:from-green-700 hover:to-green-800", // Lively Green
+    shortcut: "Product",
+    route: ROUTES_URL.PRODUCT_MANAGEMENT,
   },
   {
     id: 8,
-    title: 'Teams',
-    description: 'Manage Teams',
+    title: "Teams",
+    description: "Manage Teams",
     icon: Network,
-    color: 'bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 min-h-40 hover:from-fuchsia-700 hover:to-fuchsia-800', // Playful Fuchsia (used sparingly for unique actions)
-    shortcut: 'Team',
-    route: ROUTES_URL.TEAM_MANAGEMENT
+    color:
+      "bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 min-h-40 hover:from-fuchsia-700 hover:to-fuchsia-800", // Playful Fuchsia (used sparingly for unique actions)
+    shortcut: "Team",
+    route: ROUTES_URL.TEAM_MANAGEMENT,
   },
   {
     id: 9,
-    title: 'Products Teams/Users',
-    description: 'Manage Product Teams and Users',
+    title: "Products Teams/Users",
+    description: "Manage Product Teams and Users",
     icon: BarChart3,
-    color: 'bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700', // Bright Chart Yellow
-    shortcut: 'Product',
-    route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT
+    color:
+      "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
+    shortcut: "Product",
+    route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
   },
   {
     id: 10,
-    title: 'New Product',
-    description: 'Create Product',
+    title: "New Product",
+    description: "Create Product",
     icon: Plus,
-    color: 'bg-gradient-to-r from-cyan-500 to-cyan-600 min-h-40 hover:from-cyan-600 hover:to-cyan-700', // Clear Cyan
-    shortcut: 'Product',
-    route: ROUTES_URL.CREATE_PRODUCT
+    color:
+      "bg-gradient-to-r from-cyan-500 to-cyan-600 min-h-40 hover:from-cyan-600 hover:to-cyan-700", // Clear Cyan
+    shortcut: "Product",
+    route: ROUTES_URL.CREATE_PRODUCT,
   },
   {
     id: 11,
-    title: 'Create Team',
-    description: 'New Team',
+    title: "Create Team",
+    description: "New Team",
     icon: UserPlus,
-    color: 'bg-gradient-to-r from-red-500 to-red-600 min-h-40 hover:from-red-600 hover:to-red-700', // Action Red (for important new creation)
-    shortcut: 'Teams',
-    route: ROUTES_URL.CREATE_TEAM
-  }
+    color:
+      "bg-gradient-to-r from-red-500 to-red-600 min-h-40 hover:from-red-600 hover:to-red-700", // Action Red (for important new creation)
+    shortcut: "Teams",
+    route: ROUTES_URL.CREATE_TEAM,
+  },
 ];
 
 // const actions = [
@@ -818,32 +838,29 @@ const actions = [
 //   }
 // ];
 const QuickActions = () => {
-
   const navigate = useNavigate();
-
   return (
     <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
       <div className="mb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Quick Actions</h3>
         <p className="text-gray-600">Frequently used CRM functions</p>
       </div>
-      
+  
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {actions.map((action, index) => (
-          <button 
+          <button
             key={action.id}
-            onClick={() =>  {
-              if(action.id !==3 ){
-                    navigate(action.route);
-              }
-              else{
+            onClick={() => {
+              if (action.id !== 3) {
+                navigate(action.route);
+              } else {
                 navigate(
-                            ROUTES_URL.SCHEDULE_MEETING +
-                              "?from=" +
-                              window.location.pathname
-                          );
+                  ROUTES_URL.SCHEDULE_MEETING +
+                    "?from=" +
+                    window.location.pathname
+                );
               }
-                  
             }}
             className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
             style={{ animationDelay: `${index * 0.05}s` }}
@@ -852,7 +869,9 @@ const QuickActions = () => {
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <action.icon className="w-6 h-6" />
-                <span className="text-xs opacity-75 font-mono">{action.shortcut}</span>
+                <span className="text-xs opacity-75 font-mono">
+                  {action.shortcut}
+                </span>
               </div>
               <div className="text-left">
                 <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
@@ -862,6 +881,7 @@ const QuickActions = () => {
           </button>
         ))}
       </div>
+      
     </div>
   );
 };

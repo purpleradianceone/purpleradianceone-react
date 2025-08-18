@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { Calendar, Clock, CheckCircle, User, Phone, FileText, Mail, CheckSquare, Notebook } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, Phone, FileText, Mail, CheckSquare, Notebook } from 'lucide-react';
 import LeadTaskType from '../../../../@types/lead-management/LeadTaskType';
 import LoadingSpinner from '../../../../assets/animations/LoadingSpinner';
 
@@ -60,7 +59,7 @@ const getPriorityColor = (activity : LeadTaskType) => {
   }
 };
 
-function UpcomingTasks({
+function Tasks({
   isLoading,
   leadTasks,
   taskType,
@@ -71,7 +70,7 @@ function UpcomingTasks({
 }) {
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
   // State to manage hover for the custom tooltip
-  const [hoveredTaskId, setHoveredTaskId] = useState<number | null>(null);
+  // const [hoveredTaskId, setHoveredTaskId] = useState<number | null>(null);
 
 
   const toggleDescription = (taskId: number) => {
@@ -116,13 +115,13 @@ function UpcomingTasks({
                 : task.description;
 
             // Ensure assignedToName is an array, default to empty if not present
-            const assignedNames = Array.isArray(task.assignedToName) ? task.assignedToName : [];
+            // const assignedNames = Array.isArray(task.assignedToName) ? task.assignedToName : [];
 
 
             return (
               <div
                 key={task.id}
-                className="flex items-start space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer group"
+                className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer group"
                 style={{
                   backgroundColor: getBgColorFromHex(task.colorCode),
                   borderColor: getBorderColorFromHex(task.colorCode),
@@ -168,43 +167,41 @@ function UpcomingTasks({
                         <Clock className="w-3 h-3" />
                         <span className="text-xs font-medium">{task.dueDateTime}</span> {/* Displaying raw dueDateTime */}
                       </div>
-                      <div
-                        className="relative flex gap-2" // Essential for positioning the tooltip
+                      {/* <div
+                        className="relative flex gap-2"
                         onMouseEnter={() => setHoveredTaskId(task.id)}
                         onMouseLeave={() => setHoveredTaskId(null)}
                       >
                         <User className="w-3 h-3 text-gray-700" />
-                        <span className="text-xs cursor-pointer"> {/* Removed 'title' attribute */}
+                        <span className="text-xs cursor-pointer">
                           {assignedNames.length > 1
                             ? `${assignedNames[0]} +${assignedNames.length - 1}`
                             : assignedNames[0] || 'Unassigned'
                           }
                         </span>
-                        {/* Custom Tooltip UI */}
                         {hoveredTaskId === task.id && assignedNames.length > 0 && (
                           <div
                             className="absolute z-20 p-2 mt-1 bg-gray-800 text-white rounded shadow-lg"
                             style={{
-                              top: '100%', // Position below the span
-                              left: '50%', // Center horizontally
-                              transform: 'translateX(-50%)', // Adjust for centering
-                              whiteSpace: 'nowrap', // Prevent names from wrapping
-                              minWidth: 'max-content' // Ensure it expands to fit content
+                              top: '100%', 
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              whiteSpace: 'nowrap',
+                              minWidth: 'max-content'
                             }}
                           >
-                            <ul className="list-none p-0 m-0 text-xs"> {/* Added text-xs for consistency */}
+                            <ul className="list-none p-0 m-0 text-xs">
                               {assignedNames.map((name, nameIndex) => (
                                 <li key={nameIndex}>{name}</li>
                               ))}
                             </ul>
                           </div>
                         )}
-                      </div>
+                      </div> */}
                       <span className="text-xs text-gray-700 px-1.5 py-0.5 bg-white rounded-full">
                         {task.leadTaskStageName}
                       </span>
-                    </div>
-                    <button
+                       <button
                     type='button'
                       className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
                     >
@@ -219,6 +216,22 @@ function UpcomingTasks({
                     </button>
                     )
                     }
+                    </div>
+                    {/* <button
+                    type='button'
+                      className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                    >
+                      {taskType === "completed" ?  `${task.completedAt}` : `${task.overdueStatus}`}
+                    </button>
+                    {taskType === "completed" && (
+                        <button
+                    type='button'
+                      className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                    >
+                      {task.overdueStatus}
+                    </button>
+                    )
+                    } */}
                     
                   </div>
                 </div>
@@ -233,4 +246,4 @@ function UpcomingTasks({
   );
 }
 
-export default UpcomingTasks;
+export default  Tasks;

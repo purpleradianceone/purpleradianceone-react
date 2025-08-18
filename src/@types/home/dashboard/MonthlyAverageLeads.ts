@@ -1,8 +1,7 @@
 type MonthlyAverageLeads = {
-  averageMonthlyLeads: number;
-  monthlyConvertedLeads: number;
+  createdLeads: number;
+  convertedLeads: number;
   month: string;
-  year: number;
 };
 
 export default MonthlyAverageLeads;
