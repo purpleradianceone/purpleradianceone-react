@@ -1,13 +1,14 @@
+import { useUserPreference } from "../../../../context/user/UserPreference";
 import SettingsTabs from "../../../tabs/SettingTabs";
 
 
 function SettingsPage(){
 
     
-
+const {userPreference} = useUserPreference();
     return (
         <div className="w-full text center">
-            <div className="w-full pt-2 pl-5 pr-1 gap-1">
+            <div className={`w-full pt-2 ${userPreference.isLeftMenu ? "pl-5" :"pl-1"} pr-1 gap-1`}>
             <div className="sticky top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
                 <div className="flex w-full gap-2 justify-center">
                     <div className="flexr">

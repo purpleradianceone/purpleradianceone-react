@@ -27,7 +27,7 @@ export const  SUBSCRIPTION = {
 }
 
 export const  NUMBER_VALUES = {
-    SNACKBAR_DURATION : 2000,
+    SNACKBAR_DURATION : 500,
 }
 
 export const DATA_TYPE = {

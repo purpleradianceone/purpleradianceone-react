@@ -20,6 +20,7 @@ import EditCompanyProductModal from "../modals/products/EditProductModal";
 import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
 import ProductsManagementListProps from "../../@types/List/ProductsManagementListProps";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 function ProductsManagementList({
   products,
@@ -33,6 +34,7 @@ function ProductsManagementList({
   isListForProductUser,
 } : ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const {userPreference} = useUserPreference();
   const [isEditComapanyProductModalOpen,setIsEditCompanyProductModalOpen] = useState<boolean>(false); 
   const [isCompanyProductUserModalOpen,setIsCompanyProductUserModalOpen] = useState<boolean>(false);
   const [isCompanyProductTeamModalOpen,setIsCompanyProductTeamModalOpen] = useState<boolean>(false);
@@ -90,7 +92,7 @@ function ProductsManagementList({
 
   if (userHasAccessToViewProduct) {
     return (
-      <div className="w-full pt-1 pl-5 pr-1 gap-1">
+      <div className={`w-full pt-1 ${userPreference.isLeftMenu ? "pl-5" : "pl-1"} pr-1 gap-1`}>
         <div className="sticky z-10 top-9  flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
           <div className="flex justify-between w-full ">
               <div className="flex  gap-2">

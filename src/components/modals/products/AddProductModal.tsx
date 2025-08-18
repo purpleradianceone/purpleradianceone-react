@@ -1,6 +1,5 @@
 import { Store, X } from "lucide-react";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
   TAX_CODE,
@@ -141,19 +140,18 @@ function AddProductModal({
             withCredentials: true,
           })
           .then((response) => {
-            if (response.data.success) {
+            if (response.data.status) {
               // showMessageSnackbar({
               //   message: "Product Added Successfully",
               //   type: "success",
               // });
               toast.success(response.data.message)
-
               handleProductChangeOnAdd(addProductFormData);
               setTimeout(() => {
                 onClose();
-              }, NUMBER_VALUES.SNACKBAR_DURATION);
+              }, 500);
             }else{
-              toast.success(response.data.message)
+              toast.error(response.data.message)
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
