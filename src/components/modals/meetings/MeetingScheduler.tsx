@@ -15,24 +15,20 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import AddCompanyUsersEmailAttendeesModal from "./AddCompanyUsersEmailAttendeesModal";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import { useGoogleMeetContext } from "../../../context/meeting/GoogleMeetContext";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useZoomMeetingContext } from "../../../context/meeting/ZoomMeetingContext";
 import { useServerCurrentTime } from "../../../config/hooks/useServerCurrentTime";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import momentTimezone from "moment-timezone";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import Lead from "../../../@types/lead-management/LeadManagementProps";
 import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
+import toast from "react-hot-toast";
 
 const MeetingScheduler = () => {
   
@@ -67,19 +63,19 @@ const MeetingScheduler = () => {
     setIsAddCompanyLeadContactModalOpen,
   ] = useState<boolean>(false);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   useEffect(() => {
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
@@ -141,54 +137,63 @@ const MeetingScheduler = () => {
 
 
     if (title === "") {
-      showMessageSnackbar({
-        message: "Please give title to meeting",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please give title to meeting",
+      //   type: "error",
+      // });
+      toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      showMessageSnackbar({
-        message: "Please select start date",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select start date",
+      //   type: "error",
+      // });
+      toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      showMessageSnackbar({
-        message: "Please select start time",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select start time",
+      //   type: "error",
+      // });
+      toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      showMessageSnackbar({ message: "Please select end date", type: "error" });
+      // showMessageSnackbar({ message: "Please select end date", type: "error" });
+            toast.error( "Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      showMessageSnackbar({ message: "Please select end time", type: "error" });
+      // showMessageSnackbar({ message: "Please select end time", type: "error" });
+      toast.error("Please select end time")
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      showMessageSnackbar({
-        message: "Please select meeting platform",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select meeting platform",
+      //   type: "error",
+      // });
+      toast.error("Please select meeting platform")
+
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      showMessageSnackbar({
-        message: "End Time should be greater than start time",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "End Time should be greater than start time",
+      //   type: "error",
+      // });
+      toast.error("End Time should be greater than start time")
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
       
-      showMessageSnackbar({
-        message: "Connot create meeting as start time is in the past",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Connot create meeting as start time is in the past",
+      //   type: "error",
+      // });
+      toast.error("Connot create meeting as start time is in the past")
       setIsCreating(false);
       return;
     }
@@ -234,14 +239,16 @@ const MeetingScheduler = () => {
           setEndDate("");
           setSelectedMeetingPlatform("");
           if(response.data.status){
-              showMessageSnackbar({message : response.data.message,type : "success"});
+              // showMessageSnackbar({message : response.data.message,type : "success"});
+              toast.success(response.data.message)
               setTimeout(() => {
                 handleCloseMeetingModal();
               },2000)
           
           }
           else{
-            showMessageSnackbar({message : response.data.message,type : "error"});
+            // showMessageSnackbar({message : response.data.message,type : "error"});
+            toast.error(response.data.message);
           setTimeout(() => {
                 handleCloseMeetingModal();
               },2000)
@@ -266,10 +273,11 @@ const MeetingScheduler = () => {
           setIsCreating(false);
         });
     } else {
-      showMessageSnackbar({
-        message: "Please fill the required fields",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please fill the required fields",
+      //   type: "error",
+      // });
+      toast.error("Please fill the required fields")
     }
   };
   const createZoomMeeting = async () => {
@@ -292,54 +300,62 @@ const MeetingScheduler = () => {
       userPreference.timezoneName
     );
     if (title === "") {
-      showMessageSnackbar({
-        message: "Please give title to meeting",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please give title to meeting",
+      //   type: "error",
+      // });
+      toast.error("Please give title to meeting")
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      showMessageSnackbar({
-        message: "Please select start date",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select start date",
+      //   type: "error",
+      // });
+      toast.error("Please select start date")
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      showMessageSnackbar({
-        message: "Please select start time",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select start time",
+      //   type: "error",
+      // });
+      toast.error("Please select start time")
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      showMessageSnackbar({ message: "Please select end date", type: "error" });
+      // showMessageSnackbar({ message: "Please select end date", type: "error" });
+      toast.error("Please select end date")
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      showMessageSnackbar({ message: "Please select end time", type: "error" });
+      // showMessageSnackbar({ message: "Please select end time", type: "error" });
+      toast.error( "Please select end time")
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      showMessageSnackbar({
-        message: "Please select meeting platform",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please select meeting platform",
+      //   type: "error",
+      // });
+      toast.error( "Please select meeting platform")
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      showMessageSnackbar({
-        message: "End Time should be greater than start time",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "End Time should be greater than start time",
+      //   type: "error",
+      // });
+      toast.error("End Time should be greater than start time.")
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
       
-      showMessageSnackbar({
-        message: "Connot create meeting as start time is in the past",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Connot create meeting as start time is in the past",
+      //   type: "error",
+      // });
+      toast.error("Connot create meeting as start time is in the past")
       setIsCreating(false);
       return;
     }
@@ -374,15 +390,17 @@ const MeetingScheduler = () => {
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
             if (response.data.status) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
+              // showMessageSnackbar({
+              //   message: response.data.message,
+              //   type: "success",
+              // });
+              toast.success(response.data.message);
             } else {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "error",
-              });
+              // showMessageSnackbar({
+              //   message: response.data.message,
+              //   type: "error",
+              // });
+              toast.error(response.data.message);
             }
           }
 
@@ -540,10 +558,11 @@ const MeetingScheduler = () => {
       setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
       setAttendees((prev) => [...prev, data.email]);
     } else if (event.target.checked && !data.email) {
-      showMessageSnackbar({
-        message: "please add email for contact and then try again",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "please add email for contact and then try again",
+      //   type: "error",
+      // });
+      toast.error("please add email for contact and then try again.");
     } else if (!event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) =>
         prev.filter((id) => id !== data.id)
@@ -830,15 +849,17 @@ const MeetingScheduler = () => {
                 } else if (
                   selectedMeetingPlatform === meetingPlatform[2].name
                 ) {
-                  showMessageSnackbar({
-                    message: "Microsofft teams is coming soon...!",
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message: "Microsofft teams is coming soon...!",
+                  //   type: "error",
+                  // });
+                  toast.error("Microsofft teams is coming soon... Choose another platform instead.")
                 } else {
-                  showMessageSnackbar({
-                    message: "select the meeting platform first",
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message: "select the meeting platform first",
+                  //   type: "error",
+                  // });
+                  toast.error("Select the Meeting platform first.")
                 }
               }}
               disabled={
@@ -880,13 +901,13 @@ const MeetingScheduler = () => {
         />
       )}
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.
   );

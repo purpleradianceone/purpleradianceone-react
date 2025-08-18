@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState, useContext, useRef } from "r
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { WEB_SOCKET_CONNECTION_URL } from "../../constants/PostApi";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useLoggedInUserContext } from "../user/LoggedInUserContext";
 import { useNotificationCountContext } from "./NotificationCountContext";
 
@@ -89,7 +89,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Use useRef to hold the client instance across renders without triggering re-renders
   const clientRef = useRef<Client | null>(null);
-  const {notificationCount,setNotificationCount} = useNotificationCountContext();
+  const {setNotificationCount} = useNotificationCountContext();
 
   useEffect(() => {
     // Only connect if authenticated AND no existing client is active
@@ -146,8 +146,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
             const body: Notification = JSON.parse(message.body);
             setNotifications((prev) => [body, ...prev]);
 
-            console.log("inside User queue");
-            console.log(notificationCount);
+          
             setNotificationCount((prev) => prev+1);
             showToast(body);
           });
@@ -184,7 +183,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <NotificationContext.Provider value={notifications}>
       {children}
-      <Toaster position="top-center" reverseOrder={false} />
+      {/* <Toaster position="top-center" reverseOrder={false} /> */}
     </NotificationContext.Provider>
   );
 };

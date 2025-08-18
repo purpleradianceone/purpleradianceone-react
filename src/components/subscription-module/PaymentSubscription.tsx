@@ -5,19 +5,20 @@ import { X } from "lucide-react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useState } from "react";
 import axios from "axios";
-import { NUMBER_VALUES, STATUS_CODE, SUBSCRIPTION } from "../../constants/AppConstants";
+import { STATUS_CODE, SUBSCRIPTION } from "../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../@types/ui/MessageSnackbarProps";
 import POST_API from "../../constants/PostApi";
 import COLORS from "../../constants/Colors";
 import PaymentSuccess from "../../assets/animations/PaymentSuccessfull";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 declare global {
   interface Window {
@@ -57,19 +58,19 @@ export default function PaymentSubscription({
   const { loginStatus } = useLoggedInUserContext();
   const [isPaymentSuccessfull, setIsPaymentSuccessfull] = useState(false);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const navigate = useNavigate();
   const handlePayment = () => {
@@ -118,10 +119,11 @@ export default function PaymentSubscription({
             .then((response) => {
               if (response.data.status) {
                 //CLEARED THE LOCAL STORAGE
-                showMessageSnackbar({
-                  message: "Subscription created successfully.",
-                  type: "success",
-                });
+                // showMessageSnackbar({
+                //   message: "Subscription created successfully.",
+                //   type: "success",
+                // });
+                toast.success(response.data.message);
 
                 if (isSubscrptionFromLoginPage) {
                   setTimeout(() => {
@@ -138,11 +140,11 @@ export default function PaymentSubscription({
                 }
               }
               else{
-                  showMessageSnackbar({
-                  message: "Error creating subscription.",
-                  type: "error",
-                });
-
+                //   showMessageSnackbar({
+                //   message: "Error creating subscription.",
+                //   type: "error",
+                // });
+                toast.error(response.data.message)
                 if (isSubscrptionFromLoginPage) {
                   setTimeout(() => {
                     localStorage.clear();
@@ -180,11 +182,12 @@ export default function PaymentSubscription({
     const razorpayInstance = new window.Razorpay(options);
     razorpayInstance.on("payment.failed", function (response: any) {
       console.log(response);
-      console.log("payment Falied");
-       showMessageSnackbar({
-                  message: "payment Falied . If money debited from your account please contact us.",
-                  type: "success",
-                });
+      // console.log("payment Falied");
+      //  showMessageSnackbar({
+      //             message: "payment Falied . If money debited from your account please contact us.",
+      //             type: "success",
+      //           });
+                toast.error("Payment Falied . If money debited from your account Pease contact Support Team.")
 
                 if (isSubscrptionFromLoginPage) {
                   setTimeout(() => {
@@ -290,13 +293,13 @@ export default function PaymentSubscription({
       )}
 
       {/* Snackbar for Messages */}
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
 
       {/* Loading Spinner when Payment is Successful */}
       {isPaymentSuccessfull && !isSubscrptionFromLoginPage && (

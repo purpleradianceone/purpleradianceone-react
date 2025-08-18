@@ -3,7 +3,6 @@
 import { EditIcon, Network, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
@@ -19,15 +18,16 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyTeamSearchProps from "../../../@types/team-management/CompanyTeamListProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../../ui/MessageSnackbar";
 import Button from "../../ui/Button";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductTeamsModalProps";
 import SearchInput from "../../ui/SearchInput";
+import toast from "react-hot-toast";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
@@ -90,21 +90,22 @@ function CompanyProductTeamsModal({
   const [companyProductTeamAddCount, setCompanyProductTeamAddCount] =
     useState<number>(0);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
   const handleCompanyProductTeamUpdate = (message: string) => {
-    showMessageSnackbar({ message: message, type: "success" });
+    // showMessageSnackbar({ message: message, type: "success" });
+    toast.success(message)
   };
 
   const handleAddCompanyProductTeamChange = () => {
@@ -147,10 +148,11 @@ function CompanyProductTeamsModal({
         )
         .then((response) => {
           if (response.data.status && response.data) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message);
             const updatedCompanyTeams = companyTeamsNotAssignedList.filter(
               (team) => !addCompanyProductTeamArray.includes(team.id)
             );
@@ -161,10 +163,11 @@ function CompanyProductTeamsModal({
             setIsCompanyProductTeamsLoading(false);
             setAddCompanyProductTeamArray([]);
           } else if (!response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "error",
+            // });
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -414,15 +417,6 @@ function CompanyProductTeamsModal({
 
           setCompanyTeamsNotAssignedList(transformedData);
         }
-        
-        // "count": 25,
-        // "id": 36,
-        // "company_id": 1,
-        // "name": "Thirty Seven",
-        // "description": "This IS thirty seven team",
-        // "isactive": true,
-        // "createdby": "PurpleRadiance Pvt LTD",
-        // "createdon": "Mar 17, 2025"
 
         // Restore scroll position after data update
         if (
@@ -586,7 +580,7 @@ function CompanyProductTeamsModal({
       setCompanyProductTeamsFetchedCount(0);
       setIsCompanyProductTeamsFetchedForFirstTime(true);
       setIsCompanyTeamsNotAssignedReadyToFetch(false);
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
       // setIsCompanyTeamsNotAssignedLoading(false);
     }
   }, [isCompanyTeamsNotAssignedReadyToFetch, isOpen]);
@@ -702,13 +696,13 @@ function CompanyProductTeamsModal({
           </div>
         </div>
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 }

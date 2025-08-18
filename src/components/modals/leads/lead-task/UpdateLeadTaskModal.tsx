@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import {
-  NUMBER_VALUES,
   SIZE,
   STATUS_CODE,
 } from "../../../../constants/AppConstants";
@@ -23,17 +22,18 @@ import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUse
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../../@types/ui/MessageSnackbarProps";
+// import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import { format, parse } from "date-fns";
 import { createPortal } from "react-dom";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
+import toast from "react-hot-toast";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -98,21 +98,21 @@ function UpdateLeadTaskModal({
   const [selectedCompanyUsers, setSelectedCompanyUsers] = useState<
     CompanyUsersSearchProps[]
   >([]);
-  const [isActive , setIsActive] = useState<boolean>(leadTask.isActive);
+  const [isActive, setIsActive] = useState<boolean>(leadTask.isActive);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   useEffect(() => {
     const leadDetailsJsonData = JSON.parse(leadTask.leadActivityDetails);
@@ -218,66 +218,76 @@ function UpdateLeadTaskModal({
 
     const originalLeadActivityDetailsString = leadTask.leadActivityDetails;
 
-// If leadTask.leadActivityDetails is an object (after parsing in useEffect):
-// This is safer if you've already parsed it and use the parsed object
-const originalLeadDetailsObject = JSON.parse(originalLeadActivityDetailsString);
-const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+    // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
+    // This is safer if you've already parsed it and use the parsed object
+    const originalLeadDetailsObject = JSON.parse(
+      originalLeadActivityDetailsString
+    );
+    const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
 
     if (leadActivityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Activity",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Activity",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Activity");
       return;
     } else if (leadTaskPriorityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Priority",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Priority",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Priority");
       return;
     } else if (leadTaskStageId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Stage",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please Select Lead Task Stage",
+      //   type: "error",
+      // });
+      toast.error("Please Select Lead Task Priority");
       return;
     } else if (subject === "") {
-      showMessageSnackbar({
-        message: "Please provide Subject To Task",
-        type: "error",
-      });
-      return;
-    }
-    else if (dueDate === "") {
-      showMessageSnackbar({
-        message: "Please select Due Date for Task",
-        type: "error",
-      });
-      return;
-    }
-    else if(dueTime === ""){
-       showMessageSnackbar({
-        message: "Please select Due Time for Task",
-        type: "error",
-      });
-      return;
-    }
-    else if(
-      (subject === leadTask.subject) && 
-      (description === leadTask.description) &&
-      (leadTaskStageId === leadTask.leadTaskStageId) &&
-      (leadTaskPriorityId === leadTask.leadTaskPriorityId) &&
-      (dueDate === dueDateValue) &&
-      (dueTime === dueTimeValue) &&
-      (resultOutcome === leadTask.resultOutcome) &&
-      (assignedTo === leadTask.assignedToId) &&
-      (jsonData === stringifiedOriginalData)
-    ){
-      showMessageSnackbar({message : "Not made changes to task", type : "error"});
-      return;
-    }
+      // showMessageSnackbar({
+      //   message: "Please provide Subject To Task",
+      //   type: "error",
+      // });
+      toast.error("Please provide Subject To Task");
 
-    
+      return;
+    } else if (dueDate === "") {
+      // showMessageSnackbar({
+      //   message: "Please select Due Date for Task",
+      //   type: "error",
+      // });
+      toast.error("Please select Due Date for Task");
+      return;
+    } else if (dueTime === "") {
+      // showMessageSnackbar({
+      //   message: "Please select Due Time for Task",
+      //   type: "error",
+      // });
+      toast.error("Please select Due Time for Task");
+
+      return;
+    } else if (
+      subject === leadTask.subject &&
+      description === leadTask.description &&
+      leadTaskStageId === leadTask.leadTaskStageId &&
+      leadTaskPriorityId === leadTask.leadTaskPriorityId &&
+      dueDate === dueDateValue &&
+      dueTime === dueTimeValue &&
+      resultOutcome === leadTask.resultOutcome &&
+      assignedTo === leadTask.assignedToId &&
+      jsonData === stringifiedOriginalData
+    ) {
+      // showMessageSnackbar({
+      //   message: "Not made changes to task",
+      //   type: "error",
+      // });
+            toast.error("Not made changes to task");
+
+      return;
+    }
 
     const updateLeadTaskPostData = {
       company_id: loginStatus.companyId,
@@ -301,19 +311,21 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message)
             handleLeadTaskUpdate();
             setTimeout(() => {
               handleClose(false);
             }, 2000);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "error",
+            // });
+            toast.error(response.data.message);
           }
         }
       })
@@ -345,10 +357,9 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
         })
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-            response.data.map((res : any) => {
-                    setSelectedCompanyUsers((prev) => [...prev, res]);
-            })
-            
+            response.data.map((res: any) => {
+              setSelectedCompanyUsers((prev) => [...prev, res]);
+            });
           }
         })
         .catch(async (error) => {
@@ -365,7 +376,9 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
   };
   const timeOptions = generateTimeOptions();
 
-  const handleIsActiveCheckboxChange = async(event : React.ChangeEvent<HTMLInputElement> ) => {
+  const handleIsActiveCheckboxChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { checked } = event.target;
 
     const jsonData = generateTaskDetailsJson();
@@ -392,20 +405,22 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message);
             setIsActive(checked);
             handleLeadTaskUpdate();
             // setTimeout(() => {
             //   handleClose(false);
             // }, 2000);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "error",
+            // });
+            toast.error(response.data.message);
           }
         }
       })
@@ -419,8 +434,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
           }
         }
       });
-
-  }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -434,9 +448,8 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return (
-    createPortal(
-      <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
       <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <div className="border-b pb-1 mb-4 flex justify-between items-center">
@@ -460,9 +473,8 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
                 if (e !== 4) {
                   if (e) {
                     setLeadActivityId(e);
-                  }
-                  else{
-                     setLeadActivityId(0);
+                  } else {
+                    setLeadActivityId(0);
                   }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
@@ -477,9 +489,8 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
-                }
-                else{
-                   setLeadTaskPriorityId(0);
+                } else {
+                  setLeadTaskPriorityId(0);
                 }
               }}
               options={leadTaskPriority}
@@ -490,8 +501,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
-                }
-                else{
+                } else {
                   setLeadTaskStageId(0);
                 }
               }}
@@ -534,11 +544,11 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               </div>
             )}
           </div>
-            {leadContactDataSelectedArray.length != 0 && (
-          <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-                Selected Lead Contacts
-              </div>
-            )}
+          {leadContactDataSelectedArray.length != 0 && (
+            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
+              Selected Lead Contacts
+            </div>
+          )}
           {leadContactDataSelectedArray.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
               {leadContactDataSelectedArray.map((contact) => (
@@ -666,16 +676,14 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               </label>
             </div>
           </div>
-            
-            {selectedCompanyUsers.length != 0 && (
-          <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-                Assigned Users
-              </div>
-            )}
+
           {selectedCompanyUsers.length != 0 && (
-            
+            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
+              Assigned Users
+            </div>
+          )}
+          {selectedCompanyUsers.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-              
               {selectedCompanyUsers.map((user) => (
                 <div
                   key={user.id}
@@ -756,16 +764,15 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
         />
       )}
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>,
     document.body
-    )
   );
 }
 

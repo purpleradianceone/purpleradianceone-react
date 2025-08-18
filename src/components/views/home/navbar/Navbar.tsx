@@ -34,7 +34,7 @@ import NotificationPopup from "../../notification/NotificationManagement";
 import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { alphabets, backgroundColors } from "../../../../constants/Colors";
@@ -532,6 +532,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link> */}
                       <div className="relative">
                         <button
+                        title="Show Notification"
                           onClick={() => {
                             resetNotificationCount();
                             setIsOpenPopUpOfNotification(
@@ -558,7 +559,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </div>
 
                       <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
-                        <button className="p-2 rounded-lg hover:bg-gray-100">
+                        <button title="Panel Layout" className="p-2 rounded-lg hover:bg-gray-100">
                           <LayoutPanelLeft className="h-5 w-5" />
                         </button>
                       </Link>
@@ -695,7 +696,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
             }}
           />
         )}
-        <Toaster position="top-center" />
       </div>
     );
   }

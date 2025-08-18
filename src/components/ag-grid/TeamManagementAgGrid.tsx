@@ -1,13 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import {
-  AllCommunityModule,
-  ColDef,
-  themeBalham,
-} from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import { CheckCircle2, Edit, XCircle } from "lucide-react";
+import {  CheckCircle2, Edit, XCircle } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -27,7 +23,6 @@ function TeamManagementAgGrid({
 }: TeamManagementAgGridProps) {
   const { userHasAccessToUpdateTeamManagement } = useUserAccessModules();
 
-
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -35,7 +30,8 @@ function TeamManagementAgGrid({
         field: "name",
         sortable: true,
         filter: true,
-        flex:1
+        flex: 1,
+        cellClass: "font-bold text-gray-800  px-2 py-1 rounded"
       },
       {
         headerName: "Team Description",
@@ -43,7 +39,7 @@ function TeamManagementAgGrid({
         minWidth: 300,
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam || isGridForLeadProductTeam ,
+        hide: isGridForProductTeam || isGridForLeadProductTeam,
       },
       {
         field: "isActive",
@@ -83,7 +79,7 @@ function TeamManagementAgGrid({
         headerName: "Created On",
         sortable: true,
         filter: true,
-        hide: isGridForProductTeam|| isGridForLeadProductTeam,
+        hide: isGridForProductTeam || isGridForLeadProductTeam,
       },
       {
         headerName: "Actions",
@@ -144,7 +140,13 @@ function TeamManagementAgGrid({
               );
           }, []);
 
-          if ((isGridForProductTeam !== undefined ? !isGridForProductTeam : false ) || isGridForLeadProductTeam !== undefined ? !isGridForLeadProductTeam : false) {
+          if (
+            (isGridForProductTeam !== undefined
+              ? !isGridForProductTeam
+              : false) || isGridForLeadProductTeam !== undefined
+              ? !isGridForLeadProductTeam
+              : false
+          ) {
             return (
               <>
                 <button
@@ -204,7 +206,7 @@ function TeamManagementAgGrid({
         },
       },
     ],
-    [addCompanyProductTeamArray,companyTeamList]
+    [addCompanyProductTeamArray, companyTeamList]
   );
 
   const defaultColDef = useMemo(() => {
