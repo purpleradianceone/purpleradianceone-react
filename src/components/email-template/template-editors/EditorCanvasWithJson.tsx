@@ -210,14 +210,14 @@ export const EditorCanvasWithJson = () => {
     </div>
   ) : (
     <>
-      <div className="fixed z-10 top-14 left-14 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm mb-1.5 w-fit p-2">
+      <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex gap-1">
           <LucideMail className="w-6 h-6 text-blue-600" />
           <LucideCode className="w-4 h-4 text-blue-600" />
           <span className="text-1xl font-bold">Email Template Update</span>
           {templateTypeId && (
             <span className="text-1xl font-bold">
-              : : : {emailTemplateName}
+              : {emailTemplateName}
             </span>
           )}
         </div>

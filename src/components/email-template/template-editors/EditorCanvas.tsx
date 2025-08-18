@@ -159,16 +159,16 @@ export const EditorCanvas: React.FC = () => {
     </div>
   ) : (
     <>
-      <div className="fixed z-10 top-14 left-14 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
+      <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex  gap-1">
           {<LucideMail className="w-6 h-6 text-blue-600" />}
           {<LucideCode className="w-4 h-4 text-blue-600" />}
           <span className="text-1xl font-bold">Email Template</span>
           <span className="text-1xl font-bold">
-            : : : {JSON.parse(params!).name} Template
+            : {JSON.parse(params!).name} Template
           </span>
           <div
-            className="fixed  inset-0 justify-center top-12"
+            className="fixed  inset-0 justify-center top-14"
             style={{ height: "fit-content" }}
           >
             <div className="flex-col gap-2 justify-center justify-items-center ">
@@ -428,10 +428,6 @@ export const EditorCanvas: React.FC = () => {
                     const beautified = DOMPurify.sanitize(htmlInput);
                     navigator.clipboard.writeText(beautified);
                     toast.success("Email Template copied to clipboard!");
-                    // showMessageSnackbar({
-                    //   message: "Email Template copied to clipboard!",
-                    //   type: "success",
-                    // });
                   }}
                   style={{ padding: "8px 14px" }}
                 >
