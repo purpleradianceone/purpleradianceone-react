@@ -11,7 +11,8 @@ interface DropdownProps {
   onSelect: (selectedValue: number | undefined) => void;
   labelName: string;
   selectedValue? :number
-  readOnly? : boolean
+  readOnly? : boolean,
+  preselectedOption? : number
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -19,7 +20,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   onSelect,
   labelName,
   selectedValue,
-  readOnly
+  readOnly,
+  preselectedOption
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>((()=>{
     if(selectedValue) return selectedValue;
@@ -59,6 +61,11 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       setMessageSnackbar((prev) => ({ ...prev, open: false }));
     };
 
+  useEffect(()=>{
+    if(preselectedOption){
+      handleSelect(preselectedOption);
+    } 
+  },[])
   return (
     <div className="relative w-auto " ref={dropdownRef}>
       <label className="block text-sm font-medium text-gray-700">{labelName === "status" || labelName === "source" || labelName === "type" || labelName === "priority" || labelName === "stage" ? "" : labelName}</label>

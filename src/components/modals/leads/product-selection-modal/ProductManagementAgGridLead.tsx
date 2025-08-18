@@ -19,6 +19,7 @@ import { AgGridReact } from "ag-grid-react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import LeadProductsManagementGridProps from "../../../../@types/ag-grid/LeadProductsManagementGridProps";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
+import toast from "react-hot-toast";
 
 const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   products,
@@ -35,6 +36,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
     setRowData(products);
   }, [products]);
 
+  
   const actionCellRenderer = useCallback(
     (params: ICellRendererParams) => {
       const currentId = params.data.id;
@@ -42,24 +44,29 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         alreadyAssignedCompanyProduct?.map((p) => p.companyProductId) || [];
 
       const isAlreadyAssigned = alreadyAssignedIds.includes(currentId);
-      const isInterestFilled =
-        params.data.interest != null && params.data.interest !== "";
+      // const isInterestFilled =
+      //   params.data.interest != null && params.data.interest !== "";
       const isQtyFilled =
         params.data.requiredQuantity != null &&
         params.data.requiredQuantity !== "";
       const isCostFilled =
         params.data.expectedCost != null && params.data.expectedCost !== "";
 
-      const allFieldsFilled = isInterestFilled && isQtyFilled && isCostFilled;
+      // const allFieldsFilled = isInterestFilled && isQtyFilled && isCostFilled;
+      const allFieldsFilled =   isQtyFilled && isCostFilled;
 
       const isBlocked = !allFieldsFilled && !isAlreadyAssigned;
       const isChecked = isAlreadyAssigned || params.data.checked;
       const title = isAlreadyAssigned
         ? "Already Assigned to Lead"
         : isBlocked
-        ? "Please fill Interest, Required Quantity and Expected Cost"
+        ? "Please fill Required Quantity and Expected Cost."
         : "";
-
+      const handleShowToaster = () =>{
+        if(isBlocked){
+          toast.error("Please fill Required Quantity and Expected Cost.");
+        }
+  }
       const handleCheckboxChangeLocal = (
         event: React.ChangeEvent<HTMLInputElement>
       ) => {
@@ -92,7 +99,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       };
 
       return (
-        <div title={title}>
+        <div title={title} onClick={handleShowToaster}>
           <input
             type="checkbox"
             onChange={handleCheckboxChangeLocal}
@@ -138,6 +145,10 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
             interestTypeData.map((item) => item.id),
         },
         flex: 1,
+        
+        valueGetter : (params ) =>{
+          return params.data.interest  ?? 2;
+        },
         valueFormatter: (params) => {
           if (params.value == null || params.value === "")
             return "Select Interest";
