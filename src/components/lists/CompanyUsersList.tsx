@@ -19,6 +19,8 @@ import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps
 
 import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
 import { useUserPreference } from "../../context/user/UserPreference";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 
 function GetCompanyUsersList({
   users,
@@ -28,7 +30,7 @@ function GetCompanyUsersList({
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
 }: GetCompanyUsersListProps) {
-  const {userPreference} = useUserPreference();
+  const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
 
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
@@ -92,7 +94,11 @@ function GetCompanyUsersList({
   };
   return (
     userHasAccessToViewUser && (
-      <div className={`w-full h-screen pt-1  ${userPreference.isLeftMenu ? "pl-5" : "pl-1"} pr-1 gap-1`}>
+      <div
+        className={`w-full h-screen pt-1  ${
+          userPreference.isLeftMenu ? "pl-5" : "pl-1"
+        } pr-1 gap-1`}
+      >
         <div className="sticky z-10 top-9 py-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
@@ -287,46 +293,72 @@ function GetCompanyUsersList({
 
           {/* new end */}
 
-          {userHasAccessToAddUser ? (
-            <>
-              <div className="flex gap-1">
-                <Button onClick={() => setIsAddCompanyUserModalOpen(true)}>
-                  {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-                </Button>
-              </div>
-              <AddCompanyUserModal
-                isOpen={isAddCompanyUserModalOpen}
-                onClose={() => setIsAddCompanyUserModalOpen(false)}
-              />
-              <EditCompanyUserModal
-                handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-                isOpen={isEditCompanyUserModalOpen}
-                onClose={() => {
-                  setIsEditModalOpen(false);
-                }}
-                user={selectedCompanyUser}
-              />
-
-              <CompanyUserDashboardModal
-                isOpen={isDashboardModalOpen}
-                onClose={() => {
-                  setIsDashboardModalOpen(false);
-                }}
-                users={selectedCompanyUser}
-              />
-            </>
-          ) : (
+          <>
+            {/* {userHasAccessToAddUser ? ( */}
+            {/* <> */}
             <div className="flex gap-1">
-              <Button disabled={true}>
+              <Button
+              disabled={!userHasAccessToAddUser}
+                onClick={() => {
+                  if (!userHasAccessToAddUser) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER
+                        .DENIED_ADD_ACCESS_COMPANY_USER
+                    );
+                    return;
+                  } else {
+                    setIsAddCompanyUserModalOpen(true);
+                  }
+                }}
+                // onClick={() => setIsAddCompanyUserModalOpen(true)}
+              >
                 {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-
                 {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
               </Button>
             </div>
-          )}
+            <AddCompanyUserModal
+              isOpen={isAddCompanyUserModalOpen}
+              onClose={() => setIsAddCompanyUserModalOpen(false)}
+            />
+            {/* </>
+            ) : (
+              <div className="flex gap-1">
+                <Button
+                  disabled={true}
+                  onClick={() => {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER
+                        .DENIED_ADD_ACCESS_COMPANY_USER
+                    );
+                  }}
+                >
+                  {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+                  {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
+
+                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
+                </Button>
+              </div>
+            )
+            } */}
+            
+            <EditCompanyUserModal
+              handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+              isOpen={isEditCompanyUserModalOpen}
+              onClose={() => {
+                setIsEditModalOpen(false);
+              }}
+              user={selectedCompanyUser}
+            />
+
+            <CompanyUserDashboardModal
+              isOpen={isDashboardModalOpen}
+              onClose={() => {
+                setIsDashboardModalOpen(false);
+              }}
+              users={selectedCompanyUser}
+            />
+          </>
         </div>
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">

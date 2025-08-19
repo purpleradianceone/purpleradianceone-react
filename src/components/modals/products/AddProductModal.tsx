@@ -186,7 +186,7 @@ function AddProductModal({
   if (!isOpen) return null;
 
   return (
-    <div className={isSmallScreen ?"fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45" }>
+    <div className={isSmallScreen ?"fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45" }>
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
           className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
@@ -194,10 +194,10 @@ function AddProductModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="py-3 px-9">
-            <div className="flex items-center gap-3 mb-6">
-              <Store className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-4">
+            <div className="flex items-center gap-2 mb-3 border-b">
+              <Store className="text-blue-500" size={SIZE.TWENTY} />
+              <h2 className="text-lg font-semibold text-gray-800">
                 Add New Product
               </h2>
               <button
@@ -208,7 +208,7 @@ function AddProductModal({
               </button>
             </div>
 
-            <form className="space-y-1 " onSubmit={handleAddProductFormSubmit}>
+            <form className="space-y-2 " onSubmit={handleAddProductFormSubmit}>
               <FormInput
                 label="Product Name : "
                 type="text"
@@ -302,11 +302,11 @@ function AddProductModal({
               />
 
               {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-center max-w-60 m-3 pb-5">
+                <div className="flex justify-self-center  pt-4 ">
                   <Button type="submit">Add Product</Button>
                 </div>
               ) : (
-                <div className="flex justify-self-end max-w-36 m-3">
+                <div className="flex justify-self-center  pt-4">
                   <Button
                     type="submit"
                     onClick={() => {

@@ -601,17 +601,17 @@ function CompanyProductTeamsModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white py-2">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-4">
+            <div className="flex border-b items-center gap-2 mb-6  sticky bg-white py-1">
+              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
+              <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Teams
               </h2>
               <button
                 onClick={() => {
                   onClose();
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="absolute right-1 top-4 text-gray-400 hover:text-gray-600"
               >
                 <X size={SIZE.TWENTY} />
               </button>
@@ -622,8 +622,8 @@ function CompanyProductTeamsModal({
                 className="ag-theme-alpine"
                 style={{ height: "300px", width: "45%" }}
               >
-                <div className="flex gap-2 mb-1 mt-2 justify-between">
-                  <div>
+                <div className="flex w-full gap-2 mb-1 mt-2 justify-between">
+                <div className="w-[60%]">
                     <SearchInput
                       // readonly = {isCompanyProductTeamsLoading}
                       // inputMode="numeric"
@@ -635,7 +635,7 @@ function CompanyProductTeamsModal({
                       }}
                     ></SearchInput>
                   </div>
-                  <div className="text-lg font-semibold text-gray-700">
+                  <div className="text-base mt-2 font-semibold text-gray-700">
                     Assigned Teams
                   </div>
                 </div>
@@ -656,7 +656,7 @@ function CompanyProductTeamsModal({
                 style={{ height: "300px", width: "45%" }}
               >
                 <div className="flex gap-2 mb-1 mt-2 justify-between">
-                  <div>
+                 <div className="w-[60%]">
                     <SearchInput
                       // readonly = {isCompanyProductTeamsLoading}
                       // inputMode="numeric"

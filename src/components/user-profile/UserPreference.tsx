@@ -17,14 +17,18 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import { alphabets, backgroundColors } from "../../constants/Colors";
 import toast from "react-hot-toast";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import MESSAGE from "../../constants/Messages";
 
 const UserPreference = () => {
-  const classnameForParagragh= "text-gray-800 font-semibold";
+  const classnameForParagragh = "text-gray-800 font-semibold";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
 
   const navigate = useNavigate();
+  const { userHasAccessToUpdateUser, userHasAccessToUpdateSettingGeneral } =
+    useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid
@@ -117,7 +121,7 @@ const UserPreference = () => {
           //   message: response.data.message,
           //   type: "success",
           // });
-          toast.success( response.data.message)
+          toast.success(response.data.message);
 
           setUserPreference({
             ...userPreference,
@@ -193,14 +197,14 @@ const UserPreference = () => {
     } else {
       if (name === "email") {
         const emailRegex = REGEX.EMAIL;
-        if (!emailRegex.test(value)) {
+        if (!emailRegex.test(value.trim())) {
           errorMsg = "Invalid email format";
         }
       }
 
       if (name === "mobileNumber") {
         const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-        if (!mobileRegex.test(value)) {
+        if (!mobileRegex.test(value.trim())) {
           errorMsg = "Mobile number must be 10 digits and start with 6–9";
         }
       }
@@ -212,16 +216,18 @@ const UserPreference = () => {
     }));
 
     const hasChanged =
-      formData.fullName !== initialData.fullName ||
+      formData.fullName.trim() !== initialData.fullName ||
       formData.email !== initialData.email ||
-      formData.mobileNumber !== initialData.mobileNumber;
+      formData.mobileNumber.trim() !== initialData.mobileNumber;
 
     // Include current error for updated field
     const currentErrors = {
       ...formErrors,
       [name]: errorMsg,
     };
-
+    if (!hasChanged) {
+      toast.error("No new changes to save.");
+    }
     const hasErrors = Object.values(currentErrors).some((e) => e !== "");
 
     setIsSaveEnabled(hasChanged && !hasErrors);
@@ -241,18 +247,25 @@ const UserPreference = () => {
       const response = await axios.put(POST_API.UPDATE_COMPANY_USER, postData, {
         withCredentials: true,
       });
-
+      const res = response.data;
       if (response.status === STATUS_CODE.OK) {
         // showMessageSnackbar({
         //   message: response.data.message,
         //   type: "success",
         // });
-        toast.success(response.data.message)
-        setLoginStatus({
-          ...loginStatus,
-          fullName: formData.fullName.trim(),
-          mobileNumber: formData.mobileNumber.trim(),
-        });
+        if (res.status) {
+          toast.success(response.data.message);
+          setLoginStatus({
+            ...loginStatus,
+            fullName: formData.fullName.trim(),
+            mobileNumber: formData.mobileNumber.trim(),
+          });
+        } else {
+          formData.fullName = loginStatus.fullName!;
+          formData.mobileNumber = loginStatus.mobileNumber;
+
+          toast.error(res.message);
+        }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -387,7 +400,7 @@ const UserPreference = () => {
           </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
             <h2 className="text-3xl font-bold text-gray-900">
-              {formData.fullName}
+              {loginStatus.fullName}
             </h2>
             <p className="text-gray-600">{loginStatus.companyName || ""}</p>
             <button
@@ -400,7 +413,15 @@ const UserPreference = () => {
                       : "bg-blue-600 hover:bg-blue-700"
                   }}
                 `}
-              onClick={handleEditClick}
+              onClick={() => {
+                if (userHasAccessToUpdateUser) {
+                  handleEditClick();
+                } else {
+                  toast.error(
+                    "you do not have access to update user information."
+                  );
+                }
+              }}
               disabled={isEditing && !isSaveEnabled}
             >
               {isEditing ? "Save" : "Edit Profile"}
@@ -437,7 +458,9 @@ const UserPreference = () => {
 
           <div>
             <h4 className="text-sm font-semibold text-gray-700">Email</h4>
-            <p className={classnameForParagragh}>{formData.email || "Not Provided"}</p>
+            <p className={classnameForParagragh}>
+              {formData.email || "Not Provided"}
+            </p>
           </div>
 
           <div>
@@ -486,27 +509,30 @@ const UserPreference = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
         {/* button */}
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">Preferences <span className="text-sm">(Click to change)</span></h3>
-         { (((prevTimezoneId.current !== selectedTimezoneId) ||
-            userPreference.rowsInGrid != selectedRowsPerPage))
-            && <button
-            onClick={() => {
-              if (prevTimezoneId.current !== selectedTimezoneId) {
-                handleTimezonePreferenceChange();
-                prevTimezoneId.current = selectedTimezoneId;
-              } else if (userPreference.rowsInGrid !== selectedRowsPerPage) {
-                handleTimezonePreferenceChange();
-              }
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-          >
-            {/* {showTimeZoneData ||
-            userPreference.rowsInGrid != selectedRowsPerPage */}
-              {/* ? */}
-               Save
-              {/* : "Change" */}
-               {/* } */}
-          </button>}
+          <h3 className="text-2xl font-semibold text-gray-800">
+            Preferences <span className="text-sm">(Click to change)</span>
+          </h3>
+          {(prevTimezoneId.current !== selectedTimezoneId ||
+            userPreference.rowsInGrid != selectedRowsPerPage) && (
+            <button
+              onClick={() => {
+                if(userHasAccessToUpdateSettingGeneral){
+
+                  if (prevTimezoneId.current !== selectedTimezoneId) {
+                    handleTimezonePreferenceChange();
+                    prevTimezoneId.current = selectedTimezoneId;
+                  } else if (userPreference.rowsInGrid !== selectedRowsPerPage) {
+                    handleTimezonePreferenceChange();
+                  }
+                }else{
+                  toast.error(MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS)
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              Save
+            </button>
+          )}
         </div>
         {/* time zone */}
         <div className="flex items-center space-x-4 border-b pb-1">
@@ -538,7 +564,13 @@ const UserPreference = () => {
             // When the display text should be visible (showTimeZoneData is false)
             <p
               onClick={() => {
-                setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+                if (userHasAccessToUpdateSettingGeneral) {
+                  setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                  );
+                }
               }}
               className="text-sm  font-semibold text-blue-600 cursor-pointer hover:text-blue-700
                  rounded-md py-1.5 px-3  // Adds padding to match select height
@@ -571,7 +603,20 @@ const UserPreference = () => {
 
           {/* The styled select dropdown */}
           <select
-            onChange={handleSelectRowInGridOptionChange}
+            // disabled={!userHasAccessToUpdateSettingGeneral}
+            onClick={() => {
+              if (!userHasAccessToUpdateSettingGeneral) {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                );
+                return;
+              }
+            }}
+            onChange={(e) => {
+              if (userHasAccessToUpdateSettingGeneral) {
+                handleSelectRowInGridOptionChange(e);
+              }
+            }}
             value={selectedRowsPerPage}
             id="records-per-page-select" // Link with label's htmlFor
             className="block w-auto rounded-md border-gray-300 shadow-sm

@@ -38,6 +38,7 @@ import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { alphabets, backgroundColors } from "../../../../constants/Colors";
+import MESSAGE from "../../../../constants/Messages";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -50,6 +51,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
+    userHasAccessToUpdateSettingGeneral,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -182,7 +184,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
   //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
   // },[loginStatus])
 
-
   const getColor = (email: string) => {
     if (!email) return backgroundColors[0];
     const emailChar = email.charAt(0);
@@ -311,7 +312,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
     return (
       <div>
         <header>
-          <nav className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${position === "left" ? "h-12" : "h-14"}`}>
+          <nav
+            className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${
+              position === "left" ? "h-12" : "h-14"
+            }`}
+          >
             <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
@@ -391,14 +396,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                         )}
 
-                         {userHasAccessToViewMeeting && (
-                            <NavItem
-                              to={ROUTES_URL.MEETINGS}
-                              icon={<Calendar size={SIZE.TWENTY} />}
-                              label="Meetings"
-                              onClick={() => setIsDropdownOpen(false)}
-                            />
-                          )}
+                        {userHasAccessToViewMeeting && (
+                          <NavItem
+                            to={ROUTES_URL.MEETINGS}
+                            icon={<Calendar size={SIZE.TWENTY} />}
+                            label="Meetings"
+                            onClick={() => setIsDropdownOpen(false)}
+                          />
+                        )}
 
                         <NavItem
                           icon={<Settings />}
@@ -500,7 +505,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<LucideSettings size={SIZE.TWENTY} />}
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
-
                           />
                         </div>
                       )}
@@ -532,7 +536,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link> */}
                       <div className="relative">
                         <button
-                        title="Show Notification"
+                          title="Show Notification"
                           onClick={() => {
                             resetNotificationCount();
                             setIsOpenPopUpOfNotification(
@@ -558,11 +562,29 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         )}
                       </div>
 
-                      <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
-                        <button title="Panel Layout" className="p-2 rounded-lg hover:bg-gray-100">
+                      {userHasAccessToUpdateSettingGeneral ? (
+                        <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                          <button
+                            title="Panel Layout"
+                            className="p-2 rounded-lg hover:bg-gray-100"
+                          >
+                            <LayoutPanelLeft className="h-5 w-5" />
+                          </button>
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS
+                            );
+                          }}
+                          title="Panel Layout"
+                          className="p-2 rounded-lg opacity-50 cursor-not-allowed hover:bg-gray-100"
+                        >
                           <LayoutPanelLeft className="h-5 w-5" />
                         </button>
-                      </Link>
+                      )}
                     </>
                   )}
                   <div
@@ -598,14 +620,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         {/* Profile Section */}
                         <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
                           <div
-                      className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
-                        loginStatus.email
-                      )}`}
-                    >
-                      {loginStatus.fullName
-                        ? loginStatus.fullName.charAt(0)
-                        : ""}
-                    </div>
+                            className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
+                              loginStatus.email
+                            )}`}
+                          >
+                            {loginStatus.fullName
+                              ? loginStatus.fullName.charAt(0)
+                              : ""}
+                          </div>
                           <div className="min-w-0">
                             <span className="text-sm font-semibold text-gray-800 block truncate w-40">
                               {loginStatus?.fullName || "User Name"}
@@ -636,9 +658,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             </button>
                           )}
                           <Link to={ROUTES_URL.COMPANY_SETTING}>
-                          <button className="px-4 py-2 w-full hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                            ⚙️ Settings
-                          </button>
+                            <button className="px-4 py-2 w-full hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                              ⚙️ Settings
+                            </button>
                           </Link>
 
                           {userHasAccessToViewSubscription ? (

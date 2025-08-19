@@ -21,6 +21,8 @@ import CompanyProductUsersModal from "../modals/company-product-user/CompanyProd
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
 import ProductsManagementListProps from "../../@types/List/ProductsManagementListProps";
 import { useUserPreference } from "../../context/user/UserPreference";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 
 function ProductsManagementList({
   products,
@@ -306,13 +308,15 @@ function ProductsManagementList({
                     setIsAddProductModalOpen(true)
                   }
                 >
-                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
+                  {!isSmallScreen && <Plus size={18} />}
                   {isSmallScreen && <Plus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
                 </Button>
               ) : (
-                <Button disabled>
-                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
+                <Button disabled onClick={()=>{
+                  toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_ADD_ACCESS)
+                }}>
+                  {!isSmallScreen && <Plus size={18} />}
                   {isSmallScreen && <Plus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
                 </Button>
