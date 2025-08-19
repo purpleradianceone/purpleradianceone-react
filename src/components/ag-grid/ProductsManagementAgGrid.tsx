@@ -8,8 +8,9 @@ import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CheckCircle2, Edit, Network, UserPlus, XCircle } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import Button from "../ui/Button";
 import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 
 function ProductsManagementGrid({
   products,
@@ -95,7 +96,6 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,
-        
       },
       {
         field: "sac",
@@ -218,69 +218,69 @@ function ProductsManagementGrid({
                   >
                     {!isGridForProductUser && (
                       <>
-                        {userHasAccessToUpdateProduct && (
-                          <ActionsDropdownButton
-                            onClick={() => {
+                        <ActionsDropdownButton
+                          disabled={!userHasAccessToUpdateProduct}
+                          onClick={() => {
+                            if (userHasAccessToUpdateProduct) {
                               setIsActionsDropDownOpen(false);
                               handleEditCompanyProductModalOpen(true);
                               handleSelectedProductChange(params.data);
-                            }}
-                          >
-                            <Edit
-                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                            />{" "}
-                            {JSX_CHILDREN_NAME.EDIT}
-                          </ActionsDropdownButton>
-                        )}
-
-                        {!userHasAccessToUpdateProduct && (
-                          <Button
-                            disabled
-                            className={CLASS_NAMES.DISABLED_BUTTON}
-                          >
-                            <Edit
-                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                            />{" "}
-                            {JSX_CHILDREN_NAME.EDIT}
-                          </Button>
-                        )}
+                            } else {
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                                  .DENIED_UPDATE_ACCESS
+                              );
+                            }
+                          }}
+                        >
+                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                          {JSX_CHILDREN_NAME.EDIT}
+                        </ActionsDropdownButton>
                       </>
                     )}
 
                     {isGridForProductUser && (
                       <>
-                        {userHasAccessToUpdateProductTeam && (
-                          <>
-                            <ActionsDropdownButton
-                            onClick={()=>{
-                              setIsActionsDropDownOpen(false);
-                              handleCompanyProductUserModalOpen(true);
-                              handleSelectedProductChange(params.data);
-                            }
-                            }
-                            >
-                              <UserPlus
-                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                              />
-                              {JSX_CHILDREN_NAME.USER}
-                            </ActionsDropdownButton>
-                            <ActionsDropdownButton
-                            onClick={(()=> {
+                        {/* {userHasAccessToUpdateProductTeam && ( */}
+                        <>
+                          <ActionsDropdownButton
+                            disabled={!userHasAccessToUpdateProductTeam}
+                            onClick={() => {
+                              if (userHasAccessToUpdateProductTeam) {
+                                setIsActionsDropDownOpen(false);
+                                handleCompanyProductUserModalOpen(true);
+                                handleSelectedProductChange(params.data);
+                              } else {
+                                toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT.DENIED_UPDATE_ACCESS);
+                              }
+                            }}
+                          >
+                            <UserPlus
+                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                            />
+                            {JSX_CHILDREN_NAME.USER}
+                          </ActionsDropdownButton>
+                          <ActionsDropdownButton
+                            disabled={!userHasAccessToUpdateProductTeam}
+                            onClick={() => {
+                               if (userHasAccessToUpdateProductTeam) {
                               setIsActionsDropDownOpen(false);
                               handleCompanyProductTeamModalOpen(true);
                               handleSelectedProductChange(params.data);
-                            })}
-                            >
-                              <Network
-                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                                
-                              />
-                              {JSX_CHILDREN_NAME.TEAM}
-                            </ActionsDropdownButton>
-                          </>
-                        )}
+                               }else{
+                                toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT.DENIED_UPDATE_ACCESS);
+                               }
+                            }}
+                          >
+                            <Network
+                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                            />
+                            {JSX_CHILDREN_NAME.TEAM}
+                          </ActionsDropdownButton>
+                        </>
+                        {/* // )} */}
 
-                        {!userHasAccessToUpdateProductTeam && (
+                        {/* {!userHasAccessToUpdateProductTeam && (
                           <>
                             <Button
                              disabled
@@ -299,7 +299,7 @@ function ProductsManagementGrid({
                               {JSX_CHILDREN_NAME.TEAM}
                             </Button>
                           </>
-                        )}
+                        )} */}
                       </>
                     )}
                   </div>,

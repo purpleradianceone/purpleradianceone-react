@@ -8,14 +8,12 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 
 const PanelCustomizer: React.FC = () => {
-
-  const {loginStatus} = useLoggedInUserContext();
-  const {position, setPosition}= usePanel();
+  const { loginStatus } = useLoggedInUserContext();
+  const { position, setPosition } = usePanel();
   const prevPositionRef = React.useRef(position);
-  const {userPreference , setUserPreference}= useUserPreference();
+  const { userPreference, setUserPreference } = useUserPreference();
 
-
-   const handleUserPreferenceChange = async () => {
+  const handleUserPreferenceChange = async () => {
     const postData = {
       company_id: loginStatus.companyId,
       id: userPreference.id,
@@ -35,11 +33,13 @@ const PanelCustomizer: React.FC = () => {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        setUserPreference({
-          ...userPreference,
-          isLeftMenu : position==='left' ? true : false ,
-        });
-        prevPositionRef.current=position;
+        if (response.data.status) {
+          setUserPreference({
+            ...userPreference,
+            isLeftMenu: position === "left" ? true : false,
+          });
+          prevPositionRef.current = position;
+        }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -54,11 +54,11 @@ const PanelCustomizer: React.FC = () => {
     }
   };
 
-  useEffect(()=>{
-    if(prevPositionRef.current !== position && position!== null){
+  useEffect(() => {
+    if (prevPositionRef.current !== position && position !== null) {
       handleUserPreferenceChange();
     }
-  },[position])
+  }, [position]);
 
   return (
     <div className="w-full  min-h-screen relative max-h-full bg-gradient-to-br from-blue-50 to-purple-50  flex flex-col items-center">
@@ -71,9 +71,7 @@ const PanelCustomizer: React.FC = () => {
         {/* Top Panel Card */}
         <div
           className={`w-full lg:w-1/2 bg-white rounded-xl shadow-lg border-4 transition-all duration-300 ${
-            position === "top"
-              ? "border-indigo-500"
-              : "border-transparent"
+            position === "top" ? "border-indigo-500" : "border-transparent"
           }`}
         >
           <div className="relative w-full h-64 bg-gray-50 rounded-t-xl overflow-hidden">
@@ -99,17 +97,15 @@ const PanelCustomizer: React.FC = () => {
         {/* Left Panel Card */}
         <div
           className={`w-full lg:w-1/2 bg-white rounded-xl shadow-lg border-4 transition-all duration-300 ${
-            position === "left"
-              ? "border-indigo-500"
-              : "border-transparent"
+            position === "left" ? "border-indigo-500" : "border-transparent"
           }`}
         >
           <div className="relative w-full h-64 bg-gray-50 rounded-t-xl overflow-hidden">
             <div className="absolute top-0 left-0 h-full w-20 bg-indigo-600 text-white flex items-center justify-center font-semibold shadow-md">
-             <div className="grid">
-             Panel 
-             <span>(Left)</span>
-             </div>
+              <div className="grid">
+                Panel
+                <span>(Left)</span>
+              </div>
             </div>
           </div>
           <div className="p-4 flex justify-center">

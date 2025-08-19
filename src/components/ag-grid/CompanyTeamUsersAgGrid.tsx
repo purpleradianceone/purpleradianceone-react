@@ -99,7 +99,7 @@ function CompanyTeamUsersAgGrid({
   const [isCompanyUserSearchCleared, setIsCompanyUserSearchCleared] =
     useState<boolean>(true);
 
-    const fetchCompanyUsersNotAssigned = async (
+  const fetchCompanyUsersNotAssigned = async (
     companyUserNotAssignedSearchParameter: string
   ) => {
     if (
@@ -109,9 +109,8 @@ function CompanyTeamUsersAgGrid({
         companyUserNotAssignedSearchParameter.length === 0) ||
       companyUserFetchingRef.current
     )
-      return 
+      return;
     try {
-      
       companyUsersNotAssignedSearchParameterRef.current =
         companyUserNotAssignedSearchParameter;
       companyUserFetchingRef.current = true;
@@ -135,7 +134,7 @@ function CompanyTeamUsersAgGrid({
           companyUserNotAssignedSearchParameter.length > 0
             ? 0
             : 50 * isCompanyUsersFetchedCount,
-        isactive : true,
+        isactive: true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
@@ -150,7 +149,7 @@ function CompanyTeamUsersAgGrid({
             ? 0
             : 50 * isCompanyUsersFetchedCount,
         search_company_specific_date_range_id: 0,
-        isactive : true,
+        isactive: true,
         search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
       };
@@ -204,7 +203,10 @@ function CompanyTeamUsersAgGrid({
               },
             ]);
           });
-        } else if (companyUserNotAssignedSearchParameter.length > 0 || isCompanyUsersFetchedCount === 0) {
+        } else if (
+          companyUserNotAssignedSearchParameter.length > 0 ||
+          isCompanyUsersFetchedCount === 0
+        ) {
           const transformedData = newUsers.map((user: any) => ({
             company_id: user.company_id,
             count: user.count,
@@ -249,7 +251,6 @@ function CompanyTeamUsersAgGrid({
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyUsersNotAssigned,
         });
-        
 
         if (!refreshTokenResponse) {
           // setIsDialogueOpen(true);
@@ -279,8 +280,7 @@ function CompanyTeamUsersAgGrid({
   const handleCompanyUserNotAssignedViewPortChanged = (
     params: ViewportChangedEvent
   ) => {
-    if (!companyUsersNotAssigned.length || !companyUserHasMore)
-      return 
+    if (!companyUsersNotAssigned.length || !companyUserHasMore) return;
 
     // Store the grid API reference
     if (!companyUserGridApiRef.current && params.api) {
@@ -297,7 +297,9 @@ function CompanyTeamUsersAgGrid({
       fetchCompanyUsersNotAssigned("");
     }
   };
-  const handleCompanyUserSearchParameterChange = async(searchValue: string) => {
+  const handleCompanyUserSearchParameterChange = async (
+    searchValue: string
+  ) => {
     if (searchValue.length === 0) {
       setCompanyUsersNotAssigned([]);
       setIsCompanyUsersFetched(0);
@@ -347,7 +349,11 @@ function CompanyTeamUsersAgGrid({
       setCompanyUsersToAddToTeamsOrProduct([]);
       // handleMessageSnackbarClose();
       setIsCompanyUserSearchCleared(true);
-    } else if (isOpen && isCompanyUserNotAssignedReadyToFetch && companyUsersNotAssignedSearchParameterRef.current.length === 0) {
+    } else if (
+      isOpen &&
+      isCompanyUserNotAssignedReadyToFetch &&
+      companyUsersNotAssignedSearchParameterRef.current.length === 0
+    ) {
       fetchCompanyUsersNotAssigned("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -407,7 +413,7 @@ function CompanyTeamUsersAgGrid({
                     // });
                     toast.success(response.data.message);
                     params.data.isActive = !isActive;
-                  }else{
+                  } else {
                     toast.error(response.data.message);
                   }
                 })
@@ -453,7 +459,7 @@ function CompanyTeamUsersAgGrid({
                     // });
                     toast.success(response.data.message);
                     params.data.isActive = !isActive;
-                  }else{
+                  } else {
                     toast.error(response.data.message);
                   }
                 })
@@ -519,13 +525,13 @@ function CompanyTeamUsersAgGrid({
   }, [isAddUsersCompleted]);
 
   return (
-    <div className="flex justify-around gap-2 mb-16 pb-6">
+    <div className="flex justify-around gap-2 mb-9 py-10 ">
       <div
         className="ag-theme-alpine"
         style={{ height: "300px", width: "45%" }}
       >
-        <div className="flex gap-2 mb-2 justify-between">
-          <div>
+        <div className="flex w-full  gap-4 mb-2 justify-between">
+          <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
                 const searchValue = event.target.value;
@@ -533,7 +539,7 @@ function CompanyTeamUsersAgGrid({
               }}
             ></SearchInput>
           </div>
-          <div className="text-lg font-semibold text-gray-700">
+          <div className="text-base font-semibold mt-2 text-gray-700">
             Team Members
           </div>
         </div>
@@ -547,9 +553,15 @@ function CompanyTeamUsersAgGrid({
           columnDefs={companyTeamColumnDefs}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
-          overlayNoRowsTemplate={ isGridForProductUser
-              ? companyProductUsersList!.length === 0 ? "No users assigned to this product" : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
-              : companyTeamUsersList!.length === 0 ? "No users assigned to this product" : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          overlayNoRowsTemplate={
+            isGridForProductUser
+              ? companyProductUsersList!.length === 0
+                ? "No users assigned to this product"
+                : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
+              : companyTeamUsersList!.length === 0
+              ? "No users assigned to this product"
+              : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
+          }
           theme={themeAlpine}
           onViewportChanged={handleViewPortChanged}
           onGridReady={onGridReady}
@@ -557,10 +569,10 @@ function CompanyTeamUsersAgGrid({
       </div>
       <div
         className="ag-theme-alpine"
-        style={{ height: "300px", width: "45%" }}
+        style={{ height: "300px", width: "49%" }}
       >
-        <div className="flex gap-2 mb-2 justify-between">
-          <div>
+        <div className="flex w-full gap-2 mb-2 justify-between">
+            <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
                 const searchValue = event.target.value;
@@ -579,7 +591,7 @@ function CompanyTeamUsersAgGrid({
             )}
 
             {isGridForProductUser && (
-              <Button onClick={handleAddCompanyTeamUsers}>
+              <Button   onClick={handleAddCompanyTeamUsers}>
                 {" "}
                 <UserPlus2
                   className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
@@ -594,12 +606,9 @@ function CompanyTeamUsersAgGrid({
           handleViewPortChanged={handleCompanyUserNotAssignedViewPortChanged}
           onGridReady={companyUserNotAssignedOnGridReady}
           addCompanyTeamUserArray={addCompanyTeamAndProductUserArray}
-          handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange
-          
-          }
+          handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange}
           isGridForSubscription={false}
         />
-
       </div>
       {/* <MessageSnackBar
         isOpen={messageSnackbar.open}

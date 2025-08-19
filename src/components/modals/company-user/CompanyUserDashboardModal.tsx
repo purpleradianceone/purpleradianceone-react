@@ -4,12 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import { X } from "lucide-react";
-import toast from "react-hot-toast";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import {
+  MessageSnackbarState,
+  ShowMessageSnackbarProps,
+} from "../../../@types/ui/MessageSnackbarProps";
+import MessageSnackBar from "../../ui/MessageSnackbar";
 
 interface CompanyUserDashboard {
   id: number;
@@ -29,6 +34,7 @@ function CompanyUserDashboardModal({
   onClose,
   users,
 }: CompanyUserDashboardProps) {
+  const { userHasAccessToUpdateDashboard } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   const [companyUserDashboard, setCompanyUserDashboard] = useState<
@@ -43,15 +49,15 @@ function CompanyUserDashboardModal({
 
   const initialDataRef = useRef<CompanyUserDashboard[]>([]);
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
+  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+    open: false,
+    message: "",
+    type: "success",
+  });
 
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
+  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+    setMessageSnackbar({ open: true, message, type });
+  };
 
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
@@ -61,9 +67,9 @@ function CompanyUserDashboardModal({
     message: "",
   });
 
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
+  const handleMessageSnackbarClose = () => {
+    setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   // const { userHasAccessToUpdateAccess } = useUserAccessModules();
 
@@ -92,27 +98,30 @@ function CompanyUserDashboardModal({
           }
         )
         .then((response) => {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
-          toast.success(response.data.message);
-
-          setSpinnerAnimation({
-            status: "success",
-            message: MESSAGE.SUCCESS.SAVED,
-          });
-
-          setTimeout(() => {
-            setSpinnerAnimation({
-              status: "idle",
-              message: "",
+          if (response.data.status) {
+            // toast.success(response.data.message);
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "success",
             });
-          }, 1000);
+            setSpinnerAnimation({
+              status: "success",
+              message: MESSAGE.SUCCESS.SAVED,
+            });
 
-          setTimeout(() => {
-            onClose();
-          }, 2000);
+            setTimeout(() => {
+              setSpinnerAnimation({
+                status: "idle",
+                message: "",
+              });
+            }, 1000);
+          } else {
+            // toast.error(response.data.message);
+            showMessageSnackbar({
+              message: response.data.message,
+              type: "error",
+            });
+          }
         });
 
       console.log("---------------------------");
@@ -125,6 +134,10 @@ function CompanyUserDashboardModal({
       await fetchCompanyUserDashboard();
     } catch (e) {
       alert(e);
+    } finally {
+      setTimeout(() => {
+        onClose();
+      }, 500);
     }
   };
 
@@ -256,8 +269,24 @@ function CompanyUserDashboardModal({
           )} */}
 
           <Button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={handleSave}
+            className={`px-4 py-2 bg-blue-600 ${
+              !userHasAccessToUpdateDashboard
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            } text-white rounded hover:bg-blue-700`}
+            onClick={() => {
+              if ( userHasAccessToUpdateDashboard ) {
+                handleSave();
+              } else {
+                showMessageSnackbar({
+                  message:
+                    MESSAGE.MODULE_ACCESS.DASHBOARD
+                      .DENIED_UPDATE_ACCESS_DASHBOARD,
+                  type: "error",
+                });
+                return;
+              }
+            }}
             spinner={spinnerAnimation}
           >
             Save
@@ -265,14 +294,13 @@ function CompanyUserDashboardModal({
         </div>
       </div>
 
-
-      {/* <MessageSnackBar
+      <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
+      />
     </dialog>
   );
 }

@@ -110,9 +110,12 @@ function CompanyProductUsersModal({
             companyProductUsersGridApiRef.current = null;
             companyProductUsersLastScrollPositionRef.current = 0;
             setIsCompanyProductUsersFetchedCount(0);
-            setAddCompanyProductUserArray([]);
+            
             toast.success(response.data.message)
+          }else{
+            toast.error(response.data.message)
           }
+          setAddCompanyProductUserArray([]);
         })
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -361,17 +364,17 @@ function CompanyProductUsersModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white py-2">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-3">
+            <div className="flex items-center gap-2  border-b sticky bg-white ">
+              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
+              <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Users
               </h2>
               <button
                 onClick={() => {
                   onClose();
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="absolute right-1 top-2 text-gray-500 hover:text-gray-700"
               >
                 <X size={SIZE.TWENTY} />
               </button>
