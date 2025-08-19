@@ -2,26 +2,31 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, Edit, LucideLayoutDashboard, UserCheck, XCircle } from "lucide-react";
-import { createPortal } from "react-dom";
 import {
-  INNERHTML,
-  JSX_CHILDREN_NAME,
-} from "../../constants/AppConstants";
+  CheckCircle2,
+  Edit,
+  LucideLayoutDashboard,
+  UserCheck,
+  XCircle,
+} from "lucide-react";
+import { createPortal } from "react-dom";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 // import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
   handleSelectedCompanyUserChange,
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
-  handleIsDashboardModalOpen
- 
+  handleIsDashboardModalOpen,
 }: CompanyUserAgGridProps) {
-  const { userHasAccessToViewAccess, userHasAccessToUpdateUser } =
+  const { userHasAccessToViewAccess, userHasAccessToUpdateUser  , userHasAccessToViewDashboard
+  } =
     useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -48,7 +53,7 @@ function CompanyUserAgGrid({
       {
         field: "mobilenumber",
         headerName: "Mobile Number",
-        
+
         sortable: true,
         filter: true,
       },
@@ -95,37 +100,35 @@ function CompanyUserAgGrid({
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
-          const [isActionsDropDownOpen, setIsActionsDropDownOpen] = useState(
-            false
-          );
+          const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
+            useState(false);
           const [position, setPosition] = useState({
             top: 0,
             left: 0,
-            isUpward : false,
+            isUpward: false,
           });
 
-          
           const dropdownRef = useRef<HTMLDivElement | null>(null);
 
           const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
             setIsActionsDropDownOpen((prev) => !prev);
 
-            const rect = (event.currentTarget as HTMLButtonElement).getBoundingClientRect();
+            const rect = (
+              event.currentTarget as HTMLButtonElement
+            ).getBoundingClientRect();
             const dropdownHeight = 80; // Approximate height of dropdown
             const windowHeight = window.innerHeight;
             const spaceBelow = windowHeight - rect.bottom;
             const isUpward = spaceBelow < dropdownHeight;
-        
+
             setPosition({
-              top: isUpward 
+              top: isUpward
                 ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
                 : rect.bottom + window.scrollY - 10, // Position below button
               left: rect.left + window.scrollX - 25,
-              isUpward
+              isUpward,
             });
-
-           
           };
 
           useEffect(() => {
@@ -165,66 +168,82 @@ function CompanyUserAgGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {userHasAccessToViewAccess && (
-                      <ActionsDropdownButton
-                        onClick={() => {
+                    <ActionsDropdownButton
+                      disabled={!userHasAccessToViewAccess}
+                      onClick={() => {
+                        if (userHasAccessToViewAccess) {
                           handleSelectedCompanyUserChange(params.data);
                           handleIsAccessModalOpen(true);
                           setIsActionsDropDownOpen(false);
-                        }}
-                      >
-                        <UserCheck
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />{" "}
-                        {JSX_CHILDREN_NAME.ACCESS}
-                      </ActionsDropdownButton>
-                    )}
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.MODULE_ACCESS
+                              .DENIED_VIEW_ACCESS_MODULE_ACCESS
+                          );
+                        }
+                      }}
+                    >
+                      <UserCheck
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      />{" "}
+                      {JSX_CHILDREN_NAME.ACCESS}
+                    </ActionsDropdownButton>
 
-                    {userHasAccessToUpdateUser && (
-                      <ActionsDropdownButton
-                        onClick={() => {
+                    <ActionsDropdownButton
+                      disabled={!userHasAccessToUpdateUser}
+                      onClick={() => {
+                        if (userHasAccessToUpdateUser) {
                           handleSelectedCompanyUserChange(params.data);
                           handleIdIsEditModalOpen(true);
                           setIsActionsDropDownOpen(false);
-                        }}
-                      >
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
-                      </ActionsDropdownButton>
-                    )}
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.COMPANY_USER
+                              .DENIED_UPDATE_ACCESS_COMPANY_USER
+                          );
+                        }
+                      }}
+                    >
+                      <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                      {JSX_CHILDREN_NAME.EDIT}
+                    </ActionsDropdownButton>
 
-
-                     {userHasAccessToUpdateUser && (
-                      <ActionsDropdownButton
-                        onClick={() => {
-
+                    <ActionsDropdownButton
+                      disabled={!userHasAccessToViewDashboard}
+                      onClick={() => {
+                        if (userHasAccessToViewDashboard) {
                           handleSelectedCompanyUserChange(params.data);
-
                           handleIsDashboardModalOpen(true);
-
                           setIsActionsDropDownOpen(false);
-                        }}
-                      >
-                        <LucideLayoutDashboard className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.DASHBOARD}
-                      </ActionsDropdownButton>
-                    )}
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.DASHBOARD
+                              .DENIED_VIEW_ACCESS_DASHBOARD
+                          );
+                        }
+                      }}
+                    >
+                      <LucideLayoutDashboard
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      />{" "}
+                      {JSX_CHILDREN_NAME.DASHBOARD}
+                    </ActionsDropdownButton>
 
-                    {!userHasAccessToViewAccess && (
+                    {/* {!userHasAccessToViewAccess && (
                       <ActionsDropdownButton disabled>
                         <UserCheck
                           className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                         />{" "}
                         {JSX_CHILDREN_NAME.ACCESS}
                       </ActionsDropdownButton>
-                    )}
+                    )} */}
 
-                    {!userHasAccessToUpdateUser && (
+                    {/* {!userHasAccessToUpdateUser && (
                       <ActionsDropdownButton disabled>
                         <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
                         {JSX_CHILDREN_NAME.EDIT}
                       </ActionsDropdownButton>
-                    )}
+                    )} */}
                   </div>,
                   document.body // Render dropdown in body to avoid clipping
                 )}
@@ -248,7 +267,6 @@ function CompanyUserAgGrid({
   }, []);
 
   return (
-
     <div
       // className="ag-theme-balham w-full "
       style={{ height: "100vh", width: "100%" }}
@@ -261,7 +279,7 @@ function CompanyUserAgGrid({
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
       />
-     </div>
+    </div>
   );
 }
 

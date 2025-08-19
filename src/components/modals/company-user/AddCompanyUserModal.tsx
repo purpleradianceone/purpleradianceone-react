@@ -172,23 +172,23 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg">
             
 
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-                <h2 className="text-xl font-semibold text-gray-800">
+            <div className="py-6 px-4">
+              <div className="flex border-b items-center gap-3 mb-4">
+                <UserPlus className="text-blue-500" size={SIZE.TWENTY} />
+                <h2 className="text-lg font-semibold text-gray-800">
                   Add New Company User
                 </h2>
                 <button
                 //  note : this is logic will not work dynamically CHANGES NEEDED
                 disabled={loginStatus.activeUsersInCompany> loginStatus.subscriptionAllowedUsers}
               onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-8 text-gray-400 hover:text-gray-600"
             >
               <X size={SIZE.TWENTY} />
             </button>
               </div>
 
-              <form className="space-y-8" onSubmit={handleAddUserSubmit}>
+              <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput
                   label="Name"
                   type="text"
@@ -224,6 +224,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   error={errors.email}
                   maxLength={256}
                 />
+                
                 <Button type="submit">Create</Button>
               </form>
             </div>

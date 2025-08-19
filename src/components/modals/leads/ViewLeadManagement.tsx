@@ -1329,7 +1329,7 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-sm text-gray-700 p-0 m-0 border-none focus:outline-none focus:ring-0 w-auto"
+              className="text-sm text-gray-700  p-0 m-0  focus:outline-none focus:ring-0 w-auto"
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1341,7 +1341,7 @@ const Detail: React.FC<DetailProps> = ({
         <div>
           <p
             // title={value}
-            className="font-medium text-sm text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
+            className="font-medium text-sm  text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
           >
             {value || "-"}
           </p>

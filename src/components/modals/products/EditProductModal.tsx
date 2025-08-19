@@ -183,9 +183,12 @@ function EditCompanyProductModal({
                 }
               }
             });
+             handleCompanyProductChange(product);
+        }else{
+          toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS)
         }
 
-        handleCompanyProductChange(product);
+       
       } else {
         // showMessageSnackbar({
         //   message: MESSAGE.ERROR.NO_CHANGES,
@@ -272,7 +275,7 @@ function EditCompanyProductModal({
       className={
         isSmallScreen
           ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"
+          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
@@ -282,8 +285,8 @@ function EditCompanyProductModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
+          <div className="p-4">
+            <div className="flex items-center border-b gap-3 mb-2 sticky bg-white z-10 ">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
                 Edit {product.name}
@@ -293,7 +296,7 @@ function EditCompanyProductModal({
                   onClose();
                   setIsCreateCompanyProductTaxModalOpen(false);
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 z-10"
+                className="absolute right-1 top-2 text-gray-400 hover:text-gray-600 z-10"
               >
                 <X size={SIZE.TWENTY} />
               </button>
@@ -340,7 +343,7 @@ function EditCompanyProductModal({
                 />
 
                 <RadioButtons
-                  label="IsActive : "
+                  label="Status : "
                   onChange={handleEditCompanyProductFormDataChange}
                   options={CompanyProductIsActiveRadioButtonOptions}
                 />
@@ -362,7 +365,7 @@ function EditCompanyProductModal({
               </div>
 
               <div className="flex justify-self-center m-2 min-w-80 gap-2">
-                <Button type="submit">Update Product</Button>
+                <Button  type="submit" >Update Product</Button>
               </div>
             </form>
 

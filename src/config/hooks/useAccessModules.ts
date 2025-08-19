@@ -277,6 +277,22 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 17 && accessModule.update
   );
 
+  
+   //Dashboard
+  const userHasAccessToAddDashboard = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 18 && accessModules.add
+  );
+
+   const userHasAccessToViewDashboard  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 18 && accessModule.view
+  );
+
+  const userHasAccessToUpdateDashboard = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 18 && accessModule.update
+  );
 
   return {
     userHasAccessToAddUser,
@@ -345,6 +361,10 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
 
     userHasAccessToAddCompanyPreferences,
     userHasAccessToViewCompanyPreferences,
-    userHasAccessToUpdateCompanyPreferences
+    userHasAccessToUpdateCompanyPreferences,
+
+    userHasAccessToAddDashboard,
+    userHasAccessToViewDashboard,
+    userHasAccessToUpdateDashboard,
   };
 };

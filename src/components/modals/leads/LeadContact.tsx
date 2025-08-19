@@ -414,7 +414,7 @@ const LeadContact = ({
               }}
             >
               <div>
-                <p>{contact.name}</p>
+                <p>{contact.name}</p> 
                 <p className="text-xs text-gray-600">
                   {contact.jobTitle && <span>{contact.jobTitle}</span>}
                   {contact.jobTitle &&
@@ -762,7 +762,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="mobileNumber"
-                    placeholder="Mobile number"
+                    placeholder="Mobile Number"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}

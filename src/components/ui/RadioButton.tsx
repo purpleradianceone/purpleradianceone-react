@@ -3,13 +3,13 @@ import RadioButtonsProps from "../../@types/ui/RadioButtonProps";
 function RadioButtons(props: RadioButtonsProps) {
   return (
     <div className="mt-2">
-      <label htmlFor={props.options.at(0)?.name} className={( props.center ? 'text-center ' : '') + 'block text-base font-medium text-gray-500'}>
+      <label htmlFor={props.options.at(0)?.name} className={( props.center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
         {props.label}
       </label>
     <div className="flex">
       {props.options.map((option, index) => {
         return (
-          <div className="flex items-center mt-4 mr-4" key={index}>
+          <div className="flex items-center mt-3 mr-4" key={index}>
       <input
               
               id={option.id}
