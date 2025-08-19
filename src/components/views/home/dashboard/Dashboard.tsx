@@ -36,8 +36,12 @@ import PieChart from "./PieChart";
 // import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
-
-function Dashboard() {
+interface DashboardCRMProp {
+  companyUserId: number|null;
+}
+const Dashboard:React.FC<DashboardCRMProp> = ({ 
+ companyUserId,
+}) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
@@ -59,10 +63,18 @@ function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
 
   const getDashboardData = async () => {
+    setDashboardData({});
+    setDashboardLayout([]);
+    setDasboardVisibility([]);
+    setLeadSummaryReportData([]);
+    setLeadBySourcce([]);
+    setMonthlyAverageLeads([]);
+    setUpcomingTasks([]);
+    setPendingTasks([]);
     setIsTasksLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      owner_id: loginStatus.id,
+      owner_id: companyUserId??loginStatus.id,
       requestedby_id: loginStatus.id,
     };
 
@@ -168,7 +180,7 @@ function Dashboard() {
     if (loginStatus?.companyId && loginStatus?.id) {
       getDashboardData();
     }
-  }, []);
+  }, [companyUserId]);
 
 
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -10,14 +11,17 @@ import SupportDashboard from "../dashboards/SupportDashboard";
 import InventoryDashboard from "../dashboards/InventoryDashboard";
 import FinanceDashboard from "../dashboards/FinanceDashboard";
 import HRMSDashboard from "../dashboards/HRMSDashboard";
-
+import CompanyUserDropdown, {
+  UserResponse,
+} from "../custom_company_user_dropdown/CustomCompanyUserDropdown";
+import { useUserPreference } from "../../../../context/user/UserPreference";
 
 // ======= Dashboard Components =======
-const CRM: React.FC = () => <Dashboard />;
-const Support: React.FC = () => <SupportDashboard/>;
-const Inventory: React.FC = () => <InventoryDashboard/>;
-const Finance: React.FC = () => <FinanceDashboard/>;
-const HRMS: React.FC = () => <HRMSDashboard/>;
+const CRM: React.FC<{companyUserId:number|null}> = ({companyUserId}) => <Dashboard companyUserId={companyUserId} />;
+const Support: React.FC = () => <SupportDashboard />;
+const Inventory: React.FC = () => <InventoryDashboard />;
+const Finance: React.FC = () => <FinanceDashboard />;
+const HRMS: React.FC = () => <HRMSDashboard />;
 
 // ======= Types =======
 type DashboardType = {
@@ -33,11 +37,13 @@ const Home: React.FC = () => {
   const [modules, setModules] = useState<DashboardType[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+  const { userPreference } = useUserPreference();
 
   const renderContent = () => {
     switch (activeTab) {
       case 1:
-        return <CRM />;
+        return <CRM companyUserId={(selectedUser??loginStatus).id} />;
       case 2:
         return <Support />;
       case 3:
@@ -52,11 +58,11 @@ const Home: React.FC = () => {
   };
 
   const fetchCompanyUserDashboardAssigned = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const getCompanyUserDashboardPostData = {
         company_id: loginStatus.companyId,
-        company_user_id: loginStatus.id,
+        company_user_id: (selectedUser ?? loginStatus).id,
         isactive: true,
         requestedby_id: loginStatus.id,
       };
@@ -70,8 +76,14 @@ const Home: React.FC = () => {
         .then((response) => {
           if (response.data != null) {
             let fetchedModules: DashboardType[] = response.data;
-            fetchedModules = fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id);
-            setModules(fetchedModules.filter((m) => m.isactive).sort((a, b) => a.dashboard_id - b.dashboard_id));
+            fetchedModules = fetchedModules
+              .filter((m) => m.isactive)
+              .sort((a, b) => a.dashboard_id - b.dashboard_id);
+            setModules(
+              fetchedModules
+                .filter((m) => m.isactive)
+                .sort((a, b) => a.dashboard_id - b.dashboard_id)
+            );
 
             if (fetchedModules.length > 0) {
               setActiveTab(fetchedModules[0].dashboard_id);
@@ -98,7 +110,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchCompanyUserDashboardAssigned();
-  }, []);
+  }, [selectedUser]);
 
   if (loading) {
     return (
@@ -129,38 +141,66 @@ const Home: React.FC = () => {
     );
   }
 
-  if (modules.length === 0) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
-        No Dashboard available
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
+      {loginStatus.isSuperUser && (
+        <div className="">
+          <CompanyUserDropdown
+            limit={userPreference.rowsInGrid}
+            companyId={loginStatus.companyId}
+            requestedBy={loginStatus.id}
+            onChange={(option) => {
+              if (option) {
+                setSelectedUser({
+                  id: option.value,
+                  company_id: loginStatus.companyId,
+                  fullname: option.label,
+                  email: option.email,
+                  mobilenumber: option.mobilenumber,
+                  isactive: option.isActive,
+                  createdby: "",
+                  createdon: "",
+                });
+              } else {
+                setSelectedUser(null);
+              }
+            }}
+          />
+        </div>
+      )}
       {/* Horizontal Tabs */}
-      <div className="bg-white border-b border-gray-300">
-        <div className="flex justify-start">
-          {modules.map((module) => (
-            <button
-              key={module.dashboard_id}
-              onClick={() => setActiveTab(module.dashboard_id)}
-              className={`px-6 py-1 text-sm font-medium border-b-2 transition-colors
+      {modules.length === 0 && (
+        <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
+          No Dashboard available
+        </div>
+      )}{" "}
+      {modules.length !== 0 && (
+        <div>
+          <div className="bg-white border-b border-gray-300">
+            <div className="flex justify-start">
+              {modules.map((module) => (
+                <button
+                  key={module.dashboard_id}
+                  onClick={() => setActiveTab(module.dashboard_id)}
+                  className={`px-6 py-1 text-sm font-medium border-b-2 transition-colors
                 ${
                   activeTab === module.dashboard_id
                     ? "border-blue-500 text-blue-600"
                     : "border-transparent text-gray-700 hover:text-blue-500"
                 }`}
-            >
-              {module.dashboard_name}
-            </button>
-          ))}
-        </div>
-      </div>
+                >
+                  {module.dashboard_name}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Content Area */}
-      <div className="flex-1  overflow-y-auto bg-gray-50">{renderContent()}</div>
+          <div className="flex-1  overflow-y-auto bg-gray-50">
+            {renderContent()}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
