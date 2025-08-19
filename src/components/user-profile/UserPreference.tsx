@@ -197,14 +197,14 @@ const UserPreference = () => {
     } else {
       if (name === "email") {
         const emailRegex = REGEX.EMAIL;
-        if (!emailRegex.test(value)) {
+        if (!emailRegex.test(value.trim())) {
           errorMsg = "Invalid email format";
         }
       }
 
       if (name === "mobileNumber") {
         const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-        if (!mobileRegex.test(value)) {
+        if (!mobileRegex.test(value.trim())) {
           errorMsg = "Mobile number must be 10 digits and start with 6–9";
         }
       }
@@ -216,9 +216,9 @@ const UserPreference = () => {
     }));
 
     const hasChanged =
-      formData.fullName !== initialData.fullName ||
+      formData.fullName.trim() !== initialData.fullName ||
       formData.email !== initialData.email ||
-      formData.mobileNumber !== initialData.mobileNumber;
+      formData.mobileNumber.trim() !== initialData.mobileNumber;
 
     // Include current error for updated field
     const currentErrors = {
