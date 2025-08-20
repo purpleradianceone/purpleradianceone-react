@@ -200,6 +200,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onBlur={handleBlur}
                   error={errors.name}
                   maxLength={100}
+                  minLength={3}
                 />
                 <FormInput
                   label="Mobile Number"

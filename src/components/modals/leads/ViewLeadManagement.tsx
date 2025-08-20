@@ -45,7 +45,7 @@ const ViewLeadManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
     useState<boolean>(false);
-  const {userPreference} =useUserPreference();
+  const { userPreference } = useUserPreference();
   const [searchParams] = useSearchParams();
   const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState<boolean>(false);
   const [reasonInputBoxOpenForLeadOwner, setReasonInputBoxOpenForLeadOwner] =
@@ -650,8 +650,8 @@ const ViewLeadManagement = () => {
       //   position === "left" ? "mt-4" : "mt-6"
       // } overflow-auto`}
 
-       className={` fixed top-8 inset-0 z-10 bg-white ${
-        userPreference.isLeftMenu  ? "ml-[54px] mt-4" : " mt-6"
+      className={` fixed top-8 inset-0 z-10 bg-white ${
+        userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
       } overflow-auto`}
     >
       {/* Header */}
@@ -692,6 +692,7 @@ const ViewLeadManagement = () => {
             >
               <Detail
                 label="Name"
+                hasBorder={true}
                 type={userHasAccessToUpdateLead ? "text" : "none"}
                 value={selectedLeadData?.name}
                 onChange={(e) => {
@@ -766,7 +767,6 @@ const ViewLeadManagement = () => {
               <Plus size={8} />
               <span>Product</span>
             </button>
-           
           </div>
 
           <button
@@ -811,6 +811,7 @@ const ViewLeadManagement = () => {
             }
           >
             <Detail
+              hasBorder={true}
               label="Email"
               type={userHasAccessToUpdateLead ? "text" : "none"}
               value={selectedLeadData?.email}
@@ -847,6 +848,7 @@ const ViewLeadManagement = () => {
           >
             <Detail
               label="Mobile Number"
+              hasBorder={true}
               type={userHasAccessToUpdateLead ? "text" : "none"}
               value={selectedLeadData?.mobileNumber}
               onChange={(e) => {
@@ -1235,16 +1237,16 @@ const ViewLeadManagement = () => {
           </div>
         </div>
       )}
-       <AssignProductToLead
-              selectedLeadData={selectedLeadData}
-              isOpen={isAddProductModalOpen}
-              onClose={() => {
-                setIsAddProductModalOpen(false);
-              }}
-              leadAssignedComponyProduct={leadAssignedCompanyProduct}
-              fetchLeadCompanyProduct={fetchLeadCompanyProduct}
-              interestTypeData={interestTypeData}
-            />
+      <AssignProductToLead
+        selectedLeadData={selectedLeadData}
+        isOpen={isAddProductModalOpen}
+        onClose={() => {
+          setIsAddProductModalOpen(false);
+        }}
+        leadAssignedComponyProduct={leadAssignedCompanyProduct}
+        fetchLeadCompanyProduct={fetchLeadCompanyProduct}
+        interestTypeData={interestTypeData}
+      />
     </div>
   );
 };
@@ -1260,6 +1262,7 @@ type DetailProps = {
   ) => void;
   handleLeadInfoSave?: () => Promise<void>;
   handleClickLeadOwnerChange?: () => void;
+  hasBorder?: boolean;
 };
 
 const Detail: React.FC<DetailProps> = ({
@@ -1270,6 +1273,7 @@ const Detail: React.FC<DetailProps> = ({
   onChange,
   handleLeadInfoSave,
   handleClickLeadOwnerChange,
+  hasBorder,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -1334,6 +1338,7 @@ const Detail: React.FC<DetailProps> = ({
               onChange={onChange}
               onBlur={handleBlur}
               autoFocus
+              size={value ? value.length : 1}
             />
           )
         )
@@ -1341,7 +1346,7 @@ const Detail: React.FC<DetailProps> = ({
         <div>
           <p
             // title={value}
-            className="font-medium text-sm  text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
+            className={` font-medium text-sm  text-gray-800 whitespace-nowrap overflow-x-auto text-clip`}
           >
             {value || "-"}
           </p>
@@ -1349,7 +1354,7 @@ const Detail: React.FC<DetailProps> = ({
       ) : label === "Lead Owner" ? (
         <div
           title={value}
-          className={`font-medium text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`font-medium  border border-gray-100 px-1 rounded-md text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
           {value || "-"}
@@ -1359,12 +1364,22 @@ const Detail: React.FC<DetailProps> = ({
           title={value}
           className={`font-medium ${
             label === "Name"
-              ? "text-sm text-black"
+              ? "text-sm text-black border-gray-200 "
               : "text-sm md:whitespace-nowrap md:overflow-hidden text-gray-900"
-          }   whitespace-nowrap overflow-hidden   cursor-pointer`}
+          }   whitespace-nowrap overflow-hidden ${
+            hasBorder ? "border rounded-md px-1 border-gray-100 " : ""
+          }   cursor-pointer`}
           onClick={handleClick}
         >
-          {value || "-"}
+          {value ? (
+            value
+          ) : (
+            <>
+              <span className="text-gray-400 font-normal text-xs">
+                Add here...
+              </span>
+            </>
+          )}
         </div>
       )}
     </div>

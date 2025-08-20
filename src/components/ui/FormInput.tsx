@@ -113,7 +113,9 @@ function FormInput({
   selectOnBlur,
   selectOnChange,
   countries,
-  useCountry
+  useCountry,
+  minLength,
+  maxLength
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
   const isMobileNumberInput =useCountry;
@@ -190,6 +192,8 @@ function FormInput({
             inputMode={inputMode}
             min={min}
             max={max}
+            minLength={minLength}
+            maxLength={maxLength}
             pattern={pattern}
           />
         )}
