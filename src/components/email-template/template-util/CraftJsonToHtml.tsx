@@ -61,6 +61,13 @@ function renderNode(data: CraftData, nodeId: string): string {
     renderLinkedNodes,
   };
 
+  // ✅ Special handling for ROOT
+  if (nodeId === "ROOT") {
+    return `<div id="ROOT">${renderChildren(node.nodes)}${renderLinkedNodes(
+      node.linkedNodes
+    )}</div>`;
+  }
+
   // Determine component type
   const componentType =
     typeof node.type === "object" ? node.type.resolvedName : node.type;
