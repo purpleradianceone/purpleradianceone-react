@@ -357,6 +357,7 @@ function AddTeamModal({
             <form className="space-y-8" onSubmit={handleAddTeamFormSubmit}>
               <FormInput
                 label="Team Name : "
+                maxLength={30}
                 type="text"
                 name="name"
                 required={true}

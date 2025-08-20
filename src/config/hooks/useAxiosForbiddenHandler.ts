@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 export function useAxiosForbiddenHandler() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const dialogMessage = 'Session Expired. Please login again.';
+  const dialogMessage = 'Your session has expired or another login was detected. Please sign in again.';
 
 
 
