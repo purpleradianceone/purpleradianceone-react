@@ -382,6 +382,7 @@ const LeadDetails = ({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
+            maxLength={30}
             userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Job title"
@@ -432,6 +433,7 @@ const LeadDetails = ({
           />
 
           <FormField
+            maxLength={10}
             userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Add. Contact number"
@@ -493,6 +495,7 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
+            maxLength={70}
             label="Industry Name"
             value={editLeadDetails.industry_name}
             onChange={(e) => {
@@ -547,6 +550,7 @@ const LeadDetails = ({
             userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
             label="Website"
+            maxLength={100}
             value={editLeadDetails.website}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -612,6 +616,7 @@ type FormFieldProps = {
   selectedId?: string;
   handleGetDropdownData?: () => void | null;
   userHasAccessToUpdate: boolean;
+  maxLength? : number
 };
 
 const FormField = ({
@@ -623,6 +628,7 @@ const FormField = ({
   selectedId,
   handleGetDropdownData,
   userHasAccessToUpdate,
+  maxLength
 }: FormFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -701,6 +707,7 @@ const FormField = ({
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
+            maxLength={maxLength}
             className="text-gray-900 text-[13px]  border-none border-gray-300 focus:outline-none"
           />
         )}
