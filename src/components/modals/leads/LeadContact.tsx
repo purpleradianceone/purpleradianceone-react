@@ -701,6 +701,8 @@ const LeadContact = ({
                     type="text"
                     name="name"
                     onBlur={handleBlur}
+                    minLength={3}
+                    maxLength={100}
                     placeholder="Enter Full Name"
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -731,6 +733,7 @@ const LeadContact = ({
                   <input
                     type="email"
                     name="email"
+                    maxLength={100}
                     placeholder="Email Address"
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -762,6 +765,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="mobileNumber"
+                    minLength={10}
                     placeholder="Mobile Number"
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -793,6 +797,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="jobTitle"
+                    maxLength={100}
                     placeholder="Job Title"
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -807,6 +812,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="preferredLanguage"
+                    maxLength={100}
                     placeholder="Marathi , English etc ..."
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -820,6 +826,7 @@ const LeadContact = ({
                   </label>
                   <input
                     type="text"
+                    maxLength={100}
                     name="preferredCommunicationChannel"
                     placeholder="Mail, Phone, WhatsApp etc ..."
                     className={inputClass}
@@ -837,6 +844,7 @@ const LeadContact = ({
                   <input
                     type="text"
                     name="linkedinProfile"
+                    maxLength={256}
                     placeholder="LinkedIn URL"
                     className={inputClass}
                     onChange={handleFormInputChange}
@@ -902,6 +910,7 @@ const LeadContact = ({
                     placeholder="Full Address"
                     name="address"
                     rows={4}
+                    maxLength={256}
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}

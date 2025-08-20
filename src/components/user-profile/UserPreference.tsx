@@ -27,7 +27,7 @@ const UserPreference = () => {
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
 
   const navigate = useNavigate();
-  const { userHasAccessToUpdateUser, userHasAccessToUpdateSettingGeneral } =
+  const { userHasAccessToUpdateUser, userHasAccessToUpdateSettingGeneral , userHasAccessToViewSettingGeneral } =
     useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
@@ -441,6 +441,8 @@ const UserPreference = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  maxLength={256}
+                  minLength={3}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.fullName && (
@@ -506,7 +508,7 @@ const UserPreference = () => {
         </div>
       </div>
       {/* PREFERENCE CARD */}
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
+      <div  className={` ${!userHasAccessToViewSettingGeneral ? "hidden" : ""} max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4`}>
         {/* button */}
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-semibold text-gray-800">
