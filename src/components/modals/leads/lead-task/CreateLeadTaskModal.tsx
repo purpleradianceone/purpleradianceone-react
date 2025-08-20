@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Contact2Icon, UserPlus, Users, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
@@ -39,6 +40,7 @@ function CreateLeadTaskModal({
   leadActivity,
   leadId,
   handleLeadTaskCreate,
+  ownerId
 }: {
   isOpen: boolean;
   handleClose: () => void;
@@ -47,6 +49,7 @@ function CreateLeadTaskModal({
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
   handleLeadTaskCreate: () => void;
+  ownerId : number;
 }) {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -61,7 +64,7 @@ function CreateLeadTaskModal({
   const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [leadData, setLeadData] = useState<Lead>();
-  const [assignedTo, setAssignedTo] = useState<number[]>([loginStatus.id]);
+  const [assignedTo, setAssignedTo] = useState<number[]>([ownerId]);
   const [selectedCompanyUsers, setSelectedCompanyUsers] = useState<
     CompanyUsersSearchProps[]
   >([]);
@@ -78,6 +81,12 @@ function CreateLeadTaskModal({
     useState<number[]>([]);
   const [leadContactDataSelectedArray, setLeadContactDataSelectedArray] =
     useState<LeadContactType[]>([]);
+
+      useEffect(() => {
+    console.log("_________________________________");
+    console.log(assignedTo);
+    console.log("_________________________________");
+  }, [assignedTo]);
 
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //   open: false,
@@ -97,11 +106,6 @@ function CreateLeadTaskModal({
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
   }, [leadActivityId]);
-
-  useEffect(() =>{
-    console.log(leadData);
-    
-  },[leadData])
   const resetStates = () => {
     setSubject("");
     setDescription("");
@@ -110,7 +114,7 @@ function CreateLeadTaskModal({
     setLeadActivityId(0);
     setLeadTaskPriorityId(0);
     setLeadTaskStageId(0);
-    setAssignedTo([loginStatus.id]);
+    setAssignedTo([ownerId]);
     setIsAssignUsersModalOpen(false);
     setSelectedCompanyUsers([]);
     setLeadContactDataSelectedArray([]);
@@ -224,6 +228,8 @@ function CreateLeadTaskModal({
       // });
       toast.error("Please select Due Time for Task");
       return;
+    } else if (assignedTo.length === 0) {
+      toast.error("You haven't assigned a task yet, please assign it first");
     }
 
     event.preventDefault();
@@ -283,7 +289,7 @@ function CreateLeadTaskModal({
     setSelectedCompanyUsers([]);
     const getCompanyUserPostData = {
       company_id: loginStatus.companyId,
-      id: loginStatus.id,
+      id: ownerId,
       search_company_specific_date_range_id: 0,
       requestedby: loginStatus.id,
     };
@@ -296,7 +302,9 @@ function CreateLeadTaskModal({
         if (response.status === STATUS_CODE.OK) {
           response.data.map((res: any) => {
             setSelectedCompanyUsers((prev) => [...prev, res]);
+            // setAssignedTo(res.id);
           });
+          
         }
       })
       .catch(async (error) => {
