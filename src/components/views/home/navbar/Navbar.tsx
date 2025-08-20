@@ -648,7 +648,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               {loginStatus?.fullName || "User Name"}
                             </span>
                             <span className="text-xs text-gray-500 block truncate w-40">
-                              {loginStatus?.email || "user@example.com"}
+                              {loginStatus?.email || "User email"}
                             </span>
                           </div>
                         </div>

@@ -211,6 +211,7 @@ function AddProductModal({
             <form className="space-y-2 " onSubmit={handleAddProductFormSubmit}>
               <FormInput
                 label="Product Name : "
+                maxLength={40}
                 type="text"
                 name="name"
                 placeholder="Product Name"
