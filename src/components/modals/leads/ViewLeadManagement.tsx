@@ -1338,6 +1338,7 @@ const Detail: React.FC<DetailProps> = ({
               onChange={onChange}
               onBlur={handleBlur}
               autoFocus
+              maxLength={100}
               size={value ? value.length : 1}
             />
           )
