@@ -1,12 +1,32 @@
-import { useState } from 'react';
-import { Calendar, Clock, CheckCircle, Phone, FileText, Mail, CheckSquare, Notebook } from 'lucide-react';
-import LeadTaskType from '../../../../@types/lead-management/LeadTaskType';
-import LoadingSpinner from '../../../../assets/animations/LoadingSpinner';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import {
+  Calendar,
+  Clock,
+  CheckCircle,
+  Phone,
+  FileText,
+  Mail,
+  CheckSquare,
+  Notebook,
+} from "lucide-react";
+import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import qs from "query-string";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../../constants/Routes";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: LeadTaskType) => {
-  const activityType = activity.leadActivityId
+  const activityType = activity.leadActivityId;
   if (activityType === 1) return Phone;
   if (activityType === 2) return Mail;
   if (activityType === 3) return Mail;
@@ -20,7 +40,7 @@ const getActivityIcon = (activity: LeadTaskType) => {
 
 // Helper function to get background color from hex color code
 const getBgColorFromHex = (colorCode: string) => {
-  const hex = colorCode.replace('#', '');
+  const hex = colorCode.replace("#", "");
   const r = parseInt(hex.substr(0, 2), 16);
   const g = parseInt(hex.substr(2, 2), 16);
   const b = parseInt(hex.substr(4, 2), 16);
@@ -29,7 +49,7 @@ const getBgColorFromHex = (colorCode: string) => {
 
 // Helper function to get border color from hex color code
 const getBorderColorFromHex = (colorCode: string) => {
-  const hex = colorCode.replace('#', '');
+  const hex = colorCode.replace("#", "");
   const r = parseInt(hex.substr(0, 2), 16);
   const g = parseInt(hex.substr(2, 2), 16);
   const b = parseInt(hex.substr(4, 2), 16);
@@ -37,16 +57,15 @@ const getBorderColorFromHex = (colorCode: string) => {
 };
 
 const getIconColorFromHex = (colorCode: string) => {
-  const hex = colorCode.replace('#', '');
+  const hex = colorCode.replace("#", "");
   const r = parseInt(hex.substr(0, 2), 16);
   const g = parseInt(hex.substr(2, 2), 16);
   const b = parseInt(hex.substr(4, 2), 16);
   return `rgba(${r}, ${g}, ${b}, 0.6)`;
 };
 
-
 // Helper function to get priority styling
-const getPriorityColor = (activity : LeadTaskType) => {
+const getPriorityColor = (activity: LeadTaskType) => {
   switch (activity.leadTaskPriorityId) {
     case 1:
       return `bg-red-200 text-red-800 border-red-200`;
@@ -55,7 +74,7 @@ const getPriorityColor = (activity : LeadTaskType) => {
     case 3:
       return `bg-blue-200 text-blue-800 border-blue-200`;
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
@@ -63,111 +82,202 @@ function Tasks({
   isLoading,
   leadTasks,
   taskType,
-} : {
-  isLoading : boolean;
-  leadTasks : LeadTaskType[];
-  taskType : "upcoming" | "pending" | "completed";
+}: {
+  isLoading: boolean;
+  leadTasks: LeadTaskType[];
+  taskType: "upcoming" | "pending" | "completed";
 }) {
-  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
-  // State to manage hover for the custom tooltip
-  // const [hoveredTaskId, setHoveredTaskId] = useState<number | null>(null);
+  const { loginStatus } = useLoggedInUserContext();
+  const navigate = useNavigate();
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{
+    [key: number]: boolean;
+  }>({});
 
+  const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
   const toggleDescription = (taskId: number) => {
-    setExpandedDescriptions(prevState => ({
+    setExpandedDescriptions((prevState) => ({
       ...prevState,
-      [taskId]: !prevState[taskId]
+      [taskId]: !prevState[taskId],
     }));
   };
 
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
+  const getLeadDetails = async (leadId: number) => {
+    const postDataToGetLead = {
+      company_id: loginStatus.companyId,
+      id: leadId,
+      requestedby: loginStatus.id,
+    };
+    await axios
+      .post(POST_API.GET_LEAD, postDataToGetLead, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const leadData = response.data.map((item: any) => {
+          const queryParams = qs.stringify({
+            leadData: JSON.stringify({
+              id: item.id,
+              name: item.name,
+              email: item.email,
+              mobileNumber: item.mobilenumber,
+              companyId: item.company_id,
+              companyUserId: item.ownerid,
+              count: item.count,
+              createdBy: item.createdby,
+              createdOn: item.createdon,
+              leadOwner: item["Lead Owner"],
+              leadSource: item["Lead Source"],
+              leadSourceId: item.lead_source_id,
+              leadStatus: item["Lead Status"],
+              leadStatusId: item.lead_status_id,
+              updatedBy: item.updatedby,
+              updatedOn: item.updatedon,
+            }),
+          });
+          return queryParams;
+        });
+        navigate(ROUTES_URL.LEAD_DETAILS + `?${leadData}`);
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getLeadDetails,
+          });
 
-
+          // setIsDialogueOpen(!refreshTokenStatus);
+          if (refreshTokenStatus) {
+            getLeadDetails(leadId);
+          }
+        }
+      });
+  };
 
   return (
+    
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 h-full flex flex-col">
+      <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      
+    >
       <div className="flex items-center justify-between mb-8 flex-shrink-0">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">{taskType === 'upcoming' ? "Upcoming Tasks" : taskType === 'pending' ? "Pending Tasks" : "Completed Tasks"}</h3>
-          <p className="text-gray-700">{taskType === 'upcoming' ? "Your scheduled activities and deadlines" : taskType === "pending" ? "Your Pending activities and deadlines" : "Your completed activities and deadlines"}</p>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            {taskType === "upcoming"
+              ? "Upcoming Tasks"
+              : taskType === "pending"
+              ? "Pending Tasks"
+              : "Completed Tasks"}
+          </h3>
+          <p className="text-gray-700">
+            {taskType === "upcoming"
+              ? "Your scheduled activities and deadlines"
+              : taskType === "pending"
+              ? "Your Pending activities and deadlines"
+              : "Your completed activities and deadlines"}
+          </p>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 -mr-2">
-        {isLoading && (
-          <LoadingSpinner></LoadingSpinner>
-        )}
+        {isLoading && <LoadingSpinner></LoadingSpinner>}
         {!isLoading && (
-          
-            <div className="space-y-4">
-              {leadTasks.length === 0 && (
-                <h3 className="text-2xl text-center font-bold text-gray-300 mb-2">{taskType === "upcoming" ? "No Upcoming Tasks" : taskType === "pending" ? "No Pending Tasks" : "No Completed Tasks"}</h3>
-              )}
-          {
-          leadTasks.map((task, index) => {
-            const IconComponent = getActivityIcon(task);
-            const isDescriptionExpanded = expandedDescriptions[task.id];
-            const showViewMore = task.description.length > DESCRIPTION_TRUNCATE_LENGTH;
-            const displayedDescription =
-              showViewMore && !isDescriptionExpanded
-                ? `${task.description.substring(0, DESCRIPTION_TRUNCATE_LENGTH)}...`
-                : task.description;
+          <div className="space-y-4">
+            {leadTasks.length === 0 && (
+              <h3 className="text-2xl text-center font-bold text-gray-300 mb-2">
+                {taskType === "upcoming"
+                  ? "No Upcoming Tasks"
+                  : taskType === "pending"
+                  ? "No Pending Tasks"
+                  : "No Completed Tasks"}
+              </h3>
+            )}
+            {leadTasks.map((task, index) => {
+              const IconComponent = getActivityIcon(task);
+              const isDescriptionExpanded = expandedDescriptions[task.id];
+              const showViewMore =
+                task.description.length > DESCRIPTION_TRUNCATE_LENGTH;
+              const displayedDescription =
+                showViewMore && !isDescriptionExpanded
+                  ? `${task.description.substring(
+                      0,
+                      DESCRIPTION_TRUNCATE_LENGTH
+                    )}...`
+                  : task.description;
 
-            // Ensure assignedToName is an array, default to empty if not present
-            // const assignedNames = Array.isArray(task.assignedToName) ? task.assignedToName : [];
+              // Ensure assignedToName is an array, default to empty if not present
+              // const assignedNames = Array.isArray(task.assignedToName) ? task.assignedToName : [];
 
-
-            return (
-              <div
-                key={task.id}
-                className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer group"
-                style={{
-                  backgroundColor: getBgColorFromHex(task.colorCode),
-                  borderColor: getBorderColorFromHex(task.colorCode),
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
+              return (
                 <div
-                  className="p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
-                  style={{ backgroundColor: getIconColorFromHex(task.colorCode) }}
+                  key={task.id}
+                  className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group"
+                  style={{
+                    backgroundColor: getBgColorFromHex(task.colorCode),
+                    borderColor: getBorderColorFromHex(task.colorCode),
+                    animationDelay: `${index * 0.1}s`,
+                  }}
                 >
-                  <IconComponent className="w-5 h-5 text-white" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base">
-                        {task.subject}
-                      </h4>
-                      <p className="text-xs text-gray-700 mt-1">
-                        {displayedDescription}
-                        {showViewMore && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleDescription(task.id);
-                            }}
-                            className="text-blue-600 hover:underline ml-1 text-xs"
-                          >
-                            {isDescriptionExpanded ? 'View Less' : 'View More'}
-                          </button>
-                        )}
-                      </p>
-                    </div>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(task)} flex-shrink-0`}>
-                      {task.leadTaskPriorityName} Priority
-                    </span>
+                  <div
+                    className="p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
+                    style={{
+                      backgroundColor: getIconColorFromHex(task.colorCode),
+                    }}
+                  >
+                    <IconComponent className="w-5 h-5 text-white" />
                   </div>
 
-                  <div className="flex-1 items-center justify-between mt-2">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-1 text-gray-700">
-                        <Clock className="w-3 h-3" />
-                        <span className="text-xs font-medium">{task.dueDateTime}</span> {/* Displaying raw dueDateTime */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-1">
+                      <div>
+                        <h4
+                          onClick={() => {
+                            getLeadDetails(task.leadId);
+                          }}
+                          className="font-semibold cursor-pointer text-gray-900 group-hover:text-blue-600 transition-colors text-base"
+                        >
+                          {task.subject}
+                        </h4>
+                        <p className="text-xs text-gray-700 mt-1">
+                          {displayedDescription}
+                          {showViewMore && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleDescription(task.id);
+                              }}
+                              className="text-blue-600 hover:underline ml-1 text-xs"
+                            >
+                              {isDescriptionExpanded
+                                ? "View Less"
+                                : "View More"}
+                            </button>
+                          )}
+                        </p>
                       </div>
-                      {/* <div
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(
+                          task
+                        )} flex-shrink-0`}
+                      >
+                        {task.leadTaskPriorityName} Priority
+                      </span>
+                    </div>
+
+                    <div className="flex-1 items-center justify-between mt-2">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-1 text-gray-700">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-xs font-medium">
+                            {task.dueDateTime}
+                          </span>{" "}
+                          {/* Displaying raw dueDateTime */}
+                        </div>
+                        {/* <div
                         className="relative flex gap-2"
                         onMouseEnter={() => setHoveredTaskId(task.id)}
                         onMouseLeave={() => setHoveredTaskId(null)}
@@ -198,26 +308,27 @@ function Tasks({
                           </div>
                         )}
                       </div> */}
-                      <span className="text-xs text-gray-700 px-1.5 py-0.5 bg-white rounded-full">
-                        {task.leadTaskStageName}
-                      </span>
-                       <button
-                    type='button'
-                      className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
-                    >
-                      {taskType === "completed" ?  `${task.completedAt}` : `${task.overdueStatus}`}
-                    </button>
-                    {taskType === "completed" && (
+                        <span className="text-xs text-gray-700 px-1.5 py-0.5 bg-white rounded-full">
+                          {task.leadTaskStageName}
+                        </span>
                         <button
-                    type='button'
-                      className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
-                    >
-                      {task.overdueStatus}
-                    </button>
-                    )
-                    }
-                    </div>
-                    {/* <button
+                          type="button"
+                          className="text-xs cursor-text text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                        >
+                          {taskType === "completed"
+                            ? `${task.completedAt}`
+                            : `${task.overdueStatus}`}
+                        </button>
+                        {taskType === "completed" && (
+                          <button
+                            type="button"
+                            className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                          >
+                            {task.overdueStatus}
+                          </button>
+                        )}
+                      </div>
+                      {/* <button
                     type='button'
                       className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
                     >
@@ -232,18 +343,18 @@ function Tasks({
                     </button>
                     )
                     } */}
-                    
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
         )}
-        
       </div>
+      </motion.section>
     </div>
+    
   );
 }
 
-export default  Tasks;
+export default Tasks;

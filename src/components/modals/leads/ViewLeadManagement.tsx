@@ -197,11 +197,15 @@ const ViewLeadManagement = () => {
   const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
     number | null
   >(selectedLeadData.companyUserId);
+  
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
     if (params) {
       setPersistedSelectedUserId(params.id);
+      console.log("00000000000000000000000000000000000000000");
+      console.log(persistedSelectedUserId);
+      console.log("00000000000000000000000000000000000000000");
 
       setSelectedCompanyUser({
         company_id: params.company_id,
@@ -277,7 +281,11 @@ const ViewLeadManagement = () => {
           setSelectedLeadData((prev: any) => ({
             ...prev,
             leadOwner: selectedCompanyUser.fullname,
+            companyUserId : selectedCompanyUser.id,
+
           }));
+          console.log(selectedCompanyUser);
+          console.log(selectedLeadData)
         } else {
           toast.error(response.data.message);
         }
@@ -1171,7 +1179,7 @@ const ViewLeadManagement = () => {
             </div>
           </div> */}
           {}
-          <LeadTasksModal></LeadTasksModal>
+          <LeadTasksModal ownerId={selectedLeadData.companyUserId}></LeadTasksModal>
           {/* End Activity */}
         </div>
       </div>

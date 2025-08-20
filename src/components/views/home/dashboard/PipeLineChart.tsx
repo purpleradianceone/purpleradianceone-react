@@ -1,4 +1,6 @@
 import LeadSummaryReportType from "../../../../@types/home/dashboard/LeadSummaryReportType";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 const PipelineChart = ({
   pipelineData,
@@ -7,6 +9,9 @@ const PipelineChart = ({
   pipelineData: LeadSummaryReportType[];
   chartFor : "leadByStatus" | "leadBySource" ;
 }) => {
+    const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
+
+
   const colors = [
     { color: "#3B82F6", bgColor: "bg-blue-500" },
     { color: "#10B981", bgColor: "bg-emerald-500" },
@@ -22,6 +27,13 @@ const PipelineChart = ({
   ];
 
   return (
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      
+    >
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -70,6 +82,7 @@ const PipelineChart = ({
         ))}
       </div>
     </div>
+    </motion.section>
   );
 };
 

@@ -17,7 +17,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import { useSearchParams } from "react-router-dom";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 
-function LeadTasksModal() {
+function LeadTasksModal({ ownerId }: { ownerId: number }) {
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
 
@@ -314,6 +314,7 @@ function LeadTasksModal() {
             setIsCreateLeadTaskModalOpen(false);
           }}
           handleLeadTaskCreate={handleLeadTaskCreate}
+          ownerId={ownerId}
         />
       )}
     </div>
