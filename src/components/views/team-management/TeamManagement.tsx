@@ -23,7 +23,7 @@ function TeamManagement(){
   const {loginStatus} = useLoggedInUserContext();
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    userHasAccessToViewTeamManagement
+    false
   );
 
   const [companyTeamList,setCompanyTeamList] = useState<CompanyTeamSearchProps[]>([]);
@@ -130,6 +130,11 @@ function TeamManagement(){
       companyTeamAddCount,
     ])
 
+    useEffect(()=>{
+      if(!userHasAccessToViewTeamManagement){
+        setAccessDeniedPopUpOpen(true)
+      }
+    },[userHasAccessToViewTeamManagement])
     return(
             <div className="w-full">
       {userHasAccessToViewTeamManagement ? (
