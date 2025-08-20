@@ -21,7 +21,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import MESSAGE from "../../constants/Messages";
 
 const UserPreference = () => {
-  const classnameForParagragh = "text-gray-800 font-semibold";
+  const classnameForParagragh = "text-gray-800 font-semibold   block truncate w-full";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
@@ -399,10 +399,10 @@ const UserPreference = () => {
             {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
           </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2  title={formData.fullName ?? "Not Provided"} className="text-3xl font-bold text-gray-900 block truncate w-full  ">
               {loginStatus.fullName}
             </h2>
-            <p className="text-gray-600">{loginStatus.companyName || ""}</p>
+            <p  className="text-gray-600">{loginStatus.companyName || ""}</p>
             <button
               className={`mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition
                   ${
@@ -431,7 +431,7 @@ const UserPreference = () => {
 
         {/* Basic Info Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
+          <div className="">
             <h4 className="text-sm font-semibold text-gray-700">Name</h4>
             {isEditing ? (
               <>
@@ -441,7 +441,7 @@ const UserPreference = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  maxLength={256}
+                  maxLength={40}
                   minLength={3}
                   className="w-full p-2 border rounded"
                 />
@@ -452,7 +452,7 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p className={classnameForParagragh}>
+              <p title={formData.fullName ?? "Not Provided"} className="text-gray-800 font-semibold block truncate w-full ">
                 {formData.fullName || "Not Provided"}
               </p>
             )}
