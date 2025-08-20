@@ -52,6 +52,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
     userHasAccessToUpdateSettingGeneral,
+    
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -352,58 +353,72 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<Home size={SIZE.TWENTY} />}
                           label="Home"
                         />
-                        {userHasAccessToViewUser && (
+                        {/* {userHasAccessToViewUser && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewUser}
                             to={ROUTES_URL.GET_COMPANY_USERS}
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        )}
-                        {!userHasAccessToViewUser && (
+                        {/* )} */}
+                        {/* {!userHasAccessToViewUser && (
                           <NavItem
-                            to={ROUTES_URL.GET_COMPANY_USERS}
+                          disable ={true}
+                            // to={ROUTES_URL.GET_COMPANY_USERS}
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        )}
+                        )} */}
 
-                        {userHasAccessToViewLead && (
+                        {/* {userHasAccessToViewLead && ( */}
+                          <NavItem
+                          disable={!userHasAccessToViewLead}
+                            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
+                            icon={<Handshake size={SIZE.TWENTY} />}
+                            label="Lead"
+                          />
+                        {/* )} */}
+                        {/* {!userHasAccessToViewLead && (
                           <NavItem
                             to={ROUTES_URL.GET_LEAD_MANAGEMENT}
                             icon={<Handshake size={SIZE.TWENTY} />}
                             label="Lead"
                           />
-                        )}
-                        {userHasAccessToViewProduct && (
+                        )} */}
+                        {/* {userHasAccessToViewProduct && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewProduct}
                             to={ROUTES_URL.PRODUCT_MANAGEMENT}
                             icon={<Store size={SIZE.TWENTY} />}
                             label="Products"
                           />
-                        )}
-                        {userHasAccessToViewTeamManagement && (
+                        {/* )} */}
+                        {/* {userHasAccessToViewTeamManagement && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewTeamManagement}
                             to={ROUTES_URL.TEAM_MANAGEMENT}
                             icon={<Network size={SIZE.TWENTY} />}
                             label="Team"
                           />
-                        )}
-                        {userHasAccessToViewProductTeam && (
+                        {/* )} */}
+                        {/* {userHasAccessToViewProductTeam && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewProductTeam}
                             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                             icon={<BoxesIcon size={SIZE.TWENTY} />}
                             label="Prd Team/users"
                           />
-                        )}
+                        {/* )} */}
 
-                        {userHasAccessToViewMeeting && (
+                        {/* {userHasAccessToViewMeeting && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewMeeting}
                             to={ROUTES_URL.MEETINGS}
                             icon={<Calendar size={SIZE.TWENTY} />}
                             label="Meetings"
                             onClick={() => setIsDropdownOpen(false)}
                           />
-                        )}
+                        {/* )} */}
 
                         <NavItem
                           icon={<Settings />}
@@ -417,8 +432,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             {
                               icon: <Aperture size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
-                              label: "Email Template",
-                            },
+                              label: "Email Template", 
+                            }
                           ]}
                         />
                       </div>
@@ -640,15 +655,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                         {/* Menu Options */}
                         <div className="flex flex-col">
-                          {userHasAccessToViewUser ? (
+                          {/* {userHasAccessToViewUser ? ( */}
                             <button
                               onClick={handleClickOnUserProfile}
                               className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
                               👤 Profile
                             </button>
-                          ) : (
-                            <button
+                          {/* ) : ( */}
+                            {/* <button
                               onClick={() => {
                                 setAccessDeniedPopUpView(true);
                               }}
@@ -656,7 +671,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             >
                               👤 Profile
                             </button>
-                          )}
+                          )} */}
                           <Link to={ROUTES_URL.COMPANY_SETTING}>
                             <button className="px-4 py-2 w-full hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
                               ⚙️ Settings

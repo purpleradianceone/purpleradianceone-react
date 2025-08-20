@@ -38,6 +38,7 @@ import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import { useUserPreference } from "../../context/user/UserPreference";
+import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
 
 type TemplateType = {
   id: number;
@@ -47,7 +48,7 @@ type TemplateType = {
 };
 
 export const TemplatesPage: React.FC = () => {
-  const { userPreference} = useUserPreference();
+  const { userPreference } = useUserPreference();
   const [activeTab, setActiveTab] = useState<string>("");
   const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -90,8 +91,6 @@ export const TemplatesPage: React.FC = () => {
         handleDateRangeIdChange: handleDatePageIdChange,
       },
     });
-
-  
 
   const handleTemplateCreate = (type: string) => {
     setShowModal(false);
@@ -313,9 +312,34 @@ export const TemplatesPage: React.FC = () => {
   function refresh() {
     getTemplatesOfCompany({ typeId: selectedTypeId, reset: true });
   }
+  const { userHasAccessToViewEmailTemplateSetting } = useUserAccessModules();
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
+  useEffect(() => {
+    if (!userHasAccessToViewEmailTemplateSetting) {
+      setAccessDeniedPopUpOpen(true);
+    }
+  }, [userHasAccessToViewEmailTemplateSetting]);
+
+  if (!userHasAccessToViewEmailTemplateSetting)
+    return (
+      <div className="flex-none mx-96 mt-14">
+        <AccessDeniedPopup
+          isOpen={accessDeniedPopUpOpen}
+          onClose={() => {
+            setAccessDeniedPopUpOpen(false);
+            window.history.back();
+          }}
+        />
+      </div>
+    );
+    
   return (
-    <div className={`w-full pt-1 ${userPreference.isLeftMenu ? "pl-5" : "px-1"}  gap-1 h-screen flex flex-col `}>
+    <div
+      className={`w-full pt-1 ${
+        userPreference.isLeftMenu ? "pl-5" : "px-1"
+      }  gap-1 h-screen flex flex-col `}
+    >
       {/* Header */}
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
         <div className="flex  justify-between w-full h-12 items-center">
@@ -530,7 +554,6 @@ export const TemplatesPage: React.FC = () => {
               hasmore={hasMoreTemplates}
               selectedTypeId={selectedTypeId}
               reset={refresh}
-            
             />
           </div>
           {showModal && (
@@ -631,7 +654,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
   const { loginStatus } = useLoggedInUserContext();
   const handleDefaultToggle = async (template: EmailTemplate) => {
     if (!userHasAccessToUpdateEmailTemplateSetting) {
-      toast.error("You don't have access to update the default status.")
+      toast.error("You don't have access to update the default status.");
       return;
     }
 
@@ -657,7 +680,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
           if (response.status === STATUS_CODE.OK) {
             reset();
             toast.success(response.data.message);
-            
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -673,7 +695,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
     } catch (error) {
       console.error("Failed to update default status:", error);
       toast.error("Failed to update default status.");
-     
     } finally {
       // setUpdatingDefaultId(null);
     }
@@ -719,10 +740,11 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     ) {
                       handleEditTemplate(template);
                     } else {
-                      toast.error( template.is_master
+                      toast.error(
+                        template.is_master
                           ? "Can't Update Master Templates!"
-                          : "You don't have access!",);
-                      
+                          : "You don't have access!"
+                      );
                     }
                   }}
                 >

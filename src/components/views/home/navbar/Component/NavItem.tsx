@@ -27,6 +27,7 @@ interface DropdownItem {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void; // <--- ADDED THIS LINE
+  disable?: boolean
 }
 
 // Update NavItem props to support dropdown
@@ -36,9 +37,10 @@ interface NavItemProps {
   label: string;
   onClick?: () => void;
   dropdownItems?: DropdownItem[];
+  disable? : boolean
 }
 
-const NavItem = ({ to, icon, label, onClick, dropdownItems }: NavItemProps) => {
+const NavItem = ({ to, icon, label, onClick, dropdownItems , disable }: NavItemProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -89,7 +91,7 @@ const NavItem = ({ to, icon, label, onClick, dropdownItems }: NavItemProps) => {
       ) : (
         // Render as a single link
         <Link to={to as string} onClick={onClick}>
-          <div className="flex flex-col items-center hover:text-blue-700">
+          <div className={`flex flex-col ${disable ? "opacity-50 cursor-not-allowed" : ""} items-center hover:text-blue-700`}>
             {icon}
             <span className="text-xs text-gray-600 font-medium text-center hover:text-blue-700">
               {label}
@@ -100,7 +102,7 @@ const NavItem = ({ to, icon, label, onClick, dropdownItems }: NavItemProps) => {
 
       {/* Dropdown content */}
       {dropdownItems && isDropdownOpen && (
-        <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 bg-white shadow-lg rounded-md   z-50 flex flex-col  min-w-max">
+        <div className={`absolute ${disable ? "opacity-50 cursor-not-allowed" : ""}left-1/2 transform -translate-x-1/2 mt-1 bg-white shadow-lg rounded-md   z-50 flex flex-col  min-w-max`}>
           {dropdownItems.map((item, index) => (
             <Link
               key={index} // Consider a more robust key if items can be reordered/removed

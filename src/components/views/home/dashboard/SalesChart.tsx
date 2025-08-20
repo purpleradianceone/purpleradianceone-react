@@ -1,5 +1,7 @@
 import MonthlyAverageLeads from '../../../../@types/home/dashboard/MonthlyAverageLeads';
 import { useState } from 'react';
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 const SalesChart = ({
   leadsData
@@ -12,6 +14,8 @@ const SalesChart = ({
     x: number;
     y: number;
   } | null>(null);
+
+      const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
   const months = leadsData.map((data) => data.month);
   const salesData = leadsData.map((data) => data.createdLeads);
@@ -52,7 +56,15 @@ const SalesChart = ({
   };
 
   return (
+    
      <div className="min-h-full bg-white grid rounded-2xl shadow-lg border border-gray-100 p-4 relative">
+      <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      
+    >
       <div className="flex items-center justify-between mb-5">
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Annual Performance</h3>
@@ -128,7 +140,9 @@ const SalesChart = ({
           {/* <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div> */}
         </div>
       )}
+      </motion.section>
     </div>
+    
   );
 
 };
