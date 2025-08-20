@@ -441,6 +441,8 @@ const UserPreference = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  maxLength={256}
+                  minLength={3}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.fullName && (
