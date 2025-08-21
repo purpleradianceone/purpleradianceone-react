@@ -41,7 +41,7 @@ function LeadManagementAgGrid({
       },
       {
         field: "mobileNumber",
-        headerName: "Mobile Number",
+        headerName: "Mobile number",
         sortable: true,
         filter: true,
       },
@@ -69,24 +69,24 @@ function LeadManagementAgGrid({
       },
       { 
         field: "createdBy",
-        headerName: "Created By",
+        headerName: "Created by",
         filter: true
       },
       {
         field: "createdOn",
-        headerName: "Created On",
+        headerName: "Created on",
         sortable: true,
         filter: true,
       },
        {
         field: "updatedBy",
-        headerName: "Updated By",
+        headerName: "Updated by",
         sortable: true,
         filter: true,
       },
        {
         field: "updatedOn",
-        headerName: "Updated On",
+        headerName: "Updated on",
         sortable: true,
         filter: true,
       },
