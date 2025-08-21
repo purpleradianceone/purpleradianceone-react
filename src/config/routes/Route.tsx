@@ -56,7 +56,7 @@ import CareersPage from "../../components/views/home/landing-page/Carrers";
 import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
 import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
 import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
-import Home from "../../components/views/home/dashboard/Home";
+import Home from "../../components/views/home/Home";
 
 export const router = createBrowserRouter([
   {
