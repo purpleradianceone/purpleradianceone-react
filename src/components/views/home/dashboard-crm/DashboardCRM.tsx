@@ -39,7 +39,7 @@ type DashboardDataType = Record<string, Array<Record<string, any>>>;
 interface DashboardCRMProp {
   companyUserId: number|null;
 }
-const Dashboard:React.FC<DashboardCRMProp> = ({ 
+const DashboardCRM:React.FC<DashboardCRMProp> = ({ 
  companyUserId,
 }) => {
   const navigate = useNavigate();
@@ -561,4 +561,4 @@ const Dashboard:React.FC<DashboardCRMProp> = ({
   );
 }
 
-export default Dashboard;
+export default DashboardCRM;
