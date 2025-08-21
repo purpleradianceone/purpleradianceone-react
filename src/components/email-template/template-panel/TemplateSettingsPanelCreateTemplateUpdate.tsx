@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
 import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 export type TemplateSettingsPanelUpdateProps = {
   id: number;
@@ -87,21 +89,26 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
         withCredentials: true,
       })
       .then((response) => {
-       
         navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         if (response.status === STATUS_CODE.OK) {
-           if (response.data.status) {
-          toast.success(response.data.message);
-        } else {
-          toast.error(response.data.message);
-        }
-          navigate(
-            `${ROUTES_URL.EMAIL_TEMPLATE}`
-          );
+          if (response.data.status) {
+            toast.success(response.data.message);
+          } else {
+            toast.error(response.data.message);
+          }
+          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         }
       })
-      .catch((error) => {
-        console.error(error.toString());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: updateEmailTemplate,
+          });
+          if (refreshTokenStatus) {
+            updateEmailTemplate(emailBody);
+          }
+        }
       });
   };
   if (dynamicFields.length === 0) {

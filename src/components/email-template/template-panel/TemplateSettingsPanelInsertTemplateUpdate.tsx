@@ -8,6 +8,8 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -86,8 +88,16 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
           navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         }
       })
-      .catch((error) => {
-        console.error(error.toString());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: updateEmailTemplateInsert,
+          });
+          if (refreshTokenStatus) {
+            updateEmailTemplateInsert(emailBody);
+          }
+        }
       });
   };
   if (dynamicFields.length === 0) {
