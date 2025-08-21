@@ -33,16 +33,9 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewSettingLeady ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               <div className="col-span-1 min-h-full">
                 <LeadSetting />
-                <div className = "w-full min-h-full">
-                  <LeadAllowedDomains/>
-                </div>
-              </div>
-
-              <div className="col-span-1">
-                <LeadFormEmbed></LeadFormEmbed>
               </div>
             </div>
           ) : (
@@ -76,6 +69,29 @@ function SettingsTabs() {
         <>
           {userHasAccessToViewCompanyPreferences ? (
             <CompanyPreferenceSetting></CompanyPreferenceSetting>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Web Form Integration",
+      value: "webFormIntegration",
+      desc: (
+        <>
+          {userHasAccessToViewSettingLeady ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-1 min-h-full">
+                <div className = "w-full min-h-full">
+                  <LeadAllowedDomains/>
+                </div>
+              </div>
+
+              <div className="col-span-1">
+                <LeadFormEmbed></LeadFormEmbed>
+              </div>
+            </div>
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
