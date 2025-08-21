@@ -340,9 +340,9 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
     "Pending tasks": (
       <div
         key="Pending tasks"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-transparent
-  [&::-webkit-scrollbar-thumb]:bg-transparent
+        className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-white
+  [&::-webkit-scrollbar-thumb]:bg-white
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <Tasks
@@ -355,8 +355,11 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
     "Upcoming tasks": (
       <div
         key="Upcoming tasks"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full"
-      >
+        className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-white
+  [&::-webkit-scrollbar-thumb]:bg-white
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+        >
         <Tasks
           isLoading={isTasksLoading}
           leadTasks={upcomingTask}

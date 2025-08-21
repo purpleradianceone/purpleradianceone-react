@@ -18,6 +18,8 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import PaymentSubscription from "./PaymentSubscription";
 import POST_API from "../../constants/PostApi";
 import toast from "react-hot-toast";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function CreateSubscription({
   isSubscrptionFromLoginPage,
@@ -128,29 +130,29 @@ function CreateSubscription({
       subscription_id: null,
     };
 
-    try {
-      const response = await axios.post(
+       await axios.post(
         POST_API.GET_SUBSCRIPTION_AMOUNT,
         requestData,
         {
           withCredentials: true,
         }
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        setReponseState({
+      ).then((response) => {
+        if(response.status === STATUS_CODE.OK){
+          setReponseState({
           amount: response.data.subscription_amount,
           orderId: response.data.order_id,
         });
         setIsPaymentSubscriptionOpen(true);
-      }
-    } catch (error: any) {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
-      //   type: "error",
-      // });
-      toast.error(MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR+ error.message);
-      setLoginStatus({
+        }
+      }).catch(async(error : ApiError | any) => {
+        if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenResponse = await RefreshToken({callFunctionWithEvent : handleCreateSubscription});
+          if(refreshTokenResponse){
+            handleCreateSubscription(event);
+          }
+          else{
+            toast.error(MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR+ error.message);
+            setLoginStatus({
             companyId: 0,
             companyName: "",
             createdOn: "",
@@ -168,10 +170,21 @@ function CreateSubscription({
             startDateSubscription: "",
             endDateSubscription: "",
             isSuperUser : false
-          }); 
-    } finally {
-      setIsLoading(false);
-    }
+          });
+          }
+        }
+      }).finally(()=>{
+        setIsLoading(false);
+      });
+
+      // if (response.status === STATUS_CODE.OK) {
+      //   setReponseState({
+      //     amount: response.data.subscription_amount,
+      //     orderId: response.data.order_id,
+      //   });
+      //   setIsPaymentSubscriptionOpen(true);
+      // }
+    
   };
 
   useEffect(() => {
