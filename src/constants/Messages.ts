@@ -21,7 +21,7 @@ const MESSAGE = {
         SUBSCRIPTION_CREATION_ERROR: "Error creating subscription",
         SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade/inActive Users.",
         PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE: "Updating name, email, or phone number is not permitted for the primary lead contact from this section.",
-
+        NAME_SPACE_AND_DOT_ERROR : "Name must contain only alphanumeric characters, spaces, and dots."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",

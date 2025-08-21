@@ -2,6 +2,8 @@ import { useState } from 'react';
 import validateEmail from '../validations/ValidateEmail';
 import validateMobileNumber from '../validations/ValidateMobileNumber';
 import {  STRING_VALUES } from '../../constants/AppConstants';
+import REGEX from '../../constants/Regex';
+import MESSAGE from '../../constants/Messages';
 
 
 export type ErrorType = {
@@ -93,7 +95,10 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
       case "name":
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, name: "Name is required" }));
-        } else {
+        }else if (formType === STRING_VALUES.REGISTRATION && !REGEX.NAME_SPACE_DOT_ALLOWED_ONLY.test(value)) {
+          setErrors((prev) => ({ ...prev, name: MESSAGE.ERROR.NAME_SPACE_AND_DOT_ERROR }));
+        }
+          else {
           setErrors((prev) => ({ ...prev, name: "" }));
         }
         break;
