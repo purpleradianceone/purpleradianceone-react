@@ -80,7 +80,7 @@ export default function PaymentSubscription({
       name: SUBSCRIPTION.COMPANY_NAME,
       description: "Subscription Payment",
       order_id: orderId, // Order ID from backend
-      handler: function (response: any) {
+      handler: async function(response: any) {
        
         if (response.razorpay_payment_id !== null) {
           setIsPaymentSuccessfull(true);
@@ -94,6 +94,7 @@ export default function PaymentSubscription({
             createdby: loginStatus.id,
           };
 
+          
           const updateSubscriptionPostData = {
             company_id: loginStatus.companyId,
             subscription_id: subscriptionId!,
@@ -104,7 +105,7 @@ export default function PaymentSubscription({
             updatedby: loginStatus.id,
           };
 
-          axios
+         await axios
             .post(
               isSubscriptionForUpdate
                 ? POST_API.UPDATE_EXISTING_SUBSCRIPTION
@@ -157,6 +158,13 @@ export default function PaymentSubscription({
                     setIsPaymentSuccessfull(false);
                     handleSubscriptionListChange();
                   }, 2000);
+                }
+              }
+            }).catch(async(error : ApiError | any) => {
+              if(error.status === STATUS_CODE.UNATHORISED){
+                const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent : options.handler})
+                if(refreshTokenResponse){
+                  options.handler(response);
                 }
               }
             });

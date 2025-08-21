@@ -16,7 +16,7 @@ function LeadFormEmbed() {
   };
 
   return (
-    <div className="p-8 max-w-full mx-auto max-h-screen bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-hidden">
+    <div className="p-8 max-w-full mx-auto min-h-full bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-hidden">
       {comingSoon && (
         <div className="absolute inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
           <p className="text-green-600 text-3xl font-bold hover:text-green-700">Coming Soon!</p>

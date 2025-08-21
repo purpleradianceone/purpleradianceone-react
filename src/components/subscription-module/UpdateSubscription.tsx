@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditIcon, X } from "lucide-react";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import useScreenSize from "../../config/hooks/useScreenSize";
@@ -11,6 +12,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import PaymentSubscription from "./PaymentSubscription";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 export default function UpdateSubscription({
   isOpen,
@@ -62,7 +65,7 @@ export default function UpdateSubscription({
   const handleOnCancelPaymentPage = () => {
     setIsPaymentSubscriptionOpen(false);
   };
-  const handleUpdateFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateFormSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (
@@ -90,7 +93,7 @@ export default function UpdateSubscription({
         requestedby: loginStatus.id,
       };
 
-      axios
+      await axios
         .post(
           POST_API.GET_SUBSCRIPTION_AMOUNT,
           SubscriptionAmountRequestPostData,
@@ -105,7 +108,14 @@ export default function UpdateSubscription({
             });
             setIsPaymentSubscriptionOpen(true);
           }
-        });
+        }).catch(async(error : ApiError | any) => {
+          if(error.status === STATUS_CODE.UNATHORISED){
+            const refreshTokenResponse = await RefreshToken({callFunctionWithEvent : handleUpdateFormSubmit})
+            if(refreshTokenResponse){
+              handleUpdateFormSubmit(event);
+            }
+          }
+        })
     }
   };
 

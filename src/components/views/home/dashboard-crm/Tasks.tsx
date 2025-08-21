@@ -156,7 +156,7 @@ function Tasks({
 
   return (
     
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 h-full flex flex-col">
+    <div className="bg-white p-8 h-full flex flex-col">
       <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 40 }}

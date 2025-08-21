@@ -84,7 +84,7 @@ const SalesChart = ({
         </div>
       </div>
 
-      <div className="relative h-96">
+      <div className="relative h-96 mt-28">
         <div className="absolute inset-0 flex items-end justify-between space-x-1">
           {months.map((month, index) => (
             <div key={index} className="flex-1 flex flex-col items-center space-y-1">
@@ -94,7 +94,7 @@ const SalesChart = ({
                   <div
                     className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all duration-1000 ease-out shadow-sm cursor-pointer hover:from-blue-600 hover:to-blue-500"
                     style={{
-                      height: `${(salesData[index] / maxValue) * 380}px`,
+                      height: `${(salesData[index] / maxValue) * 400}px`,
                       animationDelay: `${index * 0.1}s`,
                     }}
                     onMouseEnter={(e) => handleBarHover(index, 'sales', e)}
@@ -109,14 +109,14 @@ const SalesChart = ({
                   <div
                     className="bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg transition-all duration-1000 ease-out shadow-sm cursor-pointer hover:from-emerald-600 hover:to-emerald-500"
                     style={{
-                      height: `${(revenueData[index] / maxValue) * 380}px`,
+                      height: `${(revenueData[index] / maxValue) * 400}px`,
                       animationDelay: `${index * 0.1 + 0.05}s`,
                     }}
                     
                   ></div>
                 </div>
               </div>
-              <span className="text-xs font-extralight text-gray-600">{month}</span>
+              <span className="text-xs font-thin block truncate max-w-20 text-gray-600">{month}</span>
             </div>
           ))}
         </div>

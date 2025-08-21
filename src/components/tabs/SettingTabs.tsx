@@ -14,6 +14,7 @@ import CompanyPreferenceSetting from "../views/settings/company-preferences/Comp
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
 import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
+import LeadAllowedDomains from "../views/settings/lead-settings/LeadAllowedDomains";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -33,8 +34,11 @@ function SettingsTabs() {
         <>
           {userHasAccessToViewSettingLeady ? (
             <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-1">
+              <div className="col-span-1 min-h-full">
                 <LeadSetting />
+                <div className = "w-full min-h-full">
+                  <LeadAllowedDomains/>
+                </div>
               </div>
 
               <div className="col-span-1">
