@@ -14,10 +14,13 @@ import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { Product } from "../../../@types/products/ProductsManagementProps";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 function ProductTeamManagement() {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
@@ -135,6 +138,12 @@ function ProductTeamManagement() {
 
   return (
     <div className="w-full">
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
       {userHasAccessToViewProduct ? (
         <>
           <div>
@@ -169,6 +178,7 @@ function ProductTeamManagement() {
           />
         </div>
       )}
+      </motion.section>
     </div>
   );
 }

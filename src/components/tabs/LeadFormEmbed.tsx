@@ -5,27 +5,24 @@ import { SIZE } from "../../constants/AppConstants";
 function LeadFormEmbed() {
   const clientId = "12344522";
   const [copied, setCopied] = useState<boolean>(false);
-  // Add a state variable to control the "Coming Soon" visibility
-  const comingSoon = true; // Set to true to show "Coming Soon" by default
+  const comingSoon = false;
 
-  const iframeCode = `<iframe src="contact-us-form/contact-us-form.html?client_id=${clientId}" width="50%" height="700px" frameborder="0"></iframe>`;
+  const iframeCode = `<iframe src="https://web-lead.netlify.app/contact-us-form.html?client_id=${clientId}" width="50%" height="700px" frameborder="0"></iframe>`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(iframeCode);
     setCopied(true);
-    setTimeout(() => setCopied(false), 10000); // Reset after 10 seconds
+    setTimeout(() => setCopied(false), 10000);
   };
 
   return (
     <div className="p-8 max-w-full mx-auto max-h-screen bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-hidden">
-      {/* Coming Soon Overlay */}
       {comingSoon && (
         <div className="absolute inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
           <p className="text-green-600 text-3xl font-bold hover:text-green-700">Coming Soon!</p>
         </div>
       )}
 
-      {/* Original Content (conditionally hidden) */}
       <div className={`${comingSoon ? 'opacity-95 pointer-events-none' : ''}`}>
         <h2 className="text-base font-bold mb-2 text-gray-800 text-center">
           Integrate Your Contact Form
