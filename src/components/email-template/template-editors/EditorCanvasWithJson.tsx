@@ -89,6 +89,16 @@ export const EditorCanvasWithJson = () => {
             }
           }
         }
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: getPlaceHolderDataFromDatabase,
+          });
+          if (refreshTokenResponse) {
+            getPlaceHolderDataFromDatabase({ templateTypeId });
+          }
+        }
       });
   };
 
@@ -216,9 +226,7 @@ export const EditorCanvasWithJson = () => {
           <LucideCode className="w-4 h-4 text-blue-600" />
           <span className="text-1xl font-bold">Email Template Update</span>
           {templateTypeId && (
-            <span className="text-1xl font-bold">
-              : {emailTemplateName}
-            </span>
+            <span className="text-1xl font-bold">: {emailTemplateName}</span>
           )}
         </div>
       </div>

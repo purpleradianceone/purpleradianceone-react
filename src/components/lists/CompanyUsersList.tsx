@@ -99,12 +99,13 @@ function GetCompanyUsersList({
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
+
         <div className="sticky z-10 top-9 py-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">Company Members</span>
+              <span className="text-1xl font-bold">Company Users</span>
             )}
           </div>
 

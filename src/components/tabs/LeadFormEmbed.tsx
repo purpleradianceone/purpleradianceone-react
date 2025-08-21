@@ -5,34 +5,31 @@ import { SIZE } from "../../constants/AppConstants";
 function LeadFormEmbed() {
   const clientId = "12344522";
   const [copied, setCopied] = useState<boolean>(false);
-  // Add a state variable to control the "Coming Soon" visibility
-  const comingSoon = true; // Set to true to show "Coming Soon" by default
+  const comingSoon = false;
 
-  const iframeCode = `<iframe src="contact-us-form/contact-us-form.html?client_id=${clientId}" width="50%" height="700px" frameborder="0"></iframe>`;
+  const iframeCode = `<iframe src="https://web-lead.netlify.app/contact-us-form.html?client_id=${clientId}" width="50%" height="700px" frameborder="0"></iframe>`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(iframeCode);
     setCopied(true);
-    setTimeout(() => setCopied(false), 10000); // Reset after 10 seconds
+    setTimeout(() => setCopied(false), 10000);
   };
 
   return (
-    <div className="p-8 max-w-full mx-auto max-h-screen bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-hidden">
-      {/* Coming Soon Overlay */}
+    <div className="p-8 max-w-full mx-auto min-h-full bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-hidden">
       {comingSoon && (
         <div className="absolute inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-10 rounded-xl">
           <p className="text-green-600 text-3xl font-bold hover:text-green-700">Coming Soon!</p>
         </div>
       )}
 
-      {/* Original Content (conditionally hidden) */}
       <div className={`${comingSoon ? 'opacity-95 pointer-events-none' : ''}`}>
         <h2 className="text-base font-bold mb-2 text-gray-800 text-center">
           Integrate Your Contact Form
         </h2>
 
         <p className="mb-2 text-gray-600 leading-relaxed text-center">
-          Easily embed your unique Contact Us form into your website by following these simple steps:
+          Easily embed your unique contact form into your website by following these simple steps:
         </p>
 
         <ol className="list-decimal text-xs space-y-4 mb-8 text-gray-700">
@@ -61,7 +58,7 @@ function LeadFormEmbed() {
           </li>
           <li>
             <p>
-              Paste the copied code snippet into your website's HTML where you want the form to appear.
+              Paste the code snippet into your website's HTML where you want the form to appear.
             </p>
           </li>
           <li>
@@ -69,17 +66,32 @@ function LeadFormEmbed() {
               Adjust the `width` and `height` attributes within the iframe code as needed to fit your website's layout.
             </p>
           </li>
+          <li>
+            <p>
+              To customize the form's colors, append the appropriate query parameters to the URL. as follows :
+              <ol className="list-disc list-inside text-xs space-y-1 mb-1 text-gray-700">
+              
+                  <li><span className="font-semibold">"color" : </span>background color</li>
+                  <li><span className="font-semibold">"header-color" : </span>heading text color</li>
+                  <li><span className="font-semibold">"label-color" : </span>labels text color</li>
+                  <li><span className="font-semibold">"button-color" : </span>button background color</li>
+                  <li><span className="font-semibold">"button-text-color" : </span>button text color</li>
+            </ol>
+            </p>
+
+          </li>
         </ol>
 
         <p className="mb-1 font-bold text-gray-800 text-xs">
           Important Notes:
         </p>
-        <ul className="list-disc list-inside space-y-1 text-xs text-gray-600">
-          <li>Ensure your website page uses **HTTPS** for secure form submission.</li>
+        <ol className="list-disc space-y-1 text-xs text-gray-600">
+          <li>Ensure your website page uses **HTTPS** for secure form submissions.</li>
           <li>**Do not share your Client ID** with unauthorized individuals.</li>
-          <li>Always **test the form thoroughly** on your website after embedding.</li>
-          <li>Consider implementing **responsive design** principles for optimal viewing across devices.</li>
-        </ul>
+          <li>When specifying a color, always use the **hex code format without the starting #**. For example, if the hex code is `#ffffff`, pass the color as `color=ffffff`.</li>
+          <li>Always **thoroughly test the form** on your website after embedding it.</li>
+          <li>Consider implementing **responsive design** principles for optimal viewing across all devices.</li>
+        </ol>
       </div>
     </div>
   );

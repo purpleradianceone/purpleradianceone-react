@@ -8,6 +8,8 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -80,14 +82,22 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
             toast.success(response.data.message);
+            navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
           } else {
             toast.error(response.data.message);
           }
-          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         }
       })
-      .catch((error) => {
-        console.error(error.toString());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: updateEmailTemplateInsert,
+          });
+          if (refreshTokenStatus) {
+            updateEmailTemplateInsert(emailBody);
+          }
+        }
       });
   };
   if (dynamicFields.length === 0) {
@@ -130,7 +140,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
               width: "350px",
               maxHeight: "calc(100vh - 80px)",
               overflowY: "auto",
-              color:"black"
+              color: "black",
             }}
           >
             <button

@@ -4,6 +4,7 @@ import { useUserPreference } from "../../../context/user/UserPreference";
 import LeadMeetingsModal from "../../modals/meetings/LeadMeetingsModal";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 
+
 function Meetings() {
   const { userPreference } = useUserPreference();
   const { userHasAccessToViewMeeting } = useUserAccessModules();
@@ -21,6 +22,7 @@ function Meetings() {
         userPreference.isLeftMenu ? "pl-4" : ""
       } `}
     >
+       
       {userHasAccessToViewMeeting ? (
         <LeadMeetingsModal
           isMeetingModalOpenFromProp={true}
@@ -38,6 +40,7 @@ function Meetings() {
           />
         </div>
       )}
+      
     </div>
   );
 }

@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import {
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
@@ -14,14 +12,15 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 function ProductManagement() {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const [productsData, setProductsData] = useState<Product[]>([]);
   const [productUpdateCount, setProductUpdateCount] = useState<number>(0);
@@ -53,8 +52,7 @@ function ProductManagement() {
 
   const handleEditProductChange = (product: Product) => {
     const userMatches = productsData.some(
-      (products) =>
-        products.id === product.id
+      (products) => products.id === product.id
     );
 
     if (userMatches) {
@@ -69,7 +67,6 @@ function ProductManagement() {
     );
     if (userMatches) {
       setProductUpdateCount((prev) => prev + 1);
-      
     }
   };
 
@@ -78,15 +75,13 @@ function ProductManagement() {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
-        dateRangeId === 8 && !concatDate
-          ? 0
-          : dateRangeId;
+        dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
-          setProductsData([]);
+      setProductsData([]);
       setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
-        id : null,
+        id: null,
         requestedby: loginStatus.id,
         limit: pageSize,
         offset: offset,
@@ -96,7 +91,6 @@ function ProductManagement() {
       };
 
       try {
-        
         const response = await axios.post(
           POST_API.GET_PRODUCTS,
           getProductPostData,
@@ -106,29 +100,25 @@ function ProductManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
-           const formattedData: Product[] = response.data.map(
-          (res: any) => ({
-                code: res.code,
-                companyId: res.company_id,
-                cost: res.cost,
-                count: res.count,
-                createdBy: res.createdby,
-                createdOn: res.createdon,
-                description: res.description,
-                hsn: res.hsn,
-                id: res.id,
-                isActive: res.isactive,
-                name: res.name,
-                sac: res.sac,
-                taxRate: res.tax_rate,
-                validFrom: res.valid_from,
-            })
-        );
-          setProductsData(formattedData)
+          const formattedData: Product[] = response.data.map((res: any) => ({
+            code: res.code,
+            companyId: res.company_id,
+            cost: res.cost,
+            count: res.count,
+            createdBy: res.createdby,
+            createdOn: res.createdon,
+            description: res.description,
+            hsn: res.hsn,
+            id: res.id,
+            isActive: res.isactive,
+            name: res.name,
+            sac: res.sac,
+            taxRate: res.tax_rate,
+            validFrom: res.valid_from,
+          }));
+          setProductsData(formattedData);
           if (response.data[0]?.count) {
-            setTotalPages(
-              Math.ceil(response.data[0].count / pageSize)
-            );
+            setTotalPages(Math.ceil(response.data[0].count / pageSize));
           }
         }
       } catch (error: ApiError | any) {
@@ -171,42 +161,49 @@ function ProductManagement() {
 
   return (
     <div className="w-full">
-      {userHasAccessToViewProduct ? (
-        <>
-          <div>
-             <ProductsManagementList
-              handleCreateCompanyProductTax={handleCreateCompanyProductTax}
-              handleEditProductChange={handleEditProductChange}
-              handleProductChangeOnAdd={handleProductChangeOnAdd}
-              onEndDateChange={handleEndDateChange}
-              onStartDateChange={handleStartDateChange}
-              handleSearchOption={{
-                handleSearchParameterChange,
-                handleDateRangeIdChange: handleDatePageIdChange,
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {userHasAccessToViewProduct ? (
+          <>
+            <div>
+              <ProductsManagementList
+                handleCreateCompanyProductTax={handleCreateCompanyProductTax}
+                handleEditProductChange={handleEditProductChange}
+                handleProductChangeOnAdd={handleProductChangeOnAdd}
+                onEndDateChange={handleEndDateChange}
+                onStartDateChange={handleStartDateChange}
+                handleSearchOption={{
+                  handleSearchParameterChange,
+                  handleDateRangeIdChange: handleDatePageIdChange,
+                }}
+                paginationData={{
+                  selectedPageSize: handlePageSizeChange,
+                  currentPage,
+                  handlePageChange,
+                  totalPages,
+                  pageSize,
+                }}
+                products={productsData}
+                isListForProductUser={false}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex-none mx-96 mt-14">
+            <AccessDeniedPopup
+              isOpen={accessDeniedPopUpOpen}
+              onClose={() => {
+                setAccessDeniedPopUpOpen(false);
+                window.history.back();
               }}
-              paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
-                pageSize,
-              }}
-              products={productsData}
-              isListForProductUser={false}
-            />                      
+            />
           </div>
-        </>
-      ) : (
-        <div className="flex-none mx-96 mt-14">
-          <AccessDeniedPopup
-            isOpen={accessDeniedPopUpOpen}
-            onClose={() => {
-              setAccessDeniedPopUpOpen(false);
-              window.history.back();
-            }}
-          />
-        </div>
-      )}
+        )}
+      </motion.section>
     </div>
   );
 }

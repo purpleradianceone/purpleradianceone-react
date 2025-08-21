@@ -14,11 +14,14 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 function GetCompanyUsers() {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     false
@@ -126,6 +129,13 @@ function GetCompanyUsers() {
       {userHasAccessToViewUser ? (
         <>
           <div>
+            <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      
+    >
             <GetCompanyUsersList
               handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
               onEndDateChange={handleEndDateChange}
@@ -143,6 +153,7 @@ function GetCompanyUsers() {
               }}
               users={companyUsers}
             />
+            </motion.section>
           </div>
         </>
       ) : (

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import MetricCard from "./MetricCard";
 import PipelineChart from "./PipeLineChart";
-import QuickActions from "./Actions";
+import QuickActions from "./QuickActions";
 import {
   AlertCircleIcon,
   ShieldAlert,
@@ -39,7 +39,7 @@ type DashboardDataType = Record<string, Array<Record<string, any>>>;
 interface DashboardCRMProp {
   companyUserId: number|null;
 }
-const Dashboard:React.FC<DashboardCRMProp> = ({ 
+const DashboardCRM:React.FC<DashboardCRMProp> = ({ 
  companyUserId,
 }) => {
   const navigate = useNavigate();
@@ -340,9 +340,9 @@ const Dashboard:React.FC<DashboardCRMProp> = ({
     "Pending tasks": (
       <div
         key="Pending tasks"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-transparent
-  [&::-webkit-scrollbar-thumb]:bg-transparent
+        className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-white
+  [&::-webkit-scrollbar-thumb]:bg-white
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <Tasks
@@ -355,8 +355,11 @@ const Dashboard:React.FC<DashboardCRMProp> = ({
     "Upcoming tasks": (
       <div
         key="Upcoming tasks"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full"
-      >
+        className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-white
+  [&::-webkit-scrollbar-thumb]:bg-white
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+        >
         <Tasks
           isLoading={isTasksLoading}
           leadTasks={upcomingTask}
@@ -442,7 +445,7 @@ const Dashboard:React.FC<DashboardCRMProp> = ({
       // console.log(currentSectionId)
       // console.log(dashboardVisiblity);
       // console.log("+++++++++++++++++");
-      if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" )) {
+      if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" || chartType === "Table" )) {
       
           renderedSections.push(currentComponentBarChart);
         
@@ -561,4 +564,4 @@ const Dashboard:React.FC<DashboardCRMProp> = ({
   );
 }
 
-export default Dashboard;
+export default DashboardCRM;

@@ -11,6 +11,7 @@ import LeadTaskPriorityType from "../../@types/lead-management/LeadTaskPriorityT
 import LeadActivityType from "../../@types/lead-management/LeadActivityType";
 import LeadTaskStageType from "../../@types/lead-management/LeadTaskStageType";
 import LeadTaskType from "../../@types/lead-management/LeadTaskType";
+import { useMeetingPlatform } from "../../config/hooks/useMeetingPlatforms";
 
 function LeadTaskTabs({
   leadTaskStage,
@@ -35,6 +36,7 @@ function LeadTaskTabs({
 }) {
 
    const [activeTab, setActiveTab] = useState("allTasks");
+   const {meetingPlatform} = useMeetingPlatform();
 
   const data = [
     {
@@ -50,6 +52,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
        handleLeadTaskUpdate={handleLeadTaskUpdate}
+       meetingPlatform={meetingPlatform}
        />
       ),
       taskId : 0
@@ -67,6 +70,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
        taskId : leadTaskStage[0]?.id,
@@ -84,6 +88,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
       taskId : leadTaskStage[1]?.id,
@@ -101,6 +106,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
       taskId : leadTaskStage[2]?.id,

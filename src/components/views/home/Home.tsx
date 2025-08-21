@@ -1,23 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
-import Dashboard from "./Dashboard";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
-import ApiError from "../../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-import SupportDashboard from "../dashboards/SupportDashboard";
-import InventoryDashboard from "../dashboards/InventoryDashboard";
-import FinanceDashboard from "../dashboards/FinanceDashboard";
-import HRMSDashboard from "../dashboards/HRMSDashboard";
+import POST_API from "../../../constants/PostApi";
+import ApiError from "../../../@types/error/ApiError";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import SupportDashboard from "./dashboards/SupportDashboard";
+import InventoryDashboard from "./dashboards/InventoryDashboard";
+import FinanceDashboard from "./dashboards/FinanceDashboard";
+import HRMSDashboard from "./dashboards/HRMSDashboard";
 import CompanyUserDropdown, {
   UserResponse,
-} from "../custom_company_user_dropdown/CustomCompanyUserDropdown";
-import { useUserPreference } from "../../../../context/user/UserPreference";
+} from "./custom_company_user_dropdown/CustomCompanyUserDropdown";
+import { useUserPreference } from "../../../context/user/UserPreference";
+import DashboardCRM from "./dashboard-crm/DashboardCRM";
 
 // ======= Dashboard Components =======
-const CRM: React.FC<{companyUserId:number|null}> = ({companyUserId}) => <Dashboard companyUserId={companyUserId} />;
+const CRM: React.FC<{companyUserId:number|null}> = ({companyUserId}) => <DashboardCRM companyUserId={companyUserId} />;
 const Support: React.FC = () => <SupportDashboard />;
 const Inventory: React.FC = () => <InventoryDashboard />;
 const Finance: React.FC = () => <FinanceDashboard />;
@@ -115,10 +114,8 @@ const Home: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
-        {/* Simple loading spinner */}
         <svg
           className="animate-spin h-8 w-8 text-blue-500"
-          // xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
         >

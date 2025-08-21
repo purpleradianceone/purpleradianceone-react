@@ -184,10 +184,15 @@ const componentRenderers: Record<string, ComponentRenderer> = {
 
   // Section Block
   SectionBlock: ({ node, renderChildren, renderLinkedNodes }) => {
+    // enforce same defaults as SectionBlock.craft
+    const background = node.props.background ?? "#f7f7f7";
+    const padding = node.props.padding ?? "20px";
+    const align = node.props.align ?? "left";
+
     const style = formatStyle({
-      backgroundColor: node.props.background || "#ffffff",
-      padding: node.props.padding || "20px",
-      textAlign: node.props.align || "left",
+      backgroundColor: background,
+      padding,
+      textAlign: align,
       width: "100%",
       boxSizing: "border-box",
       margin: "10px 0",
@@ -200,6 +205,23 @@ const componentRenderers: Record<string, ComponentRenderer> = {
 
     return `<section style="${style}">${content}</section>`;
   },
+  // SectionBlock: ({ node, renderChildren, renderLinkedNodes }) => {
+  //   const style = formatStyle({
+  //     backgroundColor: node.props.background || "#ffffff",
+  //     padding: node.props.padding || "20px",
+  //     textAlign: node.props.align || "left",
+  //     width: "100%",
+  //     boxSizing: "border-box",
+  //     margin: "10px 0",
+  //     ...node.props.style,
+  //   });
+
+  //   const content =
+  //     (node.nodes ? renderChildren(node.nodes) : "") +
+  //     (node.linkedNodes ? renderLinkedNodes(node.linkedNodes) : "");
+
+  //   return `<section style="${style}">${content}</section>`;
+  // },
 
   // Divider Block (NEWLY ADDED)
   DividerBlock: ({ node }) => {
@@ -221,56 +243,61 @@ const componentRenderers: Record<string, ComponentRenderer> = {
   },
 
   ImageBlock: ({ node }) => {
-  const { src, alt = "", width, height, alignment } = node.props;
+    const { src, alt = "", width, height, alignment } = node.props;
 
-  let wrapperStyle: React.CSSProperties = {};
-  let imageStyle: React.CSSProperties = {
-    maxWidth: "100%",
-    height: "auto",
-    objectFit: "cover",
-    objectPosition: "center center",
-    ...(width && { width: typeof width === "number" ? `${width}px` : width }),
-    ...(height && {
-      height: typeof height === "number" ? `${height}px` : height,
-    }),
-    ...node.props.style,
-  };
+    let wrapperStyle: React.CSSProperties = {};
+    let imageStyle: React.CSSProperties = {
+      maxWidth: "100%",
+      height: "auto",
+      objectFit: "cover",
+      objectPosition: "center center",
+      ...(width && { width: typeof width === "number" ? `${width}px` : width }),
+      ...(height && {
+        height: typeof height === "number" ? `${height}px` : height,
+      }),
+      ...node.props.style,
+    };
 
-  // Handle alignment styles
-  if (alignment === "center") {
-    wrapperStyle = { textAlign: "center" };
-    imageStyle = { ...imageStyle, display: "inline-block" };
-  } else if (alignment === "right") {
-    wrapperStyle = { textAlign: "right" };
-    imageStyle = { ...imageStyle, display: "inline-block" };
-  } else if (alignment === "left") {
-    wrapperStyle = { textAlign: "left" };
-    imageStyle = { ...imageStyle, display: "inline-block" };
-  } else if (alignment === "justify") {
-    wrapperStyle = { textAlign: "justify" };
-  } else if (alignment === "rtl") {
-    wrapperStyle = { direction: "rtl", textAlign: "right" };
-  }
+    // Handle alignment styles
+    if (alignment === "center") {
+      wrapperStyle = { textAlign: "center" };
+      imageStyle = { ...imageStyle, display: "inline-block" };
+    } else if (alignment === "right") {
+      wrapperStyle = { textAlign: "right" };
+      imageStyle = { ...imageStyle, display: "inline-block" };
+    } else if (alignment === "left") {
+      wrapperStyle = { textAlign: "left" };
+      imageStyle = { ...imageStyle, display: "inline-block" };
+    } else if (alignment === "justify") {
+      wrapperStyle = { textAlign: "justify" };
+    } else if (alignment === "rtl") {
+      wrapperStyle = { direction: "rtl", textAlign: "right" };
+    }
 
-  // Converts camelCase to kebab-case for inline styles
-  const styleToString = (style: Record<string, any>) =>
-    Object.entries(style)
-      .map(([key, value]) => {
-        const kebabKey = key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
-        return `${kebabKey}: ${value};`;
-      })
-      .join(" ");
+    // Converts camelCase to kebab-case for inline styles
+    const styleToString = (style: Record<string, any>) =>
+      Object.entries(style)
+        .map(([key, value]) => {
+          const kebabKey = key.replace(
+            /[A-Z]/g,
+            (match) => `-${match.toLowerCase()}`
+          );
+          return `${kebabKey}: ${value};`;
+        })
+        .join(" ");
 
-  const escapedSrc = escapeHtml(src);
-  const escapedAlt = escapeHtml(alt);
+    const escapedSrc = escapeHtml(src);
+    const escapedAlt = escapeHtml(alt);
 
-  // ✅ Wrap the image in a styled <div>
-  return `
+    // ✅ Wrap the image in a styled <div>
+    return `
     <div style="${styleToString(wrapperStyle)}">
-      <img src="${escapedSrc}" alt="${escapedAlt}" style="${styleToString(imageStyle)}" />
+      <img src="${escapedSrc}" alt="${escapedAlt}" style="${styleToString(
+      imageStyle
+    )}" />
     </div>
   `;
-},
+  },
   // Button Block
   ButtonBlock: ({ node }) => {
     const { text, href = "#", target } = node.props;
@@ -456,31 +483,30 @@ function extractHtmlFromLexical(editorState: any): string {
       return style ? `<span${style}>${content}</span>` : content;
     }
 
-    
-    if (node.type === 'paragraph') {
-  const children = node.children.map(processNode).join('');
+    if (node.type === "paragraph") {
+      const children = node.children.map(processNode).join("");
 
-  const hasOnlyWhitespace =
-    node.children.length === 1 &&
-    node.children[0].type === 'text' &&
-    /^\s*$/.test(node.children[0].text);
+      const hasOnlyWhitespace =
+        node.children.length === 1 &&
+        node.children[0].type === "text" &&
+        /^\s*$/.test(node.children[0].text);
 
-  const isTrulyEmpty = children.trim() === '' ;
+      const isTrulyEmpty = children.trim() === "";
 
-  // Show intentional blank paragraph (like between lines)
-  if (hasOnlyWhitespace) return `<p>&nbsp;</p>`;
+      // Show intentional blank paragraph (like between lines)
+      if (hasOnlyWhitespace) return `<p>&nbsp;</p>`;
 
-  // Skip auto-generated empty paragraphs (like trailing new lines)
-  if (isTrulyEmpty) return '';
+      // Skip auto-generated empty paragraphs (like trailing new lines)
+      if (isTrulyEmpty) return "";
 
-  let style = node.textStyle || '';
-  if (node.format && typeof node.format === 'string') {
-    style = appendStyle(style, `text-align: ${node.format};`);
-  }
+      let style = node.textStyle || "";
+      if (node.format && typeof node.format === "string") {
+        style = appendStyle(style, `text-align: ${node.format};`);
+      }
 
-  const styleAttr = style ? ` style="${style}"` : '';
-  return `<p${styleAttr}>${children}</p>`;
-}
+      const styleAttr = style ? ` style="${style}"` : "";
+      return `<p${styleAttr}>${children}</p>`;
+    }
 
     // Handle heading nodes
     if (node.type === "heading") {
@@ -582,13 +608,20 @@ function formatStyle(
 function escapeHtml(unsafe: string): string {
   return unsafe.replace(/[\u00A0-\u9999<>&"'`]/gim, function (i) {
     switch (i) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#039;';
-      case '`': return '&#x60;';
-      default: return `&#${i.charCodeAt(0)};`;
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#039;";
+      case "`":
+        return "&#x60;";
+      default:
+        return `&#${i.charCodeAt(0)};`;
     }
   });
 }
@@ -596,13 +629,20 @@ function escapeHtml(unsafe: string): string {
 function escapeHtmlForTextBlock(unsafe: string): string {
   return unsafe.replace(/[\u00A0-\u9999<>&"'`]/gim, function (i) {
     switch (i) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#039;';
-      case '`': return '&#x60;';
-      default: return `&#${i.charCodeAt(0)};`;
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#039;";
+      case "`":
+        return "&#x60;";
+      default:
+        return `&#${i.charCodeAt(0)};`;
     }
   });
 }

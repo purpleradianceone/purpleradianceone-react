@@ -36,11 +36,14 @@ import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 import toast from "react-hot-toast";
 import { useUserPreference } from "../../../context/user/UserPreference";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
     useUserAccessModules();
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
@@ -662,6 +665,13 @@ const ViewLeadManagement = () => {
         userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
       } overflow-auto`}
     >
+      <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      
+    >
       {/* Header */}
       <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 ">
         <div className="flex gap-6">
@@ -1255,6 +1265,7 @@ const ViewLeadManagement = () => {
         fetchLeadCompanyProduct={fetchLeadCompanyProduct}
         interestTypeData={interestTypeData}
       />
+      </motion.section>
     </div>
   );
 };
@@ -1391,6 +1402,7 @@ const Detail: React.FC<DetailProps> = ({
           )}
         </div>
       )}
+     
     </div>
   );
 };
