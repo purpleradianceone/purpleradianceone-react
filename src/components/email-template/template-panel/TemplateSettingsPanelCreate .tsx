@@ -95,10 +95,11 @@ export const TemplateSettingsPanelCreate: React.FC<
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
             toast.success(response.data.message);
+            navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
           } else {
             toast.error(response.data.message);
           }
-          navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
+          // navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
