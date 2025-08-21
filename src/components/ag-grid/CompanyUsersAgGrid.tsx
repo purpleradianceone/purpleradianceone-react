@@ -271,6 +271,7 @@ function CompanyUserAgGrid({
       // className="ag-theme-balham w-full "
       style={{ height: "100vh", width: "100%" }}
     >
+      
       <AgGridReact
         rowData={users}
         columnDefs={columnDefs}

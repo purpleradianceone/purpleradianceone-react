@@ -29,8 +29,8 @@ import momentTimezone from "moment-timezone";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import EditMeetingDetailsModal from "../../meetings/EditMeetingDetailsModal";
-import { useMeetingPlatform } from "../../../../config/hooks/useMeetingPlatforms";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import MeetingPlatforms from "../../../../@types/meeting/MeetingPlatform";
 
 function LeadTaskList({
   leadTaskPriority,
@@ -40,7 +40,8 @@ function LeadTaskList({
   handleLeadActivityFilterDropdownChange,
   handleLeadPriorityFilterDropdownChange,
   handleLeadTaskUpdate,
-  isLoading
+  isLoading,
+  meetingPlatform
 }: {
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
@@ -49,7 +50,8 @@ function LeadTaskList({
   handleLeadActivityFilterDropdownChange: (leadActivityId: number) => void;
   handleLeadPriorityFilterDropdownChange: (leadTaskPriorityId: number) => void;
   handleLeadTaskUpdate: () => void;
-  isLoading : boolean
+  isLoading : boolean;
+  meetingPlatform: MeetingPlatforms[];
 }) {
   const [isUpdateLeadTaskModalOpen, setIsUpdateLeadTaskModalOpen] =
     useState<boolean>(false);
@@ -64,7 +66,7 @@ function LeadTaskList({
     CalendarEventType
   >();
 
-    const {meetingPlatform} = useMeetingPlatform();
+    
       const [isEditMettingModalOpen, setIsEditMettingModalOpen] =
     useState<boolean>(false);
 
