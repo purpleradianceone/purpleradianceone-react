@@ -29,7 +29,7 @@ function LeadFormEmbed() {
         </h2>
 
         <p className="mb-2 text-gray-600 leading-relaxed text-center">
-          Easily embed your unique Contact Us form into your website by following these simple steps:
+          Easily embed your unique contact form into your website by following these simple steps:
         </p>
 
         <ol className="list-decimal text-xs space-y-4 mb-8 text-gray-700">
@@ -58,7 +58,7 @@ function LeadFormEmbed() {
           </li>
           <li>
             <p>
-              Paste the copied code snippet into your website's HTML where you want the form to appear.
+              Paste the code snippet into your website's HTML where you want the form to appear.
             </p>
           </li>
           <li>
@@ -68,20 +68,29 @@ function LeadFormEmbed() {
           </li>
           <li>
             <p>
-              if want to adjust the colors of form please append following query parameters in the where you want to change the color
+              To customize the form's colors, append the appropriate query parameters to the URL. as follows :
+              <ol className="list-disc list-inside text-xs space-y-1 mb-1 text-gray-700">
+              
+                  <li><span className="font-semibold">"color" : </span>background color</li>
+                  <li><span className="font-semibold">"header-color" : </span>heading text color</li>
+                  <li><span className="font-semibold">"label-color" : </span>labels text color</li>
+                  <li><span className="font-semibold">"button-color" : </span>button background color</li>
+                  <li><span className="font-semibold">"button-text-color" : </span>button text color</li>
+            </ol>
             </p>
+
           </li>
         </ol>
 
         <p className="mb-1 font-bold text-gray-800 text-xs">
           Important Notes:
         </p>
-        <ol className="list-disc  space-y-1 text-xs text-gray-600">
-          <li>Ensure your website page uses **HTTPS** for secure form submission.</li>
-          <li><span className="font-semibold">**</span>Do not share your Client ID** with unauthorized individuals.</li>
-          <li><span className="font-semibold">**</span> While giving the color always give in <span className="font-semibold">hex code</span> format but without starting # for e.g it the hex code is <span className="font-semibold">#ffffff</span> the pass the color to wuery parameter as <span className="font-semibold">color=ffffff</span></li>
-          <li>Always <span className="font-semibold">**</span>test the form thoroughly<span className="font-semibold">**</span> on your website after embedding.</li>
-          <li>Consider implementing **responsive design** principles for optimal viewing across devices.</li>
+        <ol className="list-disc space-y-1 text-xs text-gray-600">
+          <li>Ensure your website page uses **HTTPS** for secure form submissions.</li>
+          <li>**Do not share your Client ID** with unauthorized individuals.</li>
+          <li>When specifying a color, always use the **hex code format without the starting #**. For example, if the hex code is `#ffffff`, pass the color as `color=ffffff`.</li>
+          <li>Always **thoroughly test the form** on your website after embedding it.</li>
+          <li>Consider implementing **responsive design** principles for optimal viewing across all devices.</li>
         </ol>
       </div>
     </div>
