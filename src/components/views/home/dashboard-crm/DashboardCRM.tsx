@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import MetricCard from "./MetricCard";
 import PipelineChart from "./PipeLineChart";
-import QuickActions from "./Actions";
+import QuickActions from "./QuickActions";
 import {
   AlertCircleIcon,
   ShieldAlert,
@@ -445,7 +445,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
       // console.log(currentSectionId)
       // console.log(dashboardVisiblity);
       // console.log("+++++++++++++++++");
-      if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" )) {
+      if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" || chartType === "Table" )) {
       
           renderedSections.push(currentComponentBarChart);
         
