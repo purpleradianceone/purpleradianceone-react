@@ -14,10 +14,7 @@ import POST_API from "../../../constants/PostApi";
 // } from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import {
-  SIZE,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,14 +33,14 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     email: "",
   };
 
-  const {isSmallScreen} = useScreenSize()
+  const { isSmallScreen } = useScreenSize();
 
   const {
     formData: addCompanyUserFormData,
     handleChange: handleAddComapnyUserFormDataChange,
     setFormData: setAddCompanyUserFormData,
   } = useFormChange(initialAddCompanyUserFormData);
-  const { errors, handleBlur,setErrors } = useFormValidation(
+  const { errors, handleBlur, setErrors } = useFormValidation(
     addCompanyUserFormData,
     "registration"
   );
@@ -64,22 +61,28 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-     const mobileRegex = REGEX.MOBILE_NUMBER;
-     if(addCompanyUserFormData.mobilenumber!.trim() !== ""){
-         if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
-          // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
-
-          toast.error("Invalid mobile number");
-          return;
-        }
-     }
-       
+    const mobileRegex = REGEX.MOBILE_NUMBER;
+    const nameRegex = REGEX.NAME_SPACE_DOT_ALLOWED_ONLY;
+    if (addCompanyUserFormData.mobilenumber!.trim() !== "") {
+      if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
+        // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
+        toast.error("Invalid mobile number");
+        return;
+      }
+    }
+    if (
+      addCompanyUserFormData.name.trim() !== "" &&
+      !nameRegex.test(addCompanyUserFormData.name)
+    ) {
+      toast.error(MESSAGE.ERROR.NAME_SPACE_AND_DOT_ERROR);
+      return;
+    }
 
     if (
       addCompanyUserFormData.email !== "" &&
       addCompanyUserFormData.name != "" &&
       addCompanyUserFormData.email !== null &&
-      addCompanyUserFormData.name !== null 
+      addCompanyUserFormData.name !== null
     ) {
       const createCompanyUserData = {
         fullname: addCompanyUserFormData.name.trim(),
@@ -123,21 +126,21 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
         //   type: "error",
         // });
-        toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG)
+        toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({
               callFunctionWithEvent: handleAddUserSubmit,
             });
             if (refreshTokenStatus) {
-              handleAddUserSubmit(event);            }
-          } 
-          else {
+              handleAddUserSubmit(event);
+            }
+          } else {
             // showMessageSnackbar({
             //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
             //   type: "error",
             // });
-            toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG)
+            toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
           }
         }
       }
@@ -146,46 +149,54 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
       //   type: "error",
       // });
-      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
   };
 
-
-  useEffect(()=>{
-    if(!isOpen){
+  useEffect(() => {
+    if (!isOpen) {
       setErrors({
-        name : "",
-        email : "",
-      })
+        name: "",
+        email: "",
+      });
     }
-  },[])
+  }, []);
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div className={isSmallScreen ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45" }>
+      <div
+        className={
+          isSmallScreen
+            ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
+            : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45"
+        }
+      >
         <div className="flex min-h-screen items-center justify-center">
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          <div
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg">
-            
-
+   [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
+          >
             <div className="py-6 px-4">
               <div className="flex border-b items-center gap-3 mb-4">
                 <UserPlus className="text-blue-500" size={SIZE.TWENTY} />
                 <h2 className="text-lg font-semibold text-gray-800">
-                  Add New Company User
+                  Add Company User
                 </h2>
                 <button
-                //  note : this is logic will not work dynamically CHANGES NEEDED
-                disabled={loginStatus.activeUsersInCompany> loginStatus.subscriptionAllowedUsers}
-              onClick={onClose}
-              className="absolute right-4 top-8 text-gray-400 hover:text-gray-600"
-            >
-              <X size={SIZE.TWENTY} />
-            </button>
+                  //  note : this is logic will not work dynamically CHANGES NEEDED
+                  disabled={
+                    loginStatus.activeUsersInCompany >
+                    loginStatus.subscriptionAllowedUsers
+                  }
+                  onClick={onClose}
+                  className="absolute right-4 top-8 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={SIZE.TWENTY} />
+                </button>
               </div>
 
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
@@ -193,7 +204,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   label="Name"
                   type="text"
                   name="name"
-                   required={true}
+                  required={true}
                   placeholder="Enter User Name"
                   value={addCompanyUserFormData.name}
                   onChange={handleAddComapnyUserFormDataChange}
@@ -217,7 +228,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   label="Email"
                   type="email"
                   name="email"
-                   required={true}
+                  required={true}
                   placeholder="Enter Email Address"
                   value={addCompanyUserFormData.email}
                   onChange={handleAddComapnyUserFormDataChange}
@@ -225,7 +236,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   error={errors.email}
                   maxLength={256}
                 />
-                
+
                 <Button type="submit">Create</Button>
               </form>
             </div>

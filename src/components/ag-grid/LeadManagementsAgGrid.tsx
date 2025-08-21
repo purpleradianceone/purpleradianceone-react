@@ -18,13 +18,13 @@ function LeadManagementAgGrid({
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        hide: false,
+        hide: true,
         field:"id",
-        headerName : "leadid"
+        headerName : "leadid",
       },
       {
         field: "name",
-        headerName: "Lead Name",
+        headerName: "Name",
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
@@ -47,7 +47,7 @@ function LeadManagementAgGrid({
       },
       {
         field: "leadOwner",
-        headerName: "Lead Owner",
+        headerName: "Owner",
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
@@ -57,13 +57,13 @@ function LeadManagementAgGrid({
       },
       {
         field: "leadStatus",
-        headerName: "Lead Status",
+        headerName: "Status",
         sortable: true,
         filter: true,
       },
       {
         field: "leadSource",
-        headerName: "Lead Source",
+        headerName: "Source",
         sortable: true,
         filter: true,
       },

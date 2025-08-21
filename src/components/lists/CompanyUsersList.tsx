@@ -105,7 +105,7 @@ function GetCompanyUsersList({
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">Company Members</span>
+              <span className="text-1xl font-bold">Company Users</span>
             )}
           </div>
 
