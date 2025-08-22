@@ -43,10 +43,14 @@ const {loginStatus} = useLoggedInUserContext()
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error : ApiError | any) => {
+            .catch(async(error : ApiError | any) => {
               console.error(error);
               if(error.status === STATUS_CODE.UNATHORISED){
-                 RefreshToken({callFunction: fetchDateRange})
+                 const refreshTokenResponse =  await RefreshToken({callFunction: fetchDateRange});
+                 if(refreshTokenResponse){
+                  fetchDateRange();
+                 }
+                 
               }
             });
     }

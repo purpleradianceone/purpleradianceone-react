@@ -38,10 +38,13 @@ export const useMasterRowsInGrid = () => {
                 }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: ApiError | any) => {
+            .catch(async(error: ApiError | any) => {
                 if (error.status === STATUS_CODE.UNATHORISED) {
 
-                    RefreshToken({ callFunction: fetchMasterRowsInGridDropdownOptions })
+                   const refreshTOkenResponse = await RefreshToken({ callFunction: fetchMasterRowsInGridDropdownOptions });
+                   if(refreshTOkenResponse){
+                    fetchMasterRowsInGridDropdownOptions();
+                   }
                 }
             });
     }

@@ -115,7 +115,8 @@ function FormInput({
   countries,
   useCountry,
   minLength,
-  maxLength
+  maxLength,
+  autoComplete
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
   const isMobileNumberInput =useCountry;
@@ -169,6 +170,7 @@ function FormInput({
               min={min}
               max={max}
               pattern={pattern}
+              autoComplete={autoComplete}
             />
           </div>
         ) : (
