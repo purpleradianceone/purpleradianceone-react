@@ -9,6 +9,8 @@ import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 type TemplateSettingsPanelEditProps = {
   htmlTemplateTypeSubjectPlaceholder: string;
@@ -60,7 +62,9 @@ export const TemplateSettingsPanelCreate: React.FC<
     if (!canvasElement) return "";
     const json = query.serialize();
 
-    const html = craftJsonToHtml(json).trim();
+    // const html = craftJsonToHtml(json).trim();
+    const html = craftJsonToHtml(json);
+
     return html;
   }
 
@@ -91,20 +95,23 @@ export const TemplateSettingsPanelCreate: React.FC<
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
             toast.success(response.data.message);
+            navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
           } else {
             toast.error(response.data.message);
           }
-          navigate(
-            `${ROUTES_URL.EMAIL_TEMPLATE}`
-          );
-          // navigate(
-          //   `${ROUTES_URL.EMAIL_TEMPLATE}?message=${response.data.message}&status=${response.data.status}`
-          // );
+          // navigate(`${ROUTES_URL.EMAIL_TEMPLATE}`);
         }
-        // alert(response.data.message);
       })
-      .catch((error) => {
-        console.error(error.toString());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: createEmailTemplateCreate,
+          });
+          if (refreshTokenStatus) {
+            createEmailTemplateCreate(emailBody, resultJson);
+          }
+        }
       });
   };
 

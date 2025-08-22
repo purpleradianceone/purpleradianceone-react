@@ -3,6 +3,7 @@ const  REGEX= {
     MOBILE_NUMBER : /[0-9,_%+-]{10,15}$/,
     MOBILE_NUMBER_NEW : /^[6-9]\d{9}$/,
     OTP : /^\d+$/,
+    NAME_SPACE_DOT_ALLOWED_ONLY : /^[A-Za-z0-9. $]+$/
 }
 
 export default REGEX;

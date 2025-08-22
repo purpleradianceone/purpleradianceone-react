@@ -57,12 +57,19 @@ function EditCompanyUserModal({
     event.preventDefault();
 
     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-    if (updateUserformData.mobileNumber!.trim() !== "") {
+    if (updateUserformData.mobileNumber && updateUserformData.mobileNumber!.trim() !== "") {
       if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
         // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
         toast.error("Invalid mobile number");
         return;
       }
+    }
+    if (
+      updateUserformData.name.trim() !== "" &&
+      !REGEX.NAME_SPACE_DOT_ALLOWED_ONLY.test(updateUserformData.name)
+    ) {
+      toast.error(MESSAGE.ERROR.NAME_SPACE_AND_DOT_ERROR);
+      return;
     }
 
     if (
@@ -279,7 +286,7 @@ function EditCompanyUserModal({
                     htmlFor="isActive"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Status : 
+                    Status :
                   </label>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input

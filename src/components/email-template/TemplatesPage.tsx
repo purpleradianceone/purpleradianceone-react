@@ -333,7 +333,7 @@ export const TemplatesPage: React.FC = () => {
         />
       </div>
     );
-    
+
   return (
     <div
       className={`w-full pt-1 ${
@@ -692,8 +692,16 @@ const TemplateList: React.FC<TemplateListProps> = ({
             }
           }
         });
-    } catch (error) {
+    } catch (error: ApiError | any) {
       console.error("Failed to update default status:", error);
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: handleDefaultToggle,
+        });
+        if (refreshTokenResponse) {
+          handleDefaultToggle(template);
+        }
+      }
       toast.error("Failed to update default status.");
     } finally {
       // setUpdatingDefaultId(null);
@@ -890,14 +898,22 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
         }
         if (response.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
-            callFunctionWithTwoParamsNotEvent: fetchTypes,
+            callFunctionWithParamsNotEvent: fetchTypes,
           });
           if (refreshTokenResponse) {
             fetchTypes();
           }
         }
-      } catch (error) {
+      } catch (error: ApiError | any) {
         console.error("Error fetching template types for modal:", error);
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: fetchTypes,
+          });
+          if (refreshTokenStatus) {
+            fetchTypes();
+          }
+        }
       } finally {
         setLoading(false);
       }
