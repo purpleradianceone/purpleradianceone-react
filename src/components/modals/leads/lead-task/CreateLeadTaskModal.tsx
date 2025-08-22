@@ -14,10 +14,7 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import {
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
@@ -40,7 +37,7 @@ function CreateLeadTaskModal({
   leadActivity,
   leadId,
   handleLeadTaskCreate,
-  ownerId
+  ownerId,
 }: {
   isOpen: boolean;
   handleClose: () => void;
@@ -49,7 +46,7 @@ function CreateLeadTaskModal({
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
   handleLeadTaskCreate: () => void;
-  ownerId : number;
+  ownerId: number;
 }) {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -81,12 +78,6 @@ function CreateLeadTaskModal({
     useState<number[]>([]);
   const [leadContactDataSelectedArray, setLeadContactDataSelectedArray] =
     useState<LeadContactType[]>([]);
-
-      useEffect(() => {
-    console.log("_________________________________");
-    console.log(assignedTo);
-    console.log("_________________________________");
-  }, [assignedTo]);
 
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //   open: false,
@@ -260,7 +251,7 @@ function CreateLeadTaskModal({
           //   message: response.data.message,
           //   type: "success",
           // });
-          toast.success(response.data.message)
+          toast.success(response.data.message);
           handleLeadTaskCreate();
           setTimeout(() => {
             handleClose();
@@ -270,7 +261,7 @@ function CreateLeadTaskModal({
           //   message: response.data.message,
           //   type: "error",
           // });
-          toast.error(response.data.message)
+          toast.error(response.data.message);
         }
       })
       .catch(async (error) => {
@@ -304,7 +295,6 @@ function CreateLeadTaskModal({
             setSelectedCompanyUsers((prev) => [...prev, res]);
             // setAssignedTo(res.id);
           });
-          
         }
       })
       .catch(async (error) => {
@@ -376,7 +366,6 @@ function CreateLeadTaskModal({
                 } else {
                   setLeadTaskPriorityId(0);
                 }
-
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
