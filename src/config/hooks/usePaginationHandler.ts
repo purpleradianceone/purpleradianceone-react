@@ -22,11 +22,11 @@ interface UseSearchFilterPaginationDateHandlersResult {
 
 export const useSearchFilterPaginationDateHandlers = (
 ): UseSearchFilterPaginationDateHandlersResult => {
-  const {userPreference}=useUserPreference();
+  const { userPreference } = useUserPreference();
 
   // const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
   const firstValue = userPreference.rowsInGrid;
-  const [pageSize, setPageSize] = useState(firstValue);
+  const [pageSize, setPageSize] = useState(firstValue ?? 25);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Initialize totalPages
   const [startDate, setStartDate] = useState('');
@@ -36,21 +36,20 @@ export const useSearchFilterPaginationDateHandlers = (
   const [concatDate, setConcatDate] = useState('');
 
 
-  // useEffect(()=>{
-   
-  //  firstValue = userPreference.rowsInGrid 
-  // },[userPreference])
+  useEffect(() => {
+    setPageSize(firstValue)
+  }, [firstValue])
 
 
-    const formatDate = (date: Date): string => {
-      if (!date || date.toString() === STRING_VALUES.INVALID_DATE) return "";
-      const day = date.getDate().toString().padStart(2, "0");
-      const month = date.toLocaleString("en-US", { month: "long" });
-      const year = date.getFullYear();
-      return `${day}-${month}-${year}`;
-    };
+  const formatDate = (date: Date): string => {
+    if (!date || date.toString() === STRING_VALUES.INVALID_DATE) return "";
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
-    // Date formatting helpers
+  // Date formatting helpers
   const getDefaultStartDateOfYear = (): string => {
     const today = new Date();
     return `01-January-${today.getFullYear()}`;
@@ -126,7 +125,7 @@ export const useSearchFilterPaginationDateHandlers = (
         const todayDate = new Date();
         const date10DaysAgo = new Date(todayDate);
 
-        date10DaysAgo.setDate(todayDate.getDate() -10);
+        date10DaysAgo.setDate(todayDate.getDate() - 10);
         setConcatDate(`${formatDate(date10DaysAgo)}@${formatDate(new Date())}`);
         setDateRangeId(8);
       } else {

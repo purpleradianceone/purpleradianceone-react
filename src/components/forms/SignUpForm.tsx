@@ -76,6 +76,10 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if(errors.email !=="" || errors.password !== ""  || errors.confirmPassword !== "" || errors.name !== "" ){
+      alert()
+      return ;
+    }
     const mobileRegex = REGEX.MOBILE_NUMBER;
     if (SignUpFormData.mobileNumber!.trim() !== "") {
       if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
@@ -83,6 +87,7 @@ function SignUpForm() {
         return;
       }
     }
+    
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),

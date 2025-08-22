@@ -10,7 +10,7 @@ import FormCheckboxProps from "../../@types/ui/FormCheckboxProps";
  * @param onChange event handler for change event
  * @returns JSX.Element of Input type checkbox
  */
-function FormCheckbox({ label, name,onChange }: FormCheckboxProps){
+function FormCheckbox({ label, name,onChange,checked }: FormCheckboxProps){
   return (
     <div className="flex items-center">
       <input
@@ -19,6 +19,7 @@ function FormCheckbox({ label, name,onChange }: FormCheckboxProps){
         type="checkbox"
         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
         onChange={onChange}
+        checked={checked}
       />
       <label htmlFor={name} className="ml-2 block text-sm text-gray-900">
         {label}

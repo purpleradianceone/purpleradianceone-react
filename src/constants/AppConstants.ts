@@ -44,6 +44,7 @@ export const STATUS_CODE = {
     UNATHORISED : 401,
     FORBIDDEN : 403,
     PERMANENT_REDIRECT : 308,
+    ACCEPTED : 202,
 
 }
 export const JSX_CHILDREN_NAME = {

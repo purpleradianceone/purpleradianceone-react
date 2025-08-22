@@ -23,7 +23,12 @@ const DownloadAppPage = () => {
   const isLoggedIn = storedLoginStatus ? JSON.parse(storedLoginStatus) : false;
 
   if(isLoggedIn){
-    localStorage.clear();
+    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS)
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT)
   }
 
   return (

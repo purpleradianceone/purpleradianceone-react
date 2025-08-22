@@ -51,9 +51,6 @@ function TeamManagement() {
   const fetchCompanyTeam = async () => {
     const offset = (currentPage - 1) * pageSize;
     if (userHasAccessToViewTeamManagement) {
-      setTimeout(() => {
-        setCompanyTeamList([]);
-      }, 100);
 
       const getCompanyTeamPostData = {
         company_id: loginStatus.companyId,
