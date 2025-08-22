@@ -14,10 +14,11 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import ApiError from "../../../@types/error/ApiError";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import LOCALSTORAGE_KEYS from "../../../constants/LocalStorage";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -65,24 +66,24 @@ function EditSubscriptionUsersModal({
 
   const companyUserSearchParameterRef = useRef<string>("");
 
-
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //     open: false,
   //     message: "",
   //     type: "success",
   //   });
-  
+
   //   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
   //     setMessageSnackbar({ open: true, message, type });
   //   };
-  
+
   //   const handleMessageSnackbarClose = () => {
   //     setMessageSnackbar((prev) => ({ ...prev, open: false }));
   //   };
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
-   
-    if (isCompanyUsersLoading ||(!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
+    if (
+      isCompanyUsersLoading ||
+      (!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
       companyUsersFetchingRef.current
     )
       return;
@@ -174,9 +175,11 @@ function EditSubscriptionUsersModal({
         }
       }
     } catch (error: ApiError | any) {
-      if(error.status === STATUS_CODE.UNATHORISED){
-        const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent :fetchCompanyUsers});
-        if(refreshTokenResponse){
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchCompanyUsers,
+        });
+        if (refreshTokenResponse) {
           fetchCompanyUsers(comapnyUserSearchParameter);
         }
       }
@@ -244,17 +247,17 @@ function EditSubscriptionUsersModal({
     }
   };
 
-  const handleCompanyUserToggleChange =(message :string, status : boolean)=>{
+  const handleCompanyUserToggleChange = (message: string, status: boolean) => {
     // showMessageSnackbar({
     //   message: message,
     //   type : status ? 'success' : 'error',
     // })
-    if(status) {
-      toast.success(message)
-    }else{
-      toast.error(message)
+    if (status) {
+      toast.success(message);
+    } else {
+      toast.error(message);
     }
-  }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -329,7 +332,20 @@ function EditSubscriptionUsersModal({
                     loginStatus.activeUsersInCompany >=
                     statusChangeOfCompanyUserCountFromAggrid
                   ) {
-                    localStorage.clear();
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS
+                    );
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT
+                    );
                     onRedirectToLoginPage();
                     navigate(ROUTES_URL.SIGN_IN);
                   } else {

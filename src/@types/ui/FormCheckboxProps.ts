@@ -6,6 +6,7 @@ type FormCheckboxProps = {
     label: string;
     name: string;
     onChange : (event : React.ChangeEvent<HTMLInputElement>) => void;
+    checked? : boolean;
 }
 
 /**

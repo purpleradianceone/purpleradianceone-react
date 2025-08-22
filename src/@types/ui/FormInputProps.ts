@@ -36,6 +36,7 @@ type FormInputProps = {
     selectOnBlur? : (event : React.FocusEvent<HTMLSelectElement> ) => void;
     countries? : Country[];
     useCountry? : boolean;
+    autoComplete? : React.HTMLInputAutoCompleteAttribute;
   }
 
   /**

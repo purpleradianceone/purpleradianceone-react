@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
@@ -14,7 +13,7 @@ import { useAccessManagementContext } from "../../context/user/AccessManagementC
 import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
-
+import CryptoJS from "crypto-js";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
@@ -35,11 +34,11 @@ function SignInForm() {
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
-    const { setNotificationCount } =
-      useNotificationCountContext();
+  const { setNotificationCount } = useNotificationCountContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const initialSignInFormState: SignInFormDataType = {
     email: "",
@@ -51,11 +50,22 @@ function SignInForm() {
   const {
     formData: loginUserCredentials,
     handleChange: handleSignInFormDatachange,
+    setFormData: setInitialSignInFormState,
   } = useFormChange(initialSignInFormState);
   const { errors, handleBlur } = useFormValidation(
     loginUserCredentials,
     "registered"
   );
+
+  const secretKey = "S7qXRmjdLZhGv3Kunc1tlBbZiFkymrIt";
+  const encryptData = (data: string) => {
+    return CryptoJS.AES.encrypt(data, secretKey).toString();
+  };
+
+  const decryptData = (encryptedData: string) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
 
   //NOTE : NEED TO HANDLE THIS FUNCTIONALITY
   const [showSubscriptionOrInActivePopUp, setShowSubscriptionOrInActivePopUp] =
@@ -87,26 +97,26 @@ function SignInForm() {
 
   const resetLoginStatus = () => {
     setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isSuperUser:false,
-            isActiveSubscription: false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
-          });
-          setNotificationCount(0);
-  }
+      companyId: 0,
+      companyName: "",
+      createdOn: "",
+      email: "",
+      fullName: "",
+      id: 0,
+      message: "",
+      mobileNumber: "",
+      status: false,
+      token: "",
+      isSuperUser: false,
+      isActiveSubscription: false,
+      subscriptionAllowedUsers: 0,
+      activeUsersInCompany: 0,
+      subscriptionId: 0,
+      startDateSubscription: "",
+      endDateSubscription: "",
+    });
+    setNotificationCount(0);
+  };
 
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -117,7 +127,7 @@ function SignInForm() {
         //   message: MESSAGE.ERROR.EMAIL_REQUIRED,
         //   type: "error",
         // });
-        toast.error( MESSAGE.ERROR.EMAIL_REQUIRED);
+        toast.error(MESSAGE.ERROR.EMAIL_REQUIRED);
         return;
       }
       if (!loginUserCredentials.password) {
@@ -152,6 +162,15 @@ function SignInForm() {
     axios
       .post(POST_API.SIGN_IN, user, { withCredentials: true })
       .then((response) => {
+        if (response.status === STATUS_CODE.ACCEPTED) {
+          toast.error(response.data.message);
+          recaptchaRef.current!.reset();
+          setSpinnerAnimation({
+            status: "idle",
+            message: "",
+          });
+          return;
+        }
         if (response.data.status) {
           loginStatusRef.current = response.data;
           setLoginStatus({
@@ -165,7 +184,7 @@ function SignInForm() {
             token: response.data.token,
             status: response.data.status,
             createdOn: response.data.createdon,
-            isSuperUser:response.data.is_super_user,
+            isSuperUser: response.data.is_super_user,
             isActiveSubscription: response.data.isactive_subscription,
             subscriptionAllowedUsers: response.data.subscription_allowed_users,
             activeUsersInCompany: response.data.active_users_in_company,
@@ -176,14 +195,13 @@ function SignInForm() {
 
           // note: is status false , then it will navigate to create subscription page
           if (!response.data.isactive_subscription) {
-            
             setTimeout(() => {
               // showMessageSnackbar({
               //   message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
               //   type: "error",
               // });
               toast.error(MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR);
-              
+
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
             }, 1500);
             return; // ⬅️ Stops further execution
@@ -216,11 +234,10 @@ function SignInForm() {
                 loginStatusRef.current.subscription_allowed_users
               ) {
                 setShowSubscriptionOrInActivePopUp(true);
-                
+
                 return;
               }
               if (!loginStatusRef.current.isactive_subscription) {
-                
                 navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
                 return;
               } else if (
@@ -276,7 +293,7 @@ function SignInForm() {
           //   message: response.data.message,
           //   type: "error",
           // });
-          toast.error(response.data.message)
+          toast.error(response.data.message);
           setSpinnerAnimation({
             status: "idle",
             message: "",
@@ -289,7 +306,7 @@ function SignInForm() {
         //   message: error.response.data.message,
         //   type: "error",
         // });
-        toast.error(error.response.data.message)
+        toast.error(error.response.data.message);
         setSpinnerAnimation({
           status: "idle",
           message: "",
@@ -301,7 +318,32 @@ function SignInForm() {
   useEffect(() => {
     resetLoginStatus();
     setAccessModules([]);
-    localStorage.clear();
+    const remember = localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
+    if (remember === "true") {
+      setRememberMe(true);
+      const storedEmail = localStorage.getItem(
+        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS
+      );
+      const storedPass = localStorage.getItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
+      if (storedEmail) {
+        setInitialSignInFormState((prev) => ({
+          ...prev,
+          email: storedEmail
+        }));
+      }
+      if(storedPass){
+        setInitialSignInFormState((prev) => ({
+            ...prev,
+            password: decryptData(storedPass),
+          }))
+      }
+    }
+    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
   }, []);
 
   useEffect(() => {
@@ -324,8 +366,17 @@ function SignInForm() {
   ) => {
     if (event.target.checked) {
       localStorage.setItem(LOCALSTORAGE_KEYS.REMEMBER_ME, STRING_VALUES.TRUE);
+      setRememberMe(true);
+      localStorage.setItem(
+        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
+        loginUserCredentials.email
+      );
+      localStorage.setItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,encryptData(loginUserCredentials.password));
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
+      setRememberMe(false);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
     }
   };
 
@@ -340,7 +391,18 @@ function SignInForm() {
             required={true}
             placeholder="Enter your email"
             value={loginUserCredentials.email}
-            onChange={handleSignInFormDatachange}
+            defaultValue={loginUserCredentials.email}
+            onChange={(e) => {
+              if (rememberMe) {
+                localStorage.setItem(
+                  LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
+                  e.target.value
+                );
+              } else {
+                localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS);
+              }
+              handleSignInFormDatachange(e);
+            }}
             onBlur={handleBlur}
             error={errors.email}
           />
@@ -351,7 +413,18 @@ function SignInForm() {
             required={true}
             placeholder="Enter your password"
             value={loginUserCredentials.password}
-            onChange={handleSignInFormDatachange}
+            defaultValue={loginUserCredentials.password}
+            onChange={(e) => {
+              if (rememberMe) {
+                localStorage.setItem(
+                  LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
+                  encryptData(e.target.value)
+                );
+              } else {
+                localStorage.removeItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
+              }
+              handleSignInFormDatachange(e);
+            }}
             onBlur={handleBlur}
             error={errors.password}
             rightElement={
@@ -367,6 +440,7 @@ function SignInForm() {
               label="Remember me"
               name="remember"
               onChange={handleRememberMeCheckBoxChange}
+              checked={rememberMe}
             />
             <button
               type="button"
@@ -408,26 +482,31 @@ function SignInForm() {
           message="Get the Subscription / Inactive Some users."
           onClose={() => {
             setShowSubscriptionOrInActivePopUp(false);
-            localStorage.clear();
+            localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
             setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isActiveSubscription: false,
-            isSuperUser:false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
-          });
+              companyId: 0,
+              companyName: "",
+              createdOn: "",
+              email: "",
+              fullName: "",
+              id: 0,
+              message: "",
+              mobileNumber: "",
+              status: false,
+              token: "",
+              isActiveSubscription: false,
+              isSuperUser: false,
+              subscriptionAllowedUsers: 0,
+              activeUsersInCompany: 0,
+              subscriptionId: 0,
+              startDateSubscription: "",
+              endDateSubscription: "",
+            });
             navigate(ROUTES_URL.SIGN_IN);
             setSpinnerAnimation({
               status: "idle",

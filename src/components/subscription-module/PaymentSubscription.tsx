@@ -19,6 +19,7 @@ import PaymentSuccess from "../../assets/animations/PaymentSuccessfull";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 
 declare global {
   interface Window {
@@ -80,8 +81,7 @@ export default function PaymentSubscription({
       name: SUBSCRIPTION.COMPANY_NAME,
       description: "Subscription Payment",
       order_id: orderId, // Order ID from backend
-      handler: async function(response: any) {
-       
+      handler: async function (response: any) {
         if (response.razorpay_payment_id !== null) {
           setIsPaymentSuccessfull(true);
           const createSubscriptionPostData = {
@@ -94,7 +94,6 @@ export default function PaymentSubscription({
             createdby: loginStatus.id,
           };
 
-          
           const updateSubscriptionPostData = {
             company_id: loginStatus.companyId,
             subscription_id: subscriptionId!,
@@ -105,7 +104,7 @@ export default function PaymentSubscription({
             updatedby: loginStatus.id,
           };
 
-         await axios
+          await axios
             .post(
               isSubscriptionForUpdate
                 ? POST_API.UPDATE_EXISTING_SUBSCRIPTION
@@ -128,9 +127,21 @@ export default function PaymentSubscription({
 
                 if (isSubscrptionFromLoginPage) {
                   setTimeout(() => {
-                    localStorage.clear();
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS
+                    );
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT
+                    );
                     navigate(ROUTES_URL.SIGN_IN);
-                    
                   }, 3000); //animation Time
                 } else {
                   setTimeout(() => {
@@ -139,18 +150,29 @@ export default function PaymentSubscription({
                     handleSubscriptionListChange();
                   }, 2000);
                 }
-              }
-              else{
+              } else {
                 //   showMessageSnackbar({
                 //   message: "Error creating subscription.",
                 //   type: "error",
                 // });
-                toast.error(response.data.message)
+                toast.error(response.data.message);
                 if (isSubscrptionFromLoginPage) {
                   setTimeout(() => {
-                    localStorage.clear();
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS
+                    );
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT
+                    );
                     navigate(ROUTES_URL.SIGN_IN);
-                    
                   }, 3000);
                 } else {
                   setTimeout(() => {
@@ -160,10 +182,13 @@ export default function PaymentSubscription({
                   }, 2000);
                 }
               }
-            }).catch(async(error : ApiError | any) => {
-              if(error.status === STATUS_CODE.UNATHORISED){
-                const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent : options.handler})
-                if(refreshTokenResponse){
+            })
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenResponse = await RefreshToken({
+                  callFunctionWithParamsNotEvent: options.handler,
+                });
+                if (refreshTokenResponse) {
                   options.handler(response);
                 }
               }
@@ -195,44 +220,60 @@ export default function PaymentSubscription({
       //             message: "payment Falied . If money debited from your account please contact us.",
       //             type: "success",
       //           });
-                toast.error("Payment Falied . If money debited from your account Pease contact Support Team.")
+      toast.error(
+        "Payment Falied . If money debited from your account Pease contact Support Team."
+      );
 
-                if (isSubscrptionFromLoginPage) {
-                  setTimeout(() => {
-                    localStorage.clear();
-                    navigate(ROUTES_URL.SIGN_IN);
-                    
-                  }, 3000);
-                } else {
-                  setTimeout(() => {
-                    onClose();
-                    setIsPaymentSuccessfull(false);
-                    handleSubscriptionListChange();
-                  }, 2000);
-                }
+      if (isSubscrptionFromLoginPage) {
+        setTimeout(() => {
+          localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+          localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+          localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+          localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+          localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+          localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
+          navigate(ROUTES_URL.SIGN_IN);
+        }, 3000);
+      } else {
+        setTimeout(() => {
+          onClose();
+          setIsPaymentSuccessfull(false);
+          handleSubscriptionListChange();
+        }, 2000);
+      }
     });
-
 
     razorpayInstance.open();
   };
 
-  const handlePaymentProceed = async(event : React.FormEvent<HTMLButtonElement>) => {
+  const handlePaymentProceed = async (
+    event: React.FormEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
-    await axios.post(POST_API.CHECK_USER_IS_VALID,{},{
-      withCredentials : true
-    }).then((response) => {
-      if(response.status === STATUS_CODE.OK){
-        handlePayment();
-      }
-    }).catch(async(error : ApiError | any) => {
-      if(error.status === STATUS_CODE.UNATHORISED){
-          const refreshTokenStatus = await RefreshToken({callFunctionWithEvent : handlePaymentProceed})
-          if(refreshTokenStatus){
+    await axios
+      .post(
+        POST_API.CHECK_USER_IS_VALID,
+        {},
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          handlePayment();
+        }
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: handlePaymentProceed,
+          });
+          if (refreshTokenStatus) {
             handlePaymentProceed(event);
           }
-      }
-    })
-  }
+        }
+      });
+  };
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
@@ -317,6 +358,4 @@ export default function PaymentSubscription({
     </div>,
     document.body
   );
-
-  
 }
