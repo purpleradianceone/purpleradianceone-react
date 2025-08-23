@@ -95,7 +95,7 @@ function GetCompanyUsersList({
   return (
     userHasAccessToViewUser && (
       <div
-        className={`w-full h-screen pt-1  ${
+        className={`w-full  pt-1  ${
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
@@ -364,8 +364,8 @@ function GetCompanyUsersList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "80%", width: "100%" }}
+            className="ag-theme-alpine w-full h-[calc(100vh-130px)]"
+            // style={{ height: "80%", width: "100%" }}
           >
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
