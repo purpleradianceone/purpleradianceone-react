@@ -301,7 +301,8 @@ function TeamManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className= {`ag-theme-alpine w-full h-[calc(100vh-${userPreference.isLeftMenu ? "120px" : "128px"})]`}
+            
+            className= {userPreference.isLeftMenu ? `ag-theme-alpine w-full h-[calc(100vh-120px)]` : "ag-theme-alpine w-full h-[calc(100vh-128px)]"}
             // style={{ height: "90vh", width: "100%" }}
           >
             <TeamManagementAgGrid
