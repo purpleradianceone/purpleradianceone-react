@@ -58,7 +58,12 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
             ...prev,
             password:MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
           }));
-        } else {
+        } else if (formType === STRING_VALUES.REGISTRATION && formData.confirmPassword !== null && formData.confirmPassword !=="" && value !== formData.confirmPassword) {
+            setErrors((prev) => ({
+              ...prev,
+              password: "Passwords adas do not match.",
+            }));
+          } else {
           setErrors((prev) => ({ ...prev, password: "" }));
         }
         break;

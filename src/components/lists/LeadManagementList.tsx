@@ -432,10 +432,10 @@ function LeadManagementList({
           </div>
         </div>
 
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "90vh", width: "100%" }}
+            className="ag-theme-alpine w-full h-[calc(100vh-125px)]"
+            // style={{ height: "", width: "100%" }}
           >
             <LeadManagementAgGrid
               handleRowClick={handleRowClickedForShowLead}
