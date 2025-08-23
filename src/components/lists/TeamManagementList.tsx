@@ -64,7 +64,7 @@ function TeamManagementList({
       }
 
     return (
-        <div className={`w-full pt-1 ${userPreference.isLeftMenu? "pl-5" : "pl-1"} pr-1 gap-1`}>
+        <div className={`w-full  ${userPreference.isLeftMenu? "pl-5" : "pl-1"} pr-1 gap-1`}>
         <div className="sticky z-10 top-9 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Network className="w-6 h-6 text-blue-600" />}
@@ -301,8 +301,8 @@ function TeamManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "90vh", width: "100%" }}
+            className= {`ag-theme-alpine w-full h-[calc(100vh-${userPreference.isLeftMenu ? "120px" : "128px"})]`}
+            // style={{ height: "90vh", width: "100%" }}
           >
             <TeamManagementAgGrid
             companyTeamList={companyTeamList}

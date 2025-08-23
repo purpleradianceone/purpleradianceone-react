@@ -31,6 +31,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { usePanel } from "../../context/panel/usePanel";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import { useUserPreference } from "../../context/user/UserPreference";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -48,6 +49,7 @@ function LeadManagementList({
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
+  const {userPreference} = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
@@ -434,7 +436,7 @@ function LeadManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
           <div
-            className="ag-theme-alpine w-full h-[calc(100vh-125px)]"
+            className={`ag-theme-alpine w-full h-[calc(100vh-${userPreference.isLeftMenu ? "125px" : "135px"})]`}
             // style={{ height: "", width: "100%" }}
           >
             <LeadManagementAgGrid
