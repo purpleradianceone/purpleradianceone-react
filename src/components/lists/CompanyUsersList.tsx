@@ -364,8 +364,7 @@ function GetCompanyUsersList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full h-[calc(100vh-130px)]"
-            // style={{ height: "80%", width: "100%" }}
+            className={`ag-theme-alpine w-full h-[calc(100vh-${userPreference.isLeftMenu ? "130px" : "135px"})]`}
           >
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}

@@ -23,6 +23,7 @@ import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompan
 import { useState } from "react";
 import CreateSubscription from "../subscription-module/CreateSubscription";
 import UpdateSubscription from "../subscription-module/UpdateSubscription";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 function SubscriptionManagementList({
   subscriptionList,
@@ -39,6 +40,7 @@ function SubscriptionManagementList({
   onEndDateChange: (date: Date) => void;
   handleSubscriptionListChange: ()=>void;
 }) {
+  const {userPreference} = useUserPreference();
   const [isAddSubscriptionModalOpen, setIsAddSubscriptionModalOpen] =
     useState(false);
 
@@ -77,7 +79,8 @@ function SubscriptionManagementList({
 
   return (
     userHasAccessToViewSubscription && (
-      <div className="w-full pt-1 pl-5 pr-1 gap-1">
+      <div className={`w-full ${userPreference.isLeftMenu ? "pl-5" : "pl-1"
+      }   pr-1 gap-1`}>
         <div className="sticky z-10 top-9 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <CreditCard className="w-6 h-6 text-blue-600" />}
@@ -344,8 +347,7 @@ function SubscriptionManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "100%", width: "100%" }}
+            className={`ag-theme-alpine w-full h-[calc(100vh-${userPreference.rowsInGrid ? "125px" : "125px"})]`}
           >
             <SubscriptionListAggrid
               handleSelectedSubscription={handleSelectedSubscription}
