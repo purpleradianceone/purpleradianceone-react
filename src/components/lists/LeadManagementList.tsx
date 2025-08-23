@@ -14,7 +14,7 @@ import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CreateLeadModal from "../modals/leads/CreateLeadModal";
-import { useState } from "react";
+import {  useState } from "react";
 import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -436,8 +436,9 @@ function LeadManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
           <div
-            className={`ag-theme-alpine w-full h-[calc(100vh-${userPreference.isLeftMenu ? "125px" : "135px"})]`}
-            // style={{ height: "", width: "100%" }}
+            // className={`ag-theme-alpine w-full h-[calc(100vh-${isLeftMenu ? "125px" : "135px"})]`}
+                        className= {userPreference.isLeftMenu ? `ag-theme-alpine w-full h-[calc(100vh-125px)]` : "ag-theme-alpine w-full h-[calc(100vh-135px)]"}
+
           >
             <LeadManagementAgGrid
               handleRowClick={handleRowClickedForShowLead}

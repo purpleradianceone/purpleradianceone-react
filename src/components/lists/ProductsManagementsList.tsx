@@ -92,6 +92,8 @@ function ProductsManagementList({
     setIsCompanyProductTeamModalOpen(status);
   }
 
+    
+
   if (userHasAccessToViewProduct) {
     return (
       <div className={`w-full  ${userPreference.isLeftMenu ? "pl-5" : "pl-1"} pr-1 gap-1`}>
@@ -361,7 +363,7 @@ function ProductsManagementList({
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className={`ag-theme-alpine w-full  h-[calc(100vh-${userPreference.isLeftMenu ? "118px"  : "125px"})]`}
+                      className= {userPreference.isLeftMenu ? `ag-theme-alpine w-full h-[calc(100vh-118px)]` : "ag-theme-alpine w-full h-[calc(100vh-125px)]"}
           >
             <ProductsManagementGrid 
             products={products}
