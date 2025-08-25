@@ -159,6 +159,6 @@ export const SectionBlock: React.FC = () => {
   props: {
     background: "#f7f7f7",
     padding: "20px",
-    align: "left",
+    align: "center",
   },
 };
