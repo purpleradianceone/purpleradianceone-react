@@ -31,6 +31,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { usePanel } from "../../context/panel/usePanel";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import { useUserPreference } from "../../context/user/UserPreference";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -48,6 +49,7 @@ function LeadManagementList({
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
+  const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
@@ -208,46 +210,49 @@ function LeadManagementList({
                   <div className="grid ">
                     {selectedLeadOwner.id === 0 && (
                       <Button
-                      type="button"
-                      onClick={handleCompanyUserPopUp}
-                      className="flex items-center gap-2 h-7 px-2 py-1 text-xs border border-gray-300 
+                        type="button"
+                        onClick={handleCompanyUserPopUp}
+                        className="flex items-center gap-2 h-7 px-2 py-1 text-xs border border-gray-300 
                       rounded-md bg-white text-gray-700 hover:bg-gray-50 
                       focus:outline-none shadow-sm"
                       >
-                      <span>Owner</span>
-                      <User size={14} />
-                    </Button>
+                        <span>Owner</span>
+                        <User size={14} />
+                      </Button>
                     )}
 
                     {selectedLeadOwner.id !== 0 && (
                       <div className="border rounded-md border-gray-400 p-0.5">
-                       <span className=" flex text-xs items-center gap-1 bg-white text-gray-600"> <User size={11} />Selected Owner:</span>
-                      <div
-                      title={selectedLeadOwner.fullname}
-                        className={
-                          selectedLeadOwner.id === 0
-                          ? "bg-transparent"
-                          : "relative rounded flex items-center justify-between gap-x-0.5 bg-blue-600 text-white  text-xs p-0.5 "
-                        }
-                        >
-                       
-                        <span>
-                          {selectedLeadOwner.fullname.length > 14
-                            ? selectedLeadOwner.fullname.slice(0, 14) + "..."
-                            : selectedLeadOwner.fullname}
+                        <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
+                          {" "}
+                          <User size={11} />
+                          Selected Owner:
                         </span>
+                        <div
+                          title={selectedLeadOwner.fullname}
+                          className={
+                            selectedLeadOwner.id === 0
+                              ? "bg-transparent"
+                              : "relative rounded flex items-center justify-between gap-x-0.5 bg-blue-600 text-white  text-xs p-0.5 "
+                          }
+                        >
+                          <span>
+                            {selectedLeadOwner.fullname.length > 14
+                              ? selectedLeadOwner.fullname.slice(0, 14) + "..."
+                              : selectedLeadOwner.fullname}
+                          </span>
 
-                        <button
-                        title="Select another owner to view assigned leads"
-                          onClick={() => {
-                            handleSelectedCompanyUserCheckBoxChange(null);
-                          }}
-                          className="border-transparent  float-end"
+                          <button
+                            title="Select another owner to view assigned leads"
+                            onClick={() => {
+                              handleSelectedCompanyUserCheckBoxChange(null);
+                            }}
+                            className="border-transparent  float-end"
                           >
-                          <X size={14} className="self-center"></X>
-                        </button>
+                            <X size={14} className="self-center"></X>
+                          </button>
+                        </div>
                       </div>
-                          </div>
                     )}
                   </div>
                 </div>
@@ -432,10 +437,13 @@ function LeadManagementList({
           </div>
         </div>
 
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "90vh", width: "100%" }}
+            className={
+              userPreference.isLeftMenu
+                ? `ag-theme-alpine w-full h-[calc(100vh-120px)]`
+                : "ag-theme-alpine w-full h-[calc(100vh-128px)]"
+            }
           >
             <LeadManagementAgGrid
               handleRowClick={handleRowClickedForShowLead}

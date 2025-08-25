@@ -33,16 +33,16 @@ function Pagination({
   const sizeArray=rowsInGridDropdownOptions
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <label htmlFor="pageSize" className="text-sm">Page Size</label>
+      <label htmlFor="pageSize" className="text-xs">Page Size</label>
       <select
         id="pageSize"
         value={pageSize}
         onChange={handlePageSizeChange}
         style={{
-          padding: "3px 6px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "4px",
-          fontSize: "0.85rem",
+          fontSize: "0.80rem",
         }}
       >
         {sizeArray.map((data) => (
@@ -55,7 +55,7 @@ function Pagination({
         onClick={handlePreviousPage}
         disabled={currentPage === 1}
         style={{
-          padding: "2px 2px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "6px",
           backgroundColor: currentPage === 1 ? COLORS.WHITE_SMOKE : COLORS.WHITE,
@@ -63,12 +63,13 @@ function Pagination({
           fontSize: "0.85rem",
         }}
       >
-        <ChevronLeft />
+        <ChevronLeft size={20} />
       </button>
       <span style={{ fontSize: "0.85rem" }}>
         Page{" "}
         <input
           type="number"
+          disabled
           value={currentPage}
           onChange={(e) => {
             onPageChange(Number(e.target.value));
@@ -76,7 +77,7 @@ function Pagination({
           style={{
             width: "40px",
             textAlign: "center",
-            padding: "3px",
+            padding: "1px",
             border: "1px solid #ccc",
             borderRadius: "4px",
             fontSize: "0.85rem",
@@ -88,7 +89,7 @@ function Pagination({
         onClick={handleNextPage}
         disabled={currentPage === totalPages}
         style={{
-          padding: "2px 2px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "6px",
           backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE : COLORS.WHITE,
@@ -96,7 +97,7 @@ function Pagination({
           fontSize: "0.85rem",
         }}
       >
-        <ChevronRight />
+        <ChevronRight size={20}/>
       </button>
     </div>
   );

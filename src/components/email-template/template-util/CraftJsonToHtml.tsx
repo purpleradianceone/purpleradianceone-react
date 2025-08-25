@@ -63,7 +63,10 @@ function renderNode(data: CraftData, nodeId: string): string {
 
   // ✅ Special handling for ROOT
   if (nodeId === "ROOT") {
-    return `<div id="ROOT">${renderChildren(node.nodes)}${renderLinkedNodes(
+    return `<div id="ROOT" style="max-width:600px;margin:0 auto;background-color:#f7f7f7;
+            border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);
+            font-family:Arial, sans-serif;font-size:14px;line-height:20px;
+            color:#000000;overflow:hidden;">${renderChildren(node.nodes)}${renderLinkedNodes(
       node.linkedNodes
     )}</div>`;
   }
@@ -195,7 +198,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
       textAlign: align,
       width: "100%",
       boxSizing: "border-box",
-      margin: "10px 0",
+      margin: "0px 0px 0px 0px", //if you want space between two section block then change the first 0 value
       ...node.props.style,
     });
 
@@ -203,7 +206,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
       (node.nodes ? renderChildren(node.nodes) : "") +
       (node.linkedNodes ? renderLinkedNodes(node.linkedNodes) : "");
 
-    return `<section style="${style}">${content}</section>`;
+    return `<div style="${style}">${content}</div>`;
   },
   // SectionBlock: ({ node, renderChildren, renderLinkedNodes }) => {
   //   const style = formatStyle({
@@ -229,7 +232,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
       width = node.props.width,
       color = "#ccc",
       thickness = 1,
-      margin = "10px 0",
+      margin = "0px 0px 0px 0px", //for giving margins
     } = node.props;
 
     const style = formatStyle({

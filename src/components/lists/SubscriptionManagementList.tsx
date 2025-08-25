@@ -20,9 +20,10 @@ import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOpti
 import Button from "../ui/Button";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import { useState } from "react";
+import {  useState } from "react";
 import CreateSubscription from "../subscription-module/CreateSubscription";
 import UpdateSubscription from "../subscription-module/UpdateSubscription";
+import { useUserPreference } from "../../context/user/UserPreference";
 
 function SubscriptionManagementList({
   subscriptionList,
@@ -30,15 +31,16 @@ function SubscriptionManagementList({
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
-  handleSubscriptionListChange
+  handleSubscriptionListChange,
 }: {
   subscriptionList: SubscriptionListProps[];
   paginationData: PaginationDataProps;
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  handleSubscriptionListChange: ()=>void;
+  handleSubscriptionListChange: () => void;
 }) {
+  const { userPreference } = useUserPreference();
   const [isAddSubscriptionModalOpen, setIsAddSubscriptionModalOpen] =
     useState(false);
 
@@ -66,7 +68,7 @@ function SubscriptionManagementList({
       isActive: false,
       startDate: "",
       totalCost: 0,
-      subscriptionStatus : ""
+      subscriptionStatus: "",
     });
   const handleUpdateSubscriptionModalOpen = (status: boolean) => {
     setIsUpdateSubscriptionModalOpen(status);
@@ -74,10 +76,13 @@ function SubscriptionManagementList({
   const handleSelectedSubscription = (params: SubscriptionListProps) => {
     setSelectedSubscription(params);
   };
-
   return (
     userHasAccessToViewSubscription && (
-      <div className="w-full pt-1 pl-5 pr-1 gap-1">
+      <div
+        className={`w-full ${
+          userPreference.isLeftMenu ? "pl-5" : "pl-1"
+        }   pr-1 gap-1`}
+      >
         <div className="sticky z-10 top-9 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <CreditCard className="w-6 h-6 text-blue-600" />}
@@ -304,13 +309,15 @@ function SubscriptionManagementList({
                         <X size={SIZE.TWENTY} />
                       </button>
                     </div>
-                    <CreateSubscription 
-                    handleSubscriptionListChange={handleSubscriptionListChange}
-                    isSubscrptionFromLoginPage={false}
-                    isOpen={isAddSubscriptionModalOpen}
-                    onClose={()=>{
-                      setIsAddSubscriptionModalOpen(false);
-                    }}
+                    <CreateSubscription
+                      handleSubscriptionListChange={
+                        handleSubscriptionListChange
+                      }
+                      isSubscrptionFromLoginPage={false}
+                      isOpen={isAddSubscriptionModalOpen}
+                      onClose={() => {
+                        setIsAddSubscriptionModalOpen(false);
+                      }}
                     />
                   </div>
                 </div>
@@ -344,8 +351,11 @@ function SubscriptionManagementList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "100%", width: "100%" }}
+            className={
+              userPreference.isLeftMenu
+                ? `ag-theme-alpine w-full h-[calc(100vh-118px)]`
+                : "ag-theme-alpine w-full h-[calc(100vh-126px)]"
+            }
           >
             <SubscriptionListAggrid
               handleSelectedSubscription={handleSelectedSubscription}
@@ -369,14 +379,14 @@ function SubscriptionManagementList({
 
         {/* NOTE : This is the modal for UPDATING CREATED SUBSCRIPTION */}
         {isUpdateSubscriptionModalOpen && (
-          <UpdateSubscription 
-          handleSubscriptionListChange={handleSubscriptionListChange}
-          subscriptionId={selectedSubscription.id}
+          <UpdateSubscription
+            handleSubscriptionListChange={handleSubscriptionListChange}
+            subscriptionId={selectedSubscription.id}
             existingUserCount={selectedSubscription.allowedUserCount}
             startDate={selectedSubscription.startDate}
             endDate={selectedSubscription.endDate}
             isOpen={isUpdateSubscriptionModalOpen}
-            onClose={()=>{
+            onClose={() => {
               setIsUpdateSubscriptionModalOpen(false);
             }}
           />

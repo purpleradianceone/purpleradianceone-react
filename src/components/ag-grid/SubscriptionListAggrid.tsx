@@ -301,7 +301,7 @@ function SubscriptionListAggrid({
     <>
       <div
         className="ag-theme-alpine w-full"
-        style={{ height: 505, width: "100%" }}
+        style={{ height: "100%", width: "100%" }}
       >
         <AgGridReact
           rowData={subscriptionList}
