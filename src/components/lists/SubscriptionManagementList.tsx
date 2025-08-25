@@ -353,8 +353,8 @@ function SubscriptionManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-alpine w-full h-[calc(100vh-125px)]`
-                : "ag-theme-alpine w-full h-[calc(100vh-125px)]"
+                ? `ag-theme-alpine w-full h-[calc(100vh-118px)]`
+                : "ag-theme-alpine w-full h-[calc(100vh-126px)]"
             }
           >
             <SubscriptionListAggrid

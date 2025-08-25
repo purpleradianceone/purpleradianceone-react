@@ -99,7 +99,6 @@ function GetCompanyUsersList({
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
-
         <div className="sticky z-10 top-9 py-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
             {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
@@ -299,7 +298,7 @@ function GetCompanyUsersList({
             {/* <> */}
             <div className="flex gap-1">
               <Button
-              disabled={!userHasAccessToAddUser}
+                disabled={!userHasAccessToAddUser}
                 onClick={() => {
                   if (!userHasAccessToAddUser) {
                     toast.error(
@@ -342,7 +341,7 @@ function GetCompanyUsersList({
               </div>
             )
             } */}
-            
+
             <EditCompanyUserModal
               handleCompanyUserChange={handleCompanyUserChangeOnEdit}
               isOpen={isEditCompanyUserModalOpen}
@@ -364,9 +363,11 @@ function GetCompanyUsersList({
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            // className={`ag-theme-alpine w-full h-[calc(100vh-${isLeftMenu ? "130px" : "135px"})]`}
-                        className= {userPreference.isLeftMenu ? `ag-theme-alpine w-full h-[calc(100vh-130px)]` : "ag-theme-alpine w-full h-[calc(100vh-135px)]"}
-
+            className={
+              userPreference.isLeftMenu
+                ? `ag-theme-alpine w-full h-[calc(100vh-122px)]`
+                : "ag-theme-alpine w-full h-[calc(100vh-135px)]"
+            }
           >
             <CompanyUserAgGrid
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
