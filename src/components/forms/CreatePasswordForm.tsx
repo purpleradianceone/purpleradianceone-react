@@ -1,6 +1,5 @@
 import React, { useState, FormEvent } from "react";
 import axios from "axios";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import { useNavigate } from "react-router-dom";
 import {
   CreatePasswordFormData,
@@ -11,14 +10,12 @@ import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import FormInput from "../ui/FormInput";
 import Button from "../ui/Button";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import { DATA_TYPE, NUMBER_VALUES, } from "../../constants/AppConstants";
+import { DATA_TYPE,  VALIDATIONS, } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import { OTPInput } from "../ui/OtpInput";
+import REGEX from "../../constants/Regex";
+import toast from "react-hot-toast";
 
 function CreatePasswordForm() {
   const [createPasswordFormData, setCreatePasswordFormData] =
@@ -33,21 +30,21 @@ function CreatePasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
   const navigate = useNavigate();
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const handleOtpChange = (newOtp: string[]) => {
     setCreatePasswordFormData((prev) => ({ ...prev, otp: newOtp }));
@@ -83,6 +80,10 @@ function CreatePasswordForm() {
       createPasswordFormData.confirmPassword
     ) {
       newErrors.password = MESSAGE.ERROR.PASSWORD_NOT_MATCH;
+    }else if (!REGEX.PASSWORD.test(createPasswordFormData.newPassword) ){
+      newErrors.password = MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR;
+    }else if (!REGEX.PASSWORD.test(createPasswordFormData.confirmPassword) ){
+      newErrors.password = MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR;
     }
 
     setCreatePasswordFormError(newErrors);
@@ -111,19 +112,21 @@ function CreatePasswordForm() {
           setIsSubmitting(true);
 
           localStorage.removeItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL);
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message);
 
           setTimeout(() => {
             navigate(ROUTES_URL.SIGN_IN);
-          }, 5000);
+          }, 3000);
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message);
           setIsSubmitting(false);
         }
       });
@@ -148,8 +151,8 @@ function CreatePasswordForm() {
           value={createPasswordFormData.newPassword}
           name="newPassword"
           onChange={handlePasswordChange}
-          minLength={8}
-          maxLength={20}
+          minLength={VALIDATIONS.MIN_PASSWORD_LENGTH}
+          maxLength={VALIDATIONS.MAX_PASSWORD_LENGTH}
           required
           error={createPasswordFormError.password}
           rightElement={
@@ -167,8 +170,8 @@ function CreatePasswordForm() {
           value={createPasswordFormData.confirmPassword}
           name="confirmPassword"
           onChange={handlePasswordChange}
-          minLength={8}
-          maxLength={20}
+          minLength={VALIDATIONS.MIN_PASSWORD_LENGTH}
+          maxLength={VALIDATIONS.MAX_PASSWORD_LENGTH}
           required
           error={createPasswordFormError.password}
           rightElement={
@@ -182,14 +185,14 @@ function CreatePasswordForm() {
           {isSubmitting ? "Creating Password..." : "Create Password"}
         </Button>
       </form>
-
+{/* 
       <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </>
   );
 }

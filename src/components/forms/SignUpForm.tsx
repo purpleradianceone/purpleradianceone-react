@@ -11,7 +11,11 @@ import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
-import { NUMBER_VALUES, SITE_KEY } from "../../constants/AppConstants";
+import {
+  NUMBER_VALUES,
+  SITE_KEY,
+  VALIDATIONS,
+} from "../../constants/AppConstants";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
@@ -80,18 +84,24 @@ function SignUpForm() {
     if (
       errors.email !== "" ||
       errors.password !== "" ||
-      errors.confirmPassword !== "" 
+      errors.confirmPassword !== "" ||
+      errors.name !== ""
     ) {
       if (errors.email !== "") {
         toast.error(errors.email ?? "email is required");
-      }  if (errors.password !== "") {
+      }
+      if (errors.password !== "") {
         toast.error(errors.password! ?? "Password is required");
-      }  if (errors.confirmPassword !== "") {
+      }
+      if (errors.confirmPassword !== "") {
         toast.error(errors.confirmPassword! ?? "Confirm Password is required.");
-      }  
+      }
+      if (errors.name !== "") {
+        toast.error(errors.name! ?? "name is required");
+      }
       return;
     }
-    if(SignUpFormData.password !== SignUpFormData.confirmPassword){
+    if (SignUpFormData.password !== SignUpFormData.confirmPassword) {
       toast.error("Password and Confirm Password do not match.");
       return;
     }
@@ -163,15 +173,19 @@ function SignUpForm() {
 
   return (
     <>
-      <form className="space-y-3">
+      <form className="space-y-3" onSubmit={handleSignUpFormSubmit}>
         <FormInput
           label="Full Name"
           type="text"
           name="name"
+          required={true}
           placeholder="Enter full name"
           value={SignUpFormData.name}
           onChange={handleSignUpFormDataChange}
-          maxLength={40}
+          maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+          minLength={VALIDATIONS.MIN_NAME_LENGTH}
+          onBlur={handleBlur}
+          error={errors.name}
         />
         <FormInput
           label="Mobile Number"
@@ -180,7 +194,8 @@ function SignUpForm() {
           placeholder="99xxxxxxxx"
           value={SignUpFormData.mobileNumber}
           onChange={handleSignUpFormDataChange}
-          maxLength={15}
+          maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+          minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
           onBlur={handleBlur}
           error={errors.mobileNumber}
         />
@@ -190,6 +205,8 @@ function SignUpForm() {
           name="email"
           required={true}
           placeholder="Enter your email"
+          maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+          minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
           value={SignUpFormData.email}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
@@ -197,7 +214,7 @@ function SignUpForm() {
         />
 
         <CustomDropdown
-        requiredRedDot={true}
+          requiredRedDot={true}
           labelName="Country"
           onSelect={(selectedValue) => {
             if (selectedValue) {
@@ -215,8 +232,8 @@ function SignUpForm() {
           value={SignUpFormData.password}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
-          minLength={8}
-          maxLength={15}
+          minLength={VALIDATIONS.MIN_PASSWORD_LENGTH}
+          maxLength={VALIDATIONS.MAX_PASSWORD_LENGTH}
           required
           error={errors.password}
           rightElement={
@@ -234,8 +251,8 @@ function SignUpForm() {
           value={SignUpFormData.confirmPassword}
           onChange={handleSignUpFormDataChange}
           onBlur={handleBlur}
-          minLength={8}
-          maxLength={20}
+          minLength={VALIDATIONS.MIN_PASSWORD_LENGTH}
+          maxLength={VALIDATIONS.MAX_PASSWORD_LENGTH}
           required
           error={errors.confirmPassword}
           rightElement={
@@ -250,7 +267,9 @@ function SignUpForm() {
           sitekey={SITE_KEY}
           onChange={handleRecaptcha}
         />
-        <Button type="submit" onClick={handleSignUpFormSubmit}>
+        <Button type="submit"
+        //  onClick={}
+         >
           Sign Up
         </Button>
         <div className="text-center">

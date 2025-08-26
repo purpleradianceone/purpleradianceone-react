@@ -93,7 +93,13 @@ export const VALIDATIONS ={
     NUMBER : /^\d+$/,
     NUMBER_WITH_DECIMAL : /^\d+(\.\d+)?$/,
     NUMBER_WITH_DECIMAL_STRING : "/^\d+(\.\d+)?$/",
-    EMAIL : /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    EMAIL : /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    MOBILE_NUMBER_LENGTH : 10,
+    MAX_NAME_LENGTH : 60,
+    MIN_EMAIL_LENGTH :3,
+    MIN_NAME_LENGTH : 6,
+    MAX_PASSWORD_LENGTH: 20,
+    MIN_PASSWORD_LENGTH: 8
 }
 
 

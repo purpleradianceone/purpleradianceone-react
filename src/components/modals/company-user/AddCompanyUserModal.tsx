@@ -14,7 +14,7 @@ import POST_API from "../../../constants/PostApi";
 // } from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -210,8 +210,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.name}
-                  maxLength={100}
-                  minLength={3}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
                 />
                 <FormInput
                   label="Mobile Number"
@@ -222,7 +222,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.mobileNumber}
-                  maxLength={15}
+                  minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+
                 />
                 <FormInput
                   label="Email"
@@ -234,7 +236,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   onChange={handleAddComapnyUserFormDataChange}
                   onBlur={handleBlur}
                   error={errors.email}
-                  maxLength={256}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
                 />
 
                 <Button type="submit">Create</Button>

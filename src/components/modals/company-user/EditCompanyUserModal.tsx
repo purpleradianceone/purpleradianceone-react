@@ -8,7 +8,7 @@ import POST_API from "../../../constants/PostApi";
 import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -265,7 +265,8 @@ function EditCompanyUserModal({
                   value={updateUserformData.name}
                   placeholder="Enter User Name"
                   defaultValue={initialUpdateUserformData.name}
-                  maxLength={256}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
                   onChange={handleEditUserFormChange}
                   error={errors.name}
                   onBlur={handleBlur}
@@ -275,6 +276,7 @@ function EditCompanyUserModal({
                   type="tel"
                   name="mobileNumber"
                   placeholder="Enter Mobile Number"
+                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                   defaultValue={initialUpdateUserformData.mobileNumber}
                   onChange={handleEditUserFormChange}
                   onBlur={handleBlur}
@@ -309,6 +311,8 @@ function EditCompanyUserModal({
                   type="email"
                   name="email"
                   required={true}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
                   placeholder="Enter Email Address"
                   defaultValue={user.email}
                   readonly={true}

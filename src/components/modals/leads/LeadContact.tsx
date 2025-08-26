@@ -414,7 +414,7 @@ const LeadContact = ({
               }}
             >
               <div>
-                <p>{contact.name}</p> 
+                <p>{contact.name}</p>
                 <p className="text-xs text-gray-600">
                   {contact.jobTitle && <span>{contact.jobTitle}</span>}
                   {contact.jobTitle &&
@@ -483,13 +483,16 @@ const LeadContact = ({
                   : ""}
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  {selectedContactCard.name}
-                </h2>
+                {selectedContactCard.name ? (
+                  <h2 className="text-2xl font-semibold text-gray-800"></h2>
+                ) : (
+                  <span className="text-sm text-gray-400">name not given</span>
+                )}
+
                 <p className="text-gray-500">
                   {selectedContactCard.jobTitle
                     ? selectedContactCard.jobTitle
-                    : "-"}
+                    : "occupation"}
                 </p>
               </div>
               <div>
