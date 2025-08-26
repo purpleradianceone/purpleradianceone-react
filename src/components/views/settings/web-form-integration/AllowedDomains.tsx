@@ -1,20 +1,96 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { Plus, X, Globe } from 'lucide-react';
+import CompanySecret from '../../../../@types/settings/CompanySecret';
+import { useLoggedInUserContext } from '../../../../context/user/LoggedInUserContext';
+import axios from 'axios';
+import POST_API from '../../../../constants/PostApi';
+import { STATUS_CODE } from '../../../../constants/AppConstants';
+import toast from 'react-hot-toast';
+import ApiError from '../../../../@types/error/ApiError';
+import RefreshToken from '../../../../config/validations/RefreshToken';
+import { useUserAccessModules } from '../../../../config/hooks/useAccessModules';
+import MESSAGE from '../../../../constants/Messages';
 
 type LeadAllowedDomainsProps = {
   placeholder?: string;
   title?: string;
   maxDomains?: number;
+  companySecretList : CompanySecret[];
+  integrationFor : "lead" | "product";
 }
 
-const LeadAllowedDomains: React.FC<LeadAllowedDomainsProps> = ({
+const AllowedDomains: React.FC<LeadAllowedDomainsProps> = ({
   placeholder = "Enter domain (e.g., example.com)",
   title = "Allowed Domains",
-  maxDomains = 10
+  maxDomains = 10,
+  companySecretList,
+  integrationFor,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const {loginStatus} = useLoggedInUserContext();
   const [error, setError] = useState('');
-  const [domains,setDomains] = useState<string[]>([]);
+  const [domains,setDomains] = useState<string[]>(() => {
+    if(integrationFor === "lead"){
+      const secret = companySecretList.find((secret) => secret.companyFormID === 1);
+const allowedDomains = secret ? secret.allowedDomains : [];
+return allowedDomains
+    }
+     if(integrationFor === "product"){
+      const secret = companySecretList.find((secret) => secret.companyFormID === 2);
+const allowedDomains = secret ? secret.allowedDomains : [];
+return allowedDomains
+    }
+
+    return []
+  
+  });
+
+  const {userHasAccessToUpdateSettingGeneral} = useUserAccessModules();
+
+
+  const getId = () => {
+    if(integrationFor === "lead"){
+      const secret = companySecretList.find((secret) => secret.companyFormID === 1);
+const id = secret ? secret.id : null;
+return id;
+    }
+     if(integrationFor === "product"){
+      const secret = companySecretList.find((secret) => secret.companyFormID === 2);
+const id = secret ? secret.id : null;
+return id;
+    }
+  }
+
+  const handleDomainchange = async(newDomains : string[]) => {
+    const updateCompanySecretPostData = {
+      company_id : loginStatus.companyId,
+      id : getId() ,
+      allowed_domains : newDomains,
+      is_refresh_secret_code : false,
+      updatedby_id : loginStatus.id
+    }
+
+    await axios.post(POST_API.UPDATE_COMPANY_SECRET,updateCompanySecretPostData,{
+      withCredentials : true
+    }).then((response) => {
+      if(response.status === STATUS_CODE.OK){
+        if(response.data.status){
+          toast.success(response.data.message);
+          setDomains(newDomains);
+        }else{
+          toast.error(response.data.message);
+        }
+      }
+    }).catch(async(error : ApiError | any) => {
+      if(error.status === STATUS_CODE.UNATHORISED){
+        const refreshTokenStatus = await RefreshToken({callFunctionWithParamsNotEvent : handleDomainchange});
+        if(refreshTokenStatus){
+          handleDomainchange(newDomains)
+        }
+      }
+    })
+  }
 
   const validateDomain = (domain: string): boolean => {
     const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -22,6 +98,10 @@ const LeadAllowedDomains: React.FC<LeadAllowedDomainsProps> = ({
   };
 
   const addDomain = () => {
+ if(!userHasAccessToUpdateSettingGeneral){
+  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+  return;
+ }
     const trimmedDomain = inputValue.trim();
     
     if (!trimmedDomain) {
@@ -43,14 +123,13 @@ const LeadAllowedDomains: React.FC<LeadAllowedDomainsProps> = ({
       setError(`Maximum ${maxDomains} domains allowed`);
       return;
     }
-
-    setDomains([...domains, trimmedDomain]);
+    handleDomainchange([...domains,trimmedDomain])
     setInputValue('');
     setError('');
   };
 
   const removeDomain = (domainToRemove: string) => {
-    setDomains!(domains.filter(domain => domain !== domainToRemove));
+    handleDomainchange(domains.filter(domain => domain !== domainToRemove));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -167,4 +246,4 @@ const LeadAllowedDomains: React.FC<LeadAllowedDomainsProps> = ({
   );
 };
 
-export default LeadAllowedDomains;
+export default AllowedDomains;

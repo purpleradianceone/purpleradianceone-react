@@ -6,7 +6,6 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import LeadFormEmbed from "./LeadFormEmbed";
 import LeadSetting from "../views/settings/lead-settings/LeadSetting";
 import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
 import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
@@ -14,7 +13,7 @@ import CompanyPreferenceSetting from "../views/settings/company-preferences/Comp
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
 import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
-import LeadAllowedDomains from "../views/settings/lead-settings/LeadAllowedDomains";
+import WebFormIntegration from "../views/settings/web-form-integration/WebFormIntegration";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -80,18 +79,8 @@ function SettingsTabs() {
       value: "webFormIntegration",
       desc: (
         <>
-          {userHasAccessToViewSettingLeady ? (
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-1 min-h-full">
-                <div className = "w-full min-h-full">
-                  <LeadAllowedDomains/>
-                </div>
-              </div>
-
-              <div className="col-span-1">
-                <LeadFormEmbed></LeadFormEmbed>
-              </div>
-            </div>
+          {userHasAccessToViewSettingGeneral ? (
+            <WebFormIntegration/>
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
