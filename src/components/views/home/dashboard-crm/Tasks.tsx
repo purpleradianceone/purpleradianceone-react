@@ -23,6 +23,8 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: LeadTaskType) => {
@@ -79,10 +81,12 @@ const getPriorityColor = (activity: LeadTaskType) => {
 };
 
 function Tasks({
+  companyUserId,
   isLoading,
   leadTasks,
   taskType,
 }: {
+  companyUserId:number|null;
   isLoading: boolean;
   leadTasks: LeadTaskType[];
   taskType: "upcoming" | "pending" | "completed";
@@ -105,6 +109,10 @@ function Tasks({
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
   const getLeadDetails = async (leadId: number) => {
+    if(companyUserId === null || companyUserId !== loginStatus.id){
+      toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
+      return ;
+    }
     const postDataToGetLead = {
       company_id: loginStatus.companyId,
       id: leadId,
