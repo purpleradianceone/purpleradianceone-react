@@ -72,7 +72,6 @@ const ViewLeadManagement = () => {
     JSON.parse(searchParams.get("leadData") || "{}")
   );
 
-
   const [leadStatus, setLeadStatus] = useState<
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >([]);
@@ -565,29 +564,26 @@ const ViewLeadManagement = () => {
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
-  // case 1: only spaces → not allowed
-  if (selectedLeadData.name !== "" && trimmedName === "") {
-    setSelectedLeadData((prev: any) => ({
-          ...prev,
-          name: null
-        }));
-        return 
-  }
-  console.log(trimmedName);
-  
 
+    // case 1: only spaces → not allowed
+    if ( selectedLeadData.name !== "" && trimmedName === "") {
+      setSelectedLeadData((prev: any) => ({
+        ...prev,
+        name: null,
+      }));
+    }
+    console.log(trimmedName);
 
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT
       name: selectedLeadData.name,
-      // name : trimmedName === "" ? "" : trimmedName, // keep empty if cleared 
       email: selectedLeadData.email,
       mobilenumber: selectedLeadData.mobileNumber,
       updatedby_id: loginStatus.id,
     };
     console.log(PostDataForLeadUpdate);
-    
+
     try {
       const response = await axios.post(
         POST_API.UPDATE_LEAD,
@@ -732,12 +728,12 @@ const ViewLeadManagement = () => {
 
                     // const val = e.target.value.trim();
                     // if (val !== null && val !== "") {
-                      // console.log("came here 2");
+                    // console.log("came here 2");
 
-                      setSelectedLeadData({
-                        ...selectedLeadData,
-                        name: e.target.value,
-                      });
+                    setSelectedLeadData({
+                      ...selectedLeadData,
+                      name: e.target.value,
+                    });
                     // }
                   }}
                   handleLeadInfoSave={handleLeadInfoSave}
@@ -895,6 +891,7 @@ const ViewLeadManagement = () => {
                     ...selectedLeadData,
                     mobileNumber: e.target.value,
                   });
+
                 }}
                 handleLeadInfoSave={handleLeadInfoSave}
               />
@@ -1330,6 +1327,13 @@ const Detail: React.FC<DetailProps> = ({
   const handleBlur = () => {
     setIsEditing(false);
 
+    const trimmedValue= value.trim();
+     // Step 1: Check if value changed
+  if (trimmedValue === prevValueRef.current) {
+    toast.error(MESSAGE.ERROR.NO_CHANGES)
+    return; // No changes made, do nothing
+  }
+
     if (label === "Mobile number") {
       const isValid = value
         .trim()
@@ -1362,6 +1366,14 @@ const Detail: React.FC<DetailProps> = ({
         return;
       }
     }
+    //  Apply trimmed value before saving
+  if (trimmedValue !== value) {
+    const syntheticEvent = {
+      target: { value: trimmedValue },
+    } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+    onChange?.(syntheticEvent); // update UI with trimmed value
+  }
     if (value !== prevValueRef.current) {
       handleLeadInfoSave!();
     }
@@ -1390,25 +1402,48 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-sm text-gray-700  p-0 m-0  focus:outline-none focus:ring-0 w-auto"
+              className="text-sm text-gray-700 border border-gray-400 rounded-sm  p-0 m-0  focus:outline-none focus:ring-0 w-auto"
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
               autoFocus
               maxLength={100}
-              size={value ? value.length : 1}
+              size={value ? value.length : 10}
             />
           )
         )
       ) : type === "none" ? (
         <div>
           <p
-            // title={value}
-            className={`  font-medium text-sm  text-gray-800 whitespace-nowrap overflow-x-auto text-clip`}
+            className={`  font-medium text-sm   text-gray-800 whitespace-nowrap overflow-x-auto text-clip`}
           >
-            {value || (
-              <span className="text-gray-400 font-normal text-xs">
-                Add here...
+            {value ? (
+              <span
+                className={`${
+                  label === "Lead source" ||
+                  label === "Created by" ||
+                  label === "Created on"
+                    ? ""
+                    : "border border-gray-200 rounded-md px-1"
+                } `}
+              >
+                {value}
+              </span>
+            ) : (
+              <span 
+              className={`${
+                  label === "Lead source" ||
+                  label === "Created by" ||
+                  label === "Created on"
+                    ? ""
+                    : "border border-gray-200 rounded-md "
+                }text-gray-400 font-normal  text-xs px-1`}
+              >
+                {label === "Lead source" ||
+                label === "Created by" ||
+                label === "Created on"
+                  ? "Data not found"
+                  : "Add here..."}
               </span>
             )}
           </p>
@@ -1419,7 +1454,11 @@ const Detail: React.FC<DetailProps> = ({
           className={`font-medium  border border-gray-100 px-1 rounded-md text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
-          {value}
+          {value ?? (
+            <span className="text-gray-400 font-normal text-xs">
+              Add here...
+            </span>
+          )}
         </div>
       ) : (
         <div

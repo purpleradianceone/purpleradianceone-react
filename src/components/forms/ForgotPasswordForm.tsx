@@ -4,15 +4,14 @@ import FormInput from "../ui/FormInput";
 import { FormEvent, useState } from "react";
 import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimation";
 import axios from "axios";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import  POST_API  from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import { useFormChange } from "../../config/hooks/useFormChange";
-import {NUMBER_VALUES } from "../../constants/AppConstants";
+import { VALIDATIONS } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
+import toast from "react-hot-toast";
 
 /**
  *
@@ -33,19 +32,19 @@ function ForgotPasswordForm(){
     const { errors, handleBlur } = useFormValidation(forgotPasswordFromState,"registered");
 
 
-    const [messageSnackbar , setMessageSnackbar]= useState<MessageSnackbarState>({
-        open: false,
-        message: "",
-        type: "success",
-      })
+    // const [messageSnackbar , setMessageSnackbar]= useState<MessageSnackbarState>({
+    //     open: false,
+    //     message: "",
+    //     type: "success",
+    //   })
     
-      const showMessageSnackbar=({message, type} : ShowMessageSnackbarProps)=>{
-        setMessageSnackbar({open:true,message, type})
-      }
+    //   const showMessageSnackbar=({message, type} : ShowMessageSnackbarProps)=>{
+    //     setMessageSnackbar({open:true,message, type})
+    //   }
     
-      const handleMessageSnackbarClose=()=>{
-        setMessageSnackbar(prev=>({...prev , open:false}))
-      }
+    //   const handleMessageSnackbarClose=()=>{
+    //     setMessageSnackbar(prev=>({...prev , open:false}))
+    //   }
 
 
 
@@ -73,26 +72,31 @@ function ForgotPasswordForm(){
               navigate(ROUTES_URL.CREATE_PASSWORD); 
              } , 8000);
              setShowEmailSentAnimation(!showEmailSentAnimation);
-          showMessageSnackbar({message : response.data.message, type : "success"})
+             toast.success(response.data.message)
+          // showMessageSnackbar({message : response.data.message, type : "success"})
           localStorage.setItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL, forgotPasswordFromState.email);
           }
           else{
-            showMessageSnackbar({message :MESSAGE.ERROR.UNABLE_TO_SEND_OTP,type :"error"})
+            toast.error(MESSAGE.ERROR.UNABLE_TO_SEND_OTP)
+            // showMessageSnackbar({message :MESSAGE.ERROR.UNABLE_TO_SEND_OTP,type :"error"})
           }
           
           
         }else{
-          showMessageSnackbar({message : response.data.message,type:"error"})
+          toast.error(response.data.message)
+          // showMessageSnackbar({message : response.data.message,type:"error"})
         }
       })
       .catch((error) => {
         console.error(error);
-        showMessageSnackbar({message:error,type: "error"})
+        toast.error(error)
+        // showMessageSnackbar({message:error,type: "error"})
       })
       
     }
     else{
-      showMessageSnackbar({message:MESSAGE.ERROR.EMAIL_REQUIRED,type:"error"})
+      toast.error(MESSAGE.ERROR.EMAIL_REQUIRED)
+      // showMessageSnackbar({message:MESSAGE.ERROR.EMAIL_REQUIRED,type:"error"})
     }
  
   };
@@ -100,12 +104,14 @@ function ForgotPasswordForm(){
 
   return (
     <>
-      <form className="space-y-5">
+      <form className="space-y-5" >
         <FormInput
           label="Email"
           type="email"
           name="email"
           required={true}
+          maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+          minLength={VALIDATIONS.MIN_NAME_LENGTH}
           placeholder="Enter your Registered Email"
           onBlur={handleBlur}
           onChange={handleForgotPasswordFormDataChange}
@@ -127,13 +133,13 @@ function ForgotPasswordForm(){
         </div>
       )}
 
-<MessageSnackBar
+{/* <MessageSnackBar
             isOpen={messageSnackbar.open}
             message={messageSnackbar.message}
             type={messageSnackbar.type}
             onClose={handleMessageSnackbarClose}
             duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          /> 
+          />  */}
     </>
   );
 }

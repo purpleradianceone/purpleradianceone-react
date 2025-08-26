@@ -21,6 +21,7 @@ import {
   SITE_KEY,
   STATUS_CODE,
   STRING_VALUES,
+  VALIDATIONS,
 } from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
@@ -383,7 +384,7 @@ function SignInForm() {
   return (
     <>
       <div>
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleLoginSubmit}>
           <FormInput
             label="Email"
             type="email"
@@ -392,6 +393,8 @@ function SignInForm() {
             placeholder="Enter your email"
             value={loginUserCredentials.email}
             defaultValue={loginUserCredentials.email}
+            minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
+            maxLength={VALIDATIONS.MAX_NAME_LENGTH}
             onChange={(e) => {
               if (rememberMe) {
                 localStorage.setItem(
@@ -414,6 +417,7 @@ function SignInForm() {
             placeholder="Enter your password"
             value={loginUserCredentials.password}
             defaultValue={loginUserCredentials.password}
+
             onChange={(e) => {
               if (rememberMe) {
                 localStorage.setItem(
@@ -458,7 +462,7 @@ function SignInForm() {
 
           <Button
             type="submit"
-            onClick={handleLoginSubmit}
+            // onClick={}
             spinner={spinnerAnimation}
           >
             Log In
