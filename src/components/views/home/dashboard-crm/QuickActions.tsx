@@ -13,6 +13,7 @@ import ROUTES_URL from "../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
 
 // const actions = [
 //   {
@@ -902,7 +903,7 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
                   );
                 }
                 }else{
-                  toast.error("You are not on your Dashboard.")
+                  toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
                 }
               }}
               className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}

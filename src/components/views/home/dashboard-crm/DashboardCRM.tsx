@@ -262,9 +262,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     "Total Leads": (
       <div
         key="Total Leads"
-        className="flex col-span-2 w-full justify-around gap-6"
+        className="flex col-span-2 w-full gap-4 justify-around"
       >
-        <div className="flex justify-around w-full gap-6">
+        <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
           <MetricCard
             title="Total Leads"
             value={(
@@ -404,6 +404,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <Tasks
+          companyUserId={companyUserId}
           isLoading={isTasksLoading}
           leadTasks={pendingTasks}
           taskType="pending"
@@ -419,6 +420,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <Tasks
+          companyUserId={companyUserId}
           isLoading={isTasksLoading}
           leadTasks={upcomingTask}
           taskType="upcoming"
@@ -444,9 +446,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         key="Quick Actions"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        <QuickActions 
-        companyUserId={companyUserId}
-        moduleAccessCompanyUser={accessModuleCompanyUser}
+        <QuickActions
+          companyUserId={companyUserId}
+          moduleAccessCompanyUser={accessModuleCompanyUser}
         />
       </div>
     ),

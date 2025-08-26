@@ -117,6 +117,7 @@ const CompanyUserDropdown: React.FC<Props> = ({
         styles={{
           control: (provided) => ({
             ...provided,
+            maxWidth:"250px",
             minHeight: "31px",
             minWidth: "200px",
             height: "31px",

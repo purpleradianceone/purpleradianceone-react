@@ -24,6 +24,7 @@ const MESSAGE = {
         NAME_SPACE_AND_DOT_ERROR : "Name must contain only alphanumeric characters, spaces, and dots.",
         EMAIL_NOT_VALID_ERROR : "Please enter valid email id.",
         PASSWORD_VALIDATION_ERROR :  "Password must be 8–20 characters long and include at least 1 uppercase , 1 lowercase, 1 number, and 1 special character.",
+        YOU_ARE_NOT_ON_YOUR_DASHBOARD : "You are not on your Dashboard.",
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",
