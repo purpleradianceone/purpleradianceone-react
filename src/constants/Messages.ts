@@ -21,7 +21,9 @@ const MESSAGE = {
         SUBSCRIPTION_CREATION_ERROR: "Error creating subscription",
         SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade/inActive Users.",
         PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE: "Updating name, email, or phone number is not permitted for the primary lead contact from this section.",
-        NAME_SPACE_AND_DOT_ERROR : "Name must contain only alphanumeric characters, spaces, and dots."
+        NAME_SPACE_AND_DOT_ERROR : "Name must contain only alphanumeric characters, spaces, and dots.",
+        EMAIL_NOT_VALID_ERROR : "Please enter valid email id.",
+        PASSWORD_VALIDATION_ERROR :  "Password must be 8–20 characters long and include at least 1 uppercase , 1 lowercase, 1 number, and 1 special character.",
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",
@@ -35,6 +37,8 @@ const MESSAGE = {
     },
     MODULE_ACCESS: {
         LEAD_MODULE: {
+            DENIED_ADD_ACCESS : "You do not have permission to create lead.",
+            DENIED_ADD_LEAD_IMPORT_ACCESS : "You do not have permission to import leads.",
             UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update this lead."
         }, COMPANY_USER: {
             DENIED_ADD_ACCESS_COMPANY_USER: "You do not have permission to Add user.",

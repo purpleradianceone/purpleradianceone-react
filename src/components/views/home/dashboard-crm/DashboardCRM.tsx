@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
@@ -34,33 +33,77 @@ import PieChart from "./PieChart";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
 // import { BarDataItem } from "../../../../@types/dashboard/BarDataItem";
 // import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
+type AccessModuleType = {
+  id: number;
+  crm_module_id: number;
+  company_user_id: number;
+
+  add: boolean;
+  view: boolean;
+  update: boolean;
+
+  createdby: number;
+  updatedby: number;
+  createdon: string;
+  module_name: string;
+  updatedby_user: string;
+  updatedon: string;
+};
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 interface DashboardCRMProp {
-  companyUserId: number|null;
+  companyUserId: number | null;
 }
-const DashboardCRM:React.FC<DashboardCRMProp> = ({ 
- companyUserId,
-}) => {
+const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
   const [isTasksLoading, setIsTasksLoading] = useState<boolean>(true); // Set to true initially
   const [upcomingTask, setUpcomingTasks] = useState<LeadTaskType[]>([]);
   const [pendingTasks, setPendingTasks] = useState<LeadTaskType[]>([]);
-  const [leadSummaryReportData, setLeadSummaryReportData] =
-    useState<LeadSummaryReportType[]>([]);
-    const [leadBySource, setLeadBySourcce] =
-    useState<LeadSummaryReportType[]>([]);
+  const [leadSummaryReportData, setLeadSummaryReportData] = useState<
+    LeadSummaryReportType[]
+  >([]);
+  const [leadBySource, setLeadBySourcce] = useState<LeadSummaryReportType[]>(
+    []
+  );
   const [monthlyAverageLeads, setMonthlyAverageLeads] = useState<
     MonthlyAverageLeads[]
   >([]);
-    const [dashboardLayout, setDashboardLayout] = useState<string[]>([]);
+  const [dashboardLayout, setDashboardLayout] = useState<string[]>([]);
   const [dashboardVisiblity, setDasboardVisibility] = useState<
-    { key: string; value: boolean; chartType : string}[]
+    { key: string; value: boolean; chartType: string }[]
   >([]);
 
   const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
+  const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
+    AccessModuleType[]
+  >([]);
+  const getCrmModuleAccessOfCompanyUser = async () => {
+    const getCrmModuleAccessData = {
+      company_id: loginStatus.companyId,
+      company_user_id: companyUserId,
+      requestedby: loginStatus.id,
+    };
+    axios
+      .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
+        setAccessModuleCompanyUser(accessModuleOfCompanyUser);
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: getCrmModuleAccessOfCompanyUser,
+          });
+          if (refreshTokenStatus) {
+            getCrmModuleAccessOfCompanyUser();
+          }
+        }
+      });
+  };
 
   const getDashboardData = async () => {
     setDashboardData({});
@@ -74,7 +117,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
     setIsTasksLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      owner_id: companyUserId??loginStatus.id,
+      owner_id: companyUserId ?? loginStatus.id,
       requestedby_id: loginStatus.id,
     };
 
@@ -87,77 +130,95 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
 
       if (response.status === STATUS_CODE.OK) {
         const formattedDashboardData: DashboardDataType = response.data;
-        response.data.my_fixed_cursor_get_dashboard_widget.map((res : any) => {
-          setDashboardLayout((prev) => [...prev,res.dashboard_widget_name]);
-          setDasboardVisibility((prev) => [...prev,{
-            key : res.dashboard_widget_name,
-            value : true,
-            chartType : res.chart_type_name
-          }]);
-        }) 
-        response.data.my_fixed_cursor_lead_by_status.map((res : any) => {
-          setLeadSummaryReportData((prev) => [...prev, {
-            id : res.lead_status_id,
-            name : res.name,
-            total : res.total,
-            percentage : res.percentage
-          }]);
-        })
-        response.data.my_fixed_cursor_lead_by_source.map((res : any) => {
-          setLeadBySourcce((prev) => [...prev,{
-            id : res.lead_status_id,
-            name : res.name,
-            total : res.total
-          }])
-        })
-        response.data.my_fixed_cursor_12_month_performance.map((res : any) =>{
-            setMonthlyAverageLeads((prev) => [...prev,{
-            createdLeads : res.leads_created,
-            convertedLeads : res.leads_converted,
-            month : res.month_name
-            }])
-        })
-        response.data.my_fixed_cursor_upcoming_task.map((res : any) => {
-          setUpcomingTasks((prev) => [...prev,{
-             id : res.id,
-              leadId : res.lead_id,
-              leadActivityId : res.lead_activity_id,
-              leadTaskActivityName : res.lead_activity_name,
-              leadTaskPriorityId : res.lead_task_priority_id,
-              leadTaskPriorityName : res.lead_task_priority_name,
-              leadTaskStageId : res.lead_task_stage_id,
-              leadTaskStageName : res.lead_task_stage_name,
-              subject : res.subject,
-              description : res.description,
-              resultOutcome : res.result_outcome,
-              dueDateTime : res.due_date_time,
-              overdueStatus : res.overdue_status,
-              leadActivityDetails : res.lead_activity_details,
-              isActive : res.isactive,
-              colorCode : res.color_code,
-          }])
-        })
+        response.data.my_fixed_cursor_get_dashboard_widget.map((res: any) => {
+          setDashboardLayout((prev) => [...prev, res.dashboard_widget_name]);
+          setDasboardVisibility((prev) => [
+            ...prev,
+            {
+              key: res.dashboard_widget_name,
+              value: true,
+              chartType: res.chart_type_name,
+            },
+          ]);
+        });
+        response.data.my_fixed_cursor_lead_by_status.map((res: any) => {
+          setLeadSummaryReportData((prev) => [
+            ...prev,
+            {
+              id: res.lead_status_id,
+              name: res.name,
+              total: res.total,
+              percentage: res.percentage,
+            },
+          ]);
+        });
+        response.data.my_fixed_cursor_lead_by_source.map((res: any) => {
+          setLeadBySourcce((prev) => [
+            ...prev,
+            {
+              id: res.lead_status_id,
+              name: res.name,
+              total: res.total,
+            },
+          ]);
+        });
+        response.data.my_fixed_cursor_12_month_performance.map((res: any) => {
+          setMonthlyAverageLeads((prev) => [
+            ...prev,
+            {
+              createdLeads: res.leads_created,
+              convertedLeads: res.leads_converted,
+              month: res.month_name,
+            },
+          ]);
+        });
+        response.data.my_fixed_cursor_upcoming_task.map((res: any) => {
+          setUpcomingTasks((prev) => [
+            ...prev,
+            {
+              id: res.id,
+              leadId: res.lead_id,
+              leadActivityId: res.lead_activity_id,
+              leadTaskActivityName: res.lead_activity_name,
+              leadTaskPriorityId: res.lead_task_priority_id,
+              leadTaskPriorityName: res.lead_task_priority_name,
+              leadTaskStageId: res.lead_task_stage_id,
+              leadTaskStageName: res.lead_task_stage_name,
+              subject: res.subject,
+              description: res.description,
+              resultOutcome: res.result_outcome,
+              dueDateTime: res.due_date_time,
+              overdueStatus: res.overdue_status,
+              leadActivityDetails: res.lead_activity_details,
+              isActive: res.isactive,
+              colorCode: res.color_code,
+            },
+          ]);
+        });
 
-        response.data.my_fixed_cursor_pending_task.map((res : any) => {
-          setPendingTasks((prev) => [...prev, {
-              id : res.id,
-              leadId : res.lead_id,
-              leadActivityId : res.lead_activity_id,
-              leadTaskActivityName : res.lead_activity_name,
-              leadTaskPriorityId : res.lead_task_priority_id,
-              leadTaskPriorityName : res.lead_task_priority_name,
-              leadTaskStageId : res.lead_task_stage_id,
-              leadTaskStageName : res.lead_task_stage_name,
-              subject : res.subject,
-              description : res.description,
-              resultOutcome : res.result_outcome,
-              dueDateTime : res.due_date_time,
-              overdueStatus : res.overdue_status,
-              leadActivityDetails : res.lead_activity_details,
-              isActive : res.isactive,
-              colorCode : res.color_code,
-          }]);
-        })
+        response.data.my_fixed_cursor_pending_task.map((res: any) => {
+          setPendingTasks((prev) => [
+            ...prev,
+            {
+              id: res.id,
+              leadId: res.lead_id,
+              leadActivityId: res.lead_activity_id,
+              leadTaskActivityName: res.lead_activity_name,
+              leadTaskPriorityId: res.lead_task_priority_id,
+              leadTaskPriorityName: res.lead_task_priority_name,
+              leadTaskStageId: res.lead_task_stage_id,
+              leadTaskStageName: res.lead_task_stage_name,
+              subject: res.subject,
+              description: res.description,
+              resultOutcome: res.result_outcome,
+              dueDateTime: res.due_date_time,
+              overdueStatus: res.overdue_status,
+              leadActivityDetails: res.lead_activity_details,
+              isActive: res.isactive,
+              colorCode: res.color_code,
+            },
+          ]);
+        });
         setDashboardData(formattedDashboardData);
       }
     } catch (error: ApiError | any) {
@@ -170,8 +231,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
           getDashboardData();
         }
       }
-    }
-    finally{
+    } finally {
       setIsTasksLoading(false);
     }
   };
@@ -179,10 +239,9 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
   useEffect(() => {
     if (loginStatus?.companyId && loginStatus?.id) {
       getDashboardData();
+      getCrmModuleAccessOfCompanyUser();
     }
   }, [companyUserId]);
-
-
 
   useEffect(() => {
     window.history.pushState(null, document.title, window.location.href);
@@ -198,12 +257,13 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
     };
   }, [navigate]);
 
-
   const componentMapDefault: { [key: string]: JSX.Element } = {
     // Changed to ensure JSX.Element, not null
     "Total Leads": (
-      
-      <div key="Total Leads" className="flex col-span-2 w-full justify-around gap-6">
+      <div
+        key="Total Leads"
+        className="flex col-span-2 w-full justify-around gap-6"
+      >
         <div className="flex justify-around w-full gap-6">
           <MetricCard
             title="Total Leads"
@@ -332,9 +392,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
     ),
     "12 months performance": (
       <div key="12 months performance" className="min-h-[700px] col-span-1">
-        <SalesChart
-          leadsData={monthlyAverageLeads}
-        />
+        <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
     "Pending tasks": (
@@ -359,7 +417,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
   [&::-webkit-scrollbar-track]:bg-white
   [&::-webkit-scrollbar-thumb]:bg-white
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
-        >
+      >
         <Tasks
           isLoading={isTasksLoading}
           leadTasks={upcomingTask}
@@ -376,23 +434,25 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
         <PipelineChart
-        pipelineData={leadBySource}
-        chartFor="leadBySource"
+          pipelineData={leadBySource}
+          chartFor="leadBySource"
         ></PipelineChart>
       </div>
     ),
     "Quick Actions": (
       <div
-        key= "Quick Actions"
+        key="Quick Actions"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        <QuickActions />
+        <QuickActions 
+        companyUserId={companyUserId}
+        moduleAccessCompanyUser={accessModuleCompanyUser}
+        />
       </div>
     ),
   };
 
   const componentMapPieChart: { [key: string]: JSX.Element } = {
-
     "Leads by status": (
       <div
         key="Leads by status"
@@ -400,10 +460,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
       >
         <div className="min-h-[500px]">
           {leadSummaryReportData && (
-            <PieChart
-              data={leadSummaryReportData}
-              chartFor="leadByStatus"
-            />
+            <PieChart data={leadSummaryReportData} chartFor="leadByStatus" />
           )}
         </div>
       </div>
@@ -416,10 +473,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
   [&::-webkit-scrollbar-thumb]:bg-gray-50
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
-        <PieChart
-        data={leadBySource}
-        chartFor="leadBySource"
-        />
+        <PieChart data={leadBySource} chartFor="leadBySource" />
       </div>
     ),
   };
@@ -435,7 +489,7 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
       const cond = dashboardVisiblity.find(
         (visibility) => visibility.key === currentSectionId
       )!.value;
-       const chartType = dashboardVisiblity.find(
+      const chartType = dashboardVisiblity.find(
         (visibility) => visibility.key === currentSectionId
       )!.chartType;
 
@@ -445,14 +499,17 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
       // console.log(currentSectionId)
       // console.log(dashboardVisiblity);
       // console.log("+++++++++++++++++");
-      if (currentComponentBarChart && cond && ( chartType === "Bar" || chartType === "Square" || chartType === "List" || chartType === "Table" )) {
-      
-          renderedSections.push(currentComponentBarChart);
-        
-      }
-      else if (currentCompanonentPieChart && cond && chartType === "Pie") {
-          renderedSections.push(currentCompanonentPieChart);
-        
+      if (
+        currentComponentBarChart &&
+        cond &&
+        (chartType === "Bar" ||
+          chartType === "Square" ||
+          chartType === "List" ||
+          chartType === "Table")
+      ) {
+        renderedSections.push(currentComponentBarChart);
+      } else if (currentCompanonentPieChart && cond && chartType === "Pie") {
+        renderedSections.push(currentCompanonentPieChart);
       }
       nextSection = layoutIterator.next();
     }
@@ -559,9 +616,8 @@ const DashboardCRM:React.FC<DashboardCRMProp> = ({
           />
         </div>
       </div> */}
-      
     </>
   );
-}
+};
 
 export default DashboardCRM;

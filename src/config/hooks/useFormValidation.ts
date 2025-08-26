@@ -53,12 +53,17 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
       case "password":
         if (!value) {
           setErrors((prev) => ({ ...prev, password: "Password is required" }));
-        } else if (formType === STRING_VALUES.REGISTRATION && (value.length < 8 || value.length > 20)) {
+        } else if (formType === STRING_VALUES.REGISTRATION && !REGEX.PASSWORD.test(value)) {
           setErrors((prev) => ({
             ...prev,
-            password: "Password must be between 8 to 20 characters",
+            password:MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
           }));
-        } else {
+        } else if (formType === STRING_VALUES.REGISTRATION && formData.confirmPassword !== null && formData.confirmPassword !=="" && value !== formData.confirmPassword) {
+            setErrors((prev) => ({
+              ...prev,
+              password: "Passwords adas do not match.",
+            }));
+          } else {
           setErrors((prev) => ({ ...prev, password: "" }));
         }
         break;
@@ -68,14 +73,19 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
           if (!value) {
             setErrors((prev) => ({
               ...prev,
-              confirmPassword: "Confirm password is required",
+              confirmPassword: "Confirm password is required.",
             }));
           } else if (value !== formData.password) {
             setErrors((prev) => ({
               ...prev,
-              confirmPassword: "Passwords do not match",
+              confirmPassword: "Passwords do not match.",
             }));
-          } else {
+          }else if (formType === STRING_VALUES.REGISTRATION && !REGEX.PASSWORD.test(value)) {
+          setErrors((prev) => ({
+            ...prev,
+            confirmPassword: MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
+          }));
+        } else {
             setErrors((prev) => ({ ...prev, confirmPassword: "" }));
           }
         }

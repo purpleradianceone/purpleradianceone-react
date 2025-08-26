@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
-import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import toast from "react-hot-toast";
 
 // const actions = [
 //   {
@@ -725,20 +726,34 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 //     route: ROUTES_URL.CRETE_COMPANY_USER
 //   }
 // ];
-const QuickActions = () => {
+
+type AccessModuleType = {
+  id: number;
+  crm_module_id: number;
+  company_user_id: number;
+
+  add: boolean;
+  view: boolean;
+  update: boolean;
+
+  createdby: number;
+  updatedby: number;
+  createdon: string;
+  module_name: string;
+  updatedby_user: string;
+  updatedon: string;
+};
+
+interface QuickActionsProp {
+  companyUserId:number|null;
+  moduleAccessCompanyUser:AccessModuleType[];
+}
+const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessCompanyUser }) => {
+  const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
-  const {
-    userHasAccessToAddLead,
-    userHasAccessToAddUser,
-    userHasAccessToAddMeeting,
-    userHasAccessToAddEmailTemplateSetting,
-    userHasAccessToViewSettingGeneral,
-    userHasAccessToViewProduct,
-    userHasAccessToViewTeamManagement,
-    userHasAccessToViewProductTeam,
-    userHasAccessToAddProduct,
-    userHasAccessToAddTeamManagement
-  } = useUserAccessModules();
+
+  
+
   const actions = [
     {
       id: 1,
@@ -749,7 +764,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-blue-600 to-blue-700 min-h-40 hover:from-blue-700 hover:to-blue-800", // Classic Business Blue
       shortcut: "Lead",
       route: ROUTES_URL.CREATE_LEAD,
-      visibility: userHasAccessToAddLead,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 3)[0].add??false,
     },
     {
       id: 2,
@@ -760,7 +775,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-teal-600 to-teal-700 min-h-40 hover:from-teal-700 hover:to-teal-800", // Friendly Teal
       shortcut: "Users",
       route: ROUTES_URL.CREATE_COMPANY_USER,
-      visibility: userHasAccessToAddUser,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 1)[0].add??false,
     },
     {
       id: 3,
@@ -771,7 +786,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-violet-500 to-violet-600 min-h-40 hover:from-violet-600 hover:to-violet-700", // Bright but Muted Violet
       shortcut: "Meetings",
       route: ROUTES_URL.SCHEDULE_MEETING,
-      visibility: userHasAccessToAddMeeting,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 12)[0].add??false,
     },
     {
       id: 4,
@@ -782,7 +797,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-orange-500 to-orange-600 min-h-40 hover:from-orange-600 hover:to-orange-700", // Energetic Orange
       shortcut: "Templates",
       route: ROUTES_URL.EMAIL_TEMPLATE,
-      visibility: userHasAccessToAddEmailTemplateSetting,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 15)[0].add??false,
     },
     {
       id: 5,
@@ -804,7 +819,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-stone-500 to-stone-600 min-h-40 hover:from-stone-600 hover:to-stone-700", // Earthy Stone
       shortcut: "Preferences",
       route: ROUTES_URL.USER_PROFILE_SETTING,
-      visibility: userHasAccessToViewSettingGeneral,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 9)[0].view??false,
     },
     {
       id: 7,
@@ -815,7 +830,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-green-600 to-green-700 min-h-40 hover:from-green-700 hover:to-green-800", // Lively Green
       shortcut: "Product",
       route: ROUTES_URL.PRODUCT_MANAGEMENT,
-      visibility: userHasAccessToViewProduct,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 4)[0].view??false,
     },
     {
       id: 8,
@@ -826,7 +841,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 min-h-40 hover:from-fuchsia-700 hover:to-fuchsia-800", // Playful Fuchsia (used sparingly for unique actions)
       shortcut: "Team",
       route: ROUTES_URL.TEAM_MANAGEMENT,
-      visibility: userHasAccessToViewTeamManagement,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 6)[0].view??false,
     },
     {
       id: 9,
@@ -837,7 +852,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
       shortcut: "Product",
       route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-      visibility: userHasAccessToViewProductTeam,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 8)[0].view??false,
     },
     {
       id: 10,
@@ -848,7 +863,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-cyan-500 to-cyan-600 min-h-40 hover:from-cyan-600 hover:to-cyan-700", // Clear Cyan
       shortcut: "Product",
       route: ROUTES_URL.CREATE_PRODUCT,
-      visibility: userHasAccessToAddProduct,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 4)[0].add??false,
     },
     {
       id: 11,
@@ -859,7 +874,7 @@ const QuickActions = () => {
         "bg-gradient-to-r from-red-500 to-red-600 min-h-40 hover:from-red-600 hover:to-red-700", // Action Red (for important new creation)
       shortcut: "Teams",
       route: ROUTES_URL.CREATE_TEAM,
-      visibility: userHasAccessToAddTeamManagement,
+      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 6)[0].add??false,
     },
   ];
   return (
@@ -876,6 +891,7 @@ const QuickActions = () => {
             <button
               key={action.id}
               onClick={() => {
+                if(loginStatus.id === companyUserId){
                 if (action.id !== 3) {
                   navigate(action.route);
                 } else {
@@ -884,6 +900,9 @@ const QuickActions = () => {
                       "?from=" +
                       window.location.pathname
                   );
+                }
+                }else{
+                  toast.error("You are not on your Dashboard.")
                 }
               }}
               className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}

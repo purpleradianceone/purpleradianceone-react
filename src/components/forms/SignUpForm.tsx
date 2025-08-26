@@ -19,6 +19,7 @@ import REGEX from "../../constants/Regex";
 import { useCountries } from "../../config/hooks/useCountries";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import { useGeoLocationData } from "../../config/hooks/useGeoLocation";
+import toast from "react-hot-toast";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -76,6 +77,24 @@ function SignUpForm() {
 
   const handleSignUpFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      errors.email !== "" ||
+      errors.password !== "" ||
+      errors.confirmPassword !== "" 
+    ) {
+      if (errors.email !== "") {
+        toast.error(errors.email ?? "email is required");
+      }  if (errors.password !== "") {
+        toast.error(errors.password! ?? "Password is required");
+      }  if (errors.confirmPassword !== "") {
+        toast.error(errors.confirmPassword! ?? "Confirm Password is required.");
+      }  
+      return;
+    }
+    if(SignUpFormData.password !== SignUpFormData.confirmPassword){
+      toast.error("Password and Confirm Password do not match.");
+      return;
+    }
     const mobileRegex = REGEX.MOBILE_NUMBER;
     if (SignUpFormData.mobileNumber!.trim() !== "") {
       if (!mobileRegex.test(SignUpFormData.mobileNumber!.trim())) {
@@ -83,6 +102,7 @@ function SignUpForm() {
         return;
       }
     }
+
     const signupDataPost = {
       fullname: SignUpFormData.name?.trim(),
       mobilenumber: SignUpFormData.mobileNumber?.trim(),
@@ -135,11 +155,11 @@ function SignUpForm() {
 
   useEffect(() => {
     const country = countries.find((country) => country.name === countryName);
-        const id =  country ? country.id : 52;
-    if(id){
+    const id = country ? country.id : 52;
+    if (id) {
       setCountryId(id);
     }
-  },[countryName])
+  }, [countryName]);
 
   return (
     <>
@@ -148,11 +168,10 @@ function SignUpForm() {
           label="Full Name"
           type="text"
           name="name"
-          required={true}
           placeholder="Enter full name"
           value={SignUpFormData.name}
           onChange={handleSignUpFormDataChange}
-          maxLength={100}
+          maxLength={40}
         />
         <FormInput
           label="Mobile Number"
@@ -178,6 +197,7 @@ function SignUpForm() {
         />
 
         <CustomDropdown
+        requiredRedDot={true}
           labelName="Country"
           onSelect={(selectedValue) => {
             if (selectedValue) {
