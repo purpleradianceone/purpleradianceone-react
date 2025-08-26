@@ -1,19 +1,39 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 function ContactUs() {
+  useEffect(() => {
+    const iframe = document.getElementById(
+      "contact-form-iframe"
+    ) as HTMLIFrameElement;
+    // const iframeOrigin = "https://dbb8ae4cfefb.ngrok-free.app"; 
+    const iframeOrigin = "https://web-lead.netlify.app";
+
+    if (iframe && iframe.contentWindow) {
+      iframe.onload = () => {
+        console.log(iframe.contentWindow);
+        iframe.contentWindow!.postMessage(
+          window.location.origin, // Send the origin of the React page
+          iframeOrigin // Target origin to prevent security errors
+        );
+      };
+    }
+  }, []);
+
   return (
-    <div id="contactUs" className="bg-gradient-to-t from-blue-200 via-blue-100 to-blue-50 py-20">
+    <div
+      id="contactUs"
+      className="bg-gradient-to-t from-blue-200 via-blue-100 to-blue-50 py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once:false, amount: 0.15 }}
+          viewport={{ once: false, amount: 0.15 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="text-center mb-2"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Contact Us
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Us</h2>
           <p className="text-xl text-gray-600">
             Have questions? Get in touch with us!
           </p>
@@ -26,14 +46,22 @@ function ContactUs() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="flex justify-center"
         >
-          <div  className="bg-transparent p-1 min-w-full flex justify-center rounded-xl">
+          <div className="bg-transparent p-1 min-w-full flex justify-center rounded-xl">
+            <iframe
+            id="contact-form-iframe"
+          src="https://web-lead.netlify.app/contact-us-form.html?client_id=62b6ad15-52f8-479c-81b6-c1b46c84db6c"
+              width="900px"
+              height="650px"
+              className="rounded-xl shadow-lg border border-gray-200"
+            ></iframe>
             {/* <iframe
-              src="http://127.0.0.1:5500/contact-us-form.html?client_id=React"
+              id="contact-form-iframe"
+              src={`https://dbb8ae4cfefb.ngrok-free.app/contact-us-form.html?client_id=62b6ad15-52f8-479c-81b6-c1b46c84db6c`}
               width="900px"
               height="650px"
               className="rounded-xl shadow-lg border border-gray-200"
             ></iframe> */}
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-3 animate-fade-in-down">
+            {/* <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-3 animate-fade-in-down">
         <h2 className="text-2xl font-extrabold text-center text-blue-700 mb-2">Get in Touch</h2>
         <form action="#" method="POST" className="space-y-1">
             <div>
@@ -66,7 +94,7 @@ function ContactUs() {
                 Contact Us
             </button>
         </form>
-    </div>
+    </div> */}
           </div>
         </motion.div>
       </div>
