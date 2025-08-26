@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
@@ -446,6 +445,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions 
+        companyUserId={companyUserId}
         moduleAccessCompanyUser={accessModuleCompanyUser}
         />
       </div>

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import toast from "react-hot-toast";
 
 // const actions = [
 //   {
@@ -743,10 +745,11 @@ type AccessModuleType = {
 };
 
 interface QuickActionsProp {
+  companyUserId:number|null;
   moduleAccessCompanyUser:AccessModuleType[];
 }
-const QuickActions: React.FC<QuickActionsProp> = ({ moduleAccessCompanyUser }) => {
-
+const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessCompanyUser }) => {
+  const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
 
   
@@ -888,6 +891,7 @@ const QuickActions: React.FC<QuickActionsProp> = ({ moduleAccessCompanyUser }) =
             <button
               key={action.id}
               onClick={() => {
+                if(loginStatus.id === companyUserId){
                 if (action.id !== 3) {
                   navigate(action.route);
                 } else {
@@ -896,6 +900,9 @@ const QuickActions: React.FC<QuickActionsProp> = ({ moduleAccessCompanyUser }) =
                       "?from=" +
                       window.location.pathname
                   );
+                }
+                }else{
+                  toast.error("You are not on your Dashboard.")
                 }
               }}
               className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}

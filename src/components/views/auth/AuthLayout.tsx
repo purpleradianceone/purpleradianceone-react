@@ -20,14 +20,10 @@ import { IMAGE_SOURCE } from "../../../constants/ImageSource";
  * @returns Layout/Veiw for SignUpForm and signInForm components
  */
 function AuthLayout(props: AuthLayoutProps) {
-  // State to control the gradient flow direction ('b' for bottom, 't' for top)
   const [gradientFlow, setGradientFlow] = useState<"b" | "t">("b");
 
-  // useEffect hook to manage the setInterval lifecycle
   useEffect(() => {
-    // Set up an interval to toggle the gradientFlow state every 5 seconds
     const intervalId = setInterval(() => {
-      console.log("changing color"); // For debugging purposes
       setGradientFlow((prevFlow) => (prevFlow === "b" ? "t" : "b"));
     }, 5000); // 5000 milliseconds = 5 seconds
 
