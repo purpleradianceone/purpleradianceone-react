@@ -1103,14 +1103,21 @@ const LeadImportCsv = ({
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
           {csvImportButtonClicked && (
-            <button className="flex text-xs gap-3 items-center text-gray-800" onClick={resetState}>
-              <ArrowLeft size={16}/> <span>Go back and Choose another file.</span>
+            // <button className="flex text-xs gap-3 items-center text-gray-800" onClick={resetState}>
+            //   <ArrowLeft size={16}/> <span>Go back and Choose another file/ see import tags.</span>
+            // </button>
+            <button
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              onClick={resetState}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to File Selection / Imported Tags</span>
             </button>
           )}
 
           {!csvImportButtonClicked && (
             <>
-              <h2 className="text-base border-b font-semibold text-gray-800">
+              <h2 className="text-base  px-1 shadow-sm font-semibold text-gray-800">
                 Import leads from csv file.
               </h2>
               <label
