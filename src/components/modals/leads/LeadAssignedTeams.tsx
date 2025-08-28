@@ -244,7 +244,7 @@ const LeadAssignedTeams = ({
             >
               +Add
             </button>
-            <span className="text-gray-400">
+            <span className="text-gray-400 italic">
               Company Team is Not assigned to lead.
             </span>
           </div>

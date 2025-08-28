@@ -484,15 +484,15 @@ const LeadContact = ({
               </div>
               <div>
                 {selectedContactCard.name ? (
-                  <h2 className="text-2xl font-semibold text-gray-800"></h2>
+                  <h2 className="text-2xl font-semibold text-gray-800">{selectedContactCard.name}</h2>
                 ) : (
-                  <span className="text-sm text-gray-400">name not given</span>
+                  <span className="text-xs text-gray-400 italic">name not available</span>
                 )}
 
                 <p className="text-gray-500">
                   {selectedContactCard.jobTitle
                     ? selectedContactCard.jobTitle
-                    : "occupation"}
+                    : "-"}
                 </p>
               </div>
               <div>

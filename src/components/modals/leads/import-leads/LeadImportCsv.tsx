@@ -1117,12 +1117,12 @@ const LeadImportCsv = ({
 
           {!csvImportButtonClicked && (
             <>
-              <h2 className="text-base  px-1 shadow-sm font-semibold text-gray-800">
+              <h2 className=" sm:text-xs md:text-base hover:text-blue-500 rounded  px-1 shadow-sm font-semibold text-gray-800">
                 Import leads from csv file.
               </h2>
               <label
                 htmlFor="csv-upload"
-                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
               >
                 <FileUp className="w-5 h-5" />
                 <span>{csvFile ? "Change File" : "Select CSV"}</span>
