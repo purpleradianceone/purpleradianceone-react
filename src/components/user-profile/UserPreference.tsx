@@ -6,7 +6,7 @@ import POST_API from "../../constants/PostApi";
 import axios from "axios";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
-import { STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE, VALIDATIONS } from "../../constants/AppConstants";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { useUserPreference } from "../../context/user/UserPreference";
 import CustomTimezoneDropdown from "./custom-dropdown-timezonedata/CustomTimezoneDropdown";
@@ -441,8 +441,8 @@ const UserPreference = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  maxLength={40}
-                  minLength={3}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.fullName && (
@@ -482,6 +482,8 @@ const UserPreference = () => {
                   value={formData.mobileNumber}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                  minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.mobileNumber && (
