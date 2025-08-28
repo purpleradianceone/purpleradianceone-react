@@ -9,7 +9,14 @@ import React, {
   useRef,
   forwardRef,
 } from "react";
-import { FileUp, XCircle, ArrowRight, Search, Info, ArrowLeft } from "lucide-react";
+import {
+  FileUp,
+  XCircle,
+  ArrowRight,
+  Search,
+  Info,
+  ArrowLeft,
+} from "lucide-react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -398,10 +405,10 @@ const GenericValueMappingCard = forwardRef(
 // --- MAIN COMPONENT ---
 const LeadImportCsv = ({
   // isSelectCsvButtonClicked
-  handleButtonClicked 
-}:{
+  handleButtonClicked,
+}: {
   // isSelectCsvButtonClicked:boolean
-  handleButtonClicked: (value: boolean) => void; 
+  handleButtonClicked: (value: boolean) => void;
 }) => {
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
@@ -415,8 +422,6 @@ const LeadImportCsv = ({
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
-  
-
 
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
@@ -449,16 +454,16 @@ const LeadImportCsv = ({
   const [totalCompanyUsers, setTotalCompanyUsers] = useState<number>(0); // Total count for pagination
   const [companyUsersCurrentPage, setCompanyUsersCurrentPage] =
     useState<number>(0);
-  const [csvImportButtonClicked , setCsvImportButtonClicked] = useState<boolean>(false);
+  const [csvImportButtonClicked, setCsvImportButtonClicked] =
+    useState<boolean>(false);
   const [isLoadingSpinnerAfterSubmission, setIsLoadingSpinnerAfterSubmission] =
     useState<boolean>(false);
   const [showLeadImportResultPopUp, setShowLeadImportResultPopUp] =
     useState<boolean>(false);
   const [LeadImportReponse, setLeadImportResponse] =
     useState<LeadImportResponse>({
-    
       message: "",
-      status : false,
+      status: false,
     });
 
   //note : Message Snackbar
@@ -547,10 +552,10 @@ const LeadImportCsv = ({
           const refreshTokenStatus = await RefreshToken({
             callFunction: callFn,
           });
-          if(refreshTokenStatus){
+          if (refreshTokenStatus) {
             callFn();
           }
-        } 
+        }
       }
     };
     await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
@@ -658,10 +663,10 @@ const LeadImportCsv = ({
 
   // --- HANDLERS ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // true if button is clicked 
+    // true if button is clicked
     // setIsSelectCsvButtonClicked(true);
     setCsvImportButtonClicked(true);
-    handleButtonClicked(true)
+    handleButtonClicked(true);
     setCsvFile(null);
     setCsvData(null);
     setOriginalCsvHeaders([]);
@@ -692,9 +697,9 @@ const LeadImportCsv = ({
     }
   };
 
-  const resetState= ()=>{
+  const resetState = () => {
     setCsvImportButtonClicked(false);
-     handleButtonClicked(false)
+    handleButtonClicked(false);
     setCsvFile(null);
     setCsvData(null);
     setOriginalCsvHeaders([]);
@@ -709,7 +714,7 @@ const LeadImportCsv = ({
     setCsvUniqueOwners([]);
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
-  }
+  };
   const readCsv = (file: File) => {
     setIsParsing(true);
     const reader = new FileReader();
@@ -991,7 +996,7 @@ const LeadImportCsv = ({
     }
 
     const isContactMapped =
-      fieldMappings.email?.length > 0 || fieldMappings.mobileNumber?.length > 0;
+      fieldMappings.email?.length > 0 || fieldMappings.mobilenumber?.length > 0;
     // const isNameMapped = fieldMappings.name?.length > 0;
     // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
     if (!isContactMapped) {
@@ -1080,6 +1085,7 @@ const LeadImportCsv = ({
       }
     } finally {
       setIsLoadingSpinnerAfterSubmission(false);
+      handleFileChange({ target: { files: null } } as any);
     }
   };
 
@@ -1088,7 +1094,7 @@ const LeadImportCsv = ({
     fieldMappings.leadStatus?.length > 0 && csvUniqueStatuses.length > 0;
   const showSourceMapping =
     fieldMappings.leadSource?.length > 0 && csvUniqueSources.length > 0;
-  const showOwnerMapping = 
+  const showOwnerMapping =
     fieldMappings.leadOwner?.length > 0 && csvUniqueOwners.length > 0;
 
   return (
@@ -1096,32 +1102,33 @@ const LeadImportCsv = ({
       <div className="w-full h-full bg-gray-100 rounded-md overflow-auto flex flex-col p-1  space-y-2">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
-         {
-          csvImportButtonClicked &&(
-             <button onClick={
-            resetState
-            }>
-            <ArrowLeft/>
-          </button>
-          )
-         }
-          <h2 className="text-base font-semibold text-gray-800">
-            Import Leads from CSV file.
-          </h2>
-          <label
-            htmlFor="csv-upload"
-            className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer shadow-sm"
-          >
-            <FileUp className="w-5 h-5" />
-            <span>{csvFile ? "Change File" : "Select CSV"}</span>
-            <input
-              id="csv-upload"
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
+          {csvImportButtonClicked && (
+            <button className="flex text-xs gap-3 items-center text-gray-800" onClick={resetState}>
+              <ArrowLeft size={16}/> <span>Go back and Choose another file.</span>
+            </button>
+          )}
+
+          {!csvImportButtonClicked && (
+            <>
+              <h2 className="text-base border-b font-semibold text-gray-800">
+                Import leads from csv file.
+              </h2>
+              <label
+                htmlFor="csv-upload"
+                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer shadow-sm"
+              >
+                <FileUp className="w-5 h-5" />
+                <span>{csvFile ? "Change File" : "Select CSV"}</span>
+                <input
+                  id="csv-upload"
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            </>
+          )}
         </div>
 
         {isParsing && (
@@ -1316,7 +1323,7 @@ const LeadImportCsv = ({
                     );
                   }}
                 />
-                )} 
+              )}
             </div>
 
             <div className="mt-6 flex justify-end">
