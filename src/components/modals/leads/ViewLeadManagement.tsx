@@ -1476,7 +1476,7 @@ const Detail: React.FC<DetailProps> = ({
             value
           ) : (
             <>
-              <span className="text-gray-400 font-normal text-xs">
+              <span className="text-gray-400 font-normal text-xs italic">
                 Add here...
               </span>
             </>

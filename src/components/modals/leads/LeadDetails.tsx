@@ -671,7 +671,7 @@ const FormField = ({
               //   )
               <span className="font-semibold">{value?.toLocaleString()}</span>
             ) : (
-              <span className="text-[12px] text-gray-500">Add here...</span>
+              <span className="text-[12px] text-gray-500 italic">Add here...</span>
             )}
           </span>
         ) : type === "select" ? (

@@ -223,7 +223,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           >
             +Add
           </button>
-          <span>Product is not assigned to lead.</span>
+          <span className="italic">Product is not assigned to lead.</span>
         </div>
       )}
       {/* Data rows */}
