@@ -69,6 +69,8 @@ export const SIZE = {
     TWENTY : 20,
     EIGHT : 8,
     TWENTY_FOUR : 24,
+    TWELEVE : 12,
+    FOURTEEN : 14,
 }
 
 export const INNERHTML = {
