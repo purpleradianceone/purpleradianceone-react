@@ -95,7 +95,7 @@ function WebFormIntegration() {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <div className={`w-full${userPreference.isLeftMenu ? "" : ""}`}>
-          <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
+          <div className="bg-white rounded-lg shadow-sm">
             {companySecretList.length > 0 && (
             <WebFormIntegrationTabs 
             companySecretList={companySecretList} 
