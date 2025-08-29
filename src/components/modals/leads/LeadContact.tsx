@@ -457,7 +457,7 @@ const LeadContact = ({
       {/* view in pop up card  */}
       {selectedContactCard && (
         <div
-          className={` fixed inset-0  bg-opacity-0 flex justify-center items-center z-50`}
+          className={` fixed inset-0  bg-opacity-0  flex justify-center items-center z-50`}
         >
           <div
             className={` ${
