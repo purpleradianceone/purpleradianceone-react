@@ -115,6 +115,7 @@ function CompanyProductTeamsAgGrid({
       theme={themeAlpine}
       onViewportChanged={handleViewPortChanged}
       onGridReady={onGridReady}
+      
     />
   );
 }

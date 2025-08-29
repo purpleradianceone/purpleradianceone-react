@@ -300,7 +300,7 @@ function SubscriptionListAggrid({
   return (
     <>
       <div
-        className="ag-theme-alpine w-full"
+        className="ag-theme-balham w-full"
         style={{ height: "100%", width: "100%" }}
       >
         <AgGridReact

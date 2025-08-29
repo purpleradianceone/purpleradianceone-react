@@ -268,7 +268,7 @@ function CompanyUserAgGrid({
 
   return (
     <div
-      // className="ag-theme-balham w-full "
+      className="ag-theme-balham w-full "
       style={{ height: "100%", width: "100%" }}
     >
       

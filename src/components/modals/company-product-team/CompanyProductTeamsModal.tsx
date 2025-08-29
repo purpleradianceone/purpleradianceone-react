@@ -619,7 +619,7 @@ function CompanyProductTeamsModal({
             {/*Aggrid logic here */}
             <div className="flex justify-around gap-3 mb-16 pb-4">
               <div
-                className="ag-theme-alpine"
+                className="ag-theme-balham"
                 style={{ height: "300px", width: "45%" }}
               >
                 <div className="flex w-full gap-2 mb-1 mt-2 justify-between">
