@@ -527,7 +527,7 @@ function CompanyTeamUsersAgGrid({
   return (
     <div className="flex justify-around gap-2 mb-9 py-10 ">
       <div
-        className="ag-theme-alpine"
+        className="ag-theme-balham"
         style={{ height: "300px", width: "45%" }}
       >
         <div className="flex w-full  gap-4 mb-2 justify-between">
@@ -568,7 +568,7 @@ function CompanyTeamUsersAgGrid({
         />
       </div>
       <div
-        className="ag-theme-alpine"
+        className="ag-theme-balham"
         style={{ height: "300px", width: "49%" }}
       >
         <div className="flex w-full gap-2 mb-2 justify-between">

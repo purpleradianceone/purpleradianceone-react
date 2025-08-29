@@ -251,7 +251,7 @@ function AddCompanyTeamUsersAgGrid({
   return (
     <>
       {/* Optional: display the global change count */}
-      <div className="mb-2">
+      <div className="mb-2 ag-theme-balham ">
         {isGridForSubscription && (
           <>
             <span className="font-semibold">Net Status Change Count: </span>
