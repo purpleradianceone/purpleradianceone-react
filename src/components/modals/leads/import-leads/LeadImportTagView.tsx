@@ -111,13 +111,13 @@ const LeadImportTagView = () => {
       {/* Header */}
       {leadImportTagData.length > 0 && (
         <div className="bg-white p-2 rounded-lg shadow-sm border-b">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          <h2 className="text-lg font-semibold text-gray-900 mt-1">
             Lead Import Tags : 
           </h2>
-          <div className="text-sm text-gray-700 leading-relaxed space-y-3">
+          <div className="text-sm text-gray-700 leading-relaxed space-y-0 mt-4">
             <p className="font-medium text-gray-800">📌 How Tags Work:</p>
 
-            <ul className="list-disc pl-6 space-y-2">
+            <ul className="list-disc pl-6 space-y-1">
                <li>
                 Tags are created automatically , when we import the leads and currently leads are not merged into lead table.
               </li>
