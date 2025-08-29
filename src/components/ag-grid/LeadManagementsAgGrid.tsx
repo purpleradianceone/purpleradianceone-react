@@ -114,13 +114,8 @@ function LeadManagementAgGrid({
         cellRenderer : (params :LeadDataProps| any ) => {
           return (
             <span
-            style={{
-              color: '#2563eb',
-              textDecoration: 'none',
-              cursor: 'pointer',
-              fontWeight: '400',
-              fontSize : 13
-            }}
+         
+            className="lead-details"
             onClick={() =>{
               params.context.handleRowSelect(params.data)
             }}>

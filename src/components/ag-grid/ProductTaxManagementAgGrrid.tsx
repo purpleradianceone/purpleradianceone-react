@@ -2,7 +2,6 @@
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import {  useMemo, useState } from "react";
 import {  INNERHTML, NUMBER_VALUES, STATUS_CODE, } from "../../constants/AppConstants";
-import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Trash2 } from "lucide-react";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import { AgGridReact } from "ag-grid-react";
@@ -137,11 +136,12 @@ const {loginStatus} = useLoggedInUserContext();
         
          return (
             <div>
-                <ActionsDropdownButton
+                <div
                 onClick={handleCompanyProductTaxDelete}
+                className="delete"
                 >
-                    <Trash2 className={isSmallScreen ? CLASS_NAMES.INLINE_ICON_SIZE_FOUR_SMALL_SCREEN :CLASS_NAMES.INLINE_ICON_SIZE_FOUR }/>
-                </ActionsDropdownButton>
+                    <Trash2 className={isSmallScreen ? CLASS_NAMES.INLINE_ICON_SIZE_FOUR_SMALL_SCREEN  :CLASS_NAMES.INLINE_ICON_SIZE_FOUR }/>
+                </div>
             </div>
          )
       }
@@ -162,7 +162,7 @@ const {loginStatus} = useLoggedInUserContext();
 
   return (
     <><div
-          className="ag-theme-alpine w-full"
+          className="ag-theme-balham w-full"
           style={{ height: "440px", width: "100%" }}
       >
           <AgGridReact

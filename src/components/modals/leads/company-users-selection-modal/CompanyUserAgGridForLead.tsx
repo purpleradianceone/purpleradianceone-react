@@ -88,7 +88,7 @@ function CompanyUserAgGridForLead({
                   handleSelectedCompanyUserChange(user);
                 }
               }}
-              className="cursor-pointer accent-blue-500"
+              className="cursor-pointer accent-blue-500 checkbox"
             />
           );
         },
@@ -133,7 +133,7 @@ function CompanyUserAgGridForLead({
 
   return (
     <div
-      className="ag-theme-alpine w-full"
+      className="ag-theme-balham w-full"
       style={{ height: "460px", width: "100%" }}
     >
       <AgGridReact

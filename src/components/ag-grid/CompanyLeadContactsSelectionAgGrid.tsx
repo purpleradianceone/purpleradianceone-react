@@ -178,7 +178,7 @@ handleCompanyLeadContactCheckBoxChange!(params.data, event);
         </div>
         
         <div
-          // className="ag-theme-balham w-full "
+          className="ag-theme-balham w-full "
           style={{ height: "70vh", width: "100%" }}
         >
           <AgGridReact

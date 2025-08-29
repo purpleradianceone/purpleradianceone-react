@@ -221,7 +221,7 @@ function TeamManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-alpine w-full"
+      className="ag-theme-balham w-full"
       style={
         isGridForProductTeam || isGridForLeadProductTeam
           ? { height: "300px", width: "100%" }
