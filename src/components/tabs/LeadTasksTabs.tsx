@@ -116,7 +116,7 @@ function LeadTaskTabs({
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white pb-2">
+        <div className="sticky top-0 bg-white">
           <TabsHeader
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}
@@ -144,7 +144,7 @@ function LeadTaskTabs({
                 
                 }}
                 className={
-                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  activeTab === value ? "text-gray-900 text-xs" : " text-gray-600 text-xs"
                 }
               >
                 {label}
