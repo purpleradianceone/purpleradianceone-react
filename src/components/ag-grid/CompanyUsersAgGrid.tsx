@@ -126,7 +126,7 @@ function CompanyUserAgGrid({
               top: isUpward
                 ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
                 : rect.bottom + window.scrollY - 10, // Position below button
-              left: rect.left + window.scrollX - 25,
+              left: rect.left + window.scrollX - 50,
               isUpward,
             });
           };
@@ -223,10 +223,10 @@ function CompanyUserAgGrid({
                         }
                       }}
                     >
-                      <LucideLayoutDashboard
+                      <span className="flex gap-1"><LucideLayoutDashboard
                         className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                       />{" "}
-                      {JSX_CHILDREN_NAME.DASHBOARD}
+                      {JSX_CHILDREN_NAME.DASHBOARD}</span>
                     </ActionsDropdownButton>
 
                     {/* {!userHasAccessToViewAccess && (

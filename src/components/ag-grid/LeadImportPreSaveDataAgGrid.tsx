@@ -25,6 +25,7 @@ const gridRef = useRef<AgGridReact>(null);
             <div>
               <input 
               type="checkbox"
+               className="checkbox"
               checked={isChecked}
               onChange={
                 (e)=>params.context.onSelectedRow(rowId, e.target.checked)
