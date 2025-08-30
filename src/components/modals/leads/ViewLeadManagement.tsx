@@ -32,7 +32,6 @@ import LeadContactType from "../../../@types/lead-management/LeadContact";
 import LeadAssignedTeams from "./LeadAssignedTeams";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
-import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 import toast from "react-hot-toast";
@@ -564,9 +563,8 @@ const ViewLeadManagement = () => {
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
-
     // case 1: only spaces → not allowed
-    if ( selectedLeadData.name !== "" && trimmedName === "") {
+    if (selectedLeadData.name !== "" && trimmedName === "") {
       setSelectedLeadData((prev: any) => ({
         ...prev,
         name: null,
@@ -891,7 +889,6 @@ const ViewLeadManagement = () => {
                     ...selectedLeadData,
                     mobileNumber: e.target.value,
                   });
-
                 }}
                 handleLeadInfoSave={handleLeadInfoSave}
               />
@@ -1109,7 +1106,7 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Column 2 */}
-          <div className="w-full md:w-1/2 flex flex-col gap-0">
+          <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-lg ">
             {/* Meeting / Contact / Span Tabs */}
             <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
               <span
@@ -1147,7 +1144,7 @@ const ViewLeadManagement = () => {
                 Lead Teams
               </span>
             </div>
-            <div className="flex flex-col min-h-32 gap-2">
+            <div className="flex flex-col min-h-72 gap-2">
               <div
                 className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-gray-50
@@ -1155,21 +1152,36 @@ const ViewLeadManagement = () => {
               [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
               >
                 {isOpenMeetingsModal && (
-                  <div className="flec max-w-48">
-                    <Button
-                      onClick={() => {
-                        const leadDataSearchParams = JSON.parse(
-                          searchParams.get("leadData") || "{}"
-                        );
-                        sessionStorage.setItem(
-                          "leadData",
-                          JSON.stringify(leadDataSearchParams!)
-                        );
-                        navigate(ROUTES_URL.SCHEDULE_MEETING);
-                      }}
-                    >
-                      Schedule Meeting
-                    </Button>
+                  <div className="flex  items-center justify-center   min-h-72">
+                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        Schedule a Meeting
+                      </h2>
+                      <p className="text-sm text-gray-600 max-w-md">
+                        Plan your next discussion with ease. Use this option to
+                        select a convenient time, invite participants, and share
+                        meeting details — all in one place.
+                      </p>
+                      <p className="text-xs text-gray-500 max-w-md">
+                        Once scheduled, participants will receive notifications
+                        with the meeting link and reminders before it begins.
+                      </p>
+                      <button
+                        className="bg-blue-600 hover:bg-blue-700  text-xs md:text-sm p-2 text-white rounded-md "
+                        onClick={() => {
+                          const leadDataSearchParams = JSON.parse(
+                            searchParams.get("leadData") || "{}"
+                          );
+                          sessionStorage.setItem(
+                            "leadData",
+                            JSON.stringify(leadDataSearchParams!)
+                          );
+                          navigate(ROUTES_URL.SCHEDULE_MEETING);
+                        }}
+                      >
+                        + Schedule Meeting
+                      </button>
+                    </div>
                   </div>
                 )}
                 {isOpenProductCard && (
@@ -1327,12 +1339,12 @@ const Detail: React.FC<DetailProps> = ({
   const handleBlur = () => {
     setIsEditing(false);
 
-    const trimmedValue= value.trim();
-     // Step 1: Check if value changed
-  if (trimmedValue === prevValueRef.current) {
-    toast.error(MESSAGE.ERROR.NO_CHANGES)
-    return; // No changes made, do nothing
-  }
+    const trimmedValue = value.trim();
+    // Step 1: Check if value changed
+    if (trimmedValue === prevValueRef.current) {
+      toast.error(MESSAGE.ERROR.NO_CHANGES);
+      return; // No changes made, do nothing
+    }
 
     if (label === "Mobile number") {
       const isValid = value
@@ -1367,13 +1379,13 @@ const Detail: React.FC<DetailProps> = ({
       }
     }
     //  Apply trimmed value before saving
-  if (trimmedValue !== value) {
-    const syntheticEvent = {
-      target: { value: trimmedValue },
-    } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+    if (trimmedValue !== value) {
+      const syntheticEvent = {
+        target: { value: trimmedValue },
+      } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 
-    onChange?.(syntheticEvent); // update UI with trimmed value
-  }
+      onChange?.(syntheticEvent); // update UI with trimmed value
+    }
     if (value !== prevValueRef.current) {
       handleLeadInfoSave!();
     }
@@ -1430,8 +1442,8 @@ const Detail: React.FC<DetailProps> = ({
                 {value}
               </span>
             ) : (
-              <span 
-              className={`${
+              <span
+                className={`${
                   label === "Lead source" ||
                   label === "Created by" ||
                   label === "Created on"
