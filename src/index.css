@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* src/components/CompanyUserAgGrid.css */
-
 /* ===== Grid Container ===== */
 .ag-theme-balham {
   font-family: "Inter", Arial, sans-serif;
@@ -24,7 +22,6 @@
   text-transform: capitalize;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #ddd;
-  position: sticky;
   top: 0;
   transition: background 0.2s ease-in-out;
   padding: 0px 6px;
@@ -59,10 +56,10 @@
   font-size: 0.9rem;
   line-height: 1.6;
 }
-
+/* 
 .ag-theme-balham .ag-cell:hover {
   background-color: #cecefa;
-}
+} */
 
 /* ===== Row Styling ===== */
 .ag-theme-balham .ag-row-even {
@@ -172,12 +169,12 @@
 .absolute.bg-white.border.rounded-md.shadow-lg button {
   padding: 0.6rem 1rem;
   background-color: transparent;
-  color: #333;
+  color: #007bff;
   transition: background-color 0.2s ease-in-out, color 0.2s;
 }
 .absolute.bg-white.border.rounded-md.shadow-lg button:hover {
   background-color: #f1f5ff;
-  color: #007bff;
+  color: #333;
 }
 
 /* ===== Filters / Inputs ===== */

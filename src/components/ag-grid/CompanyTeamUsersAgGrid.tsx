@@ -356,7 +356,6 @@ function CompanyTeamUsersAgGrid({
     ) {
       fetchCompanyUsersNotAssigned("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isCompanyUserNotAssignedReadyToFetch]);
 
   const companyTeamColumnDefs = useMemo<ColDef[]>(
