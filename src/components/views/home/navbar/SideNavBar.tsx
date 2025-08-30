@@ -238,6 +238,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
               onClick={() => {
                 if (isSmallScreen) {
                   onNextTab();
+                 
                 }
               }}
             >

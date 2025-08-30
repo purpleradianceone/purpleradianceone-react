@@ -262,13 +262,13 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
   const [isCreateLeadTaskModalOpen, setIsCreateLeadTaskModalOpen] =
     useState<boolean>(false);
   return (
-    <div className="w-full">
+    <div className="w-full shadow-lg ">
       <div className="w-full gap-1">
         <div className="sticky top-16 flex bg-gray-200 shadow-sm  mb-1.5 w-full">
           <div className="flex justify-between  w-full pr-3">
-            <h2 className="text-base px-3 font-bold text-center text-gray-800 p-1">
+            <span className="text-sm  pl-1 font-semibold text-center text-gray-800 ">
               Tasks
-            </h2>
+            </span>
             {visibleAssignUsersBtn && (
               <div className="flex justify-end items-center text-xs gap-x-2 text-gray-500">
                 <span>Add</span>
