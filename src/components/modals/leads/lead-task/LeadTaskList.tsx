@@ -398,8 +398,8 @@ function LeadTaskList({
                 <div
                   key={activity.id}
                   className={`${
-                    activity.isActive ? "bg-green-200" : "bg-red-50"
-                  } min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl  transition-shadow duration-300 flex items-start space-x-2 border border-gray-100 relative`}
+                    activity.isActive ? "bg-green-200 border-green-300 " : "bg-red-100 border-red-300 "
+                  } min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
                 >
                   {/* Activity Icon */}
                   <div className="flex-shrink-0 p-1 bg-white rounded-full">
@@ -416,8 +416,8 @@ function LeadTaskList({
                       title={activity.subject}
                       className="text-sm font-medium text-gray-800 truncate"
                     >
-                      {activity.subject.length > 55
-                        ? activity.subject.substring(0, 55) + "..."
+                      {activity.subject.length > 50
+                        ? activity.subject.substring(0, 50) + "..."
                         : activity.subject}
                     </p>
                     {expandedCardId === activity.id ? (
