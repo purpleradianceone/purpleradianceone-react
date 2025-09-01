@@ -80,7 +80,8 @@ function CreatePasswordForm() {
       createPasswordFormData.confirmPassword
     ) {
       newErrors.password = MESSAGE.ERROR.PASSWORD_NOT_MATCH;
-    }else if (!REGEX.PASSWORD.test(createPasswordFormData.newPassword) ){
+    }else if (!REGEX.PASSWORD.test(createPasswordFormData.newPassword) ){  
+          
       newErrors.password = MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR;
     }else if (!REGEX.PASSWORD.test(createPasswordFormData.confirmPassword) ){
       newErrors.password = MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR;
