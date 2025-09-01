@@ -35,17 +35,17 @@ function SignUpForm() {
   };
 
   const { countries } = useCountries();
-  const { countryName, dialCode, error, loading } = useGeoLocationData({
+  const { countryName } = useGeoLocationData({
     countryList: countries,
   });
-  useEffect(() => {
-    console.log("*****************************************************");
-    console.log(countryName);
-    console.log(dialCode);
-    console.log(error);
-    console.log(loading);
-    console.log("*****************************************************");
-  }, [countryName]);
+  // useEffect(() => {
+  //   console.log("*****************************************************");
+  //   console.log(countryName);
+  //   console.log(dialCode);
+  //   console.log(error);
+  //   console.log(loading);
+  //   console.log("*****************************************************");
+  // }, [countryName]);
   const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
     useFormChange(initialSignUpFormState);
   const { errors, handleBlur } = useFormValidation(
