@@ -1,6 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Globe, Plus, X, XIcon } from "lucide-react";
+import {
+  Briefcase,
+  Edit3,
+  Globe,
+  Languages,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Plus,
+  Trash2,
+  User,
+  X
+} from "lucide-react";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import { useEffect, useState } from "react";
 import Button from "../../ui/Button";
@@ -68,10 +81,12 @@ const LeadContact = ({
   });
 
   const inputClass =
-    "border border-gray-100 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
-  const formInputLabelClassName =
-    "font-medium text-gray-900 text-xs  mb-1 block";
-  const viewLabelClassName = "font-medium text-gray-800";
+    "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
+  // const formInputLabelClassName =
+  //   "font-medium text-gray-900 text-xs  mb-1 block";
+      const formInputLabelClassName = "block text-sm font-medium text-gray-700 mb-2";
+
+  // const viewLabelClassName = "font-medium text-gray-800";
   const handleUrl = (link: string): string => {
     try {
       const url = new URL(link.trim());
@@ -408,39 +423,52 @@ const LeadContact = ({
           leadContact.map((contact, index) => (
             <div
               key={index}
-              className="bg-blue-50 border cursor-pointer text-xs font-medium text-gray-800 hover:text-blue-500 border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
-              onClick={() => {
-                setSelectedContactCard(contact);
-              }}
+              className="bg-gray-50 border border-blue-200 cursor-pointer text-xs font-medium text-gray-800 px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+              onClick={() => setSelectedContactCard(contact)}
             >
-              <div>
-                <p>{contact.name}</p>
-                <p className="text-xs text-gray-600">
-                  {contact.jobTitle && <span>{contact.jobTitle}</span>}
-                  {contact.jobTitle &&
-                    (contact.email || contact.mobileNumber) && <span> | </span>}
+              {/* Left: Contact Info */}
+              <div className="flex items-center gap-3">
+                {/* Avatar */}
+                <div className={` ${contact.isActive ? "bg-blue-500 " : "bg-red-500"} text-white flex items-center justify-center w-9 h-9 rounded-full border    font-semibold shadow-sm`}>
+                  {contact.name ? contact.name.charAt(0).toUpperCase() : "?"}
+                </div>
 
-                  {contact.email && <span>{contact.email}</span>}
-                  {contact.email && contact.mobileNumber && <span> | </span>}
+                {/* Text Info */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold ">
+                    {contact.name || "Unknown Contact"}
+                  </p>
+                  <p className="text-xs text-gray-500 font-normal flex flex-wrap items-center gap-x-1">
+                    {contact.jobTitle && <span className="flex gap-1 items-center"><Briefcase size={12}/> {contact.jobTitle}</span>}
+                    {contact.jobTitle &&
+                      (contact.email || contact.mobileNumber) && <span>•</span>}
 
-                  {contact.mobileNumber && <span>{contact.mobileNumber}</span>}
-                </p>
+                    {contact.email && <span className="flex gap-1 items-center"> <Mail   size={12} /> {contact.email}</span>}
+                    {contact.email && contact.mobileNumber && <span>•</span>}
+
+                    {contact.mobileNumber && (
+                      <span className="flex gap-1 items-center"> <Phone size={12}/> {contact.mobileNumber}</span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <div className="flex text-[10px] font-semibold items-center gap-1">
+
+              {/* Right: Badges */}
+              <div className="flex  items-end gap-1 text-[10px] font-semibold">
                 <span
-                  className={` px-2 py-1 rounded-full ${
+                  className={`px-2 py-0.5 rounded-full border ${
                     contact.isPrimary
-                      ? "bg-green-100 text-green-700 border border-green-400"
-                      : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                      ? "bg-green-100 text-green-700 border-green-400"
+                      : "bg-yellow-50 text-yellow-700 border-yellow-300"
                   }`}
                 >
                   {contact.isPrimary ? "Primary" : "Secondary"}
                 </span>
                 <span
-                  className={`rounded-full px-2 py-1 border  ${
+                  className={`px-2 py-0.5 rounded-full border ${
                     contact.isActive
-                      ? "text-green-900 bg-green-100 border-green-400"
-                      : "text-red-800 bg-red-100 border-red-400"
+                      ? "bg-green-100 text-green-700 border-green-400"
+                      : "bg-red-100 text-red-700 border-red-400"
                   }`}
                 >
                   {contact.isActive ? "Active" : "Inactive"}
@@ -456,47 +484,66 @@ const LeadContact = ({
       </div>
       {/* view in pop up card  */}
       {selectedContactCard && (
-        <div
-          className={` fixed inset-0  bg-opacity-0  flex justify-center items-center z-50`}
-        >
-          <div
-            className={` ${
-              isActive ? "bg-green-50" : "bg-red-50"
-            }  rounded-xl shadow-2xl w-full max-w-3xl p-7 relative`}
-          >
-            <button
-              onClick={() => setSelectedContactCard(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
-            >
-              <X size={22} />
-            </button>
+       
 
-            {/* Header Section */}
-            <div className={`flex items-center rounded-md gap-6 mb-6 `}>
-              <div
-                className={` ${
-                  isActive ? "bg-green-300" : "bg-red-300"
-                } w-20 h-20 rounded-full  flex items-center justify-center text-2xl font-bold text-white bg-gray-300`}
+        <div className="fixed top-8 inset-0 bg-opacity-5 bg-black flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+            {/* Header */}
+            <div className="relative px-8 pt-5 pb-4">
+              <button
+                onClick={() => setSelectedContactCard(null)}
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {selectedContactCard.name
-                  ? selectedContactCard.name.charAt(0).toUpperCase()
-                  : ""}
-              </div>
-              <div>
-                {selectedContactCard.name ? (
-                  <h2 className="text-2xl font-semibold text-gray-800">{selectedContactCard.name}</h2>
-                ) : (
-                  <span className="text-xs text-gray-400 italic">name not available</span>
-                )}
+                <X size={24} />
+              </button>
 
-                <p className="text-gray-500">
-                  {selectedContactCard.jobTitle
-                    ? selectedContactCard.jobTitle
-                    : "-"}
-                </p>
-              </div>
-              <div>
-                {/* Edit Button */}
+              <div className="flex items-center gap-6">
+                <div
+                  className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white ${
+                    selectedContactCard.isActive ? "bg-blue-500" : "bg-gray-400"
+                  }`}
+                >
+                  {selectedContactCard.name
+                    ? selectedContactCard.name.charAt(0).toUpperCase()
+                    : "?"}
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    {selectedContactCard.name ?? (
+                      <span className="text-sm italic">Unamed contact</span>
+                    )}
+                  </h2>
+                  <p className="text-md text-gray-600 mt-1 flex items-center">
+                    <Briefcase size={16} className="inline mr-2" />
+                    {selectedContactCard.jobTitle ?? (
+                      <span className="text-sm italic">
+                        No job title specified
+                      </span>
+                    )}
+                  </p>
+                  <div className="flex items-center gap-3 mt-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedContactCard.isPrimary
+                          ? "bg-green-100 text-green-800 border border-green-200"
+                          : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                      }`}
+                    >
+                      {selectedContactCard.isPrimary
+                        ? "Primary Contact"
+                        : "Secondary Contact"}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedContactCard.isActive
+                          ? "bg-green-100 text-green-800 border border-green-200"
+                          : "bg-red-100 text-red-800 border border-red-200"
+                      }`}
+                    >
+                      {selectedContactCard.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
                 <button
                   onClick={() => {
                     if (userHasAccessToUpdateLead) {
@@ -508,80 +555,186 @@ const LeadContact = ({
                       );
                     }
                   }}
-                  className="top-4 left-4 text-sm bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                 >
+                  <Edit3 size={16} />
                   Edit
                 </button>
               </div>
             </div>
 
-            {/* Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 text-sm">
-              <div>
-                <h4 className={viewLabelClassName}>Email</h4>
-                <p>
-                  {selectedContactCard.email ? selectedContactCard.email : "-"}
-                </p>
+            {/* Content */}
+            <div className="px-8 pb-8">
+              {/* Contact Information Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <Mail className="text-blue-500 mt-1" size={18} />
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        Email Address
+                      </h4>
+                      <p className="text-gray-700">
+                        {selectedContactCard.email ?? (
+                          <span className="text-sm italic">Not provided</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <Phone className="text-green-500 mt-1" size={18} />
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        Mobile Number
+                      </h4>
+                      <p className="text-gray-700">
+                        {selectedContactCard.mobileNumber ?? (
+                          <span className="text-sm italic">Not provided</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <Languages className="text-purple-500 mt-1" size={18} />
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        Preferred Language
+                      </h4>
+                      <p className="text-gray-700">
+                        {selectedContactCard.preferredLanguage ?? (
+                          <span className="text-sm italic">Not provided</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <MessageCircle className="text-orange-500 mt-1" size={18} />
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        Preferred Communication
+                      </h4>
+                      <p className="text-gray-700">
+                        {selectedContactCard.preferredCommunicationChannel ?? (
+                          <span className="text-sm italic">Not provided</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <Globe className="text-blue-600 mt-1" size={18} />
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        LinkedIn Profile
+                      </h4>
+                      {selectedContactCard.linkedinProfile ? (
+                        <a
+                          href={selectedContactCard.linkedinProfile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          View LinkedIn Profile
+                        </a>
+                      ) : (
+                        <p className="text-gray-700 italic text-sm">
+                          Not provided
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                    <div className="w-5 h-5 mt-1 flex items-center justify-center">
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          selectedContactCard.isActive
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      />
+                    </div>
+                    <div className="">
+                      <div className="flex gap-4">
+                        <h4 className="font-medium text-gray-900 mb-2">
+                          Status
+                        </h4>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={isActive}
+                            onChange={
+                              !selectedContactCard.isPrimary &&
+                              userHasAccessToUpdateLead
+                                ? () => {
+                                    handleActiveStatusChange(
+                                      selectedContactCard
+                                    );
+                                  }
+                                : () => {
+                                    if (selectedContactCard.isPrimary) {
+                                      toast.error(
+                                        "Update request denied — the user is designated as the Primary Contact."
+                                      );
+                                    } else {
+                                      toast.error(
+                                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                          .UPDATE_LEAD_ACCESS_DENIED_message
+                                      );
+                                    }
+                                  }
+                            }
+                            title={
+                              selectedContactCard.isPrimary
+                                ? "Cannot change the status of the primary contact."
+                                : ""
+                            }
+                            className="sr-only peer"
+                          />
+                          <div
+                            title={
+                              selectedContactCard.isPrimary
+                                ? "Cannot change the status of the primary contact."
+                                : ""
+                            }
+                            className="w-12 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
+                 after:content-[''] after:absolute after:top-[4px] after:left-[0px]
+                 after:bg-white after:border-gray-300 after:border after:rounded-full
+                 after:h-6 after:w-6 after:transition-all
+                 peer-checked:after:translate-x-full peer-checked:after:border-white"
+                          ></div>
+                          {/* <div className="w-11 h-6 bg-red-400 rounded-full peer peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[3px] after:left-[0px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" /> */}
+                          <span className="ml-3 text-sm font-medium text-gray-900">
+                            {selectedContactCard.isActive
+                              ? "Active"
+                              : "Inactive"}
+                          </span>
+                        </label>
+                      </div>
+                      {selectedContactCard.isPrimary && (
+                        <div className="text-xs italic  text-gray-500 mt-1">
+                          Primary contact status cannot be changed
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              {/* mobile Number */}
-              <div>
-                <h4 className={viewLabelClassName}>Mobile</h4>
-                <p>
-                  {selectedContactCard.mobileNumber
-                    ? selectedContactCard.mobileNumber
-                    : "-"}
-                </p>
-              </div>
-              {/* preferred Langauge */}
-              <div>
-                <h4 className={viewLabelClassName}>Preferred Language</h4>
-                <p>
-                  {selectedContactCard.preferredLanguage
-                    ? selectedContactCard.preferredLanguage
-                    : "-"}
-                </p>
-              </div>
-              {/* pref communication channel */}
-              <div>
-                <h4 className={viewLabelClassName}>
-                  Pref. Communication Channel
-                </h4>
-                <p>
-                  {selectedContactCard.preferredCommunicationChannel
-                    ? selectedContactCard.preferredCommunicationChannel
-                    : "-"}
-                </p>
-              </div>
-              {/* Linkdin Profile */}
-              <div>
-                <h4 className={viewLabelClassName}>LinkedIn</h4>
-                <a
-                  href={selectedContactCard.linkedinProfile}
-                  target="_blank"
-                  className="text-blue-500 hover:underline"
-                >
-                  {selectedContactCard.linkedinProfile
-                    ? selectedContactCard.linkedinProfile
-                    : "-"}
-                </a>
-              </div>
-              {/* isPrimary */}
-              <div>
-                <h4 className={viewLabelClassName}>Contact</h4>
-                <p>
-                  {selectedContactCard.isPrimary ? (
-                    <span className="text-green-500">Primary</span>
-                  ) : (
-                    <span className="text-red-500">Secondary</span>
-                  )}
-                </p>
-              </div>
-              {/* Social Media Handles */}
-              <div className="sm:col-span-1">
-                <h4 className={viewLabelClassName}>Social Profiles</h4>
-                <div className="flex flex-wrap gap-3 mt-1">
-                  {selectedContactCard.socialMediaHandles &&
-                    selectedContactCard.socialMediaHandles
+
+              {/* Social Media Profiles */}
+              {selectedContactCard.socialMediaHandles && (
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <Globe size={18} className="text-blue-500" />
+                    Social Media Profiles
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedContactCard.socialMediaHandles
                       .split(",")
                       .filter((link) => link.trim() !== "")
                       .map((link, index) => (
@@ -590,75 +743,27 @@ const LeadContact = ({
                           href={link.trim()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline truncate max-w-[200px]"
+                          className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm transition-colors border border-blue-200 hover:border-blue-300"
                         >
-                          {handleUrl(link)}
+                          {handleUrl(link.trim())}
                         </a>
                       ))}
+                  </div>
                 </div>
-              </div>
-              {/* status */}
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-sm font-medium text-gray-700">
-                  Status:
-                </span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isActive}
-                    onChange={
-                      !selectedContactCard.isPrimary &&
-                      userHasAccessToUpdateLead
-                        ? () => {
-                            handleActiveStatusChange(selectedContactCard);
-                          }
-                        : () => {
-                            if (selectedContactCard.isPrimary) {
-                              toast.error(
-                                "Update request denied — the user is designated as the Primary Contact."
-                              );
-                            } else {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                  .UPDATE_LEAD_ACCESS_DENIED_message
-                              );
-                            }
-                          }
-                    }
-                    title={
-                      selectedContactCard.isPrimary
-                        ? "Cannot change the status of the primary contact."
-                        : ""
-                    }
-                    className="sr-only peer"
-                  />
-                  <div
-                    title={
-                      selectedContactCard.isPrimary
-                        ? "Cannot change the status of the primary contact."
-                        : ""
-                    }
-                    className="w-11 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
-                 after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                 after:bg-white after:border-gray-300 after:border after:rounded-full
-                 after:h-5 after:w-5 after:transition-all
-                 peer-checked:after:translate-x-full peer-checked:after:border-white"
-                  ></div>
-                  <span className="ml-3 text-sm font-medium text-gray-900">
-                    {isActive ? "Active" : "Inactive"}
-                  </span>
-                </label>
-              </div>
+              )}
 
-              {/* address */}
-              <div className="sm:col-span-2">
-                <h4 className={viewLabelClassName}>Address</h4>
-                <p>
-                  {selectedContactCard.address
-                    ? selectedContactCard.address
-                    : "-"}
-                </p>
-              </div>
+              {/* Address */}
+              {selectedContactCard.address && (
+                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                  <MapPin className="text-red-500 mt-1" size={18} />
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-1">Address</h4>
+                    <p className="text-gray-700 leading-relaxed">
+                      {selectedContactCard.address}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -669,7 +774,7 @@ const LeadContact = ({
         <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
-            <div className="border-b pb-1 mb-4 flex justify-between items-center">
+            {/* <div className="border-b pb-1 mb-4 flex justify-between items-center">
               <h2 className="text-base font-semibold text-gray-800">
                 {editContactData ? "Edit Contact" : "Add New Contact"}
               </h2>
@@ -693,20 +798,56 @@ const LeadContact = ({
                 }}
                 className="text-gray-400 hover:text-gray-600 cursor-pointer"
               />
+            </div> */}
+
+             <div className="px-2 py-2  border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editContactData ? 'Edit Contact' : 'Add New Contact'}
+              </h2>
+              <p className="text-gray-600 mt-1">
+                {editContactData ? 'Update contact information' : 'Create a new lead contact'}
+              </p>
             </div>
+            <button
+             onClick={() => {
+                  // setEditMode(false);
+                  setEditingContactId(null);
+                  setIsOpenAddLeadContactForm(false);
+                  setEditContactData(null);
+                  setSocialMediaHandles([]);
+                  setLeadContactForm({
+                    name: "",
+                    email: "",
+                    address: "",
+                    jobTitle: "",
+                    linkedinProfile: "",
+                    mobileNumber: "",
+                    preferredCommunicationChannel: "",
+                    preferredLanguage: "",
+                  });
+                }}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
 
             {/* Form Grid */}
             <form>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
                 <div>
-                  <label className={formInputLabelClassName}>Full Name:</label>
+
+                  <label className={formInputLabelClassName}>  <User size={16} className="inline mr-1 text-blue-500" />Full Name* </label>
                   <input
                     type="text"
                     name="name"
                     onBlur={handleBlur}
-                    minLength={3}
-                    maxLength={100}
-                    placeholder="Enter Full Name"
+                    minLength={VALIDATIONS.MIN_NAME_LENGTH}
+                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                    placeholder="Enter full name"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     defaultValue={editContactData?.name || ""}
@@ -728,16 +869,19 @@ const LeadContact = ({
                   {errors.name && (
                     <p className="text-xs text-red-600 mt-1">{errors.name}</p>
                   )}
+                    {editContactData?.isPrimary && (
+                  <p className="text-gray-500 text-xs mt-1">Primary contact name cannot be changed</p>
+                )}
                 </div>
                 <div>
                   <label className={formInputLabelClassName}>
-                    Email Address:
+                   <Mail size={16} className="inline mr-2 text-blue-500" /> Email Address
                   </label>
                   <input
                     type="email"
                     name="email"
-                    maxLength={100}
-                    placeholder="Email Address"
+                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                    placeholder="Enter email address"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -760,16 +904,20 @@ const LeadContact = ({
                   {errors.email && (
                     <p className="text-xs text-red-600 mt-1">{errors.email}</p>
                   )}
+                  {editContactData?.isPrimary && (
+                  <p className="text-gray-500 text-xs mt-1">Primary contact email cannot be changed</p>
+                )}
                 </div>
                 <div>
                   <label className={formInputLabelClassName}>
-                    Mobile Number:
+                   <Phone size={16} className="inline mr-2 text-blue-500" /> Mobile Number
                   </label>
                   <input
                     type="text"
                     name="mobileNumber"
                     minLength={10}
-                    placeholder="Mobile Number"
+                    maxLength={10}
+                    placeholder="Enter mobile number"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -790,18 +938,21 @@ const LeadContact = ({
                     }}
                   />
                   {errors.mobileNumber && (
-                    <p className="text-xs text-red-600 mt-1">
+                    <p className="text-xs text-red-600 mt-1 ">
                       {errors.mobileNumber}
                     </p>
                   )}
+                  {editContactData?.isPrimary && (
+                  <p className="text-gray-500 text-xs mt-1">Primary contact mobile number cannot be changed</p>
+                )}
                 </div>
                 <div>
-                  <label className={formInputLabelClassName}>Job Title:</label>
+                  <label className={formInputLabelClassName}>  <Briefcase size={16} className="inline mr-2 text-blue-500" />Job Title</label>
                   <input
                     type="text"
                     name="jobTitle"
                     maxLength={100}
-                    placeholder="Job Title"
+                    placeholder="Enter job title"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -810,13 +961,13 @@ const LeadContact = ({
                 </div>
                 <div>
                   <label className={formInputLabelClassName}>
-                    Preferred Language:
+                     <Languages size={16} className="inline mr-2 text-blue-500" />Preferred Language
                   </label>
                   <input
                     type="text"
                     name="preferredLanguage"
                     maxLength={100}
-                    placeholder="Marathi , English etc ..."
+                    placeholder="eg : Marathi , English etc ..."
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -825,13 +976,13 @@ const LeadContact = ({
                 </div>
                 <div>
                   <label className={formInputLabelClassName}>
-                    Preferred Communication Channel:
+                     <MessageCircle size={16} className="inline mr-2 text-blue-500" />Preferred Communication Channel
                   </label>
                   <input
                     type="text"
                     maxLength={100}
                     name="preferredCommunicationChannel"
-                    placeholder="Mail, Phone, WhatsApp etc ..."
+                    placeholder="eg : Mail, Phone, WhatsApp etc ..."
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -842,13 +993,13 @@ const LeadContact = ({
                 </div>
                 <div>
                   <label className={formInputLabelClassName}>
-                    LinkedIn Profile:
+                     <Globe size={16} className="inline mr-2 text-blue-500" /> LinkedIn Profile
                   </label>
                   <input
                     type="text"
                     name="linkedinProfile"
                     maxLength={256}
-                    placeholder="LinkedIn URL"
+                    placeholder="Enter linkedIn url"
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
@@ -859,12 +1010,12 @@ const LeadContact = ({
                 {/* Social Media Handles */}
                 <div className="sm:col-span-2">
                   <label className={formInputLabelClassName}>
-                    Social Media Handles:
+                   <Globe size={16} className="inline mr-2 text-blue-500" />  Social Media Handles
                   </label>
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Enter Handle URL"
+                      placeholder="Enter social media url"
                       value={tempHandle}
                       onChange={(e) => setTempHandle(e.target.value)}
                       className={inputClass}
@@ -874,7 +1025,7 @@ const LeadContact = ({
                       type="button"
                       className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-0 rounded"
                     >
-                      Add
+                       <Plus size={14} />
                     </button>
                   </div>
 
@@ -899,7 +1050,8 @@ const LeadContact = ({
                           }
                           className="text-gray-800 hover:text-red-500"
                         >
-                          <X size={12} />
+                           <Trash2 size={12} />
+                          {/* <X size={12} /> */}
                         </Button>
                       </div>
                     ))}
@@ -908,9 +1060,9 @@ const LeadContact = ({
 
                 {/* Address */}
                 <div className="sm:col-span-2">
-                  <label className={formInputLabelClassName}>Address:</label>
+                  <label className={formInputLabelClassName}>  <MapPin size={16} className="inline mr-2 text-blue-500" />Address</label>
                   <textarea
-                    placeholder="Full Address"
+                    placeholder="Enter full address"
                     name="address"
                     rows={4}
                     maxLength={256}
