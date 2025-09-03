@@ -274,7 +274,7 @@ const LeadContact = ({
             id: editContactData?.id,
             updatedby_id: loginStatus.id,
             // note : need to add logic
-            isactive: true,
+            // isactive: editContactData?.isActive,
             is_primary: editContactData?.isPrimary,
           }
         : {
@@ -363,6 +363,10 @@ const LeadContact = ({
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
     // setEditMode(true);
+    console.log("this is the selected lead contact card");
+    
+    console.log(selectedContactCard);
+    
     setEditingContactId(selectedContactCard.id);
     setEditContactData(selectedContactCard);
     setIsOpenAddLeadContactForm(true);
