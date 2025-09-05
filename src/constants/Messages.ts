@@ -56,7 +56,10 @@ const MESSAGE = {
             DENIED_UPDATE_ACCESS: "You do not have permission to update product information."
         }, PRODUCT_TEAM_MANAGEMENT: {
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team/users."
-        }
+        }, ACCOUNT_TYPE_ACCESS : {
+            DENIED_ADD_ACCESS : "You do not have permission to add account type.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update account type.",
+                }
     }
 }
 
