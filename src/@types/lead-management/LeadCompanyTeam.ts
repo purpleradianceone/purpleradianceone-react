@@ -9,6 +9,7 @@ type LeadCompanyTeam = {
     leadMobileNumber: string,
     teamName: string,
     createdBy: string,
-    createdOn: string
+    createdOn: string,
+    teamDescription : string
 }
 export default LeadCompanyTeam;

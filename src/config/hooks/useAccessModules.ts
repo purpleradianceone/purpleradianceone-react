@@ -294,6 +294,38 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 18 && accessModule.update
   );
 
+  //company account type
+  const userHasAccessToAddCompanyAccountType = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 19 && accessModules.add
+  );
+
+   const userHasAccessToViewCompanyAccountType  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 19 && accessModule.view
+  );
+
+  const userHasAccessToUpdateCompanyAccountType = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 19 && accessModule.update
+  );
+
+  //account 
+  const userHasAccessToAddAccount = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 20 && accessModules.add
+  );
+
+   const userHasAccessToViewAccount  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 20 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccount = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 20 && accessModule.update
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -366,5 +398,13 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToAddDashboard,
     userHasAccessToViewDashboard,
     userHasAccessToUpdateDashboard,
+
+    userHasAccessToAddCompanyAccountType,
+    userHasAccessToViewCompanyAccountType,
+    userHasAccessToUpdateCompanyAccountType,
+
+    userHasAccessToAddAccount,
+    userHasAccessToViewAccount,
+    userHasAccessToUpdateAccount,
   };
 };

@@ -14,6 +14,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
 import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
 import WebFormIntegration from "../views/settings/web-form-integration/WebFormIntegration";
+import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -23,6 +24,7 @@ function SettingsTabs() {
     userHasAccessToViewCompanyPreferences,
     userHasAccessToViewMeetingSetting,
     userHasAccessToViewSettingGeneral,
+    userHasAccessToViewCompanyAccountType
   } = useUserAccessModules();
 
   const data = [
@@ -48,13 +50,26 @@ function SettingsTabs() {
       value: "emailSettings",
       desc: <EmailSetting />,
     },
-    {
+     {
       label: "Meetings",
       value: "meeting",
       desc: (
         <>
           {userHasAccessToViewMeetingSetting ? (
             <MeetingSettings></MeetingSettings>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Account Type",
+      value: "accounttype",
+      desc: (
+        <>
+          {userHasAccessToViewCompanyAccountType ? (
+            <AccountTypeSetting/>
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}

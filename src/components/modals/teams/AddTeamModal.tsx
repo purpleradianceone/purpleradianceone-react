@@ -20,11 +20,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+
 import MESSAGE from "../../../constants/Messages";
 import SearchInput from "../../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
@@ -32,6 +28,7 @@ import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
 import ApiError from "../../../@types/error/ApiError";
+import toast from "react-hot-toast";
 
 
 function AddTeamModal({
@@ -73,19 +70,19 @@ function AddTeamModal({
     companyUsersGridApiRef.current = params.api;
 };
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   const handleCompanyUserCheckBoxChange = (params : CompanyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.checked){
@@ -121,20 +118,22 @@ function AddTeamModal({
           });
 
           if (response.data.status && response.status === STATUS_CODE.OK) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message)
             handleCompanyTeamChangeOnAdd();
             setTimeout(() => {
               onClose();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           }
           else if(!response.data.status){
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "error",
+            // });
+            toast.error(response.data.message)
           }
         } catch (error: ApiError | any) {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -144,19 +143,23 @@ function AddTeamModal({
             if (refreshTokenResponse) {
               handleAddTeamFormSubmit(event);
             }
+          }else{
+            toast.error(error.response.data)
           }
         }
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.REQUIRED_FIELDS,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
       }
     } else {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.NOT_ATHORISED,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.NOT_ATHORISED,
+      //   type: "error",
+      // });
+      toast.error( MESSAGE.ERROR.NOT_ATHORISED)
     }
   };
 
@@ -316,7 +319,7 @@ function AddTeamModal({
         name : "",
         description : "",
       })
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
 
     } else if (isOpen && companyUsers.length === 0) {
       fetchCompanyUsers("");
@@ -422,13 +425,13 @@ function AddTeamModal({
             </form>
           </div>
         </div>
-        <MessageSnackBar
+        {/* <MessageSnackBar
           isOpen={messageSnackbar.open}
           message={messageSnackbar.message}
           type={messageSnackbar.type}
           onClose={handleMessageSnackbarClose}
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
+        /> */}
       </div>
     </div>
   );
