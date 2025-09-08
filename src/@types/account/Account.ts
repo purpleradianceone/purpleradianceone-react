@@ -12,7 +12,7 @@ type Account = {
     pan : string;
     gst : string;
     tan : string;
-    buillingAddress : string;
+    billingAddress : string;
     shippingAddress : string;
     registeredOfficeAddress : string;
     businessResgistrationNumber : string;

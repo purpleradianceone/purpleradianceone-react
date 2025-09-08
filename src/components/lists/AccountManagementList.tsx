@@ -13,13 +13,17 @@ import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Pagination from "../ag-grid/Pagination";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
+import Account from "../../@types/account/Account";
+import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 
 function AccountManagementList({
+  accounts,
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
   paginationData
 }: {
+    accounts : Account[]
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
@@ -310,12 +314,15 @@ function AccountManagementList({
               : "ag-theme-alpine w-full h-[calc(100vh-128px)]"
           }
         >
-          {/* <LeadManagementAgGrid
-            handleRowClick={handleRowClickedForShowLead}
-            onRowSelect={handleRowSelectedForShowLead}
-            handleLeadDataFormChange={handleLeadDataFormChange}
-            leads={leadData}
-          /> */}
+          <AccountManagementAgGrid
+          accounts={accounts}
+          handleRowClick={(e)=>{
+            
+          }}
+          onRowSelect={(data : any) => {
+            
+          }}
+          />
         </div>
         
       </div>
