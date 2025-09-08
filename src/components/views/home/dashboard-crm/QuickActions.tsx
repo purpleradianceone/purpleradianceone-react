@@ -746,14 +746,15 @@ type AccessModuleType = {
 };
 
 interface QuickActionsProp {
-  companyUserId:number|null;
-  moduleAccessCompanyUser:AccessModuleType[];
+  companyUserId: number | null;
+  moduleAccessCompanyUser: AccessModuleType[];
 }
-const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessCompanyUser }) => {
+const QuickActions: React.FC<QuickActionsProp> = ({
+  companyUserId,
+  moduleAccessCompanyUser,
+}) => {
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
-
-  
 
   const actions = [
     {
@@ -765,7 +766,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-blue-600 to-blue-700 min-h-40 hover:from-blue-700 hover:to-blue-800", // Classic Business Blue
       shortcut: "Lead",
       route: ROUTES_URL.CREATE_LEAD,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 3)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 3
+            )[0].add ?? false
+          : false,
     },
     {
       id: 2,
@@ -776,7 +782,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-teal-600 to-teal-700 min-h-40 hover:from-teal-700 hover:to-teal-800", // Friendly Teal
       shortcut: "Users",
       route: ROUTES_URL.CREATE_COMPANY_USER,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 1)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 1
+            )[0].add ?? false
+          : false,
     },
     {
       id: 3,
@@ -787,7 +798,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-violet-500 to-violet-600 min-h-40 hover:from-violet-600 hover:to-violet-700", // Bright but Muted Violet
       shortcut: "Meetings",
       route: ROUTES_URL.SCHEDULE_MEETING,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 12)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 12
+            )[0].add ?? false
+          : false,
     },
     {
       id: 4,
@@ -798,7 +814,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-orange-500 to-orange-600 min-h-40 hover:from-orange-600 hover:to-orange-700", // Energetic Orange
       shortcut: "Templates",
       route: ROUTES_URL.EMAIL_TEMPLATE,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 15)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 15
+            )[0].add ?? false
+          : false,
     },
     {
       id: 5,
@@ -809,7 +830,7 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-gray-600 to-gray-700 min-h-40 hover:from-gray-700 hover:to-gray-800", // Warm Gray
       shortcut: "Settings",
       route: ROUTES_URL.COMPANY_SETTING,
-      visibility: true,
+      visibility: moduleAccessCompanyUser.length !== 0 ? true : false,
     },
     {
       id: 6,
@@ -820,7 +841,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-stone-500 to-stone-600 min-h-40 hover:from-stone-600 hover:to-stone-700", // Earthy Stone
       shortcut: "Preferences",
       route: ROUTES_URL.USER_PROFILE_SETTING,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 9)[0].view??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 9
+            )[0].view ?? false
+          : false,
     },
     {
       id: 7,
@@ -831,7 +857,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-green-600 to-green-700 min-h-40 hover:from-green-700 hover:to-green-800", // Lively Green
       shortcut: "Product",
       route: ROUTES_URL.PRODUCT_MANAGEMENT,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 4)[0].view??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 4
+            )[0].view ?? false
+          : false,
     },
     {
       id: 8,
@@ -842,7 +873,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 min-h-40 hover:from-fuchsia-700 hover:to-fuchsia-800", // Playful Fuchsia (used sparingly for unique actions)
       shortcut: "Team",
       route: ROUTES_URL.TEAM_MANAGEMENT,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 6)[0].view??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 6
+            )[0].view ?? false
+          : false,
     },
     {
       id: 9,
@@ -853,7 +889,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
       shortcut: "Product",
       route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 8)[0].view??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 8
+            )[0].view ?? false
+          : false,
     },
     {
       id: 10,
@@ -864,7 +905,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-cyan-500 to-cyan-600 min-h-40 hover:from-cyan-600 hover:to-cyan-700", // Clear Cyan
       shortcut: "Product",
       route: ROUTES_URL.CREATE_PRODUCT,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 4)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 4
+            )[0].add ?? false
+          : false,
     },
     {
       id: 11,
@@ -875,7 +921,12 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
         "bg-gradient-to-r from-red-500 to-red-600 min-h-40 hover:from-red-600 hover:to-red-700", // Action Red (for important new creation)
       shortcut: "Teams",
       route: ROUTES_URL.CREATE_TEAM,
-      visibility: moduleAccessCompanyUser.filter((molule)=>molule.crm_module_id === 6)[0].add??false,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 6
+            )[0].add ?? false
+          : false,
     },
   ];
   return (
@@ -892,18 +943,18 @@ const QuickActions: React.FC<QuickActionsProp> = ({ companyUserId, moduleAccessC
             <button
               key={action.id}
               onClick={() => {
-                if(loginStatus.id === companyUserId){
-                if (action.id !== 3) {
-                  navigate(action.route);
+                if (loginStatus.id === companyUserId) {
+                  if (action.id !== 3) {
+                    navigate(action.route);
+                  } else {
+                    navigate(
+                      ROUTES_URL.SCHEDULE_MEETING +
+                        "?from=" +
+                        window.location.pathname
+                    );
+                  }
                 } else {
-                  navigate(
-                    ROUTES_URL.SCHEDULE_MEETING +
-                      "?from=" +
-                      window.location.pathname
-                  );
-                }
-                }else{
-                  toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
+                  toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
                 }
               }}
               className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
