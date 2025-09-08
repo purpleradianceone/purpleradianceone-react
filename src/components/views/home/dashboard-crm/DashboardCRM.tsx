@@ -80,18 +80,24 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     AccessModuleType[]
   >([]);
   const getCrmModuleAccessOfCompanyUser = async () => {
+    setAccessModuleCompanyUser([]);
+    setIsTasksLoading(true);
     const getCrmModuleAccessData = {
       company_id: loginStatus.companyId,
       company_user_id: companyUserId,
       requestedby: loginStatus.id,
     };
+
     axios
       .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
         withCredentials: true,
       })
       .then((response) => {
-        const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
-        setAccessModuleCompanyUser(accessModuleOfCompanyUser);
+        if (response.status === STATUS_CODE.OK) {
+          const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
+          setAccessModuleCompanyUser(accessModuleOfCompanyUser);
+        }
+        getDashboardData();
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -238,7 +244,6 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   useEffect(() => {
     if (loginStatus?.companyId && loginStatus?.id) {
-      getDashboardData();
       getCrmModuleAccessOfCompanyUser();
     }
   }, [companyUserId]);
