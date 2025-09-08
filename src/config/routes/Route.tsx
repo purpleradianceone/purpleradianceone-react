@@ -57,6 +57,7 @@ import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
 import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
 import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
 import Home from "../../components/views/home/Home";
+import GetAccounts from "../../components/views/account/AccountManagement";
 
 export const router = createBrowserRouter([
   {
@@ -554,5 +555,17 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
+  {
+    path: ROUTES_URL.ACCOUNT_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+      <PrivateRoute>
+        <Navbar>
+          <GetAccounts/>
+        </Navbar>
+      </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  }
 ]);
 export default router;

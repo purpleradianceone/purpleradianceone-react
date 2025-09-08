@@ -58,5 +58,7 @@ const ROUTES_URL = {
     NOT_AUTHORIZED : "/not-authorized",
     SETTINGS_ALREADY_EXISTS : "/meeting/settings/already-exists",
 
+    ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
+
 }
 export default ROUTES_URL;
