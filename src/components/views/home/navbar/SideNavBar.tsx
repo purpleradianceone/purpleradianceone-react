@@ -8,6 +8,7 @@ import {
   Network,
   Settings,
   Store,
+  UserCogIcon,
   X,
 } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
@@ -21,6 +22,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
   const {
     userHasAccessToViewUser,
     userHasAccessToViewLead,
+    userHasAccessToViewAccount,
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewProductTeam,
@@ -104,6 +106,37 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             <SideNavBarItem
               icon={Handshake}
               label="Leads"
+              isOpen={isOpen}
+              disabled={true}
+            />
+          </Link>
+        )}
+
+        {userHasAccessToViewAccount && (
+          <Link
+            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+            onClick={() => {
+              if (isSmallScreen) {
+                onNextTab();
+              }
+            }}
+          >
+            <SideNavBarItem icon={UserCogIcon} label="Accounts" isOpen={isOpen} />
+          </Link>
+        )}
+
+        {!userHasAccessToViewAccount && (
+          <Link
+            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+            onClick={() => {
+              if (isSmallScreen) {
+                onNextTab();
+              }
+            }}
+          >
+            <SideNavBarItem
+              icon={UserCogIcon}
+              label="Accounts"
               isOpen={isOpen}
               disabled={true}
             />
