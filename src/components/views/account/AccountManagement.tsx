@@ -86,7 +86,7 @@ function GetAccounts() {
         pan : res.pan,
         gst : res.gst,
         tan : res.tan,
-        buillingAddress : res.billing_address,
+        billingAddress : res.billing_address,
         shippingAddress : res.shipping_address,
         registeredOfficeAddress : res.registered_office_address,
         businessResgistrationNumber : res.business_registration_number,
@@ -95,7 +95,79 @@ function GetAccounts() {
         createdBy : res.createdby,
         createdOn : res.createdon
       }))
+      
       setAccounts(formattedData);
+//       setAccounts([
+//   {
+//     count: 1,
+//     id: 101,
+//     companyId: 1,
+//     name: "Acme Corp",
+//     email: "contact@acmecorp.com",
+//     mobileNumber: "9876543210",
+//     industryTypeId: 5,
+//     industryTypeName: "Technology",
+//     businessTypeId: 2,
+//     businessTypeName: "Limited Liability Partnership (LLP)",
+//     pan: "ABCDE1234F",
+//     gst: "27ABCDE1234F1Z5",
+//     tan: "ABCDE1234F",
+//     billingAddress: "123 Tech Park, Silicon Valley",
+//     shippingAddress: "123 Tech Park, Silicon Valley",
+//     registeredOfficeAddress: "123 Tech Park, Silicon Valley",
+//     businessResgistrationNumber: "C1234567",
+//     website: "https://www.acmecorp.com",
+//     isActive: true,
+//     createdBy: "admin",
+//     createdOn: "2024-01-15T10:00:00Z",
+//   },
+//   {
+//     count: 2,
+//     id: 102,
+//     companyId: 1,
+//     name: "Globex Inc.",
+//     email: "info@globex.com",
+//     mobileNumber: "9123456789",
+//     industryTypeId: 3,
+//     industryTypeName: "Manufacturing",
+//     businessTypeId: 3,
+//     businessTypeName: "Partnership",
+//     pan: "FGHIJ5678K",
+//     gst: "27FGHIJ5678K1Z5",
+//     tan: "FGHIJ5678K",
+//     billingAddress: "456 Industrial Rd, Metropolis",
+//     shippingAddress: "456 Industrial Rd, Metropolis",
+//     registeredOfficeAddress: "456 Industrial Rd, Metropolis",
+//     businessResgistrationNumber: "P9876543",
+//     website: "https://www.globex.com",
+//     isActive: true,
+//     createdBy: "admin",
+//     createdOn: "2024-02-20T11:30:00Z",
+//   },
+//   {
+//     count: 3,
+//     id: 103,
+//     companyId: 1,
+//     name: "Innovate Solutions",
+//     email: "contact@innovate.co",
+//     mobileNumber: "9988776655",
+//     industryTypeId: 7,
+//     industryTypeName: "Consulting",
+//     businessTypeId: 1,
+//     businessTypeName: "Sole Proprietorship",
+//     pan: "KLMNO9012L",
+//     gst: "27KLMNO9012L1Z5",
+//     tan: "KLMNO9012L",
+//     billingAddress: "789 Business Blvd, Innovation City",
+//     shippingAddress: "789 Business Blvd, Innovation City",
+//     registeredOfficeAddress: "789 Business Blvd, Innovation City",
+//     businessResgistrationNumber: "S1122334",
+//     website: "https://www.innovate.co",
+//     isActive: false,
+//     createdBy: "admin",
+//     createdOn: "2024-03-05T14:45:00Z",
+//   },
+// ])
       if (response.data[0]?.count) {
         setTotalPages(
           Math.ceil(response.data[0].count / pageSize)
@@ -147,6 +219,7 @@ function GetAccounts() {
       
     >
             <AccountManagementList 
+            accounts={accounts}
             handleSearchOption={{
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
