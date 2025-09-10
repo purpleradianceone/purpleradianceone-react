@@ -82,11 +82,8 @@ const LeadContact = ({
 
   const inputClass =
     "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
-  // const formInputLabelClassName =
-  //   "font-medium text-gray-900 text-xs  mb-1 block";
       const formInputLabelClassName = "block text-sm font-medium text-gray-700 mb-2";
 
-  // const viewLabelClassName = "font-medium text-gray-800";
   const handleUrl = (link: string): string => {
     try {
       const url = new URL(link.trim());
