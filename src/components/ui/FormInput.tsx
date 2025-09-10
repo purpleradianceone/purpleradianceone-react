@@ -116,15 +116,17 @@ function FormInput({
   useCountry,
   minLength,
   maxLength,
-  autoComplete
+  autoComplete,
+  logo : Icon
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
   const isMobileNumberInput =useCountry;
 
   return (
     <div className={isSmallScreen ? "mt-1" : "mt-2"}>
-      <label htmlFor={name} className={(center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
-        {label}{required && <span className="text-red-500 align-top">*</span>}
+      <label htmlFor={name} className={(center ? 'text-center ' : '') + 'flex items-center  text-sm font-medium  text-gray-700'}>
+      {Icon  && <Icon size={14} className="inline mr-1 text-blue-500"/>}
+        {label}{required && <span className="text-red-500 align-top">*</span> }
       </label>
       <div className={isSmallScreen ? "mt-1 relative" : "mt-0 relative"}>
         {isMobileNumberInput ? (

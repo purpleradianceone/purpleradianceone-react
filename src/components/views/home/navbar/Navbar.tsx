@@ -16,6 +16,7 @@ import {
   Settings,
   SettingsIcon,
   Store,
+  UserCogIcon,
   X,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -46,6 +47,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
   const {
     userHasAccessToViewLead,
+    userHasAccessToViewAccount,
     userHasAccessToViewProduct,
     userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
@@ -385,6 +387,22 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             label="Lead"
                           />
                         )} */}
+
+                       {/* {userHasAccessToViewAccount && ( */}
+                          <NavItem
+                          disable={!userHasAccessToViewAccount}
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                        {/* )} */}
+                        {/* {!userHasAccessToViewAccount && (
+                          <NavItem
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                        )} */}
                         {/* {userHasAccessToViewProduct && ( */}
                           <NavItem
                           disable={!userHasAccessToViewProduct}
@@ -469,6 +487,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
+
+                          {userHasAccessToViewAccount && (
+                          <NavItem
+                          disable={!userHasAccessToViewAccount}
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                         )}
                           {userHasAccessToViewProduct && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_MANAGEMENT}

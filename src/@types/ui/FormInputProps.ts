@@ -1,9 +1,11 @@
+import { LucideIcon } from "lucide-react";
 import Country from "../general/Country";
 
 /**
  * @typedef FormInputProps defines the props and its data types of a FormInput component
  */
 type FormInputProps = {
+
     id?:string,
     label?: string;
     type?: string;
@@ -37,6 +39,7 @@ type FormInputProps = {
     countries? : Country[];
     useCountry? : boolean;
     autoComplete? : React.HTMLInputAutoCompleteAttribute;
+    logo?: LucideIcon
   }
 
   /**

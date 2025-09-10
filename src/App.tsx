@@ -16,6 +16,8 @@ import { Toaster } from "react-hot-toast";
 import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
 import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
+import { IndustryTypeDataProvider } from "./context/Account/IndustryTypeData";
+import { BusinessTypeDataProvider } from "./context/Account/BusinessTypeData";
 
 /**
  *
@@ -25,37 +27,41 @@ function App() {
   const { confirmHandler, dialogMessage, isDialogOpen } =
     useAxiosForbiddenHandler();
   return (
-    <NotificationCountContextProvider>
-      <UserPreferenceContextProvider>
-        <PanelProvider>
-          <ZoomMeetingContextProvider>
-            <GoogleMeetContextProvider>
-              <AccessManagementContextProvider>
-                <LoggedInUserContextProvider>
-                  <NotificationProvider>
-                    <Toaster
-                      position="top-center"
-                      toastOptions={{
-                        style: { zIndex: 2147483647 }, // max safe z-index
-                      }}
-                    />
+    <LoggedInUserContextProvider>
+      <AccessManagementContextProvider>
+        <BusinessTypeDataProvider>
+          <IndustryTypeDataProvider>
+            <NotificationCountContextProvider>
+              <UserPreferenceContextProvider>
+                <PanelProvider>
+                  <ZoomMeetingContextProvider>
+                    <GoogleMeetContextProvider>
+                      <NotificationProvider>
+                        <Toaster
+                          position="top-center"
+                          toastOptions={{
+                            style: { zIndex: 2147483647 }, // max safe z-index
+                          }}
+                        />
 
-                    <DialogueBox
-                      isOpen={isDialogOpen}
-                      // onClose={closeDialog}
-                      onConfirm={confirmHandler}
-                      title="Session Expired !"
-                      message={dialogMessage}
-                    />
-                    <RouterProvider router={router} />
-                  </NotificationProvider>
-                </LoggedInUserContextProvider>
-              </AccessManagementContextProvider>
-            </GoogleMeetContextProvider>
-          </ZoomMeetingContextProvider>
-        </PanelProvider>
-      </UserPreferenceContextProvider>
-    </NotificationCountContextProvider>
+                        <DialogueBox
+                          isOpen={isDialogOpen}
+                          // onClose={closeDialog}
+                          onConfirm={confirmHandler}
+                          title="Session Expired !"
+                          message={dialogMessage}
+                        />
+                        <RouterProvider router={router} />
+                      </NotificationProvider>
+                    </GoogleMeetContextProvider>
+                  </ZoomMeetingContextProvider>
+                </PanelProvider>
+              </UserPreferenceContextProvider>
+            </NotificationCountContextProvider>
+          </IndustryTypeDataProvider>
+        </BusinessTypeDataProvider>
+      </AccessManagementContextProvider>
+    </LoggedInUserContextProvider>
   );
 }
 

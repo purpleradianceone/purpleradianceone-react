@@ -75,7 +75,7 @@ export const SIZE = {
 
 export const INNERHTML = {
     // OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-full"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div></div>',
-    OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-64 flex-col"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once animate-hide-spinner"></div><div class="opacity-0 animate-show-text text-gray-500 mt-4 text-sm">No data to show</div></div>',
+    OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-64 flex-col"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div><div class="opacity-0 animate-show-text text-gray-500 mt-4 text-sm">No data to show</div></div>',
     // OVERLAY_NO_ROWS_TEMPLATE : '<div class="relative flex justify-center items-center h-64 flex-col"><div class="absolute rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 pointer-events-none"></div><div class="opacity-0 animate-fade-in-delay text-gray-500 text-sm">No data to show</div></div>',
     OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX : '<div class = "flex justify-center items-center h-full text-blue-600" >No tax Records to Show! Please Add Tax</div>'
 }

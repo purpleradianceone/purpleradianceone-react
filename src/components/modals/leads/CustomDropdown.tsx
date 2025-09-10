@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, ChevronUp, Delete } from "lucide-react";
+import { ChevronDown, ChevronUp, Delete, LucideIcon } from "lucide-react";
 import {
   MessageSnackbarState,
   ShowMessageSnackbarProps,
@@ -16,6 +16,7 @@ interface DropdownProps {
   readOnly?: boolean;
   preselectedOption?: number;
   requiredRedDot?: boolean;
+  logo? : LucideIcon
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -26,6 +27,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   readOnly,
   preselectedOption,
   requiredRedDot,
+  logo : Icon
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
     () => {
@@ -76,8 +78,10 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     }
   }, []);
   return (
-    <div className="relative w-auto " ref={dropdownRef}>
-      <label className="block text-sm font-medium text-gray-700">
+    <div className="relative w-auto  " ref={dropdownRef}>
+       
+      <label className="block text-sm  font-medium text-gray-700">
+        {Icon  && <Icon size={14} className="inline mr-1 text-blue-500"/>}
         {labelName === "status" ||
         labelName === "source" ||
         labelName === "type" ||
@@ -90,6 +94,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
            <span className="text-rose-500">*</span>
         )
        }
+              
       </label>
 
       <div
