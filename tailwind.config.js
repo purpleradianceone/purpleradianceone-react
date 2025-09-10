@@ -10,9 +10,9 @@ export default {
       },
       animation: {
         'fade-in': 'fadeIn 1s ease-in-out forwards',
-         'spin-once': 'spin 1s linear forwards',
+         'spin-once': 'spin 1s linear 10 forwards',
         'hide-spinner': 'hide-spinner 1s linear 3s forwards',
-        'show-text': 'show-text 0s ease-in 1s forwards',
+        'show-text': 'show-text 0s ease-in 10s forwards',
       },
       keyframes: {
         fadeIn: {
