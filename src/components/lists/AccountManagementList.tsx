@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Calendar, Filter, UserRoundCogIcon, X } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
@@ -7,7 +8,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import { useState } from "react";
+import {  useState } from "react";
 import { SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
@@ -15,24 +16,31 @@ import Pagination from "../ag-grid/Pagination";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
+import CreateAccount from "../modals/Account/CreateAccount";
+import AccountDetails from "../modals/Account/AccountDetails";
+import { useIndustryTypeData } from "../../context/Account/IndustryTypeData";
+import { useBusinessTypeData } from "../../context/Account/BusinessTypeData";
 
 function AccountManagementList({
   accounts,
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
-  paginationData
+  paginationData,
+  fetchAccounts,
 }: {
-    accounts : Account[]
+  fetchAccounts : () => Promise<void>;
+  accounts: Account[];
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
-    onEndDateChange: (date: Date) => void;
-    paginationData: PaginationDataProps;
+  onEndDateChange: (date: Date) => void;
+  paginationData: PaginationDataProps;
 }) {
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
+  const [openCreateAccountForm, setOpenAccountForm] = useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
@@ -44,6 +52,17 @@ function AccountManagementList({
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
     useState<boolean>(false);
 
+  const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
+    useState<Account>();
+  const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
+  // Note : To open the details component of that account
+  const handleRowSelectedToShowAccountDetails = (data: any) => {
+    setAccountDataToShowFullDetails(data);
+      setShowAccountDetails(true);
+  };
+
+  const {industryTypeData } = useIndustryTypeData();
+  const {businessTypeData} = useBusinessTypeData();
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -100,6 +119,16 @@ function AccountManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
+              <Button
+                onClick={() => {
+                  setOpenAccountForm(!openCreateAccountForm);
+                }}
+              >
+                + Create account
+              </Button>
+              {openCreateAccountForm && (
+                <CreateAccount onClose={() => setOpenAccountForm(false)} />
+              )}
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
                   labelName="source"
@@ -192,6 +221,7 @@ function AccountManagementList({
                 ></DateRangeFilterDropdown>
               </div>
             </div>
+
             {isFilterOpenInTabletView && isCustomDateOptionSelected && (
               <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
@@ -315,16 +345,11 @@ function AccountManagementList({
           }
         >
           <AccountManagementAgGrid
-          accounts={accounts}
-          handleRowClick={(e)=>{
-            
-          }}
-          onRowSelect={(data : any) => {
-            
-          }}
+            accounts={accounts}
+            // handleRowClick={(e) => {handleRowClick}}
+            onRowSelect={handleRowSelectedToShowAccountDetails}
           />
         </div>
-        
       </div>
 
       <div className="flex items-center justify-end ">
@@ -336,6 +361,18 @@ function AccountManagementList({
           onPageSizeChange={paginationData.selectedPageSize}
         />
       </div>
+
+      {showAccountDetails && (
+          <div className="account-data">
+          <AccountDetails
+          fetchAccounts ={fetchAccounts}
+          indutryTypeData={industryTypeData!}
+          businessTypeData = {businessTypeData!}
+           company={AccountDataToShowFullDetails!}
+           onClose={() => setShowAccountDetails(false)}
+           />
+           </div>
+      )}
     </div>
   );
 }
