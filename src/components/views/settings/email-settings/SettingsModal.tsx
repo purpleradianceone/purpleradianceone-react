@@ -5,7 +5,7 @@ import Button from "../../../ui/Button";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { ShowMessageSnackbarProps } from "../../../../@types/ui/MessageSnackbarProps";
+import toast from "react-hot-toast";
 
 type SettingType = "company" | "user";
 
@@ -19,7 +19,12 @@ const Dialog: React.FC<{
       className="fixed pt-32 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto"
       onClick={() => onOpenChange(false)}
     >
-      <div className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50" onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div
+        className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
     </div>
   );
 
@@ -60,7 +65,6 @@ interface SettingsModalProps {
   settingType: SettingType;
   initialData?: EmailSettings; // initialData will be present in edit mode
   onSubmit: (data: EmailSettings) => void;
-  handleResponseMessage: ({ message, type }: ShowMessageSnackbarProps) => void;
 }
 
 const getDefaultSettings = (type: SettingType): EmailSettings =>
@@ -103,7 +107,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settingType,
   initialData, // This prop indicates if it's an edit operation
   onSubmit,
-  handleResponseMessage,
 }) => {
   const [formData, setFormData] = useState<EmailSettings>(
     getDefaultSettings(settingType)
@@ -159,11 +162,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     };
 
     // Correct the typo for authentication_required if your API expects it correctly spelled
-    if ('authatication_required' in payload) {
-        payload.authentication_required = payload.authatication_required;
-        delete payload.authatication_required;
+    if ("authatication_required" in payload) {
+      payload.authentication_required = payload.authatication_required;
+      delete payload.authatication_required;
     }
-
 
     if (!isCompany) payload.company_user_id = loginStatus.id;
 
@@ -172,21 +174,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       const response = await axios.post(apiEndpoint, payload, {
         withCredentials: true,
       });
-      handleResponseMessage({message:response.data.message,type:response.data.status?'success':"error"});
-    } catch (error: any) { // Catching 'any' for error to access properties
+      if (response.data.status) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error: any) {
+      // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
-      handleResponseMessage({message:`Something went wrong. Please try again. ${error.response?.data?.message || ''}`,type:"error"});
+      toast.error(
+        `Something went wrong. Please try again. ${
+          error.response?.data?.message || ""
+        }`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    
     await handleApiCall();
     onClose();
     onSubmit(formData); // Call onSubmit with current form data
-    
   };
 
   const renderField = (
@@ -262,13 +271,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             "checkbox"
           )}
           {/* Conditional rendering for isactive checkbox */}
-          {isEdit && (
+          {isEdit &&
             renderField(
               "Active", // Label for the checkbox
               "isactive",
               "checkbox"
-            )
-          )}
+            )}
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <Button onClick={onClose} disabled={loading}>
@@ -289,6 +297,5 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     </Dialog>
   );
 };
-
 
 export default SettingsModal;
