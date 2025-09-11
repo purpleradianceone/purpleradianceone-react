@@ -6,6 +6,9 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import ApiError from "../../../../@types/error/ApiError";
 
 type SettingType = "company" | "user";
 
@@ -13,11 +16,11 @@ const Dialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-}> = ({ open, onOpenChange, children }) =>
+  
+}> = ({ open, children }) =>
   !open ? null : (
     <div
-      className="fixed pt-32 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto"
-      onClick={() => onOpenChange(false)}
+      className="fixed pt-14 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto "
     >
       <div
         className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50"
@@ -79,10 +82,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new company settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       }
     : {
         id: 0,
@@ -95,10 +98,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new user settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       };
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -171,14 +174,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
     try {
       setLoading(true);
-      const response = await axios.post(apiEndpoint, payload, {
-        withCredentials: true,
+      await axios
+        .post(apiEndpoint, payload, {
+          withCredentials: true,
+        })
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            if (result.data.status) {
+              toast.success(result.data.message);
+            } else {
+              toast.error(result.data.message);
+            }
+          }
+        }).catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: handleApiCall,
+          });
+          if (refreshTokenStatus) {
+            handleApiCall();
+          }
+        }
       });
-      if (response.data.status) {
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
     } catch (error: any) {
       // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
@@ -245,8 +262,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={onClose}
+    >
+      <DialogContent
+      >
         <DialogHeader>
           <DialogTitle>
             {isEdit ? "Edit" : "Create"} {settingType} Email Setting
