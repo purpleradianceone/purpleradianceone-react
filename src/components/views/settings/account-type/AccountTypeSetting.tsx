@@ -76,7 +76,7 @@ const AccountTypeSetting: React.FC = () => {
     const postDataToUpdateCompanyAccountType = {
       company_id: loginStatus.companyId,
       id: editingTypeId,
-      account_type_name: editingTypeName,
+      company_account_type_name: editingTypeName,
       isactive: editingStatus,
       updatedby_id: loginStatus.id,
     };
@@ -129,15 +129,15 @@ const AccountTypeSetting: React.FC = () => {
     //   toast.error("post data is wrong");
     //   return;
     // }
-    const postDataToAddNewAccountType = {
+    const postDataToAddNewCompanyAccountType = {
       company_id: loginStatus.companyId,
       account_type_id: newParentType,
-      account_type_name: newTypeName,
+      company_account_type_name: newTypeName,
       createdby_id: loginStatus.id,
     };
 
     axios
-      .post(POST_API.CREATE_COMPANY_ACCOUNT_TYPE, postDataToAddNewAccountType, {
+      .post(POST_API.CREATE_COMPANY_ACCOUNT_TYPE, postDataToAddNewCompanyAccountType, {
         withCredentials: true,
       })
       .then((response) => {
