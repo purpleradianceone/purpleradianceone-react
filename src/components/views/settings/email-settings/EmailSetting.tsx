@@ -23,6 +23,8 @@ import MESSAGE from "../../../../constants/Messages";
 import EmailTypeSettings from "./EmailTypeSettings";
 import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
 import toast from "react-hot-toast";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
 
 interface CompanyEmailSetting {
   id: number;
@@ -81,6 +83,7 @@ export default function EmailSettingsTabs() {
     userHasAccessToViewEmailSettingCompany,
     userHasAccessToViewEmailTypeSetting,
   } = useUserAccessModules();
+  const { loginStatus } = useLoggedInUserContext();
 
   const handleModalSubmit = async (data: any) => {
     console.log("Submitted data:", data);
@@ -92,53 +95,77 @@ export default function EmailSettingsTabs() {
     }
   };
 
-  const { loginStatus } = useLoggedInUserContext();
 
   const getEmailSettingsCompany = async () => {
     setIsLoading(true); // Start loading
     setCompanySettings([]);
     try {
-      const responseCompanyEmailSettings = await axios.post(
-        POST_API.GET_EMAIL_SETTING_COMPANY,
-        {
-          company_id: loginStatus.companyId,
-          requestedby_id: loginStatus.id,
-        },
-        { withCredentials: true }
-      );
-
-      if (responseCompanyEmailSettings.status === STATUS_CODE.OK) {
-        const companyEmailSetting = responseCompanyEmailSettings.data;
-        setCompanySettings(
-          companyEmailSetting.length > 0 ? companyEmailSetting : []
-        );
-      }
+      await axios
+        .post(
+          POST_API.GET_EMAIL_SETTING_COMPANY,
+          {
+            company_id: loginStatus.companyId,
+            requestedby_id: loginStatus.id,
+          },
+          { withCredentials: true }
+        )
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            const companyEmailSetting = result.data;
+            setCompanySettings(
+              companyEmailSetting.length > 0 ? companyEmailSetting : []
+            );
+          }
+        }).catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: getEmailSettingsCompany,
+            });
+            if (refreshTokenStatus) {
+              getEmailSettingsCompany();
+            }
+          }
+        });
     } catch (error) {
       console.error("Error fetching  company email settings:", error);
     } finally {
       setIsLoading(false); // Stop loading
     }
   };
+
+
   const getEmailSettingsUser = async () => {
     setIsLoading(true); // Start loading
     setUserSettings([]);
     try {
-      const responseCompanyUserEmailSettings = await axios.post(
-        POST_API.GET_EMAIL_SETTING_COMPANY_USER,
-        {
-          company_id: loginStatus.companyId,
-          company_user_id: loginStatus.id,
-          requestedby_id: loginStatus.id,
-        },
-        { withCredentials: true }
-      );
-
-      if (responseCompanyUserEmailSettings.status === STATUS_CODE.OK) {
-        const companyUserEmailSetting = responseCompanyUserEmailSettings.data;
-        setUserSettings(
-          companyUserEmailSetting.length > 0 ? companyUserEmailSetting : []
-        );
-      }
+      await axios
+        .post(
+          POST_API.GET_EMAIL_SETTING_COMPANY_USER,
+          {
+            company_id: loginStatus.companyId,
+            company_user_id: loginStatus.id,
+            requestedby_id: loginStatus.id,
+          },
+          { withCredentials: true }
+        )
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            const companyUserEmailSetting = result.data;
+            setUserSettings(
+              companyUserEmailSetting.length > 0 ? companyUserEmailSetting : []
+            );
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: getEmailSettingsUser,
+            });
+            if (refreshTokenStatus) {
+              getEmailSettingsUser();
+            }
+          }
+        });
     } catch (error) {
       console.error("Error fetching user email setting:", error);
     } finally {
