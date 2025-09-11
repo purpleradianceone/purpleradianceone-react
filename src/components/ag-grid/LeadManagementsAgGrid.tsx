@@ -2,7 +2,7 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import {  useMemo, useRef } from "react";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGridProps";
 import LeadDataProps from "../../@types/lead-management/LeadProps";
 
@@ -151,6 +151,7 @@ function LeadManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect : onRowSelect}}
         onRowClicked={handleRowClick}
       />

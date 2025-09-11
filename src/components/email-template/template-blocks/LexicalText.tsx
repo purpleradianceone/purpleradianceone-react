@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useContext, } from "react";
+import React, { useContext } from "react";
 import { useEditor, useNode } from "@craftjs/core";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -118,7 +118,7 @@ const ToolbarSelect = ({
 
 const Toolbar = ({ editor }: { editor: any }) => {
   const dynamicFields = useContext(DynamicFieldsContext);
-   
+  const [activeFontSize,setActiveFontSize] = React.useState("");
   const [activeFormats, setActiveFormats] = React.useState<Record<string, boolean>>({
     bold: false,
     italic: false,
@@ -142,12 +142,17 @@ const Toolbar = ({ editor }: { editor: any }) => {
   };
 
   const setInlineStyle = (style: string) => {
+    if(style.includes("font-size")){
+      setActiveFontSize(style.slice(10,));
+      console.log(activeFontSize);
+    }
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         selection.setStyle(style);
       }
     });
+    
   };
 
   const insertDynamicField = (fieldKey: string) => {
@@ -165,6 +170,7 @@ const Toolbar = ({ editor }: { editor: any }) => {
       </div>
     );
   }
+
 
   return (
     <div style={{
@@ -192,7 +198,7 @@ const Toolbar = ({ editor }: { editor: any }) => {
       </div>
 
       <ToolbarSelect onChange={(e) => setInlineStyle(`font-size: ${e.target.value}`)} defaultValue="14px">
-        {["12px", "14px", "16px", "18px", "20px", "24px"].map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
+        {["8px", "10px", "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px", "42px", "44px", "46px", "48px", "50px", "52px", "54px", "56px", "58px", "60px", "62px", "64px", "66px", "68px", "70px", "72px"].map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
       </ToolbarSelect>
 
       <ToolbarSelect onChange={(e) => setInlineStyle(`font-family: ${e.target.value}`)} defaultValue="Arial">

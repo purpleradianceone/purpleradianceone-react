@@ -2,7 +2,7 @@
 import { AgGridReact } from "ag-grid-react";
 import Account from "../../@types/account/Account";
 import { useMemo, useRef } from "react";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { CheckCircle2, XCircle } from "lucide-react";
 
@@ -56,10 +56,10 @@ function AccountManagementAgGrid({
         headerName: "Business Type",
         sortable: true,
         filter: true,
-        minWidth : 200,
-        tooltipValueGetter(params){
+        minWidth: 200,
+        tooltipValueGetter(params) {
           return params.data.businessTypeName;
-        }
+        },
       },
       {
         field: "pan",
@@ -72,10 +72,10 @@ function AccountManagementAgGrid({
         headerName: "GST",
         sortable: true,
         filter: true,
-        minWidth : 180,
-        tooltipValueGetter(params){
-          return params.data.gst
-        }
+        minWidth: 180,
+        tooltipValueGetter(params) {
+          return params.data.gst;
+        },
       },
       {
         field: "tan",
@@ -88,53 +88,58 @@ function AccountManagementAgGrid({
         headerName: "Billing address",
         sortable: true,
         filter: true,
-        minWidth : 250,
+        minWidth: 250,
         tooltipValueGetter(params) {
           return params.data.billingAddress;
         },
-         onCellClicked(params) {
-        const address = encodeURIComponent(params.data.registeredOfficeAddress);
-        
-        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
-        
-        window.open(googleMapsUrl, '_blank');
-    }
-        
+        onCellClicked(params) {
+          const address = encodeURIComponent(
+            params.data.registeredOfficeAddress
+          );
+
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
+
+          window.open(googleMapsUrl, "_blank");
+        },
       },
       {
         field: "shippingAddress",
         headerName: "Shipping address",
         sortable: true,
         filter: true,
-        minWidth : 250,
-         tooltipValueGetter(params) {
+        minWidth: 250,
+        tooltipValueGetter(params) {
           return params.data.shippingAddress;
         },
-         onCellClicked(params) {
-        const address = encodeURIComponent(params.data.registeredOfficeAddress);
-        
-        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
-        
-        window.open(googleMapsUrl, '_blank');
-    }
+        onCellClicked(params) {
+          const address = encodeURIComponent(
+            params.data.registeredOfficeAddress
+          );
+
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
+
+          window.open(googleMapsUrl, "_blank");
+        },
       },
       {
-    field: "registeredOfficeAddress",
-    headerName: "Registered Office Add.",
-    sortable: true,
-    filter: true,
-    minWidth: 250,
-    tooltipValueGetter(params) {
-        return params.data.registeredOfficeAddress;
-    },
-    onCellClicked(params) {
-        const address = encodeURIComponent(params.data.registeredOfficeAddress);
-        
-        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
-        
-        window.open(googleMapsUrl, '_blank');
-    }
-},
+        field: "registeredOfficeAddress",
+        headerName: "Registered Office Add.",
+        sortable: true,
+        filter: true,
+        minWidth: 250,
+        tooltipValueGetter(params) {
+          return params.data.registeredOfficeAddress;
+        },
+        onCellClicked(params) {
+          const address = encodeURIComponent(
+            params.data.registeredOfficeAddress
+          );
+
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
+
+          window.open(googleMapsUrl, "_blank");
+        },
+      },
       {
         field: "businessResgistrationNumber",
         headerName: "Business registration number",
@@ -142,31 +147,31 @@ function AccountManagementAgGrid({
         filter: true,
       },
       {
-    field: "website",
-    headerName: "Website",
-    sortable: true,
-    filter: true,
-    minWidth: 250,
-    cellDataType: 'text',
-    tooltipValueGetter(params) {
-        return params.data.website;
-    },
-    cellRenderer: (params : any) => {
-        if (!params.value) {
+        field: "website",
+        headerName: "Website",
+        sortable: true,
+        filter: true,
+        minWidth: 250,
+        cellDataType: "text",
+        tooltipValueGetter(params) {
+          return params.data.website;
+        },
+        cellRenderer: (params: any) => {
+          if (!params.value) {
             return null;
-        }
-        return (
-            <a 
-                className="text-blue-700"
-                href={params.value} 
-                target="_blank" 
-                rel="noopener noreferrer"
+          }
+          return (
+            <a
+              className="text-blue-700"
+              href={params.value}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-                {params.value}
+              {params.value}
             </a>
-        );
-    },
-},
+          );
+        },
+      },
       {
         field: "isActive",
         headerName: "Status",
@@ -246,7 +251,6 @@ function AccountManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
-      
     }),
     []
   );
@@ -263,6 +267,7 @@ function AccountManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />

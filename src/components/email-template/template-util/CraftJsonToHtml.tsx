@@ -63,7 +63,7 @@ function renderNode(data: CraftData, nodeId: string): string {
 
   // ✅ Special handling for ROOT
   if (nodeId === "ROOT") {
-    return `<div id="ROOT" style="max-width:600px;margin:0 auto;background-color:#f7f7f7;
+    return `<div id="ROOT" style="max-width:700px;margin:0 auto;background-color:#f7f7f7;
             border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);
             font-family:Arial, sans-serif;font-size:14px;line-height:20px;
             color:#000000;overflow:hidden;">${renderChildren(node.nodes)}${renderLinkedNodes(
@@ -433,6 +433,7 @@ const componentRenderers: Record<string, ComponentRenderer> = {
         margin: "8px 0",
         whiteSpace: "pre-wrap",
         ...node.props.style,
+
       });
 
       // Return HTML with inline styles
@@ -500,7 +501,9 @@ function extractHtmlFromLexical(editorState: any): string {
       if (hasOnlyWhitespace) return `<p>&nbsp;</p>`;
 
       // Skip auto-generated empty paragraphs (like trailing new lines)
-      if (isTrulyEmpty) return "";
+      // if (isTrulyEmpty) return "";
+      if (isTrulyEmpty) return `<p>&nbsp;</p>`;
+
 
       let style = node.textStyle || "";
       if (node.format && typeof node.format === "string") {
