@@ -6,8 +6,6 @@ import {
   Globe,
   MapPin,
   FileText,
-  Calendar,
-  User,
   CheckCircle,
   XCircle,
   Factory,
@@ -49,15 +47,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   const [formData, setFormData] = useState<Account>(company);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+ 
 
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
@@ -278,7 +268,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               isMandatory && !value ? 'border border-red-300 bg-red-50' : ''
             }`}
           >
-            {value || (isReadOnly ? 'N/A' : placeholder)}
+            {value || (isReadOnly ? 'N/A' : <><span className="text-sm text-gray-500 font-normal italic">{placeholder}</span></>)}
             {!isReadOnly && (
               <Edit3 className="inline-block ml-2 h-3 w-3 text-slate-400" />
             )}
@@ -298,26 +288,27 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       } mt-8 mb-9 fixed inset-0 bg-white z-10 overflow-auto  mx-auto p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
     >
       {/* Header Section */}
-      <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-slate-200">
+      <div className="bg-white rounded-2xl shadow p-2 mb-2 border ">
         <button
-          className="flex items-center text-xs text-gray-400 gap-1  border-gray-400 rounded-md  p-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
+          className="flex items-center text-xs text-gray-400 gap-1  border-gray-400 rounded-md  px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
         >
           <ArrowLeft size={14} /> <span>back to accounts</span>
         </button>
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center space-x-4">
+        {/* Main header */}
+        <div className="flex items-start justify-between  ">
+          <div className="flex items-center space-x-3 ">
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-4 rounded-xl">
-              <Building2 className="h-8 w-8 text-white" />
+              <Building2 className="h-6 w-6 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-800">
                 {renderEditableField('name', formData.name, 'Enter company name')}
               </h1>
-              <div className="text-slate-600 mt-1">
-                {renderDropdownField('industryTypeName', formData.industryTypeName, indutryTypeData || [], 'Select industry type')}
+              <div className="text-slate-600 flex items-center ">
+               <span  className="text-xs text-gray-600">Industry type:</span>  {renderDropdownField('industryTypeName', formData.industryTypeName, indutryTypeData || [], 'Select industry type')}
               </div>
-              <div className="flex items-center mt-2">
+              <div className="flex items-center ">
                 {formData.isActive ? (
                   <div className="flex items-center text-green-600">
                     <CheckCircle className="h-4 w-4 mr-1" />
@@ -332,16 +323,45 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
             </div>
           </div>
-        </div>
+          {/* main header - right side */}
+          <div className="grid gap-2 font-semibold text-gray-700">
+            <div className="flex   items-center justify-between">
+              <span className="grid">
+              <span className="text-xs font-normal text-gray-500">
+             Created By 
+              </span>
+              <span className="text-sm">
+              {formData.createdBy}
+              </span>
+            </span>
+             <span className="grid">
+              <span className="text-xs font-normal text-gray-500">
+              Created On
+              </span>
+              <span className="text-sm">
+             {formData.createdOn}
+              </span>
+            </span>
+            </div>
+            {/* business type */}
+            <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
+          <div className="grid  items-center text-slate-700">
+            <div className="text-gray-600 font-normal text-xs">
+              Business type 
+            </div>
+            <div className="flex items-center">
 
-        <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-4 rounded-lg">
-          <div className="flex items-center text-slate-700">
             <Factory className="h-4 w-4 mr-2" />
             <div className="font-medium">
               {renderDropdownField('businessTypeName', formData.businessTypeName, businessTypeData || [], 'Select business type')}
             </div>
+            </div>
           </div>
         </div>
+          </div>
+        </div>
+
+
       </div>
 
       {/* Main Content Grid */}
@@ -461,35 +481,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           </div>
         </div>
 
-        {/* System Information */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200 lg:col-span-2">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
-            <Calendar className="h-5 w-5 mr-2 text-indigo-500" />
-            System Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-center p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-100">
-              <User className="h-8 w-8 text-indigo-500 mr-4" />
-              <div>
-                <p className="text-sm text-indigo-600 font-medium">
-                  Created By
-                </p>
-                <p className="text-lg font-semibold text-slate-800 capitalize">
-                  {formData.createdBy}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
-              <Calendar className="h-8 w-8 text-blue-500 mr-4" />
-              <div>
-                <p className="text-sm text-blue-600 font-medium">Created On</p>
-                <p className="text-lg font-semibold text-slate-800">
-                  {formatDate(formData.createdOn)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+       
       </div>
     </div>
   );
