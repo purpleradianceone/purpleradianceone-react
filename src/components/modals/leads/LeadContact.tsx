@@ -184,17 +184,9 @@ const LeadContact = ({
       .then((response) => {
         const data = response.data;
         if (response.data.status === true) {
-          // showMessageSnackbar({
-          //   message: data.message,
-          //   type: "success",
-          // });
           toast.success(data.message);
           fetchLeadContact();
         } else {
-          // showMessageSnackbar({
-          //   message: data.message,
-          //   type: "error",
-          // });
           toast.error(data.message);
         }
       })
@@ -290,17 +282,9 @@ const LeadContact = ({
       .then((response) => {
         const data = response.data;
         if (data.status === true) {
-          // showMessageSnackbar({
-          //   message: data.message,
-          //   type: "success",
-          // });
           toast.success(data.message);
           fetchLeadContact();
         } else {
-          // showMessageSnackbar({
-          //   message: data.message,
-          //   type: "error",
-          // });
           toast.error(data.message);
         }
       })

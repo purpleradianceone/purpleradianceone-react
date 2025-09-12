@@ -145,7 +145,8 @@ const POST_API = {
     GET_ACCOUNT : `${BASE_URL}${import.meta.env.VITE_GET_ACCOUNT}`,
     CREATE_ACCOUNT : `${BASE_URL}${import.meta.env.VITE_CREATE_ACCOUNT}`,
     GET_BUSINESS_TYPE : `${BASE_URL}${import.meta.env.VITE_GET_BUSINESS_TYPE}`,
-    UPDATE_ACCOUNT : `${BASE_URL}${import.meta.env.VITE_UPDATE_ACCOUNT}`
+    UPDATE_ACCOUNT : `${BASE_URL}${import.meta.env.VITE_UPDATE_ACCOUNT}`,
+    GET_ACCOUNT_CONTACT: `${BASE_URL}${import.meta.env.VITE_GET_ACCOUNT_CONTACT}`
 }
 
 export default POST_API;
