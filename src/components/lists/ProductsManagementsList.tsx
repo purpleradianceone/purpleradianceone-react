@@ -50,20 +50,29 @@ function ProductsManagementList({
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [selectedProduct, setSelectedProduct] = useState<Product>({
+    count: 0,
+    id: 0,
+    companyId: 0,
+    productTypeId: 0,
+    defaultWarrantyIntervalTypeId: 0,
+    defaultWarranty: 0,
+    defaultWarrantyName: "",
+    defaultAmcCycleIntervalTypeId: 0,
+    defaultAmcCycle: 0,
+    defaultAmcCycleName: "",
     name: "",
     code: "",
-    description: "",
-    companyId: 0,
     cost: 0,
-    count: 0,
-    createdBy: "",
-    createdOn: "",
-    hsn: "",
-    id: 0,
+    description: "",
+    version: "",
+    url: "",
     isActive: false,
+    hsn: "",
     sac: "",
     taxRate: 0,
     validFrom: "",
+    createdBy: "",
+    createdOn: "",
   });
 
   const handleSelectedProductChange = (product: Product) => {
