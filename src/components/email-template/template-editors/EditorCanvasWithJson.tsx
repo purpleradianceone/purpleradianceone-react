@@ -485,7 +485,7 @@ export const EditorCanvasWithJson = () => {
                 style={{
                   position: "sticky",
                   top: "0px",
-                  height: "3000px",
+                  height: "10000px",
                   backgroundColor: "blue",
                 }}
               >
