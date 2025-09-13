@@ -452,8 +452,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
     getComapnyAccountType();
   }, []);
   return (
-    <div className="fixed top-8 inset-0 z-20 flex items-center justify-center bg-black/5 ">
-      <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-5xl overflow-auto ">
+    <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
+      <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
         {/* Close Button */}
         <div className="flex justify-end">
           <button
@@ -468,7 +468,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
         <h2 className="text-xl font-semibold text-gray-800 py-4 mb-2  border-b">
           Create new account
         </h2>
-        <form className="space-y-2 grid grid-cols-2 gap-3">
+        <form className=" grid grid-cols-2 gap-3">
           {/* name */}
           <div className="flex flex-col col-span-1">
             <FormInput
@@ -483,16 +483,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
               value={createAccountFormData.name}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500"
             />
             {errors.name && (
-              <p className="text-xs  text-red-600 mt-1">{errors.name}</p>
+              <p className="text-xs  text-red-600 ">{errors.name}</p>
             )}
           </div>
 
           <div className="flex flex-col col-span-1">
             {/* email */}
             <FormInput
+            required
               logo={Mail}
               type="text"
               label="Email :"
@@ -503,16 +504,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
               value={createAccountFormData.email}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-lg px-3  focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && (
-              <p className="text-xs  text-red-600 mt-1">{errors.email}</p>
+              <p className="text-xs  text-red-600 ">{errors.email}</p>
             )}
           </div>
 
           <div className="flex flex-col col-span-1">
             {/* mobile number */}
             <FormInput
+              required
               logo={Phone}
               type="text"
               label="Mobile number: "

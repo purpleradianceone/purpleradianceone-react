@@ -98,6 +98,8 @@ const AccountTypeSetting: React.FC = () => {
       if (response.data.status === true) {
         toast.success(response.data.message);
         getComapnyAccountType();
+      }else{
+        toast.error(response.data.message)
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -269,10 +271,10 @@ const AccountTypeSetting: React.FC = () => {
         <div className="bg-gray-50 rounded-lg  p-2 mb-8">
           <div
             className="flex items-center hover:scale-[1.01] 
-            transition-all duration-200 ease-in-out bg-white justify-between mb-4 border py-3 px-1  rounded-md"
+            transition-all duration-200 ease-in-out bg-white text-gray-800 hover:text-blue-700 justify-between mb-4 border py-3 px-1  rounded-md"
           >
-            <h2 className="text-base font-medium text-gray-500 flex items-center gap-2">
-              <UserRoundPlus size={18} /> Add company account
+            <h2 className="text-base font-medium   px-2  flex items-center gap-2">
+              <UserRoundPlus size={18} /> Company account type
             </h2>
             {!showAddForm && (
               <button
@@ -286,17 +288,17 @@ const AccountTypeSetting: React.FC = () => {
                     );
                   }
                 }}
-                className="flex items-center gap-1 bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center font-medium gap-1 bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus size={18} />
-                Add company account
+                Add new type
               </button>
             )}
           </div>
         </div>
         {/* Add Form */}
         {showAddForm && (
-          <div className="bg-white rounded-lg p-4 mb-6 border border-gray-200">
+          <div className="bg-white rounded-lg p-4 mb-6 border border-blue-200 shadow ">
             <h3 className="text-base flex gap-2 items-center border w-fit p-2 rounded-md shadow-md font-medium text-blue-800 mb-4">
               <UserRoundPlus size={18} /> Create New Comapny Account Type
             </h3>
@@ -304,7 +306,7 @@ const AccountTypeSetting: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Account Type Name : <span className="text-red-600">*</span>
+                 Company Account Type Name : <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -313,7 +315,7 @@ const AccountTypeSetting: React.FC = () => {
                   minLength={VALIDATIONS.MIN_NAME_LENGTH}
                   required
                   onChange={(e) => setNewTypeName(e.target.value)}
-                  placeholder="Enter account type name..."
+                  placeholder="Enter company account type name..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   autoFocus
                 />
@@ -340,11 +342,11 @@ const AccountTypeSetting: React.FC = () => {
                         className={`mr-3  focus:ring-blue-5 `}
                       />
                       <div>
-                        <span className="font-medium text-gray-800">
+                        {/* <span className="font-medium text-gray-800">
                           {type.name}
-                        </span>
+                        </span> */}
                         <span
-                          className={`ml-2 px-2 py-1 text-xs rounded-full ${getParentTypeColor(
+                          className={`ml-2 px-2 py-1 text-sm font-semibold rounded-xl ${getParentTypeColor(
                             type.name!
                           )}`}
                         >
@@ -363,7 +365,7 @@ const AccountTypeSetting: React.FC = () => {
                   className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:bg-green-200  disabled:cursor-not-allowed transition-colors"
                 >
                   <Save size={16} />
-                  Create
+                  Save
                 </button>
                 <button
                   onClick={() => {
@@ -384,11 +386,11 @@ const AccountTypeSetting: React.FC = () => {
         {/* Available Account Types */}
         <div className="space-y-6 border p-2  rounded-md hover:scale-[1.01] transition-all duration-200 ease-in-out bg-white">
           <h4 className="font-medium text-md text-gray-900 border w-fit p-2  rounded-lg shadow-md   flex items-center gap-2">
-            <User size={18} /> Company account types
+            <User size={18} />Available company account types
           </h4>
           {companyAccountType.length === 0 ? (
-            <p className="text-gray-500 italic">
-              No account types available. Add one to get started.
+            <p className="text-gray-500 italic text-sm  text-center ">
+              No company account types available. Add one to get started.
             </p>
           ) : (
             Object.entries(groupedData).map(([parentType, children]) => {
@@ -426,7 +428,7 @@ const AccountTypeSetting: React.FC = () => {
                           {/* Editable Name */}
                           {editingTypeId === item.id ? (
                             <>
-                            <label htmlFor="name" className="text-xs">Name: <span className="text-red-500">*</span> (mandatory field) </label>
+                            {/* <label htmlFor="name" className="text-xs">Name: <span className="text-red-500">*</span> (mandatory field) </label> */}
                             <input
                             id="name"
                               type="text"
@@ -451,7 +453,7 @@ const AccountTypeSetting: React.FC = () => {
                                 }
                               }}
                               autoFocus
-                              className="w-full px-3  border border-blue-400 rounded-md focus:ring-1 focus:ring-blue-500"
+                              className="w-full px-2  border border-blue-400 rounded-md focus:ring-1 focus:ring-blue-500"
                             />
                             </>
                           ) : (
@@ -472,13 +474,13 @@ const AccountTypeSetting: React.FC = () => {
                                 }
                               }}
                             >
-                              <div className="grid items-center ">
+                              <div className="grid items-center pl-2 ">
 
-                              <span className="text-gray-600 text-xs">Name : </span>
-                              <div className="flex items-center gap-1 hover:bg-gray-100">
+                              {/* <span className="text-gray-600 text-xs">Name : </span> */}
+                              <div className="flex items-center gap-1 hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-100">
 
                               {item.companyAccountTypeName}
-                              <Pen size={12} className="text-gray-500 " />
+                              <Pen size={10} className="text-blue-500 " />
                               </div>
                               </div>
                             </h4>
