@@ -24,7 +24,10 @@ import REGEX from "../../../constants/Regex";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
-import { MOBILE_NUMBER_VALIDATION, STATUS_CODE } from "../../../constants/AppConstants";
+import {
+  MOBILE_NUMBER_VALIDATION,
+  STATUS_CODE,
+} from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import AccountContact from "./Account-contact/AccountContact";
 
@@ -47,15 +50,20 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   const { userPreference } = useUserPreference();
   const [editingField, setEditingField] = useState<string | null>(null);
   const [formData, setFormData] = useState<Account>(company);
-  const [originalValues, setOriginalValues] = useState<{ [key: string]: string }>({});
+  const [originalValues, setOriginalValues] = useState<{
+    [key: string]: string;
+  }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState<'contact' | 'legal' | 'address'>('contact');
+  const [activeTab, setActiveTab] = useState<"contact" | "legal" | "address">(
+    "contact"
+  );
 
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
       case "name":
         if (!value.trim()) return "Company name is required";
-        if (value.length > 40) return "Company name cannot exceed 40 characters";
+        if (value.length > 40)
+          return "Company name cannot exceed 40 characters";
         return "";
       case "email":
         if (!value.trim()) return "Email is required";
@@ -64,7 +72,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         return "";
       case "mobileNumber":
         if (!value.trim()) return "Mobile number is required";
-        if (!/^\d+$/.test(value)) return "Mobile number can only contain digits";
+        if (!/^\d+$/.test(value))
+          return "Mobile number can only contain digits";
         if (!MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value))
           return "Please enter a valid 10-digit mobile number";
         return "";
@@ -82,7 +91,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       toast.error(error);
       setErrors((prev) => ({ ...prev, [fieldName]: error }));
       // Revert to original value on error
-      setFormData((prev) => ({ ...prev, [fieldName]: originalValues[fieldName] || company[fieldName as keyof Account] }));
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]:
+          originalValues[fieldName] || company[fieldName as keyof Account],
+      }));
       return;
     }
 
@@ -116,7 +129,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         } else {
           toast.error(response.data.message);
           // Revert to original value on API error
-          setFormData((prev) => ({ ...prev, [fieldName]: originalValues[fieldName] || company[fieldName as keyof Account] }));
+          setFormData((prev) => ({
+            ...prev,
+            [fieldName]:
+              originalValues[fieldName] || company[fieldName as keyof Account],
+          }));
         }
         fetchAccounts();
       })
@@ -131,7 +148,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         } else {
           toast.error(error.response.data);
           // Revert to original value on error
-          setFormData((prev) => ({ ...prev, [fieldName]: originalValues[fieldName] || company[fieldName as keyof Account] }));
+          setFormData((prev) => ({
+            ...prev,
+            [fieldName]:
+              originalValues[fieldName] || company[fieldName as keyof Account],
+          }));
         }
       });
   };
@@ -140,9 +161,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     if (!["createdOn", "createdBy"].includes(fieldName)) {
       setEditingField(fieldName);
       // Store original value when starting to edit
-      setOriginalValues((prev) => ({ 
-        ...prev, 
-        [fieldName]: formData[fieldName as keyof Account] as string 
+      setOriginalValues((prev) => ({
+        ...prev,
+        [fieldName]: formData[fieldName as keyof Account] as string,
       }));
     }
   };
@@ -158,9 +179,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
     if (fieldName === "mobileNumber") {
       // Only allow digits for mobile number
-      processedValue = value.replace(/\D/g, '');
+      processedValue = value.replace(/\D/g, "");
     }
-    
+
     setFormData((prev) => ({ ...prev, [fieldName]: processedValue }));
   };
 
@@ -186,8 +207,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   const handleInputBlur = (fieldName: string) => {
     const currentValue = formData[fieldName as keyof Account] as string;
-    const originalValue = originalValues[fieldName] || company[fieldName as keyof Account] as string;
-    
+    const originalValue =
+      originalValues[fieldName] ||
+      (company[fieldName as keyof Account] as string);
+
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
       handleUpdateAccountDetails(fieldName, currentValue);
@@ -219,7 +242,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       // Revert to original value
       setFormData((prev) => ({
         ...prev,
-        [fieldName]: originalValues[fieldName] || company[fieldName as keyof Account],
+        [fieldName]:
+          originalValues[fieldName] || company[fieldName as keyof Account],
       }));
       setEditingField(null);
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
@@ -301,10 +325,60 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     const isMandatory = ["name", "email", "mobileNumber"].includes(fieldName);
     const hasError = errors[fieldName];
 
+    // return (
+    //   <div className="relative">
+    //     {isEditing ? (
+    //       <div>
+    //         <input
+    //           type={type}
+    //           required={required}
+    //           value={(formData[fieldName as keyof Account] as string) || ""}
+    //           onChange={(e) => handleInputChange(fieldName, e.target.value)}
+    //           onBlur={() => handleInputBlur(fieldName)}
+    //           onKeyDown={(e) => handleKeyPress(e, fieldName)}
+    //           placeholder={placeholder}
+    //           className={`w-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+    //             hasError ? "border-red-500" : "border-blue-500"
+    //           }`}
+    //           autoFocus
+    //         />
+    //         {hasError && (
+    //           <p className="text-xs text-red-500 mt-1">{hasError}</p>
+    //         )}
+    //       </div>
+    //     ) : (
+    //       <div
+    //         title={value}
+    //         onClick={() => handleFieldClick(fieldName)}
+    //         className={`font-medium  text-slate-800 truncate ${
+    //           !isReadOnly
+    //             ? "cursor-pointer hover:bg-slate-100 rounded transition-colors"
+    //             : ""
+    //         } ${!value && !isReadOnly ? "text-slate-400 italic" : ""} ${
+    //           isMandatory && !value ? "border border-red-300 bg-red-50" : ""
+    //         }`}
+    //       >
+    //         {value ||
+    //           (isReadOnly ? (
+    //             "N/A"
+    //           ) : (
+    //             <span className="text-xs text-gray-500 font-normal italic">
+    //               {placeholder}
+    //             </span>
+    //           ))}
+    //         {!isReadOnly && (
+    //           <Edit3 className="inline-block ml-2 h-3 w-3 text-slate-400" />
+    //         )}
+    //         {isMandatory && <span className="text-red-500 ml-1">*</span>}
+    //       </div>
+    //     )}
+    //   </div>
+    // );
     return (
-      <div className="relative">
+      <div className="relative w-full max-w-full">
+      {/* // <div className="relative h-full flex flex-col justify-center"> */}
         {isEditing ? (
-          <div>
+          <div className="h-full flex flex-col">
             <input
               type={type}
               required={required}
@@ -313,7 +387,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               onBlur={() => handleInputBlur(fieldName)}
               onKeyDown={(e) => handleKeyPress(e, fieldName)}
               placeholder={placeholder}
-              className={`w-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full h-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 hasError ? "border-red-500" : "border-blue-500"
               }`}
               autoFocus
@@ -326,7 +400,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div
             title={value}
             onClick={() => handleFieldClick(fieldName)}
-            className={`font-medium  text-slate-800 truncate ${
+            className={`h-full  flex items-center font-medium text-slate-800 truncate ${
               !isReadOnly
                 ? "cursor-pointer hover:bg-slate-100 rounded transition-colors"
                 : ""
@@ -354,16 +428,18 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'contact':
+      case "contact":
         return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
+             <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
             {/* Email */}
-            <div className="grid col-span-2 gap-2 bg-slate-50 border rounded-xl p-3 hover:shadow-sm transition">
+            <div className="col-span-2 flex justify-between p-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-blue-600" />
-                <p className="text-xs text-slate-500">Email</p>
+                <Mail className="h-5 w-5 text-blue-600" />
+                
               </div>
-              <div className="truncate">
+              <div className="truncate pl-3 w-full overflow-hidden">
+                <p className="text-xs text-slate-500">Email</p>
                 {renderEditableField(
                   "email",
                   formData.email,
@@ -375,12 +451,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
 
             {/* Mobile */}
-            <div className="grid gap-2 col-span-2  bg-slate-50 border rounded-xl p-2 hover:shadow-sm transition">
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-green-600" />
-                <p className="text-xs text-slate-500">Mobile</p>
+            {/* <div className=" col-span-2  justify-between p-0.5 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition"> */}
+              <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-2 px-3 hover:shadow-sm transition">
+              <div className="flex  items-center gap-2">
+                <Phone className="h-5 w-5 text-green-600" />
+                
               </div>
-              <div className="truncate">
+              <div className="truncate pl-3 w-full overflow-hidden">
+                <p className="text-xs text-slate-500">Mobile</p>
                 {renderEditableField(
                   "mobileNumber",
                   formData.mobileNumber,
@@ -392,12 +470,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
 
             {/* Website */}
-            <div className="grid gap-2 bg-slate-50 border rounded-xl p-3 hover:shadow-sm transition sm:col-span-2">
+            <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition sm:col-span-2">
+
               <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-purple-600" />
-                <p className="text-xs text-slate-500">Website</p>
+                <Globe className="h-5 w-5 text-purple-600" />
+                
               </div>
-              <div className="truncate">
+              <div className="truncate ">
+                <p className="text-xs  text-slate-500">Website</p>
                 {editingField === "website" ? (
                   renderEditableField(
                     "website",
@@ -408,7 +488,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 ) : (
                   <div
                     onClick={() => handleFieldClick("website")}
-                    className="cursor-pointer hover:bg-slate-100 rounded transition-colors truncate"
+                    className="cursor-pointer flex items-center  hover:bg-slate-100 rounded transition-colors truncate"
                   >
                     {formData.website ? (
                       <a
@@ -431,10 +511,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 )}
               </div>
             </div>
+            
           </div>
         );
 
-      case 'legal':
+      case "legal":
         return (
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-green-50 rounded-lg border border-green-100">
@@ -450,7 +531,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               {renderEditableField("tan", formData.tan, "Enter TAN number")}
             </div>
             <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
-              <p className="text-xs text-orange-600 font-medium mb-1">Registration</p>
+              <p className="text-xs text-orange-600 font-medium mb-1">
+                Registration
+              </p>
               {renderEditableField(
                 "businessResgistrationNumber",
                 formData.businessResgistrationNumber,
@@ -460,9 +543,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           </div>
         );
 
-      case 'address':
+      case "address":
         return (
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4   overflow-auto">
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -524,7 +607,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         >
           <ArrowLeft size={14} /> <span>back to accounts</span>
         </button>
-        
+
         {/* Main header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -565,24 +648,30 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
             </div>
           </div>
-          
+
           {/* Right side */}
           <div className="grid gap-2 font-semibold text-gray-700">
             <div className="flex items-center justify-between gap-4">
               <span className="grid">
-                <span className="text-xs font-normal text-gray-500">Created By</span>
+                <span className="text-xs font-normal text-gray-500">
+                  Created By
+                </span>
                 <span className="text-sm truncate">{formData.createdBy}</span>
               </span>
               <span className="grid">
-                <span className="text-xs font-normal text-gray-500">Created On</span>
+                <span className="text-xs font-normal text-gray-500">
+                  Created On
+                </span>
                 <span className="text-sm truncate">{formData.createdOn}</span>
               </span>
             </div>
-            
+
             {/* Business type */}
             <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
               <div className="grid items-center text-slate-700">
-                <div className="text-gray-600 font-normal text-xs">Business type</div>
+                <div className="text-gray-600 font-normal text-xs">
+                  Business type
+                </div>
                 <div className="flex items-center">
                   <Factory className="h-4 w-4 mr-2" />
                   <div className="font-medium truncate">
@@ -601,39 +690,39 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 max-h-72   gap-1">
         {/* Left Card with Tabs */}
-        <div className="bg-white rounded-xl p-3 border border-slate-200">
+        <div className="bg-white rounded-xl   p-3 border border-slate-200">
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200 mb-2">
+          <div className="flex border-b  border-gray-200 mb-2">
             <button
-              onClick={() => setActiveTab('contact')}
+              onClick={() => setActiveTab("contact")}
               className={`flex items-center px-2  text-sm font-medium rounded-t-lg ${
-                activeTab === 'contact'
-                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "contact"
+                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <Mail className="h-4 w-4 mr-2" />
               Contact
             </button>
             <button
-              onClick={() => setActiveTab('legal')}
+              onClick={() => setActiveTab("legal")}
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-t-lg ${
-                activeTab === 'legal'
-                  ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "legal"
+                  ? "text-green-600 border-b-2 border-green-600 bg-green-50"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <FileText className="h-4 w-4 mr-2" />
               Legal
             </button>
             <button
-              onClick={() => setActiveTab('address')}
+              onClick={() => setActiveTab("address")}
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-t-lg ${
-                activeTab === 'address'
-                  ? 'text-red-600 border-b-2 border-red-600 bg-red-50'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "address"
+                  ? "text-red-600 border-b-2 border-red-600 bg-red-50"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <MapPin className="h-4 w-4 mr-2" />
@@ -646,10 +735,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         </div>
 
         {/* Right Card - Empty for future use */}
-        <div className="bg-white rounded-xl p-3 border border-slate-200">
-          <AccountContact
-            accountId={8}
-          />
+        <div className="bg-white rounded-xl h-72 border p-1 border-slate-200">
+          <h3 className="bg-gray-100 text-sm rounded-t-md    px-2   text-gray-700 font-semibold">Account Contact</h3>
+          <AccountContact accountId={company.id} />
         </div>
       </div>
     </div>
