@@ -55,16 +55,7 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
       },
-      {
-        field: "description",
-        headerName: "Description",
-        sortable: true,
-        filter: true,
-        flex: 1.5,
-        tooltipValueGetter(params) {
-          return params.data.description;
-        },
-      },
+
       {
         field: "isActive",
         headerName: "Active",
@@ -88,6 +79,40 @@ function ProductsManagementGrid({
             </div>
           );
         },
+      },
+
+      {
+        field: "version",
+        headerName: "Version",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+      },
+      {
+        field: "url",
+        headerName: "URL",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+      },
+
+      {
+        field: "defaultWarrantyName",
+        headerName: "Warranty",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+      },
+      {
+        field: "defaultAmcCycleName",
+        headerName: "AMC Cycle",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForProductUser,
       },
       {
         field: "hsn",
@@ -126,6 +151,17 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,
+      },
+
+      {
+        field: "description",
+        headerName: "Description",
+        sortable: true,
+        filter: true,
+        flex: 1.5,
+        tooltipValueGetter(params) {
+          return params.data.description;
+        },
       },
 
       {
@@ -251,7 +287,10 @@ function ProductsManagementGrid({
                                 handleCompanyProductUserModalOpen(true);
                                 handleSelectedProductChange(params.data);
                               } else {
-                                toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT.DENIED_UPDATE_ACCESS);
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
+                                    .DENIED_UPDATE_ACCESS
+                                );
                               }
                             }}
                           >
@@ -263,13 +302,16 @@ function ProductsManagementGrid({
                           <ActionsDropdownButton
                             disabled={!userHasAccessToUpdateProductTeam}
                             onClick={() => {
-                               if (userHasAccessToUpdateProductTeam) {
-                              setIsActionsDropDownOpen(false);
-                              handleCompanyProductTeamModalOpen(true);
-                              handleSelectedProductChange(params.data);
-                               }else{
-                                toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT.DENIED_UPDATE_ACCESS);
-                               }
+                              if (userHasAccessToUpdateProductTeam) {
+                                setIsActionsDropDownOpen(false);
+                                handleCompanyProductTeamModalOpen(true);
+                                handleSelectedProductChange(params.data);
+                              } else {
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
+                                    .DENIED_UPDATE_ACCESS
+                                );
+                              }
                             }}
                           >
                             <Network
