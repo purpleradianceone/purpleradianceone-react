@@ -59,16 +59,16 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(product.productTypeId);
 
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
-    useState<number>(0);
+    useState<number>(product.defaultWarrantyIntervalTypeId);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(product.defaultWarranty);
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(product.defaultAmcCycleIntervalTypeId);
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(product.defaultAmcCycle);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -380,14 +380,53 @@ function EditCompanyProductModal({
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Cost : "
+                <div>
+                  <FormInput
+                    label="Cost : "
+                    type="text"
+                    name="cost"
+                    placeholder="Enter Product Cost"
+                    defaultValue={intialEditCompanyProductFormData.cost}
+                    onChange={handleEditCompanyProductFormDataChange}
+                  />
+                  <FormInput
+                    label="URL : "
+                    type="text"
+                    name="url"
+                    required={false}
+                    value={updateCompanyProductFormData.url}
+                    placeholder="Product URL"
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
+
+                  <FormInput
+                  label="Version : "
                   type="text"
-                  name="cost"
-                  placeholder="Enter Product Cost"
-                  defaultValue={intialEditCompanyProductFormData.cost}
+                  name="version"
+                  required={false}
+                  value={updateCompanyProductFormData.version}
+                  placeholder="Product Version"
                   onChange={handleEditCompanyProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
                 />
+
+                  <TextAreaInput
+                    label="Description : "
+                    cols={5}
+                    rows={2}
+                    name="description"
+                    required={true}
+                    placeholder="Enter Product Description"
+                    defaultValue={intialEditCompanyProductFormData.description}
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.description}
+                  />
+                </div>
+
                 <div className="grid col-span-1 gap-1">
                   <CustomDropdown
                     labelName="Product Type"
@@ -447,56 +486,15 @@ function EditCompanyProductModal({
                     options={intervalTypeData}
                     requiredRedDot={true}
                   />
-                  <FormInput
-                    label="URL : "
-                    type="text"
-                    name="url"
-                    required={false}
-                    value={updateCompanyProductFormData.url}
-                    placeholder="Product URL"
-                    onChange={handleEditCompanyProductFormDataChange}
-                    onBlur={handleBlur}
-                    error={errors.code}
-                  />
                 </div>
-
-                
-              </div>
-
-              <div className="grid gap-4">
-
-                <FormInput
-                  label="Version : "
-                  type="text"
-                  name="version"
-                  required={false}
-                  value={updateCompanyProductFormData.version}
-                  placeholder="Product Version"
-                  onChange={handleEditCompanyProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-
-                <TextAreaInput
-                  label="Description : "
-                  cols={5}
-                  rows={3}
-                  name="description"
-                  required={true}
-                  placeholder="Enter Product Description"
-                  defaultValue={intialEditCompanyProductFormData.description}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.description}
-                />
               </div>
               <div className="flex col-span-2 justify-center">
-                  <RadioButtons
-                    label="Status : "
-                    onChange={handleEditCompanyProductFormDataChange}
-                    options={CompanyProductIsActiveRadioButtonOptions}
-                  />
-                </div>
+                <RadioButtons
+                  label="Status : "
+                  onChange={handleEditCompanyProductFormDataChange}
+                  options={CompanyProductIsActiveRadioButtonOptions}
+                />
+              </div>
 
               <div className="flex justify-self-center m-2 min-w-80 gap-2">
                 <Button type="submit">Update Product</Button>
