@@ -82,12 +82,12 @@ function ProductManagement() {
       const getProductPostData = {
         company_id: loginStatus.companyId,
         id: null,
-        requestedby: loginStatus.id,
         limit: pageSize,
         offset: offset,
         search_company_specific_date_range_id: effectiveDateRangeId,
         search_parameter: searchParameter,
         search_parameter_date: concatDate,
+        requestedby_id: loginStatus.id,
       };
 
       try {
@@ -101,20 +101,30 @@ function ProductManagement() {
 
         if (response.data && response.status === STATUS_CODE.OK) {
           const formattedData: Product[] = response.data.map((res: any) => ({
-            code: res.code,
-            companyId: res.company_id,
-            cost: res.cost,
             count: res.count,
-            createdBy: res.createdby,
-            createdOn: res.createdon,
-            description: res.description,
-            hsn: res.hsn,
             id: res.id,
-            isActive: res.isactive,
+            companyId: res.company_id,
+            productTypeId:res.product_type_id,
+            defaultWarrantyIntervalTypeId:res.default_warranty_interval_type_id,
+            defaultWarranty:res.default_warranty,
+            defaultWarrantyName:res.default_warranty_name,
+            defaultAmcCycleIntervalTypeId:res.default_amc_cycle_interval_type_id,
+            defaultAmcCycle:res.default_amc_cycle,
+            defaultAmcCycleName:res.default_amc_cycle_name,
             name: res.name,
+            code: res.code,
+            cost: res.cost,
+            description: res.description,
+            version:res.version,
+            url:res.url,
+            isActive: res.isactive,
+            hsn: res.hsn,
             sac: res.sac,
             taxRate: res.tax_rate,
             validFrom: res.valid_from,
+            createdBy: res.createdby,
+            createdOn: res.createdon,
+
           }));
           setProductsData(formattedData);
           if (response.data[0]?.count) {

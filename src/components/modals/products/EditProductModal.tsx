@@ -29,6 +29,9 @@ import { Product } from "../../../@types/products/ProductsManagementProps";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CreateCompanyProductCompanyUserModal from "./CreateCompanyProductCompanyUserModal";
 import toast from "react-hot-toast";
+import CustomDropdown from "../leads/CustomDropdown";
+import { useIntervalType } from "../../../config/hooks/useIntervalType";
+import { useProductType } from "../../../config/hooks/useProductTypes";
 
 function EditCompanyProductModal({
   isOpen,
@@ -37,13 +40,35 @@ function EditCompanyProductModal({
   handleCompanyProductChange,
   handleCreateCompanyProductTaxAdd,
 }: EditCompanyProductModalProps) {
+  const { intervalTypeData } = useIntervalType();
+  const { productTypeData } = useProductType();
+
   const intialEditCompanyProductFormData = {
+    company_id: product.companyId,
+    id: product.id,
+    product_type_id: product.productTypeId,
+    default_warranty: product.defaultWarranty,
+    default_amc_cycle_interval_type_id: product.defaultAmcCycleIntervalTypeId,
+    default_amc_cycle: product.defaultAmcCycle,
     name: product.name,
-    description: product.description,
     cost: product.cost,
     code: product.code,
+    description: product.description,
+    version: product.version,
+    url: product.url,
     isActive: product.isActive,
   };
+
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(product.productTypeId);
+
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+    useState<number>(product.defaultWarrantyIntervalTypeId);
+
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(product.defaultWarranty);
+
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(product.defaultAmcCycleIntervalTypeId);
+
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(product.defaultAmcCycle);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -144,12 +169,34 @@ function EditCompanyProductModal({
           const updateProductPostData = {
             company_id: loginStatus.companyId,
             id: product.id,
+            product_type_id:
+              selectedProductTypeId !== 0
+                ? selectedProductTypeId
+                : updateCompanyProductFormData.product_type_id,
+            default_warranty_interval_type_id:
+              selectedWarrantyIntervalTypeId !== 0
+                ? selectedWarrantyIntervalTypeId
+                : updateCompanyProductFormData.default_amc_cycle_interval_type_id,
+            default_warranty:
+              selectedDefaultWarranty !== 0
+                ? selectedDefaultWarranty
+                : updateCompanyProductFormData.default_warranty,
+            default_amc_cycle_interval_type_id:
+              selectedAmcIntervalTypeId != 0
+                ? selectedAmcIntervalTypeId
+                : updateCompanyProductFormData.default_amc_cycle_interval_type_id,
+            default_amc_cycle:
+              selectedDefaultAmc !== 0
+                ? selectedDefaultAmc
+                : updateCompanyProductFormData.default_amc_cycle,
             name: updateCompanyProductFormData.name,
             code: updateCompanyProductFormData.code,
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
+            version: updateCompanyProductFormData.version,
+            url: updateCompanyProductFormData.url,
             isactive: updateCompanyProductFormData.isActive,
-            updatedby: loginStatus.id,
+            updatedby_id: loginStatus.id,
           };
           await axios
             .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
@@ -183,12 +230,12 @@ function EditCompanyProductModal({
                 }
               }
             });
-             handleCompanyProductChange(product);
-        }else{
-          toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS)
+          handleCompanyProductChange(product);
+        } else {
+          toast.error(
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+          );
         }
-
-       
       } else {
         // showMessageSnackbar({
         //   message: MESSAGE.ERROR.NO_CHANGES,
@@ -333,15 +380,115 @@ function EditCompanyProductModal({
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Cost : "
+                <div>
+                  <FormInput
+                    label="Cost : "
+                    type="text"
+                    name="cost"
+                    placeholder="Enter Product Cost"
+                    defaultValue={intialEditCompanyProductFormData.cost}
+                    onChange={handleEditCompanyProductFormDataChange}
+                  />
+                  <FormInput
+                    label="URL : "
+                    type="text"
+                    name="url"
+                    required={false}
+                    value={updateCompanyProductFormData.url}
+                    placeholder="Product URL"
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
+
+                  <FormInput
+                  label="Version : "
                   type="text"
-                  name="cost"
-                  placeholder="Enter Product Cost"
-                  defaultValue={intialEditCompanyProductFormData.cost}
+                  name="version"
+                  required={false}
+                  value={updateCompanyProductFormData.version}
+                  placeholder="Product Version"
                   onChange={handleEditCompanyProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
                 />
 
+                  <TextAreaInput
+                    label="Description : "
+                    cols={5}
+                    rows={2}
+                    name="description"
+                    required={true}
+                    placeholder="Enter Product Description"
+                    defaultValue={intialEditCompanyProductFormData.description}
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.description}
+                  />
+                </div>
+
+                <div className="grid col-span-1 gap-1">
+                  <CustomDropdown
+                    labelName="Product Type"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setSelectedProductTypeId(e);
+                      }
+                    }}
+                    options={productTypeData}
+                    requiredRedDot={true}
+                  />
+
+                  <CustomDropdown
+                    labelName="Warranty Interval"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setWarrantyIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+
+                  <CustomDropdown
+                    labelName="Default Warranty"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultWarranty(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                  <CustomDropdown
+                    labelName="AMC Cycle"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setAmcIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+
+                  <CustomDropdown
+                    labelName="Default AMC Cycle"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultAmc(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
+              </div>
+              <div className="flex col-span-2 justify-center">
                 <RadioButtons
                   label="Status : "
                   onChange={handleEditCompanyProductFormDataChange}
@@ -349,23 +496,8 @@ function EditCompanyProductModal({
                 />
               </div>
 
-              <div className="grid gap-4">
-                <TextAreaInput
-                  label="Description : "
-                  cols={5}
-                  rows={3}
-                  name="description"
-                  required={true}
-                  placeholder="Enter Product Description"
-                  defaultValue={intialEditCompanyProductFormData.description}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.description}
-                />
-              </div>
-
               <div className="flex justify-self-center m-2 min-w-80 gap-2">
-                <Button  type="submit" >Update Product</Button>
+                <Button type="submit">Update Product</Button>
               </div>
             </form>
 
