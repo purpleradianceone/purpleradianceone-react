@@ -47,6 +47,7 @@ function EditCompanyProductModal({
     company_id: product.companyId,
     id: product.id,
     product_type_id: product.productTypeId,
+    default_warranty_interval_type_id: product.defaultWarrantyIntervalTypeId,
     default_warranty: product.defaultWarranty,
     default_amc_cycle_interval_type_id: product.defaultAmcCycleIntervalTypeId,
     default_amc_cycle: product.defaultAmcCycle,
@@ -59,16 +60,24 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(product.productTypeId);
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(
+   0
+  );
 
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
-    useState<number>(product.defaultWarrantyIntervalTypeId);
+    useState<number>(0);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(product.defaultWarranty);
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(
+    0
+  );
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(product.defaultAmcCycleIntervalTypeId);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(
+    0
+  );
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(product.defaultAmcCycle);
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(
+    0
+  );
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -150,20 +159,21 @@ function EditCompanyProductModal({
     event.preventDefault();
 
     if (
-      updateCompanyProductFormData.name !== "" &&
-      updateCompanyProductFormData.description !== "" &&
-      updateCompanyProductFormData.code !== ""
+      updateCompanyProductFormData.name !== ""
     ) {
       if (
-        updateCompanyProductFormData.code !==
-          intialEditCompanyProductFormData.code ||
-        updateCompanyProductFormData.name !==
-          intialEditCompanyProductFormData.name ||
-        updateCompanyProductFormData.description !==
-          intialEditCompanyProductFormData.description ||
-        updateCompanyProductFormData.cost !==
-          intialEditCompanyProductFormData.cost ||
-        updateCompanyProductFormData.isActive !== product.isActive
+        updateCompanyProductFormData.code !== intialEditCompanyProductFormData.code ||
+        updateCompanyProductFormData.name !== intialEditCompanyProductFormData.name ||
+        updateCompanyProductFormData.description !== intialEditCompanyProductFormData.description ||
+        updateCompanyProductFormData.cost !== intialEditCompanyProductFormData.cost ||
+        updateCompanyProductFormData.isActive !== product.isActive||
+        (selectedProductTypeId!==0 && selectedProductTypeId !== intialEditCompanyProductFormData.product_type_id)||
+        (selectedWarrantyIntervalTypeId!==0 && selectedWarrantyIntervalTypeId !== intialEditCompanyProductFormData.default_warranty_interval_type_id)||
+        (selectedDefaultWarranty!==0 && selectedDefaultWarranty !== intialEditCompanyProductFormData.default_warranty)||
+        (selectedAmcIntervalTypeId!==0 && selectedAmcIntervalTypeId !== intialEditCompanyProductFormData.default_amc_cycle_interval_type_id)||
+        (selectedDefaultAmc!==0 && selectedDefaultAmc !== intialEditCompanyProductFormData.default_amc_cycle)||
+        updateCompanyProductFormData.version !== intialEditCompanyProductFormData.version||
+        updateCompanyProductFormData.url !== intialEditCompanyProductFormData.url
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -302,6 +312,7 @@ function EditCompanyProductModal({
   };
 
   useEffect(() => {
+    console.log(intialEditCompanyProductFormData);
     if (isOpen) {
       setErrors({
         code: "",
@@ -394,7 +405,8 @@ function EditCompanyProductModal({
                     type="text"
                     name="url"
                     required={false}
-                    value={updateCompanyProductFormData.url}
+                    defaultValue={intialEditCompanyProductFormData.url}
+                    value={intialEditCompanyProductFormData.url}
                     placeholder="Product URL"
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
@@ -402,23 +414,24 @@ function EditCompanyProductModal({
                   />
 
                   <FormInput
-                  label="Version : "
-                  type="text"
-                  name="version"
-                  required={false}
-                  value={updateCompanyProductFormData.version}
-                  placeholder="Product Version"
-                  onChange={handleEditCompanyProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
+                    label="Version : "
+                    type="text"
+                    name="version"
+                    required={false}
+                    defaultValue={intialEditCompanyProductFormData.version}
+                    value={intialEditCompanyProductFormData.version}
+                    placeholder="Product Version"
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
 
                   <TextAreaInput
                     label="Description : "
                     cols={5}
                     rows={2}
                     name="description"
-                    required={true}
+                    required={false}
                     placeholder="Enter Product Description"
                     defaultValue={intialEditCompanyProductFormData.description}
                     onChange={handleEditCompanyProductFormDataChange}
@@ -430,7 +443,7 @@ function EditCompanyProductModal({
                 <div className="grid col-span-1 gap-1">
                   <CustomDropdown
                     labelName="Product Type"
-                    preselectedOption={0}
+                    preselectedOption={intialEditCompanyProductFormData.product_type_id}
                     onSelect={(e) => {
                       if (e) {
                         setSelectedProductTypeId(e);
@@ -442,7 +455,7 @@ function EditCompanyProductModal({
 
                   <CustomDropdown
                     labelName="Warranty Interval"
-                    preselectedOption={0}
+                    preselectedOption={intialEditCompanyProductFormData.default_warranty_interval_type_id}
                     onSelect={(e) => {
                       if (e) {
                         setWarrantyIntervalTypeId(e);
@@ -454,7 +467,7 @@ function EditCompanyProductModal({
 
                   <CustomDropdown
                     labelName="Default Warranty"
-                    preselectedOption={0}
+                    preselectedOption={intialEditCompanyProductFormData.default_warranty}
                     onSelect={(e) => {
                       if (e) {
                         setDefaultWarranty(e);
@@ -465,7 +478,7 @@ function EditCompanyProductModal({
                   />
                   <CustomDropdown
                     labelName="AMC Cycle"
-                    preselectedOption={0}
+                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle_interval_type_id}
                     onSelect={(e) => {
                       if (e) {
                         setAmcIntervalTypeId(e);
@@ -477,7 +490,7 @@ function EditCompanyProductModal({
 
                   <CustomDropdown
                     labelName="Default AMC Cycle"
-                    preselectedOption={0}
+                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle}
                     onSelect={(e) => {
                       if (e) {
                         setDefaultAmc(e);

@@ -90,13 +90,14 @@ function AddProductModal({
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
 
- const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] = useState<number>(0);
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+    useState<number>(0);
 
- const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
 
- const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
 
- const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -118,11 +119,7 @@ function AddProductModal({
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (
-      addProductFormData.name !== "" ||
-      addProductFormData.code !== "" ||
-      addProductFormData.description !== ""
-    ) {
+    if (addProductFormData.name !== "" || addProductFormData.code !== "") {
       if (
         (addProductFormData.hsn !== "" || addProductFormData.sac !== "") &&
         (addProductFormData.taxRate === 0 ||
@@ -153,11 +150,9 @@ function AddProductModal({
           company_id: loginStatus.companyId,
           product_type_id:
             selectedProductTypeId ?? addProductFormData.productTypeId,
-          default_warranty_interval_type_id:
-            selectedWarrantyIntervalTypeId,
+          default_warranty_interval_type_id: selectedWarrantyIntervalTypeId,
           default_warranty: selectedDefaultWarranty,
-          default_amc_cycle_interval_type_id:
-           selectedAmcIntervalTypeId,
+          default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
           default_amc_cycle: selectedDefaultAmc,
           name: addProductFormData.name,
           code: addProductFormData.code,
@@ -270,32 +265,76 @@ function AddProductModal({
               className=" grid grid-cols-2  gap-3 "
               onSubmit={handleAddProductFormSubmit}
             >
-              <FormInput
-                label="Product Name : "
-                maxLength={40}
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                required={true}
-                value={addProductFormData.name}
-                onChange={handleAddProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.name}
-              />
-              <FormInput
-                label="Item Code : "
-                type="text"
-                name="code"
-                required={true}
-                value={addProductFormData.code}
-                placeholder="Product Item Code"
-                onChange={handleAddProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.code}
-              />
+              <div className="grid col-span-1 ">
+                <FormInput
+                  label="Product Name : "
+                  maxLength={40}
+                  type="text"
+                  name="name"
+                  placeholder="Product Name"
+                  required={true}
+                  value={addProductFormData.name}
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.name}
+                />
+                <FormInput
+                  label="Basic Cost : "
+                  type="number"
+                  name="cost"
+                  value={addProductFormData.cost?.toString()}
+                  placeholder="Product Price"
+                  onChange={handleAddProductFormDataChange}
+                />
+                <FormInput
+                  label="URL : "
+                  type="text"
+                  name="url"
+                  required={false}
+                  value={addProductFormData.url}
+                  placeholder="Product URL"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
+                />
+                <FormInput
+                  label="Version : "
+                  type="text"
+                  name="version"
+                  required={false}
+                  value={addProductFormData.version}
+                  placeholder="Product Version"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
+                />
 
+                <TextAreaInput
+                  label="Description : "
+                  name="description"
+                  placeholder="Product Description"
+                  value={addProductFormData.description}
+                  cols={5}
+                  rows={2}
+                  required={false}
+                  maxLength={256}
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.description}
+                />
+              </div>
               <div className="grid col-span-1 gap-1">
-
+                <FormInput
+                  label="Item Code : "
+                  type="text"
+                  name="code"
+                  required={true}
+                  value={addProductFormData.code}
+                  placeholder="Product Item Code"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
+                />
                 <CustomDropdown
                   labelName="Product Type"
                   preselectedOption={0}
@@ -353,53 +392,6 @@ function AddProductModal({
                   }}
                   options={intervalTypeData}
                   requiredRedDot={true}
-                />
-                <FormInput
-                  label="URL : "
-                  type="text"
-                  name="url"
-                  required={false}
-                  value={addProductFormData.url}
-                  placeholder="Product URL"
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-              </div>
-              <div>
-                <FormInput
-                  label="Basic Cost : "
-                  type="number"
-                  name="cost"
-                  value={addProductFormData.cost?.toString()}
-                  placeholder="Product Price"
-                  onChange={handleAddProductFormDataChange}
-                />
-
-                <FormInput
-                  label="Version : "
-                  type="text"
-                  name="version"
-                  required={false}
-                  value={addProductFormData.version}
-                  placeholder="Product Version"
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-
-                <TextAreaInput
-                  label="Description : "
-                  name="description"
-                  placeholder="Product Description"
-                  value={addProductFormData.description}
-                  cols={5}
-                  rows={8}
-                  required={true}
-                  maxLength={256}
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.description}
                 />
               </div>
 
