@@ -20,7 +20,6 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import RadioButtons from "../../ui/RadioButton";
 import CreateCompanyProductTaxModal from "./CreateCompanyProductTaxModal";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
@@ -99,22 +98,7 @@ function EditCompanyProductModal({
   //   type: "success" as "success" | "error",
   // });
 
-  const CompanyProductIsActiveRadioButtonOptions = [
-    {
-      label: "Active",
-      value: "true",
-      id: "active",
-      name: "isActive",
-      checked: intialEditCompanyProductFormData.isActive,
-    },
-    {
-      label: "Inactive",
-      value: "false",
-      id: "inActive",
-      name: "isActive",
-      checked: !intialEditCompanyProductFormData.isActive,
-    },
-  ];
+
 
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
@@ -124,6 +108,56 @@ function EditCompanyProductModal({
     formData: updateCompanyProductFormData,
     handleChange: handleEditCompanyProductFormDataChange,
   } = useFormChange(intialEditCompanyProductFormData);
+
+    const [productIsActive, setProductIsActive] = useState<boolean|undefined>(product.isActive);
+  
+
+  const handleProductToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // handleCloseSnackbar();
+    const { checked } = event.target;
+
+    if (userHasAccessToUpdateProduct) {
+          const updateProductPostData = {
+            company_id: loginStatus.companyId,
+            id: product.id,
+            isactive: checked,
+            updatedby_id: loginStatus.id,
+          };
+          await axios
+            .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (
+                response.data.status === true &&
+                response.status === STATUS_CODE.OK
+              ) {
+                
+                toast.success(response.data.message);
+                setProductIsActive(checked);
+                handleCompanyProductChange(product);
+              }
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenResponse = await RefreshToken({
+                  callFunctionWithEvent: handleProductToggle,
+                });
+                if (refreshTokenResponse) {
+                  handleProductToggle(event);
+                }
+              }
+            });
+          handleCompanyProductChange(product);
+        } else {
+          toast.error(
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+          );
+        }
+  };
 
   const { errors, handleBlur, setErrors } = useFormValidation(
     updateCompanyProductFormData,
@@ -163,7 +197,7 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
           intialEditCompanyProductFormData.cost ||
-        updateCompanyProductFormData.isActive !== product.isActive ||
+        
         (selectedProductTypeId !== 0 &&
           selectedProductTypeId !==
             intialEditCompanyProductFormData.product_type_id) ||
@@ -214,7 +248,6 @@ function EditCompanyProductModal({
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
             url: updateCompanyProductFormData.url,
-            isactive: updateCompanyProductFormData.isActive,
             updatedby_id: loginStatus.id,
           };
           await axios
@@ -462,7 +495,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="flex col-span-2 gap-3 w-fit">
+                  <div className="flex col-span-2 gap-3 ">
                     <CustomDropdown
                       labelName="Warranty Duration"
                       preselectedOption={
@@ -520,15 +553,38 @@ function EditCompanyProductModal({
                   </div>
                 </div>
               </div>
-              <div className="flex col-span-2 justify-center">
-                <RadioButtons
+              <div className="flex col-span-2 justify-start">
+                <div className="flex items-center gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status : {productIsActive?"Active":"Inactive"}
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={productIsActive}
+                      onChange={handleProductToggle}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
+                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
+                    ></div>
+                  </label>
+                </div>
+                {/* <RadioButtons
                   label="Status : "
                   onChange={handleEditCompanyProductFormDataChange}
                   options={CompanyProductIsActiveRadioButtonOptions}
-                />
+                /> */}
               </div>
 
-              <div className="flex justify-self-center m-2 min-w-80 gap-2">
+              <div className="flex justify-self-center m-2 min-w-70 gap-2">
                 <Button type="submit">Update Product</Button>
               </div>
             </form>
