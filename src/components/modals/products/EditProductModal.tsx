@@ -109,8 +109,14 @@ function EditCompanyProductModal({
     handleChange: handleEditCompanyProductFormDataChange,
   } = useFormChange(intialEditCompanyProductFormData);
 
-    const [productIsActive, setProductIsActive] = useState<boolean|undefined>(product.isActive);
+    const [productIsActive, setProductIsActive] = useState<boolean>(product.isActive);
   
+
+    useEffect(()=>{
+      if(isOpen){
+      setProductIsActive(product.isActive);
+      }
+    },[isOpen])
 
   const handleProductToggle = async (
     event: React.ChangeEvent<HTMLInputElement>
