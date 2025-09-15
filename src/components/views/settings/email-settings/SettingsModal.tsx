@@ -5,7 +5,10 @@ import Button from "../../../ui/Button";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { ShowMessageSnackbarProps } from "../../../../@types/ui/MessageSnackbarProps";
+import toast from "react-hot-toast";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import ApiError from "../../../../@types/error/ApiError";
 
 type SettingType = "company" | "user";
 
@@ -13,13 +16,18 @@ const Dialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-}> = ({ open, onOpenChange, children }) =>
+  
+}> = ({ open, children }) =>
   !open ? null : (
     <div
-      className="fixed pt-32 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto"
-      onClick={() => onOpenChange(false)}
+      className="fixed pt-14 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto "
     >
-      <div className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50" onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div
+        className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
     </div>
   );
 
@@ -60,7 +68,6 @@ interface SettingsModalProps {
   settingType: SettingType;
   initialData?: EmailSettings; // initialData will be present in edit mode
   onSubmit: (data: EmailSettings) => void;
-  handleResponseMessage: ({ message, type }: ShowMessageSnackbarProps) => void;
 }
 
 const getDefaultSettings = (type: SettingType): EmailSettings =>
@@ -75,10 +82,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new company settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       }
     : {
         id: 0,
@@ -91,10 +98,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new user settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       };
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -103,7 +110,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settingType,
   initialData, // This prop indicates if it's an edit operation
   onSubmit,
-  handleResponseMessage,
 }) => {
   const [formData, setFormData] = useState<EmailSettings>(
     getDefaultSettings(settingType)
@@ -159,34 +165,54 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     };
 
     // Correct the typo for authentication_required if your API expects it correctly spelled
-    if ('authatication_required' in payload) {
-        payload.authentication_required = payload.authatication_required;
-        delete payload.authatication_required;
+    if ("authatication_required" in payload) {
+      payload.authentication_required = payload.authatication_required;
+      delete payload.authatication_required;
     }
-
 
     if (!isCompany) payload.company_user_id = loginStatus.id;
 
     try {
       setLoading(true);
-      const response = await axios.post(apiEndpoint, payload, {
-        withCredentials: true,
+      await axios
+        .post(apiEndpoint, payload, {
+          withCredentials: true,
+        })
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            if (result.data.status) {
+              toast.success(result.data.message);
+            } else {
+              toast.error(result.data.message);
+            }
+          }
+        }).catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: handleApiCall,
+          });
+          if (refreshTokenStatus) {
+            handleApiCall();
+          }
+        }
       });
-      handleResponseMessage({message:response.data.message,type:response.data.status?'success':"error"});
-    } catch (error: any) { // Catching 'any' for error to access properties
+    } catch (error: any) {
+      // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
-      handleResponseMessage({message:`Something went wrong. Please try again. ${error.response?.data?.message || ''}`,type:"error"});
+      toast.error(
+        `Something went wrong. Please try again. ${
+          error.response?.data?.message || ""
+        }`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    
     await handleApiCall();
     onClose();
     onSubmit(formData); // Call onSubmit with current form data
-    
   };
 
   const renderField = (
@@ -236,8 +262,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={onClose}
+    >
+      <DialogContent
+      >
         <DialogHeader>
           <DialogTitle>
             {isEdit ? "Edit" : "Create"} {settingType} Email Setting
@@ -262,13 +290,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             "checkbox"
           )}
           {/* Conditional rendering for isactive checkbox */}
-          {isEdit && (
+          {isEdit &&
             renderField(
               "Active", // Label for the checkbox
               "isactive",
               "checkbox"
-            )
-          )}
+            )}
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <Button onClick={onClose} disabled={loading}>
@@ -289,6 +316,5 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     </Dialog>
   );
 };
-
 
 export default SettingsModal;

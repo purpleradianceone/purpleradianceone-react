@@ -1,20 +1,28 @@
 export type Product = {
-    code : string,
-    companyId? : number,
-    cost? : number,
-    count? : number,
-    createdBy? : string,
-    createdOn? : string,
-    description : string,
-    hsn? : string,
-    id? : number,
-    isActive? : boolean,
-    name : string,
-    sac? : string,
-    taxRate? : number,
-    validFrom? : string,
-    
-}
+  count?: number;
+  id?: number;
+  companyId?: number;
+  productTypeId: number;
+  defaultWarrantyIntervalTypeId: number;
+  defaultWarranty: number;
+  defaultWarrantyName: string;
+  defaultAmcCycleIntervalTypeId: number;
+  defaultAmcCycle: number;
+  defaultAmcCycleName: string;
+  name: string;
+  code: string;
+  cost?: number;
+  description: string;
+  version?: string;
+  url?: string;
+  isActive: boolean;
+  hsn?: string;
+  sac?: string;
+  taxRate?: number;
+  validFrom?: string;
+  createdBy?: string;
+  createdOn?: string;
+};
 export type Products = {
-    products : Product[]
-}
+  products: Product[];
+};

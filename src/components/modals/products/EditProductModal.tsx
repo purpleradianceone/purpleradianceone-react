@@ -20,7 +20,6 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import RadioButtons from "../../ui/RadioButton";
 import CreateCompanyProductTaxModal from "./CreateCompanyProductTaxModal";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
@@ -29,6 +28,10 @@ import { Product } from "../../../@types/products/ProductsManagementProps";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CreateCompanyProductCompanyUserModal from "./CreateCompanyProductCompanyUserModal";
 import toast from "react-hot-toast";
+import CustomDropdown from "../leads/CustomDropdown";
+import { useIntervalType } from "../../../config/hooks/useIntervalType";
+import { useProductType } from "../../../config/hooks/useProductTypes";
+import { Item, range } from "../../../constants/NumberList";
 
 function EditCompanyProductModal({
   isOpen,
@@ -37,13 +40,38 @@ function EditCompanyProductModal({
   handleCompanyProductChange,
   handleCreateCompanyProductTaxAdd,
 }: EditCompanyProductModalProps) {
+  const { intervalTypeData } = useIntervalType();
+  const { productTypeData } = useProductType();
+    const rangeOfNumber: Item[] = range(1, 365);
+  
+
   const intialEditCompanyProductFormData = {
+    company_id: product.companyId,
+    id: product.id,
+    product_type_id: product.productTypeId,
+    default_warranty_interval_type_id: product.defaultWarrantyIntervalTypeId,
+    default_warranty: product.defaultWarranty,
+    default_amc_cycle_interval_type_id: product.defaultAmcCycleIntervalTypeId,
+    default_amc_cycle: product.defaultAmcCycle,
     name: product.name,
-    description: product.description,
     cost: product.cost,
     code: product.code,
+    description: product.description,
+    version: product.version,
+    url: product.url,
     isActive: product.isActive,
   };
+
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
+
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+    useState<number>(0);
+
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -70,22 +98,7 @@ function EditCompanyProductModal({
   //   type: "success" as "success" | "error",
   // });
 
-  const CompanyProductIsActiveRadioButtonOptions = [
-    {
-      label: "Active",
-      value: "true",
-      id: "active",
-      name: "isActive",
-      checked: intialEditCompanyProductFormData.isActive,
-    },
-    {
-      label: "Inactive",
-      value: "false",
-      id: "inActive",
-      name: "isActive",
-      checked: !intialEditCompanyProductFormData.isActive,
-    },
-  ];
+
 
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
@@ -95,6 +108,62 @@ function EditCompanyProductModal({
     formData: updateCompanyProductFormData,
     handleChange: handleEditCompanyProductFormDataChange,
   } = useFormChange(intialEditCompanyProductFormData);
+
+    const [productIsActive, setProductIsActive] = useState<boolean>(product.isActive);
+  
+
+    useEffect(()=>{
+      if(isOpen){
+      setProductIsActive(product.isActive);
+      }
+    },[isOpen])
+
+  const handleProductToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // handleCloseSnackbar();
+    const { checked } = event.target;
+
+    if (userHasAccessToUpdateProduct) {
+          const updateProductPostData = {
+            company_id: loginStatus.companyId,
+            id: product.id,
+            isactive: checked,
+            updatedby_id: loginStatus.id,
+          };
+          await axios
+            .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (
+                response.data.status === true &&
+                response.status === STATUS_CODE.OK
+              ) {
+                
+                toast.success(response.data.message);
+                setProductIsActive(checked);
+                handleCompanyProductChange(product);
+              }
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenResponse = await RefreshToken({
+                  callFunctionWithEvent: handleProductToggle,
+                });
+                if (refreshTokenResponse) {
+                  handleProductToggle(event);
+                }
+              }
+            });
+          handleCompanyProductChange(product);
+        } else {
+          toast.error(
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+          );
+        }
+  };
 
   const { errors, handleBlur, setErrors } = useFormValidation(
     updateCompanyProductFormData,
@@ -124,11 +193,7 @@ function EditCompanyProductModal({
   ) => {
     event.preventDefault();
 
-    if (
-      updateCompanyProductFormData.name !== "" &&
-      updateCompanyProductFormData.description !== "" &&
-      updateCompanyProductFormData.code !== ""
-    ) {
+    if (updateCompanyProductFormData.name !== "") {
       if (
         updateCompanyProductFormData.code !==
           intialEditCompanyProductFormData.code ||
@@ -138,18 +203,58 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
           intialEditCompanyProductFormData.cost ||
-        updateCompanyProductFormData.isActive !== product.isActive
+        
+        (selectedProductTypeId !== 0 &&
+          selectedProductTypeId !==
+            intialEditCompanyProductFormData.product_type_id) ||
+        (selectedWarrantyIntervalTypeId !== 0 &&
+          selectedWarrantyIntervalTypeId !==
+            intialEditCompanyProductFormData.default_warranty_interval_type_id) ||
+        (selectedDefaultWarranty !== 0 &&
+          selectedDefaultWarranty !==
+            intialEditCompanyProductFormData.default_warranty) ||
+        (selectedAmcIntervalTypeId !== 0 &&
+          selectedAmcIntervalTypeId !==
+            intialEditCompanyProductFormData.default_amc_cycle_interval_type_id) ||
+        (selectedDefaultAmc !== 0 &&
+          selectedDefaultAmc !==
+            intialEditCompanyProductFormData.default_amc_cycle) ||
+        updateCompanyProductFormData.version !==
+          intialEditCompanyProductFormData.version ||
+        updateCompanyProductFormData.url !==
+          intialEditCompanyProductFormData.url
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
             company_id: loginStatus.companyId,
             id: product.id,
+            product_type_id:
+              selectedProductTypeId !== 0
+                ? selectedProductTypeId
+                : updateCompanyProductFormData.product_type_id,
+            default_warranty_interval_type_id:
+              selectedWarrantyIntervalTypeId !== 0
+                ? selectedWarrantyIntervalTypeId
+                : updateCompanyProductFormData.default_amc_cycle_interval_type_id,
+            default_warranty:
+              selectedDefaultWarranty !== 0
+                ? selectedDefaultWarranty
+                : updateCompanyProductFormData.default_warranty,
+            default_amc_cycle_interval_type_id:
+              selectedAmcIntervalTypeId != 0
+                ? selectedAmcIntervalTypeId
+                : updateCompanyProductFormData.default_amc_cycle_interval_type_id,
+            default_amc_cycle:
+              selectedDefaultAmc !== 0
+                ? selectedDefaultAmc
+                : updateCompanyProductFormData.default_amc_cycle,
             name: updateCompanyProductFormData.name,
             code: updateCompanyProductFormData.code,
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
-            isactive: updateCompanyProductFormData.isActive,
-            updatedby: loginStatus.id,
+            version: updateCompanyProductFormData.version,
+            url: updateCompanyProductFormData.url,
+            updatedby_id: loginStatus.id,
           };
           await axios
             .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
@@ -183,12 +288,12 @@ function EditCompanyProductModal({
                 }
               }
             });
-             handleCompanyProductChange(product);
-        }else{
-          toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS)
+          handleCompanyProductChange(product);
+        } else {
+          toast.error(
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+          );
         }
-
-       
       } else {
         // showMessageSnackbar({
         //   message: MESSAGE.ERROR.NO_CHANGES,
@@ -255,6 +360,7 @@ function EditCompanyProductModal({
   };
 
   useEffect(() => {
+    console.log(intialEditCompanyProductFormData);
     if (isOpen) {
       setErrors({
         code: "",
@@ -280,7 +386,7 @@ function EditCompanyProductModal({
     >
       <div className="flex min-h-screen items-center justify-center">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -307,65 +413,185 @@ function EditCompanyProductModal({
               onSubmit={hanldeUpdateCompanyProductFormSubmit}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Product Name : "
-                  type="text"
-                  name="name"
-                  required={true}
-                  value={updateCompanyProductFormData.name}
-                  placeholder="Enter Product Name"
-                  defaultValue={intialEditCompanyProductFormData.name}
-                  maxLength={256}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  error={errors.name}
-                  onBlur={handleBlur}
-                />
-                <FormInput
-                  label="Item Code : "
-                  type="text"
-                  name="code"
-                  required={true}
-                  placeholder="Enter Item Code"
-                  onChange={handleEditCompanyProductFormDataChange}
-                  defaultValue={intialEditCompanyProductFormData.code}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Cost : "
-                  type="text"
-                  name="cost"
-                  placeholder="Enter Product Cost"
-                  defaultValue={intialEditCompanyProductFormData.cost}
-                  onChange={handleEditCompanyProductFormDataChange}
-                />
+                <div className="grid col-span-1 ">
+                  <FormInput
+                    label="Product Name : "
+                    type="text"
+                    name="name"
+                    required={true}
+                    value={updateCompanyProductFormData.name}
+                    placeholder="Enter Product Name"
+                    defaultValue={intialEditCompanyProductFormData.name}
+                    maxLength={256}
+                    onChange={handleEditCompanyProductFormDataChange}
+                    error={errors.name}
+                    onBlur={handleBlur}
+                  />
+                  <FormInput
+                    label="URL : "
+                    type="text"
+                    name="url"
+                    required={false}
+                    defaultValue={intialEditCompanyProductFormData.url}
+                    value={intialEditCompanyProductFormData.url}
+                    placeholder="Product URL"
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
 
-                <RadioButtons
+                  <FormInput
+                    label="Version : "
+                    type="text"
+                    name="version"
+                    required={false}
+                    defaultValue={intialEditCompanyProductFormData.version}
+                    value={intialEditCompanyProductFormData.version}
+                    placeholder="Product Version"
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
+                  <TextAreaInput
+                    label="Description : "
+                    cols={5}
+                    rows={2}
+                    name="description"
+                    required={false}
+                    placeholder="Enter Product Description"
+                    defaultValue={intialEditCompanyProductFormData.description}
+                    onChange={handleEditCompanyProductFormDataChange}
+                    onBlur={handleBlur}
+                    // error={errors.description}
+                  />
+                </div>
+
+                <div className="grid col-span-1 gap-1">
+                  <div className="grid col-span-1 gap-1">
+                    <FormInput
+                      label="Cost : "
+                      type="text"
+                      name="cost"
+                      placeholder="Enter Product Cost"
+                      defaultValue={intialEditCompanyProductFormData.cost}
+                      onChange={handleEditCompanyProductFormDataChange}
+                    />
+                    <FormInput
+                      label="Item Code : "
+                      type="text"
+                      name="code"
+                      required={true}
+                      placeholder="Enter Item Code"
+                      onChange={handleEditCompanyProductFormDataChange}
+                      defaultValue={intialEditCompanyProductFormData.code}
+                      onBlur={handleBlur}
+                      error={errors.code}
+                    />
+                    <CustomDropdown
+                      labelName="Product Type"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.product_type_id
+                      }
+                      onSelect={(e) => {
+                        if (e) {
+                          setSelectedProductTypeId(e);
+                        }
+                      }}
+                      options={productTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 ">
+                    <CustomDropdown
+                      labelName="Warranty Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty
+                      }
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultWarranty(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="Warranty Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty_interval_type_id
+                      }
+                      onSelect={(e) => {
+                        if (e) {
+                          setWarrantyIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <CustomDropdown
+                      labelName="AMC Cycle Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle
+                      }
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultAmc(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="AMC Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
+                      }
+                      onSelect={(e) => {
+                        if (e) {
+                          setAmcIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex col-span-2 justify-start">
+                <div className="flex items-center gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status : {productIsActive?"Active":"Inactive"}
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={productIsActive}
+                      onChange={handleProductToggle}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
+                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
+                    ></div>
+                  </label>
+                </div>
+                {/* <RadioButtons
                   label="Status : "
                   onChange={handleEditCompanyProductFormDataChange}
                   options={CompanyProductIsActiveRadioButtonOptions}
-                />
+                /> */}
               </div>
 
-              <div className="grid gap-4">
-                <TextAreaInput
-                  label="Description : "
-                  cols={5}
-                  rows={3}
-                  name="description"
-                  required={true}
-                  placeholder="Enter Product Description"
-                  defaultValue={intialEditCompanyProductFormData.description}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.description}
-                />
-              </div>
-
-              <div className="flex justify-self-center m-2 min-w-80 gap-2">
-                <Button  type="submit" >Update Product</Button>
+              <div className="flex justify-self-center m-2 min-w-70 gap-2">
+                <Button type="submit">Update Product</Button>
               </div>
             </form>
 

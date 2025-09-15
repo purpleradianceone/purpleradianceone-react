@@ -58,7 +58,7 @@ function ProductTeamManagement() {
       setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
-        requestedby: loginStatus.id,
+        requestedby_id: loginStatus.id,
         limit: pageSize,
         offset: offset,
         search_company_specific_date_range_id: effectiveDateRangeId,

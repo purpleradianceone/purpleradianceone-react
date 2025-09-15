@@ -1,9 +1,5 @@
 import { Store, X } from "lucide-react";
-import {
-  SIZE,
-  STATUS_CODE,
-  TAX_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE, TAX_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -29,12 +25,16 @@ import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import toast from "react-hot-toast";
+import CustomDropdown from "../leads/CustomDropdown";
+import { useIntervalType } from "../../../config/hooks/useIntervalType";
+import { useProductType } from "../../../config/hooks/useProductTypes";
+import { Item, range } from "../../../constants/NumberList";
 
 function AddProductModal({
   isOpen,
   onClose,
   handleProductChangeOnAdd,
-} : AddProductModalProps) {
+}: AddProductModalProps) {
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //   open: false,
@@ -42,7 +42,7 @@ function AddProductModal({
   //   type: "success",
   // });
 
-  const {isSmallScreen} = useScreenSize()
+  const { isSmallScreen } = useScreenSize();
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -57,18 +57,49 @@ function AddProductModal({
   //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
   // };
 
-  const [intialAddProductFormData,setInitialAddProductFormData] =  useState<Product>({
-    name: "",
-    code: "",
-    description: "",
-    cost: 0,
-    hsn: "",
-    sac: "",
-    validFrom: "",
-  });
+  const { intervalTypeData } = useIntervalType();
+  const { productTypeData } = useProductType();
+  const rangeOfNumber: Item[] = range(1, 365);
+
+  const [intialAddProductFormData, setInitialAddProductFormData] =
+    useState<Product>({
+      count: 0,
+      id: 0,
+      companyId: 0,
+      productTypeId: 0,
+      defaultWarrantyIntervalTypeId: 0,
+      defaultWarranty: 0,
+      defaultWarrantyName: "",
+      defaultAmcCycleIntervalTypeId: 0,
+      defaultAmcCycle: 0,
+      defaultAmcCycleName: "",
+      name: "",
+      code: "",
+      cost: 0,
+      description: "",
+      version: "",
+      url: "",
+      isActive: false,
+      hsn: "",
+      sac: "",
+      taxRate: 0,
+      validFrom: "",
+      createdBy: "",
+      createdOn: "",
+    });
 
   const { userHasAccessToAddProduct } = useUserAccessModules();
-  
+
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
+
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+    useState<number>(0);
+
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -86,19 +117,13 @@ function AddProductModal({
   //   handleMessageSnackbarClose();
   // }, []);
 
-
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (
-      addProductFormData.name !== "" ||
-      addProductFormData.code !== "" ||
-      addProductFormData.description !== ""
-    ) {
+    if (addProductFormData.name !== "" || addProductFormData.code !== "") {
       if (
-        (addProductFormData.hsn !== "" ||
-          addProductFormData.sac !== "") &&
+        (addProductFormData.hsn !== "" || addProductFormData.sac !== "") &&
         (addProductFormData.taxRate === 0 ||
           addProductFormData.validFrom === "")
       ) {
@@ -106,7 +131,7 @@ function AddProductModal({
         //   message: "Please insert Tax Rate and Valid From",
         //   type: "error",
         // });
-        toast.error("Please insert Tax Rate and Valid From")
+        toast.error("Please insert Tax Rate and Valid From");
         return;
       } else {
         let formattedDate: string = "";
@@ -125,16 +150,25 @@ function AddProductModal({
         }
         const addProductPostData = {
           company_id: loginStatus.companyId,
+          product_type_id:
+            selectedProductTypeId ?? addProductFormData.productTypeId,
+          default_warranty_interval_type_id: selectedWarrantyIntervalTypeId,
+          default_warranty: selectedDefaultWarranty,
+          default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
+          default_amc_cycle: selectedDefaultAmc,
           name: addProductFormData.name,
           code: addProductFormData.code,
-          description: addProductFormData.description,
           cost: addProductFormData.cost,
+          description: addProductFormData.description,
+          version: addProductFormData.version,
+          url: addProductFormData.url,
           hsn: addProductFormData.hsn,
           sac: addProductFormData.sac,
           tax_rate: taxRateDecimal,
-          valid_from: formattedDate,
-          createdby: loginStatus.id,
+          valid_from_string: formattedDate,
+          createdby_id: loginStatus.id,
         };
+        console.log(addProductPostData);
         await axios
           .post(POST_API.ADD_PRODUCT, addProductPostData, {
             withCredentials: true,
@@ -145,51 +179,72 @@ function AddProductModal({
               //   message: "Product Added Successfully",
               //   type: "success",
               // });
-              toast.success(response.data.message)
+              toast.success(response.data.message);
               handleProductChangeOnAdd(addProductFormData);
               setTimeout(() => {
                 onClose();
               }, 500);
-            }else{
-              toast.error(response.data.message)
+            } else {
+              toast.error(response.data.message);
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .catch(async (error : ApiError | any) => {
+          .catch(async (error: ApiError | any) => {
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
                 callFunctionWithEvent: handleAddProductFormSubmit,
               });
-              if(refreshTokenResponse){
+              if (refreshTokenResponse) {
                 handleAddProductFormSubmit(event);
               }
             }
-           
           });
       }
     }
   };
-  useEffect(()=>{
-    if(!isOpen){
+  useEffect(() => {
+    if (!isOpen) {
       setInitialAddProductFormData({
+        count: 0,
+        id: 0,
+        companyId: 0,
+        productTypeId: 0,
+        defaultWarrantyIntervalTypeId: 0,
+        defaultWarranty: 0,
+        defaultWarrantyName: "",
+        defaultAmcCycleIntervalTypeId: 0,
+        defaultAmcCycle: 0,
+        defaultAmcCycleName: "",
         name: "",
         code: "",
-        description: "",
         cost: 0,
+        description: "",
+        version: "",
+        url: "",
+        isActive: false,
         hsn: "",
         sac: "",
+        taxRate: 0,
         validFrom: "",
-      })
+        createdBy: "",
+        createdOn: "",
+      });
     }
-  },[isOpen])
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className={isSmallScreen ?"fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45" }>
+    <div
+      className={
+        isSmallScreen
+          ? "fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-45"
+          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+      }
+    >
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
-          className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -208,59 +263,154 @@ function AddProductModal({
               </button>
             </div>
 
-            <form className="space-y-2 " onSubmit={handleAddProductFormSubmit}>
-              <FormInput
-                label="Product Name : "
-                maxLength={40}
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                required={true}
-                value={addProductFormData.name}
-                onChange={handleAddProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.name}
-              />
-              <FormInput
-                label="Item Code : "
-                type="text"
-                name="code"
-                required={true}
-                value={addProductFormData.code}
-                placeholder="Product Item Code"
-                onChange={handleAddProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.code}
-              />
-              <FormInput
-                label="Basic Cost : "
-                type="number"
-                name="cost"
-                value={addProductFormData.cost?.toString()}
-                placeholder="Product Price"
-                onChange={handleAddProductFormDataChange}
-              />
-              <TextAreaInput
-                label="Description : "
-                name="description"
-                placeholder="Product Description"
-                value={addProductFormData.description}
-                cols={5}
-                rows={3}
-                required={true}
-                maxLength={256}
-                onChange={handleAddProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.description}
-              />
+            <form
+              className=" grid grid-cols-2  gap-3 "
+              onSubmit={handleAddProductFormSubmit}
+            >
+              <div className="grid col-span-1 ">
+                <FormInput
+                  label="Product Name : "
+                  maxLength={40}
+                  type="text"
+                  name="name"
+                  placeholder="Product Name"
+                  required={true}
+                  value={addProductFormData.name}
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.name}
+                />
 
-              <RadioButtons
-                options={ProductsRadioButtonOptions}
-                onChange={handleTaxRadioButtonChange}
-              />
+                <FormInput
+                  label="URL :"
+                  type="text"
+                  name="url"
+                  required={false}
+                  value={addProductFormData.url}
+                  placeholder="Product URL"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
+                />
+                <FormInput
+                  label="Version :"
+                  type="text"
+                  name="version"
+                  required={false}
+                  value={addProductFormData.version}
+                  placeholder="Product Version"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.code}
+                />
 
-              {(selectedTaxCode === TAX_CODE.HSN ||
-                selectedTaxCode === "") && (
+                <TextAreaInput
+                  label="Description : "
+                  name="description"
+                  placeholder="Product Description"
+                  value={addProductFormData.description}
+                  cols={5}
+                  rows={2}
+                  required={false}
+                  maxLength={256}
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  // error={errors.description}
+                />
+              </div>
+              <div className="grid col-span-1 gap-1">
+                <div className="grid col-span-1 gap-1">
+                  <FormInput
+                    label="Basic Cost : "
+                    type="number"
+                    name="cost"
+                    value={addProductFormData.cost?.toString()}
+                    placeholder="Product Price"
+                    onChange={handleAddProductFormDataChange}
+                  />
+                  <FormInput
+                    label="Item Code : "
+                    type="text"
+                    name="code"
+                    required={true}
+                    value={addProductFormData.code}
+                    placeholder="Product Item Code"
+                    onChange={handleAddProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
+                  <CustomDropdown
+                    labelName="Product Type :"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setSelectedProductTypeId(e);
+                      }
+                    }}
+                    options={productTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <CustomDropdown
+                    labelName="Warranty Duration"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultWarranty(e);
+                      }
+                    }}
+                    options={rangeOfNumber}
+                    requiredRedDot={true}
+                  />
+                  <CustomDropdown
+                    labelName="Warranty Time Unit"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setWarrantyIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <CustomDropdown
+                    labelName="AMC Cycle Duration"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultAmc(e);
+                      }
+                    }}
+                    options={rangeOfNumber}
+                    requiredRedDot={true}
+                  />
+                  <CustomDropdown
+                    labelName="AMC Time Unit"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setAmcIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
+              </div>
+
+              <div className="flex col-span-2 justify-center">
+                <RadioButtons
+                  options={ProductsRadioButtonOptions}
+                  onChange={handleTaxRadioButtonChange}
+                />
+              </div>
+
+              {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
                   type="text"
@@ -303,11 +453,11 @@ function AddProductModal({
               />
 
               {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-center  pt-4 ">
+                <div className="flex justify-self-center col-span-2  pt-4 ">
                   <Button type="submit">Add Product</Button>
                 </div>
               ) : (
-                <div className="flex justify-self-center  pt-4">
+                <div className="flex justify-self-center col-span-2  pt-4">
                   <Button
                     type="submit"
                     onClick={() => {
@@ -321,7 +471,6 @@ function AddProductModal({
                   >
                     Add Product
                   </Button>
-                  
                 </div>
               )}
             </form>

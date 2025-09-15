@@ -89,6 +89,7 @@ const ViewLeadManagement = () => {
   const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
+   
 
   const fetchLeadStatus = async () => {
     try {
@@ -817,7 +818,7 @@ const ViewLeadManagement = () => {
             value={selectedLeadData?.createdOn}
           />
         </div>
-
+        
         {/* Lead Basic Info */}
         <div className="w-full flex ">
           <div className="mx-3 flex justify-between w-full    whitespace-nowrap overflow-auto">

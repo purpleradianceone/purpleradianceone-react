@@ -43,6 +43,7 @@ import SettingToggleCard from '../../../ui/SettingToggleCard';
 //   );
 // };
 
+
 function EmailTypeSettings() {
   const [emailTypeSettings, setEmailTypeSettings] = useState<EmailTypeSettingsType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -159,7 +160,12 @@ function EmailTypeSettings() {
           ))}
         </div>
       )}
+    <div className="w-full h-fit bg-gray-50 px-2 py-2">
+      {!userHasAccessToViewEmailTypeSetting && (
+        <AccessDeniedMessagePage></AccessDeniedMessagePage>
+      )}
     </div>
+      </div>
   );
 }
 

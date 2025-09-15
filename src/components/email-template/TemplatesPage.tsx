@@ -342,12 +342,12 @@ export const TemplatesPage: React.FC = () => {
     >
       {/* Header */}
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
-        <div className="flex  justify-between w-full h-12 items-center">
+        <div className="flex  justify-between w-full h-9 items-center">
           <div className="flex gap-2">
             {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
             {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
 
-            <span className="text-xl font-bold ">Email Templates</span>
+            <span className="text-xl sm:text-base md:text-clip font-bold ">Email Templates</span>
           </div>
           {isLargeScreen && (
             <>
@@ -541,7 +541,7 @@ export const TemplatesPage: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="flex-1 p-4 overflow-x-auto" ref={containerRef}>
+          <div className="flex-1 overflow-x-auto" ref={containerRef}>
             <Tabs
               activeTab={activeTab}
               onTabChange={handleTabChange}
@@ -574,7 +574,7 @@ const Sidebar: React.FC<{
 }> = ({ onCreate, handleAccessDenied }) => {
   const { userHasAccessToAddEmailTemplateSetting } = useUserAccessModules();
   return (
-    <div className="flex max-w-60">
+    <div className="flex max-w-60 min-h-7 h-8">
       <Button
         disabled={!userHasAccessToAddEmailTemplateSetting}
         onClick={() =>

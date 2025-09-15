@@ -59,7 +59,10 @@ const MESSAGE = {
         }, ACCOUNT_TYPE_ACCESS : {
             DENIED_ADD_ACCESS : "You do not have permission to add account type.",
             DENIED_UPDATE_ACCESS : "You do not have permission to update account type.",
-                }
+        },ACCOUNT_ACCESS : {
+            DENIED_ADD_ACCESS : "You do not have permission to add new account.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update account.",
+        }
     }
 }
 

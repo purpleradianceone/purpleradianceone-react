@@ -487,8 +487,8 @@ export const EditorCanvas: React.FC = () => {
                 <div
                   style={{
                     position: "sticky",
-                    top: "0px",
-                    height: "3000px",
+                    top: "10px",
+                    height: "10000px",
                     backgroundColor: "blue",
                   }}
                 >

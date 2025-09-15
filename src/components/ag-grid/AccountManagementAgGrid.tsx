@@ -12,8 +12,8 @@ function AccountManagementAgGrid({
   onRowSelect,
 }: {
   accounts: Account[];
-  handleRowClick: (event: any) => void;
-  onRowSelect: (data: Account | any) => void;
+  handleRowClick?: (event:  any) => void;
+  onRowSelect?: (data: Account | any) => void;
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -235,7 +235,7 @@ function AccountManagementAgGrid({
                 params.context.handleRowSelect(params.data);
               }}
             >
-              Lead Details
+              View details
             </span>
           );
         },

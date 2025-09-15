@@ -4,9 +4,7 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
-import {
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -18,12 +16,10 @@ import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
 
 function GetAccounts() {
-    const [accounts,setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
@@ -43,16 +39,12 @@ function GetAccounts() {
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers();
 
-
-
   // Fetch data function
   const fetchAccounts = async () => {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate
-        ? 0
-        : dateRangeId;
+      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -62,7 +54,7 @@ function GetAccounts() {
       offset,
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
-      isactive : null,
+      isactive: null,
       search_parameter_date: concatDate,
     };
 
@@ -71,107 +63,58 @@ function GetAccounts() {
         withCredentials: true,
       });
 
-      console.log(response.data);
-      const formattedData : Account[] = response.data.map((res : any)  => ({
-        count : res.count,
-        id : res.id,
-        companyId : res.company_id,
-        name : res.name,
-        email : res.email,
-        mobileNumber : res.mobilenumber,
-        industryTypeId : res.industry_type_id,
-        industryTypeName : res.industry_type_name,
-        businessTypeId : res.business_type_id,
-        businessTypeName : res.business_type_name,
-        pan : res.pan,
-        gst : res.gst,
-        tan : res.tan,
-        billingAddress : res.billing_address,
-        shippingAddress : res.shipping_address,
-        registeredOfficeAddress : res.registered_office_address,
-        businessResgistrationNumber : res.business_registration_number,
-        website : res.website,
-        isActive : res.isactive,
-        createdBy : res.createdby,
-        createdOn : res.createdon
-      }))
-      
+      const formattedData: Account[] = response.data.map((res: any) => ({
+        count: res.count,
+        id: res.id,
+        companyId: res.company_id,
+        name: res.name,
+        email: res.email,
+        mobileNumber: res.mobilenumber,
+        industryTypeId: res.industry_type_id,
+        industryTypeName: res.industry_type_name,
+        businessTypeId: res.business_type_id,
+        businessTypeName: res.business_type_name,
+        pan: res.pan,
+        gst: res.gst,
+        tan: res.tan,
+        billingAddress: res.billing_address,
+        shippingAddress: res.shipping_address,
+        registeredOfficeAddress: res.registered_office_address,
+        businessResgistrationNumber: res.business_registration_number,
+        website: res.website,
+        isActive: res.isactive,
+        createdBy: res.createdby,
+        createdOn: res.createdon,
+      }));
+
       setAccounts(formattedData);
-//       setAccounts([
-//   {
-//     count: 1,
-//     id: 101,
-//     companyId: 1,
-//     name: "Acme Corp",
-//     email: "contact@acmecorp.com",
-//     mobileNumber: "9876543210",
-//     industryTypeId: 5,
-//     industryTypeName: "Technology",
-//     businessTypeId: 2,
-//     businessTypeName: "Limited Liability Partnership (LLP)",
-//     pan: "ABCDE1234F",
-//     gst: "27ABCDE1234F1Z5",
-//     tan: "ABCDE1234F",
-//     billingAddress: "123 Tech Park, Silicon Valley",
-//     shippingAddress: "123 Tech Park, Silicon Valley",
-//     registeredOfficeAddress: "123 Tech Park, Silicon Valley",
-//     businessResgistrationNumber: "C1234567",
-//     website: "https://www.acmecorp.com",
-//     isActive: true,
-//     createdBy: "admin",
-//     createdOn: "2024-01-15T10:00:00Z",
-//   },
-//   {
-//     count: 2,
-//     id: 102,
-//     companyId: 1,
-//     name: "Globex Inc.",
-//     email: "info@globex.com",
-//     mobileNumber: "9123456789",
-//     industryTypeId: 3,
-//     industryTypeName: "Manufacturing",
-//     businessTypeId: 3,
-//     businessTypeName: "Partnership",
-//     pan: "FGHIJ5678K",
-//     gst: "27FGHIJ5678K1Z5",
-//     tan: "FGHIJ5678K",
-//     billingAddress: "456 Industrial Rd, Metropolis",
-//     shippingAddress: "456 Industrial Rd, Metropolis",
-//     registeredOfficeAddress: "456 Industrial Rd, Metropolis",
-//     businessResgistrationNumber: "P9876543",
-//     website: "https://www.globex.com",
-//     isActive: true,
-//     createdBy: "admin",
-//     createdOn: "2024-02-20T11:30:00Z",
-//   },
-//   {
-//     count: 3,
-//     id: 103,
-//     companyId: 1,
-//     name: "Innovate Solutions",
-//     email: "contact@innovate.co",
-//     mobileNumber: "9988776655",
-//     industryTypeId: 7,
-//     industryTypeName: "Consulting",
-//     businessTypeId: 1,
-//     businessTypeName: "Sole Proprietorship",
-//     pan: "KLMNO9012L",
-//     gst: "27KLMNO9012L1Z5",
-//     tan: "KLMNO9012L",
-//     billingAddress: "789 Business Blvd, Innovation City",
-//     shippingAddress: "789 Business Blvd, Innovation City",
-//     registeredOfficeAddress: "789 Business Blvd, Innovation City",
-//     businessResgistrationNumber: "S1122334",
-//     website: "https://www.innovate.co",
-//     isActive: false,
-//     createdBy: "admin",
-//     createdOn: "2024-03-05T14:45:00Z",
-//   },
-// ])
+      //       setAccounts([
+      //   {
+      //     count: 1,
+      //     id: 101,
+      //     companyId: 1,
+      //     name: "Acme Corp",
+      //     email: "contact@acmecorp.com",
+      //     mobileNumber: "9876543210",
+      //     industryTypeId: 5,
+      //     industryTypeName: "Technology",
+      //     businessTypeId: 2,
+      //     businessTypeName: "Limited Liability Partnership (LLP)",
+      //     pan: "ABCDE1234F",
+      //     gst: "27ABCDE1234F1Z5",
+      //     tan: "ABCDE1234F",
+      //     billingAddress: "123 Tech Park, Silicon Valley",
+      //     shippingAddress: "123 Tech Park, Silicon Valley",
+      //     registeredOfficeAddress: "123 Tech Park, Silicon Valley",
+      //     businessResgistrationNumber: "C1234567",
+      //     website: "https://www.acmecorp.com",
+      //     isActive: true,
+      //     createdBy: "admin",
+      //     createdOn: "2024-01-15T10:00:00Z",
+      //   },
+      // ])
       if (response.data[0]?.count) {
-        setTotalPages(
-          Math.ceil(response.data[0].count / pageSize)
-        );
+        setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -185,20 +128,11 @@ function GetAccounts() {
     }
   };
 
-
-
   useEffect(() => {
+    fetchAccounts();
 
-      fetchAccounts();
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    pageSize,
-    currentPage,
-    dateRangeId,
-    searchParameter,
-    concatDate,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
 
   useEffect(() => {
     if (!userHasAccessToViewAccount) {
@@ -212,28 +146,28 @@ function GetAccounts() {
         <>
           <div>
             <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      
-    >
-            <AccountManagementList 
-            accounts={accounts}
-            handleSearchOption={{
-              handleSearchParameterChange,
-              handleDateRangeIdChange: handleDatePageIdChange,
-            }}
-            onEndDateChange={handleEndDateChange}
-            onStartDateChange={handleStartDateChange}
-             paginationData={{
-              selectedPageSize: handlePageSizeChange,
-              currentPage,
-              handlePageChange,
-              totalPages,
-              pageSize,
-            }}
-            />
+              ref={ref}
+              initial={{ opacity: 0, y: 40 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <AccountManagementList
+                fetchAccounts ={fetchAccounts}
+                accounts={accounts}
+                handleSearchOption={{
+                  handleSearchParameterChange,
+                  handleDateRangeIdChange: handleDatePageIdChange,
+                }}
+                onEndDateChange={handleEndDateChange}
+                onStartDateChange={handleStartDateChange}
+                paginationData={{
+                  selectedPageSize: handlePageSizeChange,
+                  currentPage,
+                  handlePageChange,
+                  totalPages,
+                  pageSize,
+                }}
+              />
             </motion.section>
           </div>
         </>
