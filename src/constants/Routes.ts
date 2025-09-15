@@ -58,6 +58,9 @@ const ROUTES_URL = {
     NOT_AUTHORIZED : "/not-authorized",
     SETTINGS_ALREADY_EXISTS : "/meeting/settings/already-exists",
 
+    FACEBOOK_OAUTH : "/authenticate/facebook",
+    INTEGRATIONS_SETTINGS : "/settings/integrations",
+
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
 
 }

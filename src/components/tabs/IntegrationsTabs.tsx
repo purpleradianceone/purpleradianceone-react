@@ -6,39 +6,27 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import LeadSetting from "../views/settings/lead-settings/LeadSetting";
-import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
-import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
-import CompanyPreferenceSetting from "../views/settings/company-preferences/CompanyPreferenceSetting";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
-import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
-import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
+import WebFormIntegration from "../views/settings/web-form-integration/WebFormIntegration";
+import MetaAppsIntegration from "../views/settings/social-media-integration/MetaAppsIntegration";
 
-function SettingsTabs() {
-  const [activeTab, setActiveTab] = useState("onlineLead");
+function IntegrationsTabs() {
+  const [activeTab, setActiveTab] = useState("webFormIntegration");
 
   const {
-    userHasAccessToViewSettingLeady,
-    userHasAccessToViewCompanyPreferences,
-    userHasAccessToViewMeetingSetting,
-    userHasAccessToViewSettingGeneral,
-    userHasAccessToViewCompanyAccountType
+    userHasAccessToViewIntegrationSetting,
   } = useUserAccessModules();
 
   const data = [
     {
-      label: "Lead",
-      value: "onlineLead",
+      label: "Web Form Integration",
+      value: "webFormIntegration",
       desc: (
         <>
-          {userHasAccessToViewSettingLeady ? (
-            activeTab === "onlineLead" &&
-            <div className="grid grid-cols-1 gap-2">
-              <div className="col-span-1 min-h-full">
-                <LeadSetting />
-              </div>
-            </div>
+          {userHasAccessToViewIntegrationSetting ? (
+            activeTab === "webFormIntegration" && <WebFormIntegration/> 
+            
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -46,17 +34,13 @@ function SettingsTabs() {
       ),
     },
     {
-      label: "Email",
-      value: "emailSettings",
-      desc:  activeTab === "emailSettings" && <EmailSetting />,
-    },
-     {
-      label: "Meetings",
-      value: "meeting",
+      label: "Meta Apps",
+      value: "meta",
       desc: (
         <>
-          {userHasAccessToViewMeetingSetting ? (
-            activeTab === "meeting" && <MeetingSettings></MeetingSettings>
+          {userHasAccessToViewIntegrationSetting ? (
+            activeTab === "meta" && <MetaAppsIntegration/> 
+            
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -64,12 +48,16 @@ function SettingsTabs() {
       ),
     },
     {
-      label: "Account Type",
-      value: "accounttype",
+      label: "IndiaMART",
+      value: "indiaMART",
       desc: (
         <>
-          {userHasAccessToViewCompanyAccountType ? (
-            activeTab === "accounttype" && <AccountTypeSetting/>
+          {userHasAccessToViewIntegrationSetting ? (
+            activeTab === "indiaMART" && (
+                <div>
+                    INDIAMART Ads
+                </div>
+            )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -77,12 +65,16 @@ function SettingsTabs() {
       ),
     },
     {
-      label: "Company Preferences",
-      value: "companyPreference",
+      label: "LinkedIn",
+      value: "linkedIn",
       desc: (
         <>
-          {userHasAccessToViewCompanyPreferences ? (
-           activeTab === "companyPreference" && <CompanyPreferenceSetting></CompanyPreferenceSetting>
+          {userHasAccessToViewIntegrationSetting ? (
+            activeTab === "linkedIn" && (
+                <div>
+                    LinkedIn Ads
+                </div>
+            )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -90,12 +82,16 @@ function SettingsTabs() {
       ),
     },
     {
-      label: "General",
-      value: "general",
+      label: "Google Ads",
+      value: "googleAds",
       desc: (
         <>
-          {userHasAccessToViewSettingGeneral ? (
-            activeTab === "general" && <UserPrerefenceManagement />
+          {userHasAccessToViewIntegrationSetting ? (
+            activeTab === "googleAds" && (
+                <div>
+                    GOOGLE ADS
+                </div>
+            )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -107,7 +103,7 @@ function SettingsTabs() {
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0  bg-white pb-2">
+        <div className="sticky top-0 bg-white pb-2">
           <TabsHeader
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
@@ -117,7 +113,7 @@ function SettingsTabs() {
             className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-blue-500 shadow-none rounded-none",
+                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
             }}
             
           >
@@ -132,7 +128,7 @@ function SettingsTabs() {
                 value={value}
                 onClick={() => setActiveTab(value)}
                 className={
-                  activeTab === value ? "text-blue-600 text-sm font-medium  " : "text-sm text-gray-500"
+                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
                 }
               >
                 {label}
@@ -162,4 +158,4 @@ function SettingsTabs() {
   );
 }
 
-export default SettingsTabs;
+export default IntegrationsTabs;
