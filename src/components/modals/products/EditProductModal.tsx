@@ -32,6 +32,7 @@ import toast from "react-hot-toast";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
+import { Item, range } from "../../../constants/NumberList";
 
 function EditCompanyProductModal({
   isOpen,
@@ -42,6 +43,8 @@ function EditCompanyProductModal({
 }: EditCompanyProductModalProps) {
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
+    const rangeOfNumber: Item[] = range(1, 365);
+  
 
   const intialEditCompanyProductFormData = {
     company_id: product.companyId,
@@ -60,24 +63,16 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(
-   0
-  );
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
 
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
     useState<number>(0);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(
-    0
-  );
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(
-    0
-  );
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(
-    0
-  );
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -158,22 +153,36 @@ function EditCompanyProductModal({
   ) => {
     event.preventDefault();
 
-    if (
-      updateCompanyProductFormData.name !== ""
-    ) {
+    if (updateCompanyProductFormData.name !== "") {
       if (
-        updateCompanyProductFormData.code !== intialEditCompanyProductFormData.code ||
-        updateCompanyProductFormData.name !== intialEditCompanyProductFormData.name ||
-        updateCompanyProductFormData.description !== intialEditCompanyProductFormData.description ||
-        updateCompanyProductFormData.cost !== intialEditCompanyProductFormData.cost ||
-        updateCompanyProductFormData.isActive !== product.isActive||
-        (selectedProductTypeId!==0 && selectedProductTypeId !== intialEditCompanyProductFormData.product_type_id)||
-        (selectedWarrantyIntervalTypeId!==0 && selectedWarrantyIntervalTypeId !== intialEditCompanyProductFormData.default_warranty_interval_type_id)||
-        (selectedDefaultWarranty!==0 && selectedDefaultWarranty !== intialEditCompanyProductFormData.default_warranty)||
-        (selectedAmcIntervalTypeId!==0 && selectedAmcIntervalTypeId !== intialEditCompanyProductFormData.default_amc_cycle_interval_type_id)||
-        (selectedDefaultAmc!==0 && selectedDefaultAmc !== intialEditCompanyProductFormData.default_amc_cycle)||
-        updateCompanyProductFormData.version !== intialEditCompanyProductFormData.version||
-        updateCompanyProductFormData.url !== intialEditCompanyProductFormData.url
+        updateCompanyProductFormData.code !==
+          intialEditCompanyProductFormData.code ||
+        updateCompanyProductFormData.name !==
+          intialEditCompanyProductFormData.name ||
+        updateCompanyProductFormData.description !==
+          intialEditCompanyProductFormData.description ||
+        updateCompanyProductFormData.cost !==
+          intialEditCompanyProductFormData.cost ||
+        updateCompanyProductFormData.isActive !== product.isActive ||
+        (selectedProductTypeId !== 0 &&
+          selectedProductTypeId !==
+            intialEditCompanyProductFormData.product_type_id) ||
+        (selectedWarrantyIntervalTypeId !== 0 &&
+          selectedWarrantyIntervalTypeId !==
+            intialEditCompanyProductFormData.default_warranty_interval_type_id) ||
+        (selectedDefaultWarranty !== 0 &&
+          selectedDefaultWarranty !==
+            intialEditCompanyProductFormData.default_warranty) ||
+        (selectedAmcIntervalTypeId !== 0 &&
+          selectedAmcIntervalTypeId !==
+            intialEditCompanyProductFormData.default_amc_cycle_interval_type_id) ||
+        (selectedDefaultAmc !== 0 &&
+          selectedDefaultAmc !==
+            intialEditCompanyProductFormData.default_amc_cycle) ||
+        updateCompanyProductFormData.version !==
+          intialEditCompanyProductFormData.version ||
+        updateCompanyProductFormData.url !==
+          intialEditCompanyProductFormData.url
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -338,7 +347,7 @@ function EditCompanyProductModal({
     >
       <div className="flex min-h-screen items-center justify-center">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -365,40 +374,19 @@ function EditCompanyProductModal({
               onSubmit={hanldeUpdateCompanyProductFormSubmit}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Product Name : "
-                  type="text"
-                  name="name"
-                  required={true}
-                  value={updateCompanyProductFormData.name}
-                  placeholder="Enter Product Name"
-                  defaultValue={intialEditCompanyProductFormData.name}
-                  maxLength={256}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  error={errors.name}
-                  onBlur={handleBlur}
-                />
-                <FormInput
-                  label="Item Code : "
-                  type="text"
-                  name="code"
-                  required={true}
-                  placeholder="Enter Item Code"
-                  onChange={handleEditCompanyProductFormDataChange}
-                  defaultValue={intialEditCompanyProductFormData.code}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div className="grid col-span-1 ">
                   <FormInput
-                    label="Cost : "
+                    label="Product Name : "
                     type="text"
-                    name="cost"
-                    placeholder="Enter Product Cost"
-                    defaultValue={intialEditCompanyProductFormData.cost}
+                    name="name"
+                    required={true}
+                    value={updateCompanyProductFormData.name}
+                    placeholder="Enter Product Name"
+                    defaultValue={intialEditCompanyProductFormData.name}
+                    maxLength={256}
                     onChange={handleEditCompanyProductFormDataChange}
+                    error={errors.name}
+                    onBlur={handleBlur}
                   />
                   <FormInput
                     label="URL : "
@@ -425,7 +413,6 @@ function EditCompanyProductModal({
                     onBlur={handleBlur}
                     error={errors.code}
                   />
-
                   <TextAreaInput
                     label="Description : "
                     cols={5}
@@ -436,69 +423,101 @@ function EditCompanyProductModal({
                     defaultValue={intialEditCompanyProductFormData.description}
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    error={errors.description}
+                    // error={errors.description}
                   />
                 </div>
 
                 <div className="grid col-span-1 gap-1">
-                  <CustomDropdown
-                    labelName="Product Type"
-                    preselectedOption={intialEditCompanyProductFormData.product_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setSelectedProductTypeId(e);
+                  <div className="grid col-span-1 gap-1">
+                    <FormInput
+                      label="Cost : "
+                      type="text"
+                      name="cost"
+                      placeholder="Enter Product Cost"
+                      defaultValue={intialEditCompanyProductFormData.cost}
+                      onChange={handleEditCompanyProductFormDataChange}
+                    />
+                    <FormInput
+                      label="Item Code : "
+                      type="text"
+                      name="code"
+                      required={true}
+                      placeholder="Enter Item Code"
+                      onChange={handleEditCompanyProductFormDataChange}
+                      defaultValue={intialEditCompanyProductFormData.code}
+                      onBlur={handleBlur}
+                      error={errors.code}
+                    />
+                    <CustomDropdown
+                      labelName="Product Type"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.product_type_id
                       }
-                    }}
-                    options={productTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Warranty Interval"
-                    preselectedOption={intialEditCompanyProductFormData.default_warranty_interval_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setWarrantyIntervalTypeId(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setSelectedProductTypeId(e);
+                        }
+                      }}
+                      options={productTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="flex col-span-2 gap-3 w-fit">
+                    <CustomDropdown
+                      labelName="Warranty Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Default Warranty"
-                    preselectedOption={intialEditCompanyProductFormData.default_warranty}
-                    onSelect={(e) => {
-                      if (e) {
-                        setDefaultWarranty(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultWarranty(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="Warranty Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty_interval_type_id
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-                  <CustomDropdown
-                    labelName="AMC Cycle"
-                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle_interval_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setAmcIntervalTypeId(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setWarrantyIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="flex col-span-2 gap-3">
+                    <CustomDropdown
+                      labelName="AMC Cycle Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Default AMC Cycle"
-                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle}
-                    onSelect={(e) => {
-                      if (e) {
-                        setDefaultAmc(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultAmc(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="AMC Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
+                      onSelect={(e) => {
+                        if (e) {
+                          setAmcIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
                 </div>
               </div>
               <div className="flex col-span-2 justify-center">
