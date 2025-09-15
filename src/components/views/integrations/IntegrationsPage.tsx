@@ -1,9 +1,10 @@
-import { useUserPreference } from "../../../../context/user/UserPreference";
-import SettingsTabs from "../../../tabs/SettingTabs";
+
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { useUserPreference } from "../../../context/user/UserPreference";
+import IntegrationsTabs from "../../tabs/IntegrationsTabs";
 
-function SettingsPage() {
+function IntegrationsPage() {
   const { userPreference } = useUserPreference();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -24,13 +25,13 @@ function SettingsPage() {
             <div className="flex w-full gap-2 justify-center">
               <div className="flexr">
                 <span className="text-base font-bold">
-                  Tailor Settings to Your Needs
+                  Tailor Lead Settings to Your Needs
                 </span>
               </div>
             </div>
           </div>
           <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-            <SettingsTabs></SettingsTabs>
+           <IntegrationsTabs/>
           </div>
         </div>
       </motion.section>
@@ -38,4 +39,4 @@ function SettingsPage() {
   );
 }
 
-export default SettingsPage;
+export default IntegrationsPage;

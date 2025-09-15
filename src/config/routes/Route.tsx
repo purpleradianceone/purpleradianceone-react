@@ -58,6 +58,8 @@ import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
 import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
 import Home from "../../components/views/home/Home";
 import GetAccounts from "../../components/views/account/AccountManagement";
+import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
+import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 
 export const router = createBrowserRouter([
   {
@@ -566,6 +568,28 @@ export const router = createBrowserRouter([
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
-  }
+  },
+  {
+    path: ROUTES_URL.FACEBOOK_OAUTH,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+        <FacebookOAuthConsent></FacebookOAuthConsent>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+    {
+    path: ROUTES_URL.INTEGRATIONS_SETTINGS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+        <IntegrationsPage/>
+        </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
 ]);
 export default router;
