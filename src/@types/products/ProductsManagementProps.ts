@@ -15,7 +15,7 @@ export type Product = {
   description: string;
   version?: string;
   url?: string;
-  isActive?: boolean;
+  isActive: boolean;
   hsn?: string;
   sac?: string;
   taxRate?: number;
