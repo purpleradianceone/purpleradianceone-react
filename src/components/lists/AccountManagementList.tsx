@@ -61,7 +61,8 @@ function AccountManagementList({
       setShowAccountDetails(true);
   };
 
-  const {industryTypeData } = useIndustryTypeData();
+  // const {industryTypeData } = useIndustryTypeData();
+  const {industryTypeData} = useIndustryTypeData();
   const {businessTypeData} = useBusinessTypeData();
   return (
     <div
