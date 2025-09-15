@@ -501,7 +501,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="flex col-span-2 gap-3 ">
+                  <div className="grid grid-cols-2 gap-3 ">
                     <CustomDropdown
                       labelName="Warranty Duration"
                       preselectedOption={
@@ -529,7 +529,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="flex col-span-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <CustomDropdown
                       labelName="AMC Cycle Duration"
                       preselectedOption={
