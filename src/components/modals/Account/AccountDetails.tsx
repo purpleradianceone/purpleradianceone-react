@@ -42,8 +42,8 @@ interface AccountDetailsProps {
 const AccountDetails: React.FC<AccountDetailsProps> = ({
   company,
   onClose,
-  indutryTypeData,
-  businessTypeData,
+  indutryTypeData = [],
+  businessTypeData = [],
   fetchAccounts,
 }) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -376,7 +376,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     // );
     return (
       <div className="relative w-full max-w-full">
-      {/* // <div className="relative h-full flex flex-col justify-center"> */}
+        {/* // <div className="relative h-full flex flex-col justify-center"> */}
         {isEditing ? (
           <div className="h-full flex flex-col">
             <input
@@ -431,12 +431,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       case "contact":
         return (
           // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
-             <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+          <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
             {/* Email */}
             <div className="col-span-2 flex justify-between p-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition">
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
-                
               </div>
               <div className="truncate pl-3 w-full overflow-hidden">
                 <p className="text-xs text-slate-500">Email</p>
@@ -452,10 +451,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
             {/* Mobile */}
             {/* <div className=" col-span-2  justify-between p-0.5 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition"> */}
-              <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-2 px-3 hover:shadow-sm transition">
+            <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-2 px-3 hover:shadow-sm transition">
               <div className="flex  items-center gap-2">
                 <Phone className="h-5 w-5 text-green-600" />
-                
               </div>
               <div className="truncate pl-3 w-full overflow-hidden">
                 <p className="text-xs text-slate-500">Mobile</p>
@@ -471,10 +469,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
             {/* Website */}
             <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition sm:col-span-2">
-
               <div className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-purple-600" />
-                
               </div>
               <div className="truncate ">
                 <p className="text-xs  text-slate-500">Website</p>
@@ -511,7 +507,6 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 )}
               </div>
             </div>
-            
           </div>
         );
 
@@ -624,12 +619,25 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </h1>
               <div className="text-slate-600 flex items-center">
                 <span className="text-xs text-gray-600">Industry type:</span>
-                <div className="ml-1 truncate">
+                {/* <div className="ml-1 truncate">
+
                   {renderDropdownField(
                     "industryTypeName",
                     formData.industryTypeName,
                     indutryTypeData || [],
                     "Select industry type"
+                  )}
+                </div> */}
+                <div className="ml-1 truncate">
+                  {indutryTypeData && indutryTypeData.length > 0 ? (
+                    renderDropdownField(
+                      "industryTypeName",
+                      formData.industryTypeName,
+                      indutryTypeData,
+                      "Select industry type"
+                    )
+                  ) : (
+                    <p className="text-gray-400">Loading industry types...</p>
                   )}
                 </div>
               </div>
@@ -736,7 +744,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
         {/* Right Card - Empty for future use */}
         <div className="bg-white rounded-xl h-72 border p-1 border-slate-200">
-          <h3 className="bg-gray-100 text-sm rounded-t-md    px-2   text-gray-700 font-semibold">Account Contact</h3>
+          <h3 className="bg-gray-100 text-sm rounded-t-md    px-2   text-gray-700 font-semibold">
+            Account Contact
+          </h3>
           <AccountContact accountId={company.id} />
         </div>
       </div>

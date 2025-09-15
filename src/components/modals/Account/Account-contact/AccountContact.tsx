@@ -576,13 +576,13 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     </div>
                     <div className="flex-1">
                       <h2 className="text-3xl font-bold text-gray-900">
-                        {selectedContactCard.name ?? (
+                        {selectedContactCard.name ? selectedContactCard.name :  (
                           <span className="text-sm italic">Unamed contact</span>
                         )}
                       </h2>
                       <p className="text-md text-gray-600 mt-1 flex items-center">
                         <Briefcase size={16} className="inline mr-2" />
-                        {selectedContactCard.designation ?? (
+                        {selectedContactCard.designation ? selectedContactCard.designation : (
                           <span className="text-sm italic">
                             No job title specified
                           </span>

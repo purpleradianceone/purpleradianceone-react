@@ -28,6 +28,7 @@ import toast from "react-hot-toast";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
+import { Item, range } from "../../../constants/NumberList";
 
 function AddProductModal({
   isOpen,
@@ -58,6 +59,7 @@ function AddProductModal({
 
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
+  const rangeOfNumber: Item[] = range(1, 365);
 
   const [intialAddProductFormData, setInitialAddProductFormData] =
     useState<Product>({
@@ -242,7 +244,7 @@ function AddProductModal({
     >
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -278,16 +280,9 @@ function AddProductModal({
                   onBlur={handleBlur}
                   error={errors.name}
                 />
+
                 <FormInput
-                  label="Basic Cost : "
-                  type="number"
-                  name="cost"
-                  value={addProductFormData.cost?.toString()}
-                  placeholder="Product Price"
-                  onChange={handleAddProductFormDataChange}
-                />
-                <FormInput
-                  label="URL : "
+                  label="URL :"
                   type="text"
                   name="url"
                   required={false}
@@ -298,7 +293,7 @@ function AddProductModal({
                   error={errors.code}
                 />
                 <FormInput
-                  label="Version : "
+                  label="Version :"
                   type="text"
                   name="version"
                   required={false}
@@ -320,79 +315,92 @@ function AddProductModal({
                   maxLength={256}
                   onChange={handleAddProductFormDataChange}
                   onBlur={handleBlur}
-                  error={errors.description}
+                  // error={errors.description}
                 />
               </div>
               <div className="grid col-span-1 gap-1">
-                <FormInput
-                  label="Item Code : "
-                  type="text"
-                  name="code"
-                  required={true}
-                  value={addProductFormData.code}
-                  placeholder="Product Item Code"
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-                <CustomDropdown
-                  labelName="Product Type"
-                  preselectedOption={0}
-                  onSelect={(e) => {
-                    if (e) {
-                      setSelectedProductTypeId(e);
-                    }
-                  }}
-                  options={productTypeData}
-                  requiredRedDot={true}
-                />
+                <div className="grid col-span-1 gap-1">
+                  <FormInput
+                    label="Basic Cost : "
+                    type="number"
+                    name="cost"
+                    value={addProductFormData.cost?.toString()}
+                    placeholder="Product Price"
+                    onChange={handleAddProductFormDataChange}
+                  />
+                  <FormInput
+                    label="Item Code : "
+                    type="text"
+                    name="code"
+                    required={true}
+                    value={addProductFormData.code}
+                    placeholder="Product Item Code"
+                    onChange={handleAddProductFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.code}
+                  />
+                  <CustomDropdown
+                    labelName="Product Type :"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setSelectedProductTypeId(e);
+                      }
+                    }}
+                    options={productTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
 
-                <CustomDropdown
-                  labelName="Warranty Interval"
-                  preselectedOption={0}
-                  onSelect={(e) => {
-                    if (e) {
-                      setWarrantyIntervalTypeId(e);
-                    }
-                  }}
-                  options={intervalTypeData}
-                  requiredRedDot={true}
-                />
+                <div className="grid grid-cols-2 gap-3">
+                  <CustomDropdown
+                    labelName="Warranty Duration"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultWarranty(e);
+                      }
+                    }}
+                    options={rangeOfNumber}
+                    requiredRedDot={true}
+                  />
+                  <CustomDropdown
+                    labelName="Warranty Time Unit"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setWarrantyIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
 
-                <CustomDropdown
-                  labelName="Default Warranty"
-                  preselectedOption={0}
-                  onSelect={(e) => {
-                    if (e) {
-                      setDefaultWarranty(e);
-                    }
-                  }}
-                  options={intervalTypeData}
-                  requiredRedDot={true}
-                />
-                <CustomDropdown
-                  labelName="AMC Cycle"
-                  preselectedOption={0}
-                  onSelect={(e) => {
-                    if (e) {
-                      setAmcIntervalTypeId(e);
-                    }
-                  }}
-                  options={intervalTypeData}
-                  requiredRedDot={true}
-                />
-
-                <CustomDropdown
-                  labelName="Default AMC Cycle"
-                  preselectedOption={0}
-                  onSelect={(e) => {
-                    if (e) {
-                      setDefaultAmc(e);
-                    }
-                  }}
-                  options={intervalTypeData}
-                  requiredRedDot={true}
-                />
+                <div className="grid grid-cols-2 gap-3">
+                  <CustomDropdown
+                    labelName="AMC Cycle Duration"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setDefaultAmc(e);
+                      }
+                    }}
+                    options={rangeOfNumber}
+                    requiredRedDot={true}
+                  />
+                  <CustomDropdown
+                    labelName="AMC Time Unit"
+                    preselectedOption={0}
+                    onSelect={(e) => {
+                      if (e) {
+                        setAmcIntervalTypeId(e);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                </div>
               </div>
 
               <div className="flex col-span-2 justify-center">

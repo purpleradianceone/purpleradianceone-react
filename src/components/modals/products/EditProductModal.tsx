@@ -20,7 +20,6 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import RadioButtons from "../../ui/RadioButton";
 import CreateCompanyProductTaxModal from "./CreateCompanyProductTaxModal";
 import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
@@ -32,6 +31,7 @@ import toast from "react-hot-toast";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
+import { Item, range } from "../../../constants/NumberList";
 
 function EditCompanyProductModal({
   isOpen,
@@ -42,6 +42,8 @@ function EditCompanyProductModal({
 }: EditCompanyProductModalProps) {
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
+    const rangeOfNumber: Item[] = range(1, 365);
+  
 
   const intialEditCompanyProductFormData = {
     company_id: product.companyId,
@@ -60,24 +62,16 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(
-   0
-  );
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
 
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
     useState<number>(0);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(
-    0
-  );
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(
-    0
-  );
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(
-    0
-  );
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -104,22 +98,7 @@ function EditCompanyProductModal({
   //   type: "success" as "success" | "error",
   // });
 
-  const CompanyProductIsActiveRadioButtonOptions = [
-    {
-      label: "Active",
-      value: "true",
-      id: "active",
-      name: "isActive",
-      checked: intialEditCompanyProductFormData.isActive,
-    },
-    {
-      label: "Inactive",
-      value: "false",
-      id: "inActive",
-      name: "isActive",
-      checked: !intialEditCompanyProductFormData.isActive,
-    },
-  ];
+
 
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
@@ -129,6 +108,62 @@ function EditCompanyProductModal({
     formData: updateCompanyProductFormData,
     handleChange: handleEditCompanyProductFormDataChange,
   } = useFormChange(intialEditCompanyProductFormData);
+
+    const [productIsActive, setProductIsActive] = useState<boolean>(product.isActive);
+  
+
+    useEffect(()=>{
+      if(isOpen){
+      setProductIsActive(product.isActive);
+      }
+    },[isOpen])
+
+  const handleProductToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // handleCloseSnackbar();
+    const { checked } = event.target;
+
+    if (userHasAccessToUpdateProduct) {
+          const updateProductPostData = {
+            company_id: loginStatus.companyId,
+            id: product.id,
+            isactive: checked,
+            updatedby_id: loginStatus.id,
+          };
+          await axios
+            .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (
+                response.data.status === true &&
+                response.status === STATUS_CODE.OK
+              ) {
+                
+                toast.success(response.data.message);
+                setProductIsActive(checked);
+                handleCompanyProductChange(product);
+              }
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch(async (error: ApiError | any) => {
+              if (error.status === STATUS_CODE.UNATHORISED) {
+                const refreshTokenResponse = await RefreshToken({
+                  callFunctionWithEvent: handleProductToggle,
+                });
+                if (refreshTokenResponse) {
+                  handleProductToggle(event);
+                }
+              }
+            });
+          handleCompanyProductChange(product);
+        } else {
+          toast.error(
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+          );
+        }
+  };
 
   const { errors, handleBlur, setErrors } = useFormValidation(
     updateCompanyProductFormData,
@@ -158,22 +193,36 @@ function EditCompanyProductModal({
   ) => {
     event.preventDefault();
 
-    if (
-      updateCompanyProductFormData.name !== ""
-    ) {
+    if (updateCompanyProductFormData.name !== "") {
       if (
-        updateCompanyProductFormData.code !== intialEditCompanyProductFormData.code ||
-        updateCompanyProductFormData.name !== intialEditCompanyProductFormData.name ||
-        updateCompanyProductFormData.description !== intialEditCompanyProductFormData.description ||
-        updateCompanyProductFormData.cost !== intialEditCompanyProductFormData.cost ||
-        updateCompanyProductFormData.isActive !== product.isActive||
-        (selectedProductTypeId!==0 && selectedProductTypeId !== intialEditCompanyProductFormData.product_type_id)||
-        (selectedWarrantyIntervalTypeId!==0 && selectedWarrantyIntervalTypeId !== intialEditCompanyProductFormData.default_warranty_interval_type_id)||
-        (selectedDefaultWarranty!==0 && selectedDefaultWarranty !== intialEditCompanyProductFormData.default_warranty)||
-        (selectedAmcIntervalTypeId!==0 && selectedAmcIntervalTypeId !== intialEditCompanyProductFormData.default_amc_cycle_interval_type_id)||
-        (selectedDefaultAmc!==0 && selectedDefaultAmc !== intialEditCompanyProductFormData.default_amc_cycle)||
-        updateCompanyProductFormData.version !== intialEditCompanyProductFormData.version||
-        updateCompanyProductFormData.url !== intialEditCompanyProductFormData.url
+        updateCompanyProductFormData.code !==
+          intialEditCompanyProductFormData.code ||
+        updateCompanyProductFormData.name !==
+          intialEditCompanyProductFormData.name ||
+        updateCompanyProductFormData.description !==
+          intialEditCompanyProductFormData.description ||
+        updateCompanyProductFormData.cost !==
+          intialEditCompanyProductFormData.cost ||
+        
+        (selectedProductTypeId !== 0 &&
+          selectedProductTypeId !==
+            intialEditCompanyProductFormData.product_type_id) ||
+        (selectedWarrantyIntervalTypeId !== 0 &&
+          selectedWarrantyIntervalTypeId !==
+            intialEditCompanyProductFormData.default_warranty_interval_type_id) ||
+        (selectedDefaultWarranty !== 0 &&
+          selectedDefaultWarranty !==
+            intialEditCompanyProductFormData.default_warranty) ||
+        (selectedAmcIntervalTypeId !== 0 &&
+          selectedAmcIntervalTypeId !==
+            intialEditCompanyProductFormData.default_amc_cycle_interval_type_id) ||
+        (selectedDefaultAmc !== 0 &&
+          selectedDefaultAmc !==
+            intialEditCompanyProductFormData.default_amc_cycle) ||
+        updateCompanyProductFormData.version !==
+          intialEditCompanyProductFormData.version ||
+        updateCompanyProductFormData.url !==
+          intialEditCompanyProductFormData.url
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -205,7 +254,6 @@ function EditCompanyProductModal({
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
             url: updateCompanyProductFormData.url,
-            isactive: updateCompanyProductFormData.isActive,
             updatedby_id: loginStatus.id,
           };
           await axios
@@ -338,7 +386,7 @@ function EditCompanyProductModal({
     >
       <div className="flex min-h-screen items-center justify-center">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -365,40 +413,19 @@ function EditCompanyProductModal({
               onSubmit={hanldeUpdateCompanyProductFormSubmit}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Product Name : "
-                  type="text"
-                  name="name"
-                  required={true}
-                  value={updateCompanyProductFormData.name}
-                  placeholder="Enter Product Name"
-                  defaultValue={intialEditCompanyProductFormData.name}
-                  maxLength={256}
-                  onChange={handleEditCompanyProductFormDataChange}
-                  error={errors.name}
-                  onBlur={handleBlur}
-                />
-                <FormInput
-                  label="Item Code : "
-                  type="text"
-                  name="code"
-                  required={true}
-                  placeholder="Enter Item Code"
-                  onChange={handleEditCompanyProductFormDataChange}
-                  defaultValue={intialEditCompanyProductFormData.code}
-                  onBlur={handleBlur}
-                  error={errors.code}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div className="grid col-span-1 ">
                   <FormInput
-                    label="Cost : "
+                    label="Product Name : "
                     type="text"
-                    name="cost"
-                    placeholder="Enter Product Cost"
-                    defaultValue={intialEditCompanyProductFormData.cost}
+                    name="name"
+                    required={true}
+                    value={updateCompanyProductFormData.name}
+                    placeholder="Enter Product Name"
+                    defaultValue={intialEditCompanyProductFormData.name}
+                    maxLength={256}
                     onChange={handleEditCompanyProductFormDataChange}
+                    error={errors.name}
+                    onBlur={handleBlur}
                   />
                   <FormInput
                     label="URL : "
@@ -425,7 +452,6 @@ function EditCompanyProductModal({
                     onBlur={handleBlur}
                     error={errors.code}
                   />
-
                   <TextAreaInput
                     label="Description : "
                     cols={5}
@@ -436,80 +462,135 @@ function EditCompanyProductModal({
                     defaultValue={intialEditCompanyProductFormData.description}
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    error={errors.description}
+                    // error={errors.description}
                   />
                 </div>
 
                 <div className="grid col-span-1 gap-1">
-                  <CustomDropdown
-                    labelName="Product Type"
-                    preselectedOption={intialEditCompanyProductFormData.product_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setSelectedProductTypeId(e);
+                  <div className="grid col-span-1 gap-1">
+                    <FormInput
+                      label="Cost : "
+                      type="text"
+                      name="cost"
+                      placeholder="Enter Product Cost"
+                      defaultValue={intialEditCompanyProductFormData.cost}
+                      onChange={handleEditCompanyProductFormDataChange}
+                    />
+                    <FormInput
+                      label="Item Code : "
+                      type="text"
+                      name="code"
+                      required={true}
+                      placeholder="Enter Item Code"
+                      onChange={handleEditCompanyProductFormDataChange}
+                      defaultValue={intialEditCompanyProductFormData.code}
+                      onBlur={handleBlur}
+                      error={errors.code}
+                    />
+                    <CustomDropdown
+                      labelName="Product Type"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.product_type_id
                       }
-                    }}
-                    options={productTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Warranty Interval"
-                    preselectedOption={intialEditCompanyProductFormData.default_warranty_interval_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setWarrantyIntervalTypeId(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setSelectedProductTypeId(e);
+                        }
+                      }}
+                      options={productTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 ">
+                    <CustomDropdown
+                      labelName="Warranty Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Default Warranty"
-                    preselectedOption={intialEditCompanyProductFormData.default_warranty}
-                    onSelect={(e) => {
-                      if (e) {
-                        setDefaultWarranty(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultWarranty(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="Warranty Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_warranty_interval_type_id
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-                  <CustomDropdown
-                    labelName="AMC Cycle"
-                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle_interval_type_id}
-                    onSelect={(e) => {
-                      if (e) {
-                        setAmcIntervalTypeId(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setWarrantyIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <CustomDropdown
+                      labelName="AMC Cycle Duration"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-
-                  <CustomDropdown
-                    labelName="Default AMC Cycle"
-                    preselectedOption={intialEditCompanyProductFormData.default_amc_cycle}
-                    onSelect={(e) => {
-                      if (e) {
-                        setDefaultAmc(e);
+                      onSelect={(e) => {
+                        if (e) {
+                          setDefaultAmc(e);
+                        }
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    <CustomDropdown
+                      labelName="AMC Time Unit"
+                      preselectedOption={
+                        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
                       }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
+                      onSelect={(e) => {
+                        if (e) {
+                          setAmcIntervalTypeId(e);
+                        }
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex col-span-2 justify-center">
-                <RadioButtons
+              <div className="flex col-span-2 justify-start">
+                <div className="flex items-center gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status : {productIsActive?"Active":"Inactive"}
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={productIsActive}
+                      onChange={handleProductToggle}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
+                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
+                    ></div>
+                  </label>
+                </div>
+                {/* <RadioButtons
                   label="Status : "
                   onChange={handleEditCompanyProductFormDataChange}
                   options={CompanyProductIsActiveRadioButtonOptions}
-                />
+                /> */}
               </div>
 
-              <div className="flex justify-self-center m-2 min-w-80 gap-2">
+              <div className="flex justify-self-center m-2 min-w-70 gap-2">
                 <Button type="submit">Update Product</Button>
               </div>
             </form>
