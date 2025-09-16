@@ -5,7 +5,7 @@ import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import LeadCompanyTeam from "../../../@types/lead-management/LeadCompanyTeam";
-import { Plus, X } from "lucide-react";
+import {  X } from "lucide-react";
 import CompanyTeamsNotAssignedToLead from "./company-team-selection-modal/CompanyTeamsNotAssignedToLead";
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import ApiError from "../../../@types/error/ApiError";
@@ -254,17 +254,10 @@ const LeadAssignedTeams = ({
         <div className="w-full  px-1 mb-1">
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <span>Add</span>
             <button
               // disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  // showMessageSnackbar({
-                  //   message:
-                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                  //   type: "error",
-                  // });
                   toast.error(
                     MESSAGE.MODULE_ACCESS.LEAD_MODULE
                       .UPDATE_LEAD_ACCESS_DENIED_message
@@ -273,9 +266,9 @@ const LeadAssignedTeams = ({
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
             >
-              <Plus size={10} />
+              +Add
             </button>
           </div>
           {/* Company team List */}

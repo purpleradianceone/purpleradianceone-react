@@ -225,18 +225,21 @@ function AccountManagementAgGrid({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 110,
+        maxWidth: 80,
         // cellRenderer : ()=> "View",
         cellRenderer: (params: Account | any) => {
           return (
+              <div className="flex items-center justify-center  hover:underline decoration-white ">
+
             <span
               className="lead-details"
               onClick={() => {
                 params.context.handleRowSelect(params.data);
               }}
-            >
-              View details
+              >
+              Details
             </span>
+              </div>
           );
         },
       },

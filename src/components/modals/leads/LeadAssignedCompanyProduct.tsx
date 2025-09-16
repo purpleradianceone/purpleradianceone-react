@@ -10,7 +10,6 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
-import { Plus } from "lucide-react";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -229,7 +228,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       {/* Data rows */}
       {data.length > 0 && (
         <div className="flex justify-end items-center text-xs gap-x-2 p-1 text-gray-500">
-          <span>Add</span>
+          {/* <span>Add</span> */}
           <button
             onClick={() => {
               if (userHasAccessToUpdateLead) {
@@ -241,9 +240,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 );
               }
             }}
-            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
+            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
           >
-            <Plus size={10} />
+           +Add
           </button>
         </div>
       )}
