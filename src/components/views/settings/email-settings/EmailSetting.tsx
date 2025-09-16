@@ -182,6 +182,61 @@ export default function EmailSettingsTabs() {
     }
   }, [activeTab]);
 
+    const onEmailSettingToggle = async(event : React.ChangeEvent<HTMLInputElement>,setting : CompanyUserEmailSetting | CompanyEmailSetting,isForCompany : boolean) => {
+    const {checked} = event.target;
+
+    if(userHasAccessToUpdateEmailSetting){
+      const updateEmailSettingPostData = {
+        company_id : loginStatus.companyId,
+        id : setting.id,
+        email : setting.email,
+        email_password : setting.email_password,
+        smtp_host : setting.smtp_host,
+        smtp_port : setting.smtp_port,
+        email_security_type_id : setting.email_security_type_id,
+        authentication_required : setting.authentication_required,
+        isactive : checked,
+        updatedby_id : loginStatus.id
+      }
+
+      await axios.post(isForCompany ? POST_API.UPDATE_EMAIL_SETTING_COMPANY : POST_API.UPDATE_EMAIL_SETTING_COMPANY_USER,updateEmailSettingPostData,{
+        withCredentials: true
+      }).then((response) => {
+        if(response.status === STATUS_CODE.OK){
+          if(response.data.status){
+            if(isForCompany){
+              setCompanySettings((prev) => 
+          prev.map(item => item.id === setting.id 
+            ? {...item,isactive : checked} 
+          : item ));
+            }
+            else{
+              setUserSettings((prev) => 
+              prev.map(item => item.id === setting.id 
+                ? {...item,isactive : checked} 
+                : item ));
+          }
+
+            }
+          
+          toast.success(response.data.message);
+        }
+        else{
+          toast.error(response.data.message);
+        }
+      }).catch(async(error : ApiError | any) => {
+        if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenStatus = await RefreshToken({callFunctionWithTwoParamsAndEvent : onEmailSettingToggle});
+
+          if(refreshTokenStatus){
+            onEmailSettingToggle(event,setting,isForCompany)
+          }
+        }
+      })
+    }
+
+  }
+
   const renderCompanyEmailCard = (
     setting: CompanyEmailSetting,
     index: number
@@ -263,8 +318,21 @@ export default function EmailSettingsTabs() {
               <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
             )}
             <p className="text-gray-700 text-sm">
-              <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+              <strong>Active:</strong>
             </p>
+        <label className="inline-flex items-center cursor-pointer relative self-end">
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={setting.isactive}
+          id={setting.id.toString()}
+          onChange={(e) => {
+            onEmailSettingToggle(e,setting,true)
+          }}
+        />
+        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" /> {/* Adjusted size and colors */}
+        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" /> {/* Adjusted size and position */}
+      </label>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
@@ -290,6 +358,8 @@ export default function EmailSettingsTabs() {
       </div>
     </>
   );
+
+
 
   const renderUserEmailCard = (
     setting: CompanyUserEmailSetting,
@@ -373,8 +443,21 @@ export default function EmailSettingsTabs() {
                   <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
                 )}
                 <p className="text-gray-700 text-sm">
-                  <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+                  <strong>Active:</strong>
                 </p>
+                <label className="inline-flex items-center cursor-pointer relative self-end"> {/* Align toggle to bottom-right */}
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={setting.isactive}
+          id={setting.id.toString()}
+          onChange={(e) => {
+            onEmailSettingToggle(e,setting,false)
+          }}
+        />
+        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" /> {/* Adjusted size and colors */}
+        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" /> {/* Adjusted size and position */}
+      </label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -406,8 +489,6 @@ export default function EmailSettingsTabs() {
     </>
   );
 
-  //message snakbar
-
   return (
     <div className="w-full">
       <div className="mb-2 flex border-b border-gray-300">
@@ -415,8 +496,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("company")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "company"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-gray-600 text-gray-600"
+              : "border-transparent text-gray-300 hover:text-gray-500"
           }`}
         >
           Company Email Settings
@@ -425,8 +506,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("user")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "user"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-gray-600 text-gray-600"
+              : "border-transparent text-gray-300 hover:text-gray-400"
           }`}
         >
           Company User Email Settings
@@ -435,8 +516,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("email type")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "email type"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-gray-600 text-gray-600"
+              : "border-transparent text-gray-300 hover:text-gray-500"
           }`}
         >
           Email Type
@@ -457,8 +538,7 @@ export default function EmailSettingsTabs() {
                   {companySettings.length > 0 ? (
                     companySettings.map(renderCompanyEmailCard)
                   ) : (
-                    <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                      <span>No Email Settings For company </span>
+                    <div className=" w-full justify-items-end text-gray-500 p-4  rounded-md bg-white shadow-sm">
                       <div className="max-w-36">
                         <Button
                           disabled={!userHasAccessToAddEmailSetting}
@@ -476,6 +556,7 @@ export default function EmailSettingsTabs() {
                           <span className=" font-bold ">Create</span>{" "}
                         </Button>
                       </div>
+                      <span>No Email Settings For company </span>
                     </div>
                   )}
                 </div>
@@ -496,8 +577,7 @@ export default function EmailSettingsTabs() {
                   {userSettings.length > 0 ? (
                     userSettings.map(renderUserEmailCard)
                   ) : (
-                    <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                      <span>No Email Settings For company </span>
+                    <div className="text-center w-full justify-items-end text-gray-500 p-4  rounded-md bg-white shadow-sm">
                       <div className="flex justify-center  items-center max-w-36">
                         <Button
                           disabled={!userHasAccessToAddEmailSetting}
@@ -515,6 +595,8 @@ export default function EmailSettingsTabs() {
                           <span className=" font-bold ">Create</span>{" "}
                         </Button>
                       </div>
+                      <span>No Email Settings For User </span>
+                      
                     </div>
                   )}
                 </div>

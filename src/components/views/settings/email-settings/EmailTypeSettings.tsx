@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useLoggedInUserContext } from '../../../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import POST_API from '../../../../constants/PostApi';
-import { STATUS_CODE } from '../../../../constants/AppConstants';
+import { emailDescriptions, STATUS_CODE } from '../../../../constants/AppConstants';
 import RefreshToken from '../../../../config/validations/RefreshToken';
 import EmailTypeSettingsType from '../../../../@types/settings/EmailTypeSettingsType';
 import { useUserAccessModules } from '../../../../config/hooks/useAccessModules';
@@ -13,35 +12,6 @@ import AccessDeniedMessagePage from '../../not-found/AccessDeniedMessagePage';
 import toast from 'react-hot-toast';
 import SettingToggleCard from '../../../ui/SettingToggleCard';
 
-// New, reusable card component for each email setting
-// interface EmailSettingCardProps {
-//   setting: EmailTypeSettingsType;
-//   onToggle: (event: React.ChangeEvent<HTMLInputElement>) => void;
-// }
-
-// const EmailSettingCard: React.FC<EmailSettingCardProps> = ({ setting, onToggle }) => {
-//   return (
-//     <div className="relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-28">
-//       <div>
-//         <h3 className="text-base font-semibold text-gray-900 mb-1">
-//           {setting.name}
-//         </h3>
-//       </div>
-
-//       <label className="inline-flex items-center cursor-pointer relative self-end">
-//         <input
-//           type="checkbox"
-//           className="sr-only peer"
-//           checked={setting.fromCompanyEmail}
-//           id={setting.id.toString()}
-//           onChange={onToggle}
-//         />
-//         <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-//         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-//       </label>
-//     </div>
-//   );
-// };
 
 
 function EmailTypeSettings() {
@@ -49,6 +19,29 @@ function EmailTypeSettings() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToViewEmailTypeSetting } = useUserAccessModules();
+
+
+
+const getDescription = (setting : EmailTypeSettingsType) => {
+  if(setting.emailTypeId === 1){
+    return setting.isActive ? emailDescriptions.active.welcomeCompanyUser : emailDescriptions.inactive.welcomeCompanyUser;
+  }
+  else if(setting.emailTypeId === 2){
+        return setting.isActive ? emailDescriptions.active.newLeadCreated : emailDescriptions.inactive.newLeadCreated;
+  }
+  else if(setting.emailTypeId === 3){
+        return setting.isActive ? emailDescriptions.active.leadAssigned : emailDescriptions.inactive.leadAssigned;
+  }
+  else if(setting.emailTypeId === 4){
+        return setting.isActive ? emailDescriptions.active.leadStatusChanged : emailDescriptions.inactive.leadStatusChanged;
+  }
+  else if(setting.emailTypeId === 9){
+        return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyProduct : emailDescriptions.inactive.companyUserAssignedToCompanyProduct;
+  }
+  else if(setting.emailTypeId === 10){
+        return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyTeam : emailDescriptions.inactive.companyUserAssignedToCompanyTeam;
+  }
+}
 
   const fetchCompanyEmailTypeSettings = async () => {
     setIsLoading(true);
@@ -69,7 +62,7 @@ function EmailTypeSettings() {
           id: res.id,
           companyId: res.company_id,
           name: res.name,
-          fromCompanyEmail: res.tosend_from_company_email,
+          isActive: res.tosend_from_company_email,
           emailTypeId: res.email_type_id,
           createdBy: res.createdby,
           createdOn: res.createdon,
@@ -112,7 +105,7 @@ function EmailTypeSettings() {
         if (response.data.status) {
           setEmailTypeSettings((prevData) =>
             prevData.map((setting) =>
-              setting.id === id ? { ...setting, fromCompanyEmail: isChecked } : setting
+              setting.id === id ? { ...setting, isActive: isChecked } : setting
             )
           );
           toast.success(response.data.message)
@@ -146,7 +139,7 @@ function EmailTypeSettings() {
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
-        <p className="text-sm text-gray-500 mt-2">Manage settings for different types of emails sent from your company.</p>
+        <p className="text-sm text-gray-500 mt-2">Manage settings for different types of emails sent from your company email.</p>
       </div>
 
       {isLoading ? (
@@ -156,7 +149,7 @@ function EmailTypeSettings() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {emailTypeSettings.map((setting) => (
-            <SettingToggleCard key={setting.id} setting={setting} onToggle={handleEmailTypeSettingCheckBoxChange} />
+            <SettingToggleCard key={setting.id} setting={setting} onToggle={handleEmailTypeSettingCheckBoxChange} description={getDescription(setting)} />
           ))}
         </div>
       )}

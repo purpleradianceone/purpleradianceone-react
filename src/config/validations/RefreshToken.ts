@@ -13,6 +13,11 @@ const RefreshToken = async (props: {
     paramOne: any,
     paramTwo: any
   ) => Promise<void>;
+  callFunctionWithTwoParamsAndEvent?: (
+    event : any,
+    paramOne: any,
+    paramTwo: any
+  ) => Promise<void>;
 }): Promise<boolean> => { // Explicitly declare return type as Promise<boolean>
   try {
     const response = await axios.post( // Await the axios call directly
