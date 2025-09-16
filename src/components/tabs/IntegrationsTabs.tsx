@@ -110,10 +110,10 @@ function IntegrationsTabs() {
             onPointerLeaveCapture={undefined}
             onResize={undefined}
             onResizeCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
+           className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                "bg-transparent border-b-2 border-blue-500 shadow-none rounded-none",
             }}
             
           >
@@ -128,7 +128,7 @@ function IntegrationsTabs() {
                 value={value}
                 onClick={() => setActiveTab(value)}
                 className={
-                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  activeTab === value ? "text-blue-600 text-sm font-medium  " : "text-sm text-gray-500"
                 }
               >
                 {label}

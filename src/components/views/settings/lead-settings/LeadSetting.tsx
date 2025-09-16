@@ -55,8 +55,7 @@ const LeadSetting: React.FC = () => {
           getLeadSetting();
         }
       }
-      console.error(error);
-      toast.error('Failed to load settings.');
+     
     } finally {
       setIsLoading(false);
     }

@@ -28,6 +28,7 @@ function AccountManagementList({
   onEndDateChange,
   paginationData,
   fetchAccounts,
+  handleCreateCompanyAccountType,
 }: {
   fetchAccounts : () => Promise<void>;
   accounts: Account[];
@@ -35,6 +36,7 @@ function AccountManagementList({
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
+  handleCreateCompanyAccountType : () => void;
 }) {
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
@@ -128,7 +130,10 @@ function AccountManagementList({
                 + Create account
               </Button>
               {openCreateAccountForm && (
-                <CreateAccount onClose={() => setOpenAccountForm(false)} />
+                <CreateAccount 
+                onClose={() => setOpenAccountForm(false)} 
+                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+                />
               )}
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown

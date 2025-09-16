@@ -98,7 +98,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               designation: item.designation,
               preferredCommunicationChannel:
                 item.preferred_communication_channel,
-              preferredLanguage: item.preferref_language,
+              preferredLanguage: item.preferred_language,
               isActive: item.isactive,
               createdBy: item.createdby,
               updatedBy: item.updatedby,
@@ -436,7 +436,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               +Add
             </button>
             <span className="text-gray-400 italic">
-              Company Team is Not assigned to lead.
+              No contacts available.
             </span>
           </div>
         </div>
@@ -711,9 +711,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                           <h4 className="font-medium text-gray-800 mb-1">
                             Department
                           </h4>
-                          {selectedContactCard.designation ? (
+                          {selectedContactCard.department ? (
                             <span className="text-gray-700">
-                              {selectedContactCard.designation}
+                              {selectedContactCard.department}
                             </span>
                           ) : (
                             <p className="text-gray-700 italic text-sm">

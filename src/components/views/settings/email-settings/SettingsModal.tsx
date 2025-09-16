@@ -16,14 +16,11 @@ const Dialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-  
 }> = ({ open, children }) =>
   !open ? null : (
-    <div
-      className="fixed pt-14 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto "
-    >
+    <div className="fixed pt-14  inset-0 bg-black bg-opacity-5  flex justify-center items-center overflow-y-auto ">
       <div
-        className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50"
+        className="h-10 min-w-[70%] max-w-xl min-h-fit max-h-fit z-50"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -33,10 +30,13 @@ const Dialog: React.FC<{
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white px-4 py-1 rounded shadow ">{children}</div>;
+}) => <div className="bg-white px-4 py-1 rounded min-w-3xl shadow ">{children}</div>;
+
 const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="mb-2">{children}</div>;
+}) => <div className="my-4 border-b  ">{children}</div>;
+
+
 const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <h2 className="text-lg font-bold">{children}</h2>
 );
@@ -186,16 +186,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               toast.error(result.data.message);
             }
           }
-        }).catch(async (error: ApiError | any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunction: handleApiCall,
-          });
-          if (refreshTokenStatus) {
-            handleApiCall();
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: handleApiCall,
+            });
+            if (refreshTokenStatus) {
+              handleApiCall();
+            }
           }
-        }
-      });
+        });
     } catch (error: any) {
       // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
@@ -262,16 +263,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}
-    >
-      <DialogContent
-      >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <div className="bg-pink-300 w-full">
+<DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEdit ? "Edit" : "Create"} {settingType} Email Setting
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-2  gap-4 py-4">
           {renderField(
             `${settingType === "company" ? "Company" : "User"} Email`,
             "email",
@@ -284,35 +284,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             { value: 1, label: "SSL" },
             { value: 2, label: "TLS" },
           ])}
+          <div className="mt-4">
+
           {renderField(
             "Authentication Required",
             "authentication_required",
             "checkbox"
           )}
+          </div>
           {/* Conditional rendering for isactive checkbox */}
-          {isEdit &&
+          {/* {isEdit &&
             renderField(
               "Active", // Label for the checkbox
               "isactive",
               "checkbox"
-            )}
+            )} */}
         </div>
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>{isEdit ? "Updating..." : "Creating..."}</span>
-              </div>
-            ) : (
-              <span>{isEdit ? "Update" : "Create"}</span>
-            )}
-          </Button>
+        <div className="flex justify-end  space-x-2 m-4">
+          <div>
+            <Button onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+          </div>
+          <div>
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>{isEdit ? "Updating..." : "Creating..."}</span>
+                </div>
+              ) : (
+                <span>{isEdit ? "Update" : "Create"}</span>
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
+      </div>
+      
     </Dialog>
   );
 };
