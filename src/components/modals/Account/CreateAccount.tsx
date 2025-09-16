@@ -29,13 +29,15 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import CustomDropdown from "../leads/CustomDropdown";
-import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import { useCompanyAccountType } from "../../../config/hooks/useCompanyAccountType";
+import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
+import FormSkeleton from "./FormSkeleton";
 
 type CreateAccountType = {
   onClose: () => void;
+  handleCreateCompanyAccountType : () => void;
 };
 type AccountFormType = {
   name: string;
@@ -55,7 +57,7 @@ type AccountFormType = {
   company_account_type_id_array: number[];
   createdby: number;
 };
-const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
+const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompanyAccountType}) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
@@ -329,7 +331,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
       company_id: loginStatus.companyId,
     };
 
-    console.log(postData);
     await axios
       .post(POST_API.CREATE_ACCOUNT, postData, {
         withCredentials: true,
@@ -338,6 +339,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
         const data = response.data;
         if (data.status === true) {
           toast.success(data.message);
+          handleStateClear();
+          handleCreateCompanyAccountType();
           onClose();
         } else {
           toast.error(data.message);
@@ -360,7 +363,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
         }
       })
       .finally(() => {
-        handleStateClear();
+        
       });
   };
 
@@ -386,40 +389,57 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
     });
   }
 
+  // --- Group companyAccountType by parent ---
+  const groupedData = companyAccountType.reduce((acc, item) => {
+    if (!acc[item.accountTypeName]) {
+      acc[item.accountTypeName] = [];
+    }
+    acc[item.accountTypeName].push(item);
+    return acc;
+  }, {} as Record<string, CompanyAccountType[]>);
+
   const loadingState = loading || businessTypeLoading || companyTypeLoading;
   if (loadingState) {
-    return (
-  <div className="fixed inset-0 z-20 flex items-center justify-center ">
-          <div className="bg-white flex items-center justify-center rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
-
-    <div className="bg-white  p-8 flex flex-col items-center justify-center gap-4 w-[400px]">
-      {/* Loading text */}
-      <span className="text-md font-semibold text-gray-800">Loading...</span>
-
-      {/* Spinner */}
-      <LoadingSpinner />
-
-      {/* Progress-like bar */}
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-2 bg-blue-500 animate-[progress_2s_linear_infinite]" />
+    return(
+       <div className="fixed top-8 inset-0 z-30 flex items-center justify-center  shadow-2xl ">
+      <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+        <FormSkeleton/>
+        </div>
       </div>
-    </div>
+      
+    )
+    // return (
+    //   <div className="fixed inset-0 z-20 flex items-center justify-center ">
+    //     <div className="bg-white flex items-center justify-center rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+    //       <div className="bg-white  p-8 flex flex-col items-center justify-center gap-4 w-[400px]">
+    //         {/* Loading text */}
+    //         <span className="text-md font-semibold text-gray-800">
+    //           Loading...
+    //         </span>
 
-    {/* Tailwind keyframes for fake progress bar */}
-    <style>{`
-      @keyframes progress {
-        0% {
-          transform: translateX(-100%);
-        }
-        100% {
-          transform: translateX(100%);
-        }
-      }
-    `}</style>
-    </div>
-  </div>
-);
+    //         {/* Spinner */}
+    //         <LoadingSpinner />
 
+    //         {/* Progress-like bar */}
+    //         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+    //           <div className="h-2 bg-blue-500 animate-[progress_2s_linear_infinite]" />
+    //         </div>
+    //       </div>
+
+    //       {/* Tailwind keyframes for fake progress bar */}
+    //       <style>{`
+    //   @keyframes progress {
+    //     0% {
+    //       transform: translateX(-100%);
+    //     }
+    //     100% {
+    //       transform: translateX(100%);
+    //     }
+    //   }
+    // `}</style>
+    //     </div>
+    //   </div>
+    // );
   }
   return (
     <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
@@ -553,6 +573,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
             <div className="flex flex-col col-span-1">
               {/* Business type */}
               <CustomDropdown
+              requiredRedDot
                 logo={Briefcase}
                 labelName="Business Type :"
                 options={businessType}
@@ -567,6 +588,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
             <div className="flex flex-col col-span-1">
               {/* Industry type */}
               <CustomDropdown
+              requiredRedDot
                 logo={Factory}
                 labelName="Industry type :"
                 options={industryTypeData}
@@ -578,31 +600,73 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose }) => {
                 </p>
               )}
             </div>
-            <div className="col-span-2  border rounded-md ">
-              <span className="text-md font-semibold text-gray-700 pl-1">
-                <Building2 size={14} className="inline mr-1 text-blue-500" />{" "}
+
+            <div className="col-span-2  rounded-md">
+              <span className="text-md font-semibold text-gray-700 ">
+                <Building2 size={14} className="inline mr-1 text-blue-500" />
                 Company account type :
               </span>
-              <div className="grid grid-cols-3 gap-y-2 p-2 max-h-52 overflow-y-auto ">
-                {companyAccountType.length > 0 &&
-                  companyAccountType.map((item) => (
-                    <div className="flex items-center">
-                      <input
-                        id={item.companyAccountTypeName}
-                        name={item.companyAccountTypeName}
-                        type="checkbox"
-                        value={item.id}
-                        className="h-4 w-4  text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        onChange={handleAccountTypeCheckboxChange}
-                      />
-                      <label
-                        htmlFor={item.companyAccountTypeName}
-                        className="ml-2 block text-xs  text-gray-800"
-                      >
-                        {item.companyAccountTypeName}
-                      </label>
-                    </div>
-                  ))}
+
+              <div className="grid grid-cols-2 gap-y-2 p-4 max-h-56 overflow-auto">
+                {/* {companyAccountType && companyAccountType.length > 0 ? (
+      companyAccountType.map((item) => (
+        <div key={item.id} className="flex items-center">
+          <input
+            id={`account-type-${item.id}`}
+            name="companyAccountType"
+            type="checkbox"
+            value={item.id}
+            checked={companTypeId.includes(item.id)} // controlled checkbox
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            onChange={() => handleAccountTypeCheckboxChange}
+          />
+          <label
+            htmlFor={`account-type-${item.id}`}
+            className="ml-2 block text-xs text-gray-800"
+          >
+            {item.companyAccountTypeName}
+          </label>
+        </div>
+      ))
+    ) : (
+      <p className="text-xs text-gray-500 col-span-3">No account types available</p>
+    )} */}
+
+                {companyAccountType.length === 0 ? (
+                  <h1>No account type available.</h1>
+                ) : (
+                  Object.entries(groupedData).map(([parentType, children]) => {
+                    return (
+                      <div key={parentType}>
+                        <span className="text-sm font-medium text-blue-800 ">  {parentType} : </span>
+
+                        {children &&
+                          children.length &&
+                          children.map((item) => (
+                            <div key={item.id} className="flex  items-center">
+                              <div className="flex p-1">
+
+                              <input
+                                id={`account-type-${item.id}`}
+                                name="companyAccountType"
+                                type="checkbox"
+                                value={item.id}
+                                className="h-4 w-4 text-blue-600  focus:ring-blue-500 border-gray-300 rounded"
+                                onChange={handleAccountTypeCheckboxChange}
+                                />
+                              <label
+                                htmlFor={`account-type-${item.id}`}
+                                className="ml-2 block text-xs font-semibold cursor-pointer hover:text-blue-700  text-gray-800"
+                                >
+                                {item.companyAccountTypeName}
+                              </label>
+                                </div>
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 

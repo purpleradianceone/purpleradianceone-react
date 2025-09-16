@@ -436,7 +436,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               +Add
             </button>
             <span className="text-gray-400 italic">
-              Company Team is Not assigned to lead.
+              No contacts available.
             </span>
           </div>
         </div>
