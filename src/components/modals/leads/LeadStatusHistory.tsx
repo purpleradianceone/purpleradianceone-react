@@ -8,6 +8,7 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import LeadStatusHistoryData from "../../../@types/lead-management/LeadStatusHistoryData";
 import LeadStatusHistoryAgGrid from "../../ag-grid/LeadStatusHistoryAgGrid";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import { X } from "lucide-react";
 
 const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
   isOpen,
@@ -82,9 +83,10 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
       <div className="bg-slate-50 p-1 rounded-lg shadow-lg w-1/2 h-1/2 flex flex-col items-center">
         <button
           onClick={onClose}
-          className="self-end  text-xs text-gray-500 hover:underline"
+          title="Close"
+          className="self-end  text-xs text-gray-600 hover:text-gray-900 hover:underline"
         >
-          Close
+          <X size={18}/>
         </button>
         <h1 className="text-base font-semibold">Lead status history</h1>
 

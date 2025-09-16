@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Plus } from "lucide-react";
 import LeadTaskTabs from "../../../tabs/LeadTasksTabs";
 import { useEffect, useState } from "react";
 import CreateLeadTaskModal from "./CreateLeadTaskModal";
@@ -270,16 +269,16 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
               Tasks
             </span>
             {visibleAssignUsersBtn && (
-              <div className="flex justify-end items-center text-xs gap-x-2 text-gray-500">
-                <span>Add</span>
+              <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
+                {/* <span>Add</span> */}
                 <button
                   disabled={false}
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
                   onClick={() => {
                     setIsCreateLeadTaskModalOpen(true);
                   }}
                 >
-                  <Plus size={10} />
+                  +Add
                 </button>
               </div>
             )}
