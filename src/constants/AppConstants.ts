@@ -20,6 +20,26 @@ export const TAX_CODE = {
     ALL : "all"
 }
 
+
+ export const emailDescriptions = {
+  active: {
+    welcomeCompanyUser: "Sends an automatic welcome email to new users from the company's email.",
+    newLeadCreated: "Sends an email to relevant users whenever a new lead is created, originating from the company's email.",
+    leadAssigned: "Sends an email from the company's email to the user assigned to the lead.",
+    leadStatusChanged: "Sends an email from the company's email to notify relevant users when the status of a lead changes.",
+    companyUserAssignedToCompanyProduct: "Sends an email to a user from the company's email when they're assigned to a product.",
+    companyUserAssignedToCompanyTeam: "Sends an email to a user from the company's email when they're assigned to a team."
+  },
+  inactive: {
+    welcomeCompanyUser: "A welcome email is sent to new users from individual users email.",
+    newLeadCreated: "An email is sent from individual users email when new leads are created.",
+    leadAssigned: "An email is sent from individual users email when a lead is assigned.",
+    leadStatusChanged: "Emails are sent from individual users email when lead statuses change.",
+    companyUserAssignedToCompanyProduct: "An email is sent from individual users email to a user when they're assigned to a product.",
+    companyUserAssignedToCompanyTeam: "An email is sent from individual users email to a user when they're assigned to a team."
+  }
+};
+
 export const  SUBSCRIPTION = {
     RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
     COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",

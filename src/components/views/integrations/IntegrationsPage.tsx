@@ -25,7 +25,7 @@ function IntegrationsPage() {
             <div className="flex w-full gap-2 justify-center">
               <div className="flexr">
                 <span className="text-base font-bold">
-                  Tailor Lead Settings to Your Needs
+                  Tailor Inegrations to Your Needs
                 </span>
               </div>
             </div>

@@ -48,10 +48,10 @@ function WebFormIntegrationTabs({
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
+            className="rounded-none border-b border-blue-gray-50  text-gray-400 text-sm font-medium  bg-transparent p-0 hover:text-gray-500"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                "bg-transparent border-b-2 border-gray-500 text-gray-600 text-sm font-medium shadow-none rounded-none",
             }}
             onResize={undefined}
             onResizeCapture={undefined}
