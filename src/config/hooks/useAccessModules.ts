@@ -326,6 +326,22 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 20 && accessModule.update
   );
 
+  //setting-Integration
+  const userHasAccessToAddIntegrationSetting = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 21 && accessModules.add
+  );
+
+   const userHasAccessToViewIntegrationSetting  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 21 && accessModule.view
+  );
+
+  const userHasAccessToUpdateIntegrationSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 21 && accessModule.update
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -406,5 +422,9 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToAddAccount,
     userHasAccessToViewAccount,
     userHasAccessToUpdateAccount,
+
+    userHasAccessToAddIntegrationSetting,
+    userHasAccessToViewIntegrationSetting,
+    userHasAccessToUpdateIntegrationSetting,
   };
 };

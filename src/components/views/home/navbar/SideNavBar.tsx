@@ -282,12 +282,11 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
             >
             Email Template
             </Link>, 
-
-
-
-            
-
-
+            <Link
+            to= {ROUTES_URL.INTEGRATIONS_SETTINGS}
+            >
+            Integration
+            </Link>
             //   <Link
             // to= {ROUTES_URL.USER_PROFILE_SETTING}
             // >
