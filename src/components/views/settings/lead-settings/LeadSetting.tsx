@@ -102,13 +102,11 @@ const LeadSetting: React.FC = () => {
           handleLeadSettingCheckBoxChange(event);
         }
       }
-      console.error(error);
-      toast.error('Failed to update setting.');
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-1">
+    <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
         <p className="text-sm text-gray-500 mt-2">Manage your company's lead-related configurations.</p>
       </div>

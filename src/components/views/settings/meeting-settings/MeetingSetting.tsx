@@ -1,9 +1,14 @@
-import { Video, Users } from 'lucide-react';
-import { useGoogleMeetContext } from '../../../../context/meeting/GoogleMeetContext';
-import { useZoomMeetingContext } from '../../../../context/meeting/ZoomMeetingContext';
-import { useNavigate } from 'react-router-dom';
-import ROUTES_URL from '../../../../constants/Routes';
-import Button from '../../../ui/Button';
+import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
+import { useZoomMeetingContext } from "../../../../context/meeting/ZoomMeetingContext";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../../constants/Routes";
+import Button from "../../../ui/Button";
+import GoogleMeetIcon from "../../../../assets/svg/GoogleMeetIcon";
+import ZoomMeetingsIcon from "../../../../assets/svg/ZoomMeetingsIcon";
+import TeamsIcon from "../../../../assets/svg/TeamsIcon";
+
+
+
 
 
 function MeetingSettings() {
@@ -16,22 +21,22 @@ function MeetingSettings() {
       id: 1,
       name: "Connect to Google Meet",
       isConnected: googleMeetStatus.isConnected,
-      icon: <Video className="w-6 h-6 text-green-500" />,
-      iconBg: "bg-green-50"
+      icon: <GoogleMeetIcon className="w-6 h-6 text-green-500" />,
+      iconBg: "bg-green-50",
     },
     {
       id: 2,
       name: "Connect to Zoom Meetings",
       isConnected: zoomMeetingStatus.isConnected,
-      icon: <Video className="w-6 h-6 text-blue-500" />,
-      iconBg: "bg-blue-50"
+      icon: <ZoomMeetingsIcon className="w-6 h-6 text-blue-500" />,
+      iconBg: "bg-blue-50",
     },
     {
       id: 3,
       name: "Connect to Microsoft Teams",
       isConnected: false,
-      icon: <Users className="w-6 h-6 text-purple-500" />,
-      iconBg: "bg-purple-50"
+      icon: <TeamsIcon className="w-6 h-6 text-purple-500" />,
+      iconBg: "bg-purple-50",
     },
   ];
 
@@ -53,7 +58,7 @@ function MeetingSettings() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-32">
             {platform.id !== 3 ? (
               <Button
                 disabled={platform.isConnected}
@@ -61,7 +66,10 @@ function MeetingSettings() {
                   e.preventDefault();
                   if (platform.id === 1 && !googleMeetStatus.isConnected) {
                     navigate(ROUTES_URL.GOOGLE_OAUTH);
-                  } else if (platform.id === 2 && !zoomMeetingStatus.isConnected) {
+                  } else if (
+                    platform.id === 2 &&
+                    !zoomMeetingStatus.isConnected
+                  ) {
                     navigate(ROUTES_URL.ZOOM_OAUTH);
                   }
                 }}
@@ -69,9 +77,7 @@ function MeetingSettings() {
                 {platform.isConnected ? "Connected" : "Connect"}
               </Button>
             ) : (
-              <Button disabled={true}>
-                Coming Soon...
-              </Button>
+              <Button disabled={true}>Coming Soon...</Button>
             )}
           </div>
         </div>

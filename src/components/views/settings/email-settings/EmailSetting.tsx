@@ -266,31 +266,31 @@ export default function EmailSettingsTabs() {
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>Company Email:</strong> {setting.email}
+              <strong className="font-semibold">Company Email:</strong> {setting.email}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <KeyRound className="text-gray-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>Email Password:</strong> ********
+              <strong className="font-semibold">Email Password:</strong> ********
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-green-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>SMTP Host:</strong> {setting.smtp_host}
+              <strong className="font-semibold">SMTP Host:</strong> {setting.smtp_host}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-purple-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>SMTP Port:</strong> {setting.smtp_port}
+              <strong className="font-semibold">SMTP Port:</strong> {setting.smtp_port}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Lock className="text-orange-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>Security Type:</strong>{" "}
+              <strong className="font-semibold">Security Type:</strong>{" "}
               {setting.email_security_type_id === 1
                 ? "SSL"
                 : setting.email_security_type_id === 2
@@ -307,7 +307,7 @@ export default function EmailSettingsTabs() {
               }`}
             />
             <p className="text-gray-700 text-sm">
-              <strong>Authentication Required:</strong>{" "}
+              <strong className="font-semibold">Authentication Required:</strong>{" "}
               {setting.authentication_required ? "Yes" : "No"}
             </p>
           </div>
@@ -318,7 +318,7 @@ export default function EmailSettingsTabs() {
               <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
             )}
             <p className="text-gray-700 text-sm">
-              <strong>Active:</strong>
+              <strong className="font-semibold">Active:</strong>
             </p>
         <label className="inline-flex items-center cursor-pointer relative self-end">
         <input
@@ -336,22 +336,22 @@ export default function EmailSettingsTabs() {
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Created By:</strong> {setting.createdby}
+              <strong className="font-semibold">Created By:</strong> {setting.createdby}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Created On:</strong> {setting.createdon}
+              <strong className="font-semibold">Created On:</strong> {setting.createdon}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Updated By:</strong> {setting.updatedby}
+              <strong className="font-semibold">Updated By:</strong> {setting.updatedby}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Updated On:</strong> {setting.updatedon}
+              <strong className="font-semibold">Updated On:</strong> {setting.updatedon}
             </p>
           </div>
         </div>
@@ -391,31 +391,31 @@ export default function EmailSettingsTabs() {
               <div className="flex items-center space-x-2 mb-2">
                 <Mail className="text-blue-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong>User Email:</strong> {setting.email}
+                  <strong className="font-semibold">User Email:</strong> {setting.email}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <KeyRound className="text-gray-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong>Email Password:</strong> ********
+                  <strong className="font-semibold">Email Password:</strong> ********
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-green-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong>SMTP Host:</strong> {setting.smtp_host}
+                  <strong className="font-semibold">SMTP Host:</strong> {setting.smtp_host}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-purple-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong>SMTP Port:</strong> {setting.smtp_port}
+                  <strong className="font-semibold">SMTP Port:</strong> {setting.smtp_port}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Lock className="text-orange-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong>Security Type:</strong>{" "}
+                  <strong className="font-semibold">Security Type:</strong>{" "}
                   {setting.email_security_type_id === 1
                     ? "SSL"
                     : setting.email_security_type_id === 2
@@ -432,7 +432,7 @@ export default function EmailSettingsTabs() {
                   }`}
                 />
                 <p className="text-gray-700 text-sm">
-                  <strong>Authentication Required:</strong>{" "}
+                  <strong className="font-semibold">Authentication Required:</strong>{" "}
                   {setting.authentication_required ? "Yes" : "No"}
                 </p>
               </div>
@@ -443,7 +443,7 @@ export default function EmailSettingsTabs() {
                   <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
                 )}
                 <p className="text-gray-700 text-sm">
-                  <strong>Active:</strong>
+                  <strong className="font-semibold">Active:</strong>
                 </p>
                 <label className="inline-flex items-center cursor-pointer relative self-end"> {/* Align toggle to bottom-right */}
         <input
@@ -462,22 +462,22 @@ export default function EmailSettingsTabs() {
 
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong>Created By:</strong> {setting.createdby}
+                  <strong className="font-semibold">Created By:</strong> {setting.createdby}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong>Created On:</strong> {setting.createdon}
+                  <strong className="font-semibold">Created On:</strong> {setting.createdon}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong>Updated By:</strong> {setting.updatedby}
+                  <strong className="font-semibold">Updated By:</strong> {setting.updatedby}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong>Updated On:</strong> {setting.updatedon}
+                  <strong className="font-semibold">Updated On:</strong> {setting.updatedon}
                 </p>
               </div>
             </div>
@@ -496,8 +496,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("company")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "company"
-              ? "border-gray-600 text-gray-600"
-              : "border-transparent text-gray-300 hover:text-gray-500"
+              ? "border-teal-600 text-teal-600"
+              : "border-transparent text-gray-600 hover:text-gray-500"
           }`}
         >
           Company Email Settings
@@ -506,8 +506,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("user")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "user"
-              ? "border-gray-600 text-gray-600"
-              : "border-transparent text-gray-300 hover:text-gray-400"
+              ? "border-teal-600 text-teal-600"
+              : "border-transparent text-gray-600 hover:text-gray-500"
           }`}
         >
           Company User Email Settings
@@ -516,8 +516,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("email type")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "email type"
-              ? "border-gray-600 text-gray-600"
-              : "border-transparent text-gray-300 hover:text-gray-500"
+              ? "border-teal-600 text-teal-600"
+              : "border-transparent text-gray-600 hover:text-gray-500"
           }`}
         >
           Email Type
