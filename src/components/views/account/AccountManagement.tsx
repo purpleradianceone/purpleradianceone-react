@@ -20,6 +20,11 @@ function GetAccounts() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const [accountChangeCount,setAccountChangeCount] = useState<number>(0);
+
+  const handleCreateCompanyAccountType = () => {
+    setAccountChangeCount(accountChangeCount + 1);
+  }
 
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
@@ -132,7 +137,7 @@ function GetAccounts() {
     fetchAccounts();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
+  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate,accountChangeCount]);
 
   useEffect(() => {
     if (!userHasAccessToViewAccount) {
@@ -167,6 +172,7 @@ function GetAccounts() {
                   totalPages,
                   pageSize,
                 }}
+                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
               />
             </motion.section>
           </div>
