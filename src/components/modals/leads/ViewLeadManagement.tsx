@@ -89,7 +89,6 @@ const ViewLeadManagement = () => {
   const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
-   
 
   const fetchLeadStatus = async () => {
     try {
@@ -665,12 +664,6 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
   return (
     <div
-      // className={`${
-      //   position === "left" ? " ml-14" : "ml-1"
-      // } fixed top-8 inset-0 z-10 bg-white ${
-      //   position === "left" ? "mt-4" : "mt-6"
-      // } overflow-auto`}
-
       className={` fixed top-8 inset-0 z-10 bg-white ${
         userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
       } overflow-auto`}
@@ -704,12 +697,6 @@ const ViewLeadManagement = () => {
                 className="text-lg font-semibold"
                 onClick={() => {
                   if (!userHasAccessToUpdateLead) {
-                    // showMessageSnackbar({
-                    //   message:
-                    //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                    //   type: "error",
-                    // });
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
                         .UPDATE_LEAD_ACCESS_DENIED_message
@@ -723,12 +710,6 @@ const ViewLeadManagement = () => {
                   type={userHasAccessToUpdateLead ? "text" : "none"}
                   value={selectedLeadData?.name}
                   onChange={(e) => {
-                    // console.log("came here ");
-
-                    // const val = e.target.value.trim();
-                    // if (val !== null && val !== "") {
-                    // console.log("came here 2");
-
                     setSelectedLeadData({
                       ...selectedLeadData,
                       name: e.target.value,
@@ -750,10 +731,6 @@ const ViewLeadManagement = () => {
                   if (userHasAccessToUpdateLead) {
                     setIsLeadSettingModalOpen(true);
                   } else {
-                    // showMessageSnackbar({
-                    //   message: "Your are not authorized",
-                    //   type: "error",
-                    // });
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
                         .UPDATE_LEAD_ACCESS_DENIED_message
@@ -786,10 +763,6 @@ const ViewLeadManagement = () => {
                   if (userHasAccessToUpdateLead) {
                     setIsAddProductModalOpen(true);
                   } else {
-                    // showMessageSnackbar({
-                    //   message: MESSAGE.ERROR.NOT_ATHORISED,
-                    //   type: "error",
-                    // });
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
                         .UPDATE_LEAD_ACCESS_DENIED_message
@@ -818,19 +791,13 @@ const ViewLeadManagement = () => {
             value={selectedLeadData?.createdOn}
           />
         </div>
-        
+
         {/* Lead Basic Info */}
         <div className="w-full flex ">
           <div className="mx-3 flex justify-between w-full    whitespace-nowrap overflow-auto">
             <div
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  // showMessageSnackbar({
-                  //   message:
-                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                  //   type: "error",
-                  // });
                   toast.error(
                     MESSAGE.MODULE_ACCESS.LEAD_MODULE
                       .UPDATE_LEAD_ACCESS_DENIED_message
@@ -861,12 +828,6 @@ const ViewLeadManagement = () => {
             <div
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  // showMessageSnackbar({
-                  //   message:
-                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                  //   type: "error",
-                  // });
                   toast.error(
                     MESSAGE.MODULE_ACCESS.LEAD_MODULE
                       .UPDATE_LEAD_ACCESS_DENIED_message
@@ -914,12 +875,6 @@ const ViewLeadManagement = () => {
               }
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  // showMessageSnackbar({
-                  //   message:
-                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                  //   type: "error",
-                  // });
                   toast.error(
                     MESSAGE.MODULE_ACCESS.LEAD_MODULE
                       .UPDATE_LEAD_ACCESS_DENIED_message
@@ -927,48 +882,29 @@ const ViewLeadManagement = () => {
                 }
               }}
             >
+              <div className="relative">
+
               <Detail
                 label="Lead owner"
                 hasBorder={true}
                 type={userHasAccessToUpdateLead ? "select" : "none"}
                 value={selectedLeadData?.leadOwner}
                 handleClickLeadOwnerChange={handleClickLeadOwnerChange}
-              />
+                />
+                </div>
+
               <button
+              title="Lead owner history"
+              className="absolute right-4 text-xs flex items-center mt-1 hover:text-gray-900 text-gray-500" 
                 onClick={() => {
                   setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
                 }}
               >
-                <History size={13} className="mt-0" />
+               <History size={12} className="mt-0" />
               </button>
             </div>
           </div>
           {reasonInputBoxOpenForLeadOwner && (
-            // <div className="w-1/4 ">
-            // <div className="fixed w-full h-full bg-green-100  ">
-            //   <div className="  flex  items-center justify-center ml-2  gap-1 ">
-            //     <label className="text-xs text-gray-600 font-medium">
-            //       Reason(Optional)
-            //     </label>
-            //     <input
-            //       type="text"
-            //       placeholder="Enter reason for Owner Update"
-            //       className=" border rounded px-3   text-xs "
-            //       value={reasonTextForLeadOwnerChange}
-            //       onChange={(e) =>
-            //         setReasonTextForLeadOwnerChange(e.target.value)
-            //       }
-            //     />
-            //     <button
-            //       className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded w-fit"
-            //       onClick={() => {
-            //         handleLeadOwnerChange();
-            //       }}
-            //     >
-            //       Save
-            //     </button>
-            //   </div>
-            // </div>
             <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                 <div className="flex flex-col gap-1">
@@ -1009,8 +945,9 @@ const ViewLeadManagement = () => {
                 setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
               }}
             >
-              <span className="border-b text-gray-500 hover:text-gray-950 hover:border-b-black">
+              <span className="border-b flex items-center gap-1 text-gray-500 hover:text-gray-950 hover:border-b-black">
                 Status history
+                <History size={12} className="mt-0" />
               </span>
             </button>
           </div>
