@@ -406,9 +406,9 @@ function CompanyUserAccessManagementModal({
                       ? handleSaveAccessModule
                       : ()=>{
                          if (users.id === loginStatus.id) {
-                          toast.error("Updating your own Access Module is not allowed.");
+                          toast.error("For security reasons, users are unable to update their own Access Module.");
                         }else if(!userHasAccessToUpdateAccess){
-                          toast.error("You do not have permission to Update the access module of Another user.");
+                          toast.error("You do not have permission to Update the access modules of Another user.");
                         }
                       }
                   }

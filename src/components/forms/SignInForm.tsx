@@ -205,7 +205,7 @@ function SignInForm() {
 
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
             }, 1500);
-            return; // ⬅️ Stops further execution
+            return; //  Stops further execution
           }
 
           const getCrmModuleAccessData = {

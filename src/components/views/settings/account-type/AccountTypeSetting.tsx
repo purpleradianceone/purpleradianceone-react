@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
 import AccountType from "../../../../@types/settings/AccountType";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import {
@@ -8,10 +8,7 @@ import {
   ChevronUp,
   Pen,
   Plus,
-  Save,
-  User,
   UserRoundPlus,
-  X,
 } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
@@ -20,6 +17,9 @@ import toast from "react-hot-toast";
 import CompanyAccountType from "../../../../@types/settings/CompanyAccountType";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import CreateAccountType from "./CreateAccountType";
+import Button from "../../../ui/Button";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 
 const AccountTypeSetting: React.FC = () => {
   const {
@@ -34,11 +34,9 @@ const AccountTypeSetting: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStatus, setEditingStatus] = useState<boolean | null>(null);
 
-  const [newTypeName, setNewTypeName] = useState("");
-  const [newParentType, setNewParentType] = useState<number>(0);
   const [editingTypeId, setEditingTypeId] = useState<number | null>(null);
   const [editingTypeName, setEditingTypeName] = useState("");
-
+  const [loading , setIsLoading] = useState<boolean>(true);
   // --- Fetch Account Types ---
   const getAccountType = async () => {
     const PostDataToGetAccountType: AccountType = {
@@ -70,10 +68,6 @@ const AccountTypeSetting: React.FC = () => {
       });
   };
 
-  
-
-
- 
   const handleSaveEdit = async (updatedType?: {
     id?: number | null;
     company_account_type_name?: string;
@@ -98,8 +92,8 @@ const AccountTypeSetting: React.FC = () => {
       if (response.data.status === true) {
         toast.success(response.data.message);
         getComapnyAccountType();
-      }else{
-        toast.error(response.data.message)
+      } else {
+        toast.error(response.data.message);
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -109,8 +103,8 @@ const AccountTypeSetting: React.FC = () => {
         if (refreshTokenResponse) {
           handleSaveEdit(updatedType);
         }
-      }else{
-        toast.error(error.response.data)
+      } else {
+        toast.error(error.response.data);
       }
     } finally {
       setEditingTypeId(null);
@@ -125,60 +119,6 @@ const AccountTypeSetting: React.FC = () => {
     setEditingStatus(null);
   };
 
-  // --- Add Functions ---
-  const handleAddAccountType = async () => {
-    if (!userHasAccessToAddCompanyAccountType) {
-      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS.DENIED_ADD_ACCESS);
-      addFunctionStatesCleanup();
-      return;
-    }
-
-    const postDataToAddNewCompanyAccountType = {
-      company_id: loginStatus.companyId,
-      account_type_id: newParentType,
-      company_account_type_name: newTypeName,
-      createdby_id: loginStatus.id,
-    };
-
-    axios
-      .post(
-        POST_API.CREATE_COMPANY_ACCOUNT_TYPE,
-        postDataToAddNewCompanyAccountType,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        if (response.data.status) {
-          toast.success(response.data.message);
-        } else {
-          toast.error(response.data.message);
-        }
-        getComapnyAccountType();
-      })
-      .catch(async (error: any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: handleAddAccountType,
-          });
-          if (refreshTokenResponse) {
-            handleAddAccountType();
-          }
-        } else {
-          toast.error(error.response.status + error.response.data);
-        }
-      })
-      .finally(() => {
-        addFunctionStatesCleanup();
-      });
-  };
-
-  function addFunctionStatesCleanup() {
-    setNewTypeName("");
-    setNewParentType(0);
-    setShowAddForm(false);
-  }
-
   // --- Fetch Company Account Types ---
   const getComapnyAccountType = async () => {
     const PostDataToGetCompanyAccountType = {
@@ -188,7 +128,6 @@ const AccountTypeSetting: React.FC = () => {
       isactive: null,
       requestedby_id: loginStatus.id,
     };
-
     axios
       .post(
         POST_API.GET_COMPANY_ACCOUNT_TYPE,
@@ -215,31 +154,30 @@ const AccountTypeSetting: React.FC = () => {
           );
           setCompanyAccountType(companyAccountData);
         }
+      }).catch(async (error: any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: getComapnyAccountType,
+          });
+          if (refreshTokenResponse) {
+            getComapnyAccountType();
+          }
+        } else {
+          toast.error(error.response.status + error.response.data);
+        }
+      })
+      .finally(()=>{
+        setIsLoading(false);
       });
   };
 
-  //Component render first time call 
+  //Component render first time call
   useEffect(() => {
     getAccountType();
     getComapnyAccountType();
   }, []);
 
-  // --- Helpers ---
-  const getParentTypeColor = (parentType: string) => {
-    switch (parentType) {
-      case "Reseller":
-        return "bg-green-100 text-green-800";
-      case "Customer":
-        return "bg-red-100 text-red-800";
-      case "Equity":
-        return "bg-blue-100 text-blue-800";
-      case "Partner":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-  // 👇 track which parent types are expanded
+  //  track which parent types are expanded
   const [expandedParentTypes, setExpandedParentTypes] = useState<string[]>([]);
 
   const toggleParentExpand = (parentType: string) => {
@@ -260,15 +198,44 @@ const AccountTypeSetting: React.FC = () => {
     return acc;
   }, {} as Record<string, CompanyAccountType[]>);
 
+  if(loading){
+    return(
+      <div className="h-56 flex items-center justify-center">
+        <div className="flex items-center justify-between gap-3">
+
+       <span>Loading...</span> <LoadingSpinner/>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className="max-w-6xl mx-auto p-1">
-        <h1 className="text-2xl font-bold text-gray-700 my-3">
-          Company Account Type Management
-        </h1>
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-bold text-gray-700 my-3">
+            Company Account Type Management
+          </h1>
+          {!showAddForm && (
+            <Button
+              onClick={() => {
+                if (userHasAccessToAddCompanyAccountType) {
+                  setShowAddForm(true);
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS.DENIED_ADD_ACCESS
+                  );
+                }
+              }}
+              className="flex text-sm items-center  m-3 font-medium  bg-blue-600 text-white px-2  rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} />
+              Create
+            </Button>
+          )}
+        </div>
 
         {/* Add New Account Type Section */}
-        <div className="bg-gray-50 rounded-lg  p-2 mb-8">
+        <div className="hidden bg-gray-50 rounded-lg  p-2 mb-8">
           <div
             className="flex items-center hover:scale-[1.01] 
             transition-all duration-200 ease-in-out bg-white text-gray-800 hover:text-blue-700 justify-between mb-4 border py-3 px-1  rounded-md"
@@ -276,120 +243,27 @@ const AccountTypeSetting: React.FC = () => {
             <h2 className="text-base font-medium   px-2  flex items-center gap-2">
               <UserRoundPlus size={18} /> Company account type
             </h2>
-            {!showAddForm && (
-              <button
-                onClick={() => {
-                  if (userHasAccessToAddCompanyAccountType) {
-                    setShowAddForm(true);
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
-                        .DENIED_ADD_ACCESS
-                    );
-                  }
-                }}
-                className="flex items-center font-medium gap-1 bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={18} />
-                Add new type
-              </button>
-            )}
           </div>
         </div>
         {/* Add Form */}
         {showAddForm && (
-          <div className="bg-white rounded-lg p-4 mb-6 border border-blue-200 shadow ">
-            <h3 className="text-base flex gap-2 items-center border w-fit p-2 rounded-md shadow-md font-medium text-blue-800 mb-4">
-              <UserRoundPlus size={18} /> Create New Comapny Account Type
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                 Company Account Type Name : <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={newTypeName}
-                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                  required
-                  onChange={(e) => setNewTypeName(e.target.value)}
-                  placeholder="Enter company account type name..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Account Type : <span className="text-red-600">*</span>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {accountType.map((type) => (
-                    <label
-                      key={type.id}
-                      className="flex items-center p-3 border border-gray-200 bg-white rounded-lg cursor-pointer hover:bg-white hover:border-blue-400 hover:shadow-lg transition-colors"
-                    >
-                      <input
-                        type="radio"
-                        name="parentType"
-                        value={type.id!}
-                        checked={newParentType === type.id}
-                        onChange={(e) =>
-                          setNewParentType(parseInt(e.target.value))
-                        }
-                        className={`mr-3  focus:ring-blue-5 `}
-                      />
-                      <div>
-                        {/* <span className="font-medium text-gray-800">
-                          {type.name}
-                        </span> */}
-                        <span
-                          className={`ml-2 px-2 py-1 text-sm font-semibold rounded-xl ${getParentTypeColor(
-                            type.name!
-                          )}`}
-                        >
-                          {type.name}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  onClick={handleAddAccountType}
-                  disabled={!newTypeName.trim() || newParentType === 0}
-                  className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:bg-green-200  disabled:cursor-not-allowed transition-colors"
-                >
-                  <Save size={16} />
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddForm(false);
-                    setNewTypeName("");
-                    setNewParentType(0);
-                  }}
-                  className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
-                >
-                  <X size={16} />
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+          <CreateAccountType
+            onClose={() => {
+              setShowAddForm(!showAddForm);
+            }}
+            accountType={accountType}
+            getComapnyAccountType={getComapnyAccountType}
+          />
         )}
 
         {/* Available Account Types */}
+
         <div className="space-y-6 border p-2  rounded-md hover:scale-[1.01] transition-all duration-200 ease-in-out bg-white">
-          <h4 className="font-medium text-md text-gray-900 border w-fit p-2  rounded-lg shadow-md   flex items-center gap-2">
-            <User size={18} />Available company account types
-          </h4>
+          {/* <h4 className="font-medium text-md text-gray-900  w-fit p-1  rounded-lg    flex items-center gap-2">
+            
+          </h4> */}
           {companyAccountType.length === 0 ? (
-            <p className="text-gray-500 italic text-sm  text-center ">
+            <p className="text-gray-500 flex items-center justify-center italic text-sm h-56 text-center ">
               No company account types available. Add one to get started.
             </p>
           ) : (
@@ -398,39 +272,40 @@ const AccountTypeSetting: React.FC = () => {
               return (
                 <div
                   key={parentType}
-                  className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden"
+                  className="bg-white border  border-gray-200 rounded-2xl shadow-md overflow-hidden"
                 >
                   {/* Parent Header */}
-                  <div
-                    className="flex items-center justify-between p-4 cursor-pointer bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
-                    onClick={() => toggleParentExpand(parentType)}
-                  >
-                    <h3 className="text-lg font-semibold text-slate-800">
-                      {parentType}
-                    </h3>
-                    <button className="p-1 rounded-full hover:bg-blue-200 transition-colors">
-                      {isOpen ? (
-                        <ChevronUp size={20} className="text-slate-700" />
-                      ) : (
-                        <ChevronDown size={20} className="text-slate-700" />
-                      )}
-                    </button>
+                  <div className="grid ">
+                    <div
+                      className="flex items-center justify-between p-1 cursor-pointer bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
+                      onClick={() => toggleParentExpand(parentType)}
+                    >
+                      <h3 className="text-md pl-3 font-semibold text-slate-800">
+                        {parentType}
+                      </h3>
+                      <button className=" hidden p-1 rounded-full hover:bg-blue-200 transition-colors">
+                        {isOpen ? (
+                          <ChevronUp size={20} className="text-slate-700" />
+                        ) : (
+                          <ChevronDown size={20} className="text-slate-700" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Children List */}
-                  {isOpen && (
-                    <div className="p-4 grid md:grid-cols-4 sm:grid-cols-1 gap-4 bg-white">
-                      {children.map((item) => (
-                        <div
-                          key={item.id}
-                          className="p-2 rounded-xl border border-gray-100 bg-white shadow-sm hover:bg-emerald-50 hover:shadow-lg hover:scale-[1.01] transition-all duration-300"
-                        >
-                          {/* Editable Name */}
-                          {editingTypeId === item.id ? (
-                            <>
-                            {/* <label htmlFor="name" className="text-xs">Name: <span className="text-red-500">*</span> (mandatory field) </label> */}
+                  {/* {isOpen && ( */}
+                  <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white">
+                    {children.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-2  grid grid-col rounded-xl border border-gray-200 bg-white shadow-sm hover:bg-emerald-50 hover:shadow-md hover:scale-[1.01] transition-all duration-300"
+                      >
+                        {/* Editable Name */}
+                        {editingTypeId === item.id ? (
+                          <>
                             <input
-                            id="name"
+                              id="name"
                               type="text"
                               value={editingTypeName}
                               onChange={(e) =>
@@ -455,42 +330,38 @@ const AccountTypeSetting: React.FC = () => {
                               autoFocus
                               className="w-full px-2  border border-blue-400 rounded-md focus:ring-1 focus:ring-blue-500"
                             />
-                            </>
-                          ) : (
-                            <h4
-                              title={item.companyAccountTypeName}
-                              className="font-semibold hover:bg-gray-00 flex items-center gap-1 text-gray-900 text-sm   truncate md-2 cursor-pointer "
-                              onClick={() => {
-                                if (userHasAccessToUpdateCompanyAccountType) {
-                                  setEditingTypeId(item.id);
-                                  setEditingTypeName(
-                                    item.companyAccountTypeName
-                                  );
-                                } else {
-                                  toast.error(
-                                    MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
-                                      .DENIED_UPDATE_ACCESS
-                                  );
-                                }
-                              }}
-                            >
-                              <div className="grid items-center pl-2 ">
-
+                          </>
+                        ) : (
+                          <h4
+                            title={item.companyAccountTypeName}
+                            className="font-semibold hover:bg-gray-00 flex items-center  gap-1 text-gray-900 text-sm    md-2 cursor-pointer "
+                            onClick={() => {
+                              if (userHasAccessToUpdateCompanyAccountType) {
+                                setEditingTypeId(item.id);
+                                setEditingTypeName(item.companyAccountTypeName);
+                              } else {
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
+                                    .DENIED_UPDATE_ACCESS
+                                );
+                              }
+                            }}
+                          >
+                            <div className="grid items-center pl-2  w-full">
                               {/* <span className="text-gray-600 text-xs">Name : </span> */}
-                              <div className="flex items-center gap-1 hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-100">
-
-                              {item.companyAccountTypeName}
-                              <Pen size={10} className="text-blue-500 " />
+                              <div className="flex items-center justify-between  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50">
+                                {item.companyAccountTypeName}
+                                <Pen size={10} className="text-blue-500 " />
                               </div>
-                              </div>
-                            </h4>
-                          )}
+                            </div>
+                          </h4>
+                        )}
 
-                          {/* Status Toggle */}
-                          <div className="flex items-center justify-end mt-2">
-                            {/* Toggle for Active/Inactive */}
-                            <label className="flex  gap-3 items-center justify-end cursor-pointer">
-                              <input
+                        {/* Status Toggle */}
+                        <div className="flex  items-center justify-end mt-2">
+                          {/* Toggle for Active/Inactive */}
+                          <label className="inline-flex items-center cursor-pointer relative self-end">
+                             <input
                                 type="checkbox"
                                 className="sr-only peer"
                                 checked={item.isActive}
@@ -503,23 +374,16 @@ const AccountTypeSetting: React.FC = () => {
                                   });
                                 }}
                               />
-                              <span className="font-normal text-xs text-gray-600">Status :  </span>
-                              <div
-                                className={`w-11 h-6 rounded-full relative transition-colors
-      ${item.isActive ? "bg-green-500" : "bg-red-500"} 
-      peer-focus:outline-none`}
-                              >
-                                <span
-                                  className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform
-        ${item.isActive ? "translate-x-5" : "translate-x-0"}`}
-                                ></span>
-                              </div>
-                            </label>
-                          </div>
+                            <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                            {/* Adjusted size and colors */}
+                            <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                            {/* Adjusted size and position */}
+                          </label>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
+                  {/* )} */}
                 </div>
               );
             })
