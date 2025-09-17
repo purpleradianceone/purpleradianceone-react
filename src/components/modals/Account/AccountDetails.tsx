@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Building2,
   Mail,
@@ -589,6 +589,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
   };
 
+  useEffect(() =>{
+    console.log(indutryTypeData);
+    console.log(businessTypeData);
+    
+    
+  },[])
   if(indutryTypeData.length<=0 || businessTypeData.length<=0 ){
     return(
       
