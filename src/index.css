@@ -128,7 +128,7 @@
 .ag-theme-balham .ag-cell-value .lead-details:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
+  /* box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35); */
 }
 
 .ag-theme-balham .ag-cell-value .delete {

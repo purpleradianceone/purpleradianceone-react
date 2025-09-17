@@ -9,8 +9,6 @@ import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import {
-  Eye,
-  Edit2,
   CheckCircle,
   XCircle,
   Star,
@@ -32,7 +30,6 @@ import SearchInput from "../ui/SearchInput";
 import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import EmailTemplate from "../../@types/email-template/EmailTemplateType";
-import { Switch } from "@headlessui/react"; // Or use your own styled switch
 import MESSAGE from "../../constants/Messages";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
@@ -347,7 +344,9 @@ export const TemplatesPage: React.FC = () => {
             {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
             {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
 
-            <span className="text-xl sm:text-base md:text-clip font-bold ">Email Templates</span>
+            <span className="text-xl sm:text-base md:text-clip font-bold ">
+              Email Templates
+            </span>
           </div>
           {isLargeScreen && (
             <>
@@ -603,7 +602,7 @@ const Tabs: React.FC<TabsProps> = ({
   onTabChange,
   templateTypes,
 }) => (
-  <div className="sticky top-0 bg-white overflow-x-auto scrollbar-hide">
+  <div className="sticky top-0 mb-1 bg-white overflow-x-auto scrollbar-hide">
     <div className="flex flex-nowrap text-xs">
       {templateTypes.map((tab) => (
         <button
@@ -639,9 +638,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
     null
   );
-  const [updatingDefaultId, setUpdatingDefaultId] = useState<number | null>(
-    null
-  );
 
   const { userHasAccessToUpdateEmailTemplateSetting } = useUserAccessModules();
   const navigate = useNavigate();
@@ -652,6 +648,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
     );
   };
   const { loginStatus } = useLoggedInUserContext();
+
   const handleDefaultToggle = async (template: EmailTemplate) => {
     if (!userHasAccessToUpdateEmailTemplateSetting) {
       toast.error("You don't have access to update the default status.");
@@ -659,7 +656,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
     }
 
     try {
-      setUpdatingDefaultId(template.id);
       const postDataUpdateEmailTemplate = {
         company_id: loginStatus.companyId,
         updatedby_id: loginStatus.id,
@@ -669,6 +665,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
         email_subject: null,
         email_body_html: null,
         email_body_json: null,
+        isactive: template.isactive,
         is_default: template.is_default,
       };
 
@@ -704,7 +701,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
       }
       toast.error("Failed to update default status.");
     } finally {
-      // setUpdatingDefaultId(null);
+      //
     }
   };
 
@@ -722,20 +719,26 @@ const TemplateList: React.FC<TemplateListProps> = ({
             key={template.id}
             className="bg-white shadow rounded-lg p-4 border hover:shadow-md transition duration-200 ease-in-out"
           >
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold text-gray-800">
-                {template.name}
-              </h3>
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">
+                  {template.name}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  <strong>Subject:</strong>{" "}
+                  {template.email_subject || <em>No subject</em>}
+                </p>
+              </div>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={() => setPreviewTemplate(template)}
-                  className="text-blue-500 hover:text-blue-700 transition"
+                  // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Preview ${template.name}`}
                 >
-                  <Eye size={25} />
-                </button>
+                  View
+                </Button>
                 <Button
-                  className="text-green-500 hover:text-green-700 transition"
+                  // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Edit ${template.name}`}
                   disabled={
                     !userHasAccessToUpdateEmailTemplateSetting ||
@@ -756,72 +759,128 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     }
                   }}
                 >
-                  <Edit2 size={25} />
+                  Edit
                 </Button>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mb-2">
-              <strong>Subject:</strong>{" "}
-              {template.email_subject || <em>No subject</em>}
-            </p>
-            <div className="flex flex-col space-y-1 text-sm text-gray-700">
-              <span className="flex items-center gap-1">
-                {template.isactive ? (
-                  <CheckCircle className="text-green-500" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400" size={16} />
-                )}
-                <strong>Active:</strong> {template.isactive ? "Yes" : "No"}
-              </span>
-              <span className="flex items-center gap-2">
-                {template.is_default ? (
-                  <Star className="text-yellow-500" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400" size={16} />
-                )}
-                <strong>Default:</strong>
-                <Switch
-                  aria-disabled={!userHasAccessToUpdateEmailTemplateSetting}
-                  checked={template.is_default}
-                  onChange={() => {
-                    template.is_default = !template.is_default;
-                    handleDefaultToggle(template);
-                  }}
-                  className={`${
-                    template.is_default ? "bg-blue-600" : "bg-gray-300"
-                  } relative inline-flex h-5 w-10 items-center rounded-full transition`}
-                  disabled={updatingDefaultId === template.id}
-                >
-                  <span className="sr-only">Toggle Default</span>
-                  <span
-                    className={`${
-                      template.is_default ? "translate-x-5" : "translate-x-1"
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                  />
-                </Switch>
-              </span>
-              <span className="flex items-center gap-1">
-                {template.is_master ? (
-                  <Star className="text-purple-500" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400" size={16} />
-                )}
-                <strong>Master:</strong> {template.is_master ? "Yes" : "No"}
-              </span>
-              <span>
-                <strong>Created By:</strong> {template.createdby}
-              </span>
-              <span>
-                <strong>Created On:</strong>{" "}
-                {new Date(template.createdon).toLocaleDateString()}
-              </span>
-              <span>
-                <strong>Updated By:</strong> {template.updatedby}
-              </span>
-              <span>
-                <strong>Updated On:</strong>{" "}
-                {new Date(template.updatedon).toLocaleDateString()}
-              </span>
+
+            <div className="flex  items-center justify-between col-span-2    text-sm text-gray-700">
+            {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
+
+              <div className="flex flex-col col-span-1 text-sm text-gray-700">
+                {/* Active */}
+                <span className="flex items-center mb-2 justify-between gap-2">
+                  {template.isactive ? (
+                    <CheckCircle className="text-green-500" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400" size={16} />
+                  )}
+                  <strong>Active: </strong>
+                  {template.isactive ? "Yes" : "No"}
+                  <label className="inline-flex items-center cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={template.isactive}
+                      id={`active-${template.id}`}
+                      onChange={() => {
+                        if (!template.is_default) {
+                          if (
+                            userHasAccessToUpdateEmailTemplateSetting &&
+                            !template.is_master
+                          ) {
+                            template.isactive = !template.isactive;
+                            handleDefaultToggle(template);
+                          } else {
+                            if (template.is_master) {
+                              toast.error(
+                                "Can't change active status of master template."
+                              );
+                            } else {
+                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            }
+                          }
+                        } else {
+                          toast.error(
+                            "To make this inactive, please set another template as default first."
+                          );
+                        }
+                      }}
+                    />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+                  </label>
+                </span>
+
+                {/* Default */}
+                <span className="flex items-center mb-2 justify-between gap-2">
+                  {template.is_default ? (
+                    <Star className="text-yellow-500" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400" size={16} />
+                  )}
+                  <strong>Default: </strong>
+                  {template.is_default ? "Yes" : "No"}
+                  <label className="inline-flex items-center cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={template.is_default}
+                      id={`default-${template.id}`}
+                      onChange={() => {
+                        if(template.isactive){
+                        if (!template.is_default) {
+                          if (userHasAccessToUpdateEmailTemplateSetting) {
+                            template.is_default = !template.is_default;
+                            handleDefaultToggle(template);
+                          } else {
+                            toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                          }
+                        } else {
+                          toast.error(
+                            "To remove this as the default, please set another template as default first."
+                          );
+                        }
+                      }else{
+                        toast.error("Set this template as active to make it your default email template.")
+                      }
+                      }}
+                    />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+                  </label>
+                </span>
+
+                {/* Master (readonly toggle → disabled) */}
+                <span className="flex items-center mb-2 gap-2">
+                  {template.is_master ? (
+                    <Star className="text-purple-500" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400" size={16} />
+                  )}
+                  <strong>Master:</strong>
+                  <span>{template.is_master ? "Yes" : "No"}</span>
+                </span>
+              </div>
+
+              <div className="flex justify-between text-sm text-gray-600 -mt-3">
+                <div className="px-3 rounded-md">
+                  <p>
+                    <strong>Created By:</strong> {template.createdby}
+                  </p>
+                  <p>
+                    <strong>Created On:</strong>{" "}
+                    {new Date(template.createdon).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Updated By:</strong> {template.updatedby}
+                  </p>
+                  <p>
+                    <strong>Updated On:</strong>{" "}
+                    {new Date(template.updatedon).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -875,10 +934,14 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchTypes = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.post(
+    fetchTypes();
+  }, [loginStatus.companyId, loginStatus.id]);
+
+  const fetchTypes = async () => {
+    setLoading(true);
+    try {
+      await axios
+        .post(
           POST_API.GET_EMAIL_TYPE,
           {
             company_id: loginStatus.companyId,
@@ -886,45 +949,48 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
             is_host_email: false,
           },
           { withCredentials: true }
-        );
-        if (response.status === STATUS_CODE.OK) {
-          const activeTypes = response.data.filter(
-            (type: TemplateType) => type.isactive
-          );
-          setTemplateTypes(activeTypes);
-          // Optional: If you want to pre-select the first active type, uncomment the line below.
-          // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
-          // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
-        }
-        if (response.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithParamsNotEvent: fetchTypes,
-          });
-          if (refreshTokenResponse) {
-            fetchTypes();
+        )
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            const activeTypes = response.data.filter(
+              (type: TemplateType) => type.isactive
+            );
+            setTemplateTypes(activeTypes);
+            // Optional: If you want to pre-select the first active type, uncomment the line below.
+            // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
+            // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
           }
-        }
-      } catch (error: ApiError | any) {
-        console.error("Error fetching template types for modal:", error);
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithParamsNotEvent: fetchTypes,
-          });
-          if (refreshTokenStatus) {
-            fetchTypes();
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: fetchTypes,
+            });
+            if (refreshTokenResponse) {
+              fetchTypes();
+            }
           }
+        });
+    } catch (error: ApiError | any) {
+      console.error("Error fetching template types for modal:", error);
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchTypes,
+        });
+        if (refreshTokenStatus) {
+          fetchTypes();
         }
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchTypes();
-  }, [loginStatus.companyId, loginStatus.id]);
-
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleSubmit = () => {
     if (selectedTypeId) {
       // This check ensures selectedTypeId is not an empty string
       onCreate(selectedTypeId); // Pass the ID string directly
+    } else {
+      toast.error("Select template type first!");
     }
   };
 
@@ -951,24 +1017,28 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
               </option>
             ))}
         </select>
-        <div className="flex justify-between mt-4">
-          <button
-            className="text-sm text-gray-600 hover:underline"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button
-            disabled={selectedTypeId === ""}
-            className={`px-4 py-2 rounded text-white ${
-              selectedTypeId !== ""
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-            onClick={handleSubmit}
-          >
-            Continue
-          </button>
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <div className="rounded">
+            <Button
+              // className="text-sm text-gray-600 hover:underline"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+          </div>
+          <div className="rounded">
+            <Button
+              disabled={selectedTypeId === ""}
+              // className={`px-4 py-2 rounded text-white ${
+              //   selectedTypeId !== ""
+              //     ? "bg-blue-500 hover:bg-blue-600"
+              //     : "bg-gray-300 cursor-not-allowed"
+              // }`}
+              onClick={handleSubmit}
+            >
+              Continue
+            </Button>
+          </div>
         </div>
       </div>
     </div>

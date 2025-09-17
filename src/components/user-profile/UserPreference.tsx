@@ -225,9 +225,9 @@ const UserPreference = () => {
       ...formErrors,
       [name]: errorMsg,
     };
-    if (!hasChanged) {
-      toast.error("No new changes to save.");
-    }
+    // if (!hasChanged) {
+    //   toast.error("No new changes to save.");
+    // }
     const hasErrors = Object.values(currentErrors).some((e) => e !== "");
 
     setIsSaveEnabled(hasChanged && !hasErrors);

@@ -437,7 +437,7 @@ function EditCompanyProductModal({
                     placeholder="Product URL"
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    error={errors.code}
+                    error={errors.url}
                   />
 
                   <FormInput
@@ -501,7 +501,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3 ">
+                  <div className="grid grid-cols-2 gap-3">
                     <CustomDropdown
                       labelName="Warranty Duration"
                       preselectedOption={

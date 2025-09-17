@@ -105,25 +105,48 @@ function LeadManagementAgGrid({
           fontWeight: '400'
         }
       },
+      // {
+      //   headerName :"Actions",
+      //   field: "view",
+      //   pinned : "right",
+      //   maxWidth : 110,
+      //   // cellRenderer : ()=> "View",
+      //   cellRenderer : (params :LeadDataProps| any ) => {
+      //     return (
+      //       <span
+      //       className="lead-details"
+      //       onClick={() =>{
+      //         params.context.handleRowSelect(params.data)
+      //       }}>
+      //         Details
+      //       </span>
+      //     )
+      //   },
+      // }
       {
-        headerName :"Actions",
-        field: "view",
-        pinned : "right",
-        maxWidth : 110,
-        // cellRenderer : ()=> "View",
-        cellRenderer : (params :LeadDataProps| any ) => {
-          return (
-            <span
-         
-            className="lead-details"
-            onClick={() =>{
-              params.context.handleRowSelect(params.data)
-            }}>
-              Lead Details
-            </span>
-          )
-        },
-      }
+  headerName: "Actions",
+  field: "view",
+  pinned: "right",
+  maxWidth: 80,
+  // minWidth:80,
+  // autoHeight: true,
+  // suppressSizeToFit: true,
+  cellRenderer: (params: LeadDataProps | any) => {
+    return (
+      <div className="flex items-center justify-center  ">
+        <span
+          className="lead-details cursor-pointer text-blue-600 hover:underline "
+          onClick={() => {
+            params.context.handleRowSelect(params.data);
+          }}
+        >
+          Details
+        </span>
+      </div>
+    );
+  },
+}
+
     ],
     []
   );
