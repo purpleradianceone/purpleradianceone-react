@@ -732,10 +732,10 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   className="text-blue-500 hover:text-blue-700 transition"
                   aria-label={`Preview ${template.name}`}
                 >
-                  <Eye size={25} />
+                  <Eye size={20} />
                 </button>
                 <Button
-                  className="text-green-500 hover:text-green-700 transition"
+                  className="text-green-800 hover:text-green-900 transition"
                   aria-label={`Edit ${template.name}`}
                   disabled={
                     !userHasAccessToUpdateEmailTemplateSetting ||
@@ -756,7 +756,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     }
                   }}
                 >
-                  <Edit2 size={25} />
+                  <Edit2 size={13} />
                 </Button>
               </div>
             </div>
