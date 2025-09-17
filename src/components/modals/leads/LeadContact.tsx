@@ -421,7 +421,7 @@ const LeadContact = ({
                 {/* Text Info */}
                 <div className="flex flex-col">
                   <p className="text-sm font-semibold ">
-                    {contact.name || "Unknown Contact"}
+                    {contact.name.length>50 ?contact.name.substring(0, 49)+"..." : contact.name || "Unknown Contact"}
                   </p>
                   <p className="text-xs text-gray-500 font-normal flex flex-wrap items-center gap-x-1">
                     {contact.jobTitle && <span className="flex gap-1 items-center"><Briefcase size={12}/> {contact.jobTitle}</span>}
@@ -493,8 +493,9 @@ const LeadContact = ({
                     : "?"}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-gray-900">
-                    {selectedContactCard.name ?? (
+                  <h2 title={selectedContactCard.name} className="text-3xl font-bold text-gray-900">
+                    {selectedContactCard.name.length>40 ? selectedContactCard.name.substring(0,49)+"..." : selectedContactCard.name ? selectedContactCard.name :
+                     (
                       <span className="text-sm italic">Unamed contact</span>
                     )}
                   </h2>

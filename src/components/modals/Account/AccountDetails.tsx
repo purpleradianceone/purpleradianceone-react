@@ -30,6 +30,7 @@ import {
 } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import AccountContact from "./Account-contact/AccountContact";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 interface AccountDetailsProps {
   company: Account;
@@ -588,6 +589,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
   };
 
+  if(indutryTypeData.length<=0 || businessTypeData.length<=0 ){
+    return(
+      
+      <>
+      <LoadingSpinner/>
+      </>
+    )
+  }
   return (
     <div
       className={`${
@@ -629,16 +638,18 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   )}
                 </div> */}
                 <div className="ml-1 truncate">
-                  {indutryTypeData && indutryTypeData.length > 0 ? (
+                  {/* {indutryTypeData && indutryTypeData.length > 0 ? ( */}
+                  {
                     renderDropdownField(
                       "industryTypeName",
                       formData.industryTypeName,
                       indutryTypeData,
                       "Select industry type"
                     )
-                  ) : (
-                    <p className="text-gray-400">Loading industry types...</p>
-                  )}
+                  }
+                  {/* ) : ( */}
+                    {/* <p className="text-gray-400">Loading industry types...</p> */}
+                  {/* )} */}
                 </div>
               </div>
               <div className="flex items-center">
