@@ -4,6 +4,7 @@ import validateMobileNumber from '../validations/ValidateMobileNumber';
 import {  STRING_VALUES } from '../../constants/AppConstants';
 import REGEX from '../../constants/Regex';
 import MESSAGE from '../../constants/Messages';
+import validateUrl from '../validations/ValidateUrl';
 
 
 export type ErrorType = {
@@ -19,6 +20,7 @@ export type ErrorType = {
   validFrom? :string;
   hsn? :string;
   sac? : string;
+  url?:string;
   companyUserCount?: string;
   monthsToPurchase?: string;
   companyUserCountForUpdateSubscription?:string
@@ -49,6 +51,21 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
           setErrors((prev) => ({ ...prev, email: "" }));
         }
         break;
+      case "url":
+        if(value===null || value.trim()===""){
+          setErrors((prev) => ({ ...prev, url: "" }));
+        }else{
+         if (!validateUrl(value)) {
+          setErrors((prev) => ({
+            ...prev,
+            url: "Enter valid URL or leave it blank",
+          }));
+        } else {
+          setErrors((prev) => ({ ...prev, url: "" }));
+        }
+        }
+      
+      break;
 
       case "password":
         if (!value) {
@@ -179,6 +196,8 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
             setErrors((prev) => ({ ...prev, companyUserCount: "" }));
           }
           break;
+
+        
         case "monthsToPurchase" :
           if(formType === STRING_VALUES.REGISTRATION && value === "") {
             setErrors((prev) => ({ ...prev, monthsToPurchase: "minimum 1 month subscription is required"}));
@@ -208,6 +227,14 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
     } else if (!validateEmail(formData.email.toString())) {
       newErrors.email = "Email Address must be valid";
       isValid = false;
+    }
+
+    if(!formData.url){
+      if(!validateUrl(formData.url!.toString())){
+      newErrors.url = "Enter a valid url or leave it blank";
+      }
+    }else{
+      newErrors.url = "";
     }
 
     if (!formData.password) {

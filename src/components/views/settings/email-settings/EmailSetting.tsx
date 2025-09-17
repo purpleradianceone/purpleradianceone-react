@@ -95,7 +95,6 @@ export default function EmailSettingsTabs() {
     }
   };
 
-
   const getEmailSettingsCompany = async () => {
     setIsLoading(true); // Start loading
     setCompanySettings([]);
@@ -116,7 +115,8 @@ export default function EmailSettingsTabs() {
               companyEmailSetting.length > 0 ? companyEmailSetting : []
             );
           }
-        }).catch(async (error: ApiError | any) => {
+        })
+        .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenStatus = await RefreshToken({
               callFunction: getEmailSettingsCompany,
@@ -132,7 +132,6 @@ export default function EmailSettingsTabs() {
       setIsLoading(false); // Stop loading
     }
   };
-
 
   const getEmailSettingsUser = async () => {
     setIsLoading(true); // Start loading
@@ -182,60 +181,77 @@ export default function EmailSettingsTabs() {
     }
   }, [activeTab]);
 
-    const onEmailSettingToggle = async(event : React.ChangeEvent<HTMLInputElement>,setting : CompanyUserEmailSetting | CompanyEmailSetting,isForCompany : boolean) => {
-    const {checked} = event.target;
+  const onEmailSettingToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setting: CompanyUserEmailSetting | CompanyEmailSetting,
+    isForCompany: boolean
+  ) => {
+    const { checked } = event.target;
 
-    if(userHasAccessToUpdateEmailSetting){
+    if (userHasAccessToUpdateEmailSetting) {
       const updateEmailSettingPostData = {
-        company_id : loginStatus.companyId,
-        id : setting.id,
-        email : setting.email,
-        email_password : setting.email_password,
-        smtp_host : setting.smtp_host,
-        smtp_port : setting.smtp_port,
-        email_security_type_id : setting.email_security_type_id,
-        authentication_required : setting.authentication_required,
-        isactive : checked,
-        updatedby_id : loginStatus.id
-      }
+        company_id: loginStatus.companyId,
+        id: setting.id,
+        email: setting.email,
+        email_password: setting.email_password,
+        smtp_host: setting.smtp_host,
+        smtp_port: setting.smtp_port,
+        email_security_type_id: setting.email_security_type_id,
+        authentication_required: setting.authentication_required,
+        isactive: checked,
+        updatedby_id: loginStatus.id,
+      };
 
-      await axios.post(isForCompany ? POST_API.UPDATE_EMAIL_SETTING_COMPANY : POST_API.UPDATE_EMAIL_SETTING_COMPANY_USER,updateEmailSettingPostData,{
-        withCredentials: true
-      }).then((response) => {
-        if(response.status === STATUS_CODE.OK){
-          if(response.data.status){
-            if(isForCompany){
-              setCompanySettings((prev) => 
-          prev.map(item => item.id === setting.id 
-            ? {...item,isactive : checked} 
-          : item ));
-            }
-            else{
-              setUserSettings((prev) => 
-              prev.map(item => item.id === setting.id 
-                ? {...item,isactive : checked} 
-                : item ));
+      await axios
+        .post(
+          isForCompany
+            ? POST_API.UPDATE_EMAIL_SETTING_COMPANY
+            : POST_API.UPDATE_EMAIL_SETTING_COMPANY_USER,
+          updateEmailSettingPostData,
+          {
+            withCredentials: true,
           }
-
+        )
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            if (response.data.status) {
+              if (isForCompany) {
+                setCompanySettings((prev) =>
+                  prev.map((item) =>
+                    item.id === setting.id
+                      ? { ...item, isactive: checked }
+                      : item
+                  )
+                );
+              } else {
+                setUserSettings((prev) =>
+                  prev.map((item) =>
+                    item.id === setting.id
+                      ? { ...item, isactive: checked }
+                      : item
+                  )
+                );
+              }
             }
-          
-          toast.success(response.data.message);
-        }
-        else{
-          toast.error(response.data.message);
-        }
-      }).catch(async(error : ApiError | any) => {
-        if(error.status === STATUS_CODE.UNATHORISED){
-          const refreshTokenStatus = await RefreshToken({callFunctionWithTwoParamsAndEvent : onEmailSettingToggle});
 
-          if(refreshTokenStatus){
-            onEmailSettingToggle(event,setting,isForCompany)
+            toast.success(response.data.message);
+          } else {
+            toast.error(response.data.message);
           }
-        }
-      })
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunctionWithTwoParamsAndEvent: onEmailSettingToggle,
+            });
+
+            if (refreshTokenStatus) {
+              onEmailSettingToggle(event, setting, isForCompany);
+            }
+          }
+        });
     }
-
-  }
+  };
 
   const renderCompanyEmailCard = (
     setting: CompanyEmailSetting,
@@ -266,25 +282,29 @@ export default function EmailSettingsTabs() {
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Company Email:</strong> {setting.email}
+              <strong className="font-semibold">Company Email:</strong>{" "}
+              {setting.email}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <KeyRound className="text-gray-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Email Password:</strong> ********
+              <strong className="font-semibold">Email Password:</strong>{" "}
+              ********
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-green-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">SMTP Host:</strong> {setting.smtp_host}
+              <strong className="font-semibold">SMTP Host:</strong>{" "}
+              {setting.smtp_host}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-purple-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">SMTP Port:</strong> {setting.smtp_port}
+              <strong className="font-semibold">SMTP Port:</strong>{" "}
+              {setting.smtp_port}
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
@@ -307,7 +327,9 @@ export default function EmailSettingsTabs() {
               }`}
             />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Authentication Required:</strong>{" "}
+              <strong className="font-semibold">
+                Authentication Required:
+              </strong>{" "}
               {setting.authentication_required ? "Yes" : "No"}
             </p>
           </div>
@@ -320,46 +342,50 @@ export default function EmailSettingsTabs() {
             <p className="text-gray-700 text-sm">
               <strong className="font-semibold">Active:</strong>
             </p>
-        <label className="inline-flex items-center cursor-pointer relative self-end">
-        <input
-          type="checkbox"
-          className="sr-only peer"
-          checked={setting.isactive}
-          id={setting.id.toString()}
-          onChange={(e) => {
-            onEmailSettingToggle(e,setting,true)
-          }}
-        />
-        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" /> {/* Adjusted size and colors */}
-        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" /> {/* Adjusted size and position */}
-      </label>
+            <label className="inline-flex items-center cursor-pointer relative self-end">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={setting.isactive}
+                id={setting.id.toString()}
+                onChange={(e) => {
+                  onEmailSettingToggle(e, setting, true);
+                }}
+              />
+              <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+              {/* Adjusted size and colors */}
+              <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+              {/* Adjusted size and position */}
+            </label>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Created By:</strong> {setting.createdby}
+              <strong className="font-semibold">Created By:</strong>{" "}
+              {setting.createdby}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Created On:</strong> {setting.createdon}
+              <strong className="font-semibold">Created On:</strong>{" "}
+              {setting.createdon}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Updated By:</strong> {setting.updatedby}
+              <strong className="font-semibold">Updated By:</strong>{" "}
+              {setting.updatedby}
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Updated On:</strong> {setting.updatedon}
+              <strong className="font-semibold">Updated On:</strong>{" "}
+              {setting.updatedon}
             </p>
           </div>
         </div>
       </div>
     </>
   );
-
-
 
   const renderUserEmailCard = (
     setting: CompanyUserEmailSetting,
@@ -391,25 +417,29 @@ export default function EmailSettingsTabs() {
               <div className="flex items-center space-x-2 mb-2">
                 <Mail className="text-blue-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">User Email:</strong> {setting.email}
+                  <strong className="font-semibold">User Email:</strong>{" "}
+                  {setting.email}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <KeyRound className="text-gray-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Email Password:</strong> ********
+                  <strong className="font-semibold">Email Password:</strong>{" "}
+                  ********
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-green-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">SMTP Host:</strong> {setting.smtp_host}
+                  <strong className="font-semibold">SMTP Host:</strong>{" "}
+                  {setting.smtp_host}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-purple-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">SMTP Port:</strong> {setting.smtp_port}
+                  <strong className="font-semibold">SMTP Port:</strong>{" "}
+                  {setting.smtp_port}
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
@@ -432,7 +462,9 @@ export default function EmailSettingsTabs() {
                   }`}
                 />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Authentication Required:</strong>{" "}
+                  <strong className="font-semibold">
+                    Authentication Required:
+                  </strong>{" "}
                   {setting.authentication_required ? "Yes" : "No"}
                 </p>
               </div>
@@ -445,39 +477,47 @@ export default function EmailSettingsTabs() {
                 <p className="text-gray-700 text-sm">
                   <strong className="font-semibold">Active:</strong>
                 </p>
-                <label className="inline-flex items-center cursor-pointer relative self-end"> {/* Align toggle to bottom-right */}
-        <input
-          type="checkbox"
-          className="sr-only peer"
-          checked={setting.isactive}
-          id={setting.id.toString()}
-          onChange={(e) => {
-            onEmailSettingToggle(e,setting,false)
-          }}
-        />
-        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" /> {/* Adjusted size and colors */}
-        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" /> {/* Adjusted size and position */}
-      </label>
+                <label className="inline-flex items-center cursor-pointer relative self-end">
+                  {" "}
+                  {/* Align toggle to bottom-right */}
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={setting.isactive}
+                    id={setting.id.toString()}
+                    onChange={(e) => {
+                      onEmailSettingToggle(e, setting, false);
+                    }}
+                  />
+                  <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                  {/* Adjusted size and colors */}
+                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                  {/* Adjusted size and position */}
+                </label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Created By:</strong> {setting.createdby}
+                  <strong className="font-semibold">Created By:</strong>{" "}
+                  {setting.createdby}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Created On:</strong> {setting.createdon}
+                  <strong className="font-semibold">Created On:</strong>{" "}
+                  {setting.createdon}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Updated By:</strong> {setting.updatedby}
+                  <strong className="font-semibold">Updated By:</strong>{" "}
+                  {setting.updatedby}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Updated On:</strong> {setting.updatedon}
+                  <strong className="font-semibold">Updated On:</strong>{" "}
+                  {setting.updatedon}
                 </p>
               </div>
             </div>
@@ -596,7 +636,6 @@ export default function EmailSettingsTabs() {
                         </Button>
                       </div>
                       <span>No Email Settings For User </span>
-                      
                     </div>
                   )}
                 </div>
