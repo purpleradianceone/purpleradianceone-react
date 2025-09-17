@@ -212,7 +212,7 @@ const AccountTypeSetting: React.FC = () => {
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className="max-w-6xl mx-auto p-1">
         <div className="flex justify-between">
-          <h1 className="text-2xl font-bold text-gray-700 my-3">
+          <h1 className="table-header-custom my-3">
             Company Account Type Management
           </h1>
           {!showAddForm && (
@@ -226,9 +226,9 @@ const AccountTypeSetting: React.FC = () => {
                   );
                 }
               }}
-              className="flex text-sm items-center  m-3 font-medium  bg-blue-600 text-white px-2  rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center m-3 bg-blue-600 px-2 rounded-md action-btn-custom hover:bg-blue-700 transition-colors"
             >
-              <Plus size={18} />
+              <Plus size={18} className="action-btn-custom"/>
               Create
             </Button>
           )}
@@ -263,7 +263,7 @@ const AccountTypeSetting: React.FC = () => {
             
           </h4> */}
           {companyAccountType.length === 0 ? (
-            <p className="text-gray-500 flex items-center justify-center italic text-sm h-56 text-center ">
+            <p className="flex items-center justify-center caption-custom h-56 text-center ">
               No company account types available. Add one to get started.
             </p>
           ) : (
@@ -280,7 +280,7 @@ const AccountTypeSetting: React.FC = () => {
                       className="flex items-center justify-between p-1 cursor-pointer bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
                       onClick={() => toggleParentExpand(parentType)}
                     >
-                      <h3 className="text-md pl-3 font-semibold text-slate-800">
+                      <h3 className="table-header-custom pl-3">
                         {parentType}
                       </h3>
                       <button className=" hidden p-1 rounded-full hover:bg-blue-200 transition-colors">
@@ -334,7 +334,7 @@ const AccountTypeSetting: React.FC = () => {
                         ) : (
                           <h4
                             title={item.companyAccountTypeName}
-                            className="font-semibold hover:bg-gray-00 flex items-center  gap-1 text-gray-900 text-sm    md-2 cursor-pointer "
+                            className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                             onClick={() => {
                               if (userHasAccessToUpdateCompanyAccountType) {
                                 setEditingTypeId(item.id);

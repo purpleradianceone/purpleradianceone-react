@@ -20,7 +20,7 @@ const Dialog: React.FC<{
   !open ? null : (
     <div className="fixed pt-14  inset-0 bg-black bg-opacity-5  flex justify-center items-center overflow-y-auto ">
       <div
-        className="h-10 min-w-[70%] max-w-xl min-h-fit max-h-fit z-50"
+        className="h-10 min-w-[50%] max-w-xl min-h-fit max-h-fit z-50"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -30,7 +30,7 @@ const Dialog: React.FC<{
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white px-4 py-1 rounded min-w-3xl shadow ">{children}</div>;
+}) => <div className="bg-white px-4 py-1 rounded min-w-xl shadow ">{children}</div>;
 
 const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -38,7 +38,7 @@ const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
 
 
 const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="text-lg font-bold">{children}</h2>
+  <h2 className="table-header-custom">{children}</h2>
 );
 
 interface BaseEmailSettings {
@@ -224,7 +224,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   ) => (
     <div className="mb-2">
       {type !== "checkbox" && (
-        <label className="block text-sm font-medium">{label}</label>
+        <label className="block input-label-custom">{label}</label>
       )}
       {type === "select" ? (
         <select
@@ -314,7 +314,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   <span>{isEdit ? "Updating..." : "Creating..."}</span>
                 </div>
               ) : (
-                <span>{isEdit ? "Update" : "Create"}</span>
+                <span>{isEdit ? "Save" : "Save"}</span>
               )}
             </Button>
           </div>
