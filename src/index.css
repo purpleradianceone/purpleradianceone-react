@@ -1,6 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* ===== Grid Container ===== */
 .ag-theme-balham {
@@ -16,9 +18,6 @@
 /* ===== Header ===== */
 .ag-theme-balham .ag-header-cell {
   background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-  color: #1a1a1a;
-  font-weight: 600;
-  font-size: 0.95em;
   text-transform: capitalize;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #ddd;
@@ -26,6 +25,10 @@
   transition: background 0.2s ease-in-out;
   padding: 0px 6px;
   text-align: left;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333333;
 }
 
 .ag-theme-balham .ag-header-cell:hover {
@@ -43,18 +46,22 @@
 /* ===== Cells ===== */
 .ag-theme-balham .ag-cell {
   background-color: #ffffff;
-  color: #333;
+  /* color: #333; */
   border-right: 1px solid #f0f0f0;
   border-bottom: 1px solid #f0f0f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left; /* Always align text left */
-  padding: 0; /* No extra padding */
+  padding: 0.09rem; /* No extra padding */
   margin: 0;
   transition: background-color 0.15s ease-in-out;
-  font-size: 0.9rem;
+  /* font-size: 0.9rem; */
   line-height: 1.6;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333333; margin: 0.05rem;
 }
 /* 
 .ag-theme-balham .ag-cell:hover {
@@ -88,36 +95,38 @@
 
 /* ===== Actions Button ===== */
 .ag-theme-balham .ag-cell-value button {
-  font-size: 0.8rem;
-  border-radius: 6px;
-  padding: 3px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 1px 4px;
+  background: #2563eb;
   color: #fff;
   border: none;
+  margin-bottom: 0.1rem;
   box-shadow: 0 2px 6px rgba(0, 123, 255, 0.25);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 .ag-theme-balham .ag-cell-value button:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
+  background: #1d4ed8;
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
 }
 
 /* ===== Actions Button ===== */
 .ag-theme-balham .ag-cell-value .lead-details {
-  font-size: 0.8rem;
-  border-radius: 6px;
-  padding: 3px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 3px 4px;
+  background: #2563eb;
   color: #fff;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 123, 255, 0.25);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
+  justify-content: center;
 }
 .ag-theme-balham .ag-cell-value .lead-details:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
+  background: #1d4ed8;
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
 }

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { notificationsDesription, STATUS_CODE } from "../../../../constants/AppConstants";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferences";
@@ -16,6 +16,7 @@ interface PreferenceCardProps {
   label: string;
   name: string;
   checked: boolean;
+  description? : string;
   onToggle: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -23,34 +24,18 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
   label,
   name,
   checked,
-  onToggle
+  onToggle,
+  description
 }) => {
   return (
-    // <div className="relative rounded-lg p-6 bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-40">
-    //   <div>
-    //     <h3 className="text-base font-semibold text-gray-900 mb-1">{label}</h3>
-    //   </div>
-
-    //   <label className="inline-flex items-center cursor-pointer relative self-end">
-    //     <input
-    //       type="checkbox"
-    //       className="sr-only peer"
-    //       checked={checked}
-    //       name={name}
-    //       onChange={onToggle}
-    //     />
-    //     <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-    //     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-    //   </label>
-    // </div>
-    <div className="relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-28">
+    <div className={`relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between ${description ? "h-36 gap-0" : "h-28"}`}>
       <div>
-        <h3 className="text-base font-semibold text-gray-900 mb-1"> {/* Increased font size and weight */}
+        <h3 className="table-data-custom">
           {label}
         </h3>
       </div>
-
-      <label className="inline-flex items-center cursor-pointer relative self-end"> {/* Align toggle to bottom-right */}
+<p className="caption-custom m-0 p-0">{description}</p>
+      <label className="inline-flex items-center cursor-pointer relative self-end"> 
         <input
           type="checkbox"
           className="sr-only peer"
@@ -58,8 +43,8 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
           name={name}
           onChange={onToggle}
         />
-        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" /> {/* Adjusted size and colors */}
-        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" /> {/* Adjusted size and position */}
+        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
       </label>
     </div>
   );
@@ -119,7 +104,6 @@ function CompanyPreferenceSetting() {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, checked } = event.target;
-    setIsLoading(true);
 
     const updatedPreferences = {
       ...companyPreferences,
@@ -159,11 +143,7 @@ function CompanyPreferenceSetting() {
         if (refreshTokenStatus) {
           handleCompanyPreferenceCheckboxChange(event);
         }
-      } else {
-        toast.error("Failed to update preference.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -172,11 +152,22 @@ function CompanyPreferenceSetting() {
   }, []);
 
  
+  const getDescription = (preferenceId : number,isActive : boolean) => {
+    if(preferenceId === 1){
+      return isActive ? notificationsDesription.active.emailNotifications : notificationsDesription.inactive.emailNotifications;
+    }
+    else if(preferenceId === 2){
+      return isActive ? notificationsDesription.active.mobileAppNotifications : notificationsDesription.inactive.mobileAppNotifications;
+    }
+    else if(preferenceId === 3){
+      return isActive ? notificationsDesription.active.webAppNotifications : notificationsDesription.inactive.webAppNotifications;
+    }
+  }
 
   return (
     <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="table-data-custom mt-2">
           Manage your company's default settings and services.
         </p>
       </div>
@@ -193,18 +184,21 @@ function CompanyPreferenceSetting() {
                 name="isEmailServiceOn"
                 checked={companyPreferences.isEmailServiceOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
+                description={getDescription(1,companyPreferences.isEmailServiceOn)}
               />
               <PreferenceCard
                 label="Mobile App Notifications"
                 name="isNotificationServiceMobileOn"
                 checked={companyPreferences.isNotificationServiceMobileOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
+                description={getDescription(2,companyPreferences.isNotificationServiceMobileOn)}
               />
               <PreferenceCard
                 label="Web App Notifications"
                 name="isNotificatonServiceWebOn"
                 checked={companyPreferences.isNotificatonServiceWebOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
+                description={getDescription(3,companyPreferences.isNotificatonServiceWebOn)}
               />
             </>
           )}

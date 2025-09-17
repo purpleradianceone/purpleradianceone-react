@@ -28,7 +28,8 @@ export const TAX_CODE = {
     leadAssigned: "Sends an email from the company's email to the user assigned to the lead.",
     leadStatusChanged: "Sends an email from the company's email to notify relevant users when the status of a lead changes.",
     companyUserAssignedToCompanyProduct: "Sends an email to a user from the company's email when they're assigned to a product.",
-    companyUserAssignedToCompanyTeam: "Sends an email to a user from the company's email when they're assigned to a team."
+    companyUserAssignedToCompanyTeam: "Sends an email to a user from the company's email when they're assigned to a team.",
+    newAccountCreated: "Sends an email to the customer from the company's email when a new account is created.",
   },
   inactive: {
     welcomeCompanyUser: "A welcome email is sent to new users from individual users email.",
@@ -36,9 +37,37 @@ export const TAX_CODE = {
     leadAssigned: "An email is sent from individual users email when a lead is assigned.",
     leadStatusChanged: "Emails are sent from individual users email when lead statuses change.",
     companyUserAssignedToCompanyProduct: "An email is sent from individual users email to a user when they're assigned to a product.",
-    companyUserAssignedToCompanyTeam: "An email is sent from individual users email to a user when they're assigned to a team."
+    companyUserAssignedToCompanyTeam: "An email is sent from individual users email to a user when they're assigned to a team.",
+    newAccountCreated: "An email is sent from the individual user's email to notify customer of a newly created account.",
   }
 };
+
+export const leadSettingDescriptions = {
+  active: {
+    leadsAreVisibleToProductUsers: "This setting is automatically applied to new leads for the product users.",
+    leadsAreVisibleToProductTeams: "This setting is automatically applied to new leads for the product team.",
+    leadsAreVisibleToLeadTeams: "This setting is automatically applied to new leads for the lead team."
+  },
+  inactive: {
+    leadsAreVisibleToProductUsers: "This setting is not applied to new leads by default.",
+    leadsAreVisibleToProductTeams: "This setting is not applied to new leads by default.",
+    leadsAreVisibleToLeadTeams: "This setting is not applied to new leads by default."
+  }
+};
+
+export const notificationsDesription = {
+  active: {
+    emailNotifications: "Email notifications are enabled. All new email notifications will be sent to the configured email address.",
+    webAppNotifications: "Web app notifications are enabled. You will receive real-time alerts within the web application.",
+    mobileAppNotifications: "Mobile app notifications are enabled. You will receive push notifications on your mobile device."
+  },
+  inactive: {
+    emailNotifications: "Email notifications are disabled. You will not receive any new email notifications via email.",
+    webAppNotifications: "Web app notifications are disabled. You will not receive any new alerts within the application.",
+    mobileAppNotifications: "Mobile app notifications are disabled. You will not receive any push notifications on your mobile device."
+  }
+};
+
 
 export const  SUBSCRIPTION = {
     RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
