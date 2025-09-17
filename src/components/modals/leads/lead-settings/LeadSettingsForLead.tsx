@@ -134,7 +134,7 @@ function LeadSettingForLead({
 
   if (!isOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 p-5 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 p-5 flex items-center justify-center bg-black bg-opacity-5  animate-fadeIn">
       <div
         className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
         [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronLeft, History, Plus, Settings, X } from "lucide-react";
+import { ChevronLeft, Handshake, History, Pen, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -675,10 +675,10 @@ const ViewLeadManagement = () => {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         {/* Header */}
-        <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 px-1 ">
+        <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
           <div className="flex gap-6">
             <button
-              className="flex items-center  text-sm text-gray-600 hover:text-blue-600 transition"
+              className="flex items-center  text-xs text-gray-600 hover:text-blue-600 transition"
               onClick={() => {
                 navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
               }}
@@ -686,40 +686,6 @@ const ViewLeadManagement = () => {
               <ChevronLeft size={18} />
               <span>Leads</span>
             </button>
-            <div className="py-1">
-              <div
-                title={
-                  userHasAccessToUpdateLead
-                    ? ""
-                    : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
-                }
-                className="text-lg font-semibold"
-                onClick={() => {
-                  if (!userHasAccessToUpdateLead) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
-                    );
-                  }
-                }}
-              >
-                <Detail
-                  label="Name"
-                  hasBorder={true}
-                  type={userHasAccessToUpdateLead ? "text" : "none"}
-                  value={selectedLeadData?.name}
-                  onChange={(e) => {
-                    setSelectedLeadData({
-                      ...selectedLeadData,
-                      name: e.target.value,
-                    });
-                    // }
-                  }}
-                  handleLeadInfoSave={handleLeadInfoSave}
-                />
-              </div>
-            </div>
           </div>
 
           {/**Add Setting in lead details page here  */}
@@ -737,10 +703,10 @@ const ViewLeadManagement = () => {
                     );
                   }
                 }}
-                className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
+                className="px-1 py-0.5 text-xs flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
               >
                 <Settings size={12} />
-                <span>Settings</span>
+                <span>Lead setting</span>
               </button>
               {isLeadSettingModalOpen && (
                 <LeadSettingForLead
@@ -785,173 +751,13 @@ const ViewLeadManagement = () => {
               Edit
             </button>
           </div>
-          <Detail
-            type="none"
-            label="Created on"
-            value={selectedLeadData?.createdOn}
-          />
-        </div>
-
-        {/* Lead Basic Info */}
-        <div className="w-full flex ">
-          <div className="mx-3 flex justify-between w-full    whitespace-nowrap overflow-auto">
-            <div
-              onClick={() => {
-                if (!userHasAccessToUpdateLead) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-                  );
-                }
-              }}
-              title={
-                userHasAccessToUpdateLead
-                  ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-              }
-            >
-              <Detail
-                hasBorder={true}
-                label="Email"
-                type={userHasAccessToUpdateLead ? "text" : "none"}
-                value={selectedLeadData?.email}
-                onChange={(e) => {
-                  setSelectedLeadData({
-                    ...selectedLeadData,
-                    email: e.target.value.trim(),
-                  });
-                }}
-                handleLeadInfoSave={handleLeadInfoSave}
-              />
-            </div>
-            <div
-              onClick={() => {
-                if (!userHasAccessToUpdateLead) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-                  );
-                }
-              }}
-              title={
-                userHasAccessToUpdateLead
-                  ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-              }
-            >
-              <Detail
-                label="Mobile number"
-                hasBorder={true}
-                type={userHasAccessToUpdateLead ? "text" : "none"}
-                value={selectedLeadData?.mobileNumber}
-                onChange={(e) => {
-                  setSelectedLeadData({
-                    ...selectedLeadData,
-                    mobileNumber: e.target.value,
-                  });
-                }}
-                handleLeadInfoSave={handleLeadInfoSave}
-              />
-            </div>
-            <Detail
-              type="none"
-              label="Lead source"
-              value={selectedLeadData?.leadSource}
-            />
-            <Detail
-              type="none"
-              label="Created by"
-              value={selectedLeadData?.createdBy}
-            />
-            <div
-              className="flex"
-              title={
-                userHasAccessToUpdateLead
-                  ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-              }
-              onClick={() => {
-                if (!userHasAccessToUpdateLead) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-                  );
-                }
-              }}
-            >
-              <div className="relative">
-
-              <Detail
-                label="Lead owner"
-                hasBorder={true}
-                type={userHasAccessToUpdateLead ? "select" : "none"}
-                value={selectedLeadData?.leadOwner}
-                handleClickLeadOwnerChange={handleClickLeadOwnerChange}
-                />
-                </div>
-
-              <button
-              title="Lead owner history"
-              className="absolute right-4 text-xs flex items-center mt-1 hover:text-gray-900 text-gray-500" 
-                onClick={() => {
-                  setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
-                }}
-              >
-               <History size={12} className="mt-0" />
-              </button>
-            </div>
-          </div>
-          {reasonInputBoxOpenForLeadOwner && (
-            <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm text-gray-700 font-medium">
-                    Reason (Optional)
-                  </label>
-                  <textarea
-                    rows={7}
-                    placeholder="Enter reason for lead owner update"
-                    className="border rounded  p-1 text-sm"
-                    value={reasonTextForLeadOwnerChange}
-                    onChange={(e) =>
-                      setReasonTextForLeadOwnerChange(e.target.value)
-                    }
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded self-end"
-                      onClick={() => {
-                        handleLeadOwnerChange();
-                      }}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Lead Status Section */}
-        <div className="m-3 mt-2 pl-1 flex  bg-slate-100 flex-col shadow-md rounded-md">
-          <div className="flex justify-between text-xs  mb-1 px-2">
-            <span className="font-semibold ">Lead Status</span>
-            <button
-              onClick={() => {
-                setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
-              }}
-            >
-              <span className="border-b flex items-center gap-1 text-gray-500 hover:text-gray-950 hover:border-b-black">
-                Status history
-                <History size={12} className="mt-0" />
-              </span>
-            </button>
-          </div>
-          <div className="flex border rounded-r-full mb-0.5  bg-white">
+        <div className="mx-2 mt-2   flex  bg-slate-100  shadow rounded-sm">
+          
+          <div  className="flex w-full">
+            <div className="flex w-[100%] border rounded-r-full   bg-white">
             {leadStatus!.map((item: any) => (
               <button
                 title={item.name}
@@ -974,12 +780,6 @@ const ViewLeadManagement = () => {
                     setReasonInputBoxOpen(true);
                     setSelectedStatusId(item.id);
                   } else {
-                    // showMessageSnackbar({
-                    //   message:
-                    //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    //       .UPDATE_LEAD_ACCESS_DENIED_message,
-                    //   type: "error",
-                    // });
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
                         .UPDATE_LEAD_ACCESS_DENIED_message
@@ -990,22 +790,41 @@ const ViewLeadManagement = () => {
                 {item.name}
               </button>
             ))}
+            
+          </div>
+          {/* status history */}
+          <div className="flex justify-end text-xs  mb-1 px-2">
+            {/* <span className="font-semibold ">Lead Status</span> */}
+            <button
+              onClick={() => {
+                setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+              }}
+            >
+              <span
+                title="Status history"
+                className="border-b flex items-center gap-1 text-gray-500 hover:text-gray-950 hover:border-b-black"
+              >
+                history
+                <History size={12} className="mt-0" />
+              </span>
+            </button>
+          </div>
           </div>
 
           {reasonInputBoxOpen && (
-            <div className="  flex m-1  gap-1">
+            <div className="  flex m-1 w-full pr-40   gap-1">
               <label className="text-xs text-gray-600 font-medium">
                 Reason (Optional)
               </label>
               <input
                 type="text"
                 placeholder="Enter reason for status update"
-                className="border rounded px-3  text-sm"
+                className="border rounded px-3  w-full  text-sm"
                 value={reasonText}
                 onChange={(e) => setReasonText(e.target.value)}
               />
               <button
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-0.5 rounded w-fit"
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4  rounded w-fit"
                 onClick={handleSaveStatusUpdate}
               >
                 Save
@@ -1017,7 +836,193 @@ const ViewLeadManagement = () => {
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 p-2">
           {/* Column 1 */}
-          <div className="w-full md:w-1/2 flex flex-col gap-4">
+          <div className="w-full md:w-1/2 flex flex-col gap-2">
+            {/* Lead Basic Info */}
+            <div className=" flex   shadow-sm border rounded-sm p-1  ">
+              <div className="mx-1 grid md:grid-cols-3 bg-pink-00 sm:grid-cols-1  gap-2  w-full    whitespace-nowrap overflow-auto">
+                <div className=" flex items-center gap-3 col-span-3  ">
+                 <div className="bg-blue-600  p-2 rounded text-white">
+                   <Handshake  size={30}/>
+                 </div>
+                  <div
+                    title={
+                      userHasAccessToUpdateLead
+                        ? ""
+                        : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message
+                    }
+                    className="text-lg font-semibold"
+                    onClick={() => {
+                      if (!userHasAccessToUpdateLead) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message
+                        );
+                      }
+                    }}
+                  >
+                    <Detail
+                      label="Name"
+                      // hasBorder={true}
+                      type={userHasAccessToUpdateLead ? "text" : "none"}
+                      value={selectedLeadData?.name}
+                      onChange={(e) => {
+                        setSelectedLeadData({
+                          ...selectedLeadData,
+                          name: e.target.value,
+                        });
+                        // }
+                      }}
+                      handleLeadInfoSave={handleLeadInfoSave}
+                    />
+                  </div>
+                </div>
+                <div
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                >
+                  <Detail
+                    // hasBorder={true}
+                    label="Email"
+                    type={userHasAccessToUpdateLead ? "text" : "none"}
+                    value={selectedLeadData?.email}
+                    onChange={(e) => {
+                      setSelectedLeadData({
+                        ...selectedLeadData,
+                        email: e.target.value.trim(),
+                      });
+                    }}
+                    handleLeadInfoSave={handleLeadInfoSave}
+                  />
+                </div>
+
+                <div
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                >
+                  <Detail
+                    label="Mobile number"
+                    // hasBorder={true}
+                    type={userHasAccessToUpdateLead ? "text" : "none"}
+                    value={selectedLeadData?.mobileNumber}
+                    onChange={(e) => {
+                      setSelectedLeadData({
+                        ...selectedLeadData,
+                        mobileNumber: e.target.value,
+                      });
+                    }}
+                    handleLeadInfoSave={handleLeadInfoSave}
+                  />
+                </div>
+                <Detail
+                  type="none"
+                  label="Lead source"
+                  value={selectedLeadData?.leadSource}
+                />
+                <Detail
+                  type="none"
+                  label="Created on"
+                  value={selectedLeadData?.createdOn}
+                />
+                <Detail
+                  type="none"
+                  label="Created by"
+                  value={selectedLeadData?.createdBy}
+                />
+                <div
+                  className="flex"
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                >
+                  <div className="flex relative ">
+                    <Detail
+                      label="Lead owner"
+                      hasBorder={true}
+                      type={userHasAccessToUpdateLead ? "select" : "none"}
+                      value={selectedLeadData?.leadOwner}
+                      handleClickLeadOwnerChange={handleClickLeadOwnerChange}
+                    />
+                     <button
+                    title="Lead owner history"
+                    className="absolute left-24   text-xs flex items-center mt-1 hover:text-gray-900 text-gray-500"
+                    onClick={() => {
+                      setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+                    }}
+                  >
+                    <History size={12} className="mt-0" />
+                  </button>
+                  </div>
+
+                 
+                </div>
+              </div>
+              {reasonInputBoxOpenForLeadOwner && (
+                <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm text-gray-700 font-medium">
+                        Reason (Optional)
+                      </label>
+                      <textarea
+                        rows={7}
+                        placeholder="Enter reason for lead owner update"
+                        className="border rounded  p-1 text-sm"
+                        value={reasonTextForLeadOwnerChange}
+                        onChange={(e) =>
+                          setReasonTextForLeadOwnerChange(e.target.value)
+                        }
+                      />
+                      <div className="flex justify-end">
+                        <button
+                          className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded self-end"
+                          onClick={() => {
+                            handleLeadOwnerChange();
+                          }}
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             {/* Lead Details */}
             <div className="shadow-md rounded-sm">
               <LeadDetails
@@ -1044,7 +1049,7 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Column 2 */}
-          <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-lg ">
+          <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-sm">
             {/* Meeting / Contact / Span Tabs */}
             <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
               <span
@@ -1138,26 +1143,6 @@ const ViewLeadManagement = () => {
               </div>
             </div>
             {/* Activity */}
-            {/* <div className="border p-4 bg-white shadow-sm rounded">
-            <div className=" top-0 bg-slate-100 font-sans text-sm font-semibold">
-              Activity
-            </div>
-            <div className="pl-1 space-y-1">
-              {activityData.map((item: activity, index: number) => (
-                <div key={index}>
-                  <span className="text-sm font-semibold">
-                    <ArrowBigRightDash
-                      size={12}
-                      className="inline-block mr-1"
-                    />
-                    {item.person}
-                  </span>{" "}
-                  <span>➡️</span> <span className="text-xs">{item.work}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
-            {}
             <LeadTasksModal
               ownerId={selectedLeadData.companyUserId}
             ></LeadTasksModal>
@@ -1280,7 +1265,7 @@ const Detail: React.FC<DetailProps> = ({
     const trimmedValue = value.trim();
     // Step 1: Check if value changed
     if (trimmedValue === prevValueRef.current) {
-      toast.error(MESSAGE.ERROR.NO_CHANGES);
+      // toast.error(MESSAGE.ERROR.NO_CHANGES);
       return; // No changes made, do nothing
     }
 
@@ -1352,7 +1337,7 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-sm text-gray-700 border border-gray-400 rounded-sm  p-0 m-0  focus:outline-none focus:ring-0 w-auto"
+              className="text-sm text-gray-700 border border-gray-400 rounded-sm  p-0 m-0 w-44 focus:outline-none focus:ring-0 "
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1365,7 +1350,7 @@ const Detail: React.FC<DetailProps> = ({
       ) : type === "none" ? (
         <div>
           <p
-            className={`  font-medium text-sm   text-gray-800 whitespace-nowrap overflow-x-auto text-clip`}
+            className={`  font-medium text-sm   text-gray-800 whitespace-nowrap overflow-x-hidden text-clip`}
           >
             {value ? (
               <span
@@ -1413,24 +1398,28 @@ const Detail: React.FC<DetailProps> = ({
       ) : (
         <div
           title={value ?? "Enter value "}
-          className={`font-medium ${
+          className={`font-semibold text-gray-900  flex items-center  justify-between ${
             label === "Name"
-              ? "text-sm text-black border-gray-200 "
-              : "text-sm md:whitespace-nowrap md:overflow-hidden text-gray-900"
-          }   whitespace-nowrap overflow-hidden ${
-            hasBorder ? "border rounded-md px-1 border-gray-100 " : ""
+              ? "text-md p-0 font-bold border-gray-200 "
+              : "text-sm  text-gray-900"
+          }   truncate overflow-hidden ${
+            hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
           }   cursor-pointer`}
           onClick={handleClick}
         >
           {value ? (
-            value
+
+            <>
+            {value}
+            </>
           ) : (
             <>
-              <span className="text-gray-400 font-normal text-xs italic">
-                Add here...
+              <span className="text-gray-500 p-1 flex items-center justify-between font-normal text-xs italic">
+                Add here... 
               </span>
             </>
           )}
+          <Pen size={12} className="text-gray-400 "/>
         </div>
       )}
     </div>
