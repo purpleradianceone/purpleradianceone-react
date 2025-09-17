@@ -501,7 +501,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3 ">
+                  <div className="grid grid-cols-2 gap-3">
                     <CustomDropdown
                       labelName="Warranty Duration"
                       preselectedOption={
