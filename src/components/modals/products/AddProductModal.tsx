@@ -290,7 +290,7 @@ function AddProductModal({
                   placeholder="Product URL"
                   onChange={handleAddProductFormDataChange}
                   onBlur={handleBlur}
-                  error={errors.code}
+                  error={errors.url}
                 />
                 <FormInput
                   label="Version :"

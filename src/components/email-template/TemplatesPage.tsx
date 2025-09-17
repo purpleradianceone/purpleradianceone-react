@@ -602,7 +602,7 @@ const Tabs: React.FC<TabsProps> = ({
   onTabChange,
   templateTypes,
 }) => (
-  <div className="sticky top-0 bg-white overflow-x-auto scrollbar-hide">
+  <div className="sticky top-0 mb-1 bg-white overflow-x-auto scrollbar-hide">
     <div className="flex flex-nowrap text-xs">
       {templateTypes.map((tab) => (
         <button
@@ -931,10 +931,14 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchTypes = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.post(
+    fetchTypes();
+  }, [loginStatus.companyId, loginStatus.id]);
+
+  const fetchTypes = async () => {
+    setLoading(true);
+    try {
+      await axios
+        .post(
           POST_API.GET_EMAIL_TYPE,
           {
             company_id: loginStatus.companyId,
@@ -942,41 +946,42 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
             is_host_email: false,
           },
           { withCredentials: true }
-        );
-        if (response.status === STATUS_CODE.OK) {
-          const activeTypes = response.data.filter(
-            (type: TemplateType) => type.isactive
-          );
-          setTemplateTypes(activeTypes);
-          // Optional: If you want to pre-select the first active type, uncomment the line below.
-          // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
-          // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
-        }
-        if (response.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithParamsNotEvent: fetchTypes,
-          });
-          if (refreshTokenResponse) {
-            fetchTypes();
+        )
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            const activeTypes = response.data.filter(
+              (type: TemplateType) => type.isactive
+            );
+            setTemplateTypes(activeTypes);
+            // Optional: If you want to pre-select the first active type, uncomment the line below.
+            // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
+            // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
           }
-        }
-      } catch (error: ApiError | any) {
-        console.error("Error fetching template types for modal:", error);
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunctionWithParamsNotEvent: fetchTypes,
-          });
-          if (refreshTokenStatus) {
-            fetchTypes();
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: fetchTypes,
+            });
+            if (refreshTokenResponse) {
+              fetchTypes();
+            }
           }
+        });
+    } catch (error: ApiError | any) {
+      console.error("Error fetching template types for modal:", error);
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchTypes,
+        });
+        if (refreshTokenStatus) {
+          fetchTypes();
         }
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchTypes();
-  }, [loginStatus.companyId, loginStatus.id]);
-
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleSubmit = () => {
     if (selectedTypeId) {
       // This check ensures selectedTypeId is not an empty string
