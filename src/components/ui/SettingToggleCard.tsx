@@ -13,11 +13,11 @@ const SettingToggleCard: React.FC<SettingToggleCardProps> = ({ setting, onToggle
   return (
     <div className={`relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between ${description ? "h-36 gap-0" : "h-28"}`}>
       <div>
-        <h3 className="text-sm font-semibold text-gray-900">
+        <h3 className="table-data-custom">
           {setting.name}
         </h3>
       </div>
-<p className=" text-[11px] font-normal m-0 p-0">{description}</p>
+<p className="caption-custom m-0 p-0">{description}</p>
       <label className="inline-flex items-center cursor-pointer relative self-end"> 
         <input
           type="checkbox"

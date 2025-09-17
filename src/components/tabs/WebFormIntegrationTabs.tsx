@@ -11,20 +11,21 @@ import ProductFormIntegration from "../views/settings/web-form-integration/Produ
 import CompanySecret from "../../@types/settings/CompanySecret";
 
 function WebFormIntegrationTabs({
-    companySecretList,
-    handleCompanySecretChange
-} : {
-    companySecretList : CompanySecret[];
-    handleCompanySecretChange : () => void;
+  companySecretList,
+  handleCompanySecretChange,
+}: {
+  companySecretList: CompanySecret[];
+  handleCompanySecretChange: () => void;
 }) {
   const [activeTab, setActiveTab] = useState("lead");
-  const data = [{
+  const data = [
+    {
       label: "Lead",
       value: "lead",
       desc: (
-        <LeadFormIntegration 
-        companySecretList={companySecretList}
-        handleCompanySecretChange={handleCompanySecretChange}
+        <LeadFormIntegration
+          companySecretList={companySecretList}
+          handleCompanySecretChange={handleCompanySecretChange}
         />
       ),
     },
@@ -33,8 +34,8 @@ function WebFormIntegrationTabs({
       value: "product",
       desc: (
         <ProductFormIntegration
-        companySecretList={companySecretList}
-        handleCompanySecretChange={handleCompanySecretChange}
+          companySecretList={companySecretList}
+          handleCompanySecretChange={handleCompanySecretChange}
         />
       ),
     },
@@ -48,10 +49,10 @@ function WebFormIntegrationTabs({
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50  text-gray-400 text-sm font-medium  bg-transparent p-0 hover:text-gray-500"
+            className="rounded-none border-b border-gray-400  bg-transparent p-0"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-500 text-gray-600 text-sm font-medium shadow-none rounded-none",
+                "bg-transparent border-b-2 border-teal-600 shadow-none rounded-none",
             }}
             onResize={undefined}
             onResizeCapture={undefined}
@@ -69,7 +70,12 @@ function WebFormIntegrationTabs({
                   setActiveTab(value);
                 }}
                 className={
-                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  // activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  //     activeTab === value ? "border-teal-600 text-teal-600"
+                  // : "border-transparent text-gray-600 hover:text-gray-500"
+                  activeTab === value
+                    ? "text-teal-600 text-sm font-semibold "
+                    : "border-transparent text-sm font-semibold text-gray-600 hover:text-gray-500"
                 }
               >
                 {label}
@@ -87,14 +93,12 @@ function WebFormIntegrationTabs({
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            {companySecretList && 
-            data.map(({ value, desc }) => (
-              <TabPanel key={value} value={value}>
-                {desc}
-              </TabPanel>
-            ))}
-            
-            
+            {companySecretList &&
+              data.map(({ value, desc }) => (
+                <TabPanel key={value} value={value}>
+                  {desc}
+                </TabPanel>
+              ))}
           </TabsBody>
         </div>
       </Tabs>
