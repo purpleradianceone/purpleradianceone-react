@@ -764,11 +764,12 @@ const TemplateList: React.FC<TemplateListProps> = ({
               </div>
             </div>
 
-            {/* Statuses with Toggles */}
-            <div className="flex  items-center justify-between col-span-2 space-y-2   text-sm text-gray-700">
-              <div className="flex flex-col  space-y-3 -mt-4  text-sm text-gray-700">
+            <div className="flex  items-center justify-between col-span-2    text-sm text-gray-700">
+            {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
+
+              <div className="flex flex-col col-span-1 text-sm text-gray-700">
                 {/* Active */}
-                <span className="flex items-center  justify-between gap-2">
+                <span className="flex items-center mb-2 justify-between gap-2">
                   {template.isactive ? (
                     <CheckCircle className="text-green-500" size={16} />
                   ) : (
@@ -812,7 +813,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 </span>
 
                 {/* Default */}
-                <span className="flex items-center justify-between gap-2">
+                <span className="flex items-center mb-2 justify-between gap-2">
                   {template.is_default ? (
                     <Star className="text-yellow-500" size={16} />
                   ) : (
@@ -827,6 +828,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       checked={template.is_default}
                       id={`default-${template.id}`}
                       onChange={() => {
+                        if(template.isactive){
                         if (!template.is_default) {
                           if (userHasAccessToUpdateEmailTemplateSetting) {
                             template.is_default = !template.is_default;
@@ -839,6 +841,9 @@ const TemplateList: React.FC<TemplateListProps> = ({
                             "To remove this as the default, please set another template as default first."
                           );
                         }
+                      }else{
+                        toast.error("Set this template as active to make it your default email template.")
+                      }
                       }}
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
@@ -847,7 +852,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 </span>
 
                 {/* Master (readonly toggle → disabled) */}
-                <span className="flex items-center gap-2">
+                <span className="flex items-center mb-2 gap-2">
                   {template.is_master ? (
                     <Star className="text-purple-500" size={16} />
                   ) : (
@@ -858,10 +863,8 @@ const TemplateList: React.FC<TemplateListProps> = ({
                 </span>
               </div>
 
-              {/* Footer with Meta data info */}
-              <div className="flex justify-between text-sm text-gray-600">
-                <div className="bg-blue-50 px-3 py-2 rounded-md">
-                  <p className="font-medium text-blue-800">Meta Data:</p>
+              <div className="flex justify-between text-sm text-gray-600 -mt-3">
+                <div className="px-3 rounded-md">
                   <p>
                     <strong>Created By:</strong> {template.createdby}
                   </p>
