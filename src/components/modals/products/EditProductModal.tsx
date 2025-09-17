@@ -437,7 +437,7 @@ function EditCompanyProductModal({
                     placeholder="Product URL"
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    error={errors.code}
+                    error={errors.url}
                   />
 
                   <FormInput
