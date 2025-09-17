@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useLoggedInUserContext } from '../../../../context/user/LoggedInUserContext';
 import POST_API from '../../../../constants/PostApi';
-import { STATUS_CODE } from '../../../../constants/AppConstants';
+import { leadSettingDescriptions, STATUS_CODE } from '../../../../constants/AppConstants';
 import RefreshToken from '../../../../config/validations/RefreshToken';
 import CompanyLeadSettingType from '../../../../@types/settings/CompanyLeadSettings';
 import { useGoogleMeetStatus } from '../../../../config/hooks/useGoogleMeetStatus';
@@ -105,10 +105,22 @@ const LeadSetting: React.FC = () => {
     }
   };
 
+  const getDescription = (setting : CompanyLeadSettingType) => {
+    if(setting.leadSettingMasterId === 1){
+      return setting.isActive ? leadSettingDescriptions.active.leadsAreVisibleToProductUsers : leadSettingDescriptions.inactive.leadsAreVisibleToProductUsers;
+    }
+    else if(setting.leadSettingMasterId === 2){
+      return setting.isActive ? leadSettingDescriptions.active.leadsAreVisibleToProductTeams : leadSettingDescriptions.inactive.leadsAreVisibleToProductTeams;
+    }
+    else if(setting.leadSettingMasterId === 3){
+      return setting.isActive ? leadSettingDescriptions.active.leadsAreVisibleToLeadTeams : leadSettingDescriptions.inactive.leadsAreVisibleToLeadTeams;
+    }
+  }
+
   return (
     <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
-        <p className="text-sm text-gray-500 mt-2">Manage your company's lead-related configurations.</p>
+        <p className="table-data-custom mt-2">Manage your company's lead-related configurations.</p>
       </div>
       {isLoading ? (
         <div className="flex justify-center items-center mt-20">
@@ -117,8 +129,9 @@ const LeadSetting: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {leadSetting.map((per) => (
-            <SettingToggleCard key={per.id} setting={per} onToggle={handleLeadSettingCheckBoxChange} />
+            <SettingToggleCard key={per.id} setting={per} onToggle={handleLeadSettingCheckBoxChange} description={getDescription(per)} />
           ))}
+          
         </div>
       )}
     </div>

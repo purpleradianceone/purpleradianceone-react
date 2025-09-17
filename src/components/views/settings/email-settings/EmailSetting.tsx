@@ -265,7 +265,7 @@ export default function EmailSettingsTabs() {
         >
           <Button
             disabled={!userHasAccessToUpdateEmailSetting}
-            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
+            className="absolute top-4 right-4 bg-blue-600 action-btn-custom px-3 py-1 rounded hover:bg-blue-700 shadow-sm"
             onClick={() => {
               if (userHasAccessToUpdateEmailSetting) {
                 setModalType("company");
@@ -282,40 +282,38 @@ export default function EmailSettingsTabs() {
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Company Email:</strong>{" "}
-              {setting.email}
+              <strong className="input-label-custom">Company Email:</strong> <span className="caption-custom">{setting.email}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <KeyRound className="text-gray-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Email Password:</strong>{" "}
-              ********
+              <strong className="input-label-custom">Email Password:</strong> <span className="caption-custom">********</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-green-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">SMTP Host:</strong>{" "}
-              {setting.smtp_host}
+              <strong className="input-label-custom">SMTP Host:</strong> <span className="caption-custom">{setting.smtp_host}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-purple-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">SMTP Port:</strong>{" "}
-              {setting.smtp_port}
+              <strong className="input-label-custom">SMTP Port:</strong> <span className="caption-custom">{setting.smtp_port}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Lock className="text-orange-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Security Type:</strong>{" "}
+              <strong className="input-label-custom">Security Type:</strong>{" "}
+              <span className="caption-custom">
               {setting.email_security_type_id === 1
                 ? "SSL"
                 : setting.email_security_type_id === 2
                 ? "TLS"
                 : "Unknown"}
+                </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
@@ -327,10 +325,8 @@ export default function EmailSettingsTabs() {
               }`}
             />
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">
-                Authentication Required:
-              </strong>{" "}
-              {setting.authentication_required ? "Yes" : "No"}
+              <strong className="input-label-custom">Authentication Required:</strong>{" "}
+               <span className="caption-custom">{setting.authentication_required ? "Yes" : "No"}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-4">
@@ -340,7 +336,7 @@ export default function EmailSettingsTabs() {
               <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
             )}
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Active:</strong>
+              <strong className="input-label-custom">Active:</strong>
             </p>
             <label className="inline-flex items-center cursor-pointer relative self-end">
               <input
@@ -360,26 +356,22 @@ export default function EmailSettingsTabs() {
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Created By:</strong>{" "}
-              {setting.createdby}
+              <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{setting.createdby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Created On:</strong>{" "}
-              {setting.createdon}
+              <strong className="input-label-custom">Created On:</strong> <span className="caption-custom">{setting.createdon}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Updated By:</strong>{" "}
-              {setting.updatedby}
+              <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{setting.updatedby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="font-semibold">Updated On:</strong>{" "}
-              {setting.updatedon}
+              <strong className="input-label-custom">Updated On:</strong> <span className="caption-custom">{setting.updatedon}</span>
             </p>
           </div>
         </div>
@@ -401,7 +393,7 @@ export default function EmailSettingsTabs() {
             >
               <Button
                 disabled={!userHasAccessToUpdateEmailSetting}
-                className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
+                className="absolute top-4 right-4 bg-blue-600 action-btn-custom px-3 py-1 rounded hover:bg-blue-700 shadow-sm"
                 onClick={() => {
                   if (userHasAccessToUpdateEmailSetting) {
                     setModalType("user");
@@ -417,40 +409,38 @@ export default function EmailSettingsTabs() {
               <div className="flex items-center space-x-2 mb-2">
                 <Mail className="text-blue-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">User Email:</strong>{" "}
-                  {setting.email}
+                  <strong className="input-label-custom">User Email:</strong> <span className="caption-custom">{setting.email}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <KeyRound className="text-gray-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Email Password:</strong>{" "}
-                  ********
+                  <strong className="input-label-custom">Email Password:</strong> <span className="caption-custom">********</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-green-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">SMTP Host:</strong>{" "}
-                  {setting.smtp_host}
+                  <strong className="input-label-custom">SMTP Host:</strong> <span className="caption-custom">{setting.smtp_host}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-purple-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">SMTP Port:</strong>{" "}
-                  {setting.smtp_port}
+                  <strong className="input-label-custom">SMTP Port:</strong> <span className="caption-custom">{setting.smtp_port}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Lock className="text-orange-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Security Type:</strong>{" "}
+                  <strong className="input-label-custom">Security Type:</strong>{" "}
+                  <span className="caption-custom">
                   {setting.email_security_type_id === 1
                     ? "SSL"
                     : setting.email_security_type_id === 2
                     ? "TLS"
                     : "Unknown"}
+                    </span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
@@ -462,10 +452,8 @@ export default function EmailSettingsTabs() {
                   }`}
                 />
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">
-                    Authentication Required:
-                  </strong>{" "}
-                  {setting.authentication_required ? "Yes" : "No"}
+                  <strong className="input-label-custom">Authentication Required:</strong>{" "}
+                  <span className="caption-custom">{setting.authentication_required ? "Yes" : "No"}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-4">
@@ -475,7 +463,7 @@ export default function EmailSettingsTabs() {
                   <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
                 )}
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Active:</strong>
+                  <strong className="input-label-custom">Active:</strong>
                 </p>
                 <label className="inline-flex items-center cursor-pointer relative self-end">
                   {" "}
@@ -498,26 +486,22 @@ export default function EmailSettingsTabs() {
 
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Created By:</strong>{" "}
-                  {setting.createdby}
+                  <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{setting.createdby}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Created On:</strong>{" "}
-                  {setting.createdon}
+                  <strong className="input-label-custom">Created On:</strong> <span className="caption-custom">{setting.createdon}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Updated By:</strong>{" "}
-                  {setting.updatedby}
+                  <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{setting.updatedby}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="font-semibold">Updated On:</strong>{" "}
-                  {setting.updatedon}
+                  <strong className="input-label-custom">Updated On:</strong> <span className="caption-custom">{setting.updatedon}</span>
                 </p>
               </div>
             </div>
@@ -536,8 +520,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("company")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "company"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-600 hover:text-gray-500"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Company Email Settings
@@ -546,8 +530,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("user")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "user"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-600 hover:text-gray-500"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Company User Email Settings
@@ -556,8 +540,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("email type")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "email type"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-600 hover:text-gray-500"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Email Type

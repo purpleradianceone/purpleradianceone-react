@@ -41,6 +41,9 @@ const getDescription = (setting : EmailTypeSettingsType) => {
   else if(setting.emailTypeId === 10){
         return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyTeam : emailDescriptions.inactive.companyUserAssignedToCompanyTeam;
   }
+   else if(setting.emailTypeId === 11){
+        return setting.isActive ? emailDescriptions.active.newAccountCreated : emailDescriptions.inactive.newAccountCreated;
+  }
 }
 
   const fetchCompanyEmailTypeSettings = async () => {
@@ -122,7 +125,6 @@ const getDescription = (setting : EmailTypeSettingsType) => {
           handleEmailTypeSettingCheckBoxChange(event);
         }
       }
-      toast.error('Failed to update email setting.');
     }
   };
 
@@ -139,7 +141,7 @@ const getDescription = (setting : EmailTypeSettingsType) => {
   return (
     <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
-        <p className="text-sm text-gray-500 mt-2">Manage settings for different types of emails sent from your company email.</p>
+        <p className="table-data-custom mt-2">Manage settings for different types of emails sent from your company email.</p>
       </div>
 
       {isLoading ? (

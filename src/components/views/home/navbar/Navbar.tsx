@@ -326,7 +326,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-lg   font-bold text-blue-700 cursor-pointer">
+                <div className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
                     <h2 className="font-sora ">{loginStatus.companyName}</h2>
                   </Link>

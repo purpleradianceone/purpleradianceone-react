@@ -52,7 +52,7 @@ function MeetingSettings() {
               {platform.icon}
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="table-header-custom">
                 {platform.name}
               </h3>
             </div>

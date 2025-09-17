@@ -261,7 +261,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
   const [isCreateLeadTaskModalOpen, setIsCreateLeadTaskModalOpen] =
     useState<boolean>(false);
   return (
-    <div className="w-full shadow-lg ">
+    <div className="w-full  shadow-lg ">
       <div className="w-full gap-1">
         <div className="sticky top-16 flex bg-gray-200 shadow-sm  mb-1.5 w-full">
           <div className="flex justify-between  w-full pr-3">

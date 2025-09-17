@@ -11,6 +11,7 @@ import ApiError from '../../../../@types/error/ApiError';
 import RefreshToken from '../../../../config/validations/RefreshToken';
 import { useUserAccessModules } from '../../../../config/hooks/useAccessModules';
 import MESSAGE from '../../../../constants/Messages';
+import Button from '../../../ui/Button';
 
 type LeadAllowedDomainsProps = {
   placeholder?: string;
@@ -179,17 +180,19 @@ return id;
               <p className="text-red-600 text-xs mt-2 animate-fadeIn">{error}</p>
             )}
           </div>
-          <button
+          <div>
+            <Button
             onClick={addDomain}
-            disabled={!inputValue.trim() || domains.length >= maxDomains}
-            className="px-1 py-0.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium"
+            disabled={ domains.length >= maxDomains}
+            // className="px-1 py-0.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium"
           >
             <span className='m=0 p-0 flex justify-between'>
               <Plus className="w-3 h-3 mt-1" />
             <span>Add</span>
             </span>
             
-          </button>
+          </Button>
+          </div>
         </div>
         
         <div className="flex justify-between items-center mt-0.5 text-xs text-gray-500">

@@ -3,6 +3,7 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import '../src/assets/styles/fonts.css'
 // import { StrictMode } from 'react';
 
 

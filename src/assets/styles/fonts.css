@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;700&display=swap");
+
+/* Main Page Title */
+.main-title-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333333;
+}
+
+/* Section Headers */
+.section-header-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+}
+
+/* Main Navigation Links */
+.main-nav-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #757575;
+  text-decoration: none;
+  border-bottom: 1px solid #757575;
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+}
+
+.main-nav-custom.active-header {
+  color: #2563eb;
+  /* color: #f01db8; */
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+  border-bottom: 3px solid #2563eb;
+  /* border-bottom: 3px solid #f01db8; */
+  border-radius: 0px;
+  box-shadow: none;
+  border-radius: 2px;
+}
+
+.main-nav-custom.active-tab {
+  /* color: #f01db8; */
+  color : #2563eb;
+}
+
+
+/* Table Header */
+.table-header-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.table-header-custom.active {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0D9488;
+}
+
+/* Table Data */
+.table-data-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333333;
+}
+
+
+
+
+/* Action Buttons */
+.action-btn-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.action-btn-custom.disabled-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: not-allowed;;
+}
+
+.action-btn.primary {
+  background-color: #f01db8;
+}
+
+.action-btn.accent {
+}
+
+/* Small Captions (dates, status) */
+.caption-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: var(--text-medium);
+}
+
+/* Input Labels */
+.input-label-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: var(--text-dark);
+}
