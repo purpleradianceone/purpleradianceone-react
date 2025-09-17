@@ -101,7 +101,7 @@ export default function CreateAccountType({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5 ">
       <div className="bg-white w-full max-w-xl rounded-lg border border-blue-200 shadow-lg p-2 relative">
         {/* Close button */}
-        <h3 className="border-b text-xl p-1 font-semibold">Add company account type</h3>
+        <h3 className="border-b p-1 table-header-custom">Add company account type</h3>
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
@@ -126,7 +126,7 @@ export default function CreateAccountType({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block input-label-custom ">
               Account type :<span className="text-red-600">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -145,7 +145,7 @@ export default function CreateAccountType({
                   />
                   <div>
                     <span
-                      className={`ml-2 px-2 py-1 text-sm font-semibold rounded-xl ${getParentTypeColor(
+                      className={`ml-2 px-2 py-1 text-sm input-label-custom rounded-xl ${getParentTypeColor(
                         type.name!
                       )}`}
                     >

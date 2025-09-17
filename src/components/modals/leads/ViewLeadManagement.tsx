@@ -802,24 +802,26 @@ const ViewLeadManagement = () => {
             >
               <span
                 title="Status history"
-                className="border-b flex items-center gap-1 text-gray-500 hover:text-gray-950 hover:border-b-black"
+                className="flex items-center gap-1 text-gray-500 hover:text-gray-950 "
               >
-                history
+                History
                 <History size={12} className="mt-0" />
               </span>
             </button>
           </div>
           </div>
 
-          {reasonInputBoxOpen && (
-            <div className="  flex m-1 w-full pr-40   gap-1">
+          
+        </div>
+        {reasonInputBoxOpen && (
+            <div className="  flex m-3 w-full pr-40   gap-1">
               <label className="text-xs text-gray-600 font-medium">
                 Reason (Optional)
               </label>
               <input
                 type="text"
                 placeholder="Enter reason for status update"
-                className="border rounded px-3  w-full  text-sm"
+                className="border rounded px-3 w-72  text-sm"
                 value={reasonText}
                 onChange={(e) => setReasonText(e.target.value)}
               />
@@ -829,9 +831,17 @@ const ViewLeadManagement = () => {
               >
                 Save
               </button>
+              <button
+               className="bg-gray-500 px-2 rounded text-white" 
+               onClick={()=>{
+                setReasonInputBoxOpen(!reasonInputBoxOpen
+                )
+                setSelectedStatusId(null)
+              }}>
+                Cancel
+              </button>
             </div>
           )}
-        </div>
 
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 p-2">
