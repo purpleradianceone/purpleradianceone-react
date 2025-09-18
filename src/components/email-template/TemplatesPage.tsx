@@ -17,6 +17,7 @@ import {
   Calendar,
   Filter,
   X,
+  LayoutDashboard,
 } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import useScreenSize from "../../config/hooks/useScreenSize";
