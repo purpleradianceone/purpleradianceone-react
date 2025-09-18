@@ -1,10 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Settings, X } from "lucide-react";
-import {
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { createPortal } from "react-dom";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -105,7 +102,9 @@ function LeadSettingForLead({
           if (response.data.status) {
             setLeadSetting((prev) =>
               prev.map((setting) =>
-                setting.id === id ? { ...setting, isActive: isChecked } : setting
+                setting.id === id
+                  ? { ...setting, isActive: isChecked }
+                  : setting
               )
             );
             toast.success(response.data.message);
@@ -143,7 +142,8 @@ function LeadSettingForLead({
           <div className="flex items-center gap-3">
             <Settings className="text-blue-600" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-xl font-bold text-gray-800">
-              Manage Settings for <span className="text-blue-600">{lead.name}</span>
+              Manage Settings for{" "}
+              <span className="text-blue-600">{lead.name}</span>
             </h2>
           </div>
           <button
@@ -168,16 +168,19 @@ function LeadSettingForLead({
             ) : (
               <div className="space-y-3">
                 {leadSetting.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No settings available for this lead.</p>
+                  <p className="text-center text-gray-500 py-8">
+                    No settings available for this lead.
+                  </p>
                 ) : (
                   leadSetting.map((per) => (
                     <div
                       key={per.id}
                       className={`
                         relative flex items-center justify-between p-3 rounded-lg border
-                        ${per.isActive
-                          ? "bg-green-50 border-green-200 shadow-sm"
-                          : "bg-red-50 border-red-200 shadow-sm"
+                        ${
+                          per.isActive
+                            ? "bg-green-50 border-green-200 shadow-sm"
+                            : "bg-red-50 border-red-200 shadow-sm"
                         }
                         hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
                       `}
@@ -191,7 +194,9 @@ function LeadSettingForLead({
                         {per.name}
                       </div>
 
-                      <label className="inline-flex items-center cursor-pointer relative">
+                     
+                        {/* toggel button */}
+                      <label className="inline-flex items-center cursor-pointer relative self-end">
                         <input
                           type="checkbox"
                           className="sr-only peer"
@@ -199,12 +204,10 @@ function LeadSettingForLead({
                           id={per.id.toString()}
                           onChange={handleLeadSettingCheckBoxChange}
                         />
-                        <div
-                          className="w-10 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-400 rounded-full
-                          peer-checked:bg-blue-500 transition-all duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                          after:bg-white after:border after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all after:duration-300
-                          peer-checked:after:translate-x-full peer-checked:after:border-white"
-                        ></div>
+                        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                        {/* Adjusted size and colors */}
+                        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                        {/* Adjusted size and position */}
                       </label>
                     </div>
                   ))
