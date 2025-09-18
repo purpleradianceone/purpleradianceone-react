@@ -1,5 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ClipboardPlus, EditIcon, X } from "lucide-react";
+import {
+  CheckCircle2,
+  ClipboardPlus,
+  EditIcon,
+  LucideAirplay,
+  LucideClock,
+  LucideGroup,
+  LucideIndianRupee,
+  LucideLink,
+  LucidePresentation,
+  LucideTimer,
+  LucideVerified,
+  Text,
+  X,
+  XCircle,
+} from "lucide-react";
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
@@ -42,8 +57,7 @@ function EditCompanyProductModal({
 }: EditCompanyProductModalProps) {
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
-    const rangeOfNumber: Item[] = range(1, 365);
-  
+  const rangeOfNumber: Item[] = range(1, 365);
 
   const intialEditCompanyProductFormData = {
     company_id: product.companyId,
@@ -98,8 +112,6 @@ function EditCompanyProductModal({
   //   type: "success" as "success" | "error",
   // });
 
-
-
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
   };
@@ -109,14 +121,15 @@ function EditCompanyProductModal({
     handleChange: handleEditCompanyProductFormDataChange,
   } = useFormChange(intialEditCompanyProductFormData);
 
-    const [productIsActive, setProductIsActive] = useState<boolean>(product.isActive);
-  
+  const [productIsActive, setProductIsActive] = useState<boolean>(
+    product.isActive
+  );
 
-    useEffect(()=>{
-      if(isOpen){
+  useEffect(() => {
+    if (isOpen) {
       setProductIsActive(product.isActive);
-      }
-    },[isOpen])
+    }
+  }, [isOpen]);
 
   const handleProductToggle = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -125,44 +138,43 @@ function EditCompanyProductModal({
     const { checked } = event.target;
 
     if (userHasAccessToUpdateProduct) {
-          const updateProductPostData = {
-            company_id: loginStatus.companyId,
-            id: product.id,
-            isactive: checked,
-            updatedby_id: loginStatus.id,
-          };
-          await axios
-            .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
-              withCredentials: true,
-            })
-            .then((response) => {
-              if (
-                response.data.status === true &&
-                response.status === STATUS_CODE.OK
-              ) {
-                
-                toast.success(response.data.message);
-                setProductIsActive(checked);
-                handleCompanyProductChange(product);
-              }
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch(async (error: ApiError | any) => {
-              if (error.status === STATUS_CODE.UNATHORISED) {
-                const refreshTokenResponse = await RefreshToken({
-                  callFunctionWithEvent: handleProductToggle,
-                });
-                if (refreshTokenResponse) {
-                  handleProductToggle(event);
-                }
-              }
+      const updateProductPostData = {
+        company_id: loginStatus.companyId,
+        id: product.id,
+        isactive: checked,
+        updatedby_id: loginStatus.id,
+      };
+      await axios
+        .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (
+            response.data.status === true &&
+            response.status === STATUS_CODE.OK
+          ) {
+            toast.success(response.data.message);
+            setProductIsActive(checked);
+            handleCompanyProductChange(product);
+          }
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunctionWithEvent: handleProductToggle,
             });
-          handleCompanyProductChange(product);
-        } else {
-          toast.error(
-            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
-          );
-        }
+            if (refreshTokenResponse) {
+              handleProductToggle(event);
+            }
+          }
+        });
+      handleCompanyProductChange(product);
+    } else {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+      );
+    }
   };
 
   const { errors, handleBlur, setErrors } = useFormValidation(
@@ -203,7 +215,6 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
           intialEditCompanyProductFormData.cost ||
-        
         (selectedProductTypeId !== 0 &&
           selectedProductTypeId !==
             intialEditCompanyProductFormData.product_type_id) ||
@@ -416,6 +427,7 @@ function EditCompanyProductModal({
                 <div className="grid col-span-1 ">
                   <FormInput
                     label="Product Name : "
+                    logo={LucidePresentation}
                     type="text"
                     name="name"
                     required={true}
@@ -429,6 +441,7 @@ function EditCompanyProductModal({
                   />
                   <FormInput
                     label="URL : "
+                    logo={LucideLink}
                     type="text"
                     name="url"
                     required={false}
@@ -442,6 +455,7 @@ function EditCompanyProductModal({
 
                   <FormInput
                     label="Version : "
+                    logo={LucideVerified}
                     type="text"
                     name="version"
                     max={20}
@@ -453,6 +467,7 @@ function EditCompanyProductModal({
                     onBlur={handleBlur}
                   />
                   <TextAreaInput
+                    logo={Text}
                     label="Description : "
                     cols={5}
                     rows={2}
@@ -469,6 +484,7 @@ function EditCompanyProductModal({
                 <div className="grid col-span-1 gap-1">
                   <div className="grid col-span-1 gap-1">
                     <FormInput
+                      logo={LucideIndianRupee}
                       label="Cost : "
                       type="text"
                       name="cost"
@@ -478,6 +494,7 @@ function EditCompanyProductModal({
                     />
                     <FormInput
                       label="Item Code : "
+                      logo={LucideAirplay}
                       type="text"
                       name="code"
                       required={true}
@@ -489,6 +506,7 @@ function EditCompanyProductModal({
                     />
                     <CustomDropdown
                       labelName="Product Type"
+                      logo={LucideGroup}
                       preselectedOption={
                         intialEditCompanyProductFormData.product_type_id
                       }
@@ -503,6 +521,7 @@ function EditCompanyProductModal({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <CustomDropdown
+                      logo={LucideClock}
                       labelName="Warranty Duration"
                       preselectedOption={
                         intialEditCompanyProductFormData.default_warranty
@@ -516,6 +535,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                     <CustomDropdown
+                      logo={LucideTimer}
                       labelName="Warranty Time Unit"
                       preselectedOption={
                         intialEditCompanyProductFormData.default_warranty_interval_type_id
@@ -531,6 +551,7 @@ function EditCompanyProductModal({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <CustomDropdown
+                      logo={LucideClock}
                       labelName="AMC Cycle Duration"
                       preselectedOption={
                         intialEditCompanyProductFormData.default_amc_cycle
@@ -544,6 +565,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                     <CustomDropdown
+                      logo={LucideTimer}
                       labelName="AMC Time Unit"
                       preselectedOption={
                         intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
@@ -565,7 +587,17 @@ function EditCompanyProductModal({
                     htmlFor="isActive"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Status : {productIsActive?"Active":"Inactive"}
+                    {productIsActive ? (
+                      <div>
+                        <CheckCircle2 className=" text-green-500 inline-block" />{" "}
+                        Active
+                      </div>
+                    ) : (
+                      <div>
+                        <XCircle className=" text-red-500 inline-block" />{" "}
+                        Inactive
+                      </div>
+                    )}
                   </label>
                   <label className="inline-flex items-center cursor-pointer relative">
                     <input
