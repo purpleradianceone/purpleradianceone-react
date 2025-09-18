@@ -15,7 +15,7 @@ import {
   DynamicFieldsContext,
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideCode, LucideMail } from "lucide-react";
+import { LucideMail } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
@@ -222,11 +222,10 @@ export const EditorCanvasWithJson = () => {
     <>
       <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex gap-1">
-          <LucideMail className="w-6 h-6 text-blue-600" />
-          <LucideCode className="w-4 h-4 text-blue-600" />
-          <span className="text-1xl font-bold">Email Template Update</span>
+          <LucideMail className="w-6 h-6 main-nav-custom active-tab text-center" />
+          <span className="table-header-custom">Email Template Update</span>
           {templateTypeId && (
-            <span className="text-1xl font-bold">: {emailTemplateName}</span>
+            <span className="table-data-custom">: {emailTemplateName}</span>
           )}
         </div>
       </div>

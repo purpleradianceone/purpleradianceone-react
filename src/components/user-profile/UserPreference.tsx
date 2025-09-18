@@ -21,7 +21,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import MESSAGE from "../../constants/Messages";
 
 const UserPreference = () => {
-  const classnameForParagragh = "text-gray-800 font-semibold   block truncate w-full";
+  const classnameForParagragh = "table-data-custom  block truncate w-full";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
@@ -399,12 +399,12 @@ const UserPreference = () => {
             {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
           </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
-            <h2  title={formData.fullName ?? "Not Provided"} className="text-3xl font-bold text-gray-900 block truncate w-full  ">
+            <h2  title={formData.fullName ?? "Not Provided"} className="section-header-custom block truncate w-full  ">
               {loginStatus.fullName}
             </h2>
-            <p  className="text-gray-600">{loginStatus.companyName || ""}</p>
+            <p  className="table-header-custom">{loginStatus.companyName || ""}</p>
             <button
-              className={`mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition
+              className={`mt-2 px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition
                   ${
                     isEditing
                       ? isSaveEnabled
@@ -432,7 +432,7 @@ const UserPreference = () => {
         {/* Basic Info Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="">
-            <h4 className="text-sm font-semibold text-gray-700">Name</h4>
+            <h4 className="table-header-custom">Name</h4>
             {isEditing ? (
               <>
                 <input
@@ -452,26 +452,26 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p title={formData.fullName ?? "Not Provided"} className="text-gray-800 font-semibold block truncate w-full ">
+              <p title={formData.fullName ?? "Not Provided"} className="table-data-custom block truncate w-full ">
                 {formData.fullName || "Not Provided"}
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700">Email</h4>
+            <h4 className="table-header-custom">Email</h4>
             <p className={classnameForParagragh}>
               {formData.email || "Not Provided"}
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700">Company</h4>
+            <h4 className="table-header-custom">Company</h4>
             <p className={classnameForParagragh}>{loginStatus.companyName}</p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700">
+            <h4 className="table-header-custom">
               Contact Number
             </h4>
             {isEditing ? (
@@ -500,7 +500,7 @@ const UserPreference = () => {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700">
+            <h4 className="table-header-custom">
               Profile Status
             </h4>
             <p className={classnameForParagragh}>
@@ -513,8 +513,8 @@ const UserPreference = () => {
       <div  className={` ${!userHasAccessToViewSettingGeneral ? "hidden" : ""} max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4`}>
         {/* button */}
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">
-            Preferences <span className="text-sm">(Click to change)</span>
+          <h3 className="section-header-custom">
+            Preferences <span className="caption-custom">(Click to change)</span>
           </h3>
           {(prevTimezoneId.current !== selectedTimezoneId ||
             userPreference.rowsInGrid != selectedRowsPerPage) && (
@@ -532,7 +532,7 @@ const UserPreference = () => {
                   toast.error(MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS)
                 }
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
             >
               Save
             </button>
@@ -541,7 +541,7 @@ const UserPreference = () => {
         {/* time zone */}
         <div className="flex items-center space-x-4 border-b pb-1">
           {/* Label for the Time Zone setting */}
-          <h4 className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          <h4 className="input-label-custom whitespace-nowrap">
             Time Zone:
           </h4>
 
@@ -576,7 +576,7 @@ const UserPreference = () => {
                   );
                 }
               }}
-              className="text-sm  font-semibold text-blue-600 cursor-pointer hover:text-blue-700
+              className="input-label-custom text-blue-600 cursor-pointer hover:text-blue-700
                  rounded-md py-1.5 px-3  // Adds padding to match select height
                  focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
               tabIndex={0} // Makes the paragraph focusable for keyboard navigation
@@ -592,15 +592,15 @@ const UserPreference = () => {
           {/* Label for accessibility and clear identification */}
           <label
             htmlFor="records-per-page-select"
-            className="text-sm font-medium text-gray-700 whitespace-nowrap"
+            className="input-label-custom whitespace-nowrap"
           >
             Records per page:
           </label>
 
           {/* Display current preference, visually distinct */}
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-gray-500">Current:</span>
-            <span className="text-sm font-semibold text-blue-600">
+            <span className="caption-custom">Current:</span>
+            <span className="caption-custom-blue">
               {userPreference.rowsInGrid}
             </span>
           </div>
@@ -623,17 +623,17 @@ const UserPreference = () => {
             }}
             value={selectedRowsPerPage}
             id="records-per-page-select" // Link with label's htmlFor
-            className="block w-auto rounded-md border-gray-300 shadow-sm
+            className="block caption-custom w-auto rounded-md border-gray-300 shadow-sm
                focus:border-indigo-500 focus:ring-indigo-500
-               sm:text-sm  pl-3 pr-8 // Added padding for better appearance
+               sm:pl-3 pr-8 // Added padding for better appearance
                text-gray-900" // Default text color
             aria-label="Select number of records per page" // Good for accessibility
             // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
           >
-            <option value="">Select</option>
+            <option className="caption-custom" value="">Select</option>
             {rowsInGridDropdownOptions &&
               rowsInGridDropdownOptions.map((data) => (
-                <option key={data.id} value={data.rowsInGrid}>
+                <option  key={data.id} value={data.rowsInGrid}>
                   {data.rowsInGrid}
                 </option>
               ))}
@@ -643,25 +643,25 @@ const UserPreference = () => {
       {/* Subscription Card */}
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">Subscription</h3>
+          <h3 className="section-header-custom">Subscription</h3>
           <button
             onClick={() => {
               navigate(ROUTES_URL.GET_SUBSCRIPTION);
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
           >
             Update Subscription
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Started On</h4>
+            <h4 className="table-header-custom">Started On</h4>
             <p className={classnameForParagragh}>
               {loginStatus.startDateSubscription || "-"}
             </p>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Ending On</h4>
+            <h4 className="table-header-custom">Ending On</h4>
             <p className={classnameForParagragh}>
               {loginStatus.endDateSubscription || "Not Provided"}
             </p>

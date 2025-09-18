@@ -7,6 +7,7 @@ import {
   TemplateSettingsPanelCreateTemplateUpdate,
   TemplateSettingsPanelUpdateProps,
 } from "./TemplateSettingsPanelCreateTemplateUpdate";
+import Button from "../../ui/Button";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
@@ -45,34 +46,24 @@ export const ExportPanelUpdate: React.FC<ExportPanelProps> = ({
 
   return (
     <div style={{ display: "flex", gap: 10 }}>
-      <button
+      <div>
+        <Button
         onClick={handlePreview}
-        style={{
-          top: 50,
-          left: "50%",
-          padding: "2px 8px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
       >
         Preview HTML
-      </button>
+      </Button>
 
-      <button
+      </div>
+      
+      <div>
+        <Button
         onClick={handleCopy}
-        style={{
-          padding: "2px 8px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
+        
       >
         Copy HTML
-      </button>
+      </Button>
+      </div>
+      
 
       {templateSettingsPanelUpdateProps.templateTypeId && (
         <TemplateSettingsPanelCreateTemplateUpdate

@@ -40,11 +40,14 @@
   border-radius: 0px;
   box-shadow: none;
   border-radius: 2px;
+  white-space: nowrap;
+  overflow-x: auto;
 }
 
 .main-nav-custom.active-tab {
   /* color: #f01db8; */
   color : #2563eb;
+  border : none;
 }
 
 
@@ -88,7 +91,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #ffffff;
-  cursor: not-allowed;;
+  cursor: not-allowed;
 }
 
 .action-btn.primary {
@@ -103,7 +106,14 @@
   font-family: "Roboto", sans-serif;
   font-size: 12px;
   font-weight: 400; /* Maps to Regular */
-  color: var(--text-medium);
+  color: #757575;
+}
+
+.caption-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #2563eb;
 }
 
 /* Input Labels */
@@ -111,5 +121,34 @@
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   font-weight: 400; /* Maps to Regular */
-  color: var(--text-dark);
+  color: #333333;
+}
+
+
+.custom-height-scrollbar {
+  overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */
+}
+
+/* Scrollbar styling for WebKit browsers */
+.custom-height-scrollbar::-webkit-scrollbar {
+  width: 3px; /* Thinner scrollbar */
+  height: 3px;
+}
+
+/* Scrollbar track */
+.custom-height-scrollbar::-webkit-scrollbar-track {
+  background: #ededf3; /* Lighter background for the track */
+  border-radius: 10px;
+}
+
+/* Scrollbar thumb */
+.custom-height-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ededf3; /* Darker, neutral color for the thumb */
+  border-radius: 10px;
+  border: 3px solid #b5b5c4; /* Adds a clean border and gives a "floating" effect */
+}
+
+/* Scrollbar thumb on hover */
+.custom-height-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #ededf3; /* A darker shade on hover for interactivity */
 }
