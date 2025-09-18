@@ -96,45 +96,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
     industryType: "",
   });
 
-  // const getComapnyAccountType = async () => {
-  //   const PostDataToGetCompanyAccountType = {
-  //     company_id: loginStatus.companyId,
-  //     account_type_id: null,
-  //     id: null,
-  //     isactive: null,
-  //     requestedby_id: loginStatus.id,
-  //   };
-
-  //   axios
-  //     .post(
-  //       POST_API.GET_COMPANY_ACCOUNT_TYPE,
-  //       PostDataToGetCompanyAccountType,
-  //       {
-  //         withCredentials: true,
-  //       }
-  //     )
-  //     .then((response) => {
-  //       if (response.status === STATUS_CODE.OK) {
-  //         const responseData = response.data;
-
-  //         const companyAccountData: CompanyAccountType[] = responseData.map(
-  //           (item: any) => ({
-  //             id: item.id,
-  //             companyId: item.company_id,
-  //             accountTypeId: item.account_type_id,
-  //             companyAccountTypeName: item.company_account_type_name,
-  //             accountTypeName: item.account_type_name,
-  //             isActive: item.isactive,
-  //             createdBy: item.createdby,
-  //             createdOn: item.createdon,
-  //             updatedBy: item.updatedby,
-  //             updatedOn: item.updatedon,
-  //           })
-  //         );
-  //         setCompanyAccountType(companyAccountData);
-  //       }
-  //     });
-  // };
 
   function handleSelectedBusinessType(
     selectedBusinessType: number | undefined
@@ -408,38 +369,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
       </div>
       
     )
-    // return (
-    //   <div className="fixed inset-0 z-20 flex items-center justify-center ">
-    //     <div className="bg-white flex items-center justify-center rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
-    //       <div className="bg-white  p-8 flex flex-col items-center justify-center gap-4 w-[400px]">
-    //         {/* Loading text */}
-    //         <span className="text-md font-semibold text-gray-800">
-    //           Loading...
-    //         </span>
-
-    //         {/* Spinner */}
-    //         <LoadingSpinner />
-
-    //         {/* Progress-like bar */}
-    //         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-    //           <div className="h-2 bg-blue-500 animate-[progress_2s_linear_infinite]" />
-    //         </div>
-    //       </div>
-
-    //       {/* Tailwind keyframes for fake progress bar */}
-    //       <style>{`
-    //   @keyframes progress {
-    //     0% {
-    //       transform: translateX(-100%);
-    //     }
-    //     100% {
-    //       transform: translateX(100%);
-    //     }
-    //   }
-    // `}</style>
-    //     </div>
-    //   </div>
-    // );
   }
   return (
     <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">

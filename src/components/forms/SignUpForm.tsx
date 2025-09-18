@@ -24,6 +24,7 @@ import { useCountries } from "../../config/hooks/useCountries";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import { useGeoLocationData } from "../../config/hooks/useGeoLocation";
 import toast from "react-hot-toast";
+import { Globe, KeySquare, Mail, Phone, User } from "lucide-react";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -38,14 +39,7 @@ function SignUpForm() {
   const { countryName } = useGeoLocationData({
     countryList: countries,
   });
-  // useEffect(() => {
-  //   console.log("*****************************************************");
-  //   console.log(countryName);
-  //   console.log(dialCode);
-  //   console.log(error);
-  //   console.log(loading);
-  //   console.log("*****************************************************");
-  // }, [countryName]);
+
   const { formData: SignUpFormData, handleChange: handleSignUpFormDataChange } =
     useFormChange(initialSignUpFormState);
   const { errors, handleBlur } = useFormValidation(
@@ -175,6 +169,7 @@ function SignUpForm() {
     <>
       <form className="space-y-3" onSubmit={handleSignUpFormSubmit}>
         <FormInput
+        logo={User}
           label="Full Name"
           type="text"
           name="name"
@@ -188,6 +183,7 @@ function SignUpForm() {
           error={errors.name}
         />
         <FormInput
+        logo={Phone}
           label="Mobile Number"
           type="text"
           name="mobileNumber"
@@ -200,6 +196,7 @@ function SignUpForm() {
           error={errors.mobileNumber}
         />
         <FormInput
+        logo={Mail}
           label="Email"
           type="email"
           name="email"
@@ -214,6 +211,7 @@ function SignUpForm() {
         />
 
         <CustomDropdown
+        logo={Globe}
           requiredRedDot={true}
           labelName="Country"
           onSelect={(selectedValue) => {
@@ -225,6 +223,7 @@ function SignUpForm() {
           selectedValue={countryId}
         />
         <FormInput
+        logo={KeySquare}
           label="Password"
           type={showPassword ? "text" : "password"}
           name="password"
@@ -244,6 +243,7 @@ function SignUpForm() {
           }
         />
         <FormInput
+        logo={KeySquare}
           label="Confirm Password"
           type={showConfirmPassword ? "text" : "password"}
           name="confirmPassword"

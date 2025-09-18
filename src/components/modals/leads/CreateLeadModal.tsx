@@ -538,8 +538,8 @@ function CreateLeadModal({
               <Button  
               onClick={onClose}
               type="reset">
-                <div className="flex items-center gap-1">
-                  <Save size={16} />
+                <div className="flex items-center gap-0.5">
+                  <X size={16} />
                   <span>Cancel</span>
                 </div>
               </Button>

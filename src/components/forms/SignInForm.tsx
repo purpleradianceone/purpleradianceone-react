@@ -29,6 +29,7 @@ import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
 import { useUserPreference } from "../../context/user/UserPreference";
 import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
 import toast from "react-hot-toast";
+import { KeySquare, Mail } from "lucide-react";
 
 function SignInForm() {
   const navigate = useNavigate();
@@ -325,18 +326,20 @@ function SignInForm() {
       const storedEmail = localStorage.getItem(
         LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS
       );
-      const storedPass = localStorage.getItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
+      const storedPass = localStorage.getItem(
+        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS
+      );
       if (storedEmail) {
         setInitialSignInFormState((prev) => ({
           ...prev,
-          email: storedEmail
+          email: storedEmail,
         }));
       }
-      if(storedPass){
+      if (storedPass) {
         setInitialSignInFormState((prev) => ({
-            ...prev,
-            password: decryptData(storedPass),
-          }))
+          ...prev,
+          password: decryptData(storedPass),
+        }));
       }
     }
     localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
@@ -372,7 +375,10 @@ function SignInForm() {
         LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
         loginUserCredentials.email
       );
-      localStorage.setItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,encryptData(loginUserCredentials.password));
+      localStorage.setItem(
+        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
+        encryptData(loginUserCredentials.password)
+      );
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
       setRememberMe(false);
@@ -386,6 +392,7 @@ function SignInForm() {
       <div>
         <form className="space-y-5" onSubmit={handleLoginSubmit}>
           <FormInput
+            logo={Mail}
             label="Email"
             type="email"
             name="email"
@@ -410,6 +417,7 @@ function SignInForm() {
             error={errors.email}
           />
           <FormInput
+            logo={KeySquare}
             label="Password"
             type={showPassword ? "text" : "password"}
             name="password"
@@ -417,7 +425,6 @@ function SignInForm() {
             placeholder="Enter your password"
             value={loginUserCredentials.password}
             defaultValue={loginUserCredentials.password}
-
             onChange={(e) => {
               if (rememberMe) {
                 localStorage.setItem(

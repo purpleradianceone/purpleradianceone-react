@@ -802,7 +802,7 @@ const ViewLeadManagement = () => {
             >
               <span
                 title="Status history"
-                className="flex items-center justify-center  text-gray-500 hover:text-gray-950 "
+                className="flex items-center justify-center  text-gray-500 hover:text-blue-600 "
               >
                 <History size={12} className="mt-0" />
                 History
@@ -990,7 +990,7 @@ const ViewLeadManagement = () => {
                     />
                      <button
                     title="Lead owner history"
-                    className="absolute left-24   text-xs flex items-center mt-1 hover:text-gray-900 text-gray-500"
+                    className="absolute left-24   text-xs flex items-center mt-1 hover:text-blue-700 text-gray-500"
                     onClick={() => {
                       setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
                     }}

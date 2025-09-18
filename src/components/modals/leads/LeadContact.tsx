@@ -9,7 +9,7 @@ import {
   MapPin,
   MessageCircle,
   Phone,
-  Plus,
+  Save,
   Trash2,
   User,
   X,
@@ -30,6 +30,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
+import FormInput from "../../ui/FormInput";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -660,9 +661,7 @@ const LeadContact = ({
                     <div className="w-5 h-5 mt-1 flex items-center justify-center">
                       <div
                         className={`w-3 h-3 rounded-full ${
-                          isActive
-                            ? "bg-green-500"
-                            : "bg-red-500"
+                          isActive ? "bg-green-500" : "bg-red-500"
                         }`}
                       />
                     </div>
@@ -672,7 +671,7 @@ const LeadContact = ({
                           Status
                         </h4>
                         <label className="inline-flex items-center cursor-pointer relative self-end">
-                         <input
+                          <input
                             type="checkbox"
                             checked={isActive}
                             onChange={
@@ -707,9 +706,7 @@ const LeadContact = ({
                           {/* Adjusted size and colors */}
                           <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
                           <span className="ml-3 text-sm font-medium text-gray-900">
-                            {isActive
-                              ? "Active"
-                              : "Inactive"}
+                            {isActive ? "Active" : "Inactive"}
                           </span>
                         </label>
                       </div>
@@ -771,7 +768,7 @@ const LeadContact = ({
         <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
-            
+
             <div className="px-2 py-2  border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
@@ -813,12 +810,15 @@ const LeadContact = ({
             <form>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
                 <div>
-                  <label className={formInputLabelClassName}>
+                  {/* <label className={formInputLabelClassName}>
                     {" "}
                     <User size={16} className="inline mr-1 text-blue-500" />
                     Full Name*{" "}
-                  </label>
-                  <input
+                  </label> */}
+                  <FormInput
+                    logo={User}
+                    label="Full Name"
+                    required
                     type="text"
                     name="name"
                     onBlur={handleBlur}
@@ -828,9 +828,11 @@ const LeadContact = ({
                     className={inputClass}
                     onChange={handleFormInputChange}
                     defaultValue={editContactData?.name || ""}
-                    readOnly={
+                    readonly={
                       editContactData?.isPrimary && editContactData !== null
                     }
+                  />
+                  {/* <input
                     onClick={() => {
                       if (
                         editContactData?.isPrimary &&
@@ -842,7 +844,7 @@ const LeadContact = ({
                         );
                       }
                     }}
-                  />
+                  /> */}
                   {errors.name && (
                     <p className="text-xs text-red-600 mt-1">{errors.name}</p>
                   )}
@@ -853,33 +855,19 @@ const LeadContact = ({
                   )}
                 </div>
                 <div>
-                  <label className={formInputLabelClassName}>
-                    <Mail size={16} className="inline mr-2 text-blue-500" />{" "}
-                    Email Address
-                  </label>
-                  <input
+                  <FormInput
+                    label="Email Address"
+                    logo={Mail}
                     type="email"
                     name="email"
                     maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                     placeholder="Enter email address"
-                    className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.email || ""}
-                    readOnly={
+                    readonly={
                       editContactData?.isPrimary && editContactData !== null
                     }
-                    onClick={() => {
-                      if (
-                        editContactData?.isPrimary &&
-                        editContactData !== null
-                      ) {
-                        toast.error(
-                          MESSAGE.ERROR
-                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        );
-                      }
-                    }}
                   />
                   {errors.email && (
                     <p className="text-xs text-red-600 mt-1">{errors.email}</p>
@@ -891,34 +879,21 @@ const LeadContact = ({
                   )}
                 </div>
                 <div>
-                  <label className={formInputLabelClassName}>
-                    <Phone size={16} className="inline mr-2 text-blue-500" />{" "}
-                    Mobile Number
-                  </label>
-                  <input
+                  <FormInput
+                    logo={Phone}
+                    label="Mobile Number"
                     type="text"
                     name="mobileNumber"
                     minLength={10}
                     maxLength={10}
                     placeholder="Enter mobile number"
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.mobileNumber || ""}
-                    readOnly={
+                    readonly={
                       editContactData?.isPrimary && editContactData !== null
                     }
-                    onClick={() => {
-                      if (
-                        editContactData?.isPrimary &&
-                        editContactData !== null
-                      ) {
-                        toast.error(
-                          MESSAGE.ERROR
-                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        );
-                      }
-                    }}
                   />
                   {errors.mobileNumber && (
                     <p className="text-xs text-red-600 mt-1 ">
@@ -931,16 +906,12 @@ const LeadContact = ({
                     </p>
                   )}
                 </div>
+                {/* job title */}
                 <div>
-                  <label className={formInputLabelClassName}>
-                    {" "}
-                    <Briefcase
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Job Title
-                  </label>
-                  <input
+                  <FormInput
+                    label="Job title"
+                    logo={Briefcase}
+                    // Job Title
                     type="text"
                     name="jobTitle"
                     maxLength={100}
@@ -951,15 +922,11 @@ const LeadContact = ({
                     defaultValue={editContactData?.jobTitle || ""}
                   />
                 </div>
+                {/* pref language */}
                 <div>
-                  <label className={formInputLabelClassName}>
-                    <Languages
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Preferred Language
-                  </label>
-                  <input
+                  <FormInput
+                    logo={Languages}
+                    label="Preferred Language"
                     type="text"
                     name="preferredLanguage"
                     maxLength={100}
@@ -970,15 +937,11 @@ const LeadContact = ({
                     defaultValue={editContactData?.preferredLanguage || ""}
                   />
                 </div>
+                {/* pref comm channel */}
                 <div>
-                  <label className={formInputLabelClassName}>
-                    <MessageCircle
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Preferred Communication Channel
-                  </label>
-                  <input
+                  <FormInput
+                    logo={MessageCircle}
+                    label=" Preferred Communication Channel"
                     type="text"
                     maxLength={100}
                     name="preferredCommunicationChannel"
@@ -991,12 +954,11 @@ const LeadContact = ({
                     }
                   />
                 </div>
+                {/* linkedin profile */}
                 <div>
-                  <label className={formInputLabelClassName}>
-                    <Globe size={16} className="inline mr-2 text-blue-500" />{" "}
-                    LinkedIn Profile
-                  </label>
-                  <input
+                  <FormInput
+                    logo={Globe}
+                    label="LinkedIn Profile"
                     type="text"
                     name="linkedinProfile"
                     maxLength={256}
@@ -1009,29 +971,24 @@ const LeadContact = ({
                 </div>
 
                 {/* Social Media Handles */}
-                <div className="sm:col-span-2">
-                  <label className={formInputLabelClassName}>
-                    <Globe size={16} className="inline mr-2 text-blue-500" />{" "}
-                    Social Media Handles
-                  </label>
-                  <div className="flex gap-2">
-                    <input
+                <div className="col-span-2">
+                  <div className="flex col-span-2 items-center justify-between bg-pink-300  gap-2">
+                    <FormInput
+                      logo={Globe}
+                      label="Social Media Handles"
                       type="text"
                       placeholder="Enter social media url"
                       value={tempHandle}
                       onChange={(e) => setTempHandle(e.target.value)}
-                      className={inputClass}
                     />
-                    <button
-                      onClick={handleAddSocialMedia}
-                      type="button"
-                      className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-0 rounded"
-                    >
-                      <Plus size={14} />
-                    </button>
+                    <div className="flex justify-center items-center">
+                      <Button onClick={handleAddSocialMedia} type="button">
+                        {/* <Plus size={14} /> */}+ Add
+                      </Button>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 mt-3 gap-2 max-h-36 overflow-y-auto">
+                  <div className="grid grid-cols-1  sm:grid-cols-2 mt-3 gap-2 max-h-36 overflow-y-auto">
                     {socialMediaHandles.map((handle) => (
                       <div
                         key={handle}
@@ -1082,20 +1039,28 @@ const LeadContact = ({
 
               {/* Footer Buttons */}
               <div className="flex justify-end gap-4 mt-6 flex-wrap">
-                <button
-                  type="reset"
-                  onClick={() => setIsOpenAddLeadContactForm(false)}
-                  className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
-                  type="submit"
-                  onClick={handleSubmit}
-                >
-                  Save
-                </button>
+                <div className="flex gap-2">
+                  <Button
+                    type="reset"
+                    onClick={() => setIsOpenAddLeadContactForm(false)}
+                    // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
+                  >
+                    <div className="flex items-center gap-0.5">
+                      <X size={16} />
+                      Cancel
+                    </div>
+                  </Button>
+                  <Button
+                    // className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
+                    type="submit"
+                    onClick={handleSubmit}
+                  >
+                    <div className="flex items-center gap-1">
+                      <Save size={16} />
+                      Save
+                    </div>
+                  </Button>
+                </div>
               </div>
             </form>
           </div>

@@ -849,16 +849,9 @@ const MeetingScheduler = () => {
                 } else if (
                   selectedMeetingPlatform === meetingPlatform[2].name
                 ) {
-                  // showMessageSnackbar({
-                  //   message: "Microsofft teams is coming soon...!",
-                  //   type: "error",
-                  // });
+
                   toast.error("Microsofft teams is coming soon... Choose another platform instead.")
                 } else {
-                  // showMessageSnackbar({
-                  //   message: "select the meeting platform first",
-                  //   type: "error",
-                  // });
                   toast.error("Select the Meeting platform first.")
                 }
               }}
@@ -900,14 +893,6 @@ const MeetingScheduler = () => {
           }
         />
       )}
-
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>,
     document.body // Use the non-null assertion here.  We've ensured it's not null.
   );
