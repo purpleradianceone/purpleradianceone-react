@@ -296,12 +296,12 @@ function AddProductModal({
                   label="Version :"
                   type="text"
                   name="version"
+                  max={20}
                   required={false}
                   value={addProductFormData.version}
                   placeholder="Product Version"
                   onChange={handleAddProductFormDataChange}
                   onBlur={handleBlur}
-                  error={errors.code}
                 />
 
                 <TextAreaInput
