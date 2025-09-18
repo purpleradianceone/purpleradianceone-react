@@ -11,6 +11,7 @@ import MESSAGE from "../../../../constants/Messages";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import FormInput from "../../../ui/FormInput";
+import Button from "../../../ui/Button";
 
 export default function CreateAccountType({
   onClose,
@@ -157,26 +158,35 @@ export default function CreateAccountType({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 ">
-            <button
-              onClick={handleAddAccountType}
-              disabled={!newTypeName.trim() || newParentType === 0}
-              className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
-            >
-              <Save size={16} />
-              Save
-            </button>
-            <button
+          <div className="flex items-center  justify-end gap-3 ">
+           <div className="flex gap-2">
+             <Button
+            type="submit"
               onClick={() => {
                 setNewTypeName("");
                 setNewParentType(0);
                 onClose();
               }}
-              className="flex items-center gap-1 bg-gray-500 text-white px-2 py-1 rounded-md hover:bg-gray-600 transition-colors"
+              // className="flex items-center gap-1 bg-gray-500 text-white px-2 py-1 rounded-md hover:bg-gray-600 transition-colors"
             >
-              <X size={16} />
+              <div className="flex items-center ">
+                <X size={16} />
               Cancel
-            </button>
+              </div>
+            </Button>
+            <Button
+
+              onClick={handleAddAccountType}
+              disabled={!newTypeName.trim() || newParentType === 0}
+              // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
+            >
+              <div className="flex items-center  gap-1">
+                <Save size={16} />
+              Save
+              </div>
+            </Button>
+           </div>
+            
           </div>
         </div>
       </div>
