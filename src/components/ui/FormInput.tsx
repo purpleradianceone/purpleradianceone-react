@@ -117,7 +117,8 @@ function FormInput({
   minLength,
   maxLength,
   autoComplete,
-  logo : Icon
+  logo : Icon,
+  // onClick
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
   const isMobileNumberInput =useCountry;
@@ -137,7 +138,7 @@ function FormInput({
               onChange={selectOnChange}
               onBlur={selectOnBlur} // Apply blur to the select as well
               className={`block py-2 px-2 border text-wrap min-w-24 max-w-min border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm
-                ${readonly ? 'bg-gray-300' : ''}`}
+                ${readonly ? 'bg-gray-100' : ''}`}
             >
               {countries?.length !==0 ? countries!.map((country) => (
                 <option key={country.id} value={country.id!.toString()}>
@@ -164,7 +165,7 @@ function FormInput({
               onChange={onChange}
               onBlur={onBlur} // Apply blur to the input as well
               className={readonly ?
-                "appearance-none block w-full px-3 py-2 border bg-gray-300 border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                "appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 :
                 "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               }
@@ -173,6 +174,7 @@ function FormInput({
               max={max}
               pattern={pattern}
               autoComplete={autoComplete}
+              // onClick={onClick!}
             />
           </div>
         ) : (
@@ -189,7 +191,7 @@ function FormInput({
             onChange={onChange}
             onBlur={onBlur}
             className={readonly ?
-              "appearance-none block w-full px-3 py-2 mt-1 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              "appearance-none block w-full px-3 py-2 mt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               :
               "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             }

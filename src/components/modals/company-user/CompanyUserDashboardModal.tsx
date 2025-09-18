@@ -8,7 +8,7 @@ import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
-import { X } from "lucide-react";
+import { Grid, Save, X } from "lucide-react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import {
   MessageSnackbarState,
@@ -211,11 +211,11 @@ function CompanyUserDashboardModal({
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="w-[600px] p-6 rounded-lg shadow-lg border border-gray-300 bg-white"
+      className="w-[600px] p-4 rounded-lg    bg-white"
     >
-      <div className="flex justify-between items-center p-6 border-6">
-        <h2 className="text-xl font-semibold mb-4">
-          {users.fullname}'s Dashboard{" "}
+      <div className="flex justify-between border-gray-300 border-b pb-1 mb-3 items-center ">
+        <h2 className="text-xl items-center gap-1 flex text-blue-600 font-semibold ">
+          <Grid size={20}/> {users.fullname}'s <span className="text-gray-800"> dashboard </span>
         </h2>
 
         <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>
@@ -223,7 +223,7 @@ function CompanyUserDashboardModal({
         </button>
       </div>
 
-      <ul className="mb-4 space-y-2">
+      <ul className="mb-4  space-y-2">
         {companyUserDashboard.map((dashboard) => (
           <li
             key={dashboard.id}
@@ -254,28 +254,17 @@ function CompanyUserDashboardModal({
         ))}
       </ul>
 
-      <div className="p-6 border-t bg-white">
-        <div className="flex justify-end">
-          {/* {userHasAccessToUpdateAccess ? (
-            users.id === loginStatus.id ? (
-              <Button disabled={true}>Save</Button>
-            ) : (
-              <Button onClick={handleSave} spinner={spinnerAnimation}>
-                Save
-              </Button>
-            )
-          ) : (
-            <Button disabled={true}>Save</Button>
-          )} */}
-
+      <div className="p-3 border-t bg-white">
+        <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
+          <Button onClick={onClose}>
+            <div className="flex gap-0.5 items-center">
+              <X size={16} />
+              Cancel
+            </div>
+          </Button>
           <Button
-            className={`px-4 py-2 bg-blue-600 ${
-              !userHasAccessToUpdateDashboard
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            } text-white rounded hover:bg-blue-700`}
             onClick={() => {
-              if ( userHasAccessToUpdateDashboard ) {
+              if (userHasAccessToUpdateDashboard) {
                 handleSave();
               } else {
                 showMessageSnackbar({
@@ -289,7 +278,10 @@ function CompanyUserDashboardModal({
             }}
             spinner={spinnerAnimation}
           >
-            Save
+            <div className="flex gap-1 items-center">
+              <Save size={16} />
+              Save
+            </div>
           </Button>
         </div>
       </div>

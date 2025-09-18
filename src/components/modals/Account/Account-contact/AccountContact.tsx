@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Phone,
   Plus,
+  Save,
   User,
   X,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import Button from "../../../ui/Button";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -120,7 +122,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             fetchAccountContact();
           }
         }
-      }).finally(()=>{
+      })
+      .finally(() => {
         setShowLoadingSpinner(false);
       });
   };
@@ -404,7 +407,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   if (showLoadingSpinner)
     return (
       <>
-      {/* <div className="bg-gray-200 text-xs font-semibold">
+        {/* <div className="bg-gray-200 text-xs font-semibold">
         <h1>Account contact</h1>
       </div> */}
         <div className="w-full h-full  flex justify-center items-center">
@@ -435,9 +438,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             >
               +Add
             </button>
-            <span className="text-gray-400 italic">
-              No contacts available.
-            </span>
+            <span className="text-gray-400 italic">No contacts available.</span>
           </div>
         </div>
       ) : (
@@ -576,13 +577,17 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     </div>
                     <div className="flex-1">
                       <h2 className="text-3xl font-bold text-gray-900">
-                        {selectedContactCard.name ? selectedContactCard.name :  (
+                        {selectedContactCard.name ? (
+                          selectedContactCard.name
+                        ) : (
                           <span className="text-sm italic">Unamed contact</span>
                         )}
                       </h2>
                       <p className="text-md text-gray-600 mt-1 flex items-center">
                         <Briefcase size={16} className="inline mr-2" />
-                        {selectedContactCard.designation ? selectedContactCard.designation : (
+                        {selectedContactCard.designation ? (
+                          selectedContactCard.designation
+                        ) : (
                           <span className="text-sm italic">
                             No job title specified
                           </span>
@@ -643,7 +648,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             Email Address
                           </h4>
                           <p className="text-gray-700">
-                            {selectedContactCard.email ? selectedContactCard.email :  (
+                            {selectedContactCard.email ? (
+                              selectedContactCard.email
+                            ) : (
                               <span className="text-sm italic">
                                 Not provided
                               </span>
@@ -659,7 +666,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             Mobile Number
                           </h4>
                           <p className="text-gray-700">
-                            {selectedContactCard.mobileNumber ? selectedContactCard.mobileNumber :  (
+                            {selectedContactCard.mobileNumber ? (
+                              selectedContactCard.mobileNumber
+                            ) : (
                               <span className="text-sm italic">
                                 Not provided
                               </span>
@@ -675,7 +684,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             Preferred Language
                           </h4>
                           <p className="text-gray-700">
-                            {selectedContactCard.preferredLanguage ? selectedContactCard.preferredLanguage :  (
+                            {selectedContactCard.preferredLanguage ? (
+                              selectedContactCard.preferredLanguage
+                            ) : (
                               <span className="text-sm italic">
                                 Not provided
                               </span>
@@ -693,10 +704,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         />
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">
-                            Preferred Communication 
+                            Preferred Communication
                           </h4>
                           <p className="text-gray-700">
-                            {selectedContactCard.preferredCommunicationChannel ? selectedContactCard.preferredCommunicationChannel :  (
+                            {selectedContactCard.preferredCommunicationChannel ? (
+                              selectedContactCard.preferredCommunicationChannel
+                            ) : (
                               <span className="text-sm italic">
                                 Not provided
                               </span>
@@ -757,7 +770,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                                         //   );
                                         // } else {
                                         toast.error(
-                                          MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                                          MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                                            .DENIED_UPDATE_ACCESS
                                         );
                                       }
                                   // }
@@ -789,7 +803,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     </div>
                   </div>
 
-
                   {/* Address */}
                   {selectedContactCard.address && (
                     <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
@@ -808,329 +821,320 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>
             </div>
           )}
-         
         </>
       )}
-       {/* Add Contact Form Modal */}
-          {isOpenAddAccountContactForm && (
-            <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-              <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
-                {/* Header */}
+      {/* Add Contact Form Modal */}
+      {isOpenAddAccountContactForm && (
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+          <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+            {/* Header */}
 
-                <div className="px-2 py-2  border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {editContactData ? "Edit Contact" : "Add New Contact"}
-                      </h2>
-                      <p className="text-gray-600 mt-1">
-                        {editContactData
-                          ? "Update contact information"
-                          : "Create new account contact"}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setEditingContactId(null);
-                        setIsOpenAddAccountContactForm(false);
-                        setEditContactData(null);
-                        // note
-                        setAccountContactForm({
-                          name: "",
-                          email: "",
-                          address: "",
-                          department: "",
-                          designation: "",
-                          mobileNumber: "",
-                          preferredCommunicationChannel: "",
-                          preferredLanguage: "",
-                        });
-                      }}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <X size={24} />
-                    </button>
-                  </div>
+            <div className="px-2 py-2  border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {editContactData ? "Edit Contact" : "Add New Contact"}
+                  </h2>
+                  <p className="text-gray-600 mt-1">
+                    {editContactData
+                      ? "Update contact information"
+                      : "Create new account contact"}
+                  </p>
                 </div>
+                <button
+                  onClick={() => {
+                    setEditingContactId(null);
+                    setIsOpenAddAccountContactForm(false);
+                    setEditContactData(null);
+                    // note
+                    setAccountContactForm({
+                      name: "",
+                      email: "",
+                      address: "",
+                      department: "",
+                      designation: "",
+                      mobileNumber: "",
+                      preferredCommunicationChannel: "",
+                      preferredLanguage: "",
+                    });
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
 
-                {/* Form Grid */}
-                <form>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
-                    {/* name */}
-                    <div>
-                      <label htmlFor="name" className={formInputLabelClassName}>
-                        {" "}
-                        <User size={16} className="inline mr-1 text-blue-500" />
-                        Full Name*{" "}
-                      </label>
-                      <input
-                        autoFocus
-                        id="name"
-                        type="text"
-                        name="name"
-                        onBlur={handleBlur}
-                        minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                        maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                        placeholder="Enter full name"
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        defaultValue={editContactData?.name || ""}
-                        // readOnly={editContactData !== null}
-                        // onClick={() => {
-                        //   if (editContactData !== null) {
-                        //     toast.error(
-                        //       MESSAGE.ERROR
-                        //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        //     );
-                        //   }
-                        // }}
-                      />
-                      {errors.name && (
-                        <p className="text-xs text-red-600 mt-1">
-                          {errors.name}
-                        </p>
-                      )}
-                      {/* {editContactData?.isPrimary && (
+            {/* Form Grid */}
+            <form>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
+                {/* name */}
+                <div>
+                  <label htmlFor="name" className={formInputLabelClassName}>
+                    {" "}
+                    <User size={16} className="inline mr-1 text-blue-500" />
+                    Full Name*{" "}
+                  </label>
+                  <input
+                    autoFocus
+                    id="name"
+                    type="text"
+                    name="name"
+                    onBlur={handleBlur}
+                    minLength={VALIDATIONS.MIN_NAME_LENGTH}
+                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                    placeholder="Enter full name"
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    defaultValue={editContactData?.name || ""}
+                    // readOnly={editContactData !== null}
+                    // onClick={() => {
+                    //   if (editContactData !== null) {
+                    //     toast.error(
+                    //       MESSAGE.ERROR
+                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                    //     );
+                    //   }
+                    // }}
+                  />
+                  {errors.name && (
+                    <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                  )}
+                  {/* {editContactData?.isPrimary && (
                     <p className="text-gray-500 text-xs mt-1">
                       Primary contact name cannot be changed
                     </p>
                   )} */}
-                    </div>
-                    {/* email */}
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className={formInputLabelClassName}
-                      >
-                        <Mail size={16} className="inline mr-2 text-blue-500" />{" "}
-                        Email Address
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                        placeholder="Enter email address"
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.email || ""}
-                        // readOnly={editContactData !== null}
-                        // onClick={() => {
-                        //   if (editContactData !== null) {
-                        //     toast.error(
-                        //       MESSAGE.ERROR
-                        //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        //     );
-                        //   }
-                        // }}
-                      />
-                      {errors.email && (
-                        <p className="text-xs text-red-600 mt-1">
-                          {errors.email}
-                        </p>
-                      )}
-                      {/* {editContactData?.isPrimary && (
+                </div>
+                {/* email */}
+                <div>
+                  <label htmlFor="email" className={formInputLabelClassName}>
+                    <Mail size={16} className="inline mr-2 text-blue-500" />{" "}
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                    placeholder="Enter email address"
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.email || ""}
+                    // readOnly={editContactData !== null}
+                    // onClick={() => {
+                    //   if (editContactData !== null) {
+                    //     toast.error(
+                    //       MESSAGE.ERROR
+                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                    //     );
+                    //   }
+                    // }}
+                  />
+                  {errors.email && (
+                    <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+                  )}
+                  {/* {editContactData?.isPrimary && (
                     <p className="text-gray-500 text-xs mt-1">
                       Primary contact email cannot be changed
                     </p>
                   )} */}
-                    </div>
-                    {/* mobile number */}
-                    <div>
-                      <label
-                        htmlFor="mobileNumber"
-                        className={formInputLabelClassName}
-                      >
-                        <Phone
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />{" "}
-                        Mobile Number
-                      </label>
-                      <input
-                        id="mobileNumber"
-                        type="text"
-                        name="mobileNumber"
-                        minLength={10}
-                        maxLength={10}
-                        placeholder="Enter mobile number"
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.mobileNumber || ""}
-                        // onClick={() => {
-                        //   if (
-                        //     editContactData?.isPrimary &&
-                        //     editContactData !== null
-                        //   ) {
-                        //     toast.error(
-                        //       MESSAGE.ERROR
-                        //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        //     );
-                        //   }
-                        // }}
-                      />
-                      {errors.mobileNumber && (
-                        <p className="text-xs text-red-600 mt-1 ">
-                          {errors.mobileNumber}
-                        </p>
-                      )}
-                      {/* {editContactData?.isPrimary && (
+                </div>
+                {/* mobile number */}
+                <div>
+                  <label
+                    htmlFor="mobileNumber"
+                    className={formInputLabelClassName}
+                  >
+                    <Phone size={16} className="inline mr-2 text-blue-500" />{" "}
+                    Mobile Number
+                  </label>
+                  <input
+                    id="mobileNumber"
+                    type="text"
+                    name="mobileNumber"
+                    minLength={10}
+                    maxLength={10}
+                    placeholder="Enter mobile number"
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.mobileNumber || ""}
+                    // onClick={() => {
+                    //   if (
+                    //     editContactData?.isPrimary &&
+                    //     editContactData !== null
+                    //   ) {
+                    //     toast.error(
+                    //       MESSAGE.ERROR
+                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
+                    //     );
+                    //   }
+                    // }}
+                  />
+                  {errors.mobileNumber && (
+                    <p className="text-xs text-red-600 mt-1 ">
+                      {errors.mobileNumber}
+                    </p>
+                  )}
+                  {/* {editContactData?.isPrimary && (
                     <p className="text-gray-500 text-xs mt-1">
                       Primary contact mobile number cannot be changed
                     </p>
                   )} */}
-                    </div>
-                    {/* designation */}
-                    <div>
-                      <label
-                        htmlFor="designation"
-                        className={formInputLabelClassName}
-                      >
-                        {" "}
-                        <Briefcase
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />
-                        Designation
-                      </label>
-                      <input
-                        id="designation"
-                        type="text"
-                        name="designation"
-                        maxLength={100}
-                        placeholder="Enter designation"
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.designation || ""}
-                      />
-                    </div>
-                    {/* department */}
-                    <div>
-                      <label
-                        htmlFor="department"
-                        className={formInputLabelClassName}
-                      >
-                        {" "}
-                        <Briefcase
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />
-                        Department
-                      </label>
-                      <input
-                        id="department"
-                        type="text"
-                        name="department"
-                        maxLength={100}
-                        placeholder="Enter department name "
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.department || ""}
-                      />
-                    </div>
-                    {/* Preferrd language */}
-                    <div>
-                      <label
-                        htmlFor="preferredLanguage"
-                        className={formInputLabelClassName}
-                      >
-                        <Languages
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />
-                        Preferred Language
-                      </label>
-                      <input
-                        id="preferredLanguage"
-                        type="text"
-                        name="preferredLanguage"
-                        maxLength={100}
-                        placeholder="eg : Marathi , English etc ..."
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.preferredLanguage || ""}
-                      />
-                    </div>
-
-                    {/* Preferred communication channel */}
-                    <div>
-                      <label
-                        htmlFor="preferredCommunicationChannel"
-                        className={formInputLabelClassName}
-                      >
-                        <MessageCircle
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />
-                        Preferred Communication Channel
-                      </label>
-                      <input
-                        id="preferredCommunicationChannel"
-                        type="text"
-                        maxLength={100}
-                        name="preferredCommunicationChannel"
-                        placeholder="eg : Mail, Phone, WhatsApp etc ..."
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={
-                          editContactData?.preferredCommunicationChannel || ""
-                        }
-                      />
-                    </div>
-
-                    {/* Address */}
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="address"
-                        className={formInputLabelClassName}
-                      >
-                        {" "}
-                        <MapPin
-                          size={16}
-                          className="inline mr-2 text-blue-500"
-                        />
-                        Address
-                      </label>
-                      <textarea
-                        id="address"
-                        placeholder="Enter full address"
-                        name="address"
-                        rows={4}
-                        maxLength={256}
-                        className={inputClass}
-                        onChange={handleFormInputChange}
-                        onBlur={handleBlur}
-                        defaultValue={editContactData?.address || ""}
-                      />
-                    </div>
-                  </div>
-                </form>
-                {/* Footer Buttons */}
-                <div className="flex justify-end gap-4 mt-6 flex-wrap">
-                  <button
-                    type="submit"
-                    onClick={() => setIsOpenAddAccountContactForm(false)}
-                    className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
+                </div>
+                {/* designation */}
+                <div>
+                  <label
+                    htmlFor="designation"
+                    className={formInputLabelClassName}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
-                    type="submit"
-                    onClick={handleSubmit}
+                    {" "}
+                    <Briefcase
+                      size={16}
+                      className="inline mr-2 text-blue-500"
+                    />
+                    Designation
+                  </label>
+                  <input
+                    id="designation"
+                    type="text"
+                    name="designation"
+                    maxLength={100}
+                    placeholder="Enter designation"
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.designation || ""}
+                  />
+                </div>
+                {/* department */}
+                <div>
+                  <label
+                    htmlFor="department"
+                    className={formInputLabelClassName}
                   >
-                    Save Contact
-                  </button>
+                    {" "}
+                    <Briefcase
+                      size={16}
+                      className="inline mr-2 text-blue-500"
+                    />
+                    Department
+                  </label>
+                  <input
+                    id="department"
+                    type="text"
+                    name="department"
+                    maxLength={100}
+                    placeholder="Enter department name "
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.department || ""}
+                  />
+                </div>
+                {/* Preferrd language */}
+                <div>
+                  <label
+                    htmlFor="preferredLanguage"
+                    className={formInputLabelClassName}
+                  >
+                    <Languages
+                      size={16}
+                      className="inline mr-2 text-blue-500"
+                    />
+                    Preferred Language
+                  </label>
+                  <input
+                    id="preferredLanguage"
+                    type="text"
+                    name="preferredLanguage"
+                    maxLength={100}
+                    placeholder="eg : Marathi , English etc ..."
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.preferredLanguage || ""}
+                  />
+                </div>
+
+                {/* Preferred communication channel */}
+                <div>
+                  <label
+                    htmlFor="preferredCommunicationChannel"
+                    className={formInputLabelClassName}
+                  >
+                    <MessageCircle
+                      size={16}
+                      className="inline mr-2 text-blue-500"
+                    />
+                    Preferred Communication Channel
+                  </label>
+                  <input
+                    id="preferredCommunicationChannel"
+                    type="text"
+                    maxLength={100}
+                    name="preferredCommunicationChannel"
+                    placeholder="eg : Mail, Phone, WhatsApp etc ..."
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={
+                      editContactData?.preferredCommunicationChannel || ""
+                    }
+                  />
+                </div>
+
+                {/* Address */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="address" className={formInputLabelClassName}>
+                    {" "}
+                    <MapPin size={16} className="inline mr-2 text-blue-500" />
+                    Address
+                  </label>
+                  <textarea
+                    id="address"
+                    placeholder="Enter full address"
+                    name="address"
+                    rows={4}
+                    maxLength={256}
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.address || ""}
+                  />
                 </div>
               </div>
+            </form>
+            {/* Footer Buttons */}
+            <div className="flex items-center justify-end gap-4 mt-6 ">
+              <div className="flex gap-2">
+                <Button
+                  type="submit"
+                  onClick={() => setIsOpenAddAccountContactForm(false)}
+                  // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
+                >
+                  <div className="flex items-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button
+                  // className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
+                  type="submit"
+                  onClick={handleSubmit}
+                >
+                  <div className="flex items-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+              </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

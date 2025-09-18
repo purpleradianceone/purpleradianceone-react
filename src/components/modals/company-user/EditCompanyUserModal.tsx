@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { EditIcon, X } from "lucide-react";
+import { EditIcon, Mail, Phone, Save, User, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -8,7 +8,11 @@ import POST_API from "../../../constants/PostApi";
 import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
+import {
+  SIZE,
+  STATUS_CODE,
+  VALIDATIONS,
+} from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -36,11 +40,6 @@ function EditCompanyUserModal({
 
   const [userIsActive, setUserIsActive] = useState<boolean>(user.isactive);
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
   const { loginStatus } = useLoggedInUserContext();
 
   useEffect(() => {
@@ -57,9 +56,11 @@ function EditCompanyUserModal({
     event.preventDefault();
 
     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-    if (updateUserformData.mobileNumber && updateUserformData.mobileNumber!.trim() !== "") {
+    if (
+      updateUserformData.mobileNumber &&
+      updateUserformData.mobileNumber!.trim() !== ""
+    ) {
       if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
-        // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
         toast.error("Invalid mobile number");
         return;
       }
@@ -98,16 +99,8 @@ function EditCompanyUserModal({
             })
             .then((response) => {
               if (response.data.status) {
-                // showMessageSnackbar({
-                //   message: response.data.message,
-                //   type: "success",
-                // });
                 toast.success(response.data.message);
               } else if (!response.data.status) {
-                // showMessageSnackbar({
-                //   message: response.data.message,
-                //   type: "error",
-                // });
                 toast.error(response.data.message);
               }
               handleCompanyUserChange(user);
@@ -125,32 +118,19 @@ function EditCompanyUserModal({
                   handleEditUserSubmit(event);
                 }
               } else {
-                // showMessageSnackbar({
-                //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-                //   type: "error",
-                // });
                 toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
               }
             });
         } else {
-          // showMessageSnackbar({
-          //   message: MESSAGE.ERROR.NO_CHANGES,
-          //   type: "error",
-          // });
           toast.error(MESSAGE.ERROR.NO_CHANGES);
         }
       } else {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.NAME_REQUIRED,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.NAME_REQUIRED);
         setErrors({
           name: MESSAGE.ERROR.NAME_REQUIRED,
         });
       }
     } else {
-      // showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
       toast.error(MESSAGE.ERROR.NO_CHANGES);
     }
   };
@@ -163,7 +143,6 @@ function EditCompanyUserModal({
 
     if (user.id === loginStatus.id) {
       setUserIsActive(checked);
-      // showMessageSnackbar({message : "Can't change your own status", type : "error"});
       toast.error("Can't change your own status");
       setTimeout(() => {
         setUserIsActive(user.isactive);
@@ -185,17 +164,9 @@ function EditCompanyUserModal({
       })
       .then((response) => {
         if (response.data.status) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
           toast.success(response.data.message);
           setUserIsActive(checked);
         } else if (!response.data.status) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "error",
-          // });
           toast.error(response.data.message);
         }
         handleCompanyUserChange(user);
@@ -210,54 +181,41 @@ function EditCompanyUserModal({
             handleCompanyUserToggle(event);
           }
         } else {
-          // showMessageSnackbar({
-          //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-          //   type: "error",
-          // });
           toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         }
       });
   };
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
-  // useEffect(() => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // }, [isOpen]);
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-45">
+      <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+            className=" w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-            >
-              <X size={SIZE.TWENTY} />
-            </button>
-
             <div className="p-5">
-              <div className="flex items-center gap-4 mb-5 border-b pb-1">
-                <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Edit {user.fullname}
-                </h2>
+              <div className="flex justify-between items-center  mb-3 border-b ">
+                <div className="flex gap-2">
+                  <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Edit <span className="text-blue-700">{user.fullname}</span>
+                  </h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className=" right-4 top-4 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={SIZE.TWENTY} />
+                </button>
               </div>
 
-              <form className="space-y-8" onSubmit={handleEditUserSubmit}>
+              <form className="space-y-5" onSubmit={handleEditUserSubmit}>
                 <FormInput
+                  logo={User}
                   label="Name"
                   type="text"
                   name="name"
@@ -272,6 +230,7 @@ function EditCompanyUserModal({
                   onBlur={handleBlur}
                 />
                 <FormInput
+                  logo={Phone}
                   label="Mobile Number"
                   type="tel"
                   name="mobileNumber"
@@ -290,7 +249,8 @@ function EditCompanyUserModal({
                   >
                     Status :
                   </label>
-                  <label className="relative inline-flex items-center cursor-pointer">
+
+                  <label className="inline-flex items-center cursor-pointer relative self-end">
                     <input
                       type="checkbox"
                       id="isActive"
@@ -299,14 +259,14 @@ function EditCompanyUserModal({
                       onChange={handleCompanyUserToggle}
                       className="sr-only peer"
                     />
-                    <div
-                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
-                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
-                    ></div>
+                    <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                    {/* Adjusted size and colors */}
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                    {/* Adjusted size and position */}
                   </label>
                 </div>
                 <FormInput
+                  logo={Mail}
                   label="Email"
                   type="email"
                   name="email"
@@ -317,19 +277,24 @@ function EditCompanyUserModal({
                   defaultValue={user.email}
                   readonly={true}
                 />
-                <div className="flex justify-self-center min-w-60 ">
-                  <Button type="submit">Update Company User</Button>
+                <div className="flex justify-end  ">
+                  <div className="flex gap-1">
+                    <Button onClick={onClose} type="reset">
+                      <div className="flex items-center">
+                        <X size={16} /> Cancel
+                      </div>
+                    </Button>
+                    <Button type="submit">
+                      <div className="flex items-center gap-1">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>
           </div>
-          {/* <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleCloseSnackbar}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          /> */}
         </div>
       </div>
     </>

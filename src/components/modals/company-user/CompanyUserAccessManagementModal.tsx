@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { Save, X } from "lucide-react";
 import Button from "../../ui/Button";
 import AccessRightsModalProps from "../../../@types/company-users/AccessRightsModalProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -157,17 +157,8 @@ function CompanyUserAccessManagementModal({
     });
   };
 
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   const handleSaveAccessModule = async () => {
     if (changedAccessModules.length === 0) {
-      // showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
       toast.error(MESSAGE.ERROR.NO_CHANGES);
       return;
     }
@@ -191,10 +182,6 @@ function CompanyUserAccessManagementModal({
         withCredentials: true,
       })
       .then((response) => {
-        // showMessageSnackbar({
-        //   message: response.data.message,
-        //   type: "success",
-        // });
         toast.success(response.data.message);
 
         setSpinnerAnimation({
@@ -225,10 +212,6 @@ function CompanyUserAccessManagementModal({
             handleSaveAccessModule();
           }
         } else {
-          // showMessageSnackbar({
-          //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-          //   type: "error",
-          // });
           toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         }
       });
@@ -245,7 +228,7 @@ function CompanyUserAccessManagementModal({
 
   return (
     <>
-      <div className="fixed inset-0 z-10 p-4 overflow-hidden bg-black bg-opacity-45">
+      <div className="fixed inset-0 z-10 p-4 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div className="relative w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
             {/* Header */}
@@ -388,18 +371,13 @@ function CompanyUserAccessManagementModal({
 
             {/* Footer */}
             <div className="p-6 border-t bg-white">
-              <div className="flex justify-self-end min-w-36 max-w-44">
-                {/* {userHasAccessToUpdateAccess ? (
-                  users.id === loginStatus.id ? (
-                    <Button disabled={true}>Save</Button>
-                  ) : (
-                    <Button  onClick={handleSaveAccessModule} spinner={spinnerAnimation}>
-                      Save
-                    </Button>
-                  )
-                ) : (
-                  <Button disabled={true}>Save</Button>
-                )} */}
+              <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
+                 <Button type="button" onClick={onClose}>
+                  <div className="flex gap-0.5 items-center">
+              <X size={16} />
+              Cancel
+            </div>
+                </Button>
                 <Button
                   onClick={
                     userHasAccessToUpdateAccess && users.id !== loginStatus.id
@@ -421,19 +399,15 @@ function CompanyUserAccessManagementModal({
                       : undefined
                   }
                 >
-                  Save
+                 <div className="flex gap-1 items-center">
+              <Save size={16} />
+              Save
+            </div>
                 </Button>
+               
               </div>
             </div>
           </div>
-
-          {/* <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          /> */}
         </div>
       </div>
     </>
