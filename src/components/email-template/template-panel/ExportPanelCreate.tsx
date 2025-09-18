@@ -4,6 +4,7 @@ import { useEditor } from "@craftjs/core";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
 import toast from "react-hot-toast";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
+import Button from "../../ui/Button";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
@@ -42,34 +43,14 @@ export const ExportPanelCreate: React.FC<ExportPanelProps> = ({
 
   return (
     <div style={{ display: "flex", gap: 10 }}>
-      <button
-        onClick={handlePreview}
-        style={{
-          top: 50,
-          left: "50%",
-          padding: "2px 8px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        Preview HTML
-      </button>
+      <div>
+        <Button onClick={handlePreview}>Preview HTML</Button>
+      </div>
 
-      <button
-        onClick={handleCopy}
-        style={{
-          padding: "2px 8px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        Copy HTML
-      </button>
+      <div>
+        <Button onClick={handleCopy}>Copy HTML</Button>
+      </div>
+
       <>
         {/* Settings panel */}
         <TemplateSettingsPanelCreate

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Handshake, UserRoundPlus, X } from "lucide-react";
+import { Handshake, Save, UserRoundPlus, X } from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
@@ -327,7 +327,6 @@ function CreateLeadModal({
         })
         .then((response) => {
           if (response.data.status === true) {
-            
             toast.success(response.data.message);
             // note : this callback will run to refresh the list of aggrid
             onCreateLeadRefreshLeadData!();
@@ -479,17 +478,7 @@ function CreateLeadModal({
                 <div className="text-red-500 text-xs">{error.mobileNumber}</div>
               )}
             </div>
-            {/* <FormInput
-              label="Mobile Number : "
-              type="tel"
-              name="mobileNumber"
-              pattern="[0-9]{10}"
-              placeholder="Enter Phone Number"
-              value={createLeadModalFormData.mobileNumber}
-              onChange={handleCreateLeadModalFormDataChange}
-              onBlur={handleBlur}
-              error={errors.mobileNumber}
-            /> */}
+            
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
                 <Button onClick={handleCompanyUserPopUp} type="button">
@@ -516,6 +505,7 @@ function CreateLeadModal({
             {/* Lead Status */}
             <div className="space-y-1">
               <CustomDropdown
+              requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
@@ -530,6 +520,7 @@ function CreateLeadModal({
             {/* Lead Source */}
             <div className="space-y-1">
               <CustomDropdown
+              requiredRedDot
                 labelName="Lead Source :"
                 options={leadSource!}
                 onSelect={handleLeadSelectedSource}
@@ -542,10 +533,23 @@ function CreateLeadModal({
             </div>
           </div>
 
-          <div className="flex justify-center px-36 ">
-            <Button type="submit">
-              <span>Create Lead</span>
-            </Button>
+          <div className="flex justify-end ">
+            <div className="flex gap-2">
+              <Button  
+              onClick={onClose}
+              type="reset">
+                <div className="flex items-center gap-0.5">
+                  <X size={16} />
+                  <span>Cancel</span>
+                </div>
+              </Button>
+              <Button type="submit">
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  <span>Save</span>
+                </div>
+              </Button>
+            </div>
           </div>
         </form>
       </div>

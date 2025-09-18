@@ -13,12 +13,11 @@ import {
   XCircle,
   Star,
   Loader2,
-  LucideMailPlus,
   LucidePlus,
-  LayoutDashboard,
   Calendar,
   Filter,
   X,
+  LayoutDashboard,
 } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import useScreenSize from "../../config/hooks/useScreenSize";
@@ -341,10 +340,10 @@ export const TemplatesPage: React.FC = () => {
       <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
         <div className="flex  justify-between w-full h-9 items-center">
           <div className="flex gap-2">
-            {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
-            {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
+            {<LayoutDashboard className="w-7 h-7 text-blue-600 " />}
 
-            <span className="text-xl sm:text-base md:text-clip font-bold ">
+
+            <span className="section-header-custom">
               Email Templates
             </span>
           </div>
@@ -365,7 +364,7 @@ export const TemplatesPage: React.FC = () => {
                 {/* Date FIlters Dropdown */}
                 <div className="flex mx-1">
                   <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
                       <Calendar className="mt-2" />
                     </div>
                     <DateRangeFilterDropdown
@@ -603,16 +602,16 @@ const Tabs: React.FC<TabsProps> = ({
   templateTypes,
 }) => (
   <div className="sticky top-0 mb-1 bg-white overflow-x-auto scrollbar-hide">
-    <div className="flex flex-nowrap text-xs">
+    <div className="flex flex-nowrap overflow-x-auto custom-height-scrollbar p-1">
       {templateTypes.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.name)}
-          className={`py-2 px-4 border-b-2 whitespace-nowrap ${
+          className={`py-2 px-4 border-b-2 ${
             activeTab === tab.name
-              ? "border-blue-600 text-blue-600 font-semibold"
-              : "border-transparent text-gray-600 hover:text-gray-900"
-          } transition-colors duration-200`}
+              ? "main-nav-custom active-header"
+              : "border-transparent main-nav-custom"
+          } transition-colors duration-200 min-w-fit `}
         >
           {tab.name}
         </button>
@@ -708,7 +707,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
   return (
     <>
       {templates.length === 0 && !loading && !hasmore && (
-        <div className="text-center text-gray-500 mt-10 p-4 border rounded-md bg-white shadow-sm">
+        <div className="text-center caption-custom mt-10 p-4 border rounded-md bg-white shadow-sm">
           No templates found.
         </div>
       )}
@@ -721,12 +720,12 @@ const TemplateList: React.FC<TemplateListProps> = ({
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="text-base font-semibold text-gray-900">
+                <h3 className="table-header-custom">
                   {template.name}
                 </h3>
-                <p className="text-sm text-gray-600">
-                  <strong>Subject:</strong>{" "}
-                  {template.email_subject || <em>No subject</em>}
+                <p className="table-data-custom">
+                  <strong className="input-label-custom">Subject:</strong>{" "}
+                  <span className="caption-custom">{template.email_subject || <em>No subject</em>}</span>
                 </p>
               </div>
               <div className="flex gap-2">
@@ -764,10 +763,10 @@ const TemplateList: React.FC<TemplateListProps> = ({
               </div>
             </div>
 
-            <div className="flex  items-center justify-between col-span-2    text-sm text-gray-700">
+            <div className="flex  items-center justify-between col-span-2 input-label-custom">
             {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
 
-              <div className="flex flex-col col-span-1 text-sm text-gray-700">
+              <div className="flex flex-col col-span-1">
                 {/* Active */}
                 <span className="flex items-center mb-2 justify-between gap-2">
                   {template.isactive ? (
@@ -775,8 +774,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   ) : (
                     <XCircle className="text-gray-400" size={16} />
                   )}
-                  <strong>Active: </strong>
-                  {template.isactive ? "Yes" : "No"}
+                  <strong className="input-label-custom">Active: </strong>
                   <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
@@ -819,8 +817,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   ) : (
                     <XCircle className="text-gray-400" size={16} />
                   )}
-                  <strong>Default: </strong>
-                  {template.is_default ? "Yes" : "No"}
+                  <strong className="input-label-custom">Default: </strong>
                   <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
@@ -858,26 +855,26 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   ) : (
                     <XCircle className="text-gray-400" size={16} />
                   )}
-                  <strong>Master:</strong>
-                  <span>{template.is_master ? "Yes" : "No"}</span>
+                  <strong className="input-label-custom">Master:</strong>
+                  <span className={template.is_master ? 'caption-custom-blue' : 'caption-custom' }>{template.is_master ? "Yes" : "No"}</span>
                 </span>
               </div>
 
               <div className="flex justify-between text-sm text-gray-600 -mt-3">
                 <div className="px-3 rounded-md">
                   <p>
-                    <strong>Created By:</strong> {template.createdby}
+                    <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{template.createdby}</span>
                   </p>
                   <p>
-                    <strong>Created On:</strong>{" "}
-                    {new Date(template.createdon).toLocaleDateString()}
+                    <strong className="input-label-custom">Created On:</strong>{" "}
+                    <span className="caption-custom">{template.createdon}</span>
                   </p>
                   <p>
-                    <strong>Updated By:</strong> {template.updatedby}
+                    <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{template.updatedby}</span>
                   </p>
                   <p>
-                    <strong>Updated On:</strong>{" "}
-                    {new Date(template.updatedon).toLocaleDateString()}
+                    <strong className="input-label-custom">Updated On:</strong>{" "}
+                    <span className="caption-custom">{template.updatedon}</span>
                   </p>
                 </div>
               </div>
@@ -1001,11 +998,11 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   ) : (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 className="text-lg font-semibold mb-4">Select Template Type</h2>
+        <h2 className="table-header-custom mb-4">Select Template Type</h2>
         <select
           value={selectedTypeId} // Value will be '' initially or the selected ID string
           onChange={(e) => setSelectedTypeId(e.target.value)}
-          className="w-full mb-3 border px-3 py-2 rounded"
+          className="w-full mb-3 border px-3 py-2 rounded input-label-custom"
         >
           <option value="">Select template type</option>{" "}
           {/* Value is empty string for no selection */}

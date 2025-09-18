@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
-import { UserPlus, X } from "lucide-react";
+import { Mail, Phone, Save, User, UserPlus, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -8,10 +8,6 @@ import axios from "axios";
 import AddCompanyUserStateType from "../../../@types/modal/AddCompanyUserStateType";
 import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalProps";
 import POST_API from "../../../constants/PostApi";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
@@ -44,28 +40,12 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     addCompanyUserFormData,
     "registration"
   );
-
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const mobileRegex = REGEX.MOBILE_NUMBER;
     const nameRegex = REGEX.NAME_SPACE_DOT_ALLOWED_ONLY;
     if (addCompanyUserFormData.mobilenumber!.trim() !== "") {
       if (!mobileRegex.test(addCompanyUserFormData.mobilenumber!.trim())) {
-        // showMessageSnackbar({message : "Invalid mobile number", type : "error"});
         toast.error("Invalid mobile number");
         return;
       }
@@ -101,10 +81,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           }
         );
         if (response.data.status) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
           toast.success(response.data.message);
           setAddCompanyUserFormData({
             name: "",
@@ -114,18 +90,10 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           onClose();
           window.location.href = ROUTES_URL.GET_COMPANY_USERS;
         } else {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "error",
-          // });
           toast.error(response.data.message);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError | any) {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         if (error) {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -136,19 +104,11 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               handleAddUserSubmit(event);
             }
           } else {
-            // showMessageSnackbar({
-            //   message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-            //   type: "error",
-            // });
             toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
           }
         }
       }
     } else {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
-      //   type: "error",
-      // });
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
   };
@@ -169,8 +129,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       <div
         className={
           isSmallScreen
-            ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
-            : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-45"
+            ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+            : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-5"
         }
       >
         <div className="flex min-h-screen items-center justify-center">
@@ -201,6 +161,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput
+                logo={User}
                   label="Name"
                   type="text"
                   name="name"
@@ -214,6 +175,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   minLength={VALIDATIONS.MIN_NAME_LENGTH}
                 />
                 <FormInput
+                logo={Phone}
                   label="Mobile Number"
                   type="tel"
                   name="mobilenumber"
@@ -227,6 +189,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
                 />
                 <FormInput
+                logo={Mail}
                   label="Email"
                   type="email"
                   name="email"
@@ -240,17 +203,27 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                   minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
                 />
 
-                <Button type="submit">Create</Button>
+                <div className="flex items-center justify-end">
+                  <div className="flex gap-2">
+
+                <Button  onClick={onClose} type="reset">
+                  
+                   <div className="flex items-center justify-center gap-0.5">
+                    <X size={16}/>
+                    Cancel
+                    </div>
+                    </Button>
+                  <Button type="submit">
+                   <div className="flex items-center justify-center gap-1">
+                     <Save size={16}/>
+                    Save
+                   </div>
+                    </Button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>
-          {/* <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleCloseSnackbar}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          /> */}
         </div>
       </div>
     </>

@@ -10,6 +10,8 @@ import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import Button from "../../ui/Button";
+import FormInput from "../../ui/FormInput";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -106,7 +108,7 @@ export const TemplateSettingsPanelInsert: React.FC<
           top: "60px",
           right: 0,
           padding: "3px 8px",
-          backgroundColor: "#4CAF50",
+          // backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
@@ -114,7 +116,7 @@ export const TemplateSettingsPanelInsert: React.FC<
         }}
       >
         {/* Fixed Button to Open Settings */}
-        <button onClick={() => setIsOpen(true)}>Save Template</button>
+        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
 
         {isOpen && (
           <div
@@ -157,15 +159,7 @@ export const TemplateSettingsPanelInsert: React.FC<
               }}
             >
               <div style={{ marginBottom: "15px" }}>
-                <h3
-                  style={{
-                    margin: "0 0 10px 0",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Template Settings
-                </h3>
+                <h3 className="table-header-custom">Template Settings</h3>
               </div>
 
               <div
@@ -177,7 +171,15 @@ export const TemplateSettingsPanelInsert: React.FC<
               >
                 {/* Template Name */}
                 <div>
-                  <label
+                  <FormInput
+                    label="Template Name"
+                    type="text"
+                    required
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
+                  />
+                  {/* <label
                     style={{
                       display: "block",
                       marginBottom: "6px",
@@ -185,9 +187,9 @@ export const TemplateSettingsPanelInsert: React.FC<
                       fontWeight: "500",
                     }}
                   >
-                    Template Name
-                  </label>
-                  <input
+                    
+                  </label> */}
+                  {/* <input
                     type="text"
                     required
                     value={templateName}
@@ -200,7 +202,7 @@ export const TemplateSettingsPanelInsert: React.FC<
                       fontSize: "14px",
                     }}
                     placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
-                  />
+                  /> */}
                 </div>
 
                 {/* Email Subject with Dynamic Fields */}
@@ -209,11 +211,10 @@ export const TemplateSettingsPanelInsert: React.FC<
                     style={{
                       display: "block",
                       marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
                     }}
+                    className="input-label-custom"
                   >
-                    Email Subject
+                    Email Subject<span className="text-red-500 align-top">*</span>
                   </label>
                   <input
                     ref={subjectInputRef}
@@ -277,41 +278,15 @@ export const TemplateSettingsPanelInsert: React.FC<
                 </div>
 
                 {/* Buttons */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "10px",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "transparent",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Save
-                  </button>
+                <div className="flex justify-end gap-2">
+                  <div>
+                    <Button type="button" onClick={() => setIsOpen(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                  <div>
+                    <Button type="submit">Save</Button>
+                  </div>
                 </div>
               </div>
             </form>

@@ -11,6 +11,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import Button from "../../ui/Button";
 
 export type TemplateSettingsPanelUpdateProps = {
   id: number;
@@ -122,18 +123,15 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
   return (
     <>
       {/* Fixed Button to Open Settings */}
-      <button
+      <div>
+        <Button
         onClick={() => setIsOpen(true)}
-        style={{
-          padding: "3px 8px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
+        
       >
         Save Template
-      </button>
+      </Button>
+      </div>
+      
 
       {isOpen && (
         <div
@@ -326,34 +324,24 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                   gap: "10px",
                 }}
               >
-                <button
+                <div>
+                  <Button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "transparent",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                </div>
+                
+                <div>
+                  <Button
                   type="submit"
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
+                  
                 >
                   Update
-                </button>
+                </Button>
+                </div>
+                
               </div>
             </div>
           </form>

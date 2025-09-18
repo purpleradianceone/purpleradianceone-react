@@ -1,4 +1,18 @@
-import { Store, X } from "lucide-react";
+import {
+  LucideAirplay,
+  LucideCalendar,
+  LucideClock,
+  LucideGroup,
+  LucideIndianRupee,
+  LucideLink,
+  LucidePercent,
+  LucidePresentation,
+  LucideTimer,
+  LucideVerified,
+  Store,
+  Text,
+  X,
+} from "lucide-react";
 import { SIZE, STATUS_CODE, TAX_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
@@ -270,6 +284,7 @@ function AddProductModal({
               <div className="grid col-span-1 ">
                 <FormInput
                   label="Product Name : "
+                  logo={LucidePresentation}
                   maxLength={40}
                   type="text"
                   name="name"
@@ -283,6 +298,7 @@ function AddProductModal({
 
                 <FormInput
                   label="URL :"
+                  logo={LucideLink}
                   type="text"
                   name="url"
                   required={false}
@@ -294,6 +310,7 @@ function AddProductModal({
                 />
                 <FormInput
                   label="Version :"
+                  logo={LucideVerified}
                   type="text"
                   name="version"
                   max={20}
@@ -306,6 +323,7 @@ function AddProductModal({
 
                 <TextAreaInput
                   label="Description : "
+                  logo={Text}
                   name="description"
                   placeholder="Product Description"
                   value={addProductFormData.description}
@@ -322,6 +340,7 @@ function AddProductModal({
                 <div className="grid col-span-1 gap-1">
                   <FormInput
                     label="Basic Cost : "
+                    logo={LucideIndianRupee}
                     type="number"
                     name="cost"
                     value={addProductFormData.cost?.toString()}
@@ -330,6 +349,7 @@ function AddProductModal({
                   />
                   <FormInput
                     label="Item Code : "
+                    logo={LucideAirplay}
                     type="text"
                     name="code"
                     required={true}
@@ -341,6 +361,7 @@ function AddProductModal({
                   />
                   <CustomDropdown
                     labelName="Product Type :"
+                    logo={LucideGroup}
                     preselectedOption={0}
                     onSelect={(e) => {
                       if (e) {
@@ -355,6 +376,7 @@ function AddProductModal({
                 <div className="grid grid-cols-2 gap-3">
                   <CustomDropdown
                     labelName="Warranty Duration"
+                    logo={LucideClock}
                     preselectedOption={0}
                     onSelect={(e) => {
                       if (e) {
@@ -366,6 +388,7 @@ function AddProductModal({
                   />
                   <CustomDropdown
                     labelName="Warranty Time Unit"
+                    logo={LucideTimer}
                     preselectedOption={0}
                     onSelect={(e) => {
                       if (e) {
@@ -380,6 +403,7 @@ function AddProductModal({
                 <div className="grid grid-cols-2 gap-3">
                   <CustomDropdown
                     labelName="AMC Cycle Duration"
+                    logo={LucideClock}
                     preselectedOption={0}
                     onSelect={(e) => {
                       if (e) {
@@ -391,6 +415,7 @@ function AddProductModal({
                   />
                   <CustomDropdown
                     labelName="AMC Time Unit"
+                    logo={LucideTimer}
                     preselectedOption={0}
                     onSelect={(e) => {
                       if (e) {
@@ -413,6 +438,7 @@ function AddProductModal({
               {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
+                  logo={LucideVerified}
                   type="text"
                   name="hsn"
                   value={addProductFormData.hsn}
@@ -423,6 +449,7 @@ function AddProductModal({
 
               {selectedTaxCode === TAX_CODE.SAC && (
                 <FormInput
+                  logo={LucideVerified}
                   label="SAC : "
                   type="text"
                   name="sac"
@@ -434,6 +461,7 @@ function AddProductModal({
 
               <FormInput
                 label="Tax Rate"
+                logo={LucidePercent}
                 type="text"
                 name="taxRate"
                 value={addProductFormData.taxRate?.toString()}
@@ -444,6 +472,7 @@ function AddProductModal({
               />
               <DatePickerInput
                 label="Valid From :"
+                logo={LucideCalendar}
                 name="validFrom"
                 value={addProductFormData.validFrom}
                 placeholder="Select Date"
@@ -453,11 +482,14 @@ function AddProductModal({
               />
 
               {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-center col-span-2  pt-4 ">
-                  <Button type="submit">Add Product</Button>
+                <div className="flex justify-self-end col-span-2 gap-2">
+                  <Button onClick={onClose}>Cancel</Button>
+                  <Button type="submit">Save</Button>
                 </div>
               ) : (
-                <div className="flex justify-self-center col-span-2  pt-4">
+                <div className="flex justify-self-center col-span-2  gap-2 pt-4">
+                  <Button onClick={onClose}>Cancel</Button>
+
                   <Button
                     type="submit"
                     onClick={() => {
@@ -469,7 +501,7 @@ function AddProductModal({
                     }}
                     disabled
                   >
-                    Add Product
+                    Save
                   </Button>
                 </div>
               )}

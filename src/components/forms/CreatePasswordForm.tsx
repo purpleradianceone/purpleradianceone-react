@@ -16,6 +16,7 @@ import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import { OTPInput } from "../ui/OtpInput";
 import REGEX from "../../constants/Regex";
 import toast from "react-hot-toast";
+import { KeySquare } from "lucide-react";
 
 function CreatePasswordForm() {
   const [createPasswordFormData, setCreatePasswordFormData] =
@@ -30,21 +31,8 @@ function CreatePasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
 
   const navigate = useNavigate();
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   const handleOtpChange = (newOtp: string[]) => {
     setCreatePasswordFormData((prev) => ({ ...prev, otp: newOtp }));
@@ -113,20 +101,12 @@ function CreatePasswordForm() {
           setIsSubmitting(true);
 
           localStorage.removeItem(LOCALSTORAGE_KEYS.FORGOT_PASSWORD_EMAIL);
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
           toast.success(response.data.message);
 
           setTimeout(() => {
             navigate(ROUTES_URL.SIGN_IN);
           }, 3000);
         } else {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "error",
-          // });
           toast.error(response.data.message);
           setIsSubmitting(false);
         }
@@ -145,7 +125,7 @@ function CreatePasswordForm() {
           autoFocus
         />
         <FormInput
-
+          logo={KeySquare}
           type={showPassword ? "text" : "password"}
           label="Enter new password"
           placeholder="New password"
@@ -165,6 +145,7 @@ function CreatePasswordForm() {
         />
 
         <FormInput
+        logo={KeySquare}
           type={showConfirmPassword ? "text" : "password"}
           label="Re-enter new password"
           placeholder="Confirm password"
@@ -186,14 +167,6 @@ function CreatePasswordForm() {
           {isSubmitting ? "Creating Password..." : "Create Password"}
         </Button>
       </form>
-{/* 
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </>
   );
 }

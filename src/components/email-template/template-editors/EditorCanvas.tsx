@@ -16,7 +16,7 @@ import {
   DynamicFieldsContext,
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideCode, LucideMail } from "lucide-react";
+import { LucideMail, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
@@ -37,6 +37,8 @@ import ApiError from "../../../@types/error/ApiError";
 import { CanvasWrapper } from "../canvas-wrapper/CanvasWrapper ";
 import toast from "react-hot-toast";
 import { ExportPanelCreate } from "../template-panel/ExportPanelCreate";
+import Button from "../../ui/Button";
+import FormInput from "../../ui/FormInput";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -161,10 +163,9 @@ export const EditorCanvas: React.FC = () => {
     <>
       <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
         <div className="flex  gap-1">
-          {<LucideMail className="w-6 h-6 text-blue-600" />}
-          {<LucideCode className="w-4 h-4 text-blue-600" />}
-          <span className="text-1xl font-bold">Email Template</span>
-          <span className="text-1xl font-bold">
+          {<LucideMail className="w-6 h-6 main-nav-custom active-tab" />}
+          <span className="table-header-custom">Email Template</span>
+          <span className="table-data-custom  ">
             : {JSON.parse(params!).name} Template
           </span>
           <div
@@ -181,16 +182,13 @@ export const EditorCanvas: React.FC = () => {
               >
                 <div
                   onClick={() => setMode("editor")}
+                  className={`cursor-pointer ${
+                    mode === "editor"
+                      ? "main-nav-custom active-header"
+                      : "main-nav-custom "
+                  }`}
                   style={{
                     padding: "6px 10px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    borderBottom:
-                      mode === "editor"
-                        ? "2px solid #007BFF"
-                        : "2px solid transparent",
-                    color: mode === "editor" ? "#007BFF" : "#555",
-                    fontWeight: mode === "editor" ? "bold" : "normal",
                     transition: "all 0.2s ease",
                   }}
                 >
@@ -199,24 +197,21 @@ export const EditorCanvas: React.FC = () => {
 
                 <div
                   onClick={() => {
-                    if (mode === "editor") {
-                      const confirmed = window.confirm(
-                        "\nAre you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost.\n\nClick OK to continue or Cancel to stay on this page."
-                      );
-                      if (!confirmed) return;
-                    }
+                    // if (mode === "editor") {
+                    //   const confirmed = window.confirm(
+                    //     "\nAre you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost.\n\nClick OK to continue or Cancel to stay on this page."
+                    //   );
+                    //   if (!confirmed) return;
+                    // }
                     setMode("insert");
                   }}
+                  className={`cursor-pointer ${
+                    mode === "insert"
+                      ? "main-nav-custom active-header"
+                      : "main-nav-custom"
+                  }`}
                   style={{
                     padding: "6px 10px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    borderBottom:
-                      mode === "insert"
-                        ? "2px solid #007BFF"
-                        : "2px solid transparent",
-                    color: mode === "insert" ? "#007BFF" : "#555",
-                    fontWeight: mode === "insert" ? "bold" : "normal",
                     transition: "all 0.2s ease",
                   }}
                 >
@@ -245,18 +240,17 @@ export const EditorCanvas: React.FC = () => {
             right: 2,
             zIndex: 10,
             color: "white",
-            background: "#007bff",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
             padding: "6px 10px",
             cursor: "pointer",
             fontSize: "12px",
           }}
         >
           {/* Show Fields Button - Always Visible */}
-          <button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
-            ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
-          </button>
+          <div>
+            <Button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
+              ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
+            </Button>
+          </div>
 
           {showDynamicEditor && (
             <div
@@ -287,29 +281,9 @@ export const EditorCanvas: React.FC = () => {
                   borderBottom: "1px solid #eee",
                 }}
               >
-                <h4
-                  style={{
-                    margin: 0,
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    color: "black",
-                  }}
-                >
-                  Dynamic Fields
-                </h4>
-                <button
-                  onClick={() => setShowDynamicEditor(false)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                    lineHeight: 1,
-                    color: "#666",
-                    padding: "4px",
-                  }}
-                >
-                  ✖
+                <h4 className="table-header-custom">Dynamic Fields</h4>
+                <button onClick={() => setShowDynamicEditor(false)}>
+                  <X className="table-header-custom" />
                 </button>
               </div>
 
@@ -329,28 +303,10 @@ export const EditorCanvas: React.FC = () => {
               ) : (
                 parsedFields.map((field) => (
                   <div key={field.value} style={{ marginBottom: "12px" }}>
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        display: "block",
-                        marginBottom: "4px",
-                        fontWeight: 500,
-                        color: "#333",
-                      }}
-                    >
+                    <label className="mb-2 input-label-custom">
                       {field.label}
                     </label>
-                    <input
-                      style={{
-                        width: "100%",
-                        padding: "6px 8px",
-                        fontSize: "12px",
-                        borderRadius: "4px",
-                        border: "1px solid #ddd",
-                        backgroundColor: "#fff",
-                        boxSizing: "border-box",
-                        color: "black",
-                      }}
+                    <FormInput
                       value={dynamicVars[field.value] || ""}
                       onChange={(e) => {
                         setDynamicVars((prev) => ({
@@ -360,16 +316,7 @@ export const EditorCanvas: React.FC = () => {
                       }}
                       placeholder={`Enter value for ${field.label}`}
                     />
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#999",
-                        marginTop: "4px",
-                        fontFamily: "monospace",
-                      }}
-                    >
-                      {field.value}
-                    </div>
+                    <div className="caption-custom">{field.value}</div>
                   </div>
                 ))
               )}
@@ -415,26 +362,24 @@ export const EditorCanvas: React.FC = () => {
                 />
               </div>
 
-              <button
-                onClick={insertHtmlTemplate}
-                style={{ padding: "8px 14px", marginTop: "20px" }}
-              >
-                ⏭️ Preview HTML Template
-              </button>
+              <div className="m-2">
+                <Button onClick={insertHtmlTemplate}>
+                  ⏭️ Preview HTML Template
+                </Button>
+              </div>
 
-              <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-                <button
+              <div className="m-2 flex gap-4">
+                <Button
                   onClick={() => {
                     const beautified = DOMPurify.sanitize(htmlInput);
                     navigator.clipboard.writeText(beautified);
                     toast.success("Email Template copied to clipboard!");
                   }}
-                  style={{ padding: "8px 14px" }}
                 >
                   📋 Copy HTML Email
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={() => {
                     const beautified = DOMPurify.sanitize(htmlInput);
                     const blob = new Blob([beautified], { type: "text/html" });
@@ -444,10 +389,9 @@ export const EditorCanvas: React.FC = () => {
                     link.click();
                     URL.revokeObjectURL(link.href);
                   }}
-                  style={{ padding: "8px 14px" }}
                 >
                   💾 Export HTML Email
-                </button>
+                </Button>
               </div>
 
               <div style={{ marginTop: "20px", zIndex: 2000 }}>

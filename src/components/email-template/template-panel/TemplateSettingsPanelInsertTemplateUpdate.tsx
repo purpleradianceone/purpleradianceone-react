@@ -10,6 +10,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import Button from "../../ui/Button";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -116,7 +117,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
           top: "60px",
           right: 0,
           padding: "3px 8px",
-          backgroundColor: "#4CAF50",
+          // backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
           cursor: "pointer",
@@ -124,7 +125,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
         }}
       >
         {/* Fixed Button to Open Settings */}
-        <button onClick={() => setIsOpen(true)}>Save Template</button>
+        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
 
         {isOpen && (
           <div
@@ -292,34 +293,15 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     gap: "10px",
                   }}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "transparent",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Update
-                  </button>
+                  <div>
+                    <Button type="button" onClick={() => setIsOpen(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button type="submit">Save</Button>
+                  </div>
                 </div>
               </div>
             </form>

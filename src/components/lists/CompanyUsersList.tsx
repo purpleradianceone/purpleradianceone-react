@@ -11,7 +11,7 @@ import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
-import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
+import {  SIZE } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
@@ -312,35 +312,20 @@ function GetCompanyUsersList({
                 }}
                 // onClick={() => setIsAddCompanyUserModalOpen(true)}
               >
-                {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+                {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
+                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
+                <div className="flex items-center gap-1">
+                  
+                  <UserPlus size={16}/>
+                  Add
+                </div>
               </Button>
             </div>
             <AddCompanyUserModal
               isOpen={isAddCompanyUserModalOpen}
               onClose={() => setIsAddCompanyUserModalOpen(false)}
             />
-            {/* </>
-            ) : (
-              <div className="flex gap-1">
-                <Button
-                  disabled={true}
-                  onClick={() => {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_USER
-                        .DENIED_ADD_ACCESS_COMPANY_USER
-                    );
-                  }}
-                >
-                  {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-                </Button>
-              </div>
-            )
-            } */}
 
             <EditCompanyUserModal
               handleCompanyUserChange={handleCompanyUserChangeOnEdit}

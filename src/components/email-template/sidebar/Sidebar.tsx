@@ -19,37 +19,37 @@ export const Sidebar: React.FC = () => {
   return (
     <div className="sidebar-container" >
       <h1 style={{color:"transparent"}}>_</h1>
-      <h1 className="sidebar-title">Email Template Blocks</h1>
+      <h1 className="sidebar-title table-header-custom">Email Template Blocks</h1>
       <div className="sidebar-grid">
         {/* <div ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SubjectBlock />); }} className="sidebar-block">
           <span>📄</span>
           <span>Subject</span>
         </div> */}
-        <div id="section" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlock />); }} className="sidebar-block">
+        <div id="section" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlock />); }} className="sidebar-block caption-custom">
           <span>📦</span>
           <span>Section</span>
         </div>
-        <div id="text" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <LexicalText />); }} className="sidebar-block">
+        <div id="text" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <LexicalText />); }} className="sidebar-block caption-custom">
           <span>📝</span>
           <span>Text</span>
         </div>
-        <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ImageBlock src="" width={0} height={0} alignment={"left"} />); }} className="sidebar-block">
+        <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ImageBlock src="" width={0} height={0} alignment={"left"} />); }} className="sidebar-block caption-custom">
           <span>🖼️</span>
           <span>Image</span>
         </div>
-        <div id="button" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ButtonBlock />); }} className="sidebar-block">
+        <div id="button" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ButtonBlock />); }} className="sidebar-block caption-custom">
           <span>🔘</span>
           <span>Button</span>
         </div>
-        <div id="divider" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DividerBlock />); }} className="sidebar-block">
+        <div id="divider" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DividerBlock />); }} className="sidebar-block caption-custom">
           <span>➖</span>
           <span>Divider</span>
         </div>
-        <div id="column" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ColumnBlock />); }}  className="sidebar-block">
+        <div id="column" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ColumnBlock />); }}  className="sidebar-block caption-custom">
           <span>📊</span>
           <span>Column</span>
         </div>
-        <div id="table" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlock />); }}  className="sidebar-block">
+        <div id="table" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlock />); }}  className="sidebar-block caption-custom">
           <span>📋</span>
           <span>Table</span>
         </div>
