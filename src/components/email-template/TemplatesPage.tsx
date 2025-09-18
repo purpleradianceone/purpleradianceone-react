@@ -15,7 +15,6 @@ import {
   Loader2,
   LucideMailPlus,
   LucidePlus,
-  LayoutDashboard,
   Calendar,
   Filter,
   X,
@@ -342,7 +341,6 @@ export const TemplatesPage: React.FC = () => {
         <div className="flex  justify-between w-full h-9 items-center">
           <div className="flex gap-2">
             {<LucideMailPlus className="w-7 h-7 text-blue-600 " />}
-            {<LayoutDashboard className="w-4 h-4 text-blue-600 " />}
 
             <span className="text-xl sm:text-base md:text-clip font-bold ">
               Email Templates
