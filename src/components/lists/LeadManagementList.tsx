@@ -216,8 +216,8 @@ function LeadManagementList({
                       rounded-md bg-white text-gray-700 hover:bg-gray-50 
                       focus:outline-none shadow-sm"
                       >
-                        <span>Owner</span>
                         <User size={14} />
+                        <span>Owner</span>
                       </Button>
                     )}
 

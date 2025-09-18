@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   Building2,
   Mail,
@@ -31,20 +31,18 @@ import {
 import RefreshToken from "../../../config/validations/RefreshToken";
 import AccountContact from "./Account-contact/AccountContact";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import { useIndustryType } from "../../../config/hooks/useIndustryType";
+import { usebusinessType } from "../../../config/hooks/useBusinessType";
 
 interface AccountDetailsProps {
   company: Account;
   onClose: () => void;
-  indutryTypeData?: industryType[];
-  businessTypeData: BusinessType[];
   fetchAccounts: () => Promise<void>;
 }
 
 const AccountDetails: React.FC<AccountDetailsProps> = ({
   company,
   onClose,
-  indutryTypeData = [],
-  businessTypeData = [],
   fetchAccounts,
 }) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -58,6 +56,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   const [activeTab, setActiveTab] = useState<"contact" | "legal" | "address">(
     "contact"
   );
+  const {industryTypeData , loading:isIndustryTypeLoading} = useIndustryType();
+  const {businessType , isLoading:isBusinessTypeLoading} = usebusinessType();
 
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
@@ -589,18 +589,17 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
   };
 
-  useEffect(() =>{
-    console.log(indutryTypeData);
-    console.log(businessTypeData);
-    
-    
-  },[])
-  if(indutryTypeData.length<=0 || businessTypeData.length<=0 ){
+  if(isIndustryTypeLoading || isBusinessTypeLoading){
     return(
       
-      <>
-      <LoadingSpinner/>
-      </>
+      <div className="fixed inset-0 z-10 bg-white flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
+          <h1>
+            Loading
+          </h1>
+        </div>
+        <LoadingSpinner/>
+      </div>
     )
   }
   return (
@@ -615,7 +614,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
         >
-          <ArrowLeft size={14} /> <span>back to accounts</span>
+          <ArrowLeft size={14} /> <span> Accounts</span>
         </button>
 
         {/* Main header */}
@@ -649,13 +648,13 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                     renderDropdownField(
                       "industryTypeName",
                       formData.industryTypeName,
-                      indutryTypeData,
+                      industryTypeData,
                       "Select industry type"
                     )
                   }
-                  {/* ) : ( */}
-                    {/* <p className="text-gray-400">Loading industry types...</p> */}
-                  {/* )} */}
+                  {/* ) : ( 
+         <p className="text-gray-400">Loading industry types...</p> 
+                  )}  */}
                 </div>
               </div>
               <div className="flex items-center">
@@ -703,7 +702,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                     {renderDropdownField(
                       "businessTypeName",
                       formData.businessTypeName,
-                      businessTypeData || [],
+                      businessType || [],
                       "Select business type"
                     )}
                   </div>

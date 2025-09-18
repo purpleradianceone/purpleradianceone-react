@@ -14,7 +14,6 @@ import {
   Star,
   Loader2,
   LucidePlus,
-  LayoutDashboard,
   Calendar,
   Filter,
   X,
@@ -341,6 +340,7 @@ export const TemplatesPage: React.FC = () => {
         <div className="flex  justify-between w-full h-9 items-center">
           <div className="flex gap-2">
             {<LayoutDashboard className="w-7 h-7 text-blue-600 " />}
+
 
             <span className="section-header-custom">
               Email Templates

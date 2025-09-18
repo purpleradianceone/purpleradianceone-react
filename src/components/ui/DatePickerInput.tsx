@@ -6,7 +6,8 @@ function DatePickerInput(props : FormInputProps){
     return (
         <div className="mt-2">
       <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
-        {props.label}{' '}{props.required && <span className="text-red-500 align-top">*</span>}
+             {props.logo  && <props.logo size={14} className="inline mr-1 text-blue-500"/>}
+{props.label}{' '}{props.required && <span className="text-red-500 align-top">*</span>}
       </label>
       <div className="mt-1 relative">
         <input

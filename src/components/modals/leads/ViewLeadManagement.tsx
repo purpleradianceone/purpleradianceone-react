@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronLeft, Handshake, History, Pen, Plus, Settings, X } from "lucide-react";
+import { ArrowLeft,  Handshake, History, Pen, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -676,15 +676,15 @@ const ViewLeadManagement = () => {
       >
         {/* Header */}
         <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
-          <div className="flex gap-6">
+          <div className="flex w-[30%] gap-6">
             <button
-              className="flex items-center  text-xs text-gray-600 hover:text-blue-600 transition"
+              className="flex items-center gap-1 text-xs  justify-center text-gray-400 hover:text-blue-600 "
               onClick={() => {
                 navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
               }}
             >
-              <ChevronLeft size={18} />
-              <span>Leads</span>
+              <ArrowLeft size={14} />
+              <span >Leads</span>
             </button>
           </div>
 
@@ -802,10 +802,10 @@ const ViewLeadManagement = () => {
             >
               <span
                 title="Status history"
-                className="flex items-center gap-1 text-gray-500 hover:text-gray-950 "
+                className="flex items-center justify-center  text-gray-500 hover:text-gray-950 "
               >
-                History
                 <History size={12} className="mt-0" />
+                History
               </span>
             </button>
           </div>
