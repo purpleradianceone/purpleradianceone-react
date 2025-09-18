@@ -39,13 +39,12 @@ export const CanvasWrapper = () => {
 
       {/* Floating overlay message outside the Element */}
       <div
+      className="table-data-custom"
         style={{
           position: "absolute",
           top: "30%",
           left: "20%",
           transform: "translate(-50%, -50%)",
-          fontSize: "18px",
-          color: "#999",
           textAlign: "center",
           pointerEvents: "none",
           opacity: isEmpty ? 1 : 0,
