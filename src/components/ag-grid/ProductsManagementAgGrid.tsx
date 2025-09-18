@@ -21,6 +21,7 @@ function ProductsManagementGrid({
   handleCompanyProductTeamModalOpen,
 }: ProductsManagementGridProps) {
   const {
+    userHasAccessToViewProduct,
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,
     userHasAccessToUpdateProductTeam,
@@ -52,6 +53,7 @@ function ProductsManagementGrid({
         field: "cost",
         headerName: "Basic Cost",
         sortable: true,
+        maxWidth: 130,
         filter: true,
         flex: 1,
       },
@@ -82,12 +84,31 @@ function ProductsManagementGrid({
       },
 
       {
+        field: "defaultWarrantyName",
+        headerName: "Warranty",
+        sortable: true,
+        maxWidth: 110,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProduct || isGridForProductUser,
+      },
+      {
+        field: "defaultAmcCycleName",
+        headerName: "AMC Cycle",
+        sortable: true,
+        maxWidth: 120,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProduct || isGridForProductUser,
+      },
+      {
         field: "version",
         headerName: "Version",
         sortable: true,
+        maxWidth: 100,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProduct || isGridForProductUser,
       },
       {
         field: "url",
@@ -95,28 +116,22 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProduct || isGridForProductUser,
+        tooltipValueGetter(params) {
+          return params.data.url;
+        },
+        onCellClicked: (params) => {
+          if (params.value) {
+            window.open(params.value, "_blank", "noopener,noreferrer");
+          }
+        },
+        cellStyle: { color: "blue", cursor: "pointer" },
       },
 
       {
-        field: "defaultWarrantyName",
-        headerName: "Warranty",
-        sortable: true,
-        filter: true,
-        flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
-      },
-      {
-        field: "defaultAmcCycleName",
-        headerName: "AMC Cycle",
-        sortable: true,
-        filter: true,
-        flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
-      },
-      {
         field: "hsn",
         headerName: "HSN",
+        maxWidth: 100,
         sortable: true,
         filter: true,
         flex: 1,
@@ -126,6 +141,7 @@ function ProductsManagementGrid({
         field: "sac",
         headerName: "SAC",
         sortable: true,
+        maxWidth: 100,
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,
@@ -134,6 +150,7 @@ function ProductsManagementGrid({
         field: "taxRate",
         headerName: "TAX Rate",
         sortable: true,
+        maxWidth: 100,
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,

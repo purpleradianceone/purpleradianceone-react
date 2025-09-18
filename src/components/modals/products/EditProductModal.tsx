@@ -444,13 +444,13 @@ function EditCompanyProductModal({
                     label="Version : "
                     type="text"
                     name="version"
+                    max={20}
                     required={false}
                     defaultValue={intialEditCompanyProductFormData.version}
                     value={intialEditCompanyProductFormData.version}
                     placeholder="Product Version"
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    error={errors.code}
                   />
                   <TextAreaInput
                     label="Description : "
@@ -567,27 +567,19 @@ function EditCompanyProductModal({
                   >
                     Status : {productIsActive?"Active":"Inactive"}
                   </label>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
+                      className="sr-only peer"
+                      checked={productIsActive}
                       id="isActive"
                       name="isActive"
-                      checked={productIsActive}
                       onChange={handleProductToggle}
-                      className="sr-only peer"
                     />
-                    <div
-                      className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
-                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
-                    ></div>
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
                   </label>
                 </div>
-                {/* <RadioButtons
-                  label="Status : "
-                  onChange={handleEditCompanyProductFormDataChange}
-                  options={CompanyProductIsActiveRadioButtonOptions}
-                /> */}
               </div>
 
               <div className="flex justify-self-center m-2 min-w-70 gap-2">
