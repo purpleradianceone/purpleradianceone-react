@@ -482,11 +482,14 @@ function AddProductModal({
               />
 
               {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-center col-span-2  pt-4 ">
-                  <Button type="submit">Add Product</Button>
+                <div className="flex justify-self-end col-span-2 gap-2">
+                  <Button onClick={onClose}>Cancel</Button>
+                  <Button type="submit">Save</Button>
                 </div>
               ) : (
-                <div className="flex justify-self-center col-span-2  pt-4">
+                <div className="flex justify-self-center col-span-2  gap-2 pt-4">
+                  <Button onClick={onClose}>Cancel</Button>
+
                   <Button
                     type="submit"
                     onClick={() => {
@@ -498,7 +501,7 @@ function AddProductModal({
                     }}
                     disabled
                   >
-                    Add Product
+                    Save
                   </Button>
                 </div>
               )}

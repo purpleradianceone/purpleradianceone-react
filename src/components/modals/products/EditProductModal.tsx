@@ -589,12 +589,12 @@ function EditCompanyProductModal({
                   >
                     {productIsActive ? (
                       <div>
-                        <CheckCircle2 className=" text-green-500 inline-block" />{" "}
+                        <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
                         Active
                       </div>
                     ) : (
                       <div>
-                        <XCircle className=" text-red-500 inline-block" />{" "}
+                        <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
                         Inactive
                       </div>
                     )}
@@ -614,8 +614,9 @@ function EditCompanyProductModal({
                 </div>
               </div>
 
-              <div className="flex justify-self-center m-2 min-w-70 gap-2">
-                <Button type="submit">Update Product</Button>
+              <div className="flex justify-self-end m-2 min-w-70 gap-2">
+                <Button onClick={onClose}>Cancel</Button>
+                <Button type="submit">Save</Button>
               </div>
             </form>
 
