@@ -63,9 +63,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   });
 
   const inputClass =
-    "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
+    "border border-gray-300 p-2 rounded-lg  w-full input-label-custom focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
   const formInputLabelClassName =
-    "block text-sm font-medium text-gray-700 mb-2";
+    "block input-label-custom mb-2";
 
   const [isOpenAddAccountContactForm, setIsOpenAddAccountContactForm] =
     useState(false);
@@ -438,7 +438,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             >
               +Add
             </button>
-            <span className="text-gray-400 italic">No contacts available.</span>
+            <span className="caption-custom">No contacts available.</span>
           </div>
         </div>
       ) : (
@@ -486,10 +486,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                     {/* Text Info */}
                     <div className="flex flex-col">
-                      <p className="text-sm font-semibold ">
+                      <p className="inpul-label-custom ">
                         {contact.name || "Unknown Contact"}
                       </p>
-                      <p className="text-xs text-gray-500 font-normal flex flex-wrap items-center gap-x-1">
+                      <p className="caption-custom flex flex-wrap items-center gap-x-1">
                         {contact.designation && (
                           <span className="flex gap-1 items-center">
                             <Briefcase size={12} /> {contact.designation}
@@ -534,8 +534,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     <span
                       className={`px-2 py-0.5 rounded-full border ${
                         contact.isActive
-                          ? "bg-green-100 text-green-700 border-green-400"
-                          : "bg-red-100 text-red-700 border-red-400"
+                          ? "bg-green-100 caption-custom-active border-green-400"
+                          : "bg-red-100 caption-custom-inactive border-red-400"
                       }`}
                     >
                       {contact.isActive ? "Active" : "Inactive"}
