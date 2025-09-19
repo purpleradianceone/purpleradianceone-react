@@ -16,7 +16,7 @@ import {
   DynamicFieldsContext,
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideMail, X } from "lucide-react";
+import { LucideMail, Settings, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
@@ -248,7 +248,9 @@ export const EditorCanvas: React.FC = () => {
           {/* Show Fields Button - Always Visible */}
           <div>
             <Button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
-              ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
+              <div className="flex justify-center gap-1">
+          <Settings size={18} className="mt-0.5"/> <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
+          </div>
             </Button>
           </div>
 
@@ -259,13 +261,11 @@ export const EditorCanvas: React.FC = () => {
                 top: 0, // Adjusted to appear below the toggle button
                 right: 2,
                 width: "260px",
-                maxHeight: "600px",
                 background: "white",
                 padding: "10px",
                 borderRadius: "8px",
                 boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
                 zIndex: 11,
-                overflowY: "auto",
               }}
             >
               <div
@@ -287,7 +287,8 @@ export const EditorCanvas: React.FC = () => {
                 </button>
               </div>
 
-              {parsedFields.length === 0 ? (
+              <div className="overflow-y-auto max-h-[400px]">
+                {parsedFields.length === 0 ? (
                 <div
                   style={{
                     padding: "16px",
@@ -302,11 +303,14 @@ export const EditorCanvas: React.FC = () => {
                 </div>
               ) : (
                 parsedFields.map((field) => (
-                  <div key={field.value} style={{ marginBottom: "12px" }}>
-                    <label className="mb-2 input-label-custom">
+                  <div key={field.value} style={{ 
+                    marginBottom: "6px", 
+                    }}>
+                    {/* <label className=" input-label-custom">
                       {field.label}
-                    </label>
+                    </label> */}
                     <FormInput
+                      label={field.label}
                       value={dynamicVars[field.value] || ""}
                       onChange={(e) => {
                         setDynamicVars((prev) => ({
@@ -320,6 +324,8 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                 ))
               )}
+              </div>
+              
             </div>
           )}
         </div>

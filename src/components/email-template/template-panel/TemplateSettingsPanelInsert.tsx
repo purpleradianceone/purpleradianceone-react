@@ -12,6 +12,7 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
+import { X } from "lucide-react";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -147,7 +148,7 @@ export const TemplateSettingsPanelInsert: React.FC<
                 cursor: "pointer",
               }}
             >
-              ✖
+              <X className="input-label-custom" />
             </button>
 
             <form
@@ -176,6 +177,7 @@ export const TemplateSettingsPanelInsert: React.FC<
                     type="text"
                     required
                     value={templateName}
+                    // defaultValue={templateName}
                     onChange={(e) => setTemplateName(e.target.value)}
                     placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                   />
@@ -214,7 +216,8 @@ export const TemplateSettingsPanelInsert: React.FC<
                     }}
                     className="input-label-custom"
                   >
-                    Email Subject<span className="text-red-500 align-top">*</span>
+                    Email Subject
+                    <span className="text-red-500 align-top">*</span>
                   </label>
                   <input
                     ref={subjectInputRef}
@@ -243,11 +246,11 @@ export const TemplateSettingsPanelInsert: React.FC<
                     style={{
                       width: "100%",
                       padding: "6px",
-                      fontSize: "14px",
                       borderRadius: "4px",
                       border: "1px solid #ddd",
                       backgroundColor: "#f9f9f9",
                     }}
+                    className="caption-custom"
                   >
                     <option value="">Insert Dynamic Field In Subject</option>
                     {dynamicFields.map((field) => (
@@ -271,7 +274,7 @@ export const TemplateSettingsPanelInsert: React.FC<
                   />
                   <label
                     htmlFor="isDefault"
-                    style={{ fontSize: "14px", fontWeight: 500 }}
+                    className="input-label-custom"
                   >
                     Set as default template
                   </label>

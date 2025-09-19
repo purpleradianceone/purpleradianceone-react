@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
+import { X } from "lucide-react";
+import FormInput from "../../ui/FormInput";
 
 export type TemplateSettingsPanelUpdateProps = {
   id: number;
@@ -124,14 +126,8 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
     <>
       {/* Fixed Button to Open Settings */}
       <div>
-        <Button
-        onClick={() => setIsOpen(true)}
-        
-      >
-        Save Template
-      </Button>
+        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
       </div>
-      
 
       {isOpen && (
         <div
@@ -157,11 +153,10 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
               right: "10px",
               background: "transparent",
               border: "none",
-              fontSize: "18px",
               cursor: "pointer",
             }}
           >
-            ✖
+            <X className="input-label-custom" />
           </button>
 
           <form
@@ -176,9 +171,8 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
               <h3
                 style={{
                   margin: "0 0 10px 0",
-                  fontSize: "16px",
-                  fontWeight: "600",
                 }}
+                className="table-header-custom"
               >
                 Update Template Settings
               </h3>
@@ -189,7 +183,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
             >
               {/* Template Name */}
               <div>
-                <label
+                {/* <label
                   style={{
                     display: "block",
                     marginBottom: "6px",
@@ -211,6 +205,15 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                     borderRadius: "4px",
                     fontSize: "14px",
                   }}
+                /> */}
+                <FormInput
+                  label="Template Name"
+                  type="text"
+                  required
+                  value={templateName}
+                  defaultValue={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder={`e.g.,`}
                 />
               </div>
 
@@ -219,10 +222,9 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                 <label
                   style={{
                     display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
+                    marginBottom: "1px",
                   }}
+                  className="input-label-custom"
                 >
                   Email Subject
                 </label>
@@ -253,13 +255,13 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                   style={{
                     width: "100%",
                     padding: "6px",
-                    fontSize: "14px",
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
                     maxHeight: "120px",
                     overflowY: "auto",
                   }}
+                  className="caption-custom"
                 >
                   <option value="">Insert Dynamic Field In Subject</option>
                   {dynamicFields.map((field) => (
@@ -310,7 +312,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                 />
                 <label
                   htmlFor="isDefault"
-                  style={{ fontSize: "14px", fontWeight: 500 }}
+                  className="input-label-custom"
                 >
                   Set as default template
                 </label>
@@ -325,23 +327,14 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                 }}
               >
                 <div>
-                  <Button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Cancel
-                </Button>
+                  <Button type="button" onClick={() => setIsOpen(false)}>
+                    Cancel
+                  </Button>
                 </div>
-                
+
                 <div>
-                  <Button
-                  type="submit"
-                  
-                >
-                  Update
-                </Button>
+                  <Button type="submit">Update</Button>
                 </div>
-                
               </div>
             </div>
           </form>
