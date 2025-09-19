@@ -54,6 +54,7 @@ function ProductsManagementList({
     id: 0,
     companyId: 0,
     productTypeId: 0,
+    productTypeName: "",
     defaultWarrantyIntervalTypeId: 0,
     defaultWarranty: 0,
     defaultWarrantyName: "",
