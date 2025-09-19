@@ -9,6 +9,7 @@ import {
   LucidePresentation,
   LucideTimer,
   LucideVerified,
+  Save,
   Store,
   Text,
   X,
@@ -23,11 +24,6 @@ import React, { useEffect, useState } from "react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { Product } from "../../../@types/products/ProductsManagementProps";
-// import MessageSnackBar from "../../ui/MessageSnackbar";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../@types/ui/MessageSnackbarProps";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -50,11 +46,6 @@ function AddProductModal({
   handleProductChangeOnAdd,
 }: AddProductModalProps) {
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
 
   const { isSmallScreen } = useScreenSize();
   function handleTaxRadioButtonChange(
@@ -62,14 +53,6 @@ function AddProductModal({
   ) {
     setSelectedTaxCode(event.target.value);
   }
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
@@ -127,10 +110,6 @@ function AddProductModal({
     "registration"
   );
 
-  // useEffect(() => {
-  //   handleMessageSnackbarClose();
-  // }, []);
-
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -141,10 +120,6 @@ function AddProductModal({
         (addProductFormData.taxRate === 0 ||
           addProductFormData.validFrom === "")
       ) {
-        // showMessageSnackbar({
-        //   message: "Please insert Tax Rate and Valid From",
-        //   type: "error",
-        // });
         toast.error("Please insert Tax Rate and Valid From");
         return;
       } else {
@@ -189,10 +164,6 @@ function AddProductModal({
           })
           .then((response) => {
             if (response.data.status) {
-              // showMessageSnackbar({
-              //   message: "Product Added Successfully",
-              //   type: "success",
-              // });
               toast.success(response.data.message);
               handleProductChangeOnAdd(addProductFormData);
               setTimeout(() => {
@@ -333,7 +304,6 @@ function AddProductModal({
                   maxLength={256}
                   onChange={handleAddProductFormDataChange}
                   onBlur={handleBlur}
-                  // error={errors.description}
                 />
               </div>
               <div className="grid col-span-1 gap-1">
@@ -483,38 +453,45 @@ function AddProductModal({
 
               {userHasAccessToAddProduct ? (
                 <div className="flex justify-self-end col-span-2 gap-2">
-                  <Button onClick={onClose}>Cancel</Button>
-                  <Button type="submit">Save</Button>
+                  <Button onClick={onClose}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <X size={16} />
+                      Cancel
+                    </div>
+                  </Button>
+                  <Button type="submit">
+                    <div className="flex items-center justify-center gap-1">
+                      <Save size={16} />
+                      Save
+                    </div>
+                  </Button>
                 </div>
               ) : (
                 <div className="flex justify-self-center col-span-2  gap-2 pt-4">
-                  <Button onClick={onClose}>Cancel</Button>
+                  <Button onClick={onClose}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <X size={16} />
+                      Cancel
+                    </div>
+                  </Button>
 
                   <Button
                     type="submit"
                     onClick={() => {
-                      // showMessageSnackbar({
-                      //   message: MESSAGE.ERROR.NOT_ATHORISED,
-                      //   type: "error",
-                      // });
                       toast.error(MESSAGE.ERROR.NOT_ATHORISED);
                     }}
                     disabled
                   >
-                    Save
+                    <div className="flex items-center justify-center gap-1">
+                      <Save size={16} />
+                      Save
+                    </div>
                   </Button>
                 </div>
               )}
             </form>
           </div>
         </div>
-        {/* <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        /> */}
       </div>
     </div>
   );
