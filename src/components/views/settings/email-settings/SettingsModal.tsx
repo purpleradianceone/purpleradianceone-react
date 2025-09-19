@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
@@ -9,6 +10,8 @@ import toast from "react-hot-toast";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import ApiError from "../../../../@types/error/ApiError";
+import FormHeader from "../../../ui/FormHeader";
+import { Edit, LucideMailPlus, Save, X } from "lucide-react";
 
 type SettingType = "company" | "user";
 
@@ -30,16 +33,10 @@ const Dialog: React.FC<{
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white px-4 py-1 rounded min-w-xl shadow ">{children}</div>;
-
-const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => <div className="my-4 border-b  ">{children}</div>;
-
-
-const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="table-header-custom">{children}</h2>
+}) => (
+  <div className="bg-white px-3 py-3 rounded min-w-xl shadow ">{children}</div>
 );
+
 
 interface BaseEmailSettings {
   id: number;
@@ -264,64 +261,69 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="bg-pink-300 w-full">
-<DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Edit" : "Create"} {settingType} Email Setting
-          </DialogTitle>
-        </DialogHeader>
-        <div className="grid grid-cols-2  gap-4 py-4">
-          {renderField(
-            `${settingType === "company" ? "Company" : "User"} Email`,
-            "email",
-            "email"
-          )}
-          {renderField("Email Password", "email_password", "password")}
-          {renderField("SMTP Host", "smtp_host", "text")}
-          {renderField("SMTP Port", "smtp_port", "number")}
-          {renderField("Security Type", "email_security_type_id", "select", [
-            { value: 1, label: "SSL" },
-            { value: 2, label: "TLS" },
-          ])}
-          <div className="mt-4">
-
-          {renderField(
-            "Authentication Required",
-            "authentication_required",
-            "checkbox"
-          )}
-          </div>
-          {/* Conditional rendering for isactive checkbox */}
-          {/* {isEdit &&
+      <div className="w-full">
+        <DialogContent>
+          <FormHeader
+              icon={isEdit ? Edit : LucideMailPlus}
+              preText={`${isEdit ? "Edit" : "Create"}  ${settingType ==="company"?"Company":"User"} Email Setting`}
+              onClose={onClose}
+            />
+          <div className="grid grid-cols-2  gap-4 py-4">
+            {renderField(
+              `${settingType === "company" ? "Company" : "User"} Email`,
+              "email",
+              "email"
+            )}
+            {renderField("Email Password", "email_password", "password")}
+            {renderField("SMTP Host", "smtp_host", "text")}
+            {renderField("SMTP Port", "smtp_port", "number")}
+            {renderField("Security Type", "email_security_type_id", "select", [
+              { value: 1, label: "SSL" },
+              { value: 2, label: "TLS" },
+            ])}
+            <div className="mt-4">
+              {renderField(
+                "Authentication Required",
+                "authentication_required",
+                "checkbox"
+              )}
+            </div>
+            {/* Conditional rendering for isactive checkbox */}
+            {/* {isEdit &&
             renderField(
               "Active", // Label for the checkbox
               "isactive",
               "checkbox"
             )} */}
-        </div>
-        <div className="flex justify-end  space-x-2 m-4">
-          <div>
-            <Button onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
           </div>
-          <div>
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>{isEdit ? "Updating..." : "Creating..."}</span>
-                </div>
-              ) : (
-                <span>{isEdit ? "Save" : "Save"}</span>
-              )}
-            </Button>
+          <div className="flex justify-end  space-x-2 m-4">
+            <div>
+              <Button onClick={onClose} disabled={loading}>
+                <div className="flex items-center justify-center gap-0.5">
+                        <X size={16} />
+                        Cancel
+                      </div>
+              </Button>
+            </div>
+            <div>
+              <Button onClick={handleSubmit} disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>{isEdit ? "Updating..." : "Creating..."}
+
+                    </span>
+                  </div>
+                ) : (<span>{<div className="flex items-center justify-center gap-0.5">
+                      <Save size={16} />
+                      Save
+                    </div>}</span>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
       </div>
-      
     </Dialog>
   );
 };
