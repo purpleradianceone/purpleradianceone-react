@@ -123,6 +123,20 @@
   color: #2563eb;
 }
 
+.caption-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.caption-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
+}
+
 /* Input Labels */
 .input-label-custom {
   font-family: "Roboto", sans-serif;
@@ -131,11 +145,39 @@
   color: #333333;
 }
 
+.input-label-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.input-label-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
+}
+
 .input-label-custom-blue {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   font-weight: 400; /* Maps to Regular */
-  color: #2563eb;
+  color: #445bef;
+}
+
+.input-label-custom-purple {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef44ad;
+}
+
+.input-label-custom-orange {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #eb9225;
 }
 
 .custom-height-scrollbar {

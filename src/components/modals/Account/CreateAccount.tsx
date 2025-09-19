@@ -310,7 +310,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           toast.error(data.message);
         }
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(async (error: ApiError | any) => {
         //if exception occurs then rollback to previous state
         if (error.status === STATUS_CODE.UNATHORISED) {
