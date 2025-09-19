@@ -168,7 +168,7 @@ const Home: React.FC = () => {
       )}
       {/* Horizontal Tabs */}
       {modules.length === 0 && (
-        <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
+        <div className="h-screen w-screen flex items-center justify-center bg-gray-100 input-label-custom">
           No Dashboard available
         </div>
       )}{" "}
@@ -180,11 +180,11 @@ const Home: React.FC = () => {
                 <button
                   key={module.dashboard_id}
                   onClick={() => setActiveTab(module.dashboard_id)}
-                  className={`px-6 py-1 text-sm font-medium border-b-2 transition-colors
+                  className={`px-6 py-1 border-b-2 transition-colors
                 ${
                   activeTab === module.dashboard_id
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-700 hover:text-blue-500"
+                    ? "main-nav-custom active-header"
+                    : " main-nav-custom"
                 }`}
                 >
                   {module.dashboard_name}

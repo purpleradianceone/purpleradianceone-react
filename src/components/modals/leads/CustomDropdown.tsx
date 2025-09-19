@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp, Delete, LucideIcon } from "lucide-react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-import { NUMBER_VALUES } from "../../../constants/AppConstants";
+import toast from "react-hot-toast";
 
 interface DropdownProps {
   options: any[];
@@ -34,7 +29,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     else return undefined;
   });
   const [showDropdown, setShowDropdown] = useState(false);
-  const [hasError, setHasError] = useState(false); 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,34 +46,9 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     setSelectedOption(value);
     onSelect(value);
     setShowDropdown(false); 
-    if (requiredRedDot && !value) {
-      setHasError(true);
-    } else {
-      setHasError(false);
-    }
   };
 
-  const handleBlur = () => {
-    if (requiredRedDot && !selectedOption) {
-      setHasError(true);
-    } else {
-      setHasError(false);
-    }
-  };
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   useEffect(() => {
     if (preselectedOption) {
@@ -87,9 +56,10 @@ const CustomDropdown: React.FC<DropdownProps> = ({
     }
   }, []);
 
+
   return (
     <div className="relative w-auto" ref={dropdownRef}>
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block input-label-custom">
         {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
         {labelName === "status" ||
         labelName === "source" ||
@@ -105,20 +75,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         role="button"
         tabIndex={0}
         className={`w-full flex justify-between py-1 px-1 border-2 rounded-md cursor-pointer text-gray-700 
-          ${readOnly ? "bg-gray-300" : "bg-white"} 
-          ${
-            hasError
-              ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
-              : "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-          }`}
+          ${readOnly ? "bg-gray-300" : "bg-white"}`}
         onClick={() => {
           if (!readOnly) {
             setShowDropdown((prev) => !prev);
           } else {
-            showMessageSnackbar({
-              message: `Can't Update ${labelName}`,
-              type: "error",
-            });
+
+            toast.error(`Can't Update ${labelName}`);
           }
         }}
         onKeyDown={(e) => {
@@ -128,9 +91,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             setShowDropdown((prev) => !prev);
           }
         }}
-        onBlur={handleBlur} 
       >
-        <div className="text-xs">
+        <div className="caption-custom">
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||
@@ -154,10 +116,10 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSelect(undefined);
             }}
-            className="px-4 py-0.5 flex gap-2 items-center hover:bg-red-600 hover:text-white cursor-pointer text-gray-800 border-b focus:bg-red-600 focus:text-white"
+            className="px-4 py-0.5 flex gap-2 items-center caption-custom hover:bg-gray-200 cursor-pointer text-gray-800 border-b"
           >
             <Delete size={18} />{" "}
-            <span className="text-xs"> Clear Selection</span>
+            <span className="caption-custom"> Clear Selection</span>
           </div>
 
           {Array.isArray(options) &&
@@ -169,21 +131,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSelect(option.id!);
                 }}
-                className="px-4 py-0.5 text-xs border-b hover:bg-blue-700 hover:text-white cursor-pointer text-gray-800 focus:bg-blue-700 focus:text-white"
+                className="px-4 py-0.5 caption-custom border-b hover:bg-blue-600 hover:text-white cursor-pointer focus:bg-blue-600 focus:text-white"
               >
                 {option.name}
               </div>
             ))}
         </div>
       )}
-
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </div>
   );
 };

@@ -222,9 +222,9 @@ function CompanyUserAccessManagementModal({
     modules.every((module) => module[field]);
 
   const columnClasses = {
-    srNo: "w-[10%]",
-    moduleName: "w-[40%]",
-    checkbox: "w-[16.67%]",
+    srNo: "w-[10%] table-header-custom",
+    moduleName: "w-[40%] table-header-custom",
+    checkbox: "w-[16.67%] table-header-custom",
   };
 
   return (
@@ -330,9 +330,9 @@ function CompanyUserAccessManagementModal({
                               key={module.id}
                               className="border-t hover:bg-gray-50"
                             >
-                              <td className="p-4">{module.crm_module_id}</td>
-                              <td className="p-4">{module.module_name}</td>
-                              <td className="p-4">
+                              <td className="p-4 table-data-custom">{module.crm_module_id}</td>
+                              <td className="p-4 table-data-custom">{module.module_name}</td>
+                              <td className="p-4 table-data-custom">
                                 <div className="flex flex-col ml-2 items-center">
                                   <input
                                     type="checkbox"

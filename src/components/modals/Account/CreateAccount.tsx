@@ -34,10 +34,11 @@ import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import { useCompanyAccountType } from "../../../config/hooks/useCompanyAccountType";
 import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import FormSkeleton from "./FormSkeleton";
+import Button from "../../ui/Button";
 
 type CreateAccountType = {
   onClose: () => void;
-  handleCreateCompanyAccountType : () => void;
+  handleCreateCompanyAccountType: () => void;
 };
 type AccountFormType = {
   name: string;
@@ -57,7 +58,10 @@ type AccountFormType = {
   company_account_type_id_array: number[];
   createdby: number;
 };
-const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompanyAccountType}) => {
+const CreateAccount: React.FC<CreateAccountType> = ({
+  onClose,
+  handleCreateCompanyAccountType,
+}) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
@@ -95,7 +99,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
     businessType: "",
     industryType: "",
   });
-
 
   function handleSelectedBusinessType(
     selectedBusinessType: number | undefined
@@ -323,9 +326,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
           toast.error(error.response.data);
         }
       })
-      .finally(() => {
-        
-      });
+      .finally(() => {});
   };
 
   // note : to make the state clear
@@ -361,14 +362,13 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
 
   const loadingState = loading || businessTypeLoading || companyTypeLoading;
   if (loadingState) {
-    return(
-       <div className="fixed top-8 inset-0 z-30 flex items-center justify-center  shadow-2xl ">
-      <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
-        <FormSkeleton/>
+    return (
+      <div className="fixed top-8 inset-0 z-30 flex items-center justify-center  shadow-2xl ">
+        <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+          <FormSkeleton />
         </div>
       </div>
-      
-    )
+    );
   }
   return (
     <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
@@ -386,14 +386,14 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
                 handleStateClear();
                 onClose();
               }}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+              className="input-label-custom"
             >
               ✕
             </button>
           </div>
 
           {/* Form */}
-          <h2 className="text-xl font-semibold text-gray-800 py-4 mb-2  border-b">
+          <h2 className="table-header-custom py-4 mb-2  border-b">
             Create new account
           </h2>
           <form className=" grid grid-cols-2 gap-3">
@@ -403,7 +403,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
                 required
                 logo={User}
                 type="text"
-                label="Name :"
+                label="Name"
                 name="name"
                 maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                 minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -424,7 +424,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
                 required
                 logo={Mail}
                 type="text"
-                label="Email :"
+                label="Email"
                 name="email"
                 maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                 minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -453,7 +453,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
                 value={createAccountFormData.mobilenumber}
                 onBlur={handleOnBlur}
                 onChange={handleFormInputChange}
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
               {errors.mobileNumber && (
                 <p className="text-xs  text-red-600 mt-1">
@@ -465,7 +464,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <FormInput
               logo={FileText}
               type="text"
-              label="Pan :"
+              label="Pan"
               name="pan"
               placeholder="Enter pan number"
               value={createAccountFormData.pan}
@@ -477,7 +476,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <FormInput
               logo={ReceiptText}
               type="text"
-              label="Gst : "
+              label="Gst "
               name="gst"
               placeholder="Enter email address"
               value={createAccountFormData.email}
@@ -489,7 +488,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <FormInput
               logo={FileSignature}
               type="text"
-              label="Tan : "
+              label="Tan "
               name="tan"
               maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -502,9 +501,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <div className="flex flex-col col-span-1">
               {/* Business type */}
               <CustomDropdown
-              requiredRedDot
+                requiredRedDot
                 logo={Briefcase}
-                labelName="Business Type :"
+                labelName="Business Type"
                 options={businessType}
                 onSelect={handleSelectedBusinessType}
               />
@@ -517,9 +516,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <div className="flex flex-col col-span-1">
               {/* Industry type */}
               <CustomDropdown
-              requiredRedDot
+                requiredRedDot
                 logo={Factory}
-                labelName="Industry type :"
+                labelName="Industry type"
                 options={industryTypeData}
                 onSelect={handleSelectedIndustryType}
               />
@@ -531,9 +530,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             </div>
 
             <div className="col-span-2  rounded-md">
-              <span className="text-md font-semibold text-gray-700 ">
+              <span className="input-label-custom flex items-center gap-1">
                 <Building2 size={14} className="inline mr-1 text-blue-500" />
-                Company account type :
+                <span>Company account type</span>
               </span>
 
               <div className="grid grid-cols-2 gap-y-2 p-4 max-h-56 overflow-auto">
@@ -567,29 +566,31 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
                   Object.entries(groupedData).map(([parentType, children]) => {
                     return (
                       <div key={parentType}>
-                        <span className="text-sm font-medium text-blue-800 ">  {parentType} : </span>
+                        <span className="input-label-custom-blue">
+                          {" "}
+                          {parentType}{" "}
+                        </span>
 
                         {children &&
                           children.length &&
                           children.map((item) => (
                             <div key={item.id} className="flex  items-center">
                               <div className="flex p-1">
-
-                              <input
-                                id={`account-type-${item.id}`}
-                                name="companyAccountType"
-                                type="checkbox"
-                                value={item.id}
-                                className="h-4 w-4 text-blue-600  focus:ring-blue-500 border-gray-300 rounded"
-                                onChange={handleAccountTypeCheckboxChange}
+                                <input
+                                  id={`account-type-${item.id}`}
+                                  name="companyAccountType"
+                                  type="checkbox"
+                                  value={item.id}
+                                  className="h-4 w-4 text-blue-600  focus:ring-blue-500 border-gray-300 rounded"
+                                  onChange={handleAccountTypeCheckboxChange}
                                 />
-                              <label
-                                htmlFor={`account-type-${item.id}`}
-                                className="ml-2 block text-xs font-semibold cursor-pointer hover:text-blue-700  text-gray-800"
+                                <label
+                                  htmlFor={`account-type-${item.id}`}
+                                  className="ml-2 block caption-custom cursor-pointer hover:text-blue-700"
                                 >
-                                {item.companyAccountTypeName}
-                              </label>
-                                </div>
+                                  {item.companyAccountTypeName}
+                                </label>
+                              </div>
                             </div>
                           ))}
                       </div>
@@ -603,7 +604,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             <FormInput
               logo={Phone}
               type="text"
-              label="Business registration number : "
+              label="Business registration number "
               name="business_registration_number"
               maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
               minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
@@ -632,7 +633,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
               logo={MapPin}
               cols={4}
               rows={4}
-              label="Billing address : "
+              label="Billing address "
               name="billing_address"
               placeholder="Enter Billing address"
               value={createAccountFormData.billing_address}
@@ -658,7 +659,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
               logo={MapPin}
               cols={4}
               rows={4}
-              label="Registered office address : "
+              label="Registered office address "
               name="registered_office_address"
               placeholder="Enter registered office address"
               value={createAccountFormData.registered_office_address}
@@ -668,20 +669,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({ onClose,handleCreateCompan
             />
 
             <div className="col-span-2 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleStateClear}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
-              >
-                Submit
-              </button>
+              <div>
+                <Button type="button" onClick={handleStateClear}>
+                  Cancel
+                </Button>
+              </div>
+
+              <div>
+                <Button type="submit" onClick={handleSubmit}>
+                  Submit
+                </Button>
+              </div>
             </div>
           </form>
         </motion.section>

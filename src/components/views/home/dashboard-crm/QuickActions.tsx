@@ -929,55 +929,105 @@ const QuickActions: React.FC<QuickActionsProp> = ({
           : false,
     },
   ];
-  return (
-    <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
-      <div className="mb-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Quick Actions</h3>
-        <p className="text-gray-600">Frequently used CRM functions</p>
-      </div>
+  // return (
+  //   <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
+  //     <div className="mb-8">
+  //       <h3 className="section-header-custom mb-2">Quick Actions</h3>
+  //       <p className="table-header-custom">Frequently used CRM functions</p>
+  //     </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {actions
-          .filter((action) => action.visibility)
-          .map((action, index) => (
-            <button
-              key={action.id}
-              onClick={() => {
-                if (loginStatus.id === companyUserId) {
-                  if (action.id !== 3) {
-                    navigate(action.route);
-                  } else {
-                    navigate(
-                      ROUTES_URL.SCHEDULE_MEETING +
-                        "?from=" +
-                        window.location.pathname
-                    );
-                  }
-                } else {
-                  toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
-                }
-              }}
-              className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
-              <div className="relative">
-                <div className="flex items-center justify-between mb-3">
-                  <action.icon className="w-6 h-6" />
-                  <span className="text-xs opacity-75 font-mono">
-                    {action.shortcut}
-                  </span>
-                </div>
-                <div className="text-left">
-                  <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
-                  <p className="text-xs opacity-90">{action.description}</p>
-                </div>
-              </div>
-            </button>
-          ))}
-      </div>
+  //     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  //       {actions
+  //         .filter((action) => action.visibility)
+  //         .map((action, index) => (
+  //           <button
+  //             key={action.id}
+  //             onClick={() => {
+  //               if (loginStatus.id === companyUserId) {
+  //                 if (action.id !== 3) {
+  //                   navigate(action.route);
+  //                 } else {
+  //                   navigate(
+  //                     ROUTES_URL.SCHEDULE_MEETING +
+  //                       "?from=" +
+  //                       window.location.pathname
+  //                   );
+  //                 }
+  //               } else {
+  //                 toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
+  //               }
+  //             }}
+  //             className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
+  //             style={{ animationDelay: `${index * 0.05}s` }}
+  //           >
+  //             <div className="relative grid gap-2">
+  //               <div className="flex items-start justify-between mb-3">
+  //                 <action.icon className="w-6 h-6" />
+  //                 <span className="caption-custom white-text opacity-75">
+  //                   {action.shortcut}
+  //                 </span>
+  //               </div>
+  //               <div className="text-left">
+  //                 <h4 className="caption-custom white-text mb-1">{action.title}</h4>
+  //                 <p className="caption-custom white-text opacity-90">{action.description}</p>
+  //               </div>
+  //             </div>
+  //           </button>
+  //         ))}
+  //     </div>
+  //   </div>
+  // );
+
+
+  return (
+  <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
+    <div className="mb-8">
+      <h3 className="section-header-custom mb-2">Quick Actions</h3>
+      <p className="table-header-custom">Frequently used CRM functions</p>
     </div>
-  );
+
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {actions
+        .filter((action) => action.visibility)
+        .map((action, index) => (
+          <button
+            key={action.id}
+            onClick={() => {
+              if (loginStatus.id === companyUserId) {
+                if (action.id !== 3) {
+                  navigate(action.route);
+                } else {
+                  navigate(
+                    ROUTES_URL.SCHEDULE_MEETING +
+                    "?from=" +
+                    window.location.pathname
+                  );
+                }
+              } else {
+                toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
+              }
+            }}
+            className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
+            {/* The change is in this div, specifically the flex classes */}
+            <div className="relative flex flex-col h-full"> 
+              <div className="flex items-start justify-between mb-3">
+                <action.icon className="w-6 h-6" />
+                <span className="caption-custom white-text opacity-75">
+                  {action.shortcut}
+                </span>
+              </div>
+              <div className="text-left mt-auto"> {/* mt-auto pushes this to the bottom */}
+                <h4 className="caption-custom white-text mb-1">{action.title}</h4>
+                <p className="caption-custom white-text opacity-90">{action.description}</p>
+              </div>
+            </div>
+          </button>
+        ))}
+    </div>
+  </div>
+);
 };
 
 export default QuickActions;

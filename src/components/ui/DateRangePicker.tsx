@@ -37,7 +37,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
   return (
     <div className="flex  flex-col space-y-4 sm:flex-row sm:space-x-1 sm:space-y-0">
       <div className="relative flex gap-1 justify-center items-center">
-        <label htmlFor="start-date" className=" text-xs font-medium text-gray-700 ">
+        <label htmlFor="start-date" className="block caption-custom">
           From :
         </label>
         <div className="relative">
@@ -48,14 +48,14 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
             onChange={handleStartDateChange}
             max={endDate ? endDate : getCurrentDate() }
             // min={endDate}
-            className="block w-full text-xs text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full caption-custom border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         
         </div>
       </div>
 
       <div className="relative flex gap-1 justify-center items-center">
-        <label htmlFor="end-date" className="block text-xs font-medium text-gray-700 ">
+        <label htmlFor="end-date" className="block caption-custom">
            To :
         </label>
         <div className="relative">
@@ -67,7 +67,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
             min={startDate}
             max={getCurrentDate()}
             
-            className="block w-full  text-xs text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full  caption-custom border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
          
         </div>

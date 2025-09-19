@@ -359,7 +359,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
 
           <MetricCard
-            title="Conversion Rate (%)"
+            title="Conversion Rate"
             value={`${(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERSION_RATE
