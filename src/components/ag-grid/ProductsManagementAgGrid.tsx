@@ -35,6 +35,9 @@ function ProductsManagementGrid({
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
+        tooltipValueGetter(params) {
+          return params.data.name;
+        },
 
         comparator: (valueA, valueB) => {
           if (!valueA) return -1;
@@ -46,6 +49,7 @@ function ProductsManagementGrid({
         field: "code",
         headerName: "Item Code",
         sortable: true,
+        maxWidth:130,
         filter: true,
         flex: 1,
       },
@@ -63,6 +67,7 @@ function ProductsManagementGrid({
         headerName: "Active",
         sortable: true,
         filter: true,
+        maxWidth:100,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
@@ -115,6 +120,7 @@ function ProductsManagementGrid({
         headerName: "URL",
         sortable: true,
         filter: true,
+        maxWidth:120,
         flex: 1,
         hide: !userHasAccessToViewProduct || isGridForProductUser,
         tooltipValueGetter(params) {
@@ -127,13 +133,15 @@ function ProductsManagementGrid({
         },
         cellStyle: { color: "blue", cursor: "pointer" },
       },
-
       {
         field: "hsn",
         headerName: "HSN",
-        maxWidth: 100,
+        maxWidth: 90,
         sortable: true,
         filter: true,
+        tooltipValueGetter(params) {
+          return params.data.hsn;
+        },
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,
       },
@@ -141,8 +149,11 @@ function ProductsManagementGrid({
         field: "sac",
         headerName: "SAC",
         sortable: true,
-        maxWidth: 100,
+        maxWidth: 90,
         filter: true,
+        tooltipValueGetter(params) {
+          return params.data.sac;
+        },
         flex: 1,
         hide: !userHasAccessToViewProductTax || isGridForProductUser,
       },
