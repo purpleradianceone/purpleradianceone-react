@@ -780,6 +780,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       checked={template.isactive}
                       id={`active-${template.id}`}
                       onChange={() => {
+                        if(!template.is_master){
                         if (!template.is_default) {
                           if (
                             userHasAccessToUpdateEmailTemplateSetting &&
@@ -801,6 +802,9 @@ const TemplateList: React.FC<TemplateListProps> = ({
                             "To make this inactive, please set another template as default first."
                           );
                         }
+                      }else{
+                        toast.error("The master template cannot be deactivated.")
+                      }
                       }}
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
@@ -833,7 +837,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                             }
                           } else {
                             toast.error(
-                              "To remove this as the default, please set another template as default first."
+                              "Please make another template the default to remove this one as default."
                             );
                           }
                         } else {

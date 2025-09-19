@@ -14,7 +14,7 @@ import {
   Text,
   X,
 } from "lucide-react";
-import { SIZE, STATUS_CODE, TAX_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE, TAX_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -39,6 +39,7 @@ import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
+import FormHeader from "../../ui/FormHeader";
 
 function AddProductModal({
   isOpen,
@@ -235,7 +236,7 @@ function AddProductModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            <div className="flex items-center gap-2 mb-3 border-b">
+            {/* <div className="flex items-center gap-2 mb-3 border-b">
               <Store className="text-blue-500" size={SIZE.TWENTY} />
               <h2 className="text-lg font-semibold text-gray-800">
                 Add New Product
@@ -246,7 +247,12 @@ function AddProductModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={Store}
+              onClose={onClose}
+              preText="Add New Product"
+            />
 
             <form
               className=" grid grid-cols-2  gap-3 "

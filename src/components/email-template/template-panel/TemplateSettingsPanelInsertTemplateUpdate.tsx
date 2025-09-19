@@ -11,8 +11,9 @@ import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
-import { X } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -118,7 +119,6 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
           position: "fixed",
           top: "60px",
           right: 0,
-          padding: "3px 8px",
           // backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
@@ -127,7 +127,12 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
         }}
       >
         {/* Fixed Button to Open Settings */}
-        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
+        <Button onClick={() => setIsOpen(true)}>
+          <div className="flex items-center justify-center gap-0.5">
+            <Save size={16} />
+            Save Template
+          </div>
+        </Button>
 
         {isOpen && (
           <div
@@ -146,21 +151,6 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
               color: "black",
             }}
           >
-            <button
-              onClick={() => setIsOpen(false)}
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                background: "transparent",
-                border: "none",
-                fontSize: "18px",
-                cursor: "pointer",
-              }}
-            >
-              <X className="input-label-custom" />
-            </button>
-
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -168,16 +158,11 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                 await updateEmailTemplateInsert(htmlBody);
               }}
             >
-              <div style={{ marginBottom: "15px" }}>
-                <h3
-                  style={{
-                    margin: "0 0 10px 0",
-                  }}
-                  className="table-header-custom"
-                >
-                  Update Template Settings{" "}
-                </h3>
-              </div>
+              <FormHeader
+                icon={Edit}
+                onClose={() => setIsOpen(false)}
+                preText="Update Template Settings"
+              />
 
               <div
                 style={{
@@ -212,8 +197,8 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     }}
                   /> */}
                   <FormInput
-                  label="Template Name"
-                  type="text"
+                    label="Template Name"
+                    type="text"
                     required
                     value={templateName}
                     defaultValue={templateName}
@@ -231,6 +216,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     className="input-label-custom"
                   >
                     Email Subject
+                    <span className="text-red-500 align-top">*</span>
                   </label>
                   <input
                     ref={subjectInputRef}
@@ -285,10 +271,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     onChange={() => setIsDefault((prev) => !prev)}
                     style={{ width: "16px", height: "16px" }}
                   />
-                  <label
-                    htmlFor="isDefault"
-                    className="input-label-custom"
-                  >
+                  <label htmlFor="isDefault" className="input-label-custom">
                     Set as default template
                   </label>
                 </div>
@@ -303,12 +286,21 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                 >
                   <div>
                     <Button type="button" onClick={() => setIsOpen(false)}>
-                      Cancel
+                      <div className="flex items-center justify-center gap-0.5">
+                        <X size={16} />
+                        Cancel
+                      </div>
                     </Button>
                   </div>
 
                   <div>
-                    <Button type="submit">Save</Button>
+                    <Button type="submit">
+                      {" "}
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    </Button>
                   </div>
                 </div>
               </div>
