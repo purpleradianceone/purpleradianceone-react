@@ -234,12 +234,10 @@ function CompanyUserDashboardModal({
         {companyUserDashboard.map((dashboard) => (
           <li
             key={dashboard.id}
-            className={`p-3 border rounded ${
-              dashboard.isactive ? "bg-green-100" : "bg-gray-100"
-            }`}
+            className={`p-3 border rounded bg-gray-50`}
           >
             <div className="flex justify-between items-center">
-              <span className="font-medium">{dashboard.dashboard_name}</span>
+              <span className="table-data-custom">{dashboard.dashboard_name}</span>
 
               <input
                 type="checkbox"

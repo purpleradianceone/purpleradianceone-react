@@ -18,6 +18,7 @@ const SalesChart = ({
       const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
   const months = leadsData.map((data) => data.month);
+
   const salesData = leadsData.map((data) => data.createdLeads);
   const revenueData = leadsData.map((data) => data.convertedLeads);
 
@@ -55,6 +56,11 @@ const SalesChart = ({
       : 'Converted Leads';
   };
 
+  const getFormatedMonth = (month : string) => {
+    const formattedMonthArray = month.split(" ");
+    const formattedMonth = formattedMonthArray[0] + " " +formattedMonthArray[1].substring(2,4);
+    return formattedMonth;
+  }
   return (
     
      <div className="min-h-full bg-white grid rounded-2xl shadow-lg border border-gray-100 p-4 relative">
@@ -67,18 +73,18 @@ const SalesChart = ({
     >
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Annual Performance</h3>
-          <p className="text-gray-600">Monthly Leads Trend</p>
+          <h3 className="section-header-custom mb-2">Annual Performance</h3>
+          <p className="table-header-custom">Monthly Leads Trend</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-              <span className="text-xs font-medium text-gray-700">Created Leads</span>
+              <span className="input-label-custom">Created Leads</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"></div>
-              <span className="text-xs font-medium text-gray-700">Converted Leads</span>
+              <span className="input-label-custom">Converted Leads</span>
             </div>
           </div>
         </div>
@@ -116,7 +122,7 @@ const SalesChart = ({
                   ></div>
                 </div>
               </div>
-              <span className="text-xs font-thin block truncate max-w-20 text-gray-600">{month}</span>
+              <span className="caption-custom block truncate min-w-8 max-w-10">{getFormatedMonth(month)}</span>
             </div>
           ))}
         </div>
@@ -125,16 +131,16 @@ const SalesChart = ({
       {/* Tooltip */}
       {hoveredBar && (
         <div
-          className="absolute z-50 bg-gray-200 text-gray-700 px-3 py-2 rounded-lg shadow-lg text-sm pointer-events-none transform -translate-x-1/2 -translate-y-full"
+          className="absolute z-50 bg-white px-3 py-2 rounded-lg shadow-lg caption-custom pointer-events-none transform -translate-x-1/2 -translate-y-full"
           style={{
             left: hoveredBar.x,
             top: hoveredBar.y - 10,
           }}
         >
           <div className="text-center min-w-24">
-            <div className="font-base text-xs">{months[hoveredBar.monthIndex]}</div>
-            <div className="text-xs text-gray-700">{getTooltipLabel()}</div>
-            <div className="font-base text-xs">{getTooltipValue()}</div>
+            <div className="caption-custom">{months[hoveredBar.monthIndex]}</div>
+            <div className="caption-custom">{getTooltipLabel()}</div>
+            <div className="input-label-custom">{getTooltipValue()}</div>
           </div>
           {/* Tooltip arrow */}
           {/* <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div> */}

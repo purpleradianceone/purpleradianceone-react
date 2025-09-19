@@ -19,7 +19,7 @@ import {
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -42,6 +42,7 @@ import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
+import FormHeader from "../../ui/FormHeader";
 
 function EditCompanyProductModal({
   isOpen,
@@ -371,7 +372,7 @@ function EditCompanyProductModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            <div className="flex items-center border-b gap-3 mb-2 sticky bg-white z-10 ">
+            {/* <div className="flex items-center border-b gap-3 mb-2 sticky bg-white z-10 ">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
                 Edit {product.name}
@@ -385,8 +386,15 @@ function EditCompanyProductModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
 
+            <FormHeader
+              icon={EditIcon}
+              onClose={onClose}
+              preText="Edit "
+              userName={product.name}
+              postText="."
+            />
             <form
               className="space-y-2"
               onSubmit={hanldeUpdateCompanyProductFormSubmit}

@@ -104,7 +104,7 @@ const CompanyUserDropdown: React.FC<Props> = ({
   return createPortal(
     <div
       className={`fixed ${
-        userPreference.isLeftMenu ? "top-12" : "top-14"
+        userPreference.isLeftMenu ? "top-12 mt-1" : "top-14 mt-1"
       } right-0 `}
     >
       <AsyncPaginate<OptionType, GroupBase<OptionType>, Additional>
@@ -114,6 +114,7 @@ const CompanyUserDropdown: React.FC<Props> = ({
         onChange={onChange}
         additional={{ page: 1 }}
         isClearable
+        className="caption-custom"
         styles={{
           control: (provided) => ({
             ...provided,
@@ -121,8 +122,9 @@ const CompanyUserDropdown: React.FC<Props> = ({
             minHeight: "31px",
             minWidth: "200px",
             height: "31px",
-            fontSize: "14px",
+
           }),
+          
           valueContainer: (provided) => ({
             ...provided,
             padding: "0 6px",

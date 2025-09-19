@@ -23,12 +23,12 @@ const FormHeader =({
       <Icon className="text-blue-500 mt-1" size={SIZE.TWENTY} />
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-800 flex flex-wrap items-center gap-1">
+        <h2 className="table-header-custom">
           {preText}
-          <span className="text-blue-700">{userName}</span>
+          <span className="table-header-custom">{userName}</span>
           {postText}
         </h2>
-        <p className="text-xs text-gray-500">
+        <p className="caption-custom">
           {description}
         </p>
       </div>
@@ -37,12 +37,13 @@ const FormHeader =({
     {/* Close button */}
     <button
       onClick={onClose}
-      className=" rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+      className=" right-4 top-4 input-label-custom"
     >
       <X size={SIZE.TWENTY} />
     </button>
   </div>
 );
+
 
 }
 

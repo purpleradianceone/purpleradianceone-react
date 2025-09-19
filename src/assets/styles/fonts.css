@@ -98,8 +98,8 @@
   background-color: #f01db8;
 }
 
-.action-btn.accent {
-}
+/* .action-btn.accent {
+} */
 
 /* Small Captions (dates, status) */
 .caption-custom {
@@ -107,6 +107,13 @@
   font-size: 12px;
   font-weight: 400; /* Maps to Regular */
   color: #757575;
+}
+
+.caption-custom.white-text {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: white;
 }
 
 .caption-custom-blue {
@@ -124,6 +131,12 @@
   color: #333333;
 }
 
+.input-label-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #2563eb;
+}
 
 .custom-height-scrollbar {
   overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */

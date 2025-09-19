@@ -251,7 +251,7 @@ function EditCompanyUserModal({
                 <div className="flex items-center gap-4 justify-start">
                   <label
                     htmlFor="isActive"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block input-label-custom"
                   >
                     Status :
                   </label>
