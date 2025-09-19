@@ -37,10 +37,10 @@ const PipelineChart = ({
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <h3 className="section-header-custom mb-2">
             Leads Pipeline
           </h3>
-          <p className="text-gray-600">
+          <p className="table-header-custom">
             {chartFor === "leadByStatus" ? "Current pipeline by Lead Status" : "Current pipeline by Lead Source" }
           </p>
         </div>
@@ -52,12 +52,12 @@ const PipelineChart = ({
             <div className="flex items-center justify-between mb-4 ">
               <div className="flex items-center space-x-3">
                 <div className={`w-3 h-3 ${colors[index]} rounded-full`}></div>
-                <span className="font-medium text-xs text-gray-900">
+                <span className="input-label-custom">
                   {stage.name}
                 </span>
               </div>
               <div className="flex items-center space-x-6">
-                <span className="text-sm font-medium text-gray-600">
+                <span className="input-label-custom">
                   {stage.total + " "}deals
                 </span>
                 {/* <span className="text-lg font-bold text-gray-900">{stage.value}</span> */}
@@ -74,7 +74,7 @@ const PipelineChart = ({
                   }}
                 ></div>
               </div>
-              <span className="absolute right-0 -top-6 text-xs font-medium text-gray-500">
+              <span className="absolute right-0 -top-6 caption-custom">
                 {stage.percentage}%
               </span>
             </div>

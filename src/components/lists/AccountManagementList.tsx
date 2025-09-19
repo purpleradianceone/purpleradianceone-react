@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, Filter, UserRoundCogIcon, X } from "lucide-react";
+import { Calendar, UserRoundCogIcon, } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
@@ -9,7 +9,6 @@ import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompan
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
 import {  useState } from "react";
-import { SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Pagination from "../ag-grid/Pagination";
@@ -46,12 +45,6 @@ function AccountManagementList({
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState(false);
-
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-
   const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
     useState<Account>();
   const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
@@ -67,13 +60,13 @@ function AccountManagementList({
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
       <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-        <div className="flex">
+        <div className="flex gap-1">
           {!isSmallScreen && (
             <UserRoundCogIcon className="w-6= h-6 text-blue-600" />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
-            <span className="text-1xl mt-1 font-bold">{" Accounts"} </span>
+            <span className="section-header-custom mt-1">{" Accounts"} </span>
           )}
         </div>
 
@@ -94,9 +87,9 @@ function AccountManagementList({
               </div>
 
               {/* Date FIlters Dropdown */}
-              <div className="flex ">
+              <div className="flex">
                 <div className="flex">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
                     <Calendar />
                   </div>
                   <DateRangeFilterDropdown
@@ -200,142 +193,6 @@ function AccountManagementList({
           </>
         )}
 
-        {isMediumScreen && (
-          <>
-            <div className="relative flex items-start w-80 ">
-              <SearchInput
-                onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value
-                  );
-                }}
-              ></SearchInput>
-            </div>
-            <div className="flex relative  gap-2  ">
-              <div className="mt-1 flex ">
-                <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                  <Calendar />
-                </div>
-
-                <DateRangeFilterDropdown
-                  dropdownOptions={dateRangeDropdownOptions}
-                  handleDateIdChange={handleDateRangeIdChange}
-                ></DateRangeFilterDropdown>
-              </div>
-            </div>
-
-            {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-              <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                  <button
-                    onClick={() => {
-                      setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
-                    }}
-                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={SIZE.TWENTY} />
-                  </button>
-
-                  <div className="my-10 justify-items-center mb-5">
-                    <div className="mb-5">
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-                    <div className="w-full justify-items-center">
-                      <div className="w-24">
-                        <Button>Done</Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {isSmallScreen && (
-          <>
-            <div className="relative flex items-start w-80 ">
-              <SearchInput
-                onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value
-                  );
-                }}
-              ></SearchInput>
-            </div>
-            <div className="flex relative gap-2">
-              <Button
-                onClick={() => {
-                  setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                }}
-              >
-                <Filter size={SIZE.EIGHT} />
-              </Button>
-            </div>
-            {isFiltersOpenInMobileView && (
-              <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                  <button
-                    onClick={() => {
-                      setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                    }}
-                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={SIZE.EIGHT} />
-                  </button>
-                  {/* Date FIlters Dropdown */}
-
-                  <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                    <div className="mt-1 flex ">
-                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                        <Calendar size={SIZE.TWENTY} />
-                      </div>
-
-                      <DateRangeFilterDropdown
-                        dropdownOptions={dateRangeDropdownOptions}
-                        handleDateIdChange={handleDateRangeIdChange}
-                      ></DateRangeFilterDropdown>
-                    </div>
-                  </div>
-
-                  {/* Custom Date Picker Div Flex Box*/}
-                  <div
-                    className="mb-10 justify-items-center"
-                    style={
-                      isCustomDateOptionSelected
-                        ? { visibility: "visible" }
-                        : { visibility: "hidden" }
-                    }
-                  >
-                    <DateRangePicker
-                      onStartDateChange={onStartDateChange}
-                      onEndDateChange={onEndDateChange}
-                    />
-                  </div>
-
-                  {
-                    <div className="flex w-full justify-center items-center mb-5">
-                      <div className="w-28">
-                        <Button
-                          onClick={() => {
-                            setIsFiltersOpenInMobileView(
-                              !isFiltersOpenInMobileView
-                            );
-                          }}
-                        >
-                          Done
-                        </Button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            )}
-          </>
-        )}
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
