@@ -393,7 +393,7 @@ function EditCompanyProductModal({
               onClose={onClose}
               preText="Edit "
               userName={product.name}
-              postText="."
+              description="Update the necessary product details to edit the product in the CRM."
             />
             <form
               className="space-y-2"

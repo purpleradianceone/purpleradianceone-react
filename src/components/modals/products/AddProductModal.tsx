@@ -254,6 +254,7 @@ function AddProductModal({
               icon={Store}
               onClose={onClose}
               preText="Add New Product"
+              description="Enter the necessary product details to add a new product to the CRM."
             />
 
             <form
