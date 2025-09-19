@@ -4,7 +4,6 @@ import { Handshake, Save, UserRoundPlus, X } from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
@@ -25,6 +24,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
 import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 function CreateLeadModal({
   isOpen,
@@ -385,10 +385,10 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-45 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn px-6 py-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-1">
+        {/* <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <Handshake className="text-blue-500" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-lg font-semibold text-gray-800">
@@ -401,10 +401,16 @@ function CreateLeadModal({
           >
             <X size={SIZE.TWENTY} />
           </button>
-        </div>
+        </div> */}
+        <FormHeader
+          icon={Handshake}
+          onClose={onClose}
+          preText="Create new "
+          userName="Opportunity"
+        />
 
         {/* Divider */}
-        <div className="border-t border-gray-300"></div>
+        {/* <div className="border-t border-gray-300"></div> */}
 
         {/* Form */}
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
