@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ArrowLeft,  Handshake, History, Pen, Plus, Settings, X } from "lucide-react";
+import { ArrowLeft,  Handshake, History, Pen, Plus, Save, Settings, User2, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -38,6 +38,8 @@ import toast from "react-hot-toast";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import Button from "../../ui/Button";
+import FormHeader from "../../ui/FormHeader";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -242,10 +244,6 @@ const ViewLeadManagement = () => {
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
-      // showMessageSnackbar({
-      //   message: "Select new lead owner before procedding.",
-      //   type: "error",
-      // });
       toast.error("Select new lead owner before procedding.");
       return;
     }
@@ -662,6 +660,15 @@ const ViewLeadManagement = () => {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
     useState<boolean>(false);
+
+
+
+  // Note : Clears the states when user clicks on lead owner change button
+  function handleLeadOwnerChangeStateClear(){
+    setReasonTextForLeadOwnerChange("");
+    setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
+    setPersistedSelectedUserId(selectedLeadData.companyUserId);
+  }
   return (
     <div
       className={` fixed top-8 inset-0 z-10 bg-white ${
@@ -1018,15 +1025,27 @@ const ViewLeadManagement = () => {
                           setReasonTextForLeadOwnerChange(e.target.value)
                         }
                       />
-                      <div className="flex justify-end">
-                        <button
-                          className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded self-end"
+                      <div className="flex justify-end ">
+                       <div className="flex gap-1">
+                         <Button
                           onClick={() => {
                             handleLeadOwnerChange();
                           }}
                         >
+                          <div className="flex items-center gap-1">
+                            <Save size={16}/>
                           Save
-                        </button>
+                          </div>
+                        </Button>
+                        <Button
+                          onClick={handleLeadOwnerChangeStateClear}
+                        >
+                           <div className="flex items-center ">
+                            <X size={18}/>
+                          Cancel
+                          </div>
+                        </Button>
+                       </div>
                       </div>
                     </div>
                   </div>
@@ -1161,6 +1180,8 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* end  */}
+
+        {/* update lead form */}
         <UpdateLeadForm
           isOpen={isUpdateLeadFormOpen}
           onClose={() => {
@@ -1169,6 +1190,7 @@ const ViewLeadManagement = () => {
           selectedLeadForEdit={selectedLeadData}
         />
 
+        {/* lead status history */}
         <LeadStatusHistory
           selectedLeadData={selectedLeadData}
           isOpen={isOpenLeadStatusHistory}
@@ -1176,6 +1198,7 @@ const ViewLeadManagement = () => {
             setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
           }}
         />
+        {/* lead owner history */}
         <LeadOwnerHistory
           selectedLeadData={selectedLeadData}
           isOpen={isOpenLeadOwnerHistory}
@@ -1184,11 +1207,12 @@ const ViewLeadManagement = () => {
           }}
         />
 
+        {/* lead owner pop up open */}
         {isLeadOwnerPopUpOpen && (
           <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+            <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
-              <div className="flex justify-between items-center p-2 border-b border-gray-200">
+              {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800">
                   Select Company User
                 </h3>
@@ -1208,9 +1232,25 @@ const ViewLeadManagement = () => {
                 >
                   <X size={20} />
                 </button>
-              </div>
+              </div> */}
+              <FormHeader
+                preText="Assign new lead owner."
+                description="Select and assign a new owner to manage this lead."
+                onClose={() => {
+                    setIsLeadOwnerPopUpOpen(false);
+
+                    if (
+                      selectedCompanyUser.id !== 0 &&
+                      selectedCompanyUser.id !== null &&
+                      selectedCompanyUser.id === persistedSelectedUserId
+                    ) {
+                      setReasonInputBoxOpenForLeadOwner(true);
+                    }
+                  }}
+                  icon={User2}
+              />
               {/* NOTE : CALL TO THE MODAL COMPONENT */}
-              <div className="p-1">
+              <div className="">
                 <GetCompanyUsersForLead
                   selectedUserId={persistedSelectedUserId} // Pass the persisted ID
                   handleSelectedCompanyUserChange={

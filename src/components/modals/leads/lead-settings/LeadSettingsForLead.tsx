@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Settings, X } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { Settings } from "lucide-react";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import { createPortal } from "react-dom";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -12,6 +12,8 @@ import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 
 function LeadSettingForLead({
   isOpen,
@@ -133,12 +135,12 @@ function LeadSettingForLead({
 
   if (!isOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 p-5 flex items-center justify-center bg-black bg-opacity-5  animate-fadeIn">
+    <div className="fixed inset-0 z-20 p-4 flex items-center justify-center bg-black bg-opacity-5  animate-fadeIn">
       <div
-        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
+        className="relative w-full p-4 max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
         [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between z-10">
+        {/* <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
             <Settings className="text-blue-600" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-xl font-bold text-gray-800">
@@ -153,20 +155,27 @@ function LeadSettingForLead({
           >
             <X size={SIZE.TWENTY_FOUR} />
           </button>
-        </div>
+        </div> */}
+        <FormHeader
+          icon={Settings}
+          onClose={onClose}
+          userName={lead.name}
+          preText="Manage lead settings - "
+          description="Update and manage the settings associated with this lead."
+        />
 
-        <div className="p-6">
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <div className="p-1">
+          <div className="bg-gray-50 rounded-lg p-2 mb-1">
             <div className="flex justify-between items-center mb-4 text-gray-600 font-semibold text-sm border-b pb-2">
               <span className="ml-2">Setting Name</span>
               <span className="mr-2">Status</span>
             </div>
             {isLoading ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              <div className="flex justify-center items-center h-32">
+                <LoadingSpinner/>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {leadSetting.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">
                     No settings available for this lead.
@@ -176,7 +185,7 @@ function LeadSettingForLead({
                     <div
                       key={per.id}
                       className={`
-                        relative flex items-center justify-between p-3 rounded-lg border
+                        relative flex items-center justify-between p-2 rounded-lg border
                         ${
                           per.isActive
                             ? "bg-green-50 border-green-200 shadow-sm"

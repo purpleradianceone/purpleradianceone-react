@@ -163,6 +163,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                 icon={UserPlus}
                 onClose={onClose}
                 preText="Add Company User"
+                description="Create and manage a new user account for your company."
 
               />
 
