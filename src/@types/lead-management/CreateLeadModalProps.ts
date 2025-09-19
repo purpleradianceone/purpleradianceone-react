@@ -1,6 +1,6 @@
 type CreateLeadModalProps = {
     isOpen?: boolean;
-    onClose?: () => void;
+    onClose: () => void;
     onCreateLeadRefreshLeadData? : () => void;
 }
 
