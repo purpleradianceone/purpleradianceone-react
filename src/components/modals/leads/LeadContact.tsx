@@ -379,7 +379,10 @@ const LeadContact = ({
     if (selectedContactCard?.isActive !== undefined) {
       setIsActive(selectedContactCard.isActive);
     }
+    console.log(selectedContactCard);
+    
   }, [selectedContactCard]);
+
 
   return (
     <div className={`w-full z-10 px-1 mb-1 `}>
@@ -419,15 +422,15 @@ const LeadContact = ({
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
                   } text-white flex items-center justify-center w-9 h-9 rounded-full border    font-semibold shadow-sm`}
                 >
-                  {contact.name ? contact.name.charAt(0).toUpperCase() : "?"}
+                  {contact.name ? contact.name.charAt(0).toUpperCase() : contact.email.charAt(0).toUpperCase() || "?"}
                 </div>
 
                 {/* Text Info */}
                 <div className="flex flex-col">
                   <p className="text-sm font-semibold ">
-                    {contact.name.length > 50
+                    {contact.name && contact.name.length > 50
                       ? contact.name.substring(0, 49) + "..."
-                      : contact.name || "Unknown Contact"}
+                      : contact.name || contact.email || contact.mobileNumber }
                   </p>
                   <p className="text-xs text-gray-500 font-normal flex flex-wrap items-center gap-x-1">
                     {contact.jobTitle && (
@@ -487,7 +490,7 @@ const LeadContact = ({
       </div>
       {/* view in pop up card  */}
       {selectedContactCard && (
-        <div className="fixed top-8 inset-0 bg-opacity-5 bg-black flex justify-center items-center z-50 p-4">
+        <div className="fixed top-8 inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
             {/* Header */}
             <div className="relative px-8 pt-5 pb-4">
@@ -504,21 +507,21 @@ const LeadContact = ({
                     isActive ? "bg-blue-500" : "bg-gray-400"
                   }`}
                 >
-                  {selectedContactCard.name
+                  {selectedContactCard.name !== null
                     ? selectedContactCard.name.charAt(0).toUpperCase()
                     : "?"}
                 </div>
                 <div className="flex-1">
                   <h2
-                    title={selectedContactCard.name}
+                    title={selectedContactCard.name ?? ""}
                     className="text-3xl font-bold text-gray-900"
                   >
-                    {selectedContactCard.name.length > 40 ? (
+                    {selectedContactCard.name !==null && selectedContactCard.name.length > 40 ? (
                       selectedContactCard.name.substring(0, 49) + "..."
                     ) : selectedContactCard.name ? (
                       selectedContactCard.name
                     ) : (
-                      <span className="text-sm italic">Unamed contact</span>
+                      <span className="text-base text-gray-500 font-normal italic">Unamed contact</span>
                     )}
                   </h2>
                   <p className="text-md text-gray-600 mt-1 flex items-center">
@@ -765,7 +768,7 @@ const LeadContact = ({
 
       {/* Add Contact Form Modal */}
       {isOpenAddLeadContactForm && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
 

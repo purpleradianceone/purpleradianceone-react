@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Handshake, Save, UserRoundPlus, X } from "lucide-react";
+import { Clock, Handshake, Link, Mail, Phone, Save, User, UserRoundPlus, X } from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
@@ -25,6 +25,7 @@ import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModa
 import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import FormInput from "../../ui/FormInput";
 
 function CreateLeadModal({
   isOpen,
@@ -36,7 +37,6 @@ function CreateLeadModal({
     email: "",
     mobileNumber: "",
   };
-  const createLeadLabelCss = "text-xs font-medium text-gray-700 block mb-1";
   const createLeadInputTagCss =
     "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
   const { loginStatus } = useLoggedInUserContext();
@@ -385,8 +385,8 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn px-6 py-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn p-5 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         {/* <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
@@ -407,6 +407,7 @@ function CreateLeadModal({
           onClose={onClose}
           preText="Create new "
           userName="Opportunity"
+          description="Fill in the details below to create a new lead."
         />
 
         {/* Divider */}
@@ -414,9 +415,17 @@ function CreateLeadModal({
 
         {/* Form */}
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
-          <div className="flex flex-col space-y-3">
-            <div className="">
-              <label className={createLeadLabelCss} htmlFor="name">
+          <div className="flex flex-col space-y-1">
+            {/* <div className=""> */}
+              <FormInput
+              label="Name:"
+              logo={User}                type="text"
+                name="name"
+                placeholder="Enter Name: "
+                value={createLeadModalFormData.name}
+                onChange={handleCreateLeadModalFormDataChange}
+              />
+              {/* <label className={createLeadLabelCss} htmlFor="name">
                 Name:
               </label>
               <input
@@ -426,24 +435,13 @@ function CreateLeadModal({
                 placeholder="Enter Name: "
                 value={createLeadModalFormData.name}
                 onChange={handleCreateLeadModalFormDataChange}
-              />
-            </div>
-            {/* <FormInput
-              label="Name : "
-              type="text"
-              name="name"
-              placeholder="Enter Name"
-              value={createLeadModalFormData.name}
-              onChange={handleCreateLeadModalFormDataChange}
-            /> */}
-
+              /> */}
+            {/* </div> */}
             {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
             <div className="">
-              <label className={createLeadLabelCss} htmlFor="email">
-                Email:
-              </label>
-              <input
-                className={createLeadInputTagCss}
+               <FormInput
+               label="Email:"
+               logo={Mail}
                 type="email"
                 name="email"
                 placeholder="Enter Email: "
@@ -467,12 +465,10 @@ function CreateLeadModal({
               onBlur={handleBlur}
             /> */}
             <div className="">
-              <label className={createLeadLabelCss} htmlFor="mobileNumber">
-                Mobile Number:
-              </label>
-              <input
-                type="text"
-                // pattern="[0-9]{10}"
+               <FormInput
+               type="text"
+               label="Mobile Number:"
+               logo={Phone}
                 className={createLeadInputTagCss}
                 name="mobileNumber"
                 placeholder="Enter Mobile Number: "
@@ -480,6 +476,12 @@ function CreateLeadModal({
                 onBlur={handleBlur}
                 onChange={handleCreateLeadModalFormDataChange}
               />
+              {/* <label className={createLeadLabelCss} htmlFor="mobileNumber">
+                Mobile Number:
+              </label>
+              <input */}
+               
+              {/* /> */}
               {error.mobileNumber && (
                 <div className="text-red-500 text-xs">{error.mobileNumber}</div>
               )}
@@ -488,8 +490,8 @@ function CreateLeadModal({
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
                 <Button onClick={handleCompanyUserPopUp} type="button">
-                  <div className="flex gap-2 items-center whitespace-nowrap">
-                    <UserRoundPlus size={18} />
+                  <div className="flex gap-1 items-center whitespace-nowrap">
+                    <UserRoundPlus size={16} />
                     <span>Assign Lead Owner</span>
                   </div>
                 </Button>
@@ -511,6 +513,7 @@ function CreateLeadModal({
             {/* Lead Status */}
             <div className="space-y-1">
               <CustomDropdown
+              logo={Clock}
               requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
@@ -526,6 +529,7 @@ function CreateLeadModal({
             {/* Lead Source */}
             <div className="space-y-1">
               <CustomDropdown
+              logo={Link}
               requiredRedDot
                 labelName="Lead Source :"
                 options={leadSource!}

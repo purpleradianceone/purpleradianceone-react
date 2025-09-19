@@ -1,4 +1,4 @@
-import { Users, Calendar, Filter, X } from "lucide-react";
+import {  Calendar, Filter, X } from "lucide-react";
 import { useState } from "react";
 import { useComapanySpecificSearchDateRange } from "../../../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../../../config/hooks/useDateRangeIdChange";
@@ -62,19 +62,12 @@ function GetCompanyUserListForLeadAssignment({
 
   return (
     userHasAccessToViewUser && (
-      <div className="w-full  pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-10  mb-2 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.8w-full">
-          <div className=" w-56  flex items-center justify-evenly  gap-5 ">
-            {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
-
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl  font-bold whitespace-nowrap text-ellipsis">Company Users</span>
-            )}
-          </div>
+      <div className="w-full">
+        <div className="sticky z-10 top-10  mb-2 flex items-center justify-between p-0.5  bg-gray-50 rounded-lg shadow-sm   w-full">
 
           {isLargeScreen && (
             <>
-              <div className="flex items-center gap-1">
+              <div className="flex  justify-between items-center gap-1">
                 {/* search box flex div */}
                 <div className="relative flex items-start w-80 ">
                   <SearchInput

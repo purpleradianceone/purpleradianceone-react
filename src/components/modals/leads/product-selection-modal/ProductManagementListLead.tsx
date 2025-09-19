@@ -1,4 +1,4 @@
-import { BoxesIcon, Calendar, Filter, Store, X } from "lucide-react";
+import {  Calendar, Filter, X } from "lucide-react";
 import useScreenSize from "../../../../config/hooks/useScreenSize";
 import { useState } from "react";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
@@ -38,24 +38,24 @@ function ProductsManagementListLead({
 
   if (userHasAccessToViewProduct) {
     return (
-      <div className="w-full  pt-1 pl-5 pr-1 gap-1">
+      <div className="w-full p-2">
         <div className="sticky z-10 top-9  flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
           <div className="flex justify-between w-full ">
-            <div className="flex  gap-2">
-              {!isSmallScreen ? (
-                <BoxesIcon className="w-6 h-6 text-blue-600 mt-2" />
-              ) : (
-                <Store className="w-6 h-6 text-blue-600 mt-2" />
-              )}
+            {/* <div className="flex  gap-2"> */}
+              {/* {!isSmallScreen ? ( */}
+                 {/* <BoxesIcon className="w-6 h-6 text-blue-600 mt-2" /> */}
+              {/* ) : ( */}
+                {/* <Store className="w-6 h-6 text-blue-600 mt-2" /> */}
+              {/* )} */}
 
-              {(isMediumScreen || isLargeScreen) && (
+              {/* {(isMediumScreen || isLargeScreen) && (
                 <>
                   <span className="text-1xl font-bold mt-2">
                     Product Management
                   </span>
                 </>
-              )}
-            </div>
+              )} */}
+            {/* </div> */}
 
             {isLargeScreen && (
               <>
@@ -245,8 +245,8 @@ function ProductsManagementListLead({
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "75vh", width: "100%" }}
+            className="ag-theme-alpine "
+            style={{ height: "65vh", width: "100%" }}
           >
             <ProductsManagementGridLead
               handleProductCheckboxChange={handleProductCheckboxChange}
