@@ -19,6 +19,9 @@ import {
   X,
   LayoutDashboard,
   LucideArrowBigRight,
+  BookDashed,
+  Edit,
+  Eye,
 } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import useScreenSize from "../../config/hooks/useScreenSize";
@@ -36,6 +39,7 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import { useUserPreference } from "../../context/user/UserPreference";
 import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
+import FormHeader from "../ui/FormHeader";
 
 type TemplateType = {
   id: number;
@@ -732,7 +736,11 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Preview ${template.name}`}
                 >
-                  View
+                  
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Eye size={16} />
+                    View
+                  </div>
                 </Button>
                 <Button
                   // className="px-3 py-1 text-sm border rounded"
@@ -756,7 +764,10 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     }
                   }}
                 >
-                  Edit
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Edit size={16} />
+                    Edit
+                  </div>
                 </Button>
               </div>
             </div>
@@ -780,31 +791,33 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       checked={template.isactive}
                       id={`active-${template.id}`}
                       onChange={() => {
-                        if(!template.is_master){
-                        if (!template.is_default) {
-                          if (
-                            userHasAccessToUpdateEmailTemplateSetting &&
-                            !template.is_master
-                          ) {
-                            template.isactive = !template.isactive;
-                            handleDefaultToggle(template);
-                          } else {
-                            if (template.is_master) {
-                              toast.error(
-                                "Can't change active status of master template."
-                              );
+                        if (!template.is_master) {
+                          if (!template.is_default) {
+                            if (
+                              userHasAccessToUpdateEmailTemplateSetting &&
+                              !template.is_master
+                            ) {
+                              template.isactive = !template.isactive;
+                              handleDefaultToggle(template);
                             } else {
-                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              if (template.is_master) {
+                                toast.error(
+                                  "Can't change active status of master template."
+                                );
+                              } else {
+                                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              }
                             }
+                          } else {
+                            toast.error(
+                              "To make this inactive, please set another template as default first."
+                            );
                           }
                         } else {
                           toast.error(
-                            "To make this inactive, please set another template as default first."
+                            "The master template cannot be deactivated."
                           );
                         }
-                      }else{
-                        toast.error("The master template cannot be deactivated.")
-                      }
                       }}
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
@@ -906,22 +919,31 @@ const TemplateList: React.FC<TemplateListProps> = ({
       {previewTemplate && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <h2 className="text-xl font-semibold mb-4">
-              Preview: {previewTemplate.name}
-            </h2>
+            <FormHeader
+            icon={Eye}
+            preText= {"Preview:"}
+            userName={previewTemplate.name}
+            onClose={() => setPreviewTemplate(null)}
+            />
             <div
               className="overflow-y-auto flex-1 border rounded p-4 text-sm text-gray-800 bg-gray-50"
               dangerouslySetInnerHTML={{
                 __html: previewTemplate.email_body_html,
               }}
             />
-            <div className="text-right mt-4">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            <div className="relative text-right justify-items-end justify-end items-end w-full">
+
+              <div className="w-fit">
+                <Button
                 onClick={() => setPreviewTemplate(null)}
               >
-                Close
-              </button>
+                <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Close
+                  </div>
+              </Button>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -1009,7 +1031,12 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   ) : (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 className="table-header-custom mb-4">Select Template Type</h2>
+        {/* <h2 className="table-header-custom mb-4">Select Template Type</h2> */}
+        <FormHeader
+          icon={BookDashed}
+          preText="Select Template Type"
+          onClose={onClose}
+        />
         <select
           value={selectedTypeId} // Value will be '' initially or the selected ID string
           onChange={(e) => setSelectedTypeId(e.target.value)}

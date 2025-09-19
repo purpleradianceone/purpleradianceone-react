@@ -81,6 +81,7 @@ function ProductTeamManagement() {
                 code: res.code,
                 companyId: res.company_id,
                 cost: res.cost,
+                productTypeName:res.product_type_name,
                 count: res.count,
                 createdBy: res.createdby,
                 createdOn: res.createdon,

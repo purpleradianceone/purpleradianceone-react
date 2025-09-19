@@ -63,6 +63,15 @@ function ProductsManagementGrid({
       },
 
       {
+        field: "productTypeName",
+        headerName: "Product Type",
+        sortable: true,
+        maxWidth: 120,
+        filter: true,
+        flex: 1,
+      },
+
+      {
         field: "isActive",
         headerName: "Active",
         sortable: true,
