@@ -10,6 +10,7 @@ import {
   Plus,
   CheckCircle,
   XCircle,
+  Edit,
 } from "lucide-react";
 import SettingsModal from "./SettingsModal";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -263,9 +264,9 @@ export default function EmailSettingsTabs() {
           key={index}
           className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
         >
-          <Button
+          <div className="absolute right-3">
+            <Button
             disabled={!userHasAccessToUpdateEmailSetting}
-            className="absolute top-4 right-4 bg-blue-600 action-btn-custom px-3 py-1 rounded hover:bg-blue-700 shadow-sm"
             onClick={() => {
               if (userHasAccessToUpdateEmailSetting) {
                 setModalType("company");
@@ -276,31 +277,40 @@ export default function EmailSettingsTabs() {
               }
             }}
           >
-            Edit
+           <div className="flex items-center justify-center gap-0.5">
+                      <Edit size={16} />
+                      Edit
+                    </div>
           </Button>
+          </div>
+          
 
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Company Email:</strong> <span className="caption-custom">{setting.email}</span>
+              <strong className="input-label-custom">Company Email:</strong>{" "}
+              <span className="caption-custom">{setting.email}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <KeyRound className="text-gray-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Email Password:</strong> <span className="caption-custom">********</span>
+              <strong className="input-label-custom">Email Password:</strong>{" "}
+              <span className="caption-custom">********</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-green-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">SMTP Host:</strong> <span className="caption-custom">{setting.smtp_host}</span>
+              <strong className="input-label-custom">SMTP Host:</strong>{" "}
+              <span className="caption-custom">{setting.smtp_host}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-purple-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">SMTP Port:</strong> <span className="caption-custom">{setting.smtp_port}</span>
+              <strong className="input-label-custom">SMTP Port:</strong>{" "}
+              <span className="caption-custom">{setting.smtp_port}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
@@ -308,12 +318,12 @@ export default function EmailSettingsTabs() {
             <p className="text-gray-700 text-sm">
               <strong className="input-label-custom">Security Type:</strong>{" "}
               <span className="caption-custom">
-              {setting.email_security_type_id === 1
-                ? "SSL"
-                : setting.email_security_type_id === 2
-                ? "TLS"
-                : "Unknown"}
-                </span>
+                {setting.email_security_type_id === 1
+                  ? "SSL"
+                  : setting.email_security_type_id === 2
+                  ? "TLS"
+                  : "Unknown"}
+              </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
@@ -325,8 +335,12 @@ export default function EmailSettingsTabs() {
               }`}
             />
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Authentication Required:</strong>{" "}
-               <span className="caption-custom">{setting.authentication_required ? "Yes" : "No"}</span>
+              <strong className="input-label-custom">
+                Authentication Required:
+              </strong>{" "}
+              <span className="caption-custom">
+                {setting.authentication_required ? "Yes" : "No"}
+              </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-4">
@@ -356,22 +370,26 @@ export default function EmailSettingsTabs() {
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{setting.createdby}</span>
+              <strong className="input-label-custom">Created By:</strong>{" "}
+              <span className="caption-custom">{setting.createdby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Created On:</strong> <span className="caption-custom">{setting.createdon}</span>
+              <strong className="input-label-custom">Created On:</strong>{" "}
+              <span className="caption-custom">{setting.createdon}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{setting.updatedby}</span>
+              <strong className="input-label-custom">Updated By:</strong>{" "}
+              <span className="caption-custom">{setting.updatedby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong className="input-label-custom">Updated On:</strong> <span className="caption-custom">{setting.updatedon}</span>
+              <strong className="input-label-custom">Updated On:</strong>{" "}
+              <span className="caption-custom">{setting.updatedon}</span>
             </p>
           </div>
         </div>
@@ -391,9 +409,9 @@ export default function EmailSettingsTabs() {
               key={index}
               className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
             >
-              <Button
+              <div className="absolute w-fit right-3">
+                <Button
                 disabled={!userHasAccessToUpdateEmailSetting}
-                className="absolute top-4 right-4 bg-blue-600 action-btn-custom px-3 py-1 rounded hover:bg-blue-700 shadow-sm"
                 onClick={() => {
                   if (userHasAccessToUpdateEmailSetting) {
                     setModalType("user");
@@ -404,30 +422,41 @@ export default function EmailSettingsTabs() {
                   }
                 }}
               >
-                Edit
+                <div className="flex items-center justify-center gap-0.5">
+                      <Edit size={16} />
+                      Edit
+                    </div>
               </Button>
+              </div>
+              
               <div className="flex items-center space-x-2 mb-2">
                 <Mail className="text-blue-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">User Email:</strong> <span className="caption-custom">{setting.email}</span>
+                  <strong className="input-label-custom">User Email:</strong>{" "}
+                  <span className="caption-custom">{setting.email}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <KeyRound className="text-gray-500 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Email Password:</strong> <span className="caption-custom">********</span>
+                  <strong className="input-label-custom">
+                    Email Password:
+                  </strong>{" "}
+                  <span className="caption-custom">********</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-green-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">SMTP Host:</strong> <span className="caption-custom">{setting.smtp_host}</span>
+                  <strong className="input-label-custom">SMTP Host:</strong>{" "}
+                  <span className="caption-custom">{setting.smtp_host}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <Server className="text-purple-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">SMTP Port:</strong> <span className="caption-custom">{setting.smtp_port}</span>
+                  <strong className="input-label-custom">SMTP Port:</strong>{" "}
+                  <span className="caption-custom">{setting.smtp_port}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
@@ -435,12 +464,12 @@ export default function EmailSettingsTabs() {
                 <p className="text-gray-700 text-sm">
                   <strong className="input-label-custom">Security Type:</strong>{" "}
                   <span className="caption-custom">
-                  {setting.email_security_type_id === 1
-                    ? "SSL"
-                    : setting.email_security_type_id === 2
-                    ? "TLS"
-                    : "Unknown"}
-                    </span>
+                    {setting.email_security_type_id === 1
+                      ? "SSL"
+                      : setting.email_security_type_id === 2
+                      ? "TLS"
+                      : "Unknown"}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
@@ -452,8 +481,12 @@ export default function EmailSettingsTabs() {
                   }`}
                 />
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Authentication Required:</strong>{" "}
-                  <span className="caption-custom">{setting.authentication_required ? "Yes" : "No"}</span>
+                  <strong className="input-label-custom">
+                    Authentication Required:
+                  </strong>{" "}
+                  <span className="caption-custom">
+                    {setting.authentication_required ? "Yes" : "No"}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-4">
@@ -486,22 +519,26 @@ export default function EmailSettingsTabs() {
 
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{setting.createdby}</span>
+                  <strong className="input-label-custom">Created By:</strong>{" "}
+                  <span className="caption-custom">{setting.createdby}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Created On:</strong> <span className="caption-custom">{setting.createdon}</span>
+                  <strong className="input-label-custom">Created On:</strong>{" "}
+                  <span className="caption-custom">{setting.createdon}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{setting.updatedby}</span>
+                  <strong className="input-label-custom">Updated By:</strong>{" "}
+                  <span className="caption-custom">{setting.updatedby}</span>
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 text-sm">
-                  <strong className="input-label-custom">Updated On:</strong> <span className="caption-custom">{setting.updatedon}</span>
+                  <strong className="input-label-custom">Updated On:</strong>{" "}
+                  <span className="caption-custom">{setting.updatedon}</span>
                 </p>
               </div>
             </div>
@@ -562,8 +599,13 @@ export default function EmailSettingsTabs() {
                   {companySettings.length > 0 ? (
                     companySettings.map(renderCompanyEmailCard)
                   ) : (
-                    <div className=" w-full justify-items-end text-gray-500 p-4  rounded-md bg-white shadow-sm">
-                      <div className="max-w-36">
+                    <div className="flex col-span-2 w-full items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
+                      
+                      <div>
+                        <span>No Email Settings For company </span>
+                      </div>
+
+                      <div >
                         <Button
                           disabled={!userHasAccessToAddEmailSetting}
                           onClick={() => {
@@ -576,11 +618,13 @@ export default function EmailSettingsTabs() {
                             }
                           }}
                         >
-                          <Plus className="w-5 h-5 text-white " />{" "}
-                          <span className=" font-bold ">Create</span>{" "}
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Plus size={16} />
+                            Create
+                          </div>
                         </Button>
                       </div>
-                      <span>No Email Settings For company </span>
+                      
                     </div>
                   )}
                 </div>
@@ -601,8 +645,12 @@ export default function EmailSettingsTabs() {
                   {userSettings.length > 0 ? (
                     userSettings.map(renderUserEmailCard)
                   ) : (
-                    <div className="text-center w-full justify-items-end text-gray-500 p-4  rounded-md bg-white shadow-sm">
-                      <div className="flex justify-center  items-center max-w-36">
+                    <div className="flex col-span-2 w-full justify-items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
+                      
+                      <div>
+                        <span>No Email Settings For User </span>
+                      </div>
+                      <div >
                         <Button
                           disabled={!userHasAccessToAddEmailSetting}
                           onClick={() => {
@@ -615,11 +663,13 @@ export default function EmailSettingsTabs() {
                             }
                           }}
                         >
-                          <Plus className="w-5 h-5 text-white " />{" "}
-                          <span className=" font-bold ">Create</span>{" "}
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Plus size={16} />
+                            Create
+                          </div>
                         </Button>
                       </div>
-                      <span>No Email Settings For User </span>
+                      
                     </div>
                   )}
                 </div>
