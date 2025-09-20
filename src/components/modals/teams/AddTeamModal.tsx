@@ -30,25 +30,26 @@ import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 
-
 function AddTeamModal({
   isOpen,
   onClose,
-  handleCompanyTeamChangeOnAdd
-} : AddTeamModalProps){
-  const { userHasAccessToAddTeamManagement, userHasAccessToViewUser } = useUserAccessModules();
+  handleCompanyTeamChangeOnAdd,
+}: AddTeamModalProps) {
+  const { userHasAccessToAddTeamManagement, userHasAccessToViewUser } =
+    useUserAccessModules();
   const { isSmallScreen } = useScreenSize();
 
-  const [intialAddTeamFormData, setIntialAddTeamFormData] = useState<AddTeamFormDataState>({
-    name: "",
-    description: "",
-  });
+  const [intialAddTeamFormData, setIntialAddTeamFormData] =
+    useState<AddTeamFormDataState>({
+      name: "",
+      description: "",
+    });
 
   const { loginStatus } = useLoggedInUserContext();
   const {
     formData: AddTeamFormData,
     handleChange: handleAddTeamFormDataChange,
-    setFormData : setAddTeamFormData
+    setFormData: setAddTeamFormData,
   } = useFormChange(intialAddTeamFormData);
 
   const { errors, handleBlur, setErrors } = useFormValidation(
@@ -56,11 +57,16 @@ function AddTeamModal({
     "registration"
   );
 
-  const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<number[]>([]);
-  const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>([]);
+  const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<
+    number[]
+  >([]);
+  const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
+    []
+  );
   const [isCompanyUsersLoading, setIsCompanyUsersLoading] = useState(false);
   const [companyUsersHasMore, setCompanyUsersHasMore] = useState(true);
-  const [isCompanyUsersFetchedCount,setIsCompanyUsersFetchedCount] = useState<number>(0);
+  const [isCompanyUsersFetchedCount, setIsCompanyUsersFetchedCount] =
+    useState<number>(0);
   const companyUsersFetchingRef = useRef(false);
   const companyUsersGridApiRef = useRef<GridApi | null>(null);
   const companyUsersLastScrollPositionRef = useRef<number>(0);
@@ -68,28 +74,26 @@ function AddTeamModal({
 
   const onGridReady = (params: { api: GridApi }) => {
     companyUsersGridApiRef.current = params.api;
-};
+  };
 
   const handleCompanyUserCheckBoxChange = (params : CompanyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.checked){
       
       setAddCompanyTeamUserArray((prev) => [...prev, params.id]);
+    } else {
+      setAddCompanyTeamUserArray((prev) =>
+        prev.filter((id) => id !== params.id)
+      );
     }
-    else{
-      
-      setAddCompanyTeamUserArray((prev) => prev.filter((id) => id !== params.id));
-    }
+  };
 
-  }
-
-  const handleAddTeamFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleAddTeamFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
-    if (userHasAccessToAddTeamManagement){
-      if (
-        AddTeamFormData.name !== "" ||
-        AddTeamFormData.description !== ""
-      ) {
+    if (userHasAccessToAddTeamManagement) {
+      if (AddTeamFormData.name !== "" || AddTeamFormData.description !== "") {
         const addTeamPostData = {
           company_id: loginStatus.companyId,
           name: AddTeamFormData.name,
@@ -99,9 +103,13 @@ function AddTeamModal({
         };
 
         try {
-          const response = await axios.post(POST_API.CREATE_COMPANY_TEAM, addTeamPostData, {
-            withCredentials: true,
-          });
+          const response = await axios.post(
+            POST_API.CREATE_COMPANY_TEAM,
+            addTeamPostData,
+            {
+              withCredentials: true,
+            }
+          );
 
           if (response.data.status && response.status === STATUS_CODE.OK) {
             toast.success(response.data.message)
@@ -121,8 +129,8 @@ function AddTeamModal({
             if (refreshTokenResponse) {
               handleAddTeamFormSubmit(event);
             }
-          }else{
-            toast.error(error.response.data)
+          } else {
+            toast.error(error.response.data);
           }
         }
       } else {
@@ -133,11 +141,17 @@ function AddTeamModal({
     }
   };
 
-  const fetchCompanyUsers = async (companyUsersSearchParameter : string) => {
-    if (!userHasAccessToViewUser || isCompanyUsersLoading || (!companyUsersHasMore && companyUsersSearchParameter.length === 0) || companyUsersFetchingRef.current) return;
-     
+  const fetchCompanyUsers = async (companyUsersSearchParameter: string) => {
+    if (
+      !userHasAccessToViewUser ||
+      isCompanyUsersLoading ||
+      (!companyUsersHasMore && companyUsersSearchParameter.length === 0) ||
+      companyUsersFetchingRef.current
+    )
+      return;
+
     try {
-      if(companyUsersSearchParameter.length > 0){
+      if (companyUsersSearchParameter.length > 0) {
         setCompanyUsers([]);
       }
       companyUserSearchParameterRef.current = companyUsersSearchParameter;
@@ -146,9 +160,10 @@ function AddTeamModal({
 
       // Save current scroll position before fetching
       if (companyUsersGridApiRef.current) {
-        const rowIndex = companyUsersGridApiRef.current.getLastDisplayedRowIndex();
+        const rowIndex =
+          companyUsersGridApiRef.current.getLastDisplayedRowIndex();
         if (rowIndex !== null) {
-          companyUsersLastScrollPositionRef.current = rowIndex ;
+          companyUsersLastScrollPositionRef.current = rowIndex;
         }
       }
 
@@ -156,16 +171,23 @@ function AddTeamModal({
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
         limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
-        offset: companyUsersSearchParameter.length > 0 ? 0 : 50 * isCompanyUsersFetchedCount,
-        isactive : true,
+        offset:
+          companyUsersSearchParameter.length > 0
+            ? 0
+            : 50 * isCompanyUsersFetchedCount,
+        isactive: true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyUsersSearchParameter,
         search_parameter_date: "",
       };
 
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        POST_API.GET_COMPANY_USERS,
+        getCompanyUserPostData,
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.data) {
         const newUsers = response.data;
@@ -174,28 +196,35 @@ function AddTeamModal({
           return;
         }
 
-        if(companyUsersSearchParameter.length === 0){
-          newUsers.map((user : any) => {
-            setCompanyUsers((prev) => [...prev,user])
-          })
+        if (companyUsersSearchParameter.length === 0) {
+          newUsers.map((user: any) => {
+            setCompanyUsers((prev) => [...prev, user]);
+          });
           setIsCompanyUsersFetchedCount(isCompanyUsersFetchedCount + 1);
-        }
-        else if(companyUsersSearchParameter.length > 0){
+        } else if (companyUsersSearchParameter.length > 0) {
           setCompanyUsers(newUsers);
         }
 
         // Restore scroll position after data update
-        if (companyUsersGridApiRef.current && companyUsersLastScrollPositionRef.current > 0) {
+        if (
+          companyUsersGridApiRef.current &&
+          companyUsersLastScrollPositionRef.current > 0
+        ) {
           setTimeout(() => {
-              if(companyUsersGridApiRef.current){
-                  companyUsersGridApiRef.current.ensureIndexVisible(companyUsersLastScrollPositionRef.current-11);
-                  //companyUsersGridApiRef.current.setFirstDisplayedRow(companyUsersLastScrollPositionRef.current); Removed this line.
-              }
+            if (companyUsersGridApiRef.current) {
+              companyUsersGridApiRef.current.ensureIndexVisible(
+                companyUsersLastScrollPositionRef.current - 11
+              );
+              //companyUsersGridApiRef.current.setFirstDisplayedRow(companyUsersLastScrollPositionRef.current); Removed this line.
+            }
           }, 150);
-      }
+        }
 
-
-        if (newUsers[0]?.count && companyUsers.length + newUsers.length >= newUsers[0].count && companyUsersSearchParameter.length === 0) {
+        if (
+          newUsers[0]?.count &&
+          companyUsers.length + newUsers.length >= newUsers[0].count &&
+          companyUsersSearchParameter.length === 0
+        ) {
           setCompanyUsersHasMore(false);
         }
       }
@@ -206,25 +235,23 @@ function AddTeamModal({
         });
         if (refreshTokenResponse) {
           companyUsersFetchingRef.current = false;
-          fetchCompanyUsers(companyUsersSearchParameter)
+          fetchCompanyUsers(companyUsersSearchParameter);
         }
       }
     } finally {
-      if(companyUsersSearchParameter.length === 0){
+      if (companyUsersSearchParameter.length === 0) {
         setIsCompanyUsersLoading(false);
         companyUsersFetchingRef.current = false;
-      }
-      else if(companyUsersSearchParameter.length > 0){
+      } else if (companyUsersSearchParameter.length > 0) {
         setIsCompanyUsersLoading(false);
         companyUsersFetchingRef.current = false;
-        setCompanyUsersHasMore(true)
-        if(companyUserSearchParameterRef.current.length === 1){
+        setCompanyUsersHasMore(true);
+        if (companyUserSearchParameterRef.current.length === 1) {
           companyUsersGridApiRef.current = null;
           companyUsersLastScrollPositionRef.current = 0;
           setIsCompanyUsersFetchedCount(0);
         }
       }
-      
     }
   };
 
@@ -238,34 +265,37 @@ function AddTeamModal({
 
     const lastVisibleRow = params.lastRow;
     const totalRowCount = companyUsers[0]?.count;
-    
-    if (totalRowCount && lastVisibleRow >= companyUsers.length - 5 && companyUserSearchParameterRef.current.length === 0) {
+
+    if (
+      totalRowCount &&
+      lastVisibleRow >= companyUsers.length - 5 &&
+      companyUserSearchParameterRef.current.length === 0
+    ) {
       fetchCompanyUsers("");
     }
   };
 
-  const handleCompanyUsersSearchBoxChange = (searchValue : string) => {
-    if(searchValue.length > 0){
+  const handleCompanyUsersSearchBoxChange = (searchValue: string) => {
+    if (searchValue.length > 0) {
       setCompanyUsers([]);
       setIsCompanyUsersLoading(false);
       setIsCompanyUsersFetchedCount(0);
-      setCompanyUsersHasMore(true)
+      setCompanyUsersHasMore(true);
+      companyUsersGridApiRef.current = null;
+      companyUsersLastScrollPositionRef.current = 0;
+      companyUsersFetchingRef.current = false;
+      fetchCompanyUsers(searchValue);
+    } else if (searchValue.length === 0) {
+      setCompanyUsers([]);
+      setIsCompanyUsersLoading(false);
+      setIsCompanyUsersFetchedCount(0);
+      setCompanyUsersHasMore(true);
       companyUsersGridApiRef.current = null;
       companyUsersLastScrollPositionRef.current = 0;
       companyUsersFetchingRef.current = false;
       fetchCompanyUsers(searchValue);
     }
-    else if(searchValue.length === 0){
-      setCompanyUsers([]);
-      setIsCompanyUsersLoading(false);
-      setIsCompanyUsersFetchedCount(0);
-      setCompanyUsersHasMore(true)
-      companyUsersGridApiRef.current = null;
-      companyUsersLastScrollPositionRef.current = 0;
-      companyUsersFetchingRef.current = false;
-      fetchCompanyUsers(searchValue);
-    }
-  }
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -286,11 +316,10 @@ function AddTeamModal({
       companyUserSearchParameterRef.current = "";
       setIsCompanyUsersFetchedCount(0);
       setAddTeamFormData({
-        name : "",
-        description : "",
-      })
+        name: "",
+        description: "",
+      });
       // handleMessageSnackbarClose();
-
     } else if (isOpen && companyUsers.length === 0) {
       fetchCompanyUsers("");
     }
@@ -323,6 +352,7 @@ function AddTeamModal({
             />
 
             <form className="space-y-3" onSubmit={handleAddTeamFormSubmit}>
+
               <FormInput
               logo={Users}
                 label="Name : "
@@ -331,7 +361,7 @@ function AddTeamModal({
                 name="name"
                 required={true}
                 value={AddTeamFormData.name}
-                placeholder="Product Name"
+                placeholder="Team Name"
                 onBlur={handleBlur}
                 error={errors.name}
                 onChange={handleAddTeamFormDataChange}
@@ -341,7 +371,7 @@ function AddTeamModal({
               logo={Text}
                 label="Description : "
                 name="description"
-                placeholder="Product Description"
+                placeholder="Team Description"
                 value={AddTeamFormData.description}
                 cols={5}
                 rows={3}
@@ -351,42 +381,55 @@ function AddTeamModal({
                 onChange={handleAddTeamFormDataChange}
               />
               <div
-                className="ag-theme-alpine"
+                // className="ag-theme-balham"
                 style={{ height: "350px", width: "100%", marginBottom: "60px" }}
               >
                 <div className="flex gap-2 mb-2 justify-between">
                   <div className="place-content-center">
-                    <span className="text-lg font-semibold text-gray-700">
-                      Company Members
-                    </span>
+                    <span className="table-header-custom">Company Members</span>
                   </div>
                   <div>
-                    <SearchInput 
-                    onChange={(event) => {
-                      handleCompanyUsersSearchBoxChange(event.target.value)
-                    }}
+                    <SearchInput
+                      onChange={(event) => {
+                        handleCompanyUsersSearchBoxChange(event.target.value);
+                      }}
                     />
                   </div>
                 </div>
                 <AddCompanyTeamUsersAgGrid
                   companyUsers={companyUsers}
                   handleViewPortChanged={handleViewPortChanged}
-                  onGridReady = {onGridReady}
-                  handleCompanyUserCheckBoxChange={handleCompanyUserCheckBoxChange}
+                  onGridReady={onGridReady}
+                  handleCompanyUserCheckBoxChange={
+                    handleCompanyUserCheckBoxChange
+                  }
                   addCompanyTeamUserArray={addCompanyTeamUserArray}
                   isGridForSubscription={false}
                 />
               </div>
 
               {userHasAccessToAddTeamManagement ? (
-                <div className="flex justify-self-center max-w-60 mt-16 pb-14">
-                  <Button type="submit">Create Team</Button>
+                <div className="flex justify-self-end gap-3 mt-16 pb-14">
+                  <div className="min-w-28">
+                    <Button type="button" onClick={()=>{onClose()}}>
+                      <div className="flex gap-1 text-center">
+                        <X size={18} />
+                        <span>Cancel</span>
+                      </div>
+                    </Button>
+                  </div>
+                  <div className="min-w-28">
+                    <Button type="submit">
+                      <div className="flex gap-1 text-center">
+                        <Save size={18} />
+                        <span>Save</span>
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex justify-self-end max-w-36 m-3">
-                  <Button type="submit" onClick={() => {}} disabled>
-                    Create Team
-                  </Button>
+                  <div></div>
                 </div>
               )}
             </form>

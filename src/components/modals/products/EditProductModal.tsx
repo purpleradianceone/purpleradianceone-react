@@ -549,12 +549,12 @@ function EditCompanyProductModal({
                     {productIsActive ? (
                       <div>
                         <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
-                        Active
+                        <span className="input-label-custom">Active</span>
                       </div>
                     ) : (
                       <div>
                         <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
-                        Inactive
+                        <span className="input-label-custom">Inactive</span>
                       </div>
                     )}
                   </label>
@@ -590,8 +590,8 @@ function EditCompanyProductModal({
             </form>
 
             <div className="inline-flex items-center justify-center w-full">
-              <hr className="w-full h-1 mx-auto my-4 border-0 rounded-sm md:my-10 bg-gray-700" />
-              <span className="absolute px-3 text-xl font-semibold text-gray-800 -translate-x-1/2 bg-white left-1/2">
+              <hr className="w-full h-0.5 mx-auto my-4 border-0 rounded-sm md:my-10 bg-gray-700" />
+              <span className="absolute px-3 table-header-custom -translate-x-1/2 bg-white left-1/2">
                 Product Tax
               </span>
             </div>
@@ -616,13 +616,7 @@ function EditCompanyProductModal({
             </div>
 
             {isCreateCompanyProductTaxModalOpen && (
-              <div
-                className={
-                  isSmallScreen
-                    ? "flex justify-center items-center min-w-full"
-                    : "flex justify-center items-center min-w-fit"
-                }
-              >
+              
                 <CreateCompanyProductTaxModal
                   isOpen={isCreateCompanyProductTaxModalOpen}
                   handleCreateCompanyProductTax={handleCreateCompanyProductTax}
@@ -631,7 +625,7 @@ function EditCompanyProductModal({
                   }}
                   product={product}
                 />
-              </div>
+              
             )}
 
             <CreateCompanyProductCompanyUserModal

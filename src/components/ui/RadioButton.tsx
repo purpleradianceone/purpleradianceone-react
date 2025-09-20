@@ -22,7 +22,7 @@ function RadioButtons(props: RadioButtonsProps) {
             />
             <label
               htmlFor={option.id}
-              className="ms-2 text-sm font-medium text-gray-900"
+              className="ms-2 input-label-custom"
             >
               {option.label}
             </label>
