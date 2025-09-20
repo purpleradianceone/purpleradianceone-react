@@ -5,9 +5,9 @@ import FormInputProps from "../../@types/ui/FormInputProps";
 function DatePickerInput(props : FormInputProps){
     return (
         <div className="mt-2">
-      <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block text-sm font-medium text-gray-700'}>
+      <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block input-label-custom'}>
              {props.logo  && <props.logo size={14} className="inline mr-1 text-blue-500"/>}
-{props.label}{' '}{props.required && <span className="text-red-500 align-top">*</span>}
+{props.label}{props.required && <span className="caption-custom-inactive align-top">*</span>}
       </label>
       <div className="mt-1 relative">
         <input
@@ -22,15 +22,15 @@ function DatePickerInput(props : FormInputProps){
           onChange={props.onChange}
           onBlur={props.onBlur}
           className={props.readonly ? 
-            "appearance-none block w-full px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            "input-label-custom appearance-none block w-full px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             :
-            "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            "input-label-custom appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
            }
           inputMode={props.inputMode}
           max={props.maxDate}
         />
         </div>
-        {props.error && <div className="mt-3 ml-2 text-red-500 text-sm">{props.error}</div>}
+        {props.error && <div className="mt-3 ml-2 caption-custom-inactive">{props.error}</div>}
         </div>
         
     );

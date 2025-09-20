@@ -259,7 +259,8 @@ function AddCompanyTeamUsersAgGrid({
         </>
       )}
 
-      <AgGridReact
+<div className="ag-theme-balham w-full h-full">
+        <AgGridReact
         rowData={companyUsers}
         columnDefs={companyUserColDefs}
         defaultColDef={defaultColDef}
@@ -269,6 +270,8 @@ function AddCompanyTeamUsersAgGrid({
         onViewportChanged={handleViewPortChanged}
         onGridReady={onGridReady}
       />
+</div>
+      
     </>
   );
 }
