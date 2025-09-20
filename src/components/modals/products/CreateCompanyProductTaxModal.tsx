@@ -1,4 +1,4 @@
-import { EditIcon, X } from "lucide-react";
+import { EditIcon, Save, X } from "lucide-react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
@@ -105,13 +105,8 @@ function CreateCompanyProductTaxModal({
               response.data.status === true &&
               response.status === STATUS_CODE.OK
             ) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "success",
-              // });
               toast.success(response.data.message);
               handleCreateCompanyProductTax(product);
-
               setTimeout(() => {
                 onClose();
               }, 2000);
@@ -119,10 +114,6 @@ function CreateCompanyProductTaxModal({
               response.status === STATUS_CODE.OK &&
               !response.data.status
             ) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "error",
-              // });
               toast.error(response.data.message);
             }
           })
@@ -139,10 +130,6 @@ function CreateCompanyProductTaxModal({
           });
       }
     } else {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
-      //   type: "error",
-      // });
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
     }
   };
@@ -193,7 +180,6 @@ function CreateCompanyProductTaxModal({
                 options={ProductsRadioButtonOptions}
                 onChange={handleTaxRadioButtonChange}
               />
-
               {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
                 <FormInput
                   label="HSN : "
@@ -244,22 +230,32 @@ function CreateCompanyProductTaxModal({
                 onBlur={handleBlur}
                 error={errors.validFrom}
               />
-              <div className="flex justify-center">
-                <div className="max-w-80 min-w-72">
-                  <Button type="submit">Create Product Tax</Button>
+              <div className="flex justify-end gap-2">
+                <div >
+                  <Button
+                  onClick={onClose}
+                  >
+                  
+                  <div className="flex items-center justify-center gap-1">
+                    <X size={16} />
+                    Close
+                  </div>
+                  </Button>
+                </div>
+                <div >
+                  <Button type="submit">
+                    
+                  <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                  </Button>
                 </div>
               </div>
             </form>
           </div>
         </div>
       </div>
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </>
   );
 }
