@@ -4,7 +4,6 @@ import {
   AllCommunityModule,
   ColDef,
   GridApi,
-  themeAlpine,
   ViewportChangedEvent,
 } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -385,7 +384,7 @@ function CompanyTeamUsersAgGrid({
           );
 
           const handleCompanyTeamUsersToggle = async (
-            event: React.FormEvent<HTMLButtonElement>
+            event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
             if (userHasAccessToUpdateTeamManagement) {
@@ -430,7 +429,7 @@ function CompanyTeamUsersAgGrid({
           };
 
           const handleCompanyProductUsersToggle = async (
-            event: React.FormEvent<HTMLButtonElement>
+            event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
             if (userHasAccessToUpdateProductTeam) {
@@ -475,8 +474,8 @@ function CompanyTeamUsersAgGrid({
             }
           };
           return (
-            <div className="flex flex-col items-center mt-3">
-              <button
+            <div className="flex flex-col items-center mt-2">
+              {/* <button
                 id={params.data.id.toString()}
                 className={`w-6 h-3 rounded-md transition-colors duration-200 ${
                   isActive
@@ -496,7 +495,25 @@ function CompanyTeamUsersAgGrid({
                     isActive ? "float-end" : "float-start"
                   }`}
                 ></div>
-              </button>
+              </button> */}
+              <label className="inline-flex items-center cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isActive}
+                      id={params.data.id.toString()}
+                      name="isActive"
+                      onChange={(e) => {
+                         if (!isGridForProductUser) {
+                    handleCompanyTeamUsersToggle(e);
+                  } else if (isGridForProductUser) {
+                    handleCompanyProductUsersToggle(e);
+                  }
+                      }}
+                    />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+                  </label>
             </div>
           );
         },
@@ -524,12 +541,12 @@ function CompanyTeamUsersAgGrid({
   }, [isAddUsersCompleted]);
 
   return (
-    <div className="flex justify-around gap-2 mb-9 py-10 ">
+    <div className="flex justify-around gap-2 mb-9 py-10">
       <div
-        className="ag-theme-balham"
+        // className="ag-theme-balham"
         style={{ height: "300px", width: "45%" }}
       >
-        <div className="flex w-full  gap-4 mb-2 justify-between">
+        <div className="flex w-full  gap-4 mb-2 mt-1 ml-1 justify-between">
           <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
@@ -538,12 +555,12 @@ function CompanyTeamUsersAgGrid({
               }}
             ></SearchInput>
           </div>
-          <div className="text-base font-semibold mt-2 text-gray-700">
+          <div className="table-header-custom mt-2 mr-3">
             Team Members
           </div>
         </div>
-
-        <AgGridReact
+            <div className="ag-theme-balham w-full h-full mt-3">
+<AgGridReact
           rowData={
             isGridForProductUser
               ? companyProductUsersList!
@@ -561,16 +578,18 @@ function CompanyTeamUsersAgGrid({
               ? "No users assigned to this product"
               : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
           }
-          theme={themeAlpine}
+          // theme={}
           onViewportChanged={handleViewPortChanged}
           onGridReady={onGridReady}
         />
+            </div>
+        
       </div>
       <div
-        className="ag-theme-balham"
+        // className="ag-theme-balham"
         style={{ height: "300px", width: "49%" }}
       >
-        <div className="flex w-full gap-2 mb-2 justify-between">
+        <div className="flex w-full gap-2 mb-2 justify-between mt-1 ml-1">
             <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
@@ -579,13 +598,17 @@ function CompanyTeamUsersAgGrid({
               }}
             ></SearchInput>
           </div>
-          <div className="justify-self-end">
+          <div className="justify-self-end mr-3">
             {!isGridForProductUser && (
               <Button onClick={handleAddCompanyTeamUsers}>
-                <UserPlus2
+                <div className="flex justify-center items-center">
+                  <UserPlus2
                   className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                ></UserPlus2>{" "}
-                Add To Team
+                ></UserPlus2>
+                <span>Add</span>
+                </div>
+                
+                
               </Button>
             )}
 

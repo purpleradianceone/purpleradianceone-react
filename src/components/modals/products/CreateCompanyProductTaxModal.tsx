@@ -2,7 +2,6 @@ import { EditIcon, Save, X } from "lucide-react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  SIZE,
   STATUS_CODE,
   TAX_CODE,
 } from "../../../constants/AppConstants";
@@ -24,8 +23,8 @@ import CreateCompanyProductTaxModalProps from "../../../@types/modal/CreateCompa
 import RadioButtons from "../../ui/RadioButton";
 import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
-import useScreenSize from "../../../config/hooks/useScreenSize";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 function CreateCompanyProductTaxModal({
   isOpen,
@@ -42,7 +41,6 @@ function CreateCompanyProductTaxModal({
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
-  const { isSmallScreen } = useScreenSize();
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
 
@@ -149,17 +147,19 @@ function CreateCompanyProductTaxModal({
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="flex justify-center items-center w-full">
+    <div
+      className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+      
+    >
+      <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
-          className={
-            isSmallScreen
-              ? "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn "
-              : "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn px-3 "
-          }
+          className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-300
+  [&::-webkit-scrollbar-thumb]:bg-gray-400
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
+            {/* <div className="flex items-center gap-3 mb-6">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
                 Create Tax For : {product.name}
@@ -170,7 +170,14 @@ function CreateCompanyProductTaxModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+            icon={EditIcon}
+            onClose={onClose}
+            preText="Create Tax For "
+            userName={product.name}
+            description="Easily manage your product taxation by adding all tax details in one place"
+            />
 
             <form
               className="space-y-2"
@@ -182,7 +189,7 @@ function CreateCompanyProductTaxModal({
               />
               {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
                 <FormInput
-                  label="HSN : "
+                  label="HSN "
                   type="text"
                   name="hsn"
                   value={createCompanyProductTaxFormData.hsn}
@@ -196,7 +203,7 @@ function CreateCompanyProductTaxModal({
 
               {selectedTaxCode === TAX_CODE.SAC && (
                 <FormInput
-                  label="SAC : "
+                  label="SAC "
                   type="text"
                   name="sac"
                   required={true}
@@ -209,7 +216,7 @@ function CreateCompanyProductTaxModal({
               )}
 
               <FormInput
-                label="Tax Rate : "
+                label="Tax Rate "
                 type="text"
                 name="taxRate"
                 required={true}
@@ -221,7 +228,7 @@ function CreateCompanyProductTaxModal({
               />
 
               <DatePickerInput
-                label="Valid From :"
+                label="Valid From"
                 name="validFrom"
                 required={true}
                 value={createCompanyProductTaxFormData.validFrom}
@@ -256,7 +263,7 @@ function CreateCompanyProductTaxModal({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

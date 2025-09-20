@@ -1,4 +1,4 @@
-import { BoxesIcon, Calendar, Filter, Plus, Store, X } from "lucide-react";
+import { BoxesIcon, Calendar, Plus, Store } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
@@ -43,10 +43,6 @@ function ProductsManagementList({
 
   const { userHasAccessToAddProduct, userHasAccessToViewProduct } =
     useUserAccessModules();
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [selectedProduct, setSelectedProduct] = useState<Product>({
@@ -119,12 +115,12 @@ function ProductsManagementList({
               {(isMediumScreen || isLargeScreen) && (
                 <>
                   {!isListForProductUser && (
-                    <span className="text-1xl font-bold mt-2">
+                    <span className="section-header-custom mt-2">
                       Product Management
                     </span>
                   )}
                   {isListForProductUser && (
-                    <span className="text-1xl font-bold mt-2">
+                    <span className="section-header-custom mt-2">
                       Product Team/Users Management
                     </span>
                   )}
@@ -134,7 +130,7 @@ function ProductsManagementList({
 
             {isLargeScreen && (
               <>
-                <div className="flex gap-1">
+                <div className="flex gap-1 mt-2">
                   {/* search box flex div */}
                   <div className="relative flex items-start w-80 ">
                     <SearchInput
@@ -149,7 +145,7 @@ function ProductsManagementList({
                   {/* Date FIlters Dropdown */}
                   <div className="flex mx-3">
                     <div className="flex">
-                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
                         <Calendar className="mt-2" />
                       </div>
 
@@ -177,148 +173,8 @@ function ProductsManagementList({
               </>
             )}
 
-            {isMediumScreen && (
-              <>
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
-                <div className="flex relative  gap-2  ">
-                  <div className="mt-1 flex ">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar />
-                    </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                </div>
-                {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                  <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                      <button
-                        onClick={() => {
-                          setIsFilterOpenInTabletView(
-                            !isFilterOpenInTabletView
-                          );
-                        }}
-                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                      >
-                        <X size={SIZE.TWENTY} />
-                      </button>
-
-                      <div className="my-10 justify-items-center mb-5">
-                        <div className="mb-5">
-                          <DateRangePicker
-                            onStartDateChange={onStartDateChange}
-                            onEndDateChange={onEndDateChange}
-                          />
-                        </div>
-                        <div className="w-full justify-items-center">
-                          <div className="w-24">
-                            <Button>Done</Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
-            {isSmallScreen && (
-              <>
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
-                <div className="flex relative gap-2">
-                  <Button
-                    onClick={() => {
-                      setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                    }}
-                  >
-                    <Filter size={SIZE.EIGHT} />
-                  </Button>
-                </div>
-                {isFiltersOpenInMobileView && (
-                  <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                      <button
-                        onClick={() => {
-                          setIsFiltersOpenInMobileView(
-                            !isFiltersOpenInMobileView
-                          );
-                        }}
-                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                      >
-                        <X size={SIZE.EIGHT} />
-                      </button>
-                      {/* Date FIlters Dropdown */}
-
-                      <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                        <div className="mt-1 flex ">
-                          <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                            <Calendar size={SIZE.TWENTY} />
-                          </div>
-
-                          <DateRangeFilterDropdown
-                            dropdownOptions={dateRangeDropdownOptions}
-                            handleDateIdChange={handleDateRangeIdChange}
-                          ></DateRangeFilterDropdown>
-                        </div>
-                      </div>
-
-                      {/* Custom Date Picker Div Flex Box*/}
-                      <div
-                        className="mb-10 justify-items-center"
-                        style={
-                          isCustomDateOptionSelected
-                            ? { visibility: "visible" }
-                            : { visibility: "hidden" }
-                        }
-                      >
-                        <DateRangePicker
-                          onStartDateChange={onStartDateChange}
-                          onEndDateChange={onEndDateChange}
-                        />
-                      </div>
-
-                      {
-                        <div className="flex w-full justify-center items-center mb-5">
-                          <div className="w-28">
-                            <Button
-                              onClick={() => {
-                                setIsFiltersOpenInMobileView(
-                                  !isFiltersOpenInMobileView
-                                );
-                              }}
-                            >
-                              Done
-                            </Button>
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
             {!isListForProductUser && (
-              <div className="flex gap-1 ">
+              <div className="flex gap-1 mt-1">
                 {userHasAccessToAddProduct ? (
                   <Button onClick={() => setIsAddProductModalOpen(true)}>
                     {!isSmallScreen && <Plus size={18} />}
