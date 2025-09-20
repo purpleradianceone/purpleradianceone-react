@@ -22,6 +22,7 @@ import {
   Phone,
   ReceiptText,
   User,
+  UserCogIcon,
 } from "lucide-react";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -35,6 +36,7 @@ import { useCompanyAccountType } from "../../../config/hooks/useCompanyAccountTy
 import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import FormSkeleton from "./FormSkeleton";
 import Button from "../../ui/Button";
+import FormHeader from "../../ui/FormHeader";
 
 type CreateAccountType = {
   onClose: () => void;
@@ -348,6 +350,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       company_account_type_id_array: [],
       createdby: loginStatus.id,
     });
+    onClose()
   }
 
   // --- Group companyAccountType by parent ---
@@ -362,7 +365,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   const loadingState = loading || businessTypeLoading || companyTypeLoading;
   if (loadingState) {
     return (
-      <div className="fixed top-8 inset-0 z-30 flex items-center justify-center  shadow-2xl ">
+      <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
         <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
           <FormSkeleton />
         </div>
@@ -370,8 +373,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     );
   }
   return (
-    <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
-      <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+    <div className="fixed top-8 inset-0 z-20 border  flex items-center justify-center  shadow-2xl ">
+      <div className=" bg-white  rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
         <motion.section
           ref={ref}
           initial={{ opacity: 0, y: 40 }}
@@ -379,7 +382,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           {/* Close Button */}
-          <div className="flex justify-end">
+
+          <FormHeader
+          icon={UserCogIcon}
+          preText="Create new account"
+          description="Complete the form below to add a new account and manage it effectively"
+          onClose={() => {
+                handleStateClear();
+                onClose();
+              }}
+          />
+          {/* <div className="flex justify-end">
             <button
               onClick={() => {
                 handleStateClear();
@@ -389,12 +402,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             >
               ✕
             </button>
-          </div>
+          </div> */}
 
           {/* Form */}
-          <h2 className="table-header-custom py-4 mb-2  border-b">
-            Create new account
-          </h2>
           <form className=" grid grid-cols-2 gap-3">
             {/* name */}
             <div className="flex flex-col col-span-1">
@@ -402,7 +412,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 required
                 logo={User}
                 type="text"
-                label="Name"
+                label="Name:"
                 name="name"
                 maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                 minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -410,7 +420,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 value={createAccountFormData.name}
                 onBlur={handleOnBlur}
                 onChange={handleFormInputChange}
-                className="w-full border rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500"
+                // className="w-full border rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500"
               />
               {errors.name && (
                 <p className="text-xs  text-red-600 ">{errors.name}</p>
@@ -423,7 +433,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 required
                 logo={Mail}
                 type="text"
-                label="Email"
+                label="Email:"
                 name="email"
                 maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                 minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -431,7 +441,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 value={createAccountFormData.email}
                 onBlur={handleOnBlur}
                 onChange={handleFormInputChange}
-                className="w-full border rounded-lg px-3  focus:ring-2 focus:ring-blue-500"
+                // className="w-full border rounded-lg px-3  focus:ring-2 focus:ring-blue-500"
               />
               {errors.email && (
                 <p className="text-xs  text-red-600 ">{errors.email}</p>
@@ -463,19 +473,19 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             <FormInput
               logo={FileText}
               type="text"
-              label="Pan"
+              label="Pan:"
               name="pan"
               placeholder="Enter pan number"
               value={createAccountFormData.pan}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* gst */}
             <FormInput
               logo={ReceiptText}
               type="text"
-              label="Gst "
+              label="Gst: "
               name="gst"
               placeholder="Enter email address"
               value={createAccountFormData.email}
@@ -487,7 +497,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             <FormInput
               logo={FileSignature}
               type="text"
-              label="Tan "
+              label="Tan: "
               name="tan"
               maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -495,14 +505,14 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               value={createAccountFormData.tan}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex flex-col col-span-1">
               {/* Business type */}
               <CustomDropdown
                 requiredRedDot
                 logo={Briefcase}
-                labelName="Business Type"
+                labelName="Business Type:"
                 options={businessType}
                 onSelect={handleSelectedBusinessType}
               />
@@ -517,7 +527,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               <CustomDropdown
                 requiredRedDot
                 logo={Factory}
-                labelName="Industry type"
+                labelName="Industry type:"
                 options={industryTypeData}
                 onSelect={handleSelectedIndustryType}
               />
@@ -531,7 +541,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             <div className="col-span-2  rounded-md">
               <span className="input-label-custom flex items-center gap-1">
                 <Building2 size={14} className="inline mr-1 text-blue-500" />
-                <span>Company account type</span>
+                <span>Company account type:</span>
               </span>
 
               <div className="grid grid-cols-2 gap-y-2 p-4 max-h-56 overflow-auto">
@@ -603,7 +613,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             <FormInput
               logo={Phone}
               type="text"
-              label="Business registration number "
+              label="Business registration number: "
               name="business_registration_number"
               maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
               minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
@@ -611,13 +621,13 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               value={createAccountFormData.business_registration_number}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full  border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full  border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* website */}
             <FormInput
               logo={Globe}
               type="text"
-              label="Website : "
+              label="Website: "
               name="website"
               maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -625,46 +635,46 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               value={createAccountFormData.website}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* billing address */}
             <TextAreaInput
               logo={MapPin}
               cols={4}
               rows={4}
-              label="Billing address "
+              label="Billing address: "
               name="billing_address"
               placeholder="Enter Billing address"
               value={createAccountFormData.billing_address}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* shipping address */}
             <TextAreaInput
               logo={MapPin}
               cols={4}
               rows={4}
-              label="Shipping address : "
+              label="Shipping address: "
               name="shipping_address"
               placeholder="Enter Shipping address"
               value={createAccountFormData.shipping_address}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full col-span-2 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full col-span-2 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* registered office address */}
             <TextAreaInput
               logo={MapPin}
               cols={4}
               rows={4}
-              label="Registered office address "
+              label="Registered office address: "
               name="registered_office_address"
               placeholder="Enter registered office address"
               value={createAccountFormData.registered_office_address}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              className="w-full border rounded-lg col-span-2 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg col-span-2 px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
 
             <div className="col-span-2 flex justify-end gap-3">
