@@ -360,13 +360,13 @@ function EditCompanyProductModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
         <div
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -375,9 +375,9 @@ function EditCompanyProductModal({
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
-              preText="Edit "
-              userName={product.name}
-              description="Update the necessary product details to edit the product in the CRM."
+              preText="Edit -"
+              userName={product.name || "Name not given"}
+              description="Modify product details to keep information accurate and up to date."
             />
             <form
               className="space-y-2"

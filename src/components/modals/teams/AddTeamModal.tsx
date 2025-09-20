@@ -6,6 +6,7 @@ import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
   NUMBER_VALUES,
   STATUS_CODE,
+  VALIDATIONS,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -356,12 +357,13 @@ function AddTeamModal({
               <FormInput
               logo={Users}
                 label="Name : "
-                maxLength={30}
+                maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                minLength={VALIDATIONS.MIN_NAME_LENGTH}
                 type="text"
                 name="name"
                 required={true}
                 value={AddTeamFormData.name}
-                placeholder="Team Name"
+                placeholder="Enter team name"
                 onBlur={handleBlur}
                 error={errors.name}
                 onChange={handleAddTeamFormDataChange}
@@ -371,7 +373,7 @@ function AddTeamModal({
               logo={Text}
                 label="Description : "
                 name="description"
-                placeholder="Team Description"
+                placeholder="Enter team description"
                 value={AddTeamFormData.description}
                 cols={5}
                 rows={3}
@@ -381,14 +383,16 @@ function AddTeamModal({
                 onChange={handleAddTeamFormDataChange}
               />
               <div
-                // className="ag-theme-balham"
                 style={{ height: "350px", width: "100%", marginBottom: "60px" }}
               >
-                <div className="flex gap-2 mb-2 justify-between">
+                <div className="flex w-full items-center gap-5 mb-1 ">
                   <div className="place-content-center">
-                    <span className="table-header-custom">Company Members</span>
+                    <div>
+                      <span className="table-header-custom">Company Members</span>
+                    <div className="caption-custom">Select the company user that needs to be in the team</div>
+                    </div>
                   </div>
-                  <div>
+                  <div className="w-56">
                     <SearchInput
                       onChange={(event) => {
                         handleCompanyUsersSearchBoxChange(event.target.value);
@@ -409,10 +413,10 @@ function AddTeamModal({
               </div>
 
               {userHasAccessToAddTeamManagement ? (
-                <div className="flex justify-self-end gap-3 mt-16 pb-14">
+                <div className="flex justify-self-end  gap-3">
                   <div className="min-w-28">
                     <Button type="button" onClick={()=>{onClose()}}>
-                      <div className="flex gap-1 text-center">
+                      <div className="flex gap-1 items-center ">
                         <X size={18} />
                         <span>Cancel</span>
                       </div>
@@ -420,7 +424,7 @@ function AddTeamModal({
                   </div>
                   <div className="min-w-28">
                     <Button type="submit">
-                      <div className="flex gap-1 text-center">
+                      <div className="flex gap-1 items-center">
                         <Save size={18} />
                         <span>Save</span>
                       </div>
@@ -428,7 +432,7 @@ function AddTeamModal({
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-self-end max-w-36 m-3">
+                <div className="flex justify-self-end max-w-36 ">
                   <div></div>
                 </div>
               )}

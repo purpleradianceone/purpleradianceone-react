@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CheckCircle2, Edit, Save, X, XCircle } from "lucide-react";
+import { CheckCircle2, Edit, Save, Text, Users, X, XCircle } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
   STATUS_CODE,
@@ -477,18 +477,18 @@ function EditCompanyTeamModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-7 overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen mb-5 items-center justify-center">
+      <div className="flex min-h-screen  items-center justify-center">
         <div
-          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
+          <div className="p-4">
             {/* <div className="flex items-center gap-3 mb-6">
               <Edit className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
@@ -504,14 +504,15 @@ function EditCompanyTeamModal({
             <FormHeader
             icon={Edit}
             onClose={onClose}
-            preText="Edit Team"
+            preText="Edit team  - "
             userName={companyTeam.name}
-            description="Modify the details of an existing company team"
+            description="Modify the details of an existing company team."
             />
 
-            <form className="space-y-1" onSubmit={handleUpdateCompanyTeam}>
+            <form className="space-y-2" onSubmit={handleUpdateCompanyTeam}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-stretch">
                 <FormInput
+                logo={Users}
                   label="Team Name : "
                   type="text"
                   name="name"
@@ -561,6 +562,7 @@ function EditCompanyTeamModal({
               </div>
 
               <TextAreaInput
+              logo={Text}
                 label="Description : "
                 name="description"
                 placeholder="Team Description"
@@ -574,9 +576,6 @@ function EditCompanyTeamModal({
               />
 
               {userHasAccessToUpdateTeamManagement ? (
-                // <div className="flex justify-self-center max-w-60 m-3 pb-14">
-                //   <Button type="submit">Save</Button>
-                // </div>
                 <div className="flex justify-self-end m-2 min-w-70 gap-2">
                 <Button onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
