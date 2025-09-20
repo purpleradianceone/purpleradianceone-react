@@ -269,7 +269,7 @@ function LeadAssociatedUsersModal({
             />
 
             <div
-              className="ag-theme-alpine"
+              className="ag-theme-balham"
               style={{ height: "400px", width: "100%" }}
             >
               <div className="flex gap-2 my-2 justify-between">

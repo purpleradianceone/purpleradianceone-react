@@ -561,7 +561,7 @@ function CompanyTeamUsersAgGrid({
                 <UserPlus2
                   className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                 ></UserPlus2>{" "}
-                Assign Users
+                Add
               </Button>
             )}
           </div>

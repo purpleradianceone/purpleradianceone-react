@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditIcon, Network, X } from "lucide-react";
+import { EditIcon, Network } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import CompanyProductTeamsAgGrid from "../../ag-grid/CompanyProductTeamsAgGrid";
 import TeamManagementAgGrid from "../../ag-grid/TeamManagementAgGrid";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -25,6 +25,7 @@ import { CLASS_NAMES } from "../../../constants/ClassNames";
 import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductTeamsModalProps";
 import SearchInput from "../../ui/SearchInput";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
@@ -602,7 +603,7 @@ function CompanyProductTeamsModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            <div className="flex border-b items-center gap-2 mb-6  sticky bg-white py-1">
+            {/* <div className="flex border-b items-center gap-2 mb-6  sticky bg-white py-1">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
               <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Teams
@@ -615,7 +616,14 @@ function CompanyProductTeamsModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={EditIcon}
+              onClose={onClose}
+              description="Manage the Teams assigned to product"
+              preText="Edit product team of"
+              userName={companyProduct.name}
+            />
             {/*Aggrid logic here */}
             <div className="flex justify-around gap-3 mb-16 pb-4">
               <div
@@ -635,26 +643,24 @@ function CompanyProductTeamsModal({
                       }}
                     ></SearchInput>
                   </div>
-                  <div className="table-header-custom mt-2">
+                  <div className="table-header-custom mt-3">
                     Assigned Teams
                   </div>
                 </div>
-                <div className="ag-theme-balham w-full h-full mt-2">
-                  <CompanyProductTeamsAgGrid
-                    companyProductTeams={companyProductTeamsList}
-                    handleCompanyProductTeamUpdate={
-                      handleCompanyProductTeamUpdate
-                    }
-                    handleViewPortChanged={
-                      handleCompanyProductTeamsViewPortChanged
-                    }
-                    onGridReady={companyProductTeamsOnGridReady}
-                  ></CompanyProductTeamsAgGrid>
-                </div>
+                <CompanyProductTeamsAgGrid
+                  companyProductTeams={companyProductTeamsList}
+                  handleCompanyProductTeamUpdate={
+                    handleCompanyProductTeamUpdate
+                  }
+                  handleViewPortChanged={
+                    handleCompanyProductTeamsViewPortChanged
+                  }
+                  onGridReady={companyProductTeamsOnGridReady}
+                ></CompanyProductTeamsAgGrid>
               </div>
 
               <div
-                className="ag-theme-alpine"
+                // className="ag-theme-balham"
                 style={{ height: "300px", width: "45%" }}
               >
                 <div className="flex gap-2 mb-1 mt-2 justify-between">
@@ -676,23 +682,25 @@ function CompanyProductTeamsModal({
                       <Network
                         className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                       ></Network>
-                      Assign Teams
+                      Add
                     </Button>
                   </div>
                 </div>
 
-                <TeamManagementAgGrid
-                  companyTeamList={companyTeamsNotAssignedList}
-                  isGridForProductTeam={true}
-                  handleCompanyTeamCheckboxChange={
-                    handleCompanyTeamCheckboxChange
-                  }
-                  addCompanyProductTeamArray={addCompanyProductTeamArray}
-                  handleViewPortChanged={
-                    handleCompanyTeamsNotAssignedViewPortChanged
-                  }
-                  onGridReady={companyTeamsNotAssignedOnGridReady}
-                />
+               
+                  <TeamManagementAgGrid
+                    companyTeamList={companyTeamsNotAssignedList}
+                    isGridForProductTeam={true}
+                    handleCompanyTeamCheckboxChange={
+                      handleCompanyTeamCheckboxChange
+                    }
+                    addCompanyProductTeamArray={addCompanyProductTeamArray}
+                    handleViewPortChanged={
+                      handleCompanyTeamsNotAssignedViewPortChanged
+                    }
+                    onGridReady={companyTeamsNotAssignedOnGridReady}
+                  />
+                
               </div>
             </div>
           </div>
