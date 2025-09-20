@@ -215,8 +215,9 @@ function EditCompanyUserModal({
               <FormHeader
                 icon={EditIcon}
                 onClose={onClose}
-                preText="Edit"
+                preText="Update user : "
                 userName={user.fullname}
+                description="Modify and manage user details, including contact information, as needed."
               />
 
               <form className="space-y-5" onSubmit={handleEditUserSubmit}>

@@ -223,12 +223,15 @@ function CompanyUserDashboardModal({
           <X size={20}></X>
         </button>
       </div> */}
-      <FormHeader
+      <div className="mb-2">
+        <FormHeader
         icon={Grid}
         onClose={onClose}
         postText="'s dashboard"
+        description="Modify who can view the dashboard based on roles and responsibilities."
         userName={users.fullname}
       />
+      </div>
 
       <ul className="mb-4  space-y-2">
         {companyUserDashboard.map((dashboard) => (

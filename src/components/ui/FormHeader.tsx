@@ -25,7 +25,7 @@ const FormHeader =({
       <div>
         <h2 className="table-header-custom">
           {preText}
-          <span className="table-header-custom">{userName}</span>
+          <span className="table-header-custom ">{userName}</span>
           {postText}
         </h2>
         <p className="caption-custom">

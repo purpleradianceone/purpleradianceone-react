@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ClipboardList, Contact2Icon,  FileTextIcon, Globe,  TargetIcon, Text,  UserPlus, Users, X } from "lucide-react";
+import {
+  ClipboardList,
+  Contact,
+  FileText,
+  FileTextIcon,
+  Globe,
+  Save,
+  TargetIcon,
+  Text,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
@@ -74,7 +86,6 @@ function CreateLeadTaskModal({
     useState<number[]>([]);
   const [leadContactDataSelectedArray, setLeadContactDataSelectedArray] =
     useState<LeadContactType[]>([]);
-
 
   useEffect(() => {
     setLeadContactDataSelectedArray([]);
@@ -272,22 +283,24 @@ function CreateLeadTaskModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+    <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
+      <div className="bg-white mt-14 min-h-[50vh]  rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <FormHeader
           icon={ClipboardList}
           onClose={handleClose}
-          preText="Add Task for Timely Action"
+          preText="Create task for timely action"
           description="Plan and create a task to schedule follow-ups and ensure timely action."
         />
 
         {/* Form Grid */}
-        <form className="space-y-2">
+        <form className="space-y-2 mt-2">
           <div className="grid grid-cols-3 gap-3">
+            {/* type */}
             <CustomDropdown
-            logo={Text}
-              labelName="Type"
+            requiredRedDot
+              logo={Text}
+              labelName="Type:"
               onSelect={(e) => {
                 if (e !== 4) {
                   if (e) {
@@ -302,9 +315,11 @@ function CreateLeadTaskModal({
               }}
               options={leadActivity}
             ></CustomDropdown>
+            {/* priority */}
             <CustomDropdown
-            logo={Text}
-              labelName="Priority"
+            requiredRedDot
+              logo={Text}
+              labelName="Priority :"
               preselectedOption={2} // id of medium
               onSelect={(e) => {
                 if (e) {
@@ -315,8 +330,11 @@ function CreateLeadTaskModal({
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
+
+            {/* Stage */}
             <CustomDropdown
-            logo={Text}
+            requiredRedDot
+              logo={Text}
               labelName="Stage"
               preselectedOption={2}
               onSelect={(e) => {
@@ -328,13 +346,14 @@ function CreateLeadTaskModal({
               }}
               options={leadTaskStage}
             ></CustomDropdown>
+
             {leadActivityId !== 3 && (
               <div className="flex items-center gap-4  mb-0">
                 <label
                   htmlFor="phoneCallBtn"
                   className="block text-sm font-normal text-gray-700"
                 >
-                  Select Lead Contact : 
+                  Select Lead Contact :
                 </label>
                 <div id="phoneCallBtn" className=" max-w-20 m-0">
                   <Button
@@ -343,8 +362,8 @@ function CreateLeadTaskModal({
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
-                    <span className="flex gap-2">
-                      <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
+                    <span className="flex gap-1">
+                      <Contact size={SIZE.TWENTY}></Contact>
                       <span>Select</span>
                     </span>
                   </Button>
@@ -354,7 +373,7 @@ function CreateLeadTaskModal({
             {leadActivityId === 3 && (
               <div className="col-span-3">
                 <FormInput
-                logo={Globe}
+                  logo={Globe}
                   value={physicalMeetingAddress}
                   label="Address"
                   onChange={(e) => {
@@ -381,7 +400,7 @@ function CreateLeadTaskModal({
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
                       <span className="text-xs text-gray-600">
-                        {contact.name}
+                        {contact.name || contact.email || "Unnamed contact"}
                       </span>
                     </span>
                     <Button
@@ -405,10 +424,12 @@ function CreateLeadTaskModal({
           )}
 
           <div className="grid grid-cols-2 gap-3">
+            {/* Subject */}
             <div className="mt-2">
               <FormInput
-              logo={FileTextIcon}
-                label="Subject"
+              required
+                logo={FileTextIcon}
+                label="Subject :"
                 type="text"
                 className="test-base"
                 onChange={(e) => {
@@ -417,9 +438,10 @@ function CreateLeadTaskModal({
               ></FormInput>
             </div>
 
+            {/* Outcome */}
             <div className="row-span-2">
               <TextAreaInput
-              logo={TargetIcon}
+                logo={TargetIcon}
                 cols={5}
                 rows={5}
                 label="Outcome"
@@ -429,6 +451,7 @@ function CreateLeadTaskModal({
               ></TextAreaInput>
             </div>
 
+            {/* End date */}
             <div className="grid grid-cols-4 gap-2">
               <div className="col-span-2">
                 <DatePickerInput
@@ -462,8 +485,11 @@ function CreateLeadTaskModal({
                 </select>
               </div>
             </div>
+
+            {/* Description */}
             <div className="col-span-2">
               <TextAreaInput
+                logo={FileText}
                 cols={5}
                 rows={5}
                 label="Description"
@@ -475,13 +501,29 @@ function CreateLeadTaskModal({
           </div>
 
           {selectedCompanyUsers.length != 0 && (
-            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-              Assigned Users
+            <div className="relative grid grid-cols-3  text-sm font-normal text-gray-800">
+
+              Assign Users :  
+              {/* Assign button */}
+              <div className="absolute left-28 max-w-28">
+                <Button
+                  type="button"
+                  onClick={() => setIsAssignUsersModalOpen(true)}
+                >
+                  <span title="Assign user to this task" className="flex  text-center text-xs text-nowrap">
+                    <UserPlus size={14}></UserPlus>
+                    {/* <span>Assign user</span> */}
+                  </span>
+                </Button>
+              </div>
             </div>
           )}
 
           {selectedCompanyUsers.length != 0 && (
-            <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+            <div className="p-1">
+            <span className="text-xs">Currently assigned users:</span>
+            <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+             
               {selectedCompanyUsers.map((user) => (
                 <div
                   key={user.id}
@@ -490,8 +532,8 @@ function CreateLeadTaskModal({
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
-                        {user.fullname}
+                      <span className="text-xs text-gray-800">
+                        {user.fullname ? user.fullname :  user.email || "Unnamed contact"}
                       </span>
                     </span>
                     <Button
@@ -513,27 +555,31 @@ function CreateLeadTaskModal({
                 </div>
               ))}
             </div>
+            </div>
+            
           )}
         </form>
 
         {/* Footer Buttons */}
-        <div className="flex justify-center gap-4 mt-6">
-          <div className="max-w-28">
-            <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
-            >
-              <span className="flex gap-2">
-                <UserPlus size={SIZE.TWENTY}></UserPlus>
-                <span>Assign</span>
-              </span>
-            </Button>
-          </div>
-
-          <div className="max-w-28">
-            <Button type="submit" onClick={createLeadTask}>
-              Create Task
-            </Button>
+        <div className="flex w-full justify-center gap-4 mt-6">
+          {/* Create task */}
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button type="reset">
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button type="submit" onClick={createLeadTask}>
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

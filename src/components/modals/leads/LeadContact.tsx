@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Briefcase,
+  Contact2,
   Edit3,
   Globe,
   Languages,
@@ -31,6 +32,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
 import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -772,7 +774,7 @@ const LeadContact = ({
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
 
-            <div className="px-2 py-2  border-b border-gray-200">
+            {/* <div className="px-2 py-2  border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
@@ -807,7 +809,31 @@ const LeadContact = ({
                   <X size={24} />
                 </button>
               </div>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={Contact2}
+              preText={editContactData ? "Edit Contact" : "Add New Contact"}
+              description= {editContactData
+                      ? "Update the contact’s information to keep records accurate and up to date."
+                      : "Create a contact for this lead to ensure proper follow-up and engagement."}
+              onClose={() => {
+                    // setEditMode(false);
+                    setEditingContactId(null);
+                    setIsOpenAddLeadContactForm(false);
+                    setEditContactData(null);
+                    setSocialMediaHandles([]);
+                    setLeadContactForm({
+                      name: "",
+                      email: "",
+                      address: "",
+                      jobTitle: "",
+                      linkedinProfile: "",
+                      mobileNumber: "",
+                      preferredCommunicationChannel: "",
+                      preferredLanguage: "",
+                    });
+                  }}
+            />
 
             {/* Form Grid */}
             <form>
@@ -975,7 +1001,7 @@ const LeadContact = ({
 
                 {/* Social Media Handles */}
                 <div className="col-span-2">
-                  <div className="flex col-span-2 items-center justify-between bg-pink-300  gap-2">
+                  <div className="flex col-span-2 items-center justify-between bg-pink-00  gap-2">
                     <FormInput
                       logo={Globe}
                       label="Social Media Handles"
