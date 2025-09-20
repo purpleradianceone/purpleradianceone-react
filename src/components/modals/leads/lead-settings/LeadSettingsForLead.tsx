@@ -159,7 +159,7 @@ function LeadSettingForLead({
         <FormHeader
           icon={Settings}
           onClose={onClose}
-          userName={lead.name}
+          userName={lead.name || lead.email || "unnamed lead"}
           preText="Manage lead settings - "
           description="Update and manage the settings associated with this lead."
         />

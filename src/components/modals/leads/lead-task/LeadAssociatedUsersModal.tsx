@@ -8,11 +8,12 @@ import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { createPortal } from "react-dom";
-import { UserPlus, X } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { UserPlus } from "lucide-react";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import SearchInput from "../../../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "../../../ag-grid/AddCompanyTeamUsersAgGrid";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import FormHeader from "../../../ui/FormHeader";
 
 function LeadAssociatedUsersModal({
   isOpen,
@@ -30,11 +31,6 @@ function LeadAssociatedUsersModal({
   ) => void;
   addCompanyTeamUserArray?: number[];
 }) {
-  // useEffect(() => {
-  //   console.log("_________________________________");
-  //   console.log(addCompanyTeamUserArray);
-  //   console.log("_________________________________");
-  // }, [addCompanyTeamUserArray]);
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -240,18 +236,18 @@ function LeadAssociatedUsersModal({
   return createPortal(
     <div
       className={
-        "fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"
+        "fixed inset-0 z-50 p-9 overflow-hidden  bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex h-full min-h-[50vh] items-center justify-center">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-5xl  overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
+          <div className="p-4">
+            {/* <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
               <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
                 Assign Users
@@ -264,14 +260,20 @@ function LeadAssociatedUsersModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+            icon={UserPlus}
+            onClose={onClose}
+            preText="Assign task to user"
+            description="Select a user to assign this task for timely completion."
+            />
 
             <div
               className="ag-theme-alpine"
-              style={{ height: "300px", width: "100%" }}
+              style={{ height: "400px", width: "100%" }}
             >
-              <div className="flex gap-2 mb-2 justify-between">
-                <div className="flex gap-28">
+              <div className="flex gap-2  justify-between">
+                <div className="flex w-72">
                   {/* <span className="font-semibold">Search the User</span> */}
                   <SearchInput
                     onChange={(event) => {

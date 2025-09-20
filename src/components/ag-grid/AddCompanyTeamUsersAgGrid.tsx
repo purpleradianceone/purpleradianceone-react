@@ -148,7 +148,6 @@ function AddCompanyTeamUsersAgGrid({
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
 
-
             const handleCompanyUserUpdateToggle = async (
               event: React.FormEvent<HTMLButtonElement>
             ) => {
@@ -193,9 +192,8 @@ function AddCompanyTeamUsersAgGrid({
                   });
                   if (refreshTokenStatus) {
                     handleCompanyUserUpdateToggle(event);
-                  } 
+                  }
                 }
-
               }
             };
 
@@ -251,14 +249,16 @@ function AddCompanyTeamUsersAgGrid({
   return (
     <>
       {/* Optional: display the global change count */}
-      <div className="mb-2 ag-theme-balham ">
-        {isGridForSubscription && (
-          <>
+
+      {isGridForSubscription && (
+        <>
+          <div className="mb-2 ag-theme-balham ">
             <span className="font-semibold">Net Status Change Count: </span>
             <span>{statusChangeCount}</span>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
+
       <AgGridReact
         rowData={companyUsers}
         columnDefs={companyUserColDefs}

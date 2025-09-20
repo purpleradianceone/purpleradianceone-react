@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contact2Icon, UserPlus, Users, X } from "lucide-react";
+import { Contact, Edit, UserPlus, Users, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
@@ -14,19 +14,11 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import {
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../../@types/ui/MessageSnackbarProps";
-// import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
@@ -34,6 +26,7 @@ import { format, parse } from "date-fns";
 import { createPortal } from "react-dom";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -78,7 +71,9 @@ function UpdateLeadTaskModal({
     leadTask.leadTaskStageId
   );
   const [leadData, setLeadData] = useState<Lead>();
-  const [assignedTo, setAssignedTo] = useState<number[]>(leadTask.assignedToId!);
+  const [assignedTo, setAssignedTo] = useState<number[]>(
+    leadTask.assignedToId!
+  );
   const [physicalMeetingAddress, setPhysicalMeetingAddress] =
     useState<string>("");
   const [resultOutcome, setResultOutcome] = useState<string>(
@@ -99,20 +94,6 @@ function UpdateLeadTaskModal({
     CompanyUsersSearchProps[]
   >([]);
   const [isActive, setIsActive] = useState<boolean>(leadTask.isActive);
-
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   useEffect(() => {
     const leadDetailsJsonData = JSON.parse(leadTask.leadActivityDetails);
@@ -226,48 +207,22 @@ function UpdateLeadTaskModal({
     const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
 
     if (leadActivityId === 0) {
-      // showMessageSnackbar({
-      //   message: "Please Select Lead Task Activity",
-      //   type: "error",
-      // });
       toast.error("Please Select Lead Task Activity");
       return;
     } else if (leadTaskPriorityId === 0) {
-      // showMessageSnackbar({
-      //   message: "Please Select Lead Task Priority",
-      //   type: "error",
-      // });
       toast.error("Please Select Lead Task Priority");
       return;
     } else if (leadTaskStageId === 0) {
-      // showMessageSnackbar({
-      //   message: "Please Select Lead Task Stage",
-      //   type: "error",
-      // });
       toast.error("Please Select Lead Task Priority");
       return;
     } else if (subject === "") {
-      // showMessageSnackbar({
-      //   message: "Please provide Subject To Task",
-      //   type: "error",
-      // });
       toast.error("Please provide Subject To Task");
-
       return;
     } else if (dueDate === "") {
-      // showMessageSnackbar({
-      //   message: "Please select Due Date for Task",
-      //   type: "error",
-      // });
       toast.error("Please select Due Date for Task");
       return;
     } else if (dueTime === "") {
-      // showMessageSnackbar({
-      //   message: "Please select Due Time for Task",
-      //   type: "error",
-      // });
       toast.error("Please select Due Time for Task");
-
       return;
     } else if (
       subject === leadTask.subject &&
@@ -280,12 +235,7 @@ function UpdateLeadTaskModal({
       assignedTo === leadTask.assignedToId &&
       jsonData === stringifiedOriginalData
     ) {
-      // showMessageSnackbar({
-      //   message: "Not made changes to task",
-      //   type: "error",
-      // });
-            toast.error("Not made changes to task");
-
+      toast.error("Not made changes to task");
       return;
     }
 
@@ -311,20 +261,12 @@ function UpdateLeadTaskModal({
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "success",
-            // });
-            toast.success(response.data.message)
+            toast.success(response.data.message);
             handleLeadTaskUpdate();
             setTimeout(() => {
               handleClose(false);
             }, 2000);
           } else {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "error",
-            // });
             toast.error(response.data.message);
           }
         }
@@ -405,21 +347,10 @@ function UpdateLeadTaskModal({
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "success",
-            // });
             toast.success(response.data.message);
             setIsActive(checked);
             handleLeadTaskUpdate();
-            // setTimeout(() => {
-            //   handleClose(false);
-            // }, 2000);
           } else {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "error",
-            // });
             toast.error(response.data.message);
           }
         }
@@ -449,10 +380,10 @@ function UpdateLeadTaskModal({
 
   if (!isOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex justify-center items-center  p-11  ">
+      <div className="bg-white mt-14 min-h-[60vh] rounded-lg w-full max-w-5xl max-h-[85vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
-        <div className="border-b pb-1 mb-4 flex justify-between items-center">
+        {/* <div className="border-b pb-1 mb-4 flex justify-between items-center">
           <h2 className="text-base font-semibold text-gray-800">Update Task</h2>
 
           <X
@@ -461,8 +392,15 @@ function UpdateLeadTaskModal({
             }}
             className="text-gray-400 hover:text-gray-600 cursor-pointer"
           />
-        </div>
-
+        </div> */}
+        <FormHeader
+          icon={Edit}
+          onClose={() => {
+              handleClose(false);
+            }}
+          preText="Update task"
+          description="Modify task details to keep information accurate and up to date."
+        />
         {/* Form Grid */}
         <form className="space-y-2">
           <div className="grid grid-cols-3 gap-3">
@@ -509,27 +447,48 @@ function UpdateLeadTaskModal({
               selectedValue={leadTask.leadTaskStageId}
             ></CustomDropdown>
             {leadActivityId !== 3 && (
-              <div className="flex justify-between col-span-3 mb-0">
-                <label
-                  htmlFor="phoneCallBtn"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Select Lead Contact
-                </label>
-                <div id="phoneCallBtn" className="max-w-20 m-0">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setIsAddCompanyLeadContactModalOpen(true);
-                    }}
-                  >
-                    <span className="flex gap-2">
-                      <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
-                      <span>Select</span>
-                    </span>
-                  </Button>
-                </div>
-              </div>
+              // <div className="flex justify-between col-span-3 mb-0">
+              //   <label
+              //     htmlFor="phoneCallBtn"
+              //     className="block text-sm font-medium text-gray-700"
+              //   >
+              //     Select Lead Contact
+              //   </label>
+              //   <div id="phoneCallBtn" className="max-w-20 m-0">
+              //     <Button
+              //       type="button"
+              //       onClick={() => {
+              //         setIsAddCompanyLeadContactModalOpen(true);
+              //       }}
+              //     >
+              //       <span className="flex gap-2">
+              //         <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
+              //         <span>Select</span>
+              //       </span>
+              //     </Button>
+              //   </div>
+              // </div>
+              <div className="flex items-center gap-4  mb-0">
+                              <label
+                                htmlFor="phoneCallBtn"
+                                className="block text-sm font-normal text-gray-700"
+                              >
+                                Select Lead Contact :
+                              </label>
+                              <div id="phoneCallBtn" className=" max-w-20 m-0">
+                                <Button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsAddCompanyLeadContactModalOpen(true);
+                                  }}
+                                >
+                                  <span className="flex gap-1">
+                                    <Contact size={SIZE.TWENTY}></Contact>
+                                    <span>Select</span>
+                                  </span>
+                                </Button>
+                              </div>
+                            </div>
             )}
             {leadActivityId === 3 && (
               <div className="col-span-3">

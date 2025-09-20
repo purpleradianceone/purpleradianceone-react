@@ -580,7 +580,7 @@ const LeadAssignedTeams = ({
       )}
       {/* Add Company Team Form */}
       {openCreateLeadCompanyTeam && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center p-2 sm-p-6 ">
           <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
             <div>
               {/* note : need to make changes in the isopen and onclose */}

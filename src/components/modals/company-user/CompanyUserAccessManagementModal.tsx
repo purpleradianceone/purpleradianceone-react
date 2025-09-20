@@ -246,9 +246,10 @@ function CompanyUserAccessManagementModal({
             </div> */}
             <FormHeader
               icon={ShieldCheck}
-              preText="Update Access rights of"
+              preText="Update Access rights of User - "
               userName={users.fullname}
               onClose={onClose}
+              description="Manage who can view, edit, or control modules by updating access rights to align with user responsibilities."
             />
 
 
