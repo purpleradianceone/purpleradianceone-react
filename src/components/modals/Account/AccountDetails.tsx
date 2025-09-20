@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import {
   Building2,
   Mail,
@@ -30,7 +30,6 @@ import {
 } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import AccountContact from "./Account-contact/AccountContact";
-import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 
@@ -56,8 +55,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   const [activeTab, setActiveTab] = useState<"contact" | "legal" | "address">(
     "contact"
   );
-  const {industryTypeData , loading:isIndustryTypeLoading} = useIndustryType();
-  const {businessType , isLoading:isBusinessTypeLoading} = usebusinessType();
+  const { industryTypeData, loading: isIndustryTypeLoading } =
+    useIndustryType();
+  const { businessType, isLoading: isBusinessTypeLoading } = usebusinessType();
 
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
@@ -265,7 +265,6 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         {isEditing ? (
           <div>
             <select
-
               value={
                 fieldName === "businessTypeName"
                   ? formData.businessTypeId || ""
@@ -326,56 +325,6 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     const isReadOnly = ["createdOn", "createdBy"].includes(fieldName);
     const isMandatory = ["name", "email", "mobileNumber"].includes(fieldName);
     const hasError = errors[fieldName];
-
-    // return (
-    //   <div className="relative">
-    //     {isEditing ? (
-    //       <div>
-    //         <input
-    //           type={type}
-    //           required={required}
-    //           value={(formData[fieldName as keyof Account] as string) || ""}
-    //           onChange={(e) => handleInputChange(fieldName, e.target.value)}
-    //           onBlur={() => handleInputBlur(fieldName)}
-    //           onKeyDown={(e) => handleKeyPress(e, fieldName)}
-    //           placeholder={placeholder}
-    //           className={`w-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-    //             hasError ? "border-red-500" : "border-blue-500"
-    //           }`}
-    //           autoFocus
-    //         />
-    //         {hasError && (
-    //           <p className="text-xs text-red-500 mt-1">{hasError}</p>
-    //         )}
-    //       </div>
-    //     ) : (
-    //       <div
-    //         title={value}
-    //         onClick={() => handleFieldClick(fieldName)}
-    //         className={`font-medium  text-slate-800 truncate ${
-    //           !isReadOnly
-    //             ? "cursor-pointer hover:bg-slate-100 rounded transition-colors"
-    //             : ""
-    //         } ${!value && !isReadOnly ? "text-slate-400 italic" : ""} ${
-    //           isMandatory && !value ? "border border-red-300 bg-red-50" : ""
-    //         }`}
-    //       >
-    //         {value ||
-    //           (isReadOnly ? (
-    //             "N/A"
-    //           ) : (
-    //             <span className="text-xs text-gray-500 font-normal italic">
-    //               {placeholder}
-    //             </span>
-    //           ))}
-    //         {!isReadOnly && (
-    //           <Edit3 className="inline-block ml-2 h-3 w-3 text-slate-400" />
-    //         )}
-    //         {isMandatory && <span className="text-red-500 ml-1">*</span>}
-    //       </div>
-    //     )}
-    //   </div>
-    // );
     return (
       <div className="relative w-full max-w-full mb-2">
         {/* // <div className="relative h-full flex flex-col justify-center"> */}
@@ -389,9 +338,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               onBlur={() => handleInputBlur(fieldName)}
               onKeyDown={(e) => handleKeyPress(e, fieldName)}
               placeholder={placeholder}
-              className={`w-full h-full bg-white border-1 rounded px-2 py-1 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${fieldName === "name" ? "section-header-custom" : "caption-custom"} ${
-                hasError ? "border-red-500" : "border-blue-500"
-              }`}
+              className={`w-full h-full bg-white border-1 rounded px-2 py-1 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                fieldName === "name"
+                  ? "section-header-custom"
+                  : "caption-custom"
+              } ${hasError ? "border-red-500" : "border-blue-500"}`}
               autoFocus
             />
             {hasError && (
@@ -404,8 +355,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             onClick={() => handleFieldClick(fieldName)}
             className={`h-full  flex items-center truncate ${
               !isReadOnly
-                ? `${fieldName === "name" ? "section-header-custom" : "caption-custom"} cursor-pointer hover:bg-slate-100 rounded transition-colors`
-                : fieldName === "name" ? "section-header-custom" : "caption-custom"
+                ? `${
+                    fieldName === "name"
+                      ? "section-header-custom"
+                      : "caption-custom"
+                  } cursor-pointer hover:bg-slate-100 rounded transition-colors`
+                : fieldName === "name"
+                ? "section-header-custom"
+                : "caption-custom"
             }  ${
               isMandatory && !value ? "border border-red-300 bg-red-50" : ""
             }`}
@@ -414,7 +371,13 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               (isReadOnly ? (
                 "N/A"
               ) : (
-                <span className={`${fieldName === "name" ? "section-header-custom" : "caption-custom"}`}>
+                <span
+                  className={`${
+                    fieldName === "name"
+                      ? "section-header-custom"
+                      : "caption-custom"
+                  }`}
+                >
                   {placeholder}
                 </span>
               ))}
@@ -528,9 +491,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               {renderEditableField("tan", formData.tan, "Enter TAN number")}
             </div>
             <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
-              <p className="input-label-custom-orange mb-1">
-                Registration
-              </p>
+              <p className="input-label-custom-orange mb-1">Registration</p>
               {renderEditableField(
                 "businessResgistrationNumber",
                 formData.businessResgistrationNumber,
@@ -559,7 +520,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                 <span className="input-label-custom">Shipping Address</span>
+                <span className="input-label-custom">Shipping Address</span>
               </h3>
               <div className="text-sm text-slate-600 bg-green-50 p-3 rounded-lg border border-green-100">
                 {renderEditableField(
@@ -572,7 +533,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                 <span className="input-label-custom">Registered Office</span>
+                <span className="input-label-custom">Registered Office</span>
               </h3>
               <div className="text-sm text-slate-600 bg-purple-50 p-3 rounded-lg border border-purple-100">
                 {renderEditableField(
@@ -590,18 +551,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
   };
 
-  if(isIndustryTypeLoading || isBusinessTypeLoading){
-    return(
-      
-      <div className="fixed inset-0 z-10 bg-white flex items-center gap-3">
-        <div className="flex items-center justify-center gap-3">
-          <h1>
-            Loading
-          </h1>
-        </div>
-        <LoadingSpinner/>
+  if (isIndustryTypeLoading || isBusinessTypeLoading) {
+    return (
+      <div className="fixed  inset-0 z-10 bg-white p-8 ml-11 mt-11">
+        <Skeleton/>
       </div>
-    )
+    );
   }
   return (
     <div
@@ -615,7 +570,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
         >
-          <ArrowLeft size={14} /> <span className="caption-custom hover:text-blue-700"> Accounts</span>
+          <ArrowLeft size={14} />{" "}
+          <span className="caption-custom hover:text-blue-700"> Accounts</span>
         </button>
 
         {/* Main header */}
@@ -634,28 +590,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </h1>
               <div className="text-slate-600 flex items-center">
                 <span className="input-label-custom">Industry type:</span>
-                {/* <div className="ml-1 truncate">
 
+                <div className="ml-1 truncate">
                   {renderDropdownField(
                     "industryTypeName",
                     formData.industryTypeName,
-                    indutryTypeData || [],
+                    industryTypeData,
                     "Select industry type"
                   )}
-                </div> */}
-                <div className="ml-1 truncate">
-                  {/* {indutryTypeData && indutryTypeData.length > 0 ? ( */}
-                  {
-                    renderDropdownField(
-                      "industryTypeName",
-                      formData.industryTypeName,
-                      industryTypeData,
-                      "Select industry type"
-                    )
-                  }
-                  {/* ) : ( 
-         <p className="text-gray-400">Loading industry types...</p> 
-                  )}  */}
                 </div>
               </div>
               <div className="flex items-center">
@@ -667,7 +609,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 ) : (
                   <div className="flex items-center text-red-600">
                     <XCircle className="h-4 w-4 mr-1" />
-                    <span className="input-label-custom-inactive">Inactive</span>
+                    <span className="input-label-custom-inactive">
+                      Inactive
+                    </span>
                   </div>
                 )}
               </div>
@@ -678,25 +622,23 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div className="grid gap-2 font-semibold text-gray-700">
             <div className="flex items-center justify-between gap-4">
               <span className="grid">
-                <span className="input-label-custom">
-                  Created By
+                <span className="input-label-custom">Created By</span>
+                <span className="caption-custom truncate">
+                  {formData.createdBy}
                 </span>
-                <span className="caption-custom truncate">{formData.createdBy}</span>
               </span>
               <span className="grid">
-                <span className="input-label-custom">
-                  Created On
+                <span className="input-label-custom">Created On</span>
+                <span className="caption-custom truncate">
+                  {formData.createdOn}
                 </span>
-                <span className="caption-custom truncate">{formData.createdOn}</span>
               </span>
             </div>
 
             {/* Business type */}
             <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
               <div className="grid items-center text-slate-700">
-                <div className="input-label-custom">
-                  Business type
-                </div>
+                <div className="input-label-custom">Business type</div>
                 <div className="flex items-center">
                   <Factory className="h-4 w-4 mr-2" />
                   <div className="caption-custom truncate">
@@ -746,7 +688,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               onClick={() => setActiveTab("address")}
               className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
                 activeTab === "address"
-                ? "border-teal-600 table-header-custom active"
+                  ? "border-teal-600 table-header-custom active"
                   : "border-transparent table-header-custom"
               }`}
             >
@@ -770,5 +712,68 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     </div>
   );
 };
+
+
+// Note : this is the form skeleton
+const Skeleton: React.FC = () => {
+  return (
+    <div className="    bg-white animate-pulse">
+      {/* Header Section */}
+      <div className="flex items-center space-x-4 mb-6">
+        <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+        <div className="flex flex-col space-y-2 flex-1">
+          <div className="h-4 bg-gray-200 rounded w-48"></div>
+          <div className="h-3 bg-gray-200 rounded w-32"></div>
+        </div>
+        <div className="flex flex-col items-end space-y-2">
+          <div className="h-3 bg-gray-200 rounded w-24"></div>
+          <div className="h-3 bg-gray-200 rounded w-24"></div>
+        </div>
+      </div>
+      
+      {/* Tab and Content Section */}
+      <div className="flex space-x-4 mb-6">
+        <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
+        <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
+        <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Side (Contact, Mobile, Website) */}
+        <div className="flex flex-col space-y-4">
+          <div className="p-4 bg-white rounded-md border border-gray-200">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-full"></div>
+          </div>
+          <div className="p-4 bg-white rounded-md border border-gray-200">
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-full"></div>
+          </div>
+          <div className="p-4 bg-white rounded-md border border-gray-200">
+            <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-full"></div>
+          </div>
+        </div>
+        
+        {/* Right Side (Account Contact) */}
+        <div className="p-4 bg-white rounded-md border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="w-16 h-8 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+            <div className="flex-1">
+              <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-48"></div>
+            </div>
+            <div className="h-8 w-16 bg-gray-200 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 export default AccountDetails;

@@ -115,8 +115,7 @@ function AccountManagementList({
                 onClick={() => {
                   setOpenAccountForm(!openCreateAccountForm);
                 }}
-              >
-                + Create account
+              ><span>+ Create</span>
               </Button>
               {openCreateAccountForm && (
                 <CreateAccount 
