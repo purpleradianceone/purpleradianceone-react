@@ -1,30 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
-import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
-import {
-  CheckCircle,
-  XCircle,
-  Star,
-  Loader2,
-  LucidePlus,
-  Calendar,
-  Filter,
-  X,
-  LayoutDashboard,
-  LucideArrowBigRight,
-  BookDashed,
-  Edit,
-  Eye,
-} from "lucide-react";
+import { STATUS_CODE } from "../../constants/AppConstants";
+import { LucidePlus, Calendar, LayoutDashboard } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import useScreenSize from "../../config/hooks/useScreenSize";
 import Button from "../ui/Button";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
@@ -34,14 +18,17 @@ import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePag
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import EmailTemplate from "../../@types/email-template/EmailTemplateType";
 import MESSAGE from "../../constants/Messages";
-import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import { useUserPreference } from "../../context/user/UserPreference";
 import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
-import FormHeader from "../ui/FormHeader";
+import { TemplateTypeModal } from "./template-panel/TemplateTypeModal";
+import { EmailTypeDropdown } from "./email-template-custom/EmailTypeDropdown";
+import { EmailTemplateList } from "./email-template-custom/TemplateList";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ApiError from "../../@types/error/ApiError";
 
-type TemplateType = {
+export type TemplateType = {
   id: number;
   name: string;
   is_host_email: boolean;
@@ -66,15 +53,8 @@ export const TemplatesPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number>(0);
 
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
-
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState(false);
-
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
   const {
     dateRangeId,
     concatDate,
@@ -315,6 +295,7 @@ export const TemplatesPage: React.FC = () => {
   }
   const { userHasAccessToViewEmailTemplateSetting } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const { userHasAccessToAddEmailTemplateSetting } = useUserAccessModules();
 
   useEffect(() => {
     if (!userHasAccessToViewEmailTemplateSetting) {
@@ -342,213 +323,86 @@ export const TemplatesPage: React.FC = () => {
       }  gap-1 h-screen flex flex-col `}
     >
       {/* Header */}
-      <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full ">
+      <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full mb-2">
         <div className="flex  justify-between w-full h-9 items-center">
           <div className="flex gap-2">
             {<LayoutDashboard className="w-7 h-7 text-blue-600 " />}
 
             <span className="section-header-custom">Email Templates</span>
           </div>
-          {isLargeScreen && (
-            <>
+          <div>
+            <EmailTypeDropdown
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              templateTypes={templateTypes}
+            />
+          </div>
+
+          <div className="flex">
+            {/* search box flex div */}
+            <div className="relative flex items-start w-80 transition-colors hover:border-gray-400">
+              <div className="grid w-full">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchParameterChange(e.target.value);
+                  }}
+                ></SearchInput>
+              </div>
+            </div>
+
+            {/* Date FIlters Dropdown */}
+            <div className="flex mx-1">
               <div className="flex">
-                {/* search box flex div */}
-                <div className="relative flex items-start w-44">
-                  <div className="grid w-full">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchParameterChange(e.target.value);
-                      }}
-                    ></SearchInput>
-                  </div>
+                <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
+                  <Calendar className="mt-1 input-label-custom" />
                 </div>
-
-                {/* Date FIlters Dropdown */}
-                <div className="flex mx-1">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                      <Calendar className="mt-2" />
-                    </div>
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                </div>
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                ></DateRangeFilterDropdown>
               </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={handleStartDateChange}
-                  onEndDateChange={handleEndDateChange}
-                />
+            </div>
+          </div>
+          {/* Custom Date Picker Div Flex Box*/}
+          <div
+            style={
+              isCustomDateOptionSelected
+                ? { visibility: "visible" }
+                : { visibility: "hidden" }
+            }
+          >
+            <DateRangePicker
+              onStartDateChange={handleStartDateChange}
+              onEndDateChange={handleEndDateChange}
+            />
+          </div>
+          <div className="flex max-w-60 min-h-7 h-8">
+            <Button
+              disabled={!userHasAccessToAddEmailTemplateSetting}
+              onClick={() =>
+                userHasAccessToAddEmailTemplateSetting
+                  ? setShowModal(true)
+                  : toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+              }
+            >
+              <div className="flex items-center justify-center gap-0.5">
+                <LucidePlus size={18} />
+                Template
               </div>
-            </>
-          )}
-
-          {isMediumScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchParameterChange(e.target.value);
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative  gap-2  ">
-                <div className="mt-1 flex ">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                    <Calendar />
-                  </div>
-
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.TWENTY} />
-                    </button>
-
-                    <div className="my-10 justify-items-center mb-5">
-                      <div className="mb-5">
-                        <DateRangePicker
-                          onStartDateChange={handleStartDateChange}
-                          onEndDateChange={handleEndDateChange}
-                        />
-                      </div>
-                      <div className="w-full justify-items-center">
-                        <div className="w-24">
-                          <Button>Done</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {isSmallScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchParameterChange(e.target.value);
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative gap-2">
-                <Button
-                  onClick={() => {
-                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                  }}
-                >
-                  <Filter size={SIZE.EIGHT} />
-                </Button>
-              </div>
-              {isFiltersOpenInMobileView && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
-                        );
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.EIGHT} />
-                    </button>
-                    {/* Date FIlters Dropdown */}
-
-                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                      <div className="mt-1 flex ">
-                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                          <Calendar size={SIZE.TWENTY} />
-                        </div>
-
-                        <DateRangeFilterDropdown
-                          dropdownOptions={dateRangeDropdownOptions}
-                          handleDateIdChange={handleDateRangeIdChange}
-                        ></DateRangeFilterDropdown>
-                      </div>
-                    </div>
-
-                    {/* Custom Date Picker Div Flex Box*/}
-                    <div
-                      className="mb-10 justify-items-center"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={handleStartDateChange}
-                        onEndDateChange={handleEndDateChange}
-                      />
-                    </div>
-
-                    {
-                      <div className="flex w-full justify-center items-center mb-5">
-                        <div className="w-28">
-                          <Button
-                            onClick={() => {
-                              setIsFiltersOpenInMobileView(
-                                !isFiltersOpenInMobileView
-                              );
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-          <Sidebar
-            onCreate={() => setShowModal(true)}
-            handleAccessDenied={(message: string) => {
-              toast.error(message);
-            }}
-          />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Main Content Area */}
       {loadingTemplatePage ? (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-screen">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       ) : (
         <>
           <div className="flex-1 overflow-x-auto" ref={containerRef}>
-            <Tabs
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-              templateTypes={templateTypes}
-            />
-
-            <TemplateList
+            <EmailTemplateList
               templates={templates}
               loading={loadingTemplates}
               hasmore={hasMoreTemplates}
@@ -564,516 +418,6 @@ export const TemplatesPage: React.FC = () => {
           )}
         </>
       )}
-    </div>
-  );
-};
-
-const Sidebar: React.FC<{
-  onCreate: () => void;
-  handleAccessDenied: (message: string) => void;
-}> = ({ onCreate, handleAccessDenied }) => {
-  const { userHasAccessToAddEmailTemplateSetting } = useUserAccessModules();
-  return (
-    <div className="flex max-w-60 min-h-7 h-8">
-      <Button
-        disabled={!userHasAccessToAddEmailTemplateSetting}
-        onClick={() =>
-          userHasAccessToAddEmailTemplateSetting
-            ? onCreate()
-            : handleAccessDenied(MESSAGE.ERROR.NOT_ATHORISED)
-        }
-      >
-        <div className="flex gap-1">
-          <LucidePlus className="w-6 h-6 text-white " />
-          <span className=" font-bold ">New Template </span>
-        </div>
-      </Button>
-    </div>
-  );
-};
-
-type TabsProps = {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  templateTypes: TemplateType[];
-};
-
-const Tabs: React.FC<TabsProps> = ({
-  activeTab,
-  onTabChange,
-  templateTypes,
-}) => (
-  <div className="sticky top-0 mb-1 bg-white overflow-x-auto scrollbar-hide">
-    <div className="flex flex-nowrap overflow-x-auto custom-height-scrollbar p-1">
-      {templateTypes.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.name)}
-          className={`py-2 px-4 border-b-2 ${
-            activeTab === tab.name
-              ? "main-nav-custom active-header"
-              : "border-transparent main-nav-custom"
-          } transition-colors duration-200 min-w-fit `}
-        >
-          {tab.name}
-        </button>
-      ))}
-    </div>
-  </div>
-);
-
-type TemplateListProps = {
-  templates: EmailTemplate[];
-  loading: boolean;
-  hasmore: boolean;
-  selectedTypeId: number;
-  reset: () => void;
-};
-
-const TemplateList: React.FC<TemplateListProps> = ({
-  templates,
-  loading,
-  hasmore,
-  reset,
-}) => {
-  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
-    null
-  );
-
-  const { userHasAccessToUpdateEmailTemplateSetting } = useUserAccessModules();
-  const navigate = useNavigate();
-
-  const handleEditTemplate = (emailTemplate: EmailTemplate): void => {
-    navigate(
-      `${ROUTES_URL.EMAIL_TEMPLATE_UPDATE}?template_type_id=${emailTemplate.email_type_id}&template_id=${emailTemplate.id}`
-    );
-  };
-  const { loginStatus } = useLoggedInUserContext();
-
-  const handleDefaultToggle = async (template: EmailTemplate) => {
-    if (!userHasAccessToUpdateEmailTemplateSetting) {
-      toast.error("You don't have access to update the default status.");
-      return;
-    }
-
-    try {
-      const postDataUpdateEmailTemplate = {
-        company_id: loginStatus.companyId,
-        updatedby_id: loginStatus.id,
-        id: template.id,
-        email_type_id: template.email_type_id,
-        name: null,
-        email_subject: null,
-        email_body_html: null,
-        email_body_json: null,
-        isactive: template.isactive,
-        is_default: template.is_default,
-      };
-
-      await axios
-        .post(POST_API.UPDATE_EMAIL_TEMPLATE, postDataUpdateEmailTemplate, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            reset();
-            toast.success(response.data.message);
-          }
-        })
-        .catch(async (error: ApiError | any) => {
-          if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({
-              callFunctionWithParamsNotEvent: handleDefaultToggle,
-            });
-            if (refreshTokenResponse) {
-              handleDefaultToggle(template);
-            }
-          }
-        });
-    } catch (error: ApiError | any) {
-      console.error("Failed to update default status:", error);
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenResponse = await RefreshToken({
-          callFunctionWithParamsNotEvent: handleDefaultToggle,
-        });
-        if (refreshTokenResponse) {
-          handleDefaultToggle(template);
-        }
-      }
-      toast.error("Failed to update default status.");
-    } finally {
-      //
-    }
-  };
-
-  return (
-    <>
-      {templates.length === 0 && !loading && !hasmore && (
-        <div className="text-center caption-custom mt-10 p-4 border rounded-md bg-white shadow-sm">
-          No templates found.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {templates.map((template) => (
-          <div
-            key={template.id}
-            className="bg-white shadow rounded-lg p-4 border hover:shadow-md transition duration-200 ease-in-out"
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h3 className="table-header-custom">{template.name}</h3>
-                <p className="table-data-custom">
-                  <strong className="input-label-custom">Subject:</strong>{" "}
-                  <span className="caption-custom">
-                    {template.email_subject || <em>No subject</em>}
-                  </span>
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setPreviewTemplate(template)}
-                  // className="px-3 py-1 text-sm border rounded"
-                  aria-label={`Preview ${template.name}`}
-                >
-                  
-                  <div className="flex items-center justify-center gap-0.5">
-                    <Eye size={16} />
-                    View
-                  </div>
-                </Button>
-                <Button
-                  // className="px-3 py-1 text-sm border rounded"
-                  aria-label={`Edit ${template.name}`}
-                  disabled={
-                    !userHasAccessToUpdateEmailTemplateSetting ||
-                    template.is_master
-                  }
-                  onClick={() => {
-                    if (
-                      userHasAccessToUpdateEmailTemplateSetting &&
-                      !template.is_master
-                    ) {
-                      handleEditTemplate(template);
-                    } else {
-                      toast.error(
-                        template.is_master
-                          ? "Can't Update Master Templates!"
-                          : "You don't have access!"
-                      );
-                    }
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-0.5">
-                    <Edit size={16} />
-                    Edit
-                  </div>
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex  items-center justify-between col-span-2 input-label-custom">
-              {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
-
-              <div className="flex flex-col col-span-1">
-                {/* Active */}
-                <span className="flex items-center mb-2 justify-between gap-2">
-                  {template.isactive ? (
-                    <CheckCircle className="text-green-500" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400" size={16} />
-                  )}
-                  <strong className="input-label-custom">Active: </strong>
-                  <label className="inline-flex items-center cursor-pointer relative">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={template.isactive}
-                      id={`active-${template.id}`}
-                      onChange={() => {
-                        if (!template.is_master) {
-                          if (!template.is_default) {
-                            if (
-                              userHasAccessToUpdateEmailTemplateSetting &&
-                              !template.is_master
-                            ) {
-                              template.isactive = !template.isactive;
-                              handleDefaultToggle(template);
-                            } else {
-                              if (template.is_master) {
-                                toast.error(
-                                  "Can't change active status of master template."
-                                );
-                              } else {
-                                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                              }
-                            }
-                          } else {
-                            toast.error(
-                              "To make this inactive, please set another template as default first."
-                            );
-                          }
-                        } else {
-                          toast.error(
-                            "The master template cannot be deactivated."
-                          );
-                        }
-                      }}
-                    />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
-                </span>
-
-                {/* Default */}
-                <span className="flex items-center mb-2 justify-between gap-2">
-                  {template.is_default ? (
-                    <Star className="text-yellow-500" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400" size={16} />
-                  )}
-                  <strong className="input-label-custom">Default: </strong>
-                  <label className="inline-flex items-center cursor-pointer relative">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={template.is_default}
-                      id={`default-${template.id}`}
-                      onChange={() => {
-                        if (template.isactive) {
-                          if (!template.is_default) {
-                            if (userHasAccessToUpdateEmailTemplateSetting) {
-                              template.is_default = !template.is_default;
-                              handleDefaultToggle(template);
-                            } else {
-                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                            }
-                          } else {
-                            toast.error(
-                              "Please make another template the default to remove this one as default."
-                            );
-                          }
-                        } else {
-                          toast.error(
-                            "Set this template as active to make it your default email template."
-                          );
-                        }
-                      }}
-                    />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
-                </span>
-
-                {/* Master (readonly toggle → disabled) */}
-                <span className="flex items-center mb-2 gap-2">
-                  {template.is_master ? (
-                    <Star className="text-purple-500" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400" size={16} />
-                  )}
-                  <strong className="input-label-custom">Master:</strong>
-                  <span
-                    className={
-                      template.is_master
-                        ? "caption-custom-blue"
-                        : "caption-custom"
-                    }
-                  >
-                    {template.is_master ? "Yes" : "No"}
-                  </span>
-                </span>
-              </div>
-
-              <div className="flex justify-between text-sm text-gray-600 -mt-3">
-                <div className="px-3 rounded-md">
-                  <p>
-                    <strong className="input-label-custom">Created By:</strong>{" "}
-                    <span className="caption-custom">{template.createdby}</span>
-                  </p>
-                  <p>
-                    <strong className="input-label-custom">Created On:</strong>{" "}
-                    <span className="caption-custom">{template.createdon}</span>
-                  </p>
-                  <p>
-                    <strong className="input-label-custom">Updated By:</strong>{" "}
-                    <span className="caption-custom">{template.updatedby}</span>
-                  </p>
-                  <p>
-                    <strong className="input-label-custom">Updated On:</strong>{" "}
-                    <span className="caption-custom">{template.updatedon}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {loading && hasmore && (
-        <div className="flex justify-center items-center flex-1">
-          <Loader2 className="animate-spin text-blue-600" size={48} />
-        </div>
-      )}
-
-      {previewTemplate && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <FormHeader
-            icon={Eye}
-            preText= {"Preview:"}
-            userName={previewTemplate.name}
-            onClose={() => setPreviewTemplate(null)}
-            />
-            <div
-              className="overflow-y-auto flex-1 border rounded p-4 text-sm text-gray-800 bg-gray-50"
-              dangerouslySetInnerHTML={{
-                __html: previewTemplate.email_body_html,
-              }}
-            />
-            <div className="relative text-right justify-items-end justify-end items-end w-full">
-
-              <div className="w-fit">
-                <Button
-                onClick={() => setPreviewTemplate(null)}
-              >
-                <div className="flex items-center justify-center gap-0.5">
-                    <X size={16} />
-                    Close
-                  </div>
-              </Button>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-type TemplateTypeModalProps = {
-  onClose: () => void;
-  onCreate: (typeId: string) => void;
-};
-
-const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
-  onClose,
-  onCreate,
-}) => {
-  const [selectedTypeId, setSelectedTypeId] = useState<string>(""); // Initial state is an empty string
-  const { loginStatus } = useLoggedInUserContext();
-  const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    fetchTypes();
-  }, [loginStatus.companyId, loginStatus.id]);
-
-  const fetchTypes = async () => {
-    setLoading(true);
-    try {
-      await axios
-        .post(
-          POST_API.GET_EMAIL_TYPE,
-          {
-            company_id: loginStatus.companyId,
-            requestedby: loginStatus.id,
-            is_host_email: false,
-          },
-          { withCredentials: true }
-        )
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            const activeTypes = response.data.filter(
-              (type: TemplateType) => type.isactive
-            );
-            setTemplateTypes(activeTypes);
-          }
-        })
-        .catch(async (error: ApiError | any) => {
-          if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({
-              callFunction: fetchTypes,
-            });
-            if (refreshTokenResponse) {
-              fetchTypes();
-            }
-          }
-        });
-    } catch (error: ApiError | any) {
-      console.error("Error fetching template types for modal:", error);
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: fetchTypes,
-        });
-        if (refreshTokenStatus) {
-          fetchTypes();
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handleSubmit = () => {
-    if (selectedTypeId) {
-      // This check ensures selectedTypeId is not an empty string
-      onCreate(selectedTypeId); // Pass the ID string directly
-    } else {
-      toast.error("Select template type first!");
-    }
-  };
-
-  return loading ? (
-    <div className="flex justify-center items-center h-full">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-    </div>
-  ) : (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        {/* <h2 className="table-header-custom mb-4">Select Template Type</h2> */}
-        <FormHeader
-          icon={BookDashed}
-          preText="Select Template Type"
-          onClose={onClose}
-        />
-        <select
-          value={selectedTypeId} // Value will be '' initially or the selected ID string
-          onChange={(e) => setSelectedTypeId(e.target.value)}
-          className="w-full mb-3 border px-3 py-2 rounded input-label-custom"
-        >
-          <option value="">Select template type</option>{" "}
-          {/* Value is empty string for no selection */}
-          {templateTypes
-            .filter((t) => t.isactive)
-            .map((type) => (
-              <option key={type.id} value={JSON.stringify(type)}>
-                {type.name}
-              </option>
-            ))}
-        </select>
-        <div className="flex items-center justify-end gap-3 mt-4">
-          <div className="rounded">
-            <Button
-              // className="text-sm text-gray-600 hover:underline"
-              onClick={onClose}
-            >
-              <div className="flex items-center justify-center gap-0.5">
-                <X size={16} />
-                Cancel
-              </div>{" "}
-            </Button>
-          </div>
-          <div className="rounded">
-            <Button disabled={selectedTypeId === ""} onClick={handleSubmit}>
-              <div className="flex items-center justify-center gap-0.5">
-                <LucideArrowBigRight size={16} />
-                Continue
-              </div>
-            </Button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -20,7 +20,7 @@ export const CanvasWrapper = () => {
   }, [query]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative" }}  className="table-data-custom">
       {/* Canvas frame */}
       <Frame>
         <Element
