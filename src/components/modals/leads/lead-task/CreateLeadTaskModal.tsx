@@ -355,16 +355,16 @@ function CreateLeadTaskModal({
                 >
                   Select Lead Contact :
                 </label>
-                <div id="phoneCallBtn" className=" max-w-20 m-0">
+                <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
                     type="button"
                     onClick={() => {
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
-                    <span className="flex gap-1">
+                   <span className="flex gap-1 text-nowrap ">
                       <Contact size={SIZE.TWENTY}></Contact>
-                      <span>Select</span>
+                      <span>lead contact</span>
                     </span>
                   </Button>
                 </div>
@@ -562,11 +562,10 @@ function CreateLeadTaskModal({
 
         {/* Footer Buttons */}
         <div className="flex w-full justify-center gap-4 mt-6">
-          {/* Create task */}
           <div className=" flex w-full justify-end ">
             <div className="flex items-center gap-1 ">
               {/* Cancel */}
-              <Button type="reset">
+              <Button onClick={handleClose} type="reset">
                 <div className="flex items-center gap-1">
                   <X size={16} />
                   Cancel

@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Network, X } from "lucide-react";
+import { Network, Text, Users } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
   NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
@@ -29,6 +28,7 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
 import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 
 function AddTeamModal({
@@ -70,20 +70,6 @@ function AddTeamModal({
     companyUsersGridApiRef.current = params.api;
 };
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   const handleCompanyUserCheckBoxChange = (params : CompanyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.checked){
       
@@ -118,10 +104,6 @@ function AddTeamModal({
           });
 
           if (response.data.status && response.status === STATUS_CODE.OK) {
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "success",
-            // });
             toast.success(response.data.message)
             handleCompanyTeamChangeOnAdd();
             setTimeout(() => {
@@ -129,10 +111,6 @@ function AddTeamModal({
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           }
           else if(!response.data.status){
-            // showMessageSnackbar({
-            //   message: response.data.message,
-            //   type: "error",
-            // });
             toast.error(response.data.message)
           }
         } catch (error: ApiError | any) {
@@ -148,17 +126,9 @@ function AddTeamModal({
           }
         }
       } else {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
       }
     } else {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.NOT_ATHORISED,
-      //   type: "error",
-      // });
       toast.error( MESSAGE.ERROR.NOT_ATHORISED)
     }
   };
@@ -332,34 +302,30 @@ function AddTeamModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen mb-5 items-center justify-center">
+      <div className="flex min-h-screen  items-center justify-center">
         <div
-          className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-3xl max-h-[80vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Network className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Create New Team
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div>
+          <div className="p-4">
+            {/* Form header */}
+            <FormHeader
+              preText="Create new team"
+              icon={Network}
+              onClose={onClose}
+              description="Set up a new team to manage tasks and responsibilities efficiently."
+            />
 
-            <form className="space-y-8" onSubmit={handleAddTeamFormSubmit}>
+            <form className="space-y-3" onSubmit={handleAddTeamFormSubmit}>
               <FormInput
-                label="Team Name : "
+              logo={Users}
+                label="Name : "
                 maxLength={30}
                 type="text"
                 name="name"
@@ -372,6 +338,7 @@ function AddTeamModal({
               />
 
               <TextAreaInput
+              logo={Text}
                 label="Description : "
                 name="description"
                 placeholder="Product Description"
@@ -425,13 +392,6 @@ function AddTeamModal({
             </form>
           </div>
         </div>
-        {/* <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        /> */}
       </div>
     </div>
   );
