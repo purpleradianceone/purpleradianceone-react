@@ -5,7 +5,6 @@ import { Network, Save, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
   NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
