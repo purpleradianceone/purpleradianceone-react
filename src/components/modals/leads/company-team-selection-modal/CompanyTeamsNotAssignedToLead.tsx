@@ -9,9 +9,9 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import { EditIcon, Plus, X } from "lucide-react";
+import { EditIcon, Plus } from "lucide-react";
 import SearchInput from "../../../ui/SearchInput";
 import Button from "../../../ui/Button";
 import { CLASS_NAMES } from "../../../../constants/ClassNames";
@@ -19,6 +19,7 @@ import TeamManagementAgGrid from "../../../ag-grid/TeamManagementAgGrid";
 import CompanyTeamsNotAssignedToLeadModalProps from "../../../../@types/lead-management/CompanyTeamsNotAssignedToLeadModalProps";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
 
 /** simple debounce without external deps */
 function useDebouncedCallback<T extends (...args: any[]) => void>(
@@ -380,7 +381,7 @@ function CompanyTeamsNotAssignedToLead({
       className={
         isSmallScreen
           ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden  bg-opacity-5"
-          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden  bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center p-28 pt-2 overflow-hidden  bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
@@ -390,9 +391,9 @@ function CompanyTeamsNotAssignedToLead({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-5">
+          <div className="p-4">
             {/* Header */}
-            <div className="flex items-center justify-between  mb-1 sticky  ">
+            {/* <div className="flex items-center justify-between  mb-1 sticky  ">
               <div className="flex gap-2 items-center">
                 <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                 <h2 className="text-lg font-semibold text-gray-800">
@@ -407,7 +408,14 @@ function CompanyTeamsNotAssignedToLead({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={EditIcon}
+              preText="Assign team to this lead - "
+              userName={selectedLeadData.name ?? selectedLeadData.email}
+              description="Add a team responsible for handling and nurturing this lead."
+              onClose={onClose}
+            />
 
             {/* Body */}
             <div className="flex flex-col  justify-around  mb-7 ">
@@ -420,12 +428,12 @@ function CompanyTeamsNotAssignedToLead({
                     }}
                   />
                 </div>
-                <div className="flex-1  flex items-end justify-end">
-                  <div className="w-36">
+                <div className="flex-1 flex items-center justify-end">
+                  <div className="">
                     <Button type="submit" onClick={handleAddCompanyTeamToLead}>
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-center text-nowrap">
                         <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                        <span> Assign Teams</span>
+                        <span>Assign</span>
                       </div>
                     </Button>
                   </div>

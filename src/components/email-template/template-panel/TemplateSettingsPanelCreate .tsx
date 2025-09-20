@@ -12,6 +12,9 @@ import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
+import { LucideMail, Save, X } from "lucide-react";
+import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 
 type TemplateSettingsPanelEditProps = {
   htmlTemplateTypeSubjectPlaceholder: string;
@@ -128,7 +131,12 @@ export const TemplateSettingsPanelCreate: React.FC<
     <>
       {/* Fixed Button to Open Settings */}
       <div>
-        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
+        <Button onClick={() => setIsOpen(true)}>
+          <div className="flex items-center justify-center gap-0.5">
+            <Save size={16} />
+            Save Template
+          </div>
+        </Button>
       </div>
 
       {isOpen && (
@@ -147,21 +155,7 @@ export const TemplateSettingsPanelCreate: React.FC<
             overflowY: "auto",
           }}
         >
-          <button
-            onClick={() => setIsOpen(false)}
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              background: "transparent",
-              border: "none",
-              fontSize: "18px",
-              cursor: "pointer",
-            }}
-          >
-            ✖
-          </button>
-
+          
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -171,45 +165,25 @@ export const TemplateSettingsPanelCreate: React.FC<
               createEmailTemplateCreate(resultHtml, resultJson);
             }}
           >
-            <div style={{ marginBottom: "15px" }}>
-              <h3
-                style={{
-                  margin: "0 0 10px 0",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                }}
-              >
-                Template Settings
-              </h3>
-            </div>
+            <FormHeader
+              icon={LucideMail}
+              onClose={()=>setIsOpen(false)}
+              preText=" Template Settings"
+            />
+
 
             <div
               style={{ display: "flex", flexDirection: "column", gap: "15px" }}
             >
               {/* Template Name */}
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Template Name
-                </label>
-                <input
+                <FormInput
+                  label="Template Name"
                   type="text"
                   required
                   value={templateName}
+                  defaultValue={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                  }}
                   placeholder={`e.g., ${htmlTemplateTypeSubjectPlaceholder}`}
                 />
               </div>
@@ -219,12 +193,11 @@ export const TemplateSettingsPanelCreate: React.FC<
                 <label
                   style={{
                     display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
+                    marginBottom: "1px",
                   }}
+                  className="input-label-custom"
                 >
-                  Email Subject
+                  Email Subject<span className="text-red-500 align-top">*</span>
                 </label>
                 <input
                   ref={subjectInputRef}
@@ -253,13 +226,13 @@ export const TemplateSettingsPanelCreate: React.FC<
                   style={{
                     width: "100%",
                     padding: "6px",
-                    fontSize: "14px",
                     borderRadius: "4px",
                     border: "1px solid #ddd",
                     backgroundColor: "#f9f9f9",
                     maxHeight: "120px",
                     overflowY: "auto",
                   }}
+                  className="caption-custom"
                 >
                   <option value="">Insert Dynamic Field In Subject</option>
                   {dynamicFields.map((field) => (
@@ -270,33 +243,6 @@ export const TemplateSettingsPanelCreate: React.FC<
                 </select>
               </div>
 
-              {/* Description */}
-              {/* <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    minHeight: "80px",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
-                  placeholder="Template description..."
-                />
-              </div> */}
               {/* Default Template Toggle */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -308,10 +254,7 @@ export const TemplateSettingsPanelCreate: React.FC<
                   onChange={() => setIsDefault((prev) => !prev)}
                   style={{ width: "16px", height: "16px" }}
                 />
-                <label
-                  htmlFor="isDefault"
-                  style={{ fontSize: "14px", fontWeight: 500 }}
-                >
+                <label htmlFor="isDefault" className="input-label-custom">
                   Set as default template
                 </label>
               </div>
@@ -326,12 +269,20 @@ export const TemplateSettingsPanelCreate: React.FC<
               >
                 <div>
                   <Button type="button" onClick={() => setIsOpen(false)}>
-                    Cancel
+                    <div className="flex items-center justify-center gap-0.5">
+                      <X size={16} />
+                      Cancel
+                    </div>
                   </Button>
                 </div>
 
                 <div>
-                  <Button type="submit">Save</Button>
+                  <Button type="submit">
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Save size={16} />
+                      Save
+                    </div>
+                  </Button>
                 </div>
               </div>
             </div>

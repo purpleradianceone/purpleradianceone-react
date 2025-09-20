@@ -10,7 +10,7 @@ import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalP
 import POST_API from "../../../constants/PostApi";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
+import {  STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,6 +19,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -141,23 +142,30 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
           >
             <div className="py-6 px-4">
-              <div className="flex border-b items-center gap-3 mb-4">
+              {/* <div className="flex border-b items-center gap-3 mb-4">
                 <UserPlus className="text-blue-500" size={SIZE.TWENTY} />
                 <h2 className="text-lg font-semibold text-gray-800">
                   Add Company User
                 </h2>
                 <button
                   //  note : this is logic will not work dynamically CHANGES NEEDED
-                  disabled={
-                    loginStatus.activeUsersInCompany >
-                    loginStatus.subscriptionAllowedUsers
-                  }
+                  // disabled={
+                  //   loginStatus.activeUsersInCompany >
+                  //   loginStatus.subscriptionAllowedUsers
+                  // }
                   onClick={onClose}
                   className="absolute right-4 top-8 text-gray-400 hover:text-gray-600"
                 >
                   <X size={SIZE.TWENTY} />
                 </button>
-              </div>
+              </div> */}
+              <FormHeader
+                icon={UserPlus}
+                onClose={onClose}
+                preText="Add Company User"
+                description="Create and manage a new user account for your company."
+
+              />
 
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput

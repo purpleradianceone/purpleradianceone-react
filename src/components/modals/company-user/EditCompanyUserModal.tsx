@@ -9,7 +9,6 @@ import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
@@ -18,6 +17,7 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 function EditCompanyUserModal({
   isOpen,
   onClose,
@@ -198,7 +198,7 @@ function EditCompanyUserModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
             <div className="p-5">
-              <div className="flex justify-between items-center  mb-3 border-b ">
+              {/* <div className="flex justify-between items-center  mb-3 border-b ">
                 <div className="flex gap-2">
                   <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                   <h2 className="text-xl font-semibold text-gray-800">
@@ -211,7 +211,14 @@ function EditCompanyUserModal({
                 >
                   <X size={SIZE.TWENTY} />
                 </button>
-              </div>
+              </div> */}
+              <FormHeader
+                icon={EditIcon}
+                onClose={onClose}
+                preText="Update user : "
+                userName={user.fullname}
+                description="Modify and manage user details, including contact information, as needed."
+              />
 
               <form className="space-y-5" onSubmit={handleEditUserSubmit}>
                 <FormInput
@@ -245,7 +252,7 @@ function EditCompanyUserModal({
                 <div className="flex items-center gap-4 justify-start">
                   <label
                     htmlFor="isActive"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block input-label-custom"
                   >
                     Status :
                   </label>

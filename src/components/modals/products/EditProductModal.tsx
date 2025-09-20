@@ -11,6 +11,7 @@ import {
   LucidePresentation,
   LucideTimer,
   LucideVerified,
+  Save,
   Text,
   X,
   XCircle,
@@ -18,16 +19,11 @@ import {
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
-// import MessageSnackBar from "../../ui/MessageSnackbar";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useEffect, useState } from "react";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -36,7 +32,6 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import CreateCompanyProductTaxModal from "./CreateCompanyProductTaxModal";
-import { CLASS_NAMES } from "../../../constants/ClassNames";
 import ProductTaxManagementAgGrid from "../../ag-grid/ProductTaxManagementAgGrrid";
 import ProductTax from "../../../@types/products/ProductTaxManagementProps";
 import { Product } from "../../../@types/products/ProductsManagementProps";
@@ -47,6 +42,7 @@ import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
+import FormHeader from "../../ui/FormHeader";
 
 function EditCompanyProductModal({
   isOpen,
@@ -106,12 +102,6 @@ function EditCompanyProductModal({
     setIsCreateCompanyProductCompanyUserModalOpen,
   ] = useState<boolean>(false);
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
   const handleCreateCompanyProductTaxModalOpen = (status: boolean) => {
     setIsCreateCompanyProductTaxModalOpen(status);
   };
@@ -134,7 +124,6 @@ function EditCompanyProductModal({
   const handleProductToggle = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    // handleCloseSnackbar();
     const { checked } = event.target;
 
     if (userHasAccessToUpdateProduct) {
@@ -181,13 +170,6 @@ function EditCompanyProductModal({
     updateCompanyProductFormData,
     "registration"
   );
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   const handleCompanyProductTaxChange = (status: boolean) => {
     if (status) {
@@ -276,10 +258,6 @@ function EditCompanyProductModal({
                 response.data.status === true &&
                 response.status === STATUS_CODE.OK
               ) {
-                // showMessageSnackbar({
-                //   message: response.data.message,
-                //   type: "success",
-                // });
                 toast.success(response.data.message);
                 handleCompanyProductChange(product);
                 setTimeout(() => {
@@ -306,17 +284,9 @@ function EditCompanyProductModal({
           );
         }
       } else {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.NO_CHANGES,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.NO_CHANGES);
       }
     } else {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.REQUIRED_FIELDS,
-      //   type: "error",
-      // });
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
   };
@@ -378,7 +348,6 @@ function EditCompanyProductModal({
         description: "",
         name: "",
       });
-      // handleMessageSnackbarClose();
       fetchCompanyroductTax();
     } else {
       setCompanyProductTax([]);
@@ -403,22 +372,13 @@ function EditCompanyProductModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            <div className="flex items-center border-b gap-3 mb-2 sticky bg-white z-10 ">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Edit {product.name}
-              </h2>
-              <button
-                onClick={() => {
-                  onClose();
-                  setIsCreateCompanyProductTaxModalOpen(false);
-                }}
-                className="absolute right-1 top-2 text-gray-400 hover:text-gray-600 z-10"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div>
-
+            <FormHeader
+              icon={EditIcon}
+              onClose={onClose}
+              preText="Edit "
+              userName={product.name}
+              description="Update the necessary product details to edit the product in the CRM."
+            />
             <form
               className="space-y-2"
               onSubmit={hanldeUpdateCompanyProductFormSubmit}
@@ -477,7 +437,6 @@ function EditCompanyProductModal({
                     defaultValue={intialEditCompanyProductFormData.description}
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
-                    // error={errors.description}
                   />
                 </div>
 
@@ -615,8 +574,18 @@ function EditCompanyProductModal({
               </div>
 
               <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button onClick={onClose}>Cancel</Button>
-                <Button type="submit">Save</Button>
+                <Button onClick={onClose}>
+                  <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button type="submit">
+                  <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
               </div>
             </form>
 
@@ -639,10 +608,10 @@ function EditCompanyProductModal({
                   handleCreateCompanyProductTaxModalOpen(true);
                 }}
               >
-                <ClipboardPlus
-                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                ></ClipboardPlus>
-                Add TAX
+                <div className="flex items-center justify-center gap-1">
+                  <ClipboardPlus size={16} />
+                  Add Tax
+                </div>
               </Button>
             </div>
 
@@ -686,13 +655,6 @@ function EditCompanyProductModal({
             </div>
           </div>
         </div>
-        {/* <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        /> */}
       </div>
     </div>
   );

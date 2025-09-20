@@ -16,7 +16,14 @@ import {
   DynamicFieldsContext,
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideMail, X } from "lucide-react";
+import {
+  ClipboardCopy,
+  Eye,
+  LucideDatabase,
+  LucideMail,
+  Save,
+  Settings
+} from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
@@ -39,6 +46,7 @@ import toast from "react-hot-toast";
 import { ExportPanelCreate } from "../template-panel/ExportPanelCreate";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -197,12 +205,12 @@ export const EditorCanvas: React.FC = () => {
 
                 <div
                   onClick={() => {
-                    // if (mode === "editor") {
-                    //   const confirmed = window.confirm(
-                    //     "\nAre you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost.\n\nClick OK to continue or Cancel to stay on this page."
-                    //   );
-                    //   if (!confirmed) return;
-                    // }
+                    if (mode === "editor") {
+                      const confirmed = window.confirm(
+                        "\nAre you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost.\n\nClick OK to continue or Cancel to stay on this page."
+                      );
+                      if (!confirmed) return;
+                    }
                     setMode("insert");
                   }}
                   className={`cursor-pointer ${
@@ -237,10 +245,9 @@ export const EditorCanvas: React.FC = () => {
           style={{
             position: "fixed",
             top: 100,
-            right: 2,
+            right: 0,
             zIndex: 10,
             color: "white",
-            padding: "6px 10px",
             cursor: "pointer",
             fontSize: "12px",
           }}
@@ -248,7 +255,10 @@ export const EditorCanvas: React.FC = () => {
           {/* Show Fields Button - Always Visible */}
           <div>
             <Button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
-              ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
+              <div className="flex justify-center gap-1">
+                <Settings size={16} className="mt-0.5" />
+                <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
+              </div>
             </Button>
           </div>
 
@@ -257,69 +267,62 @@ export const EditorCanvas: React.FC = () => {
               style={{
                 position: "absolute",
                 top: 0, // Adjusted to appear below the toggle button
-                right: 2,
+                right: 0,
                 width: "260px",
-                maxHeight: "600px",
                 background: "white",
                 padding: "10px",
                 borderRadius: "8px",
                 boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
                 zIndex: 11,
-                overflowY: "auto",
               }}
             >
-              <div
-                style={{
-                  position: "sticky",
-                  display: "flex",
-                  top: 0,
-                  justifyContent: "space-between",
-                  background: "white",
-                  alignItems: "center",
-                  marginBottom: "10px",
-                  paddingBottom: "8px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <h4 className="table-header-custom">Dynamic Fields</h4>
-                <button onClick={() => setShowDynamicEditor(false)}>
-                  <X className="table-header-custom" />
-                </button>
-              </div>
+              <FormHeader
+                icon={LucideDatabase}
+                onClose={() => setShowDynamicEditor(false)}
+                preText="Dynamic Fields"
+              />
 
-              {parsedFields.length === 0 ? (
-                <div
-                  style={{
-                    padding: "16px",
-                    textAlign: "center",
-                    color: "#666",
-                    fontSize: "12px",
-                  }}
-                >
-                  {isLoading
-                    ? "Loading dynamic fields..."
-                    : "No dynamic fields available"}
-                </div>
-              ) : (
-                parsedFields.map((field) => (
-                  <div key={field.value} style={{ marginBottom: "12px" }}>
-                    <label className="mb-2 input-label-custom">
-                      {field.label}
-                    </label>
-                    <FormInput
-                      value={dynamicVars[field.value] || ""}
-                      onChange={(e) => {
-                        setDynamicVars((prev) => ({
-                          ...prev,
-                          [field.value]: e.target.value,
-                        }));
-                      }}
-                      placeholder={`Enter value for ${field.label}`}
-                    />
-                    <div className="caption-custom">{field.value}</div>
+              <div className="overflow-y-auto max-h-[400px]">
+                {parsedFields.length === 0 ? (
+                  <div
+                    style={{
+                      padding: "16px",
+                      textAlign: "center",
+                      color: "#666",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {isLoading
+                      ? "Loading dynamic fields..."
+                      : "No dynamic fields available"}
                   </div>
-                ))
-              )}
+                ) : (
+                  parsedFields.map((field) => (
+                    <div
+                      key={field.value}
+                      style={{
+                        marginBottom: "6px",
+                      }}
+                    >
+                      {/* <label className=" input-label-custom">
+                      {field.label}
+                    </label> */}
+                      <FormInput
+                        label={field.label}
+                        value={dynamicVars[field.value] || ""}
+                        onChange={(e) => {
+                          setDynamicVars((prev) => ({
+                            ...prev,
+                            [field.value]: e.target.value,
+                          }));
+                        }}
+                        placeholder={`Enter value for ${field.label}`}
+                      />
+                      <div className="caption-custom">{field.value}</div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -362,36 +365,49 @@ export const EditorCanvas: React.FC = () => {
                 />
               </div>
 
-              <div className="m-2">
-                <Button onClick={insertHtmlTemplate}>
-                  ⏭️ Preview HTML Template
-                </Button>
-              </div>
-
-              <div className="m-2 flex gap-4">
-                <Button
-                  onClick={() => {
-                    const beautified = DOMPurify.sanitize(htmlInput);
-                    navigator.clipboard.writeText(beautified);
-                    toast.success("Email Template copied to clipboard!");
-                  }}
-                >
-                  📋 Copy HTML Email
-                </Button>
-
-                <Button
-                  onClick={() => {
-                    const beautified = DOMPurify.sanitize(htmlInput);
-                    const blob = new Blob([beautified], { type: "text/html" });
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = "sanitized-template.html";
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                  }}
-                >
-                  💾 Export HTML Email
-                </Button>
+              <div className="mt-2 flex gap-4">
+                <div>
+                  <Button onClick={insertHtmlTemplate}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Eye size={16} />
+                      View HTML Template
+                    </div>
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    onClick={() => {
+                      const beautified = DOMPurify.sanitize(htmlInput);
+                      navigator.clipboard.writeText(beautified);
+                      toast.success("Email Template copied to clipboard!");
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <ClipboardCopy size={16} />
+                      Copy HTML Email
+                    </div>
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    onClick={() => {
+                      const beautified = DOMPurify.sanitize(htmlInput);
+                      const blob = new Blob([beautified], {
+                        type: "text/html",
+                      });
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(blob);
+                      link.download = "sanitized-template.html";
+                      link.click();
+                      URL.revokeObjectURL(link.href);
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Save size={16} />
+                      Export HTML Email
+                    </div>
+                  </Button>
+                </div>
               </div>
 
               <div style={{ marginTop: "20px", zIndex: 2000 }}>
@@ -446,25 +462,6 @@ export const EditorCanvas: React.FC = () => {
                     position: "relative",
                   }}
                 >
-                  {/* <div
-                    style={{
-                      position: "absolute",
-                      top: 10,
-                      right: 300,
-                      // zIndex: 10,
-                    }}
-                  >
-                    <label style={{ fontSize: "14px", fontWeight: 500}}>
-                      Canvas Background:
-                      <input
-                        type="color"
-                        value={canvasBgColor}
-                        onChange={(e) => setCanvasBgColor(e.target.value)}
-                        style={{ marginLeft: "10px" }}
-                      />
-                    </label>
-                  </div> */}
-
                   <div
                     className="fixed inset-0 justify-self-end top-14 "
                     style={{

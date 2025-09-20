@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Package, Save } from "lucide-react";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -16,6 +16,8 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import ApiError from "../../../@types/error/ApiError";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import Button from "../../ui/Button";
 
 const AssignProductToLead = ({
   selectedLeadData,
@@ -63,8 +65,8 @@ const AssignProductToLead = ({
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          toast.success(response.data.message)
-           fetchLeadCompanyProduct();
+          toast.success(response.data.message);
+          fetchLeadCompanyProduct();
         }
         if (response.data.status === false) {
           toast.error(response.data.message);
@@ -83,7 +85,7 @@ const AssignProductToLead = ({
         });
         if (refreshTokenStatus) {
           handleProductAddToLead(event);
-        } 
+        }
       }
     }
   };
@@ -130,15 +132,15 @@ const AssignProductToLead = ({
       <div
         className={`${
           position === "top" ? "top-12" : ""
-        } fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4`}
+        } fixed inset-0 z-30 bg-black bg-opacity-5 flex items-center justify-center p-4`}
       >
         <div
           className={` ${
             position === "left" ? " inset-0 top-6 left-6 " : ""
-          }bg-white rounded-2xl shadow-lg min-w-fit  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
+          }bg-white rounded-2xl shadow-lg p-3 min-w-fit  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
         >
           {/* Header with Close Button */}
-          <div className="flex justify-between items-center ml-4 p-1 border-b border-gray-200">
+          {/* <div className="flex justify-between items-center ml-4 p-1 border-b border-gray-200">
             <h3 className="text-md font-medium text-gray-800 hover:shadow-sm">
               Assign Product to Lead
             </h3>
@@ -159,9 +161,29 @@ const AssignProductToLead = ({
                 <X size={20} />
               </button>
             </div>
-          </div>
+          </div> */}
+          <FormHeader
+            icon={Package}
+            onClose={onClose}
+            preText="Assign Product to lead"
+            description="Link a product with this lead for better tracking and management."
+          />
           {/* NOTE : CALL TO THE MODAL COMPONENT */}
-          <div className=" p-1">
+          <div className="    w-full bg">
+            <div className=" flex   justify-end">
+              <div className="p-1">
+                {showSaveButton && (
+                  <Button
+                    onClick={handleProductAddToLead}
+                    disabled={!showSaveButton}
+                  >
+                    <div className="flex items-center gap-1">
+                      <Save size={16} /> Add
+                    </div>
+                  </Button>
+                )}
+              </div>
+            </div>
             <ProductManagementLead
               AssignLeadId={selectedLeadData.id}
               handleProductCheckboxChange={handleProductCheckboxChange}

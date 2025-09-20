@@ -174,14 +174,14 @@ function Tasks({
     >
       <div className="flex items-center justify-between mb-8 flex-shrink-0">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <h3 className="section-header-custom mb-2">
             {taskType === "upcoming"
               ? "Upcoming Tasks"
               : taskType === "pending"
               ? "Pending Tasks"
               : "Completed Tasks"}
           </h3>
-          <p className="text-gray-700">
+          <p className="table-header-custom">
             {taskType === "upcoming"
               ? "Your scheduled activities and deadlines"
               : taskType === "pending"
@@ -196,7 +196,7 @@ function Tasks({
         {!isLoading && (
           <div className="space-y-4">
             {leadTasks.length === 0 && (
-              <h3 className="text-2xl text-center font-bold text-gray-300 mb-2">
+              <h3 className="input-label-custom mb-2">
                 {taskType === "upcoming"
                   ? "No Upcoming Tasks"
                   : taskType === "pending"
@@ -246,11 +246,11 @@ function Tasks({
                           onClick={() => {
                             getLeadDetails(task.leadId);
                           }}
-                          className="font-semibold cursor-pointer text-gray-900 group-hover:text-blue-600 transition-colors text-base"
+                          className="input-label-custom cursor-pointer group-hover:text-blue-600 transition-colors"
                         >
                           {task.subject}
                         </h4>
-                        <p className="text-xs text-gray-700 mt-1">
+                        <p className="caption-custom mt-1">
                           {displayedDescription}
                           {showViewMore && (
                             <button
@@ -258,7 +258,7 @@ function Tasks({
                                 e.stopPropagation();
                                 toggleDescription(task.id);
                               }}
-                              className="text-blue-600 hover:underline ml-1 text-xs"
+                              className="caption-custom-blue hover:underline ml-1"
                             >
                               {isDescriptionExpanded
                                 ? "View Less"
@@ -268,7 +268,7 @@ function Tasks({
                         </p>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(
+                        className={`px-2 py-0.5 rounded-full input-label-custom border ${getPriorityColor(
                           task
                         )} flex-shrink-0`}
                       >
@@ -278,9 +278,9 @@ function Tasks({
 
                     <div className="flex-1 items-center justify-between mt-2">
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1 text-gray-700">
+                        <div className="flex items-center space-x-1 input-label-custom">
                           <Clock className="w-3 h-3" />
-                          <span className="text-xs font-medium">
+                          <span className="input-label-custom">
                             {task.dueDateTime}
                           </span>{" "}
                           {/* Displaying raw dueDateTime */}
@@ -316,12 +316,12 @@ function Tasks({
                           </div>
                         )}
                       </div> */}
-                        <span className="text-xs text-gray-700 px-1.5 py-0.5 bg-white rounded-full">
+                        <span className="caption-custom px-1.5 py-0.5 bg-white rounded-full">
                           {task.leadTaskStageName}
                         </span>
                         <button
                           type="button"
-                          className="text-xs cursor-text text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                          className="caption-custom px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
                         >
                           {taskType === "completed"
                             ? `${task.completedAt}`
@@ -330,7 +330,7 @@ function Tasks({
                         {taskType === "completed" && (
                           <button
                             type="button"
-                            className="text-xs text-gray-700 hover:text-gray-700 font-medium px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                            className="caption-custom px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
                           >
                             {task.overdueStatus}
                           </button>

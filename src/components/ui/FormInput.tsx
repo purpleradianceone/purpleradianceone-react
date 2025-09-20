@@ -165,9 +165,9 @@ function FormInput({
               onChange={onChange}
               onBlur={onBlur} // Apply blur to the input as well
               className={readonly ?
-                "appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                "caption-custom appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 :
-                "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                "caption-custom appearance-none block w-full px-3 py-2 border border-gray-300 rounded-r-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               }
               inputMode={inputMode || "tel"} // Default to "tel"
               min={min}

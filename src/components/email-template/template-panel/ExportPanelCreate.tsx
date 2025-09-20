@@ -5,6 +5,7 @@ import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
 import toast from "react-hot-toast";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
 import Button from "../../ui/Button";
+import { ClipboardCopy, Eye } from "lucide-react";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
@@ -42,13 +43,23 @@ export const ExportPanelCreate: React.FC<ExportPanelProps> = ({
   };
 
   return (
-    <div style={{ display: "flex", gap: 10 }}>
+    <div style={{ display: "flex", gap: 5 }}>
       <div>
-        <Button onClick={handlePreview}>Preview HTML</Button>
+        <Button onClick={handlePreview}>
+          <div className="flex items-center justify-center gap-0.5">
+            <Eye size={16} />
+            Preview HTML
+          </div>
+        </Button>
       </div>
 
       <div>
-        <Button onClick={handleCopy}>Copy HTML</Button>
+        <Button onClick={handleCopy}>
+          <div className="flex items-center justify-center gap-0.5">
+            <ClipboardCopy size={16} />
+            Copy HTML
+          </div>
+        </Button>
       </div>
 
       <>

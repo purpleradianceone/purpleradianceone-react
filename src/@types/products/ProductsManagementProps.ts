@@ -3,6 +3,7 @@ export type Product = {
   id?: number;
   companyId?: number;
   productTypeId: number;
+  productTypeName:string;
   defaultWarrantyIntervalTypeId: number;
   defaultWarranty: number;
   defaultWarrantyName: string;

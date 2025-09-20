@@ -11,6 +11,9 @@ import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
+import { Edit, Save, X } from "lucide-react";
+import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 
 type TemplateSettingsPanelInsertProps = {
   htmlBody: string;
@@ -116,7 +119,6 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
           position: "fixed",
           top: "60px",
           right: 0,
-          padding: "3px 8px",
           // backgroundColor: "#4CAF50",
           color: "white",
           borderRadius: "4px",
@@ -125,7 +127,12 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
         }}
       >
         {/* Fixed Button to Open Settings */}
-        <Button onClick={() => setIsOpen(true)}>Save Template</Button>
+        <Button onClick={() => setIsOpen(true)}>
+          <div className="flex items-center justify-center gap-0.5">
+            <Save size={16} />
+            Save Template
+          </div>
+        </Button>
 
         {isOpen && (
           <div
@@ -144,21 +151,6 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
               color: "black",
             }}
           >
-            <button
-              onClick={() => setIsOpen(false)}
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                background: "transparent",
-                border: "none",
-                fontSize: "18px",
-                cursor: "pointer",
-              }}
-            >
-              ✖
-            </button>
-
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -166,17 +158,11 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                 await updateEmailTemplateInsert(htmlBody);
               }}
             >
-              <div style={{ marginBottom: "15px" }}>
-                <h3
-                  style={{
-                    margin: "0 0 10px 0",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Update Template Settings{" "}
-                </h3>
-              </div>
+              <FormHeader
+                icon={Edit}
+                onClose={() => setIsOpen(false)}
+                preText="Update Template Settings"
+              />
 
               <div
                 style={{
@@ -187,7 +173,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
               >
                 {/* Template Name */}
                 <div>
-                  <label
+                  {/* <label
                     style={{
                       display: "block",
                       marginBottom: "6px",
@@ -209,6 +195,14 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                       borderRadius: "4px",
                       fontSize: "14px",
                     }}
+                  /> */}
+                  <FormInput
+                    label="Template Name"
+                    type="text"
+                    required
+                    value={templateName}
+                    defaultValue={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
                   />
                 </div>
 
@@ -217,12 +211,12 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                   <label
                     style={{
                       display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
+                      marginBottom: "1px",
                     }}
+                    className="input-label-custom"
                   >
                     Email Subject
+                    <span className="text-red-500 align-top">*</span>
                   </label>
                   <input
                     ref={subjectInputRef}
@@ -251,11 +245,11 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     style={{
                       width: "100%",
                       padding: "6px",
-                      fontSize: "14px",
                       borderRadius: "4px",
                       border: "1px solid #ddd",
                       backgroundColor: "#f9f9f9",
                     }}
+                    className="caption-custom"
                   >
                     <option value="">Insert Dynamic Field In Subject</option>
                     {dynamicFields.map((field) => (
@@ -277,10 +271,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     onChange={() => setIsDefault((prev) => !prev)}
                     style={{ width: "16px", height: "16px" }}
                   />
-                  <label
-                    htmlFor="isDefault"
-                    style={{ fontSize: "14px", fontWeight: 500 }}
-                  >
+                  <label htmlFor="isDefault" className="input-label-custom">
                     Set as default template
                   </label>
                 </div>
@@ -295,12 +286,21 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                 >
                   <div>
                     <Button type="button" onClick={() => setIsOpen(false)}>
-                      Cancel
+                      <div className="flex items-center justify-center gap-0.5">
+                        <X size={16} />
+                        Cancel
+                      </div>
                     </Button>
                   </div>
 
                   <div>
-                    <Button type="submit">Save</Button>
+                    <Button type="submit">
+                      {" "}
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    </Button>
                   </div>
                 </div>
               </div>

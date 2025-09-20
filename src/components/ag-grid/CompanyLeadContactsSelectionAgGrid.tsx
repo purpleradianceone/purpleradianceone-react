@@ -4,11 +4,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {
-  AllCommunityModule,
-  ColDef,
-  themeAlpine,
-} from "ag-grid-community";
+import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { useMemo, useState, useEffect } from "react";
 import { INNERHTML } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
@@ -16,20 +12,24 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import LeadContactType from "../../@types/lead-management/LeadContact";
-import { X } from "lucide-react";
+import { Contact2Icon } from "lucide-react";
+import FormHeader from "../ui/FormHeader";
 
 function CompanyLeadContactsSelectionAgGrid({
   isOpen,
   selectedLeadId,
   onClose,
   addCompanyLeadContactIdArray,
-  handleCompanyLeadContactCheckBoxChange
+  handleCompanyLeadContactCheckBoxChange,
 }: {
   isOpen: boolean;
   selectedLeadId?: number;
   onClose: () => void;
   addCompanyLeadContactIdArray?: number[];
-  handleCompanyLeadContactCheckBoxChange? : (data : LeadContactType , event : React.ChangeEvent<HTMLInputElement>) => void;
+  handleCompanyLeadContactCheckBoxChange?: (
+    data: LeadContactType,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
 }) {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -93,7 +93,6 @@ function CompanyLeadContactsSelectionAgGrid({
           if (!valueB) return 1;
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
-        
       },
       {
         field: "email",
@@ -116,34 +115,28 @@ function CompanyLeadContactsSelectionAgGrid({
         pinned: "right",
         width: 100,
         cellRenderer: (params: any) => {
-         
+          const isChecked = addCompanyLeadContactIdArray
+            ? addCompanyLeadContactIdArray.includes(params.data.id)
+            : false;
 
-           const isChecked = addCompanyLeadContactIdArray
-              ? addCompanyLeadContactIdArray.includes(params.data.id)
-              : false;
-
-           return (
-              <div className="flex flex-col ml-2 items-center">
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                  onChange={(event) => {
-handleCompanyLeadContactCheckBoxChange!(params.data, event);
-                       
-                       
-                  }}
-                  
-                />
-              </div>
-            );
+          return (
+            <div className="flex flex-col ml-2 items-center">
+              <input
+                type="checkbox"
+                checked={isChecked}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                onChange={(event) => {
+                  handleCompanyLeadContactCheckBoxChange!(params.data, event);
+                }}
+              />
+            </div>
+          );
         },
-        
       },
     ],
     // Include dependencies that affect the rendering.
 
-    [leadContact,addCompanyLeadContactIdArray]
+    [leadContact, addCompanyLeadContactIdArray]
     //[addCompanyTeamUserArray, companyUsers]
     //need to check the above code
   );
@@ -156,27 +149,36 @@ handleCompanyLeadContactCheckBoxChange!(params.data, event);
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
       // headerClass: "bg-blue-300",
-
     };
   }, [leadContact]);
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
-      <div className="grid max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
-        <div className="flex justify-between">
-          <div className="text-gray-500 font-bold text-lg">Add Lead Contacts To Meeting</div>
-<button
-          className="place-self-end mb-6"
-          onClick={() => {
-            onClose();
-          }}
-        >
-          <X></X>
-        </button>
+    <div className="fixed inset-0 top-9 bg-black bg-opacity-5 flex items-center justify-center overflow-y-auto">
+      <div className="grid max-w-4xl mt-1 w-full p-5 bg-white rounded-lg shadow-xl overflow-y-auto">
+        {/* <div className="flex justify-between">
+          <div className="text-gray-500 font-bold text-lg">
+            Add Lead Contacts To Meeting
+          </div>
+          <button
+            className="place-self-end mb-6"
+            onClick={() => {
+              onClose();
+            }}
+          >
+            <X></X>
+          </button>
+        </div> */}
+        <div className="mb-2">
 
-        </div>
-        
+        <FormHeader
+          onClose={onClose}
+          icon={Contact2Icon}
+          preText="Add Lead Contacts for this task"
+          description="Select and add lead contacts to associate with this task for better follow-up."
+          />
+          </div>
+
         <div
           className="ag-theme-balham w-full "
           style={{ height: "70vh", width: "100%" }}
@@ -194,7 +196,6 @@ handleCompanyLeadContactCheckBoxChange!(params.data, event);
           />
         </div>
       </div>
-
     </div>
   );
 }

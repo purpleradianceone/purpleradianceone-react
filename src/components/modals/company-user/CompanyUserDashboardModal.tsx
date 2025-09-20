@@ -15,6 +15,7 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../ui/MessageSnackbar";
+import FormHeader from "../../ui/FormHeader";
 
 interface CompanyUserDashboard {
   id: number;
@@ -213,7 +214,7 @@ function CompanyUserDashboardModal({
       onClose={onClose}
       className="w-[600px] p-4 rounded-lg    bg-white"
     >
-      <div className="flex justify-between border-gray-300 border-b pb-1 mb-3 items-center ">
+      {/* <div className="flex justify-between border-gray-300 border-b pb-1 mb-3 items-center ">
         <h2 className="text-xl items-center gap-1 flex text-blue-600 font-semibold ">
           <Grid size={20}/> {users.fullname}'s <span className="text-gray-800"> dashboard </span>
         </h2>
@@ -221,18 +222,25 @@ function CompanyUserDashboardModal({
         <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>
           <X size={20}></X>
         </button>
+      </div> */}
+      <div className="mb-2">
+        <FormHeader
+        icon={Grid}
+        onClose={onClose}
+        postText="'s dashboard"
+        description="Modify who can view the dashboard based on roles and responsibilities."
+        userName={users.fullname}
+      />
       </div>
 
       <ul className="mb-4  space-y-2">
         {companyUserDashboard.map((dashboard) => (
           <li
             key={dashboard.id}
-            className={`p-3 border rounded ${
-              dashboard.isactive ? "bg-green-100" : "bg-gray-100"
-            }`}
+            className={`p-3 border rounded bg-gray-50`}
           >
             <div className="flex justify-between items-center">
-              <span className="font-medium">{dashboard.dashboard_name}</span>
+              <span className="table-data-custom">{dashboard.dashboard_name}</span>
 
               <input
                 type="checkbox"

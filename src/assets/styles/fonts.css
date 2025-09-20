@@ -98,8 +98,8 @@
   background-color: #f01db8;
 }
 
-.action-btn.accent {
-}
+/* .action-btn.accent {
+} */
 
 /* Small Captions (dates, status) */
 .caption-custom {
@@ -109,11 +109,32 @@
   color: #757575;
 }
 
+.caption-custom.white-text {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: white;
+}
+
 .caption-custom-blue {
   font-family: "Roboto", sans-serif;
   font-size: 12px;
   font-weight: 400; /* Maps to Regular */
   color: #2563eb;
+}
+
+.caption-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.caption-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
 }
 
 /* Input Labels */
@@ -124,6 +145,40 @@
   color: #333333;
 }
 
+.input-label-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.input-label-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
+}
+
+.input-label-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #445bef;
+}
+
+.input-label-custom-purple {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef44ad;
+}
+
+.input-label-custom-orange {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #eb9225;
+}
 
 .custom-height-scrollbar {
   overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */

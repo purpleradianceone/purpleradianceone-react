@@ -265,6 +265,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         {isEditing ? (
           <div>
             <select
+
               value={
                 fieldName === "businessTypeName"
                   ? formData.businessTypeId || ""
@@ -283,7 +284,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 }
               }}
               onBlur={() => handleDropdownBlur(fieldName)}
-              className={`w-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full caption-custom bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 hasError ? "border-red-500" : "border-blue-500"
               }`}
               autoFocus
@@ -304,7 +305,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         ) : (
           <div
             onClick={() => handleFieldClick(fieldName)}
-            className="font-medium text-slate-800 cursor-pointer hover:bg-slate-100 rounded px-2 py-1 transition-colors truncate"
+            className="caption-custom cursor-pointer hover:bg-slate-100 rounded px-2 py-1 transition-colors truncate"
           >
             {value || placeholder}
             <Edit3 className="inline-block ml-2 h-3 w-3 text-slate-400" />
@@ -376,10 +377,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     //   </div>
     // );
     return (
-      <div className="relative w-full max-w-full">
+      <div className="relative w-full max-w-full mb-2">
         {/* // <div className="relative h-full flex flex-col justify-center"> */}
         {isEditing ? (
-          <div className="h-full flex flex-col">
+          <div className="h-full flex flex-col mr-8 ml-0.5">
             <input
               type={type}
               required={required}
@@ -388,7 +389,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               onBlur={() => handleInputBlur(fieldName)}
               onKeyDown={(e) => handleKeyPress(e, fieldName)}
               placeholder={placeholder}
-              className={`w-full h-full font-medium text-slate-800 bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full h-full bg-white border-1 rounded px-2 py-1 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${fieldName === "name" ? "section-header-custom" : "caption-custom"} ${
                 hasError ? "border-red-500" : "border-blue-500"
               }`}
               autoFocus
@@ -401,11 +402,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div
             title={value}
             onClick={() => handleFieldClick(fieldName)}
-            className={`h-full  flex items-center font-medium text-slate-800 truncate ${
+            className={`h-full  flex items-center truncate ${
               !isReadOnly
-                ? "cursor-pointer hover:bg-slate-100 rounded transition-colors"
-                : ""
-            } ${!value && !isReadOnly ? "text-slate-400 italic" : ""} ${
+                ? `${fieldName === "name" ? "section-header-custom" : "caption-custom"} cursor-pointer hover:bg-slate-100 rounded transition-colors`
+                : fieldName === "name" ? "section-header-custom" : "caption-custom"
+            }  ${
               isMandatory && !value ? "border border-red-300 bg-red-50" : ""
             }`}
           >
@@ -413,7 +414,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               (isReadOnly ? (
                 "N/A"
               ) : (
-                <span className="text-xs text-gray-500 font-normal italic">
+                <span className={`${fieldName === "name" ? "section-header-custom" : "caption-custom"}`}>
                   {placeholder}
                 </span>
               ))}
@@ -439,7 +440,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <Mail className="h-5 w-5 text-blue-600" />
               </div>
               <div className="truncate pl-3 w-full overflow-hidden">
-                <p className="text-xs text-slate-500">Email</p>
+                <p className="input-label-custom">Email</p>
                 {renderEditableField(
                   "email",
                   formData.email,
@@ -457,7 +458,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <Phone className="h-5 w-5 text-green-600" />
               </div>
               <div className="truncate pl-3 w-full overflow-hidden">
-                <p className="text-xs text-slate-500">Mobile</p>
+                <p className="input-label-custom">Mobile</p>
                 {renderEditableField(
                   "mobileNumber",
                   formData.mobileNumber,
@@ -474,7 +475,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <Globe className="h-5 w-5 text-purple-600" />
               </div>
               <div className="truncate ">
-                <p className="text-xs  text-slate-500">Website</p>
+                <p className="input-label-custom">Website</p>
                 {editingField === "website" ? (
                   renderEditableField(
                     "website",
@@ -493,7 +494,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                         target="_blank"
                         title={formData.website}
                         rel="noopener noreferrer"
-                        className="font-medium text-blue-600 hover:text-blue-800 transition-colors truncate block"
+                        className="caption-custom hover:text-blue-800 transition-colors truncate block"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {formData.website}
@@ -515,19 +516,19 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         return (
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-              <p className="text-xs text-green-600 font-medium mb-1">PAN</p>
+              <p className="input-label-custom-active mb-1">PAN</p>
               {renderEditableField("pan", formData.pan, "Enter PAN number")}
             </div>
             <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <p className="text-xs text-blue-600 font-medium mb-1">GST</p>
+              <p className="input-label-custom-blue mb-1">GST</p>
               {renderEditableField("gst", formData.gst, "Enter GST number")}
             </div>
             <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
-              <p className="text-xs text-purple-600 font-medium mb-1">TAN</p>
+              <p className="input-label-custom-purple mb-1">TAN</p>
               {renderEditableField("tan", formData.tan, "Enter TAN number")}
             </div>
             <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
-              <p className="text-xs text-orange-600 font-medium mb-1">
+              <p className="input-label-custom-orange mb-1">
                 Registration
               </p>
               {renderEditableField(
@@ -545,7 +546,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                Billing Address
+                <span className="input-label-custom">Billing Address</span>
               </h3>
               <div className="text-sm text-slate-600 bg-blue-50 p-3 rounded-lg border border-blue-100">
                 {renderEditableField(
@@ -558,7 +559,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Shipping Address
+                 <span className="input-label-custom">Shipping Address</span>
               </h3>
               <div className="text-sm text-slate-600 bg-green-50 p-3 rounded-lg border border-green-100">
                 {renderEditableField(
@@ -571,7 +572,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                Registered Office
+                 <span className="input-label-custom">Registered Office</span>
               </h3>
               <div className="text-sm text-slate-600 bg-purple-50 p-3 rounded-lg border border-purple-100">
                 {renderEditableField(
@@ -614,7 +615,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
         >
-          <ArrowLeft size={14} /> <span> Accounts</span>
+          <ArrowLeft size={14} /> <span className="caption-custom hover:text-blue-700"> Accounts</span>
         </button>
 
         {/* Main header */}
@@ -624,7 +625,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               <Building2 className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-bold text-slate-800 truncate">
+              <h1 className="section-header-custom truncate">
                 {renderEditableField(
                   "name",
                   formData.name,
@@ -632,7 +633,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 )}
               </h1>
               <div className="text-slate-600 flex items-center">
-                <span className="text-xs text-gray-600">Industry type:</span>
+                <span className="input-label-custom">Industry type:</span>
                 {/* <div className="ml-1 truncate">
 
                   {renderDropdownField(
@@ -661,12 +662,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 {formData.isActive ? (
                   <div className="flex items-center text-green-600">
                     <CheckCircle className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">Active</span>
+                    <span className="input-label-custom-active">Active</span>
                   </div>
                 ) : (
                   <div className="flex items-center text-red-600">
                     <XCircle className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">Inactive</span>
+                    <span className="input-label-custom-inactive">Inactive</span>
                   </div>
                 )}
               </div>
@@ -677,28 +678,28 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div className="grid gap-2 font-semibold text-gray-700">
             <div className="flex items-center justify-between gap-4">
               <span className="grid">
-                <span className="text-xs font-normal text-gray-500">
+                <span className="input-label-custom">
                   Created By
                 </span>
-                <span className="text-sm truncate">{formData.createdBy}</span>
+                <span className="caption-custom truncate">{formData.createdBy}</span>
               </span>
               <span className="grid">
-                <span className="text-xs font-normal text-gray-500">
+                <span className="input-label-custom">
                   Created On
                 </span>
-                <span className="text-sm truncate">{formData.createdOn}</span>
+                <span className="caption-custom truncate">{formData.createdOn}</span>
               </span>
             </div>
 
             {/* Business type */}
             <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
               <div className="grid items-center text-slate-700">
-                <div className="text-gray-600 font-normal text-xs">
+                <div className="input-label-custom">
                   Business type
                 </div>
                 <div className="flex items-center">
                   <Factory className="h-4 w-4 mr-2" />
-                  <div className="font-medium truncate">
+                  <div className="caption-custom truncate">
                     {renderDropdownField(
                       "businessTypeName",
                       formData.businessTypeName,
@@ -721,10 +722,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div className="flex border-b  border-gray-200 mb-2">
             <button
               onClick={() => setActiveTab("contact")}
-              className={`flex items-center px-2  text-sm font-medium rounded-t-lg ${
+              className={`flex items-center px-2 rounded-t-lg border-b-2 ${
                 activeTab === "contact"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
               }`}
             >
               <Mail className="h-4 w-4 mr-2" />
@@ -732,10 +733,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </button>
             <button
               onClick={() => setActiveTab("legal")}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-t-lg ${
+              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
                 activeTab === "legal"
-                  ? "text-green-600 border-b-2 border-green-600 bg-green-50"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
               }`}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -743,10 +744,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </button>
             <button
               onClick={() => setActiveTab("address")}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-t-lg ${
+              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
                 activeTab === "address"
-                  ? "text-red-600 border-b-2 border-red-600 bg-red-50"
-                  : "text-gray-500 hover:text-gray-700"
+                ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
               }`}
             >
               <MapPin className="h-4 w-4 mr-2" />
@@ -760,7 +761,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
         {/* Right Card - Empty for future use */}
         <div className="bg-white rounded-xl h-72 border p-1 border-slate-200">
-          <h3 className="bg-gray-100 text-sm rounded-t-md    px-2   text-gray-700 font-semibold">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Contact
           </h3>
           <AccountContact accountId={company.id} />

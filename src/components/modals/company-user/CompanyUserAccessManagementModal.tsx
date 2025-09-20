@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
-import { Save, X } from "lucide-react";
+import { Save, ShieldCheck, X } from "lucide-react";
 import Button from "../../ui/Button";
 import AccessRightsModalProps from "../../../@types/company-users/AccessRightsModalProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -15,6 +15,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -221,20 +222,20 @@ function CompanyUserAccessManagementModal({
     modules.every((module) => module[field]);
 
   const columnClasses = {
-    srNo: "w-[10%]",
-    moduleName: "w-[40%]",
-    checkbox: "w-[16.67%]",
+    srNo: "w-[10%] table-header-custom",
+    moduleName: "w-[40%] table-header-custom",
+    checkbox: "w-[16.67%] table-header-custom",
   };
 
   return (
     <>
       <div className="fixed inset-0 z-10 p-4 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
-          <div className="relative w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
+          <div className="relative p-5 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-lg font-medium text-gray-700">
-                Update Access rights of {users.fullname}
+            {/* <div className="flex justify-between items-center p-3 border-b">
+              <h2 className="text-xl flex items-center gap-2 font-medium text-gray-900">
+               <ShieldCheck size={20}/> Update Access rights of <span className="text-blue-600">{users.fullname}</span>
               </h2>
               <button
                 onClick={onClose}
@@ -242,7 +243,15 @@ function CompanyUserAccessManagementModal({
               >
                 <X size={20} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={ShieldCheck}
+              preText="Update Access rights of User - "
+              userName={users.fullname}
+              onClose={onClose}
+              description="Manage who can view, edit, or control modules by updating access rights to align with user responsibilities."
+            />
+
 
             {/* Content Area */}
             <div className="flex-1 overflow-hidden">
@@ -322,9 +331,9 @@ function CompanyUserAccessManagementModal({
                               key={module.id}
                               className="border-t hover:bg-gray-50"
                             >
-                              <td className="p-4">{module.crm_module_id}</td>
-                              <td className="p-4">{module.module_name}</td>
-                              <td className="p-4">
+                              <td className="p-4 table-data-custom">{module.crm_module_id}</td>
+                              <td className="p-4 table-data-custom">{module.module_name}</td>
+                              <td className="p-4 table-data-custom">
                                 <div className="flex flex-col ml-2 items-center">
                                   <input
                                     type="checkbox"

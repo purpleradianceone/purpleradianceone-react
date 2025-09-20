@@ -5,7 +5,7 @@ function TextAreaInput(props: TextAreaInputProps) {
     <div className="mt-4">
       <label
         htmlFor={props.name}
-        className="block text-sm font-semibold text-gray-700"
+        className="block input-label-custom"
       >
         {props.logo && <props.logo size={14} className="inline mr-1 text-blue-500" />}
         {props.label}{props.required && <span className="text-red-500 align-top">*</span>}

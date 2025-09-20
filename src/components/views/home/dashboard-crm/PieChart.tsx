@@ -200,10 +200,10 @@ const PieChart = ({
       >
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <h3 className="section-header-custom mb-2">
               {chartFor === "leadByStatus" ? "Lead Status" : "Lead Sources"}
             </h3>
-            <p className="text-gray-600">
+            <p className="table-header-custom">
               {chartFor === "leadByStatus"
                 ? "Distribution of leads by current status"
                 : "Distribution of leads by acquisition source"}
@@ -258,7 +258,7 @@ const PieChart = ({
                   x="150"
                   y="140"
                   textAnchor="middle"
-                  className="text-sm font-medium text-gray-600 fill-current"
+                  className="input-label-custom fill-current"
                 >
                   Total Leads
                 </text>
@@ -266,7 +266,7 @@ const PieChart = ({
                   x="150"
                   y="160"
                   textAnchor="middle"
-                  className="text-2xl font-bold text-gray-900 fill-current"
+                  className="table-header-custom fill-current"
                 >
                   {totalLeads}
                 </text>
@@ -274,11 +274,11 @@ const PieChart = ({
 
               {/* Tooltip for hovered slice */}
               {hoveredSlice !== null && (
-                <div className="absolute flex gap-2 -top-6 left-8 place-self-center min-w-60 justify-between bg-gray-900 text-white px-3 py-2 rounded-lg text-xs font-medium z-10 shadow-lg">
-                  <div className="font-semibold">
+                <div className="absolute flex gap-2 -top-6 left-8 place-self-center bg-white min-w-60 justify-between input-label-custom px-3 py-2 rounded-lg  z-10 shadow-lg">
+                  <div className="input-label-custom">
                     {pieSlices[hoveredSlice].name}
                   </div>
-                  <div>{pieSlices[hoveredSlice].count}</div>
+                  <div className="input-label-custom">{pieSlices[hoveredSlice].count}</div>
                 </div>
               )}
             </div>
@@ -301,12 +301,12 @@ const PieChart = ({
                       className="w-2 h-2 rounded-full shadow-sm"
                       style={{ backgroundColor: item.color }}
                     ></div>
-                    <span className="font-medium text-xs text-gray-900 max-w-32">
+                    <span className="caption-custom max-w-32">
                       {item.name}
                     </span>
                   </div>
                   <div className="flex items-center space-x-3 text-right">
-                    <span className="text-xs font-semibold text-gray-700">
+                    <span className="caption-custom">
                       {item.count}
                     </span>
                   </div>
@@ -332,7 +332,7 @@ const PieChart = ({
                   />
                 </svg>
               </div>
-              <p className="text-gray-500 font-medium">
+              <p className="input-label-custom">
                 No lead source data available
               </p>
             </div>

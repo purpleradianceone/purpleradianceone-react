@@ -31,7 +31,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
           className={`
             bg-white
             border border-gray-300
-            text-gray-700
+            input-label-custom
             py-1 px-4
             rounded-lg
             shadow-sm
@@ -48,7 +48,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
         >
           <span className="truncate">{selectedOption}</span>
           <ChevronDown 
-            className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            className={`h-4 w-4 input-label-custom transition-transform duration-200 ${
               isOpen ? 'transform rotate-180' : ''
             }`}
           />
@@ -59,11 +59,11 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             <div className="py-1 max-h-60 overflow-auto">
               <button
               id = "0"
-                className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                className="w-full px-4 py-2 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
                 onClick={() => handleOptionClick(0,"Filter")}
               >
-                <div className='flex gap-2 text-start'><Delete></Delete>
-                Clear Filter</div>
+                <div className='flex gap-2 text-center input-label-custom'><Delete></Delete>
+                <span className='mt-0.5 input-label-custom'>Clear Filter</span></div>
                 
               </button>
               {props.dropdownOptions.map((option) => (
@@ -74,7 +74,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
                     w-full px-4 py-2 text-left
                     ${selectedOption === option.date_range
                       ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-800 hover:bg-gray-50'}
+                      : 'input-label-custom hover:bg-gray-50'}
                     focus:outline-none focus:bg-gray-50
                   `}
                   onClick={() => handleOptionClick(option.search_date_range_id,option.date_range)}

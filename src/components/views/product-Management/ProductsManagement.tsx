@@ -105,6 +105,7 @@ function ProductManagement() {
             id: res.id,
             companyId: res.company_id,
             productTypeId:res.product_type_id,
+            productTypeName:res.product_type_name,
             defaultWarrantyIntervalTypeId:res.default_warranty_interval_type_id,
             defaultWarranty:res.default_warranty,
             defaultWarrantyName:res.default_warranty_name,

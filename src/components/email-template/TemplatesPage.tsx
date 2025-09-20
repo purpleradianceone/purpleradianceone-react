@@ -18,6 +18,10 @@ import {
   Filter,
   X,
   LayoutDashboard,
+  LucideArrowBigRight,
+  BookDashed,
+  Edit,
+  Eye,
 } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import useScreenSize from "../../config/hooks/useScreenSize";
@@ -35,6 +39,7 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import { useUserPreference } from "../../context/user/UserPreference";
 import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
+import FormHeader from "../ui/FormHeader";
 
 type TemplateType = {
   id: number;
@@ -342,10 +347,7 @@ export const TemplatesPage: React.FC = () => {
           <div className="flex gap-2">
             {<LayoutDashboard className="w-7 h-7 text-blue-600 " />}
 
-
-            <span className="section-header-custom">
-              Email Templates
-            </span>
+            <span className="section-header-custom">Email Templates</span>
           </div>
           {isLargeScreen && (
             <>
@@ -720,12 +722,12 @@ const TemplateList: React.FC<TemplateListProps> = ({
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="table-header-custom">
-                  {template.name}
-                </h3>
+                <h3 className="table-header-custom">{template.name}</h3>
                 <p className="table-data-custom">
                   <strong className="input-label-custom">Subject:</strong>{" "}
-                  <span className="caption-custom">{template.email_subject || <em>No subject</em>}</span>
+                  <span className="caption-custom">
+                    {template.email_subject || <em>No subject</em>}
+                  </span>
                 </p>
               </div>
               <div className="flex gap-2">
@@ -734,7 +736,11 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Preview ${template.name}`}
                 >
-                  View
+                  
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Eye size={16} />
+                    View
+                  </div>
                 </Button>
                 <Button
                   // className="px-3 py-1 text-sm border rounded"
@@ -758,13 +764,16 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     }
                   }}
                 >
-                  Edit
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Edit size={16} />
+                    Edit
+                  </div>
                 </Button>
               </div>
             </div>
 
             <div className="flex  items-center justify-between col-span-2 input-label-custom">
-            {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
+              {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
 
               <div className="flex flex-col col-span-1">
                 {/* Active */}
@@ -782,25 +791,31 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       checked={template.isactive}
                       id={`active-${template.id}`}
                       onChange={() => {
-                        if (!template.is_default) {
-                          if (
-                            userHasAccessToUpdateEmailTemplateSetting &&
-                            !template.is_master
-                          ) {
-                            template.isactive = !template.isactive;
-                            handleDefaultToggle(template);
-                          } else {
-                            if (template.is_master) {
-                              toast.error(
-                                "Can't change active status of master template."
-                              );
+                        if (!template.is_master) {
+                          if (!template.is_default) {
+                            if (
+                              userHasAccessToUpdateEmailTemplateSetting &&
+                              !template.is_master
+                            ) {
+                              template.isactive = !template.isactive;
+                              handleDefaultToggle(template);
                             } else {
-                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              if (template.is_master) {
+                                toast.error(
+                                  "Can't change active status of master template."
+                                );
+                              } else {
+                                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              }
                             }
+                          } else {
+                            toast.error(
+                              "To make this inactive, please set another template as default first."
+                            );
                           }
                         } else {
                           toast.error(
-                            "To make this inactive, please set another template as default first."
+                            "The master template cannot be deactivated."
                           );
                         }
                       }}
@@ -825,22 +840,24 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       checked={template.is_default}
                       id={`default-${template.id}`}
                       onChange={() => {
-                        if(template.isactive){
-                        if (!template.is_default) {
-                          if (userHasAccessToUpdateEmailTemplateSetting) {
-                            template.is_default = !template.is_default;
-                            handleDefaultToggle(template);
+                        if (template.isactive) {
+                          if (!template.is_default) {
+                            if (userHasAccessToUpdateEmailTemplateSetting) {
+                              template.is_default = !template.is_default;
+                              handleDefaultToggle(template);
+                            } else {
+                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            }
                           } else {
-                            toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            toast.error(
+                              "Please make another template the default to remove this one as default."
+                            );
                           }
                         } else {
                           toast.error(
-                            "To remove this as the default, please set another template as default first."
+                            "Set this template as active to make it your default email template."
                           );
                         }
-                      }else{
-                        toast.error("Set this template as active to make it your default email template.")
-                      }
                       }}
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
@@ -856,21 +873,31 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     <XCircle className="text-gray-400" size={16} />
                   )}
                   <strong className="input-label-custom">Master:</strong>
-                  <span className={template.is_master ? 'caption-custom-blue' : 'caption-custom' }>{template.is_master ? "Yes" : "No"}</span>
+                  <span
+                    className={
+                      template.is_master
+                        ? "caption-custom-blue"
+                        : "caption-custom"
+                    }
+                  >
+                    {template.is_master ? "Yes" : "No"}
+                  </span>
                 </span>
               </div>
 
               <div className="flex justify-between text-sm text-gray-600 -mt-3">
                 <div className="px-3 rounded-md">
                   <p>
-                    <strong className="input-label-custom">Created By:</strong> <span className="caption-custom">{template.createdby}</span>
+                    <strong className="input-label-custom">Created By:</strong>{" "}
+                    <span className="caption-custom">{template.createdby}</span>
                   </p>
                   <p>
                     <strong className="input-label-custom">Created On:</strong>{" "}
                     <span className="caption-custom">{template.createdon}</span>
                   </p>
                   <p>
-                    <strong className="input-label-custom">Updated By:</strong> <span className="caption-custom">{template.updatedby}</span>
+                    <strong className="input-label-custom">Updated By:</strong>{" "}
+                    <span className="caption-custom">{template.updatedby}</span>
                   </p>
                   <p>
                     <strong className="input-label-custom">Updated On:</strong>{" "}
@@ -892,22 +919,31 @@ const TemplateList: React.FC<TemplateListProps> = ({
       {previewTemplate && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <h2 className="text-xl font-semibold mb-4">
-              Preview: {previewTemplate.name}
-            </h2>
+            <FormHeader
+            icon={Eye}
+            preText= {"Preview:"}
+            userName={previewTemplate.name}
+            onClose={() => setPreviewTemplate(null)}
+            />
             <div
               className="overflow-y-auto flex-1 border rounded p-4 text-sm text-gray-800 bg-gray-50"
               dangerouslySetInnerHTML={{
                 __html: previewTemplate.email_body_html,
               }}
             />
-            <div className="text-right mt-4">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            <div className="relative text-right justify-items-end justify-end items-end w-full">
+
+              <div className="w-fit">
+                <Button
                 onClick={() => setPreviewTemplate(null)}
               >
-                Close
-              </button>
+                <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Close
+                  </div>
+              </Button>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -953,9 +989,6 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
               (type: TemplateType) => type.isactive
             );
             setTemplateTypes(activeTypes);
-            // Optional: If you want to pre-select the first active type, uncomment the line below.
-            // if (activeTypes.length > 0) setSelectedTypeId(String(activeTypes[0].id));
-            // Otherwise, leave selectedTypeId as '' so "Select template type" is initially shown.
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -998,7 +1031,12 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   ) : (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 className="table-header-custom mb-4">Select Template Type</h2>
+        {/* <h2 className="table-header-custom mb-4">Select Template Type</h2> */}
+        <FormHeader
+          icon={BookDashed}
+          preText="Select Template Type"
+          onClose={onClose}
+        />
         <select
           value={selectedTypeId} // Value will be '' initially or the selected ID string
           onChange={(e) => setSelectedTypeId(e.target.value)}
@@ -1020,20 +1058,18 @@ const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
               // className="text-sm text-gray-600 hover:underline"
               onClick={onClose}
             >
-              Cancel
+              <div className="flex items-center justify-center gap-0.5">
+                <X size={16} />
+                Cancel
+              </div>{" "}
             </Button>
           </div>
           <div className="rounded">
-            <Button
-              disabled={selectedTypeId === ""}
-              // className={`px-4 py-2 rounded text-white ${
-              //   selectedTypeId !== ""
-              //     ? "bg-blue-500 hover:bg-blue-600"
-              //     : "bg-gray-300 cursor-not-allowed"
-              // }`}
-              onClick={handleSubmit}
-            >
-              Continue
+            <Button disabled={selectedTypeId === ""} onClick={handleSubmit}>
+              <div className="flex items-center justify-center gap-0.5">
+                <LucideArrowBigRight size={16} />
+                Continue
+              </div>
             </Button>
           </div>
         </div>
