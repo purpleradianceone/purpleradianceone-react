@@ -11,7 +11,8 @@ import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import ApiError from "../../../../@types/error/ApiError";
 import FormHeader from "../../../ui/FormHeader";
-import { Edit, LucideMailPlus, Save, X } from "lucide-react";
+import { Edit, KeySquareIcon, LucideIcon, LucideMailPlus, NetworkIcon, Save, ServerCog, Shield, User, X } from "lucide-react";
+import FormInput from "../../../ui/FormInput";
 
 type SettingType = "company" | "user";
 
@@ -36,7 +37,6 @@ const DialogContent: React.FC<{ children: React.ReactNode }> = ({
 }) => (
   <div className="bg-white px-3 py-3 rounded min-w-xl shadow ">{children}</div>
 );
-
 
 interface BaseEmailSettings {
   id: number;
@@ -217,25 +217,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     label: string,
     name: keyof EmailSettings,
     type: "text" | "email" | "password" | "number" | "checkbox" | "select",
-    options?: { value: number; label: string }[]
+    logo?: LucideIcon,
+    options?: { value: number; label: string }[],
   ) => (
     <div className="mb-2">
-      {type !== "checkbox" && (
+      {/* {type !== "checkbox" && (
         <label className="block input-label-custom">{label}</label>
-      )}
+      )} */}
       {type === "select" ? (
-        <select
-          name={name}
-          value={formData[name] as number}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        >
-          {options?.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <>
+          <label className="block input-label-custom"> <Shield size={16} className="inline mr-1 text-blue-500"/>{label}</label>
+          <select
+            name={name}
+            value={formData[name] as number}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded"
+          >
+            {options?.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </>
       ) : type === "checkbox" ? (
         <label className="inline-flex items-center mt-2">
           <input
@@ -245,15 +249,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             onChange={handleChange}
             className="mr-2"
           />
-          {label}
+           {label}
         </label>
       ) : (
-        <input
+        <FormInput
+        label={label}
+          logo={logo}
           type={type}
           name={name}
+          defaultValue={formData[name] as string | number}
           value={formData[name] as string | number}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          // className="w-full px-3 py-2 border rounded"
         />
       )}
     </div>
@@ -261,26 +268,34 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="w-full">
+      <div className="w-full ">
         <DialogContent>
           <FormHeader
-              icon={isEdit ? Edit : LucideMailPlus}
-              preText={`${isEdit ? "Edit" : "Create"}  ${settingType ==="company"?"Company":"User"} Email Setting`}
-              onClose={onClose}
-            />
-          <div className="grid grid-cols-2  gap-4 py-4">
+            icon={isEdit ? Edit : LucideMailPlus}
+            preText={`${isEdit ? "Edit" : "Create"}  ${
+              settingType === "company" ? "Company" : "User"
+            } Email Setting`}
+            description={` ${
+              settingType === "company"
+                ? "Manage and edit your company’s email configuration as required."
+                : "Manage and edit the user’s email configuration as required."
+            }`}
+            onClose={onClose}
+          />
+          <div className="grid grid-cols-2 p-2 gap-4">
             {renderField(
               `${settingType === "company" ? "Company" : "User"} Email`,
               "email",
-              "email"
+              "email",
+              User
             )}
-            {renderField("Email Password", "email_password", "password")}
-            {renderField("SMTP Host", "smtp_host", "text")}
-            {renderField("SMTP Port", "smtp_port", "number")}
-            {renderField("Security Type", "email_security_type_id", "select", [
+            {renderField("Email Password", "email_password", "password" , KeySquareIcon)}
+            {renderField("SMTP Host", "smtp_host", "text" ,  ServerCog)}
+            {renderField("SMTP Port", "smtp_port", "number"  , NetworkIcon )}
+            {renderField("Security Type", "email_security_type_id", "select", Shield, [
               { value: 1, label: "SSL" },
               { value: 2, label: "TLS" },
-            ])}
+            ] )}
             <div className="mt-4">
               {renderField(
                 "Authentication Required",
@@ -296,13 +311,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               "checkbox"
             )} */}
           </div>
-          <div className="flex justify-end  space-x-2 m-4">
+          <div className="flex justify-end  space-x-1 ">
             <div>
               <Button onClick={onClose} disabled={loading}>
                 <div className="flex items-center justify-center gap-0.5">
-                        <X size={16} />
-                        Cancel
-                      </div>
+                  <X size={16} />
+                  Cancel
+                </div>
               </Button>
             </div>
             <div>
@@ -310,14 +325,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 {loading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{isEdit ? "Updating..." : "Creating..."}
-
-                    </span>
+                    <span>{isEdit ? "Updating..." : "Creating..."}</span>
                   </div>
-                ) : (<span>{<div className="flex items-center justify-center gap-0.5">
-                      <Save size={16} />
-                      Save
-                    </div>}</span>
+                ) : (
+                  <span>
+                    {
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    }
+                  </span>
                 )}
               </Button>
             </div>

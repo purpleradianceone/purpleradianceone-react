@@ -216,7 +216,8 @@ const AccountTypeSetting: React.FC = () => {
             Company Account Type Management
           </h1>
           {!showAddForm && (
-            <Button
+            <div>
+              <Button
               onClick={() => {
                 if (userHasAccessToAddCompanyAccountType) {
                   setShowAddForm(true);
@@ -226,11 +227,14 @@ const AccountTypeSetting: React.FC = () => {
                   );
                 }
               }}
-              className="flex items-center m-3 bg-blue-600 px-2 rounded-md action-btn-custom hover:bg-blue-700 transition-colors"
+              // className="flex items-center m-3 bg-blue-600 px-2 rounded-md action-btn-custom hover:bg-blue-700 transition-colors"
             >
-              <Plus size={18} className="action-btn-custom"/>
+              <div className="flex items-center ">
+                <Plus size={16} className="action-btn-custom"/>
               Create
+              </div>
             </Button>
+            </div>
           )}
         </div>
 

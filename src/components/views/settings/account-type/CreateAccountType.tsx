@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Save, X } from "lucide-react";
+import { Briefcase, Edit, Save,  User, X } from "lucide-react";
 import AccountType from "../../../../@types/settings/AccountType";
 import { useState } from "react";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -12,6 +12,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import FormInput from "../../../ui/FormInput";
 import Button from "../../../ui/Button";
+import FormHeader from "../../../ui/FormHeader";
 
 export default function CreateAccountType({
   onClose,
@@ -102,18 +103,26 @@ export default function CreateAccountType({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5 ">
       <div className="bg-white w-full max-w-xl rounded-lg border border-blue-200 shadow-lg p-2 relative">
         {/* Close button */}
-        <h3 className="border-b p-1 table-header-custom">Add company account type</h3>
+        {/* <h3 className="border-b p-1 table-header-custom">Add company account type</h3>
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
         >
           <X size={20} />
-        </button>
+        </button> */}
+
+        <FormHeader 
+        icon={Edit}
+        preText="Add company account type"
+        onClose={onClose}
+        description="Create a new company account type to categorize business accounts."
+        />
 
         <div className="space-y-3 p-2">
           <div>
 
             <FormInput
+            logo={User}
               label="Name : "
               type="text"
               value={newTypeName}
@@ -128,8 +137,11 @@ export default function CreateAccountType({
 
           <div>
             <label className="block input-label-custom ">
-              Account type :<span className="text-red-600">*</span>
+             <div className="flex items-center gap-1">
+               <Briefcase size={14} className="text-blue-500"/>  Account type :<span className="text-red-600">*</span>
+             </div>
             </label>
+            
             <div className="grid grid-cols-2 gap-2">
               {accountType.map((type) => (
                 <label
