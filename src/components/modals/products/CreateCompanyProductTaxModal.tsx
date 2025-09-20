@@ -148,7 +148,7 @@ function CreateCompanyProductTaxModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+      className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"
       
     >
       <div className="flex min-h-screen mb-5 items-center justify-center">

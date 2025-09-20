@@ -361,10 +361,6 @@ function EditCompanyTeamModal({
           })
           .then((response) => {
             if (response.data.status) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "success",
-              // });
               toast.success(response.data.message);
               handleCompanyTeamChangeOnUpdate(companyTeam.id);
               setIsTeamActive(checked);
@@ -414,10 +410,6 @@ function EditCompanyTeamModal({
           })
           .then((response) => {
             if (response.data.status) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "success",
-              // });
               toast.success(response.data.message);
               handleCompanyTeamChangeOnUpdate(companyTeam.id);
               setTimeout(() => {
@@ -489,18 +481,6 @@ function EditCompanyTeamModal({
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            {/* <div className="flex items-center gap-3 mb-6">
-              <Edit className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Edit Team {companyTeam.name}
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div> */}
             <FormHeader
             icon={Edit}
             onClose={onClose}
@@ -524,11 +504,6 @@ function EditCompanyTeamModal({
                   onChange={handleUpdateCompanyFormDataChange}
                 />
 
-                {/* <RadioButtons
-                  label="IsActive : "
-                  onChange={handleUpdateCompanyFormDataChange}
-                  options={CompanyTeamIsActiveRadioButtonOptions}
-                /> */}
                  <div className="flex items-center mt-6 gap-4 justify-start">
                   <label
                     htmlFor="isActive"
@@ -619,13 +594,6 @@ function EditCompanyTeamModal({
             ></CompanyTeamUsersAgGrid>
           </div>
         </div>
-        {/* <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        /> */}
       </div>
     </div>
   );
