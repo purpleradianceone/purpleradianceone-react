@@ -258,7 +258,7 @@ function AddCompanyUsersEmailAttendeesModal({
                 </div>
 
                 <div
-              className="ag-theme-alpine"
+              className="ag-theme-balham"
               style={{ height: "300px", width: "100%" }}
             >
               <div className="flex gap-2 mb-2 justify-between">

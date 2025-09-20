@@ -209,8 +209,8 @@ function GetCompanyUsersList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-alpine w-full h-[calc(100vh-122px)]`
-                : "ag-theme-alpine w-full h-[calc(100vh-130px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-130px)]"
             }
           >
             <CompanyUserAgGrid

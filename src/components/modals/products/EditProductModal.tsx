@@ -638,7 +638,7 @@ function EditCompanyProductModal({
 
             <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
               <div
-                className="ag-theme-alpine w-full"
+                className="ag-theme-balham w-full"
                 style={{ height: "440px", width: "100%" }}
               >
                 <ProductTaxManagementAgGrid

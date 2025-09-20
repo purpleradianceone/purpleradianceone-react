@@ -5,7 +5,7 @@ import FormInput from "../../ui/FormInput";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import Button from "../../ui/Button";
-import { Contact2, Plus, UserPlus, Users, X } from "lucide-react";
+import { CalendarPlusIcon, ClipboardList, Contact2, Plus, UserPlus, Users, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -29,6 +29,7 @@ import Lead from "../../../@types/lead-management/LeadManagementProps";
 import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 const MeetingScheduler = () => {
   
@@ -591,7 +592,7 @@ const MeetingScheduler = () => {
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto">
       <div className="max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <h1 className="text-xl font-semibold mb-3 text-gray-800">
             Schedule Meeting
           </h1>
@@ -604,7 +605,14 @@ const MeetingScheduler = () => {
               <X className="text-gray-500 hover:text-gray-700" size={20}></X>
             </button>
           </div>
-        </div>
+        </div> */}
+        <FormHeader
+        onClose={handleCloseMeetingModal}
+        icon={CalendarPlusIcon}
+        description="Schedule your mettings as per your need"
+        preText="Schedule Meeting"
+
+        />
         <div className="mb-1 grid grid-cols-3 gap-1">
           <div className="col-span-2">
             <FormInput
@@ -615,14 +623,19 @@ const MeetingScheduler = () => {
               placeholder="Meeting Title"
               className="mt-1"
               label="Title"
+              logo={ClipboardList}
             />
           </div>
-          <div className="mt-1 col-span-1">
+          <div className="col-span-1">
             <label
               htmlFor="startTime"
-              className="block text-sm font-medium text-gray-700"
+              className="input-label-custom"
             >
-              Meeting Platform
+              <div className="flex gap-2 text-center">
+                  <CalendarPlusIcon className="text-blue-600 w-2 h-2"/>
+              <span>Meeting Platform</span>
+              </div>
+              
             </label>
             <select
               id="startTtime"
@@ -649,9 +662,9 @@ const MeetingScheduler = () => {
               }}
               className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             >
-              <option value="">Select Platform</option>
+              <option className="input-label-custom" value="">Select Platform</option>
               {meetingPlatform.map((option) => (
-                <option key={option.id} value={option.name}>
+                <option className="input-label-custom" key={option.id} value={option.name}>
                   {option.name}
                 </option>
               ))}

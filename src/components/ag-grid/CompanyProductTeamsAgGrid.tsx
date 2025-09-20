@@ -69,7 +69,7 @@ function CompanyProductTeamsAgGrid({
             }
           }
           return (
-            <div className="flex flex-col items-center mt-3">
+            <div className="flex flex-col items-center mt-1">
               {/* <button
                 id={params.data.id.toString()}
                 onClick={(event) => {
@@ -120,7 +120,8 @@ function CompanyProductTeamsAgGrid({
   }, []);
 
   return (
-    <AgGridReact
+    <div className="ag-theme-balham w-full h-full mt-2">
+<AgGridReact
     rowData={companyProductTeams}
       columnDefs={companyProductTeamsColDefs}
       defaultColDef={defaultColDef}
@@ -131,6 +132,8 @@ function CompanyProductTeamsAgGrid({
       onGridReady={onGridReady}
       
     />
+    </div>
+    
   );
 }
 

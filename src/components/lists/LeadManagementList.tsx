@@ -398,7 +398,7 @@ function LeadManagementList({
             </>
           )}
 
-          <div className="flex  gap-1    ">
+          <div className="flex  gap-1  ">
             <Button
               disabled={!userHasAccessToAddLead}
               onClick={() => {
@@ -412,8 +412,8 @@ function LeadManagementList({
                 }
               }}
             >
-              <Plus className="text-white h-2 w-3 md:h-4 md:w-4" />
-              <span className="hidden md:inline md:text-xs">Import </span>
+              <Plus className=" h-5 w-5" />
+              <span>Import </span>
             </Button>
             <Button
               disabled={!userHasAccessToAddLead}
@@ -428,7 +428,7 @@ function LeadManagementList({
                 }
               }}
             >
-              <span className="text-xs flex">
+              <span className="flex">
                 {!isSmallScreen && <ClipboardPlus size={16} />}
                 {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
@@ -441,8 +441,8 @@ function LeadManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-alpine w-full h-[calc(100vh-120px)]`
-                : "ag-theme-alpine w-full h-[calc(100vh-128px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
             }
           >
             <LeadManagementAgGrid
