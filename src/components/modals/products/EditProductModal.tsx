@@ -372,22 +372,6 @@ function EditCompanyProductModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            {/* <div className="flex items-center border-b gap-3 mb-2 sticky bg-white z-10 ">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Edit {product.name}
-              </h2>
-              <button
-                onClick={() => {
-                  onClose();
-                  setIsCreateCompanyProductTaxModalOpen(false);
-                }}
-                className="absolute right-1 top-2 text-gray-400 hover:text-gray-600 z-10"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div> */}
-
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
