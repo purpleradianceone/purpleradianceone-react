@@ -590,8 +590,8 @@ function CompanyProductTeamsModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
