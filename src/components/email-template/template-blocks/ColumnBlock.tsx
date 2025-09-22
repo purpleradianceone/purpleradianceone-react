@@ -5,6 +5,8 @@ import { Element, useEditor, useNode } from "@craftjs/core";
 import { v4 as uuidv4 } from "uuid";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
+import Button from "../../ui/Button";
+import { Plus, Trash2 } from "lucide-react";
 
 interface ColumnBlockProps {
   columnIds?: string[];
@@ -17,10 +19,7 @@ interface ColumnBlockNodeProps {
 export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
   const { actions, query } = useEditor();
   const { connectors, id } = useNode();
-  const {
-    linkedNodes,
-    actions: nodeActions,
-  } = useNode((node) => ({
+  const { linkedNodes, actions: nodeActions } = useNode((node) => ({
     columnIds: node.data.props.columnIds as string[],
     linkedNodes: (node.data.linkedNodes as Record<string, string>) || {},
     data: node.data,
@@ -53,7 +52,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
 
   const addColumn = () => {
     let newId = uuidv4();
-    if(columns.length!==0){
+    if (columns.length !== 0) {
       const lastId = columns[columns.length - 1];
       let isNewIdIsLesserThanLastId: boolean = true;
       if (newId > lastId) {
@@ -67,7 +66,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
       }
     }
 
-    const newColumns = [ ...columns, newId];
+    const newColumns = [...columns, newId];
     setColumns(newColumns);
     nodeActions.setProp((props: ColumnBlockNodeProps) => {
       props.columnIds = newColumns;
@@ -88,7 +87,6 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
         try {
           actions.delete(columnId);
           actions.delete(linkedNodes[columnId][0]);
-
         } catch (deleteError) {
           console.warn(
             `Node ${columnId} couldn't be deleted from editor`,
@@ -152,7 +150,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
       height={blockSize.height === "auto" ? 300 : blockSize.height}
       onResize={onResize}
       resizeHandles={["s", "e", "se"]}
-      minConstraints={[300, 200]}
+      minConstraints={[500, 200]}
       maxConstraints={[1200, 800]}
     >
       <div
@@ -173,22 +171,16 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
           boxSizing: "border-box",
         }}
       >
-        {/* 🗑️ Delete entire block */}
-        <div style={{ textAlign: "right", marginBottom: "10px" }}>
-          <button
-            onClick={deleteEntireBlock}
-            style={{
-              padding: "6px 12px",
-              fontSize: "13px",
-              backgroundColor: "#dc3545",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            🗑️ Delete Column Block
-          </button>
+        {/* Delete entire block */}
+        <div className="flex justify-end items-end w-full mb-2">
+          <div className="w-fit">
+            <Button onClick={deleteEntireBlock}>
+              <div className="flex items-center justify-center gap-1">
+                <Trash2 size={16} />
+                Delete Column Block
+              </div>
+            </Button>
+          </div>
         </div>
 
         {/* 📦 Columns */}
@@ -213,49 +205,31 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
                 style={{ minHeight: "80px" }}
               />
               {columns.length > 1 && (
-                <button
-                  onClick={() => removeColumn(columnId)}
-                  style={{
-                    position: "absolute",
-                    top: 6,
-                    right: 6,
-                    backgroundColor: "#dc3545",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "26px",
-                    height: "26px",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  title="Delete Column"
-                >
-                  ×
-                </button>
+                <div className="absolute top-1 right-1 w-fit ">
+                  <Button
+                    onClick={() => removeColumn(columnId)}
+                    title="Delete Column"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <Trash2 size={14} />
+                    </div>
+                  </Button>
+                </div>
               )}
             </div>
           ))}
         </div>
 
         {/* ➕ Add Column */}
-        <div style={{ marginTop: "16px", textAlign: "right" }}>
-          <button
-            onClick={addColumn}
-            style={{
-              padding: "6px 12px",
-              fontSize: "13px",
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            ➕ Add Column
-          </button>
+        <div className="flex justify-end items-end mt-2 text-right w-full">
+          <div className="w-fit">
+            <Button onClick={addColumn}>
+              <div className="flex items-center justify-center gap-1">
+                <Plus size={16} />
+                Add Column
+              </div>
+            </Button>
+          </div>
         </div>
       </div>
     </Resizable>

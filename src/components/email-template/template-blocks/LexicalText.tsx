@@ -24,12 +24,16 @@ import {
   FiAlignLeft,
   FiAlignCenter,
   FiAlignRight,
-  FiX,
 } from "react-icons/fi";
 import { DynamicFieldsContext } from "../DynamicFieldsContext";
+import { Trash2 } from "lucide-react";
+import Button from "../../ui/Button";
 
 // Styled Components
-const EditorContainer = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(({ children }, ref) => (
+const EditorContainer = React.forwardRef<
+  HTMLDivElement,
+  { children: React.ReactNode }
+>(({ children }, ref) => (
   <div
     ref={ref}
     className="lexical-editor-container"
@@ -50,45 +54,33 @@ const EditorContainer = React.forwardRef<HTMLDivElement, { children: React.React
 ));
 
 const DeleteButton = ({ onClick }: { onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    style={{
-      position: "absolute",
-      top: "8px",
-      right: "8px",
-      background: "#ef4444",
-      color: "white",
-      border: "none",
-      borderRadius: "50%",
-      width: "24px",
-      height: "24px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <FiX size={14} />
-  </button>
+  <div className="absolute top-3 right-2 w-fit h-fit cursor-pointer">
+    <Button onClick={onClick}>
+      <div className="flex items-center justify-center gap-1">
+        <Trash2 size={14} />
+        Delete Text Block
+      </div>
+    </Button>
+  </div>
 );
 
-const ToolbarButton = ({ onClick, children, active = false }: { onClick: () => void; children: React.ReactNode; active?: boolean }) => (
-  <button
+const ToolbarButton = ({
+  onClick,
+  children,
+  active = false,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  active?: boolean;
+}) => (
+  <Button
+    className={`table-data-custom color:${active ? "#4f46e5" : "#4b5563"} ${
+      active ? "bg-indigo-100" : "bg-transparent"
+    } border border-gray-300 rounded-[4px] px-[10px] py-[6px] cursor-pointer flex items-center gap-[6px]`}
     onClick={onClick}
-    style={{
-      background: active ? "#e0e7ff" : "transparent",
-      color: active ? "#4f46e5" : "#4b5563",
-      border: "1px solid #e2e8f0",
-      borderRadius: "4px",
-      padding: "6px 10px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-    }}
   >
     {children}
-  </button>
+  </Button>
 );
 
 const ToolbarSelect = ({
@@ -101,16 +93,9 @@ const ToolbarSelect = ({
   defaultValue?: string;
 }) => (
   <select
+    className="table-data-custom border border-gray-300 rounded py-1.5 px-2.5 bg-white text-gray-600 cursor-pointer"
     onChange={onChange}
     defaultValue={defaultValue}
-    style={{
-      border: "1px solid #e2e8f0",
-      borderRadius: "4px",
-      padding: "6px 10px",
-      background: "white",
-      color: "#4b5563",
-      cursor: "pointer",
-    }}
   >
     {children}
   </select>
@@ -118,32 +103,34 @@ const ToolbarSelect = ({
 
 const Toolbar = ({ editor }: { editor: any }) => {
   const dynamicFields = useContext(DynamicFieldsContext);
-  const [activeFontSize,setActiveFontSize] = React.useState("");
-  const [activeFormats, setActiveFormats] = React.useState<Record<string, boolean>>({
+  const [activeFontSize, setActiveFontSize] = React.useState("");
+  const [activeFormats, setActiveFormats] = React.useState<
+    Record<string, boolean>
+  >({
     bold: false,
     italic: false,
     left: false,
     center: false,
-    right: false
+    right: false,
   });
 
   const applyFormat = (command: any, value?: any) => {
     editor.dispatchCommand(command, value);
-    if (value === 'left' || value === 'center' || value === 'right') {
-      setActiveFormats(prev => ({
+    if (value === "left" || value === "center" || value === "right") {
+      setActiveFormats((prev) => ({
         ...prev,
-        left: value === 'left',
-        center: value === 'center',
-        right: value === 'right'
+        left: value === "left",
+        center: value === "center",
+        right: value === "right",
       }));
     } else {
-      setActiveFormats(prev => ({ ...prev, [value]: !prev[value] }));
+      setActiveFormats((prev) => ({ ...prev, [value]: !prev[value] }));
     }
   };
 
   const setInlineStyle = (style: string) => {
-    if(style.includes("font-size")){
-      setActiveFontSize(style.slice(10,));
+    if (style.includes("font-size")) {
+      setActiveFontSize(style.slice(10));
       console.log(activeFontSize);
     }
     editor.update(() => {
@@ -152,7 +139,6 @@ const Toolbar = ({ editor }: { editor: any }) => {
         selection.setStyle(style);
       }
     });
-    
   };
 
   const insertDynamicField = (fieldKey: string) => {
@@ -165,49 +151,156 @@ const Toolbar = ({ editor }: { editor: any }) => {
   };
   if (dynamicFields.length === 0) {
     return (
-      <div style={{ padding: '8px', background: '#f0f0f0', color: '#666' }}>
+      <div className=" table-data-custom p-2 bg-gray-100 text-gray-600">
         Loading dynamic fields...
       </div>
     );
   }
 
-
   return (
-    <div style={{
-      display: "flex",
-      gap: "8px",
-      flexWrap: "wrap",
-      marginBottom: "12px",
-      paddingBottom: "12px",
-      borderBottom: "1px solid #f1f5f9",
-    }}>
-      <ToolbarButton onClick={() => applyFormat(FORMAT_TEXT_COMMAND, "bold")} active={activeFormats["bold"]}><FiBold size={14} /></ToolbarButton>
-      <ToolbarButton onClick={() => applyFormat(FORMAT_TEXT_COMMAND, "italic")} active={activeFormats["italic"]}><FiItalic size={14} /></ToolbarButton>
-      <ToolbarButton onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "left")} active={activeFormats["left"]}><FiAlignLeft size={14} /></ToolbarButton>
-      <ToolbarButton onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "center")} active={activeFormats["center"]}><FiAlignCenter size={14} /></ToolbarButton>
-      <ToolbarButton onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "right")} active={activeFormats["right"]}><FiAlignRight size={14} /></ToolbarButton>
+    <div className="flex flex-wrap gap-2 mb-[12px] pb-[12px] border-b border-[#f1f5f9]">
+      <ToolbarButton
+        onClick={() => applyFormat(FORMAT_TEXT_COMMAND, "bold")}
+        active={activeFormats["bold"]}
+      >
+        <FiBold size={14} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => applyFormat(FORMAT_TEXT_COMMAND, "italic")}
+        active={activeFormats["italic"]}
+      >
+        <FiItalic size={14} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "left")}
+        active={activeFormats["left"]}
+      >
+        <FiAlignLeft size={14} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "center")}
+        active={activeFormats["center"]}
+      >
+        <FiAlignCenter size={14} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => applyFormat(FORMAT_ELEMENT_COMMAND, "right")}
+        active={activeFormats["right"]}
+      >
+        <FiAlignRight size={14} />
+      </ToolbarButton>
 
       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-        <label style={{ fontSize: "12px", color: "#64748b" }}>Text:</label>
-        <input type="color" onChange={(e) => setInlineStyle(`color: ${e.target.value}`)} style={{ width: "24px", height: "24px", border: "1px solid #e2e8f0", borderRadius: "4px", cursor: "pointer" }} />
+        <label className="table-data-custom" style={{ fontSize: "12px", color: "#64748b" }}>Text:</label>
+        <input 
+          type="color"
+          onChange={(e) => setInlineStyle(`color: ${e.target.value}`)}
+          style={{
+            width: "24px",
+            height: "24px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-        <label style={{ fontSize: "12px", color: "#64748b" }}>BG:</label>
-        <input type="color" onChange={(e) => setInlineStyle(`background-color: ${e.target.value}`)} style={{ width: "24px", height: "24px", border: "1px solid #e2e8f0", borderRadius: "4px", cursor: "pointer" }} />
+        <label className="table-data-custom" style={{ fontSize: "12px", color: "#64748b" }}>BG:</label>
+        <input 
+          type="color"
+          onChange={(e) =>
+            setInlineStyle(`background-color: ${e.target.value}`)
+          }
+          style={{
+            width: "24px",
+            height: "24px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        />
       </div>
 
-      <ToolbarSelect onChange={(e) => setInlineStyle(`font-size: ${e.target.value}`)} defaultValue="14px">
-        {["8px", "10px", "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px", "42px", "44px", "46px", "48px", "50px", "52px", "54px", "56px", "58px", "60px", "62px", "64px", "66px", "68px", "70px", "72px"].map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
+      <ToolbarSelect
+        onChange={(e) => setInlineStyle(`font-size: ${e.target.value}`)}
+        defaultValue="14px"
+      >
+        {[
+          "8px",
+          "10px",
+          "12px",
+          "14px",
+          "16px",
+          "18px",
+          "20px",
+          "22px",
+          "24px",
+          "26px",
+          "28px",
+          "30px",
+          "32px",
+          "34px",
+          "36px",
+          "38px",
+          "40px",
+          "42px",
+          "44px",
+          "46px",
+          "48px",
+          "50px",
+          "52px",
+          "54px",
+          "56px",
+          "58px",
+          "60px",
+          "62px",
+          "64px",
+          "66px",
+          "68px",
+          "70px",
+          "72px",
+        ].map((size) => (
+          <option className="table-data-custom" key={size} value={size}>
+            {size.replace("px", "")}
+          </option>
+        ))}
       </ToolbarSelect>
 
-      <ToolbarSelect onChange={(e) => setInlineStyle(`font-family: ${e.target.value}`)} defaultValue="Arial">
-        {["Arial", "Courier New", "Georgia", "Times New Roman", "Verdana", "Helvetica"].map(font => <option key={font} value={font}>{font}</option>)}
+      <ToolbarSelect
+        onChange={(e) => setInlineStyle(`font-family: ${e.target.value}`)}
+        defaultValue="Arial"
+      >
+        {[
+          "Arial",
+          "Courier New",
+          "Georgia",
+          "Times New Roman",
+          "Verdana",
+          "Helvetica",
+        ].map((font) => (
+          <option className="table-data-custom" key={font} value={font}>
+            {font}
+          </option>
+        ))}
       </ToolbarSelect>
 
-      <ToolbarSelect onChange={(e) => { const value = e.target.value; if (value) insertDynamicField(value); e.target.value = ""; }} defaultValue="">
-        <option value="" disabled>Insert Field</option>
-        {dynamicFields.map((field) => <option key={field.value} value={field.value}>{field.label}</option>)}
+      <ToolbarSelect
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value) insertDynamicField(value);
+          e.target.value = "";
+        }}
+        defaultValue=""
+      >
+        <option className="table-data-custom" value="" disabled>
+          Insert Field
+        </option>
+        {dynamicFields.map((field) => (
+          <option className="table-data-custom" key={field.value} value={field.value}>
+            {field.label}
+          </option>
+        ))}
       </ToolbarSelect>
     </div>
   );
@@ -256,46 +349,50 @@ export const LexicalText = React.forwardRef<HTMLDivElement>((props, ref) => {
   };
 
   return (
-    <EditorContainer ref={(el) => {
-      if (el) connect(drag(el));
-      if (ref) typeof ref === "function" ? ref(el) : (ref.current = el);
-    }}>
+    <EditorContainer
+      ref={(el) => {
+        if (el) connect(drag(el));
+        if (ref) typeof ref === "function" ? ref(el) : (ref.current = el);
+      }}
+    >
       <DeleteButton onClick={() => actions.delete(id)} />
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarWrapper />
         <RichTextPlugin
           contentEditable={
-            <ContentEditable style={{
-              minHeight: "100px",
-              padding: "12px",
-              border: "1px solid #e2e8f0",
-              borderRadius: "4px",
-              backgroundColor: "white",
-              lineHeight: "1.5",
-              outline: "none",
-            }} />
+            <ContentEditable
+              style={{
+                minHeight: "100px",
+                padding: "12px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "4px",
+                backgroundColor: "white",
+                lineHeight: "1.5",
+                outline: "none",
+              }}
+            />
           }
-          placeholder={<div style={{
-            position: "relative",
-            top: -70,
-            left: 40,
-            color: "#94a3b8",
-            pointerEvents: "none",
-          }}>Type your content here...</div>}
+          placeholder={
+            <div className="relative -top-[70px] left-10 text-slate-400 pointer-events-none">
+              Type your content here...
+            </div>
+          }
           ErrorBoundary={LexicalErrorBoundary}
         />
         <HistoryPlugin />
-        <OnChangePlugin onChange={(editorState) => {
-          editorState.read(() => {
-            const root = $getRoot();
-            const textContent = root.getTextContent();
-            const editorJson = JSON.stringify(editorState);
-            setProp((props: any) => {
-              props.text = textContent;
-              props.editorState = editorJson;
-            }, 500);
-          });
-        }} />
+        <OnChangePlugin
+          onChange={(editorState) => {
+            editorState.read(() => {
+              const root = $getRoot();
+              const textContent = root.getTextContent();
+              const editorJson = JSON.stringify(editorState);
+              setProp((props: any) => {
+                props.text = textContent;
+                props.editorState = editorJson;
+              }, 500);
+            });
+          }}
+        />
       </LexicalComposer>
     </EditorContainer>
   );
@@ -310,4 +407,3 @@ LexicalText.displayName = "LexicalText";
     editorState: "",
   },
 };
-

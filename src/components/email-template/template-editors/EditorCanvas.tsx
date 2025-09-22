@@ -166,17 +166,17 @@ export const EditorCanvas: React.FC = () => {
   };
 
   return isLoading ? (
-    <div className="flex h-screen w-full justify-center items-center ">
+    <div className="flex h-screen w-screen justify-center items-center ">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
-    <>
-      <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
+    <div className="w-screen h-screen">
+      <div className="sticky z-10 top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-1 px-3">
         <div className="flex  gap-1">
-          {<LucideMail className="w-6 h-6 main-nav-custom active-tab" />}
-          <span className="table-header-custom">Email Template</span>
-          <span className="table-data-custom  ">
-            : {JSON.parse(params!).name} Template
+          {<LucideMail className="w-7 h-7 text-blue-600" />}
+          <span className="section-header-custom">Email Template</span>
+          <span className="section-header-custom">
+            : {JSON.parse(params!).name}
           </span>
           <div
             className="fixed  inset-0 justify-center top-14"
@@ -236,7 +236,7 @@ export const EditorCanvas: React.FC = () => {
           </div>
         </div>
       </div>
-      <>
+      <div>
         <div
           style={{
             position: "fixed",
@@ -336,103 +336,111 @@ export const EditorCanvas: React.FC = () => {
 
         <DynamicFieldsContext.Provider value={parsedFields}>
           {mode === "insert" ? (
-            <div style={{ marginTop: "60px", padding: "40px" }}>
-              <div>
-                <textarea
-                  placeholder="Paste your HTML template here"
-                  value={htmlInput}
-                  onChange={handleHtmlInputChange}
-                  style={{
-                    width: "100%",
-                    minWidth: "400px",
-                    height: "200px",
-                    padding: "10px",
-                    resize: "both",
-                    overflow: "auto",
-                    whiteSpace: "pre",
-                  }}
-                />
-              </div>
-
-              <div style={{ marginTop: "20px" }}>
-                <input
-                  type="file"
-                  accept=".html"
-                  onChange={handleHtmlFileUpload}
-                  style={{
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                    transition: "background-color 0.3s ease",
-                  }}
-                />
-              </div>
-
-              <div className="mt-2 flex gap-4">
+            <div className="flex justify-center items-center">
+              <div
+                style={{
+                  marginTop: "60px",
+                  padding: "40px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <div>
-                  <Button onClick={insertHtmlTemplate}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <Eye size={16} />
-                      View HTML Template
-                    </div>
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    onClick={() => {
-                      const beautified = DOMPurify.sanitize(htmlInput);
-                      navigator.clipboard.writeText(beautified);
-                      toast.success("Email Template copied to clipboard!");
+                  <textarea
+                    placeholder="Paste your HTML template here"
+                    value={htmlInput}
+                    onChange={handleHtmlInputChange}
+                    style={{
+                      width: "100%",
+                      minWidth: "400px",
+                      height: "200px",
+                      padding: "10px",
+                      resize: "both",
+                      overflow: "auto",
+                      whiteSpace: "pre",
                     }}
-                  >
-                    <div className="flex items-center justify-center gap-0.5">
-                      <ClipboardCopy size={16} />
-                      Copy HTML Email
-                    </div>
-                  </Button>
+                  />
                 </div>
-                <div>
-                  <Button
-                    onClick={() => {
-                      const beautified = DOMPurify.sanitize(htmlInput);
-                      const blob = new Blob([beautified], {
-                        type: "text/html",
-                      });
-                      const link = document.createElement("a");
-                      link.href = URL.createObjectURL(blob);
-                      link.download = "sanitized-template.html";
-                      link.click();
-                      URL.revokeObjectURL(link.href);
-                    }}
-                  >
-                    <div className="flex items-center justify-center gap-0.5">
-                      <Save size={16} />
-                      Export HTML Email
-                    </div>
-                  </Button>
-                </div>
-              </div>
 
-              <div style={{ marginTop: "20px", zIndex: 2000 }}>
-                <HtmlPreviewModal
-                  isOpen={isPreviewOpen}
-                  onClose={() => setIsPreviewOpen(false)}
-                  html={previewHtml}
-                  onHtmlChange={setHtmlContent}
-                  editable={false}
-                />
-              </div>
-              <>
+                <div style={{ marginTop: "20px" }}>
+                  <input
+                    type="file"
+                    accept=".html"
+                    onChange={handleHtmlFileUpload}
+                    style={{
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      backgroundColor: "#007bff",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "4px",
+                      fontSize: "14px",
+                      transition: "background-color 0.3s ease",
+                    }}
+                  />
+                </div>
+
+                <div className="mt-2 flex gap-4">
+                  <div>
+                    <Button onClick={insertHtmlTemplate}>
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Eye size={16} />
+                        View HTML Template
+                      </div>
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      onClick={() => {
+                        const beautified = DOMPurify.sanitize(htmlInput);
+                        navigator.clipboard.writeText(beautified);
+                        toast.success("Email Template copied to clipboard!");
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-0.5">
+                        <ClipboardCopy size={16} />
+                        Copy HTML Email
+                      </div>
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      onClick={() => {
+                        const beautified = DOMPurify.sanitize(htmlInput);
+                        const blob = new Blob([beautified], {
+                          type: "text/html",
+                        });
+                        const link = document.createElement("a");
+                        link.href = URL.createObjectURL(blob);
+                        link.download = "sanitized-template.html";
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Export HTML Email
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "20px", zIndex: 2000 }}>
+                  <HtmlPreviewModal
+                    isOpen={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    html={previewHtml}
+                    onHtmlChange={setHtmlContent}
+                    editable={false}
+                  />
+                </div>
+
                 {/* Settings panel */}
                 <TemplateSettingsPanelInsert
                   htmlBody={htmlInput}
                   htmlTemplateTypeSubjectPlaceholder={JSON.parse(params!).name}
                 />
-              </>
+              </div>
             </div>
           ) : (
             <Editor
@@ -501,7 +509,7 @@ export const EditorCanvas: React.FC = () => {
             </Editor>
           )}
         </DynamicFieldsContext.Provider>
-      </>
-    </>
+      </div>
+    </div>
   );
 };

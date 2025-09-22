@@ -89,8 +89,8 @@ export const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-fit p-6">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+      <div className="bg-white rounded-lg shadow-lg w-fit p-4">
         {/* <h2 className="table-header-custom mb-4">Select Template Type</h2> */}
         <FormHeader
           icon={CheckCircle}

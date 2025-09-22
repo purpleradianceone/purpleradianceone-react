@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
+import Button from "../../ui/Button";
+import { Trash2 } from "lucide-react";
 
 export const DividerBlock: React.FC = () => {
   const {
@@ -32,32 +34,38 @@ export const DividerBlock: React.FC = () => {
         padding: "20px",
         textAlign: "center",
         cursor: "move",
+        width:"fit-content"
       }}
     >
       {/* Delete Button */}
       {hovered && (
-        <button
+        <div className="absolute -top-4 -right-4 w-fit h-fit">
+          <Button
           onClick={() => actions.delete(id)}
-          style={{
-            position: "absolute",
-            top: "-10px",
-            right: "-10px",
-            background: "#ff5f5f",
-            color: "#fff",
-            border: "none",
-            borderRadius: "50%",
-            width: "24px",
-            height: "24px",
-            cursor: "pointer",
-            zIndex: 10,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: "16px",
-          }}
+          // style={{
+          //   position: "absolute",
+          //   top: "-10px",
+          //   right: "-10px",
+          //   background: "#ff5f5f",
+          //   color: "#fff",
+          //   border: "none",
+          //   borderRadius: "50%",
+          //   width: "24px",
+          //   height: "24px",
+          //   cursor: "pointer",
+          //   zIndex: 10,
+          //   display: "flex",
+          //   justifyContent: "center",
+          //   alignItems: "center",
+          //   fontSize: "16px",
+          // }}
         >
-          ×
-        </button>
+         <div className="flex items-center justify-center gap-1">
+                <Trash2 size={14} />
+              </div>
+        </Button>
+        </div>
+        
       )}
 
       {/* Resizable Divider */}

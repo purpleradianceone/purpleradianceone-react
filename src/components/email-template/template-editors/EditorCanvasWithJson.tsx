@@ -229,13 +229,13 @@ export const EditorCanvasWithJson = () => {
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
-    <>
-      <div className="absolute z-10 w-full top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-2">
+    <div className="w-screen h-screen">
+      <div className="sticky z-10 top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-1 px-3">
         <div className="flex gap-1">
-          <LucideMail className="w-6 h-6 main-nav-custom active-tab text-center" />
-          <span className="table-header-custom">Email Template Update</span>
+          <LucideMail className="w-7 h-7 text-blue-600" />
+          <span className="section-header-custom">Email Template Update</span>
           {templateTypeId && (
-            <span className="table-data-custom">: {emailTemplateName}</span>
+            <span className="section-header-custom">: {emailTemplateName}</span>
           )}
         </div>
       </div>
@@ -320,97 +320,100 @@ export const EditorCanvasWithJson = () => {
 
       <DynamicFieldsContext.Provider value={parsedFields}>
         {currentJson == null || currentJson === "" ? (
-          <div style={{ marginTop: "60px", padding: "40px" }}>
-            <div>
-              <textarea
-                placeholder="Paste your HTML template here"
-                value={htmlInput}
-                onChange={handleHtmlInputChange}
-                style={{
-                  width: "100%",
-                  minWidth: "400px",
-                  height: "200px",
-                  padding: "10px",
-                  resize: "both",
-                  overflow: "auto",
-                  whiteSpace: "pre",
-                }}
-              />
-            </div>
-
-            <div style={{ marginTop: "20px" }}>
-              <input
-                type="file"
-                accept=".html"
-                onChange={handleHtmlFileUpload}
-                style={{
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  transition: "background-color 0.3s ease",
-                }}
-              />
-            </div>
-
-            <div className="mt-2 flex gap-4">
+          <div className="flex justify-center items-center">
+            <div style={{ marginTop: "60px", padding: "40px" }}>
               <div>
-                <Button onClick={insertHtmlTemplate}>
-                  <div className="flex items-center justify-center gap-0.5">
-                    <Eye size={16} />
-                    View HTML Template
-                  </div>
-                </Button>
-              </div>
-              <div>
-                <Button
-                  onClick={() => {
-                    const beautified = htmlInput;
-                    navigator.clipboard.writeText(beautified);
-                    toast.success("Html copied to clipboard!");
-                    // showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
+                <textarea
+                  placeholder="Paste your HTML template here"
+                  value={htmlInput}
+                  onChange={handleHtmlInputChange}
+                  style={{
+                    width: "100%",
+                    minWidth: "400px",
+                    height: "200px",
+                    padding: "10px",
+                    resize: "both",
+                    overflow: "auto",
+                    whiteSpace: "pre",
                   }}
-                >
-                  <div className="flex items-center justify-center gap-0.5">
-                    <ClipboardCopy size={16} />
-                    Copy HTML Email
-                  </div>
-                </Button>
+                />
               </div>
 
-              <div>
-                <Button
-                  onClick={() => {
-                    const beautified = htmlInput;
-                    const blob = new Blob([beautified], { type: "text/html" });
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = "sanitized-template.html";
-                    link.click();
-                    URL.revokeObjectURL(link.href);
+              <div style={{ marginTop: "20px" }}>
+                <input
+                  type="file"
+                  accept=".html"
+                  onChange={handleHtmlFileUpload}
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    transition: "background-color 0.3s ease",
                   }}
-                >
-                  <div className="flex items-center justify-center gap-0.5">
-                    <Save size={16} />
-                    Export HTML Email
-                  </div>
-                </Button>
+                />
               </div>
-            </div>
 
-            <div style={{ marginTop: "20px", zIndex: 2000 }}>
-              <HtmlPreviewModal
-                isOpen={isPreviewOpen}
-                onClose={() => setIsPreviewOpen(false)}
-                html={previewHtml}
-                onHtmlChange={setHtmlContent}
-                editable={false}
-              />
-            </div>
-            <>
+              <div className="mt-2 flex gap-4">
+                <div>
+                  <Button onClick={insertHtmlTemplate}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Eye size={16} />
+                      View HTML Template
+                    </div>
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    onClick={() => {
+                      const beautified = htmlInput;
+                      navigator.clipboard.writeText(beautified);
+                      toast.success("Html copied to clipboard!");
+                      // showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <ClipboardCopy size={16} />
+                      Copy HTML Email
+                    </div>
+                  </Button>
+                </div>
+
+                <div>
+                  <Button
+                    onClick={() => {
+                      const beautified = htmlInput;
+                      const blob = new Blob([beautified], {
+                        type: "text/html",
+                      });
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(blob);
+                      link.download = "sanitized-template.html";
+                      link.click();
+                      URL.revokeObjectURL(link.href);
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Save size={16} />
+                      Export HTML Email
+                    </div>
+                  </Button>
+                </div>
+              </div>
+
+              <div style={{ marginTop: "20px", zIndex: 2000 }}>
+                <HtmlPreviewModal
+                  isOpen={isPreviewOpen}
+                  onClose={() => setIsPreviewOpen(false)}
+                  html={previewHtml}
+                  onHtmlChange={setHtmlContent}
+                  editable={false}
+                />
+              </div>
+
               {/* Settings panel */}
               <TemplateSettingsPanelInsertTemplateUpdate
                 htmlBody={htmlInput}
@@ -420,7 +423,7 @@ export const EditorCanvasWithJson = () => {
                 emailTemplateSubject={emailTemplateSubject}
                 emailTemplateIsDefault={emailTemplateDefault}
               />
-            </>
+            </div>
           </div>
         ) : (
           <Editor
@@ -513,6 +516,6 @@ export const EditorCanvasWithJson = () => {
           </Editor>
         )}
       </DynamicFieldsContext.Provider>
-    </>
+    </div>
   );
 };
