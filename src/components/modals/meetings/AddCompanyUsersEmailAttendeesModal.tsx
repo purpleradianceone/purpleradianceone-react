@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UserPlus, X } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useEffect, useRef, useState } from "react";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";

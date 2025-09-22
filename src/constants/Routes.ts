@@ -18,7 +18,7 @@ const ROUTES_URL = {
     NOTIFICATION: "/home/notifications",
 
     TEAM_MANAGEMENT : "/home/manage-teams/teams",
-    PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
+    // PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
     USER_PROFILE_SETTING : "/settings/userprofile",
     //for subscription
     CREATE_SUBSCRIPTION : "/create/subscription",

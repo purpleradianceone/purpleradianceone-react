@@ -21,7 +21,6 @@ import ContactUs from "../../components/views/home/landing-page/ContactUs";
 import LeadManagement from "../../components/views/lead-management/LeadManagement";
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
-import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
 import CreateSubscription from "../../components/subscription-module/CreateSubscription";
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
@@ -288,20 +287,20 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-  {
-    path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-    element: (
-      <MobileRedirectWrapper>
-        <PrivateRoute>
-          <div>
-            <Navbar>
-              <ProductTeamManagement />
-            </Navbar>
-          </div>
-        </PrivateRoute>
-      </MobileRedirectWrapper>
-    ),
-  },
+  // {
+  //   path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <ProductTeamManagement />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
   {
     path: ROUTES_URL.CREATE_SUBSCRIPTION,
     element: (
