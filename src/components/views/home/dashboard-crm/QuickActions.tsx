@@ -3,7 +3,6 @@ import {
   UserPlus,
   Calendar,
   Mail,
-  BarChart3,
   LayoutPanelLeft,
   Store,
   Network,
@@ -880,22 +879,22 @@ const QuickActions: React.FC<QuickActionsProp> = ({
             )[0].view ?? false
           : false,
     },
-    {
-      id: 9,
-      title: "Products Teams/Users",
-      description: "Manage Product Teams and Users",
-      icon: BarChart3,
-      color:
-        "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
-      shortcut: "Product",
-      route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-      visibility:
-        moduleAccessCompanyUser.length !== 0
-          ? moduleAccessCompanyUser.filter(
-              (molule) => molule.crm_module_id === 8
-            )[0].view ?? false
-          : false,
-    },
+    // {
+    //   id: 9,
+    //   title: "Products Teams/Users",
+    //   description: "Manage Product Teams and Users",
+    //   icon: BarChart3,
+    //   color:
+    //     "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
+    //   shortcut: "Product",
+    //   route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
+    //   visibility:
+    //     moduleAccessCompanyUser.length !== 0
+    //       ? moduleAccessCompanyUser.filter(
+    //           (molule) => molule.crm_module_id === 8
+    //         )[0].view ?? false
+    //       : false,
+    // },
     {
       id: 10,
       title: "New Product",

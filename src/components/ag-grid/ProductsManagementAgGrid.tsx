@@ -16,7 +16,7 @@ function ProductsManagementGrid({
   products,
   handleEditCompanyProductModalOpen,
   handleSelectedProductChange,
-  isGridForProductUser,
+  // isGridForProductUser,
   handleCompanyProductUserModalOpen,
   handleCompanyProductTeamModalOpen,
 }: ProductsManagementGridProps) {
@@ -104,7 +104,7 @@ function ProductsManagementGrid({
         maxWidth: 110,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct || isGridForProductUser,
+        hide: !userHasAccessToViewProduct ,
       },
       {
         field: "defaultAmcCycleName",
@@ -113,7 +113,7 @@ function ProductsManagementGrid({
         maxWidth: 120,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct || isGridForProductUser,
+        hide: !userHasAccessToViewProduct ,
       },
       {
         field: "version",
@@ -122,7 +122,7 @@ function ProductsManagementGrid({
         maxWidth: 100,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct || isGridForProductUser,
+        hide: !userHasAccessToViewProduct,
       },
       {
         field: "url",
@@ -131,7 +131,7 @@ function ProductsManagementGrid({
         filter: true,
         maxWidth:120,
         flex: 1,
-        hide: !userHasAccessToViewProduct || isGridForProductUser,
+        hide: !userHasAccessToViewProduct,
         tooltipValueGetter(params) {
           return params.data.url;
         },
@@ -152,7 +152,7 @@ function ProductsManagementGrid({
           return params.data.hsn;
         },
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProductTax,
       },
       {
         field: "sac",
@@ -164,7 +164,7 @@ function ProductsManagementGrid({
           return params.data.sac;
         },
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProductTax,
       },
       {
         field: "taxRate",
@@ -173,7 +173,7 @@ function ProductsManagementGrid({
         maxWidth: 100,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProductTax,
         valueFormatter: (params) => {
           if (params.value === 0) {
             return ""; // Return an empty string if the value is 0
@@ -187,7 +187,7 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax || isGridForProductUser,
+        hide: !userHasAccessToViewProductTax,
       },
 
       {
@@ -289,7 +289,6 @@ function ProductsManagementGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {!isGridForProductUser && (
                       <>
                         <ActionsDropdownButton
                           disabled={!userHasAccessToUpdateProduct}
@@ -310,9 +309,7 @@ function ProductsManagementGrid({
                           {JSX_CHILDREN_NAME.EDIT}
                         </ActionsDropdownButton>
                       </>
-                    )}
 
-                    {isGridForProductUser && (
                       <>
                         {/* {userHasAccessToUpdateProductTeam && ( */}
                         <>
@@ -380,7 +377,7 @@ function ProductsManagementGrid({
                           </>
                         )} */}
                       </>
-                    )}
+
                   </div>,
                   document.body // Render dropdown in body to avoid clipping
                 )}

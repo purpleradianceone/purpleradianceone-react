@@ -163,7 +163,7 @@ function ProductTeamManagement() {
                 pageSize,
               }}
               products={productsData}
-              isListForProductUser={true}
+              // isListForProductUser={true}
 
             /> 
           </div>

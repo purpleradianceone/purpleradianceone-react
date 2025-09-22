@@ -199,7 +199,7 @@ function ProductManagement() {
                   pageSize,
                 }}
                 products={productsData}
-                isListForProductUser={false}
+                // isListForProductUser={false}
               />
             </div>
           </>

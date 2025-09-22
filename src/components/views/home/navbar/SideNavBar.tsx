@@ -1,5 +1,4 @@
 import {
-  BoxesIcon,
   Building2,
   Calendar,
   Handshake,
@@ -25,7 +24,6 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
     userHasAccessToViewAccount,
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
-    userHasAccessToViewProductTeam,
     userHasAccessToViewMeeting
   } = useUserAccessModules();
   const { isSmallScreen } = useScreenSize();
@@ -204,7 +202,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
           </Link>
         )}
 
-        {userHasAccessToViewProductTeam && (
+        {/* {userHasAccessToViewProductTeam && (
           <Link
             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
             onClick={() => {
@@ -219,8 +217,8 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
               label=" Product Teams/Users"
             ></SideNavBarItem>
           </Link>
-        )}
-        {!userHasAccessToViewProductTeam && (
+        )} */}
+        {/* {!userHasAccessToViewProductTeam && (
           <Link
             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
             onClick={() => {
@@ -236,7 +234,7 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
               disabled={true}
             ></SideNavBarItem>
           </Link>
-        )}
+        )} */}
         {userHasAccessToViewMeeting && (
           <Link
             to={ROUTES_URL.MEETINGS}
