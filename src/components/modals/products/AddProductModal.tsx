@@ -226,30 +226,18 @@ function AddProductModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen mb-5 items-center justify-center">
+      <div className="flex min-h-screen  items-center justify-center">
         <div
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            {/* <div className="flex items-center gap-2 mb-3 border-b">
-              <Store className="text-blue-500" size={SIZE.TWENTY} />
-              <h2 className="text-lg font-semibold text-gray-800">
-                Add New Product
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div> */}
             <FormHeader
               icon={Store}
               onClose={onClose}

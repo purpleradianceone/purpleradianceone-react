@@ -1,6 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contact, Edit, UserPlus, Users, X } from "lucide-react";
+import {
+  Contact,
+  Edit,
+  FileText,
+  FileTextIcon,
+  Save,
+  TargetIcon,
+  Text,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
@@ -393,20 +404,60 @@ function UpdateLeadTaskModal({
             className="text-gray-400 hover:text-gray-600 cursor-pointer"
           />
         </div> */}
+        {/* Form header */}
         <FormHeader
           icon={Edit}
           onClose={() => {
-              handleClose(false);
-            }}
+            handleClose(false);
+          }}
           preText="Update task"
           description="Modify task details to keep information accurate and up to date."
         />
         {/* Form Grid */}
         <form className="space-y-2">
           <div className="grid grid-cols-3 gap-3">
+            <div className="flex items-center col-span-3 justify-end gap-3 py-1  border-blue-00">
+              {/* <label
+                htmlFor="isActive"
+                className="text-lg text-gray-700 cursor-pointer"
+              >
+                Active
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={isActive}
+                  onChange={handleIsActiveCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
+              </label> */}
+
+              {/* new */}
+              <span>Status :</span>
+              <label className="inline-flex items-center cursor-pointer relative self-end">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={isActive}
+                  onChange={handleIsActiveCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                {/* Adjusted size and colors */}
+                <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                {/* Adjusted size and position */}
+              </label>
+            </div>
+            {/* type */}
             <CustomDropdown
+              requiredRedDot
+              logo={Text}
               readOnly={true}
-              labelName="Type"
+              labelName="Type: "
               onSelect={(e) => {
                 if (e !== 4) {
                   if (e) {
@@ -422,8 +473,12 @@ function UpdateLeadTaskModal({
               selectedValue={leadTask.leadActivityId}
               options={leadActivity}
             ></CustomDropdown>
+
+            {/* Priority */}
             <CustomDropdown
-              labelName="Priority"
+              requiredRedDot
+              logo={Text}
+              labelName="Priority: "
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
@@ -434,8 +489,12 @@ function UpdateLeadTaskModal({
               options={leadTaskPriority}
               selectedValue={leadTask.leadTaskPriorityId}
             ></CustomDropdown>
+
+            {/* Stage */}
             <CustomDropdown
-              labelName="Stage"
+              requiredRedDot
+              logo={Text}
+              labelName="Stage: "
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
@@ -468,27 +527,29 @@ function UpdateLeadTaskModal({
               //     </Button>
               //   </div>
               // </div>
+
+              // Select lead contact
               <div className="flex items-center gap-4  mb-0">
-                              <label
-                                htmlFor="phoneCallBtn"
-                                className="block text-sm font-normal text-gray-700"
-                              >
-                                Select Lead Contact :
-                              </label>
-                              <div id="phoneCallBtn" className=" max-w-20 m-0">
-                                <Button
-                                  type="button"
-                                  onClick={() => {
-                                    setIsAddCompanyLeadContactModalOpen(true);
-                                  }}
-                                >
-                                  <span className="flex gap-1">
-                                    <Contact size={SIZE.TWENTY}></Contact>
-                                    <span>Select</span>
-                                  </span>
-                                </Button>
-                              </div>
-                            </div>
+                <label
+                  htmlFor="phoneCallBtn"
+                  className="block text-sm font-normal text-gray-700"
+                >
+                  Select Lead Contact :
+                </label>
+                <div id="phoneCallBtn" className=" max-w-32 m-0">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
+                    </span>
+                  </Button>
+                </div>
+              </div>
             )}
             {leadActivityId === 3 && (
               <div className="col-span-3">
@@ -519,7 +580,7 @@ function UpdateLeadTaskModal({
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
                       <span className="text-xs text-gray-600">
-                        {contact.name}
+                        {contact.name || contact.email || contact.mobileNumber}
                       </span>
                     </span>
                     <Button
@@ -543,9 +604,12 @@ function UpdateLeadTaskModal({
           )}
 
           <div className="grid grid-cols-2 gap-3">
+            {/* Subject */}
             <div className="mt-2">
               <FormInput
-                label="Subject"
+                label="Subject: "
+                required
+                logo={FileTextIcon}
                 type="text"
                 value={subject}
                 defaultValue={leadTask.subject}
@@ -556,11 +620,13 @@ function UpdateLeadTaskModal({
               ></FormInput>
             </div>
 
+            {/* outcome */}
             <div className="row-span-2">
               <TextAreaInput
+                logo={TargetIcon}
                 cols={5}
                 rows={5}
-                label="Outcome"
+                label="Outcome: "
                 defaultValue={resultOutcome}
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
@@ -569,9 +635,10 @@ function UpdateLeadTaskModal({
             </div>
 
             <div className="grid grid-cols-4 gap-2">
+              {/* end date */}
               <div className="col-span-2">
                 <DatePickerInput
-                  label="End Date"
+                  label="End Date: "
                   defaultValue={dueDate}
                   onChange={(e) => {
                     setDueDate(e.target.value);
@@ -579,12 +646,13 @@ function UpdateLeadTaskModal({
                 />
               </div>
 
+              {/* edn time */}
               <div className="mt-2 col-span-2">
                 <label
                   htmlFor="endTime"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  End Time
+                  End Time:
                 </label>
                 <select
                   id="endTime"
@@ -605,35 +673,31 @@ function UpdateLeadTaskModal({
             </div>
 
             <div className="col-span-2">
+              {/* description */}
               <TextAreaInput
+                logo={FileText}
                 cols={5}
                 rows={5}
-                label="Description"
+                label="Description: "
                 defaultValue={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
               ></TextAreaInput>
             </div>
-            <div className="flex items-center col-span-2 justify-between py-1 border-b border-blue-100">
-              <label
-                htmlFor="isActive"
-                className="text-lg text-gray-700 cursor-pointer"
-              >
-                Active
-              </label>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  name="isActive"
-                  checked={isActive}
-                  onChange={handleIsActiveCheckboxChange}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
+            {/* status  */}
+          </div>
+          <div className=" flex w-28 items-center text-nowrap gap-2">
+            <span>Assign new user: </span>
+            <Button
+              type="button"
+              onClick={() => setIsAssignUsersModalOpen(true)}
+            >
+              <span className="flex gap-2">
+                <UserPlus size={SIZE.TWENTY}></UserPlus>
+                <span></span>
+              </span>
+            </Button>
           </div>
 
           {selectedCompanyUsers.length != 0 && (
@@ -679,22 +743,26 @@ function UpdateLeadTaskModal({
 
         {/* Footer Buttons */}
         <div className="flex justify-center gap-4 mt-6">
-          <div className="max-w-28">
-            <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
-            >
-              <span className="flex gap-2">
-                <UserPlus size={SIZE.TWENTY}></UserPlus>
-                <span>Assign</span>
-              </span>
+           <div className=" flex w-full justify-end ">
+           <div className="flex items-center gap-1 ">
+            {/* Cancel */}
+            <Button onClick={() => {
+            handleClose(false);
+          }} type="reset">
+              <div className="flex items-center gap-1">
+                <X size={16} />
+                Cancel
+              </div>
             </Button>
-          </div>
-          <div className="max-w-28">
+            {/* Save */}
             <Button type="submit" onClick={UpdateLeadTask}>
-              Update Task
+            <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
             </Button>
           </div>
+        </div>
         </div>
       </div>
       <LeadAssociatedUsersModal

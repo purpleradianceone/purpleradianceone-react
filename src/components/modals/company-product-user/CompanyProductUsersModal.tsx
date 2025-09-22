@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditIcon, X } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { EditIcon } from "lucide-react";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import CompanyProductUsersModalProps from "../../../@types/modal/CompanyProductUsersModalProps";
@@ -16,6 +16,7 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import axios from "axios";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 function CompanyProductUsersModal({
   isOpen,
   onClose,
@@ -353,19 +354,19 @@ function CompanyProductUsersModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center pl-28 p-9  overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-full items-center justify-center">
         <div
-          className="relative w-full max-w-6xl min-w-full max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl min-w-full max-h-[95vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-3">
-            <div className="flex items-center gap-2  border-b sticky bg-white ">
+            {/* <div className="flex items-center gap-2  border-b sticky bg-white ">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
               <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Users
@@ -378,7 +379,14 @@ function CompanyProductUsersModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+            icon={EditIcon}
+            onClose={onClose}
+            description="Manage the users assigned to product"
+            preText="Edit product users of"
+            userName={companyProduct.name}
+            />
             {/*Aggrid logic here */}
             <CompanyTeamUsersAgGrid
               companyProduct={companyProduct}

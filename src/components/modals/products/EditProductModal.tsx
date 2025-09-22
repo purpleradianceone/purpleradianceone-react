@@ -360,13 +360,13 @@ function EditCompanyProductModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
         <div
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -375,9 +375,9 @@ function EditCompanyProductModal({
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
-              preText="Edit "
-              userName={product.name}
-              description="Update the necessary product details to edit the product in the CRM."
+              preText="Edit -"
+              userName={product.name || "Name not given"}
+              description="Modify product details to keep information accurate and up to date."
             />
             <form
               className="space-y-2"
@@ -549,12 +549,12 @@ function EditCompanyProductModal({
                     {productIsActive ? (
                       <div>
                         <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
-                        Active
+                        <span className="input-label-custom">Active</span>
                       </div>
                     ) : (
                       <div>
                         <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
-                        Inactive
+                        <span className="input-label-custom">Inactive</span>
                       </div>
                     )}
                   </label>
@@ -590,8 +590,8 @@ function EditCompanyProductModal({
             </form>
 
             <div className="inline-flex items-center justify-center w-full">
-              <hr className="w-full h-1 mx-auto my-4 border-0 rounded-sm md:my-10 bg-gray-700" />
-              <span className="absolute px-3 text-xl font-semibold text-gray-800 -translate-x-1/2 bg-white left-1/2">
+              <hr className="w-full h-0.5 mx-auto my-4 border-0 rounded-sm md:my-10 bg-gray-700" />
+              <span className="absolute px-3 table-header-custom -translate-x-1/2 bg-white left-1/2">
                 Product Tax
               </span>
             </div>
@@ -616,13 +616,7 @@ function EditCompanyProductModal({
             </div>
 
             {isCreateCompanyProductTaxModalOpen && (
-              <div
-                className={
-                  isSmallScreen
-                    ? "flex justify-center items-center min-w-full"
-                    : "flex justify-center items-center min-w-fit"
-                }
-              >
+              
                 <CreateCompanyProductTaxModal
                   isOpen={isCreateCompanyProductTaxModalOpen}
                   handleCreateCompanyProductTax={handleCreateCompanyProductTax}
@@ -631,7 +625,7 @@ function EditCompanyProductModal({
                   }}
                   product={product}
                 />
-              </div>
+              
             )}
 
             <CreateCompanyProductCompanyUserModal
@@ -644,7 +638,7 @@ function EditCompanyProductModal({
 
             <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
               <div
-                className="ag-theme-alpine w-full"
+                className="ag-theme-balham w-full"
                 style={{ height: "440px", width: "100%" }}
               >
                 <ProductTaxManagementAgGrid

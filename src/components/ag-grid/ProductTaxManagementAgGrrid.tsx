@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
-import {  useMemo, useState } from "react";
-import {  INNERHTML, NUMBER_VALUES, STATUS_CODE, } from "../../constants/AppConstants";
+import {  useMemo, } from "react";
+import {  INNERHTML, STATUS_CODE, } from "../../constants/AppConstants";
 import { Trash2 } from "lucide-react";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import { AgGridReact } from "ag-grid-react";
@@ -11,11 +11,10 @@ import POST_API from "../../constants/PostApi";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import MESSAGE from "../../constants/Messages";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import ProductTaxManagementAgGridProps from "../../@types/ag-grid/ProductTaxManagementAgGridProps";
+import toast from "react-hot-toast";
 
 
 function ProductTaxManagementAgGrid({
@@ -30,19 +29,6 @@ function ProductTaxManagementAgGrid({
 const {userHasAccessToUpdateProductTax} = useUserAccessModules();
 const {loginStatus} = useLoggedInUserContext();
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-      setMessageSnackbar({ open: true, message, type });
-    };
-  
-    const handleCloseSnackbar = () => {
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
-    };
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -107,12 +93,12 @@ const {loginStatus} = useLoggedInUserContext();
                     })
                     .then((response) => {
                        if(response.data.status){
-                        showMessageSnackbar({message : response.data.message,type : "success"});
+                        toast.success(response.data.message);
                         handleCompanyProductTaxChange(true);
 
                        }
                        else if(!response.data.status){
-                        showMessageSnackbar({message : response.data.message,type : "error"});
+                        toast.error(response.data.message);
                        }
                        
                     })
@@ -130,7 +116,7 @@ const {loginStatus} = useLoggedInUserContext();
                     })
                 }
                 else{
-                    showMessageSnackbar({message : MESSAGE.ERROR.NOT_ATHORISED,type : "error"})
+                    toast.error(MESSAGE.ERROR.NOT_ATHORISED)
                 }
             }
         
@@ -161,7 +147,7 @@ const {loginStatus} = useLoggedInUserContext();
   }, []);
 
   return (
-    <><div
+    <div
           className="ag-theme-balham w-full"
           style={{ height: "440px", width: "100%" }}
       >
@@ -173,13 +159,7 @@ const {loginStatus} = useLoggedInUserContext();
               overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX}
               theme={themeAlpine}
               />
-      </div><MessageSnackBar
-              isOpen={messageSnackbar.open}
-              message={messageSnackbar.message}
-              type={messageSnackbar.type}
-              onClose={handleCloseSnackbar}
-              duration={NUMBER_VALUES.SNACKBAR_DURATION} />
-              </>
+      </div>
   );
 
 

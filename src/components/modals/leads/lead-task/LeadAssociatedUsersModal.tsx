@@ -246,7 +246,7 @@ function LeadAssociatedUsersModal({
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-4">
+          <div className="p-5 mb-2">
             {/* <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
               <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
@@ -269,10 +269,10 @@ function LeadAssociatedUsersModal({
             />
 
             <div
-              className="ag-theme-alpine"
+              className="ag-theme-balham"
               style={{ height: "400px", width: "100%" }}
             >
-              <div className="flex gap-2  justify-between">
+              <div className="flex gap-2 my-2 justify-between">
                 <div className="flex w-72">
                   {/* <span className="font-semibold">Search the User</span> */}
                   <SearchInput

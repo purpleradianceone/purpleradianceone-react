@@ -99,7 +99,7 @@ function CreateCompanyProductCompanyUserModal({
   if (!isOpen) return null;
 
   return (
-    <div className={isSmallScreen ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"}>
+    <div className={isSmallScreen ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"}>
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div className="relative w-full max-w-3xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
           {/* Header */}

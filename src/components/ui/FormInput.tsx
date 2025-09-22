@@ -127,7 +127,7 @@ function FormInput({
     <div className={isSmallScreen ? "mt-1" : "mt-2"}>
       <label htmlFor={name} className={(center ? 'text-center ' : '') + 'flex items-center input-label-custom'}>
       {Icon  && <Icon size={14} className="inline mr-1 text-blue-500"/>}
-        {label}{required && <span className="text-red-500 align-top">*</span> }
+        {label}{required && <span className="caption-custom-inactive align-top">*</span> }
       </label>
       <div className={isSmallScreen ? "mt-1 relative" : "mt-0 relative"}>
         {isMobileNumberInput ? (
@@ -210,7 +210,7 @@ function FormInput({
           </div>
         )}
       </div>
-      {error && <div className="mt-0 ml-0.5 text-red-500 text-sm">{error}</div>}
+      {error && <div className="mt-0 ml-0.5 caption-custom-inactive">{error}</div>}
     </div>
   );
 }

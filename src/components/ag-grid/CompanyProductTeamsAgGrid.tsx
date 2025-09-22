@@ -47,7 +47,7 @@ function CompanyProductTeamsAgGrid({
             params.data.isActive
           );
 
-          const handleUpdateCompanyProductTeamToggle = async (event :React.FormEvent<HTMLButtonElement>) => {
+          const handleUpdateCompanyProductTeamToggle = async (event :React.ChangeEvent<HTMLInputElement>) => {
             if(userHasAccessToUpdateProductTeam){
               const updateCompanyProductTeamPostData = {
                 company_id : loginStatus.companyId,
@@ -69,8 +69,8 @@ function CompanyProductTeamsAgGrid({
             }
           }
           return (
-            <div className="flex flex-col items-center mt-3">
-              <button
+            <div className="flex flex-col items-center mt-1">
+              {/* <button
                 id={params.data.id.toString()}
                 onClick={(event) => {
                   handleUpdateCompanyProductTeamToggle(event);
@@ -86,7 +86,21 @@ function CompanyProductTeamsAgGrid({
                     isActive ? "float-end" : "float-start"
                   }`}
                 ></div>
-              </button>
+              </button> */}
+              <label className="inline-flex items-center cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isActive}
+                      id={params.data.id.toString()}
+                      name="isActive"
+                      onChange={(e) => {
+                         handleUpdateCompanyProductTeamToggle(e);
+                      }}
+                    />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+                  </label>
             </div>
           );
         },
@@ -106,7 +120,8 @@ function CompanyProductTeamsAgGrid({
   }, []);
 
   return (
-    <AgGridReact
+    <div className="ag-theme-balham w-full h-full mt-2">
+<AgGridReact
     rowData={companyProductTeams}
       columnDefs={companyProductTeamsColDefs}
       defaultColDef={defaultColDef}
@@ -117,6 +132,8 @@ function CompanyProductTeamsAgGrid({
       onGridReady={onGridReady}
       
     />
+    </div>
+    
   );
 }
 

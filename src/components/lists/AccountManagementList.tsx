@@ -115,8 +115,7 @@ function AccountManagementList({
                 onClick={() => {
                   setOpenAccountForm(!openCreateAccountForm);
                 }}
-              >
-                + Create account
+              ><span>+ Create</span>
               </Button>
               {openCreateAccountForm && (
                 <CreateAccount 
@@ -199,8 +198,8 @@ function AccountManagementList({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-alpine w-full h-[calc(100vh-120px)]`
-              : "ag-theme-alpine w-full h-[calc(100vh-128px)]"
+              ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-128px)]"
           }
         >
           <AccountManagementAgGrid

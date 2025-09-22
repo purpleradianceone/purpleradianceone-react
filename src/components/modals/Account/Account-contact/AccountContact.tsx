@@ -13,6 +13,7 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import AccountContactType from "../../../../@types/account/AccountContact";
 import {
   Briefcase,
+  Edit,
   Edit3,
   Globe,
   Languages,
@@ -30,6 +31,9 @@ import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import Button from "../../../ui/Button";
+import FormHeader from "../../../ui/FormHeader";
+import FormInput from "../../../ui/FormInput";
+import TextAreaInput from "../../../ui/TextAreaInput";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -61,11 +65,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     email: "",
     mobileNumber: "",
   });
-
-  const inputClass =
-    "border border-gray-300 p-2 rounded-lg  w-full input-label-custom focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
-  const formInputLabelClassName =
-    "block input-label-custom mb-2";
 
   const [isOpenAddAccountContactForm, setIsOpenAddAccountContactForm] =
     useState(false);
@@ -404,12 +403,30 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     }
   }, [selectedContactCard]);
 
+  function handleStateClearFunctionOnClickOfCancelOrXButton() {
+     setEditingContactId(null);
+                  setIsOpenAddAccountContactForm(false);
+                  setEditContactData(null);
+                  setErrors({
+                    email: "",
+                    mobileNumber : "",
+                    name : ""
+                  })
+                  // note
+                  setAccountContactForm({
+                    name: "",
+                    email: "",
+                    address: "",
+                    department: "",
+                    designation: "",
+                    mobileNumber: "",
+                    preferredCommunicationChannel: "",
+                    preferredLanguage: "",
+                  });
+  }
   if (showLoadingSpinner)
     return (
       <>
-        {/* <div className="bg-gray-200 text-xs font-semibold">
-        <h1>Account contact</h1>
-      </div> */}
         <div className="w-full h-full  flex justify-center items-center">
           <LoadingSpinner />
         </div>
@@ -417,9 +434,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     );
   return (
     <>
-      {/* <div className="bg-gray-200 text-xs font-semibold">
-        <h1>Account contact</h1>
-      </div> */}
       {accountContact.length === 0 ? (
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
@@ -825,12 +839,47 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       )}
       {/* Add Contact Form Modal */}
       {isOpenAddAccountContactForm && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-          <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
+          <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-2">
             {/* Header */}
 
-            <div className="px-2 py-2  border-b border-gray-200">
-              <div className="flex justify-between items-center">
+            <div className=" py-2">
+              <FormHeader
+                icon={Edit}
+                preText={
+                  editContactData
+                    ? "Update contact information"
+                    : "Create new Account's contact "
+                }
+                description={
+                  editContactData
+                    ? "Update the contact’s information to keep records accurate and up to date."
+                    : "Create a contact for this Account to ensure proper follow-up and engagement."
+                }
+                onClose={
+                  handleStateClearFunctionOnClickOfCancelOrXButton
+                  // setEditingContactId(null);
+                  // setIsOpenAddAccountContactForm(false);
+                  // setEditContactData(null);
+                  // setErrors({
+                  //   email: "",
+                  //   mobileNumber : "",
+                  //   name : ""
+                  // })
+                  // // note
+                  // setAccountContactForm({
+                  //   name: "",
+                  //   email: "",
+                  //   address: "",
+                  //   department: "",
+                  //   designation: "",
+                  //   mobileNumber: "",
+                  //   preferredCommunicationChannel: "",
+                  //   preferredLanguage: "",
+                  // });
+                }
+              />
+              {/* <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
                     {editContactData ? "Edit Contact" : "Add New Contact"}
@@ -840,7 +889,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                       ? "Update contact information"
                       : "Create new account contact"}
                   </p>
-                </div>
+                </div>             
                 <button
                   onClick={() => {
                     setEditingContactId(null);
@@ -862,21 +911,18 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 >
                   <X size={24} />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Form Grid */}
             <form>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm text-gray-500">
                 {/* name */}
                 <div>
-                  <label htmlFor="name" className={formInputLabelClassName}>
-                    {" "}
-                    <User size={16} className="inline mr-1 text-blue-500" />
-                    Full Name*{" "}
-                  </label>
-                  <input
-                    autoFocus
+                  <FormInput
+                  logo={User}
+                    label="Full Name: "
+                    required
                     id="name"
                     type="text"
                     name="name"
@@ -884,126 +930,68 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     minLength={VALIDATIONS.MIN_NAME_LENGTH}
                     maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                     placeholder="Enter full name"
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     defaultValue={editContactData?.name || ""}
-                    // readOnly={editContactData !== null}
-                    // onClick={() => {
-                    //   if (editContactData !== null) {
-                    //     toast.error(
-                    //       MESSAGE.ERROR
-                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                    //     );
-                    //   }
-                    // }}
                   />
                   {errors.name && (
-                    <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                    <p className="text-xs text-red-600 ">{errors.name}</p>
                   )}
-                  {/* {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
-                      Primary contact name cannot be changed
-                    </p>
-                  )} */}
                 </div>
                 {/* email */}
                 <div>
-                  <label htmlFor="email" className={formInputLabelClassName}>
-                    <Mail size={16} className="inline mr-2 text-blue-500" />{" "}
-                    Email Address
-                  </label>
-                  <input
+                  <FormInput
+                  logo={Mail}
+                    label="Email: "
                     id="email"
+                    required
                     type="email"
                     name="email"
                     maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                     placeholder="Enter email address"
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.email || ""}
-                    // readOnly={editContactData !== null}
-                    // onClick={() => {
-                    //   if (editContactData !== null) {
-                    //     toast.error(
-                    //       MESSAGE.ERROR
-                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                    //     );
-                    //   }
-                    // }}
                   />
                   {errors.email && (
-                    <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+                    <p className="text-xs text-red-600 ">{errors.email}</p>
                   )}
-                  {/* {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
-                      Primary contact email cannot be changed
-                    </p>
-                  )} */}
                 </div>
                 {/* mobile number */}
                 <div>
-                  <label
-                    htmlFor="mobileNumber"
-                    className={formInputLabelClassName}
-                  >
-                    <Phone size={16} className="inline mr-2 text-blue-500" />{" "}
-                    Mobile Number
-                  </label>
-                  <input
+                  <FormInput
+                  logo={Phone}
+                    label="Mobile number: "
+                    required
                     id="mobileNumber"
                     type="text"
                     name="mobileNumber"
                     minLength={10}
                     maxLength={10}
                     placeholder="Enter mobile number"
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.mobileNumber || ""}
-                    // onClick={() => {
-                    //   if (
-                    //     editContactData?.isPrimary &&
-                    //     editContactData !== null
-                    //   ) {
-                    //     toast.error(
-                    //       MESSAGE.ERROR
-                    //         .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                    //     );
-                    //   }
-                    // }}
                   />
                   {errors.mobileNumber && (
-                    <p className="text-xs text-red-600 mt-1 ">
+                    <p className="text-xs text-red-600  ">
                       {errors.mobileNumber}
                     </p>
                   )}
-                  {/* {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
-                      Primary contact mobile number cannot be changed
-                    </p>
-                  )} */}
                 </div>
                 {/* designation */}
                 <div>
-                  <label
-                    htmlFor="designation"
-                    className={formInputLabelClassName}
-                  >
-                    {" "}
-                    <Briefcase
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Designation
-                  </label>
-                  <input
-                    id="designation"
+                  <FormInput
+                  logo={Briefcase}
+                  label="Designation:"
+                   id="designation"
                     type="text"
                     name="designation"
                     maxLength={100}
                     placeholder="Enter designation"
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.designation || ""}
@@ -1011,24 +999,15 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 </div>
                 {/* department */}
                 <div>
-                  <label
-                    htmlFor="department"
-                    className={formInputLabelClassName}
-                  >
-                    {" "}
-                    <Briefcase
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Department
-                  </label>
-                  <input
-                    id="department"
+                  <FormInput
+                  logo={Briefcase}
+                  label="Department:"
+                   id="department"
                     type="text"
                     name="department"
                     maxLength={100}
                     placeholder="Enter department name "
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.department || ""}
@@ -1036,23 +1015,15 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 </div>
                 {/* Preferrd language */}
                 <div>
-                  <label
-                    htmlFor="preferredLanguage"
-                    className={formInputLabelClassName}
-                  >
-                    <Languages
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Preferred Language
-                  </label>
-                  <input
-                    id="preferredLanguage"
+                  <FormInput
+                  logo={Languages}
+                  label="Preferred Language:"
+                     id="preferredLanguage"
                     type="text"
                     name="preferredLanguage"
                     maxLength={100}
                     placeholder="eg : Marathi , English etc ..."
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.preferredLanguage || ""}
@@ -1061,23 +1032,15 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                 {/* Preferred communication channel */}
                 <div>
-                  <label
-                    htmlFor="preferredCommunicationChannel"
-                    className={formInputLabelClassName}
-                  >
-                    <MessageCircle
-                      size={16}
-                      className="inline mr-2 text-blue-500"
-                    />
-                    Preferred Communication Channel
-                  </label>
-                  <input
-                    id="preferredCommunicationChannel"
+                  <FormInput
+                  logo={MessageCircle}
+                  label="Preferred Communication Channel:"
+                   id="preferredCommunicationChannel"
                     type="text"
                     maxLength={100}
                     name="preferredCommunicationChannel"
                     placeholder="eg : Mail, Phone, WhatsApp etc ..."
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={
@@ -1088,18 +1051,16 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                 {/* Address */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="address" className={formInputLabelClassName}>
-                    {" "}
-                    <MapPin size={16} className="inline mr-2 text-blue-500" />
-                    Address
-                  </label>
-                  <textarea
-                    id="address"
+                  <TextAreaInput
+                  logo={MapPin}
+                  cols={5}
+                  label="Address:"
+                   id="address"
                     placeholder="Enter full address"
                     name="address"
                     rows={4}
                     maxLength={256}
-                    className={inputClass}
+                    // className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.address || ""}
@@ -1108,11 +1069,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>
             </form>
             {/* Footer Buttons */}
-            <div className="flex items-center justify-end gap-4 mt-6 ">
+            <div className="flex items-center justify-end gap-4 mt-3 ">
               <div className="flex gap-2">
                 <Button
                   type="submit"
-                  onClick={() => setIsOpenAddAccountContactForm(false)}
+                  onClick={handleStateClearFunctionOnClickOfCancelOrXButton}
                   // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                 >
                   <div className="flex items-center gap-0.5">

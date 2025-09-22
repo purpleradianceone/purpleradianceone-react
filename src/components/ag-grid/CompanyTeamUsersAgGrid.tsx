@@ -4,13 +4,11 @@ import {
   AllCommunityModule,
   ColDef,
   GridApi,
-  themeAlpine,
   ViewportChangedEvent,
 } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   INNERHTML,
-  // NUMBER_VALUES,
   STATUS_CODE,
 } from "../../constants/AppConstants";
 import { UserPlus2 } from "lucide-react";
@@ -26,11 +24,6 @@ import Button from "../ui/Button";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import SearchInput from "../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
-// import MessageSnackBar from "../ui/MessageSnackbar";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../@types/ui/MessageSnackbarProps";
 import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
 import toast from "react-hot-toast";
 
@@ -83,19 +76,6 @@ function CompanyTeamUsersAgGrid({
     companyUserGridApiRef.current = params.api;
   };
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
   const [isCompanyUserSearchCleared, setIsCompanyUserSearchCleared] =
     useState<boolean>(true);
 
@@ -347,7 +327,6 @@ function CompanyTeamUsersAgGrid({
       companyUserLastScrollPositionRef.current = 0;
       companyUsersNotAssignedSearchParameterRef.current = "";
       setCompanyUsersToAddToTeamsOrProduct([]);
-      // handleMessageSnackbarClose();
       setIsCompanyUserSearchCleared(true);
     } else if (
       isOpen &&
@@ -385,7 +364,7 @@ function CompanyTeamUsersAgGrid({
           );
 
           const handleCompanyTeamUsersToggle = async (
-            event: React.FormEvent<HTMLButtonElement>
+            event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
             if (userHasAccessToUpdateTeamManagement) {
@@ -406,10 +385,6 @@ function CompanyTeamUsersAgGrid({
                 .then((response) => {
                   if (response.data.status) {
                     setIsActive(!isActive);
-                    // showMessageSnackbar({
-                    //   message: response.data.message,
-                    //   type: "success",
-                    // });
                     toast.success(response.data.message);
                     params.data.isActive = !isActive;
                   } else {
@@ -430,7 +405,7 @@ function CompanyTeamUsersAgGrid({
           };
 
           const handleCompanyProductUsersToggle = async (
-            event: React.FormEvent<HTMLButtonElement>
+            event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
             if (userHasAccessToUpdateProductTeam) {
@@ -452,10 +427,6 @@ function CompanyTeamUsersAgGrid({
                 .then((response) => {
                   if (response.data.status) {
                     setIsActive(!isActive);
-                    // showMessageSnackbar({
-                    //   message: response.data.message,
-                    //   type: "success",
-                    // });
                     toast.success(response.data.message);
                     params.data.isActive = !isActive;
                   } else {
@@ -475,28 +446,25 @@ function CompanyTeamUsersAgGrid({
             }
           };
           return (
-            <div className="flex flex-col items-center mt-3">
-              <button
-                id={params.data.id.toString()}
-                className={`w-6 h-3 rounded-md transition-colors duration-200 ${
-                  isActive
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-500"
-                } text-white font-semibold`}
-                onClick={(event) => {
-                  if (!isGridForProductUser) {
-                    handleCompanyTeamUsersToggle(event);
-                  } else if (isGridForProductUser) {
-                    handleCompanyProductUsersToggle(event);
-                  }
-                }}
-              >
-                <div
-                  className={`bg-gray-200 h-2 w-2 transition-opacity rounded-full ${
-                    isActive ? "float-end" : "float-start"
-                  }`}
-                ></div>
-              </button>
+            <div className="flex flex-col items-center mt-2">
+              <label className="inline-flex items-center cursor-pointer relative">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={isActive}
+                  id={params.data.id.toString()}
+                  name="isActive"
+                  onChange={(e) => {
+                    if (!isGridForProductUser) {
+                      handleCompanyTeamUsersToggle(e);
+                    } else if (isGridForProductUser) {
+                      handleCompanyProductUsersToggle(e);
+                    }
+                  }}
+                />
+                <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+              </label>
             </div>
           );
         },
@@ -524,12 +492,11 @@ function CompanyTeamUsersAgGrid({
   }, [isAddUsersCompleted]);
 
   return (
-    <div className="flex justify-around gap-2 mb-9 py-10 ">
+    <div className="flex justify-around gap-2 mb-9 py-10">
       <div
-        className="ag-theme-balham"
         style={{ height: "300px", width: "45%" }}
       >
-        <div className="flex w-full  gap-4 mb-2 justify-between">
+        <div className="flex w-full  gap-4 mb-2 mt-1 ml-1 justify-between">
           <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
@@ -538,40 +505,37 @@ function CompanyTeamUsersAgGrid({
               }}
             ></SearchInput>
           </div>
-          <div className="text-base font-semibold mt-2 text-gray-700">
-            Team Members
-          </div>
+          <div className="table-header-custom mt-2 mr-3">Team Members</div>
         </div>
-
-        <AgGridReact
-          rowData={
-            isGridForProductUser
-              ? companyProductUsersList!
-              : companyTeamUsersList!
-          }
-          columnDefs={companyTeamColumnDefs}
-          defaultColDef={defaultColDef}
-          modules={[AllCommunityModule]}
-          overlayNoRowsTemplate={
-            isGridForProductUser
-              ? companyProductUsersList!.length === 0
+        <div className="ag-theme-balham w-full h-full mt-3">
+          <AgGridReact
+            rowData={
+              isGridForProductUser
+                ? companyProductUsersList!
+                : companyTeamUsersList!
+            }
+            columnDefs={companyTeamColumnDefs}
+            defaultColDef={defaultColDef}
+            modules={[AllCommunityModule]}
+            overlayNoRowsTemplate={
+              isGridForProductUser
+                ? companyProductUsersList!.length === 0
+                  ? "No users assigned to this product"
+                  : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
+                : companyTeamUsersList!.length === 0
                 ? "No users assigned to this product"
                 : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
-              : companyTeamUsersList!.length === 0
-              ? "No users assigned to this product"
-              : INNERHTML.OVERLAY_NO_ROWS_TEMPLATE
-          }
-          theme={themeAlpine}
-          onViewportChanged={handleViewPortChanged}
-          onGridReady={onGridReady}
-        />
+            }
+            onViewportChanged={handleViewPortChanged}
+            onGridReady={onGridReady}
+          />
+        </div>
       </div>
       <div
-        className="ag-theme-balham"
         style={{ height: "300px", width: "49%" }}
       >
-        <div className="flex w-full gap-2 mb-2 justify-between">
-            <div className="w-[60%]">
+        <div className="flex w-full gap-2 mb-2 justify-between mt-1 ml-1">
+          <div className="w-[60%]">
             <SearchInput
               onChange={(event) => {
                 const searchValue = event.target.value;
@@ -579,23 +543,25 @@ function CompanyTeamUsersAgGrid({
               }}
             ></SearchInput>
           </div>
-          <div className="justify-self-end">
+          <div className="justify-self-end mr-3">
             {!isGridForProductUser && (
               <Button onClick={handleAddCompanyTeamUsers}>
-                <UserPlus2
-                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                ></UserPlus2>{" "}
-                Add To Team
+                <div className="flex justify-center items-center">
+                  <UserPlus2
+                    className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                  ></UserPlus2>
+                  <span>Add</span>
+                </div>
               </Button>
             )}
 
             {isGridForProductUser && (
-              <Button   onClick={handleAddCompanyTeamUsers}>
+              <Button onClick={handleAddCompanyTeamUsers}>
                 {" "}
                 <UserPlus2
                   className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                 ></UserPlus2>{" "}
-                Assign Users
+                Add
               </Button>
             )}
           </div>
@@ -609,13 +575,6 @@ function CompanyTeamUsersAgGrid({
           isGridForSubscription={false}
         />
       </div>
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>
   );
 }

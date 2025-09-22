@@ -397,7 +397,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           id={product.companyProductName}
                           title={product.isActive ? "Active" : "Inactive"}
                           className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
-                            product.isActive ? "bg-green-500" : "bg-red-500"
+                            product.isActive ? "bg-blue-500" : "bg-gray-400"
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
