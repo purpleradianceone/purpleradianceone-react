@@ -33,7 +33,7 @@ function Pagination({
   const sizeArray=rowsInGridDropdownOptions
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <label htmlFor="pageSize" className="text-xs">Page Size</label>
+      <label htmlFor="pageSize" className="input-label-custom">Page Size</label>
       <select
         id="pageSize"
         value={pageSize}
@@ -42,8 +42,9 @@ function Pagination({
           padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "4px",
-          fontSize: "0.80rem",
+          // fontSize: "0.80rem",
         }}
+        className="input-label-custom"
       >
         {sizeArray.map((data) => (
           <option key={data.id} value={data.rowsInGrid}>
@@ -60,12 +61,13 @@ function Pagination({
           borderRadius: "6px",
           backgroundColor: currentPage === 1 ? COLORS.WHITE_SMOKE : COLORS.WHITE,
           cursor: currentPage === 1 ? "not-allowed" : "pointer",
-          fontSize: "0.85rem",
+          // fontSize: "0.85rem",
         }}
+        className="input-label-custom"
       >
         <ChevronLeft size={20} />
       </button>
-      <span style={{ fontSize: "0.85rem" }}>
+      <span className="input-label-custom">
         Page{" "}
         <input
           type="number"
@@ -80,8 +82,9 @@ function Pagination({
             padding: "1px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            fontSize: "0.85rem",
+            // fontSize: "0.85rem",
           }}
+          className="input-label-custom"
         />{" "}
         of {Number(totalPages)}
       </span>
@@ -94,8 +97,9 @@ function Pagination({
           borderRadius: "6px",
           backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE : COLORS.WHITE,
           cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-          fontSize: "0.85rem",
+          // fontSize: "0.85rem",
         }}
+        className="input-label-custom"
       >
         <ChevronRight size={20}/>
       </button>

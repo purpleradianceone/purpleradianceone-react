@@ -265,7 +265,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
       <div className="w-full gap-1">
         <div className="sticky top-16 flex bg-gray-200 shadow-sm  mb-1.5 w-full">
           <div className="flex justify-between  w-full pr-3">
-            <span className="text-sm  pl-1 font-semibold text-center text-gray-800 ">
+            <span className="table-header-custom pl-1  text-center ">
               Tasks
             </span>
             {visibleAssignUsersBtn && (
@@ -273,7 +273,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
                 {/* <span>Add</span> */}
                 <button
                   disabled={false}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+                  className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
                   onClick={() => {
                     setIsCreateLeadTaskModalOpen(true);
                   }}

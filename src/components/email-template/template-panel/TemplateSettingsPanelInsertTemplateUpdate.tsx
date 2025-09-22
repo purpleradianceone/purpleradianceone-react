@@ -280,11 +280,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
 
                 {/* Buttons */}
                 <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "10px",
-                  }}
+                  className="flex justify-end gap-2.5"
                 >
                   <div>
                     <Button type="button" onClick={() => setIsOpen(false)}>

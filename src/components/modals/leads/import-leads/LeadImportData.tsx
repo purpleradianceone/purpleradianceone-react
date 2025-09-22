@@ -19,6 +19,7 @@ import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
 import { Search } from "lucide-react";
+import Button from "../../../ui/Button";
 
 const LeadImportData = ({ 
     selectedLeadTag, 
@@ -350,28 +351,31 @@ const LeadImportData = ({
   <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
     {/* Header */}
     <div className="flex items-center justify-between mb-4 bg-white px-2 py-1 rounded-lg shadow-sm">
-      <span className="text-sm flex items-center gap-2 text-gray-800 font-medium">
+      <span className="flex items-center gap-2 table-header-custom">
         These are the leads from selected tag:
-        <span className="text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md text-xs">
+        <span className="input-label-custom-blue bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
           {selectedLeadTag}
         </span>
       </span>
 
       {/* Move All Button */}
-      <button
+      <div>
+ <Button
         title="By clicking, all leads from this tag will be moved to the Leads Table."
         onClick={() => setOpenFinalPopup(true)}
-        className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
+        // className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
       >
         Move all Leads To lead data
-      </button>
+      </Button>
+      </div>
+     
     </div>
 
     {/* Actions Row */}
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-3">
         {/* Delete Button */}
-        <button
+        <Button
           disabled={!userHasAccessToUpdateLead}
           onClick={() => {
             if (userHasAccessToUpdateLead) {
@@ -385,14 +389,9 @@ const LeadImportData = ({
               }
             }
           }}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all shadow-sm ${
-            !userHasAccessToUpdateLead
-              ? "bg-red-300 cursor-not-allowed text-white"
-              : "bg-red-600 hover:bg-red-700 text-white"
-          }`}
         >
           Delete Selected
-        </button>
+        </Button>
 
         {/* Search */}
         <div className="relative">
@@ -401,7 +400,7 @@ const LeadImportData = ({
             placeholder="Search by Name, Email, or Mobile..."
             value={searchInput}
             onChange={handleSearchChange}
-            className="border border-gray-300 pl-9 pr-3 py-1.5 text-sm rounded-lg w-80 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="border border-gray-300 pl-9 pr-3 py-1.5 caption-custom rounded-lg w-80 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           <span className="absolute left-2 top-2.5 text-gray-400">
             <Search size={16} />

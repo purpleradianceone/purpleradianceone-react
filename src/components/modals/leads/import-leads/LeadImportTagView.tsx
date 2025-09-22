@@ -111,13 +111,13 @@ const LeadImportTagView = () => {
       {/* Header */}
       {leadImportTagData.length > 0 && (
         <div className="bg-white p-2 rounded-lg shadow-sm border-b">
-          <h2 className="text-lg font-semibold text-gray-900 mt-1">
+          <h2 className="table-header-custom mt-1">
             Lead Import Tags : 
           </h2>
           <div className="text-sm text-gray-700 leading-relaxed space-y-0 mt-4">
-            <p className="font-medium text-gray-800">📌 How Tags Work:</p>
+            <p className="table-header-custom">📌 How Tags Work:</p>
 
-            <ul className="list-disc pl-6 space-y-1">
+            <ul className="input-label-custom list-disc pl-6 space-y-1">
                <li>
                 Tags are created automatically , when we import the leads and currently leads are not merged into lead table.
               </li>
@@ -141,7 +141,7 @@ const LeadImportTagView = () => {
 
             <div className="flex items-center gap-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
               ⚠️{" "}
-              <span className="font-medium">
+              <span className="caption-custom">
                 Once moved, this action cannot be undone.
               </span>
             </div>
@@ -159,7 +159,7 @@ const LeadImportTagView = () => {
       {/* Empty State */}
       {leadImportTagData.length === 0 && !leadimportTagDataCame && (
         <div className="flex justify-center py-6">
-          <span className="text-gray-500 text-sm italic">No tags found.</span>
+          <span className="caption-custom">No tags found.</span>
         </div>
       )}
 
@@ -170,11 +170,11 @@ const LeadImportTagView = () => {
             <button
               key={index}
               onClick={() => setSelectedLeadTag(data.import_tag)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 border shadow-sm
+              className={`px-3 py-1.5 rounded-lg transition-all duration-200 border shadow-sm
               ${
                 selectedLeadTag === data.import_tag
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                  : "bg-white text-gray-800 hover:bg-blue-50 hover:border-blue-300"
+                  ? "bg-blue-600 text-white border-blue-600 shadow-md table-header-custom"
+                  : "bg-white hover:bg-blue-50 hover:border-blue-300 table-header-custom"
               }`}
             >
               {data.import_tag}

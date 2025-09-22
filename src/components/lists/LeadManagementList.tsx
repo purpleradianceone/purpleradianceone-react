@@ -2,7 +2,6 @@
 import {
   Calendar,
   ClipboardPlus,
-  Filter,
   Handshake,
   Plus,
   User,
@@ -32,6 +31,7 @@ import { usePanel } from "../../context/panel/usePanel";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
+import FormHeader from "../ui/FormHeader";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -105,12 +105,6 @@ function LeadManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState(false);
-
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
@@ -146,7 +140,7 @@ function LeadManagementList({
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">{" Leads"} </span>
+              <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
 
@@ -169,7 +163,7 @@ function LeadManagementList({
                 {/* Date FIlters Dropdown */}
                 <div className="flex ">
                   <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                    <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
                       <Calendar />
                     </div>
                     <DateRangeFilterDropdown
@@ -212,8 +206,8 @@ function LeadManagementList({
                       <Button
                         type="button"
                         onClick={handleCompanyUserPopUp}
-                        className="flex items-center gap-2 h-7 px-2 py-1 text-xs border border-gray-300 
-                      rounded-md bg-white text-gray-700 hover:bg-gray-50 
+                        className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
+                      rounded-md bg-white  hover:bg-gray-50 
                       focus:outline-none shadow-sm"
                       >
                         <User size={14} />
@@ -223,17 +217,17 @@ function LeadManagementList({
 
                     {selectedLeadOwner.id !== 0 && (
                       <div className="border rounded-md border-gray-400 p-0.5">
-                        <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
+                        {/* <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
                           {" "}
                           <User size={11} />
                           Selected Owner:
-                        </span>
+                        </span> */}
                         <div
                           title={selectedLeadOwner.fullname}
                           className={
                             selectedLeadOwner.id === 0
                               ? "bg-transparent"
-                              : "relative rounded flex items-center justify-between gap-x-0.5 bg-blue-600 text-white  text-xs p-0.5 "
+                              : "relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5 "
                           }
                         >
                           <span>
@@ -257,144 +251,6 @@ function LeadManagementList({
                   </div>
                 </div>
               </div>
-            </>
-          )}
-
-          {isMediumScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative  gap-2  ">
-                <div className="mt-1 flex ">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                    <Calendar />
-                  </div>
-
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.TWENTY} />
-                    </button>
-
-                    <div className="my-10 justify-items-center mb-5">
-                      <div className="mb-5">
-                        <DateRangePicker
-                          onStartDateChange={onStartDateChange}
-                          onEndDateChange={onEndDateChange}
-                        />
-                      </div>
-                      <div className="w-full justify-items-center">
-                        <div className="w-24">
-                          <Button>Done</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {isSmallScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative gap-2">
-                <Button
-                  onClick={() => {
-                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                  }}
-                >
-                  <Filter size={SIZE.EIGHT} />
-                </Button>
-              </div>
-              {isFiltersOpenInMobileView && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
-                        );
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.EIGHT} />
-                    </button>
-                    {/* Date FIlters Dropdown */}
-
-                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                      <div className="mt-1 flex ">
-                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                          <Calendar size={SIZE.TWENTY} />
-                        </div>
-
-                        <DateRangeFilterDropdown
-                          dropdownOptions={dateRangeDropdownOptions}
-                          handleDateIdChange={handleDateRangeIdChange}
-                        ></DateRangeFilterDropdown>
-                      </div>
-                    </div>
-
-                    {/* Custom Date Picker Div Flex Box*/}
-                    <div
-                      className="mb-10 justify-items-center"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-
-                    {
-                      <div className="flex w-full justify-center items-center mb-5">
-                        <div className="w-28">
-                          <Button
-                            onClick={() => {
-                              setIsFiltersOpenInMobileView(
-                                !isFiltersOpenInMobileView
-                              );
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              )}
             </>
           )}
 
@@ -470,9 +326,9 @@ function LeadManagementList({
         </div>
         {openPopUpOfCompanyUserModal && (
           <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+            <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
-              <div className="flex justify-between items-center p-3 border-b border-gray-200">
+              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800">
                   Select Company User
                 </h3>
@@ -482,7 +338,13 @@ function LeadManagementList({
                 >
                   <X size={20} />
                 </button>
-              </div>
+              </div> */}
+               <FormHeader
+            icon={User}
+            onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+            preText="Select Company User"
+            description="Select the user to view him/her owned leads"
+            />
               {/* NOTE : CALL TO THE MODAL COMPONENT */}
               <div className="p-1">
                 <GetCompanyUsersForLead
