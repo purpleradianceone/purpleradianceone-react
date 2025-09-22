@@ -370,7 +370,7 @@ const LeadDetails = ({
     <div>
       <form>
         <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
-          <span className="text-sm font-semibold text-gray-800">Details</span>
+          <span className="table-header-custom">Details</span>
           {showSaveLeadButton && (
             <button
               className="text-xs text-white mb-0 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
@@ -638,7 +638,7 @@ const FormField = ({
 
   return (
     <div className="flex w-full  items-center border-b  ">
-      <div className="text-gray-700 w-[50%] text-xs">{label}</div>
+      <div className="input-label-custom w-[50%]">{label}</div>
       <div
         className="flex items-center w-[50%]   min-w-[150px]"
         onClick={() => {
@@ -655,7 +655,7 @@ const FormField = ({
       >
         {!isEditing ? (
           <span
-            className="text-gray-800   text-[12px] cursor-pointer truncate  text-ellipsis    whitespace-nowrap"
+            className="caption-custom cursor-pointer truncate whitespace-nowrap"
             title={
               // selectOptions
               //   ?.find((opt) => opt.value === value)
@@ -669,9 +669,9 @@ const FormField = ({
               //       Select {label.toLowerCase()}
               //     </span>
               //   )
-              <span className="font-semibold">{value?.toLocaleString()}</span>
+              <span className="caption-custom">{value?.toLocaleString()}</span>
             ) : (
-              <span className="text-[12px] text-gray-500 italic">Add here...</span>
+              <span className="caption-custom italic">Add here...</span>
             )}
           </span>
         ) : type === "select" ? (
@@ -680,7 +680,7 @@ const FormField = ({
             value={selectedId}
             onBlur={handleBlur}
             onChange={onChange}
-            className="text-gray-900 font-semibold border border-gray-300 w-36 rounded p-1 text-[13px] focus:outline-none"
+            className="caption-custom border border-gray-300 w-36 rounded p-1 focus:outline-none"
           >
             <option value=""> Select {label} </option>
             {selectOptions?.map((opt) => (
@@ -698,7 +698,7 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
-            className="text-gray-900 text-[13px] border border-gray-300 rounded p-1 focus:outline-none"
+            className="caption-custom border border-gray-300 rounded p-1 focus:outline-none"
           />
         ) : (
           <input
@@ -708,7 +708,7 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             maxLength={maxLength}
-            className="text-gray-900 text-[13px]  border-none border-gray-300 focus:outline-none"
+            className="caption-custom border-none border-gray-300 focus:outline-none"
           />
         )}
       </div>

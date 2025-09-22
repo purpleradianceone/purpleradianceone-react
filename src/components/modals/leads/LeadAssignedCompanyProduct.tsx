@@ -208,18 +208,18 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   return (
     <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
       {/* Header row */}
-      <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.7fr]  font-semibold bg-gray-200 text-gray-800  border-gray-500 px-1 py-0.5 ">
-        <div className="text-[13px]">Product Name</div>
-        <div className="text-center text-xs">Req. Quantity</div>
-        <div className="text-center text-xs">Exp. Cost</div>
-        <div className="text-center text-xs">Interest</div>
-        <div className="text-center text-xs">Status</div>
+      <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.7fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
+        <div className="table-header-custom">Product Name</div>
+        <div className="table-header-custom">Req. Quantity</div>
+        <div className="table-header-custom">Exp. Cost</div>
+        <div className="table-header-custom">Interest</div>
+        <div className="table-header-custom">Status</div>
       </div>
       {data.length == 0 && (
-        <div className="flex w-full gap-1 h-28 bg-green50 text-xs text-gray-400 justify-center items-center ">
+        <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
           <button
             onClick={handleAddProductToLeadButtonClick}
-            className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
+            className="border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 "
           >
             +Add
           </button>
@@ -228,7 +228,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       )}
       {/* Data rows */}
       {data.length > 0 && (
-        <div className="flex justify-end items-center text-xs gap-x-2 p-1 text-gray-500">
+        <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
           {/* <span>Add</span> */}
           <button
             onClick={() => {
@@ -241,7 +241,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 );
               }
             }}
-            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+            className="bg-blue-500 hover:bg-blue-600 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
           >
            +Add
           </button>
@@ -263,7 +263,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 >
                   <div
                     // className="text-[13px] font-medium text-gray-800 truncate "
-                    className={`  rounded-lg ${
+                    className={`  input-label-custom rounded-lg ${
                       !product.isActive ? "opacity-50 " : ""
                     }`}
                     onClick={() => {
@@ -285,14 +285,14 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         disabled={!userHasAccessToUpdateLead}
                         value={editedValues.quantityRequired}
                         onChange={(e) => handleQuantityChange(e.target.value)}
-                        className="border py-0.5 px-1 rounded w-16 "
+                        className="border py-0.5 px-1 rounded w-16 input-label-custom "
                       />
                       <input
                         type="text"
                         disabled={!userHasAccessToUpdateLead}
                         value={editedValues.costExpected}
                         onChange={(e) => handleCostChange(e.target.value)}
-                        className="border px-1 rounded w-16 "
+                        className="border px-1 rounded w-16 input-label-custom"
                       />
                       <select
                         disabled={!userHasAccessToUpdateLead}
@@ -307,7 +307,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                             interestName: e.target.selectedOptions[0].text,
                           }))
                         }
-                        className="border rounded w-16"
+                        className="border rounded w-20 input-label-custom"
                       >
                         <option value="">Select</option>
                         {interestTypeData.map((option) => (
@@ -319,7 +319,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                       <div className="flex items-center justify-center">
                         <button
                           type="button"
-                          className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs"
+                          className="bg-blue-600 caption-custom white-text px-2 py-0.5 rounded"
                           onClick={() => {
                             if (userHasAccessToUpdateLead) {
                               handleSaveClick(product);
@@ -340,7 +340,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                   ) : (
                     <>
                       <div
-                        className={`cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -363,7 +363,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         }
                       > */}
                       <div
-                        className={`cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -379,7 +379,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         ₹{product.costExpected}
                       </div>
                       <div
-                        className={`cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""

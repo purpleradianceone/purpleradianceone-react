@@ -240,11 +240,11 @@ const LeadAssignedTeams = ({
                   );
                 }
               }}
-              className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
+              className="border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 "
             >
               +Add
             </button>
-            <span className="text-gray-400 italic">
+            <span className="caption-custom italic">
               Company Team is Not assigned to lead.
             </span>
           </div>
@@ -266,7 +266,7 @@ const LeadAssignedTeams = ({
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+              className="bg-blue-500 hover:bg-blue-600 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
             >
               +Add
             </button>
@@ -282,7 +282,7 @@ const LeadAssignedTeams = ({
                     getComapnyTeamUsers(companyTeam);
                     setIsLoadingCompanyTeamCompanyUser(true);
                   }}
-                  className="bg-blue-0 border border-blue-100 cursor-pointer text-xs font-medium text-gray-800 px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow-sm hover:text-blue-600 hover:border-blue-200 transition"
+                  className="bg-blue-0 border border-blue-100 cursor-pointer px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow-sm hover:text-blue-600 hover:border-blue-200 transition"
                 >
                   {/* Left: Avatar + Team Info */}
                   <div className="flex items-center gap-3">
@@ -300,7 +300,7 @@ const LeadAssignedTeams = ({
                     {/* Team Name */}
                     <div>
                       <>
-                        <p className="text-sm font-semibold ">
+                        <p className="table-data-custom">
                           {companyTeam.teamName || "Unnamed Team"}
                         </p>
                         <p
@@ -308,7 +308,7 @@ const LeadAssignedTeams = ({
                             companyTeam.teamDescription ??
                             "Team description is not given"
                           }
-                          className="text-xs text-gray-700 font-normal"
+                          className="caption-custom"
                         >
                           {" "}
                           {companyTeam.teamDescription ? (
@@ -320,7 +320,7 @@ const LeadAssignedTeams = ({
                             )
                           ) : (
                             <>
-                              <span className="text-xs italic text-gray-400">
+                              <span className="caption-custom italic">
                                 team description is not given
                               </span>
                             </>
@@ -335,8 +335,8 @@ const LeadAssignedTeams = ({
                     <span
                       className={`px-2 py-0.5 rounded-full border ${
                         companyTeam.isActive
-                          ? "bg-green-100 text-green-700 border-green-400"
-                          : "bg-red-100 text-red-700 border-red-300"
+                          ? "bg-green-100 caption-custom-active border-green-400"
+                          : "bg-red-100 caption-custom-inactive border-red-300"
                       }`}
                     >
                       {companyTeam.isActive ? "Active" : "Inactive"}
@@ -345,7 +345,7 @@ const LeadAssignedTeams = ({
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center">
+              <p className="input-label-custom text-center">
                 No teams are assigned available
               </p>
             )}
@@ -372,7 +372,7 @@ const LeadAssignedTeams = ({
                     setCompanyTeamCompanyUser([]);
                     setIsLoadingCompanyTeamCompanyUser(false);
                   }}
-                  className="absolute top-1 right-4 p-2 text-gray-400 hover:text-red-500 transition-all duration-200 z-20"
+                  className="absolute top-1 right-4 p-2 caption-custom hover:text-gray-600 transition-all duration-200 z-20"
                 >
                   <X size={20} />
                 </button>
@@ -398,7 +398,7 @@ const LeadAssignedTeams = ({
 
                       {/* Team details */}
                       <div className="flex-1 min-w-0">
-                        <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 ">
+                        <h2 className="section-header-custom">
                           {selectedCompanyTeamCard.teamName}
                         </h2>
                         <p
@@ -408,7 +408,7 @@ const LeadAssignedTeams = ({
                                 selectedCompanyTeamCard.teamDescription
                               : "Team description is not given"
                           }
-                          className="text-sm text-gray-600 leading-relaxed"
+                          className="table-data-custom leading-relaxed"
                         >
                           {selectedCompanyTeamCard.teamDescription ? (
                             selectedCompanyTeamCard.teamDescription.length <=
@@ -421,7 +421,7 @@ const LeadAssignedTeams = ({
                               ) + "..."
                             )
                           ) : (
-                            <span className="italic text-gray-400">
+                            <span className="italic table-data-custom">
                               Team description is not available
                             </span>
                           )}
@@ -437,8 +437,8 @@ const LeadAssignedTeams = ({
                           className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm
                         ${
                           isActive
-                            ? "bg-green-100 text-green-800 border border-green-200"
-                            : "bg-red-100 text-red-800 border border-red-200"
+                            ? "bg-green-100 input-label-custom-active border border-green-200"
+                            : "bg-red-100 input-label-custom-inactive border border-red-200"
                         }`}
                         >
                           <span
@@ -451,7 +451,7 @@ const LeadAssignedTeams = ({
 
                       {/* Toggle Switch */}
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-600">Status:</span>
+                        <span className="input-label-custom">Status:</span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -479,9 +479,9 @@ const LeadAssignedTeams = ({
 
                   {/* Team Members Section */}
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <h3 className="table-header-custom mb-1 flex items-center gap-2">
                       Team Members
-                      <span className="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded-full">
+                      <span className="bg-gray-100 input-label-custom px-2 py-1 rounded-full">
                         {Array.isArray(companyTeamCompanyUsers)
                           ? companyTeamCompanyUsers.length
                           : 0}
@@ -513,10 +513,10 @@ const LeadAssignedTeams = ({
                                       : "?"}
                                   </div>
                                   <div>
-                                    <p className="font-semibold text-gray-900 text-sm">
+                                    <p className="input-label-custom">
                                       {userData.userName || "Unnamed User"}
                                     </p>
-                                    <p className="text-xs text-gray-500">
+                                    <p className="caption-custom">
                                       Team Member
                                     </p>
                                   </div>
@@ -527,8 +527,8 @@ const LeadAssignedTeams = ({
                                   className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2
                                 ${
                                   userData.isActive
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
+                                    ? "bg-green-100 caption-custom-active"
+                                    : "bg-red-100 caption-custom-inactive"
                                 }`}
                                 >
                                   <span
