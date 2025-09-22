@@ -10,6 +10,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
+import { Save } from "lucide-react";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -318,7 +319,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                       <div className="flex items-center justify-center">
                         <button
                           type="button"
-                          className="bg-blue-500 text-white px-2 py-0.5 rounded text-xs"
+                          className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs"
                           onClick={() => {
                             if (userHasAccessToUpdateLead) {
                               handleSaveClick(product);
@@ -330,7 +331,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                             }
                           }}
                         >
-                          Save
+                        <div className="flex items-center gap-0.5">
+                           <Save size={12}/> Save
+                        </div>
                         </button>
                       </div>
                     </>
@@ -397,7 +400,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           id={product.companyProductName}
                           title={product.isActive ? "Active" : "Inactive"}
                           className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
-                            product.isActive ? "bg-blue-500" : "bg-gray-400"
+                            product.isActive ? "bg-green-500" : "bg-gray-400"
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -419,6 +422,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                             }`}
                           ></div>
                         </button>
+
+
+                        
                       </div>
                     </>
                   )}

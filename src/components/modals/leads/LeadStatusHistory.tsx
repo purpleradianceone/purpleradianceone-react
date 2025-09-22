@@ -8,7 +8,8 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import LeadStatusHistoryData from "../../../@types/lead-management/LeadStatusHistoryData";
 import LeadStatusHistoryAgGrid from "../../ag-grid/LeadStatusHistoryAgGrid";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { X } from "lucide-react";
+import { History} from "lucide-react";
+import FormHeader from "../../ui/FormHeader";
 
 const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
   isOpen,
@@ -80,15 +81,16 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-0 z-50">
-      <div className="bg-slate-50 p-1 rounded-lg shadow-lg w-1/2 h-1/2 flex flex-col items-center">
-        <button
-          onClick={onClose}
-          title="Close"
-          className="self-end  text-xs text-gray-600 hover:text-gray-900 hover:underline"
-        >
-          <X size={18}/>
-        </button>
-        <h1 className="text-base font-semibold">Lead status history</h1>
+      <div className="bg-white border p-1 rounded-lg shadow-lg w-1/2 h-1/2 flex flex-col ">
+
+        <div className="m-0.5  p-0.5">
+          <FormHeader
+          icon={History}
+          preText="Lead status history"
+          description="Track changes made to the lead’s status over time."
+          onClose={onClose}
+        />
+        </div>
 
         <div 
          style={{ height: "100%", width: "100%" }}
