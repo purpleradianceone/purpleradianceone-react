@@ -11,7 +11,7 @@ type ProductsManagementListProps = {
     handleProductChangeOnAdd?: (product: Product) => void;
     handleEditProductChange?: (product:Product) => void;
     handleCreateCompanyProductTax? : (product : Product) => void;
-    isListForProductUser : boolean;
+    // isListForProductUser : boolean;
 }
  
 export default ProductsManagementListProps;

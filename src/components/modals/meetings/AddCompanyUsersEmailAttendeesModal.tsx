@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UserPlus, X } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useEffect, useRef, useState } from "react";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
@@ -13,6 +13,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { createPortal } from "react-dom";
 import SearchInput from "../../ui/SearchInput";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import FormHeader from "../../ui/FormHeader";
 
 
 function AddCompanyUsersEmailAttendeesModal({
@@ -237,12 +238,12 @@ function AddCompanyUsersEmailAttendeesModal({
     return(
         createPortal(<div className={"fixed inset-0 z-50 p-16 overflow-hidden bg-black bg-opacity-45"}>
             <div className="flex min-h-screen items-center justify-center">
-              <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+              <div className="relative w-full max-w-5xl max-h-[100vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
     <div className="p-6">
-                <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
+                {/* <div className="flex items-center gap-3 mb-6 sticky bg-white z-10 py-2">
                   <UserPlus className="text-blue-500" size={SIZE.TWENTY_FOUR} />
                   <h2 className="text-xl font-semibold text-gray-800">
                     {isModalForMeeting ? "Add Users To Meeting" : "Assign Users" }
@@ -255,13 +256,19 @@ function AddCompanyUsersEmailAttendeesModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-                </div>
+                </div> */}
+                <FormHeader
+                icon={UserPlus}
+                onClose={onClose}
+                preText={isModalForMeeting ? "Add Users To Meeting" : "Assign Users" }
+                description={isModalForMeeting ? "Include users from your company in meeting" : "Assign users as per your convinence" }
+                />
 
                 <div
-              className="ag-theme-balham"
+              // className="ag-theme-balham"
               style={{ height: "300px", width: "100%" }}
             >
-              <div className="flex gap-2 mb-2 justify-between">
+              <div className="flex gap-2 mb-2 justify-between mt-2">
                 <div className="flex gap-28">
                   {/* <span className="font-semibold">Search the User</span> */}
                   <SearchInput

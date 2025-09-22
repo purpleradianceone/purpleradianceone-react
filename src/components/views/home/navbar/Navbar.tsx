@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import {
   Aperture,
   Bell,
-  BoxesIcon,
   Building2,
   Calendar,
   Handshake,
@@ -49,7 +48,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewLead,
     userHasAccessToViewAccount,
     userHasAccessToViewProduct,
-    userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
@@ -420,12 +418,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                         {/* )} */}
                         {/* {userHasAccessToViewProductTeam && ( */}
-                          <NavItem
+                          {/* <NavItem
                           disable={!userHasAccessToViewProductTeam}
                             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                             icon={<BoxesIcon size={SIZE.TWENTY} />}
                             label="Prd Team/users"
-                          />
+                          /> */}
                         {/* )} */}
 
                         {/* {userHasAccessToViewMeeting && ( */}
@@ -512,14 +510,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
-                          {userHasAccessToViewProductTeam && (
+                          {/* {userHasAccessToViewProductTeam && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                               icon={<BoxesIcon size={SIZE.TWENTY} />}
                               label=""
                               onClick={() => setIsDropdownOpen(false)}
                             />
-                          )}
+                          )} */}
 
                           {userHasAccessToViewMeeting && (
                             <NavItem

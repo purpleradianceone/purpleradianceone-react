@@ -685,7 +685,7 @@ const ViewLeadManagement = () => {
         <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
           <div className="flex w-[30%] gap-6">
             <button
-              className="flex items-center gap-1 text-xs  justify-center text-gray-400 hover:text-blue-600 "
+              className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
                 navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
               }}
@@ -710,7 +710,7 @@ const ViewLeadManagement = () => {
                     );
                   }
                 }}
-                className="px-1 py-0.5 text-xs flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
+                className="px-1 py-0.5 caption-custom flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
               >
                 <Settings size={12} />
                 <span>Lead setting</span>
@@ -761,7 +761,7 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Lead Status Section */}
-        <div className="mx-2 mt-2   flex  bg-slate-100  shadow rounded-sm">
+        <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
           
           <div  className="flex w-full">
             <div className="flex w-[100%] border rounded-r-full   bg-white">
@@ -769,18 +769,18 @@ const ViewLeadManagement = () => {
               <button
                 title={item.name}
                 key={item.id}
-                className={`flex-1 text-xs text-ellipsis  overflow-hidden ${
+                className={`flex-1 table-data-custom  overflow-hidden ${
                   selectedLeadData.leadStatus === item.name
-                    ? "bg-blue-700 text-white hover:bg-blue-900"
+                    ? "bg-blue-700  hover:bg-blue-500 hover:text-white"
                     : "hover:bg-blue-700 hover:text-white"
                 }
               ${
                 selectedStatusId === item.id &&
-                "bg-sky-400 text-white hover:bg-sky-500"
-              } text-gray-800 font-medium text-center`}
+                "bg-sky-400 hover:bg-sky-500"
+              } text-center`}
                 style={{
                   clipPath:
-                    "polygon(0 0, calc(100% - 17px) 0, 100% 50%, calc(100% - 17px) 100%, 0 100%)",
+                    "polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)",
                 }}
                 onClick={() => {
                   if (userHasAccessToUpdateLead) {
@@ -800,7 +800,7 @@ const ViewLeadManagement = () => {
             
           </div>
           {/* status history */}
-          <div className="flex justify-end text-xs  mb-1 px-2">
+          <div className="flex justify-end caption-custom  mb-1 px-2">
             {/* <span className="font-semibold ">Lead Status</span> */}
             <button
               onClick={() => {
@@ -809,7 +809,7 @@ const ViewLeadManagement = () => {
             >
               <span
                 title="Status history"
-                className="flex items-center justify-center  text-gray-500 hover:text-blue-600 "
+                className="flex items-center justify-center hover:text-blue-600 "
               >
                 <History size={12} className="mt-0" />
                 History
@@ -822,13 +822,13 @@ const ViewLeadManagement = () => {
         </div>
         {reasonInputBoxOpen && (
             <div className="  flex m-3 w-full pr-40   gap-1">
-              <label className="text-xs text-gray-600 font-medium">
+              <label className="input-label-custom">
                 Reason (Optional)
               </label>
               <input
                 type="text"
                 placeholder="Enter reason for status update"
-                className="border rounded px-3 w-72  text-sm"
+                className="border rounded px-3 w-72 input-label-custom"
                 value={reasonText}
                 onChange={(e) => setReasonText(e.target.value)}
               />
@@ -868,7 +868,7 @@ const ViewLeadManagement = () => {
                         : MESSAGE.MODULE_ACCESS.LEAD_MODULE
                             .UPDATE_LEAD_ACCESS_DENIED_message
                     }
-                    className="text-lg font-semibold"
+                    className="table-header-custom"
                     onClick={() => {
                       if (!userHasAccessToUpdateLead) {
                         toast.error(
@@ -997,7 +997,7 @@ const ViewLeadManagement = () => {
                     />
                      <button
                     title="Lead owner history"
-                    className="absolute left-24   text-xs flex items-center mt-1 hover:text-blue-700 text-gray-500"
+                    className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
                     onClick={() => {
                       setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
                     }}
@@ -1013,13 +1013,13 @@ const ViewLeadManagement = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
                   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-sm text-gray-700 font-medium">
+                      <label className="table-header-custom">
                         Reason (Optional)
                       </label>
                       <textarea
                         rows={7}
                         placeholder="Enter reason for lead owner update"
-                        className="border rounded  p-1 text-sm"
+                        className="border rounded  p-1 input-label-custom"
                         value={reasonTextForLeadOwnerChange}
                         onChange={(e) =>
                           setReasonTextForLeadOwnerChange(e.target.value)
@@ -1080,12 +1080,12 @@ const ViewLeadManagement = () => {
           {/* Column 2 */}
           <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-sm">
             {/* Meeting / Contact / Span Tabs */}
-            <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
+            <div className="bg-slate-200 pl-1  flex caption-custom gap-4">
               <span
                 id="contact"
                 className={`cursor-pointer ${
                   activeTab === "contact"
-                    ? "border-b-2 border-blue-500 text-blue-600"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
                     : "hover:text-blue-500"
                 }`}
                 onClick={handleClickCards}
@@ -1096,7 +1096,7 @@ const ViewLeadManagement = () => {
                 id="meeting"
                 className={`cursor-pointer ${
                   activeTab === "meeting"
-                    ? "border-b-2 border-blue-500 text-blue-600"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
                     : "hover:text-blue-500"
                 }`}
                 onClick={handleClickCards}
@@ -1108,7 +1108,7 @@ const ViewLeadManagement = () => {
                 id="LeadTeams"
                 className={`cursor-pointer ${
                   activeTab === "LeadTeams"
-                    ? "border-b-2 border-blue-500 text-blue-600"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
                     : "hover:text-blue-500"
                 }`}
                 onClick={handleClickCards}
@@ -1126,19 +1126,20 @@ const ViewLeadManagement = () => {
                 {isOpenMeetingsModal && (
                   <div className="flex  items-center justify-center   min-h-72">
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
-                      <h2 className="text-lg font-semibold text-gray-800">
+                      <h2 className="table-header-custom">
                         Schedule a Meeting
                       </h2>
-                      <p className="text-sm text-gray-600 max-w-md">
+                      <p className="input-label-custom">
                         Plan your next discussion with ease. Use this option to
                         select a convenient time, invite participants, and share
                         meeting details — all in one place.
                       </p>
-                      <p className="text-xs text-gray-500 max-w-md">
+                      <p className="input-label-custom max-w-md">
                         Once scheduled, participants will receive notifications
                         with the meeting link and reminders before it begins.
                       </p>
-                      <button
+                      <div>
+                        <Button
                         className="bg-blue-600 hover:bg-blue-700  text-xs md:text-sm p-2 text-white rounded-md "
                         onClick={() => {
                           const leadDataSearchParams = JSON.parse(
@@ -1152,7 +1153,9 @@ const ViewLeadManagement = () => {
                         }}
                       >
                         + Schedule Meeting
-                      </button>
+                      </Button>
+                      </div>
+                      
                     </div>
                   </div>
                 )}
@@ -1365,13 +1368,13 @@ const Detail: React.FC<DetailProps> = ({
   };
   return (
     <div className="">
-      <label className="text-xs text-gray-700 block  whitespace-nowrap overflow-hidden  ">
+      <label className="caption-custom block  whitespace-nowrap overflow-hidden  ">
         {label}
       </label>
       {isEditing ? (
         type === "select" ? (
           <select
-            className="text-sm text-gray-700 "
+            className="input-label-custom"
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
@@ -1387,7 +1390,7 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-sm text-gray-700 border border-gray-400 rounded-sm  p-0 m-0 w-44 focus:outline-none focus:ring-0 "
+              className="input-label-custom border border-gray-400 rounded-sm  p-0 m-0 w-44 focus:outline-none focus:ring-0 "
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1400,7 +1403,7 @@ const Detail: React.FC<DetailProps> = ({
       ) : type === "none" ? (
         <div>
           <p
-            className={`  font-medium text-sm   text-gray-800 whitespace-nowrap overflow-x-hidden text-clip`}
+            className={`input-label-custom  text-gray-800 whitespace-nowrap overflow-x-hidden text-clip`}
           >
             {value ? (
               <span
@@ -1422,7 +1425,7 @@ const Detail: React.FC<DetailProps> = ({
                   label === "Created on"
                     ? ""
                     : "border border-gray-200 rounded-md "
-                }text-gray-400 font-normal  text-xs px-1`}
+                }caption-custom px-1`}
               >
                 {label === "Lead source" ||
                 label === "Created by" ||
@@ -1436,11 +1439,11 @@ const Detail: React.FC<DetailProps> = ({
       ) : label === "Lead owner" ? (
         <div
           title={value}
-          className={`font-medium  border border-gray-100 px-1 rounded-md text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`input-label-custom border border-gray-100 px-1 rounded-md   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
           {value ?? (
-            <span className="text-gray-400 font-normal text-xs">
+            <span className="input-label-custom">
               Add here...
             </span>
           )}
@@ -1448,10 +1451,10 @@ const Detail: React.FC<DetailProps> = ({
       ) : (
         <div
           title={value ?? "Enter value "}
-          className={`font-semibold text-gray-900  flex items-center  justify-between ${
+          className={`table-header-custom flex items-center  justify-between ${
             label === "Name"
-              ? "text-md p-0 font-bold border-gray-200 "
-              : "text-sm  text-gray-900"
+              ? "table-header-custom p-0  border-gray-200 "
+              : "input-label-custom"
           }   truncate overflow-hidden ${
             hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
           }   cursor-pointer`}
@@ -1464,12 +1467,12 @@ const Detail: React.FC<DetailProps> = ({
             </>
           ) : (
             <>
-              <span className="text-gray-500 p-1 flex items-center justify-between font-normal text-xs italic">
+              <span className=" p-1 caption-custom flex items-center justify-between italic">
                 Add here... 
               </span>
             </>
           )}
-          <Pen size={12} className="text-gray-400 "/>
+          <Pen size={12} className="caption-custom "/>
         </div>
       )}
     </div>
