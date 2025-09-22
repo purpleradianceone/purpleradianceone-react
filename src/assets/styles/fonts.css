@@ -123,6 +123,13 @@
   color: #2563eb;
 }
 
+.caption-custom-yellow {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ebeb25;
+}
+
 .caption-custom-active {
   font-family: "Roboto", sans-serif;
   font-size: 12px;
@@ -137,12 +144,26 @@
   color: #ef4444;
 }
 
+.caption-custom-orange {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #eb9225;
+}
+
 /* Input Labels */
 .input-label-custom {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   font-weight: 400; /* Maps to Regular */
   color: #333333;
+}
+
+.input-label-custom-active-tab {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #0D9488;
 }
 
 .input-label-custom-active {

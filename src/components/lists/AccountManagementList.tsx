@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, UserRoundCogIcon, } from "lucide-react";
+import { Calendar, UserRoundCogIcon } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
@@ -8,7 +8,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import {  useState } from "react";
+import { useState } from "react";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Pagination from "../ag-grid/Pagination";
@@ -27,13 +27,13 @@ function AccountManagementList({
   fetchAccounts,
   handleCreateCompanyAccountType,
 }: {
-  fetchAccounts : () => Promise<void>;
+  fetchAccounts: () => Promise<void>;
   accounts: Account[];
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
-  handleCreateCompanyAccountType : () => void;
+  handleCreateCompanyAccountType: () => void;
 }) {
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
@@ -51,18 +51,17 @@ function AccountManagementList({
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: any) => {
     setAccountDataToShowFullDetails(data);
-      setShowAccountDetails(true);
+    setShowAccountDetails(true);
   };
 
-  
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
       <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-        <div className="flex gap-1">
+        <div className="flex items-center justify-center gap-2">
           {!isSmallScreen && (
-            <UserRoundCogIcon className="w-6= h-6 text-blue-600" />
+            <UserRoundCogIcon className="w-5 h-5 text-blue-600" />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
@@ -70,7 +69,7 @@ function AccountManagementList({
           )}
         </div>
 
-        {isLargeScreen && (
+        {/* {isLargeScreen && ( */}
           <>
             <div className="flex gap-2 justify-center items-center">
               {/* search box flex div */}
@@ -111,18 +110,7 @@ function AccountManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
-              <Button
-                onClick={() => {
-                  setOpenAccountForm(!openCreateAccountForm);
-                }}
-              ><span>+ Create</span>
-              </Button>
-              {openCreateAccountForm && (
-                <CreateAccount 
-                onClose={() => setOpenAccountForm(false)} 
-                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
-                />
-              )}
+
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
                   labelName="source"
@@ -190,8 +178,22 @@ function AccountManagementList({
               </div> */}
             </div>
           </>
+        {/* // )} */}
+       <div>
+         <Button
+          onClick={() => {
+            setOpenAccountForm(!openCreateAccountForm);
+          }}
+        >
+          <span>+ Create</span>
+        </Button>
+        {openCreateAccountForm && (
+          <CreateAccount
+            onClose={() => setOpenAccountForm(false)}
+            handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+          />
         )}
-
+       </div>
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
@@ -221,15 +223,15 @@ function AccountManagementList({
       </div>
 
       {showAccountDetails && (
-          <div className="account-data">
+        <div className="account-data">
           <AccountDetails
-          fetchAccounts ={fetchAccounts}
-          // indutryTypeData={industryTypeData!}
-          // businessTypeData = {businessTypeData!}
-           company={AccountDataToShowFullDetails!}
-           onClose={() => setShowAccountDetails(false)}
-           />
-           </div>
+            fetchAccounts={fetchAccounts}
+            // indutryTypeData={industryTypeData!}
+            // businessTypeData = {businessTypeData!}
+            company={AccountDataToShowFullDetails!}
+            onClose={() => setShowAccountDetails(false)}
+          />
+        </div>
       )}
     </div>
   );

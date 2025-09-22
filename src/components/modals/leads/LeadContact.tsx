@@ -3,7 +3,7 @@
 import {
   Briefcase,
   Contact2,
-  Edit3,
+  Edit2,
   Globe,
   Languages,
   Mail,
@@ -85,7 +85,7 @@ const LeadContact = ({
   const inputClass =
     "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
   const formInputLabelClassName =
-    "block text-sm font-medium text-gray-700 mb-2";
+    "block input-label-custom mb-2";
 
   const handleUrl = (link: string): string => {
     try {
@@ -401,7 +401,7 @@ const LeadContact = ({
               );
             }
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+          className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
         >
           +Add
         </button>
@@ -413,7 +413,7 @@ const LeadContact = ({
           leadContact.map((contact, index) => (
             <div
               key={index}
-              className="bg-gray-50 border border-blue-200 cursor-pointer text-xs font-medium text-gray-800 px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+              className="bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
               onClick={() => setSelectedContactCard(contact)}
             >
               {/* Left: Contact Info */}
@@ -422,19 +422,19 @@ const LeadContact = ({
                 <div
                   className={` ${
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
-                  } text-white flex items-center justify-center w-9 h-9 rounded-full border    font-semibold shadow-sm`}
+                  } text-white flex items-center justify-center w-9 h-9 rounded-full border  font-semibold shadow-sm`}
                 >
                   {contact.name ? contact.name.charAt(0).toUpperCase() : contact.email.charAt(0).toUpperCase() || "?"}
                 </div>
 
                 {/* Text Info */}
                 <div className="flex flex-col">
-                  <p className="text-sm font-semibold ">
+                  <p className="input-label-custom">
                     {contact.name && contact.name.length > 50
                       ? contact.name.substring(0, 49) + "..."
                       : contact.name || contact.email || contact.mobileNumber }
                   </p>
-                  <p className="text-xs text-gray-500 font-normal flex flex-wrap items-center gap-x-1">
+                  <p className="caption-custom flex flex-wrap items-center gap-x-1">
                     {contact.jobTitle && (
                       <span className="flex gap-1 items-center">
                         <Briefcase size={12} /> {contact.jobTitle}
@@ -466,8 +466,8 @@ const LeadContact = ({
                 <span
                   className={`px-2 py-0.5 rounded-full border ${
                     contact.isPrimary
-                      ? "bg-green-100 text-green-700 border-green-400"
-                      : "bg-yellow-50 text-yellow-700 border-yellow-300"
+                      ? "bg-green-100 caption-custom-active border-green-400"
+                      : "bg-yellow-50 caption-custom-orange border-yellow-400"
                   }`}
                 >
                   {contact.isPrimary ? "Primary" : "Secondary"}
@@ -475,8 +475,8 @@ const LeadContact = ({
                 <span
                   className={`px-2 py-0.5 rounded-full border ${
                     contact.isActive
-                      ? "bg-green-100 text-green-700 border-green-400"
-                      : "bg-red-100 text-red-700 border-red-400"
+                      ? "bg-green-100 caption-custom-active border-green-400"
+                      : "bg-red-100 caption-custom-inactive border-red-400"
                   }`}
                 >
                   {contact.isActive ? "Active" : "Inactive"}
@@ -485,7 +485,7 @@ const LeadContact = ({
             </div>
           ))
         ) : (
-          <p className="text-sm text-gray-500 text-center">
+          <p className="caption-custom text-center">
             No contacts available
           </p>
         )}
@@ -498,7 +498,7 @@ const LeadContact = ({
             <div className="relative px-8 pt-5 pb-4">
               <button
                 onClick={() => setSelectedContactCard(null)}
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute top-6 right-6 caption-custom hover:text-gray-600 transition-colors"
               >
                 <X size={24} />
               </button>
@@ -516,30 +516,30 @@ const LeadContact = ({
                 <div className="flex-1">
                   <h2
                     title={selectedContactCard.name ?? ""}
-                    className="text-3xl font-bold text-gray-900"
+                    className="section-header-custom"
                   >
                     {selectedContactCard.name !==null && selectedContactCard.name.length > 40 ? (
                       selectedContactCard.name.substring(0, 49) + "..."
                     ) : selectedContactCard.name ? (
                       selectedContactCard.name
                     ) : (
-                      <span className="text-base text-gray-500 font-normal italic">Unamed contact</span>
+                      <span className="input-label-custom italic">Unamed contact</span>
                     )}
                   </h2>
-                  <p className="text-md text-gray-600 mt-1 flex items-center">
+                  <p className="input-label-custom mt-1 flex items-center">
                     <Briefcase size={16} className="inline mr-2" />
                     {selectedContactCard.jobTitle ?? (
-                      <span className="text-sm italic">
+                      <span className="input-label-custom italic">
                         No job title specified
                       </span>
                     )}
                   </p>
                   <div className="flex items-center gap-3 mt-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      className={`px-3 py-1 rounded-full ${
                         selectedContactCard.isPrimary
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                          ? "bg-green-100 input-label-custom-active border border-green-200"
+                          : "bg-yellow-100 input-label-custom-orange border border-yellow-200"
                       }`}
                     >
                       {selectedContactCard.isPrimary
@@ -549,15 +549,16 @@ const LeadContact = ({
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         isActive
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : "bg-red-100 text-red-800 border border-red-200"
+                          ? "bg-green-100 input-label-custom-active border border-green-200"
+                          : "bg-red-100 input-label-custom-inactive border border-red-200"
                       }`}
                     >
                       {isActive ? "Active" : "Inactive"}
                     </span>
                   </div>
                 </div>
-                <button
+                <div>
+                  <Button
                   onClick={() => {
                     if (userHasAccessToUpdateLead) {
                       handleEditLeadContactClick(selectedContactCard);
@@ -568,11 +569,16 @@ const LeadContact = ({
                       );
                     }
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                  // className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                 >
-                  <Edit3 size={16} />
-                  Edit
-                </button>
+                  <div className="flex gap-2">
+                      <Edit2 size={16} className="mt-1"/>
+                  <span>Edit</span>
+                  </div>
+                  
+                </Button>
+                </div>
+                
               </div>
             </div>
 
@@ -582,42 +588,42 @@ const LeadContact = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Mail className="text-blue-500 mt-1" size={18} />
+                    <Mail className="input-label-custom-blue mt-1" size={18} />
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="table-header-custom mb-1">
                         Email Address
                       </h4>
-                      <p className="text-gray-700">
+                      <p className="input-label-custom">
                         {selectedContactCard.email ?? (
-                          <span className="text-sm italic">Not provided</span>
+                          <span className="input-label-custom italic">Not provided</span>
                         )}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Phone className="text-green-500 mt-1" size={18} />
+                    <Phone className="input-label-custom-active mt-1" size={18} />
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="table-header-custom mb-1">
                         Mobile Number
                       </h4>
-                      <p className="text-gray-700">
+                      <p className="input-label-custom">
                         {selectedContactCard.mobileNumber ?? (
-                          <span className="text-sm italic">Not provided</span>
+                          <span className="input-label-customc">Not provided</span>
                         )}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Languages className="text-purple-500 mt-1" size={18} />
+                    <Languages className="input-label-custom-purple mt-1" size={18} />
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="table-header-custom mb-1">
                         Preferred Language
                       </h4>
-                      <p className="text-gray-700">
+                      <p className="input-label-custom">
                         {selectedContactCard.preferredLanguage ?? (
-                          <span className="text-sm italic">Not provided</span>
+                          <span className="input-label-custom italic">Not provided</span>
                         )}
                       </p>
                     </div>
@@ -626,23 +632,23 @@ const LeadContact = ({
 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <MessageCircle className="text-orange-500 mt-1" size={18} />
+                    <MessageCircle className="input-label-custom-orange mt-1" size={18} />
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="table-header-custom mb-1">
                         Preferred Communication
                       </h4>
-                      <p className="text-gray-700">
+                      <p className="input-label-custom">
                         {selectedContactCard.preferredCommunicationChannel ?? (
-                          <span className="text-sm italic">Not provided</span>
+                          <span className="input-label-custom italic">Not provided</span>
                         )}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Globe className="text-blue-600 mt-1" size={18} />
+                    <Globe className="input-label-custom-blue mt-1" size={18} />
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="table-header-custom mb-1">
                         LinkedIn Profile
                       </h4>
                       {selectedContactCard.linkedinProfile ? (
@@ -650,12 +656,12 @@ const LeadContact = ({
                           href={selectedContactCard.linkedinProfile}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                          className="input-label-custom-blue hover:text-blue-800 hover:underline"
                         >
                           View LinkedIn Profile
                         </a>
                       ) : (
-                        <p className="text-gray-700 italic text-sm">
+                        <p className="input-label-custom italic">
                           Not provided
                         </p>
                       )}
@@ -665,14 +671,14 @@ const LeadContact = ({
                   <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
                     <div className="w-5 h-5 mt-1 flex items-center justify-center">
                       <div
-                        className={`w-3 h-3 rounded-full ${
+                        className={`w-3 h-3 rounded-full -mt-2 ${
                           isActive ? "bg-green-500" : "bg-red-500"
                         }`}
                       />
                     </div>
                     <div className="">
                       <div className="flex gap-4">
-                        <h4 className="font-medium text-gray-900 mb-2">
+                        <h4 className="table-header-custom ">
                           Status
                         </h4>
                         <label className="inline-flex items-center cursor-pointer relative self-end">
@@ -710,13 +716,13 @@ const LeadContact = ({
                           <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
                           {/* Adjusted size and colors */}
                           <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                          <span className="ml-3 text-sm font-medium text-gray-900">
+                          <span className="ml-3 text-sm table-header-custom">
                             {isActive ? "Active" : "Inactive"}
                           </span>
                         </label>
                       </div>
                       {selectedContactCard.isPrimary && (
-                        <div className="text-xs italic  text-gray-500 mt-1">
+                        <div className="caption-custom italic mt-1">
                           Primary contact status cannot be changed
                         </div>
                       )}
@@ -728,8 +734,8 @@ const LeadContact = ({
               {/* Social Media Profiles */}
               {selectedContactCard.socialMediaHandles && (
                 <div className="mb-6">
-                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                    <Globe size={18} className="text-blue-500" />
+                  <h4 className="table-header-custom mb-3 flex items-center gap-2">
+                    <Globe size={18} className="input-label-custom-blue" />
                     Social Media Profiles
                   </h4>
                   <div className="flex flex-wrap gap-3">
@@ -742,7 +748,7 @@ const LeadContact = ({
                           href={link.trim()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm transition-colors border border-blue-200 hover:border-blue-300"
+                          className="bg-blue-50 input-label-custom-blue hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
                         >
                           {handleUrl(link.trim())}
                         </a>
@@ -754,10 +760,10 @@ const LeadContact = ({
               {/* Address */}
               {selectedContactCard.address && (
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                  <MapPin className="text-red-500 mt-1" size={18} />
+                  <MapPin className="input-label-custom-inactive mt-1" size={18} />
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Address</h4>
-                    <p className="text-gray-700 leading-relaxed">
+                    <h4 className="table-header-custom mb-1">Address</h4>
+                    <p className="input-label-custom leading-relaxed">
                       {selectedContactCard.address}
                     </p>
                   </div>
@@ -814,7 +820,7 @@ const LeadContact = ({
               icon={Contact2}
               preText={editContactData ? "Edit Contact" : "Add New Contact"}
               description= {editContactData
-                      ? "Update the contact’s information to keep records accurate and up to date."
+                      ? "Update the contact's information to keep records accurate and up to date."
                       : "Create a contact for this lead to ensure proper follow-up and engagement."}
               onClose={() => {
                     // setEditMode(false);
@@ -875,10 +881,10 @@ const LeadContact = ({
                     }}
                   /> */}
                   {errors.name && (
-                    <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                    <p className="caption-custom-inactive mt-1">{errors.name}</p>
                   )}
                   {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
+                    <p className="caption-custom mt-1">
                       Primary contact name cannot be changed
                     </p>
                   )}
@@ -899,10 +905,10 @@ const LeadContact = ({
                     }
                   />
                   {errors.email && (
-                    <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+                    <p className="caption-custom-inactive mt-1">{errors.email}</p>
                   )}
                   {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
+                    <p className="caption-custom mt-1">
                       Primary contact email cannot be changed
                     </p>
                   )}
@@ -925,12 +931,12 @@ const LeadContact = ({
                     }
                   />
                   {errors.mobileNumber && (
-                    <p className="text-xs text-red-600 mt-1 ">
+                    <p className="caption-custom-inactive mt-1 ">
                       {errors.mobileNumber}
                     </p>
                   )}
                   {editContactData?.isPrimary && (
-                    <p className="text-gray-500 text-xs mt-1">
+                    <p className="caption-custom mt-1">
                       Primary contact mobile number cannot be changed
                     </p>
                   )}
@@ -1024,8 +1030,8 @@ const LeadContact = ({
                         className="flex items-center justify-between bg-gray-100 px-3 py-1.5 rounded shadow-sm"
                       >
                         <div className="flex items-center gap-2">
-                          <Globe size={14} className="text-gray-600" />
-                          <span className="text-xs text-gray-700">
+                          <Globe size={14} className="caption-custom" />
+                          <span className="caption-custom">
                             {handle}
                           </span>
                         </div>
@@ -1036,7 +1042,7 @@ const LeadContact = ({
                               prev.filter((h) => h !== handle)
                             )
                           }
-                          className="text-gray-800 hover:text-red-500"
+                          className="caption-custom hover:text-red-500"
                         >
                           <Trash2 size={12} />
                           {/* <X size={12} /> */}
@@ -1050,7 +1056,7 @@ const LeadContact = ({
                 <div className="sm:col-span-2">
                   <label className={formInputLabelClassName}>
                     {" "}
-                    <MapPin size={16} className="inline mr-2 text-blue-500" />
+                    <MapPin size={16} className="inline mr-2 -mt-1 input-label-custom-blue" />
                     Address
                   </label>
                   <textarea

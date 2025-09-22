@@ -21,8 +21,10 @@ import {
   MapPin,
   Phone,
   ReceiptText,
+  Save,
   User,
   UserCogIcon,
+  X,
 } from "lucide-react";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -374,7 +376,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   }
   return (
     <div className="fixed top-8 inset-0 z-20 border  flex items-center justify-center  shadow-2xl ">
-      <div className=" bg-white  rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+      <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
         <motion.section
           ref={ref}
           initial={{ opacity: 0, y: 40 }}
@@ -680,13 +682,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             <div className="col-span-2 flex justify-end gap-3">
               <div>
                 <Button type="button" onClick={handleStateClear}>
-                  Cancel
+                  <div className="flex items-center gap-0.5">
+                    <X size={16}/> Cancel
+                  </div>
                 </Button>
               </div>
 
               <div>
                 <Button type="submit" onClick={handleSubmit}>
-                  Submit
+                  <div className="flex items-center gap-1">
+                    <Save size={16}/> Save
+                  </div>
                 </Button>
               </div>
             </div>

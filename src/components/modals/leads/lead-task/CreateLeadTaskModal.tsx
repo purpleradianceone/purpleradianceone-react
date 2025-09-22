@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  Calendar,
   ClipboardList,
+  Clock,
   Contact,
+  Contact2,
   FileText,
   FileTextIcon,
   Globe,
   Save,
   TargetIcon,
   Text,
+  User,
   UserPlus,
   Users,
   X,
@@ -283,8 +287,8 @@ function CreateLeadTaskModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-white mt-14 min-h-[50vh]  rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
+      <div className="bg-white mt-12 min-h-[60vh]  rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <FormHeader
           icon={ClipboardList}
@@ -298,7 +302,7 @@ function CreateLeadTaskModal({
           <div className="grid grid-cols-3 gap-3">
             {/* type */}
             <CustomDropdown
-            requiredRedDot
+              requiredRedDot
               logo={Text}
               labelName="Type:"
               onSelect={(e) => {
@@ -317,7 +321,7 @@ function CreateLeadTaskModal({
             ></CustomDropdown>
             {/* priority */}
             <CustomDropdown
-            requiredRedDot
+              requiredRedDot
               logo={Text}
               labelName="Priority :"
               preselectedOption={2} // id of medium
@@ -333,7 +337,7 @@ function CreateLeadTaskModal({
 
             {/* Stage */}
             <CustomDropdown
-            requiredRedDot
+              requiredRedDot
               logo={Text}
               labelName="Stage"
               preselectedOption={2}
@@ -349,11 +353,11 @@ function CreateLeadTaskModal({
 
             {leadActivityId !== 3 && (
               <div className="flex items-center gap-4  mb-0">
-                <label
-                  htmlFor="phoneCallBtn"
-                  className="block text-sm font-normal text-gray-700"
-                >
-                  Select Lead Contact :
+                <label htmlFor="phoneCallBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <Contact2 className="text-blue-600 mt-0.5" size={16} />
+                    <span>Select Lead Contact :</span>
+                  </div>
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
@@ -362,7 +366,7 @@ function CreateLeadTaskModal({
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
-                   <span className="flex gap-1 text-nowrap ">
+                    <span className="flex gap-1 text-nowrap ">
                       <Contact size={SIZE.TWENTY}></Contact>
                       <span>lead contact</span>
                     </span>
@@ -385,7 +389,7 @@ function CreateLeadTaskModal({
           </div>
 
           {leadContactDataSelectedArray.length != 0 && (
-            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
+            <div className="grid grid-cols-3 input-label-custom">
               Selected Lead Contacts
             </div>
           )}
@@ -398,8 +402,8 @@ function CreateLeadTaskModal({
                 >
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
+                      <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
+                      <span className="caption-custom">
                         {contact.name || contact.email || "Unnamed contact"}
                       </span>
                     </span>
@@ -413,7 +417,7 @@ function CreateLeadTaskModal({
                           prev.filter((item) => item.id !== contact.id)
                         );
                       }}
-                      className="text-gray-600 hover:text-red-500"
+                      className="caption-custom hover:text-red-500"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -427,7 +431,7 @@ function CreateLeadTaskModal({
             {/* Subject */}
             <div className="mt-2">
               <FormInput
-              required
+                required
                 logo={FileTextIcon}
                 label="Subject :"
                 type="text"
@@ -459,15 +463,16 @@ function CreateLeadTaskModal({
                   onChange={(e) => {
                     setDueDate(e.target.value);
                   }}
+                  logo={Calendar}
                 />
               </div>
 
               <div className="mt-2 col-span-2">
-                <label
-                  htmlFor="endTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  End Time
+                <label htmlFor="endTime" className="block input-label-custom">
+                  <div className="flex gap-2 text-center">
+                    <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                    <span>End Time</span>
+                  </div>
                 </label>
                 <select
                   id="endTime"
@@ -501,17 +506,24 @@ function CreateLeadTaskModal({
           </div>
 
           {selectedCompanyUsers.length != 0 && (
-            <div className="relative grid grid-cols-3  text-sm font-normal text-gray-800">
+            <div className="relative grid grid-cols-3 input-label-custom">
+              <div className="flex gap-2 text-center">
+                <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                <span>Assign Users : </span>
+              </div>
 
-              Assign Users :  
               {/* Assign button */}
               <div className="absolute left-28 max-w-28">
                 <Button
                   type="button"
                   onClick={() => setIsAssignUsersModalOpen(true)}
                 >
-                  <span title="Assign user to this task" className="flex  text-center text-xs text-nowrap">
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center caption-custom white-text text-nowrap"
+                  >
                     <UserPlus size={14}></UserPlus>
+
                     {/* <span>Assign user</span> */}
                   </span>
                 </Button>
@@ -521,42 +533,42 @@ function CreateLeadTaskModal({
 
           {selectedCompanyUsers.length != 0 && (
             <div className="p-1">
-            <span className="text-xs">Currently assigned users:</span>
-            <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-             
-              {selectedCompanyUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
-                >
-                  <div className="flex justify-between">
-                    <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-800">
-                        {user.fullname ? user.fullname :  user.email || "Unnamed contact"}
+              <span className="caption-custom">Currently assigned users:</span>
+              <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+                {selectedCompanyUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
+                  >
+                    <div className="flex justify-between">
+                      <span className="flex items-center gap-2">
+                        <Users className="h-3 w-3caption-custom rounded-full bg-white" />
+                        <span className="caption-custom">
+                          {user.fullname
+                            ? user.fullname
+                            : user.email || "Unnamed contact"}
+                        </span>
                       </span>
-                    </span>
-                    <Button
-                      size="sm"
-                      type="button"
-                      onClick={() => {
-                        setAssignedTo((prev) =>
-                          prev.filter((id) => id !== user.id)
-                        );
-                        setSelectedCompanyUsers((prev) =>
-                          prev.filter((item) => item.id !== user.id)
-                        );
-                      }}
-                      className="text-gray-600 hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                      <Button
+                        size="sm"
+                        type="button"
+                        onClick={() => {
+                          setAssignedTo((prev) =>
+                            prev.filter((id) => id !== user.id)
+                          );
+                          setSelectedCompanyUsers((prev) =>
+                            prev.filter((item) => item.id !== user.id)
+                          );
+                        }}
+                        className="caption-custom hover:text-red-500"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-            </div>
-            
           )}
         </form>
 

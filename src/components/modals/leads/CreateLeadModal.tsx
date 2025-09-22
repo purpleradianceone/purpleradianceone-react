@@ -38,7 +38,7 @@ function CreateLeadModal({
     mobileNumber: "",
   };
   const createLeadInputTagCss =
-    "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
+    "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500";
   const { loginStatus } = useLoggedInUserContext();
   const { errors } = useFormValidation(
     initialCreatLeadFormData,
@@ -483,7 +483,7 @@ function CreateLeadModal({
                
               {/* /> */}
               {error.mobileNumber && (
-                <div className="text-red-500 text-xs">{error.mobileNumber}</div>
+                <div className="caption-custom-inactive">{error.mobileNumber}</div>
               )}
             </div>
             
@@ -496,17 +496,17 @@ function CreateLeadModal({
                   </div>
                 </Button>
 
-                <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
-                  <span className="text-xs font-normal ">Lead Owner :</span>{" "}
+                <span className="caption-custom whitespace-nowrap">
+                  <span className="input-label-custom">Lead Owner :</span>{" "}
                   {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
                   {selectedCompanyUser.fullname || loginStatus.fullName}
                 </span>
               </div>
 
-              <span className=" text-xs text-gray-700 ">
-                <span className="font-medium">Note :</span> If a lead owner is
+              <span className="caption-custom">
+                <span className="">Note :</span> If a lead owner is
                 not selected, then lead will be assigned to the lead
-                <span className="font-medium"> Creator</span> by default.
+                <span className=""> Creator</span> by default.
               </span>
             </div>
 
@@ -566,9 +566,9 @@ function CreateLeadModal({
 
       {openPopUpOfCompanyUserModal && (
         <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+          <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
             {/* Header with Close Button */}
-            <div className="flex justify-between items-center p-3 border-b border-gray-200">
+            {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">
                 Select Company User
               </h3>
@@ -578,7 +578,15 @@ function CreateLeadModal({
               >
                 <X size={20} />
               </button>
-            </div>
+            </div> */}
+
+              
+            <FormHeader
+            icon={UserRoundPlus}
+            onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+            preText="Select Company User"
+            description="Select the user to assign him/her as lead owner"
+            />
             {/* NOTE : CALL TO THE MODAL COMPONENT */}
             <div className="p-1">
               <GetCompanyUsersForLead

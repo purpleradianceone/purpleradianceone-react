@@ -29,9 +29,10 @@ import {
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import AccountContact from "./Account-contact/AccountContact";
+import AccountContact from "./account-contact/AccountContact";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
+import AccountLead from "./account-lead/AccountLead";
 
 interface AccountDetailsProps {
   company: Account;
@@ -553,7 +554,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   if (isIndustryTypeLoading || isBusinessTypeLoading) {
     return (
-      <div className="fixed  inset-0 z-10 bg-white p-8 ml-11 mt-11">
+      <div className={` ${userPreference.isLeftMenu ? " ml-11 " :""}fixed mt-11  inset-0 z-10 bg-white p-8`}>
         <Skeleton/>
       </div>
     );
@@ -562,10 +563,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     <div
       className={`${
         userPreference.isLeftMenu ? "ml-14" : ""
-      } mt-8 mb-9 fixed inset-0 bg-white z-10 overflow-auto mx-auto p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
+      } mt-8  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-2 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
+
     >
-      {/* Header Section */}
-      <div className="bg-white rounded-2xl shadow p-2 mb-2 border">
+      <div className="pb-3">
+        {/* Header Section */}
+      <div className="bg-white rounded-2xl  p-2 mb-2 border">
         <button
           className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
@@ -657,7 +660,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 max-h-72   gap-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2    gap-1">
         {/* Left Card with Tabs */}
         <div className="bg-white rounded-xl   p-3 border border-slate-200">
           {/* Tab Navigation */}
@@ -702,12 +705,19 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         </div>
 
         {/* Right Card - Empty for future use */}
-        <div className="bg-white rounded-xl h-72 border p-1 border-slate-200">
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Contact
           </h3>
           <AccountContact accountId={company.id} />
         </div>
+        {/* Account Lead */}
+        <div>
+          <AccountLead
+          account={company}
+          />
+        </div>
+      </div>
       </div>
     </div>
   );

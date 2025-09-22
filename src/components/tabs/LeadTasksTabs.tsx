@@ -124,7 +124,7 @@ function LeadTaskTabs({
             className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                "bg-transparent border-b-2 border-teal-600 shadow-none rounded-none",
             }}
             onResize={undefined}
             onResizeCapture={undefined}
@@ -144,7 +144,7 @@ function LeadTaskTabs({
                 
                 }}
                 className={
-                  activeTab === value ? "text-gray-900 text-xs" : " text-gray-600 text-xs"
+                  activeTab === value ? "input-label-custom-active-tab" : "input-label-custom"
                 }
               >
                 {label}

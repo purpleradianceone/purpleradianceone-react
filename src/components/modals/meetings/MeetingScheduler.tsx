@@ -5,7 +5,19 @@ import FormInput from "../../ui/FormInput";
 import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import Button from "../../ui/Button";
-import { CalendarPlusIcon, ClipboardList, Contact2, Plus, UserPlus, Users, X } from "lucide-react";
+import {
+  Calendar,
+  CalendarPlusIcon,
+  ClipboardList,
+  Clock,
+  Contact2,
+  Plus,
+  Save,
+  Text,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -32,7 +44,6 @@ import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 
 const MeetingScheduler = () => {
-  
   const { loginStatus } = useLoggedInUserContext();
   const [title, setTitle] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
@@ -53,7 +64,6 @@ const MeetingScheduler = () => {
 
   const { userPreference } = useUserPreference();
   const { meetingPlatform } = useMeetingPlatform();
-
 
   const [searchParams] = useSearchParams();
 
@@ -117,8 +127,7 @@ const MeetingScheduler = () => {
     }
   }, [searchParams]);
   const createGoogleMeetMeeting = async () => {
-
-    if(isCreating){
+    if (isCreating) {
       return;
     }
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
@@ -135,7 +144,6 @@ const MeetingScheduler = () => {
       pickerFormatString,
       userPreference.timezoneName
     );
-
 
     if (title === "") {
       // showMessageSnackbar({
@@ -163,12 +171,12 @@ const MeetingScheduler = () => {
       return;
     } else if (endDate === "") {
       // showMessageSnackbar({ message: "Please select end date", type: "error" });
-            toast.error( "Please select end date");
+      toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
       // showMessageSnackbar({ message: "Please select end time", type: "error" });
-      toast.error("Please select end time")
+      toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
@@ -176,7 +184,7 @@ const MeetingScheduler = () => {
       //   message: "Please select meeting platform",
       //   type: "error",
       // });
-      toast.error("Please select meeting platform")
+      toast.error("Please select meeting platform");
 
       setIsCreating(false);
       return;
@@ -185,16 +193,15 @@ const MeetingScheduler = () => {
       //   message: "End Time should be greater than start time",
       //   type: "error",
       // });
-      toast.error("End Time should be greater than start time")
+      toast.error("End Time should be greater than start time");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      
       // showMessageSnackbar({
       //   message: "Connot create meeting as start time is in the past",
       //   type: "error",
       // });
-      toast.error("Connot create meeting as start time is in the past")
+      toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
     }
@@ -229,44 +236,40 @@ const MeetingScheduler = () => {
         })
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-           setTitle("");
-          setEndTime("");
-          setStartTime("");
-          // setTimeZone("");
-          setAttendees([]);
-          setDescription("");
-          setIsCreating(false);
-          setStartDate("");
-          setEndDate("");
-          setSelectedMeetingPlatform("");
-          if(response.data.status){
+            setTitle("");
+            setEndTime("");
+            setStartTime("");
+            // setTimeZone("");
+            setAttendees([]);
+            setDescription("");
+            setIsCreating(false);
+            setStartDate("");
+            setEndDate("");
+            setSelectedMeetingPlatform("");
+            if (response.data.status) {
               // showMessageSnackbar({message : response.data.message,type : "success"});
-              toast.success(response.data.message)
+              toast.success(response.data.message);
               setTimeout(() => {
                 handleCloseMeetingModal();
-              },2000)
-          
-          }
-          else{
-            // showMessageSnackbar({message : response.data.message,type : "error"});
-            toast.error(response.data.message);
-          setTimeout(() => {
+              }, 2000);
+            } else {
+              // showMessageSnackbar({message : response.data.message,type : "error"});
+              toast.error(response.data.message);
+              setTimeout(() => {
                 handleCloseMeetingModal();
-              },2000)
-          }
-          
-          }
-
-          
-        })
-        .catch(async(error) => {
-          if(error.status === STATUS_CODE.UNATHORISED){
-            const refreshTokenResponse = await RefreshToken({callFunction:createGoogleMeetMeeting});
-            if(refreshTokenResponse){
-              createGoogleMeetMeeting();
+              }, 2000);
             }
           }
-          else if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
+        })
+        .catch(async (error) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunction: createGoogleMeetMeeting,
+            });
+            if (refreshTokenResponse) {
+              createGoogleMeetMeeting();
+            }
+          } else if (error.status === STATUS_CODE.PERMANENT_REDIRECT) {
             handleGoogleMeetAuth();
           }
         })
@@ -278,12 +281,11 @@ const MeetingScheduler = () => {
       //   message: "Please fill the required fields",
       //   type: "error",
       // });
-      toast.error("Please fill the required fields")
+      toast.error("Please fill the required fields");
     }
   };
   const createZoomMeeting = async () => {
-
-    if(isCreating){
+    if (isCreating) {
       return;
     }
     const combinedPickerStartDateTimeString = `${startDate} ${startTime}`;
@@ -305,7 +307,7 @@ const MeetingScheduler = () => {
       //   message: "Please give title to meeting",
       //   type: "error",
       // });
-      toast.error("Please give title to meeting")
+      toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
@@ -313,7 +315,7 @@ const MeetingScheduler = () => {
       //   message: "Please select start date",
       //   type: "error",
       // });
-      toast.error("Please select start date")
+      toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
@@ -321,17 +323,17 @@ const MeetingScheduler = () => {
       //   message: "Please select start time",
       //   type: "error",
       // });
-      toast.error("Please select start time")
+      toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
       // showMessageSnackbar({ message: "Please select end date", type: "error" });
-      toast.error("Please select end date")
+      toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
       // showMessageSnackbar({ message: "Please select end time", type: "error" });
-      toast.error( "Please select end time")
+      toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
@@ -339,7 +341,7 @@ const MeetingScheduler = () => {
       //   message: "Please select meeting platform",
       //   type: "error",
       // });
-      toast.error( "Please select meeting platform")
+      toast.error("Please select meeting platform");
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
@@ -347,16 +349,15 @@ const MeetingScheduler = () => {
       //   message: "End Time should be greater than start time",
       //   type: "error",
       // });
-      toast.error("End Time should be greater than start time.")
+      toast.error("End Time should be greater than start time.");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      
       // showMessageSnackbar({
       //   message: "Connot create meeting as start time is in the past",
       //   type: "error",
       // });
-      toast.error("Connot create meeting as start time is in the past")
+      toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
     }
@@ -607,11 +608,10 @@ const MeetingScheduler = () => {
           </div>
         </div> */}
         <FormHeader
-        onClose={handleCloseMeetingModal}
-        icon={CalendarPlusIcon}
-        description="Schedule your mettings as per your need"
-        preText="Schedule Meeting"
-
+          onClose={handleCloseMeetingModal}
+          icon={CalendarPlusIcon}
+          description="Schedule your mettings as per your need"
+          preText="Schedule Meeting"
         />
         <div className="mb-1 grid grid-cols-3 gap-1">
           <div className="col-span-2">
@@ -627,18 +627,14 @@ const MeetingScheduler = () => {
             />
           </div>
           <div className="col-span-1">
-            <label
-              htmlFor="startTime"
-              className="input-label-custom"
-            >
-              <div className="flex gap-2 text-center">
-                  <CalendarPlusIcon className="text-blue-600 w-2 h-2"/>
-              <span>Meeting Platform</span>
+            <label htmlFor="platform" className="input-label-custom mb-0">
+              <div className="flex gap-2 text-center mt-2">
+                <CalendarPlusIcon className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                <span>Meeting Platform</span>
               </div>
-              
             </label>
             <select
-              id="startTtime"
+              id="platform"
               value={selectedMeetingPlatform}
               onChange={(e) => {
                 if (e.target.value === meetingPlatform[0].name) {
@@ -660,11 +656,17 @@ const MeetingScheduler = () => {
                   setSelectedMeetingPlatform("");
                 }
               }}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="block w-full pl-3 pr-10 py-2 border input-label-custom border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
-              <option className="input-label-custom" value="">Select Platform</option>
+              <option className="input-label-custom" value="">
+                Select Platform
+              </option>
               {meetingPlatform.map((option) => (
-                <option className="input-label-custom" key={option.id} value={option.name}>
+                <option
+                  className="input-label-custom"
+                  key={option.id}
+                  value={option.name}
+                >
                   {option.name}
                 </option>
               ))}
@@ -678,21 +680,32 @@ const MeetingScheduler = () => {
               onChange={(e) => {
                 setStartDate(e.target.value);
               }}
+              logo={Calendar}
             />
+            {/* <Calendar/>
+            <DatePickerInput
+              label="Start Date"
+              onChange={(e) => {
+                setStartDate(e.target.value);
+              }}
+            /> */}
           </div>
 
           <div className="mt-2 col-span-2">
             <label
               htmlFor="startTime"
-              className="block text-sm font-medium text-gray-700"
+              className="input-label-custom"
             >
-              Start Time
+              <div className="flex gap-2 text-center">
+                <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                <span>Start Time</span>
+              </div>
             </label>
             <select
               id="startTtime"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 input-label-custom py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -709,21 +722,25 @@ const MeetingScheduler = () => {
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
+              logo={Calendar}
             />
           </div>
 
           <div className="mt-2 col-span-2">
             <label
               htmlFor="endTime"
-              className="block text-sm font-medium text-gray-700"
+               className="input-label-custom"
             >
-              End Time
+              <div className="flex gap-2 text-center">
+                <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                <span>End Time</span>
+              </div>
             </label>
             <select
               id="endTime"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -744,6 +761,7 @@ const MeetingScheduler = () => {
             onChange={(e) => {
               setDescription(e.target.value);
             }}
+           logo={Text}
           />
         </div>
         <div className="mb-1">
@@ -762,6 +780,7 @@ const MeetingScheduler = () => {
                 placeholder="Enter Attendees"
                 label="Attendees"
                 id="attendee"
+                logo={UserPlus}
               />
             </div>
             <div className="col-span-1 mt-7">
@@ -770,7 +789,7 @@ const MeetingScheduler = () => {
                   setIsAddCompanyUserEmailAttedeesModalOpen(true);
                 }}
               >
-                <UserPlus className="h-6 w-4" />
+                <UserPlus className="h-6 w-4"/>
               </Button>
             </div>
             {isModalForLead && (
@@ -789,7 +808,7 @@ const MeetingScheduler = () => {
                 onClick={() => {
                   handleAddAttendee();
                 }}
-                disabled={!newAttendeeEmail.trim()}
+                // disabled={!newAttendeeEmail.trim()}
               >
                 <Plus className="h-6 w-4" />
               </Button>
@@ -805,7 +824,7 @@ const MeetingScheduler = () => {
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">{attendee}</span>
+                      <span className="caption-custom">{attendee}</span>
                     </span>
                     <Button
                       size="sm"
@@ -834,12 +853,14 @@ const MeetingScheduler = () => {
         <div className="flex justify-end gap-3">
           <div className="max-w-28 mt-1 place-self-center">
             <Button
-              className="px-4 py-2.5 text-sm font-medium text-gray-100 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
               onClick={() => {
                 handleCloseMeetingModal();
               }}
             >
-              Close
+              <div className="flex items-center justify-center gap-1">
+                     <X size={16}/>
+                    Cancel
+                   </div>
             </Button>
           </div>
           <div className="max-w-48 mt-1 place-self-center">
@@ -862,22 +883,22 @@ const MeetingScheduler = () => {
                 } else if (
                   selectedMeetingPlatform === meetingPlatform[2].name
                 ) {
-
-                  toast.error("Microsofft teams is coming soon... Choose another platform instead.")
+                  toast.error(
+                    "Microsofft teams is coming soon... Choose another platform instead."
+                  );
                 } else {
-                  toast.error("Select the Meeting platform first.")
+                  toast.error("Select the Meeting platform first.");
                 }
               }}
               disabled={
-                isCreating ||
-                !title.trim() ||
-                !startDate ||
-                !startTime ||
-                !endDate ||
-                !endTime
+                isCreating
               }
             >
-              {isCreating ? "Creating..." : "Schedule Meeting"}
+              {/* {isCreating ? "Creating..." : "Save"} */}
+               <div className="flex items-center justify-center gap-1">
+                     <Save size={16}/>
+                    {isCreating ? "Saving..." : "Save"}
+                   </div>
             </Button>
           </div>
         </div>

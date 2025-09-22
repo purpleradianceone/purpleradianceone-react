@@ -1,4 +1,4 @@
-import { BoxesIcon, Calendar, Plus, Store } from "lucide-react";
+import { Calendar, Plus, Store } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
@@ -30,7 +30,7 @@ function ProductsManagementList({
   handleProductChangeOnAdd,
   handleEditProductChange,
   handleCreateCompanyProductTax,
-  isListForProductUser,
+  // isListForProductUser,
 }: ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { userPreference } = useUserPreference();
@@ -106,24 +106,17 @@ function ProductsManagementList({
         <div className="sticky z-10 top-9   flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
           <div className="flex justify-between w-full ">
             <div className="flex  gap-2">
-              {!isSmallScreen && isListForProductUser ? (
-                <BoxesIcon className="w-6 h-6 text-blue-600 mt-2" />
-              ) : (
+              
                 <Store className="w-6 h-6 text-blue-600 mt-2" />
-              )}
+
 
               {(isMediumScreen || isLargeScreen) && (
                 <>
-                  {!isListForProductUser && (
+
                     <span className="section-header-custom mt-2">
                       Product Management
                     </span>
-                  )}
-                  {isListForProductUser && (
-                    <span className="section-header-custom mt-2">
-                      Product Team/Users Management
-                    </span>
-                  )}
+
                 </>
               )}
             </div>
@@ -173,7 +166,6 @@ function ProductsManagementList({
               </>
             )}
 
-            {!isListForProductUser && (
               <div className="flex gap-1 mt-1">
                 {userHasAccessToAddProduct ? (
                   <Button onClick={() => setIsAddProductModalOpen(true)}>
@@ -197,7 +189,7 @@ function ProductsManagementList({
                   </Button>
                 )}
               </div>
-            )}
+
 
             <AddProductModal
               isOpen={isAddProductModalOpen}
@@ -242,7 +234,7 @@ function ProductsManagementList({
           >
             <ProductsManagementGrid
               products={products}
-              isGridForProductUser={isListForProductUser}
+              // isGridForProductUser={isListForProductUsser}
               handleCompanyProductUserModalOpen={
                 handleCompanyProductUserModalOpen
               }

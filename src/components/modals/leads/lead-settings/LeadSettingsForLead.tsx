@@ -166,7 +166,7 @@ function LeadSettingForLead({
 
         <div className="p-1">
           <div className="bg-gray-50 rounded-lg p-2 mb-1">
-            <div className="flex justify-between items-center mb-4 text-gray-600 font-semibold text-sm border-b pb-2">
+            <div className="flex justify-between items-center mb-4 table-header-custom border-b pb-2">
               <span className="ml-2">Setting Name</span>
               <span className="mr-2">Status</span>
             </div>
@@ -177,29 +177,30 @@ function LeadSettingForLead({
             ) : (
               <div className="space-y-2">
                 {leadSetting.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">
+                  <p className="text-center input-label-custom py-8">
                     No settings available for this lead.
                   </p>
                 ) : (
                   leadSetting.map((per) => (
                     <div
                       key={per.id}
-                      className={`
-                        relative flex items-center justify-between p-2 rounded-lg border
-                        ${
-                          per.isActive
-                            ? "bg-green-50 border-green-200 shadow-sm"
-                            : "bg-red-50 border-red-200 shadow-sm"
-                        }
-                        hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
-                      `}
+                      // className={`
+                      //   relative flex items-center justify-between p-2 rounded-lg border
+                      //   ${
+                      //     per.isActive
+                      //       ? "bg-green-50 border-green-200 shadow-sm"
+                      //       : "bg-red-50 border-red-200 shadow-sm"
+                      //   }
+                      //   hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
+                      // `}
+                      className="relative flex items-center justify-between p-2 rounded-lg border hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
                     >
-                      <div className="text-gray-800 font-medium text-sm flex items-center gap-2">
-                        {per.isActive ? (
+                      <div className="table-data-custom flex items-center gap-2">
+                        {/* {per.isActive ? (
                           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                         ) : (
                           <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                        )}
+                        )} */}
                         {per.name}
                       </div>
 
