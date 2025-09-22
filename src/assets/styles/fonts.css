@@ -123,6 +123,13 @@
   color: #2563eb;
 }
 
+.caption-custom-yellow {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ebeb25;
+}
+
 .caption-custom-active {
   font-family: "Roboto", sans-serif;
   font-size: 12px;
