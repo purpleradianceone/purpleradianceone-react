@@ -163,8 +163,8 @@ function TeamManagementList({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-alpine w-full h-[calc(100vh-114px)]`
-              : "ag-theme-alpine w-full h-[calc(100vh-122px)]"
+              ? `ag-theme-balham w-full h-[calc(100vh-114px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-122px)]"
           }
         >
           <TeamManagementAgGrid

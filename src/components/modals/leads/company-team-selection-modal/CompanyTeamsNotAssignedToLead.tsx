@@ -440,7 +440,7 @@ function CompanyTeamsNotAssignedToLead({
                 </div>
               </div>
 
-              <div className="ag-theme-alpine" style={{ height: "300px", width: "100%" }}>
+              <div style={{ height: "300px", width: "100%" }}>
                 <TeamManagementAgGrid
                   companyTeamList={companyTeamsNotAssignedList}
                   isGridForLeadProductTeam={true}

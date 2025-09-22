@@ -245,7 +245,7 @@ function ProductsManagementListLead({
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine "
+            className="ag-theme-balham "
             style={{ height: "65vh", width: "100%" }}
           >
             <ProductsManagementGridLead

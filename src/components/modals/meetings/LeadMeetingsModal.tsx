@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Button from "../../ui/Button";
 import {
   CalendarIcon,
+  CalendarPlus,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -676,11 +677,14 @@ function LeadMeetingsModal({
                           }
                         }}
                       >
-                        Schedule Meeting
+                        <div className="flex gap-2">
+                          <CalendarPlus size={18} />
+                          <span>Schedule Meeting</span>
+                        </div>
                       </Button>
                     </div>
                     <div className="grid gap-1">
-                      <h1 className="text-gray-800 font-medium text-center ">
+                      <h1 className="table-header-custom text-center">
                         {view === "month" &&
                           moment(currentViewDate)
                             .startOf("month")
@@ -704,29 +708,29 @@ function LeadMeetingsModal({
 
                       <div className="justify-self-start flex items-start gap-1">
                         {/* Colored Dots and Names */}
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: "#24bf26" }}
                           ></div>
-                          <span className="text-gray-700 text-sm">
+                          <span className="caption-custom">
                             Google Meet
                           </span>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: "blue" }}
                           ></div>
-                          <span className="text-gray-700 text-sm">Zoom</span>
+                          <span className="caption-custom">Zoom</span>
                         </div>
 
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: "#eb4b4b" }}
                           ></div>
-                          <span className="text-gray-700 text-sm">
+                          <span className="caption-custom">
                             Cancelled
                           </span>
                         </div>

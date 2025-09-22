@@ -22,7 +22,7 @@ import {
   LucideDatabase,
   LucideMail,
   Save,
-  Settings
+  Settings,
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
@@ -47,6 +47,7 @@ import { ExportPanelCreate } from "../template-panel/ExportPanelCreate";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import FormHeader from "../../ui/FormHeader";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -61,6 +62,7 @@ export const EditorCanvas: React.FC = () => {
   const [placeHolderData, setPlaceHolderData] = useState<PlaceholderItem[]>([]);
   const [searchParams] = useSearchParams();
   const params = searchParams.get("type");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const getPlaceHolderDataFromDatabase = async ({
     templateTypeId,
@@ -164,7 +166,7 @@ export const EditorCanvas: React.FC = () => {
   };
 
   return isLoading ? (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex h-screen w-full justify-center items-center ">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
@@ -205,13 +207,7 @@ export const EditorCanvas: React.FC = () => {
 
                 <div
                   onClick={() => {
-                    if (mode === "editor") {
-                      const confirmed = window.confirm(
-                        "\nAre you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost.\n\nClick OK to continue or Cancel to stay on this page."
-                      );
-                      if (!confirmed) return;
-                    }
-                    setMode("insert");
+                    setShowConfirm(true);
                   }}
                   className={`cursor-pointer ${
                     mode === "insert"
@@ -261,12 +257,23 @@ export const EditorCanvas: React.FC = () => {
               </div>
             </Button>
           </div>
+          {showConfirm && (
+            <ConfirmationDialog
+              open={showConfirm}
+              title="Leave Create Email Template?"
+              message={
+                "Are you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost."
+              }
+              onConfirm={() => setMode("insert")}
+              onCancel={() => setShowConfirm(false)}
+            />
+          )}
 
           {showDynamicEditor && (
             <div
               style={{
                 position: "absolute",
-                top: 0, // Adjusted to appear below the toggle button
+                top: 0,
                 right: 0,
                 width: "260px",
                 background: "white",

@@ -146,7 +146,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
             zIndex: 100,
-            width: "350px",
+            width: "fit-content",
             maxHeight: "calc(100vh - 80px)",
             overflowY: "auto",
           }}
@@ -165,6 +165,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
               icon={Edit}
               onClose={()=>setIsOpen(false)}
               preText="Update Template Settings"
+              description="Provide the necessary fields to update your email template."
             />
 
             <div

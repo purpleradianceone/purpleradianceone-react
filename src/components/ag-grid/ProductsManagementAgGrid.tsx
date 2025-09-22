@@ -84,12 +84,12 @@ function ProductsManagementGrid({
               {params.value ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">Active</span>
+                  <span className="text-xs text-green-600">Active</span>
                 </>
               ) : (
                 <>
                   <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">Inactive</span>
+                  <span className="text-xs text-red-600">Inactive</span>
                 </>
               )}
             </div>

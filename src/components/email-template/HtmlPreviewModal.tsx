@@ -1,6 +1,9 @@
-// HtmlPreviewModal.tsx
 import React, { useRef } from "react";
 import Modal from "react-modal";
+import FormHeader from "../ui/FormHeader";
+import { Eye, Save, X } from "lucide-react";
+import Button from "../ui/Button";
+import { createPortal } from "react-dom";
 
 interface HtmlPreviewModalProps {
   isOpen: boolean;
@@ -15,7 +18,7 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
   onClose,
   html,
   onHtmlChange,
-  editable = false
+  editable = false,
 }) => {
   const editableRef = useRef<HTMLDivElement>(null);
 
@@ -27,72 +30,80 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onClose}
-      contentLabel="HTML Preview"
-      style={{
-        content: {
-          top: "50%",
-          left: "50%",
-          right: "auto",
-          bottom: "auto",
-          marginRight: "-50%",
-          transform: "translate(-50%, -50%)",
-          width: "80%",
-          height: "80%",
-          overflow: "auto",
-          zIndex: 1000
-        },
-      }}
-    >
-      <div>
-        <h2>HTML Preview</h2>
-        <div
-          ref={editableRef}
-          contentEditable={editable}
-          suppressContentEditableWarning
-          dangerouslySetInnerHTML={{ __html: html }}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            minHeight: "300px",
-            backgroundColor: "#fff",
-            overflowY: "auto",
-            marginBottom: "20px",
-            cursor: editable ? "text" : "not-allowed",
-          }}
-        />
-
-        <div style={{ display: "flex", gap: "10px" }}>
-          {editable && (
-            <button
-              onClick={handleSave}
-              style={{
-                padding: "8px 20px",
-                backgroundColor: "#28a745",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-              }}
-            >
-              💾 Save Changes
-            </button>
-          )}
-          <button
-            onClick={onClose}
+    <div>
+      
+      {isOpen &&
+        createPortal(
+          <div>
+          <Modal
+            isOpen={isOpen}
+            onRequestClose={onClose}
+            contentLabel="HTML Preview"
             style={{
-              padding: "8px 20px",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
+              content: {
+                top: "54%",
+                left: "50%",
+                right: "auto",
+                bottom: "auto",
+                marginRight: "-50%",
+                transform: "translate(-50%, -50%)",
+                minWidth:"60%",
+                maxWidth:"70%",
+                height: "fit-content",
+                maxHeight: "80%",
+                overflow: "auto",
+              },
             }}
           >
-            ✖ Close
-          </button>
-        </div>
-      </div>
-    </Modal>
+            <div>
+              <FormHeader
+                icon={Eye}
+                preText="HTML Preview"
+                description="This is the preview of your HTML template."
+                onClose={onClose}
+              />
+              
+              <div
+                ref={editableRef}
+                contentEditable={editable}
+                suppressContentEditableWarning
+                dangerouslySetInnerHTML={{ __html: html }}
+                style={{
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  minHeight: "300px",
+                  backgroundColor: "#fff",
+                  overflowY: "auto",
+                  marginBottom: "20px",
+                  cursor: editable ? "text" : "not-allowed",
+                }}
+              />
+
+              <div className="flex justify-end items-end">
+                <div>
+                  <Button onClick={onClose}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <X size={16} />
+                      Close
+                    </div>
+                  </Button>
+                </div>
+                {editable && (
+                  <div>
+                    <Button onClick={handleSave}>
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Modal>
+          </div>,
+          document.body
+        )}
+    </div>
   );
 };

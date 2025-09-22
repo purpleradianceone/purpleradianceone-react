@@ -236,8 +236,8 @@ function ProductsManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-alpine w-full h-[calc(100vh-112px)]`
-                : "ag-theme-alpine w-full h-[calc(100vh-120px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
             }
           >
             <ProductsManagementGrid
