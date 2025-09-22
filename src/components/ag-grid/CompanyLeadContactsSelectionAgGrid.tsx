@@ -14,6 +14,8 @@ import POST_API from "../../constants/PostApi";
 import LeadContactType from "../../@types/lead-management/LeadContact";
 import { Contact2Icon } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function CompanyLeadContactsSelectionAgGrid({
   isOpen,
@@ -69,8 +71,13 @@ function CompanyLeadContactsSelectionAgGrid({
         );
         setLeadContact(mappedLeadContactData);
       })
-      .catch((error) => {
-        alert("exception in fetch lead contact  :" + error);
+      .catch(async(error : ApiError | any) => {
+        if(error.status){
+          const refreshTokenResponse = await RefreshToken({callFunction:fetchLeadContact})
+          if(refreshTokenResponse){
+            fetchLeadContact();
+          }
+        }
       });
   };
 

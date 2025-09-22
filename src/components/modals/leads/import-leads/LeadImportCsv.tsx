@@ -35,6 +35,7 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
+import Button from "../../../ui/Button";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -82,7 +83,7 @@ const DraggableCsvColumn: React.FC<{ header: string }> = ({ header }) => {
   return (
     <li
       ref={drag}
-      className={`bg-gray-100 text-gray-800 px-3 py-1.5 rounded text-sm border border-gray-200 shadow-sm cursor-grab ${
+      className={`bg-gray-100  px-3 py-1.5 rounded input-label-custom border border-gray-200 shadow-sm cursor-grab ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -133,7 +134,7 @@ const DroppableCrmField: React.FC<{
     <div key={field.id} className="flex items-start gap-1">
       <label
         htmlFor={`map-${field.id}`}
-        className="w-1/3 text-sm font-medium text-gray-700 pt-2"
+        className="w-1/3 input-label-custom pt-2"
       >
         {field.label} :
         {field.required && <span className="text-red-500 ml-1">*</span>}
@@ -150,7 +151,7 @@ const DroppableCrmField: React.FC<{
           mappedHeaders.map((header) => (
             <span
               key={header}
-              className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium"
+              className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 caption-custom-blue"
             >
               {header}
               <XCircle
@@ -287,7 +288,7 @@ const GenericValueMappingCard = forwardRef(
             } ${mappedValue ? "bg-green-100" : "bg-white"}`}
           >
             {mappedValue ? (
-              <div className="flex justify-between items-center w-full text-sm font-medium text-green-800">
+              <div className="flex justify-between items-center w-full input-label-custom-active">
                 <span>{mappedValue}</span>
                 <XCircle
                   className="w-4 h-4 text-red-500 cursor-pointer"
@@ -295,11 +296,11 @@ const GenericValueMappingCard = forwardRef(
                 />
               </div>
             ) : (
-              <span className="text-gray-400 text-sm italic">Drop here</span>
+              <span className="caption-custom">Drop here</span>
             )}
           </div>
           <ArrowRight className="text-gray-400 flex-shrink-0" />
-          <div className="flex-1 p-2 bg-blue-100 text-blue-800 rounded-md text-sm font-medium h-10 flex items-center justify-center">
+          <div className="flex-1 p-2 bg-blue-100 input-label-custom-blue rounded-md h-10 flex items-center justify-center">
             {crmItem.name!}
           </div>
         </div>
@@ -324,13 +325,13 @@ const GenericValueMappingCard = forwardRef(
 
     return (
       <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm">
-        <h3 className="text-md font-semibold text-gray-800 mb-3">{title}</h3>
+        <h3 className="table-header-custom mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="font-medium text-sm text-center mb-2 text-gray-600">
+            <h4 className="input-label-custom text-center mb-2">
               Your CSV Values (Drag)
             </h4>
-            <div className="space-y-2 p-2 bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
+            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
               {unmappedCsvValues.map((s) => (
                 <DraggableCsvValue key={s} value={s} type={itemType} />
               ))}
@@ -365,7 +366,7 @@ const GenericValueMappingCard = forwardRef(
               </button> */}
               </div>
             )}
-            <h4 className="font-medium text-sm text-center mb-2 text-gray-600">
+            <h4 className="input-label-custom  text-center mb-2">
               To CRM Values (Drop)
             </h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -379,17 +380,17 @@ const GenericValueMappingCard = forwardRef(
                 <button
                   onClick={() => handleInternalPageChange(currentPage - 1)}
                   disabled={currentPage === 0}
-                  className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200 input-label-custom  disabled:opacity-50"
                 >
                   Previous
                 </button>
-                <span className="text-sm">
+                <span className="input-label-custom ">
                   Page {currentPage + 1} of {totalPages}
                 </span>
                 <button
                   onClick={() => handleInternalPageChange(currentPage + 1)}
                   disabled={currentPage === totalPages - 1}
-                  className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200input-label-custom  disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -1107,7 +1108,7 @@ const LeadImportCsv = ({
             //   <ArrowLeft size={16}/> <span>Go back and Choose another file/ see import tags.</span>
             // </button>
             <button
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              className="flex items-center gap-2 table-header-custom hover:text-blue-600 transition-colors"
               onClick={resetState}
             >
               <ArrowLeft size={16} />
@@ -1117,7 +1118,7 @@ const LeadImportCsv = ({
 
           {!csvImportButtonClicked && (
             <>
-              <h2 className=" sm:text-xs md:text-base hover:text-blue-500 rounded  px-1 shadow-sm font-semibold text-gray-800">
+              <h2 className="table-header-custom hover:text-blue-500 rounded  px-1 shadow-sm">
                 Import leads from csv file.
               </h2>
               <label
@@ -1139,10 +1140,10 @@ const LeadImportCsv = ({
         </div>
 
         {isParsing && (
-          <div className="p-3 bg-blue-100 rounded-md">Parsing CSV...</div>
+          <div className="p-3 input-label-custom bg-blue-100 rounded-md">Parsing CSV...</div>
         )}
         {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md font-bold">
+          <div className="p-3 bg-red-100 input-label-inactive rounded-md ">
             {error}
           </div>
         )}
@@ -1151,12 +1152,12 @@ const LeadImportCsv = ({
         {csvData && (
           <div className="flex-shrink-0 p-2 border rounded-lg bg-white shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-md font-semibold text-gray-700">
+              <h4 className="table-header-custom">
                 Preview (First 5 Rows)
               </h4>
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-sm text-blue-600 hover:underline"
+                className="input-label-custom-blue text-blue-600 hover:underline"
               >
                 {showPreview ? "Hide" : "Show"}
               </button>
@@ -1167,7 +1168,7 @@ const LeadImportCsv = ({
                   <thead className="bg-gray-50">
                     <tr>
                       {originalCsvHeaders.map((h, i) => (
-                        <th key={i} className="px-3 py-2 text-left font-medium">
+                        <th key={i} className="px-3 py-2 text-left table-header-custom">
                           {h}
                         </th>
                       ))}
@@ -1175,7 +1176,7 @@ const LeadImportCsv = ({
                   </thead>
                   <tbody>
                     {csvData.slice(1, 6).map((row, i) => (
-                      <tr key={i} className="border-t">
+                      <tr key={i} className="border-t table-data-custom">
                         {row.map((cell, j) => (
                           <td key={j} className="px-3 py-2">
                             {cell}
@@ -1187,7 +1188,7 @@ const LeadImportCsv = ({
                 </table>
               </div>
             )}
-            <div className="text-xs text-gray-500">
+            <div className="caption-custom">
               Total records in csv file : {csvData.length - 1}
             </div>
           </div>
@@ -1199,7 +1200,7 @@ const LeadImportCsv = ({
             <div className="flex-grow flex flex-col lg:flex-row w-full gap-6">
               <div className="w-full lg:w-5/12 xl:w-4/12 flex flex-col gap-4">
                 <div className="border rounded-lg p-3 bg-white shadow-sm">
-                  <h3 className=" flex items-center gap-1 text-md font-semibold text-gray-800 mb-3">
+                  <h3 className=" flex items-center gap-1 table-header-custom mb-3">
                     <span>1. CSV Columns</span>
                     <span
                       className="cursor-pointer"
@@ -1218,7 +1219,7 @@ const LeadImportCsv = ({
               </div>
               <div className="w-full  lg:w-7/12 xl:w-8/12 flex flex-col">
                 <div className="border rounded-lg p-4 bg-white flex-grow shadow-sm">
-                  <h3 className=" flex items-center gap-2 text-md font-semibold text-gray-800 mb-4">
+                  <h3 className=" flex items-center gap-2 table-header-custom mb-4">
                     <span>2. Map Columns to CRM Fields </span>
                     <span
                       className="cursor-pointer"
@@ -1334,13 +1335,16 @@ const LeadImportCsv = ({
             </div>
 
             <div className="mt-6 flex justify-end">
-              <button
+              <div>
+ <Button
                 onClick={processCsvForReview} // Changed to trigger review first
                 disabled={isParsing || !csvFile}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
               >
                 Review and Finalize Import
-              </button>
+              </Button>
+              </div>
+             
             </div>
           </>
         )}
@@ -1348,10 +1352,10 @@ const LeadImportCsv = ({
         {/* Pre-Import Review Section */}
         {showPreImportReview && (
           <div className="mt-6 p-4 border rounded-lg bg-white shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="section-header-custom mb-4">
               6. Review Leads Before Import
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="input-label-custom mb-4">
               Review the mapped data below. Leads highlighted in{" "}
               <span className="font-bold text-red-600">red</span> indicate
               potential duplicates (based on Email or Mobile Number). Check the
@@ -1363,7 +1367,7 @@ const LeadImportCsv = ({
                   <tr>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left table-header-custom uppercase tracking-wider"
                     >
                       Import
                     </th>
@@ -1371,7 +1375,7 @@ const LeadImportCsv = ({
                       <th
                         key={field.id}
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-6 py-3 text-left table-header-custom uppercase tracking-wider"
                       >
                         {field.label}
                       </th>
@@ -1397,7 +1401,7 @@ const LeadImportCsv = ({
                       {crmLeadFields.map((field) => (
                         <td
                           key={field.id}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                          className="px-6 py-4 whitespace-nowrap table-data-custom"
                         >
                           {lead.mappedData[field.id]}
                         </td>
@@ -1408,13 +1412,17 @@ const LeadImportCsv = ({
               </table>
             </div>
             <div className="mt-6 flex justify-between">
-              <button
+              <div>
+                <Button
                 onClick={() => setShowPreImportReview(false)}
-                className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
+                // className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
               >
                 Back to Mapping
-              </button>
-              <button
+              </Button>
+              </div>
+              
+              <div>
+                 <Button
                 onClick={handleSubmitImport}
                 disabled={
                   isParsing ||
@@ -1422,10 +1430,12 @@ const LeadImportCsv = ({
                   processedLeads.filter((l) => l.isSelectedForImport).length ===
                     0
                 }
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                // className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
               >
                 Confirm and Import Selected Leads
-              </button>
+              </Button>
+              </div>
+             
             </div>
           </div>
         )}

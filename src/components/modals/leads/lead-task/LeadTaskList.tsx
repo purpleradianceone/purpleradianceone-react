@@ -383,7 +383,7 @@ function LeadTaskList({
             </div>
           ) : leadTasks.length === 0 ? (
             <div className=" min-h-72   flex items-center justify-center">
-              <p className="text-center   text-gray-600 text-xs italic ">
+              <p className="text-center caption-custom italic ">
                 No activities found.
               </p>
             </div>
@@ -414,32 +414,32 @@ function LeadTaskList({
                   <div className="flex-1 min-w-0">
                     <p
                       title={activity.subject}
-                      className="text-sm font-medium text-gray-800 truncate"
+                      className="table-header-custom truncate"
                     >
                       {activity.subject.length > 50
                         ? activity.subject.substring(0, 50) + "..."
                         : activity.subject}
                     </p>
                     {expandedCardId === activity.id ? (
-                      <div className="text-sm text-gray-800 ">
+                      <div className="caption-custom">
                         <p className="pb-1 pt-2">
                           <div>
-                            <span className="font-semibold text-blue-700">
+                            <span className="caption-custom-blue">
                               Description :{" "}
                             </span>{" "}
-                            <span className="font-medium ">
+                            <span className="caption-custom">
                               {activity.description}
                             </span>{" "}
                           </div>
-                          <div className="flex gap-1 ">
-                            <span className="font-semibold text-blue-700">
+                          <div className="flex gap-1">
+                            <span className="caption-custom-blue">
                               Assignees :{" "}
                             </span>{" "}
                             <div className="grid grid-cols-3">
                               {activity.assignedToName!.map((name) => (
                                 <span
                                   key={name} // Added key for list items
-                                  className="bg-gray-100 border text-gray-800  mx-1 rounded-md  font-medium"
+                                  className="bg-white border caption-custom-blue rounded-md"
                                   title={name} // Added title for better UX
                                 >
                                   {name.length > 15
@@ -451,7 +451,7 @@ function LeadTaskList({
                           </div>
                           <div>
                             <div className="mt-1 flex gap-2">
-                              <span className="font-semibold text-blue-700">
+                              <span className="caption-custom-blue">
                                 {activity.leadActivityId !== 3 &&
                                 activity.leadActivityId !== 4
                                   ? "Contact : "
@@ -473,18 +473,18 @@ function LeadTaskList({
                                     (contact: LeadContactType) => (
                                       <span
                                         key={contact.id} // Assuming contact has an id
-                                        className=" m-1  rounded-md px-1 font-medium"
+                                        className=" rounded-md px-1 caption-custom"
                                       >
                                         {contact.name}
                                       </span>
                                     )
                                   )
                                 ) : activity.leadActivityId !== 4 ? (
-                                  <span className="bg-gray-0 rounded-md px-1 font-medium">
+                                  <span className="bg-gray-0 rounded-md px-1 caption-custom">
                                     {getLeadTaskJsonData(activity)}
                                   </span>
                                 ) : (
-                                  <span className=" rounded-md font-medium">
+                                  <span className=" rounded-md caption-custom">
                                     {getLeadTaskJsonData(activity).map(
                                       (meetingDetails: any) => {
                                         return meetingDetails.meetingSummary;
@@ -503,7 +503,7 @@ function LeadTaskList({
                                           getZoomMeeting(activity);
                                         }
                                       }}
-                                      className="text-blue-500 hover:underline text-xs ml-3 focus:outline-none"
+                                      className="caption-custom-blue hover:underline ml-3 focus:outline-none"
                                     >
                                       View Details
                                     </button>
@@ -511,10 +511,10 @@ function LeadTaskList({
                                 )}
                               </div>
                             </div>
-                            <span className="font-semibold text-blue-700">
+                            <span className="caption-custom-blue">
                               Outcome :{" "}
                             </span>{" "}
-                            <span className="font-medium">
+                            <span className="caption-custom">
                               {activity.resultOutcome ?? (
                                 <>
                                   <span className="italic text-xs font-normal text-gray-600">
@@ -527,7 +527,7 @@ function LeadTaskList({
                         </p>
                         <button
                           onClick={() => toggleExpand(activity.id)}
-                          className="text-blue-500 hover:underline text-xs focus:outline-none"
+                          className="caption-custom-blue hover:underline focus:outline-none"
                         >
                           View Less
                         </button>
@@ -536,21 +536,21 @@ function LeadTaskList({
                       <div className="text-xs text-gray-600">
                         <p className="truncate  mt-1">
                           <div className="mt-1">
-                            <span className="font-semibold text-blue-700">
+                            <span className="caption-custom-blue">
                               Description :{" "}
                             </span>{" "}
-                            <span className="font-medium">
+                            <span className="caption-custom">
                               {activity.description}
                             </span>{" "}
                           </div>
                           <div className="mt-1">
-                            <span className="font-semibold text-blue-700">
+                            <span className="caption-custom-blue">
                               Assignees :{" "}
                             </span>{" "}
                             {activity.assignedToName!.map((name) => (
                               <span
                                 key={name} // Added key for list items
-                                className="bg-gray-50 border text-gray-800  mx-1 rounded-md px-1 font-medium"
+                                className="bg-white border caption-custom-blue  mx-1 rounded-md px-1"
                                 title={name} // Added title for better UX
                               >
                                 {name.length > 20
@@ -563,7 +563,7 @@ function LeadTaskList({
                         {activity.subject.length > 0 && ( // Adjust threshold as needed
                           <button
                             onClick={() => toggleExpand(activity.id)}
-                            className="text-blue-500 hover:underline font-normal mt-1 text-xs focus:outline-none hover:text-blue-700"
+                            className="caption-custom-blue hover:underline font-normal mt-1 focus:outline-none hover:text-blue-700"
                           >
                             View More
                           </button>
@@ -574,7 +574,7 @@ function LeadTaskList({
 
                   {/* Date and Action Buttons */}
                   <div className="absolute top-2  right-2 flex items-center space-x-1">
-                    <span className="text-xs text-gray-500">
+                    <span className="caption-custom">
                       {activity.dueDateTime}
                     </span>
                     <button
@@ -582,7 +582,7 @@ function LeadTaskList({
                         setIsUpdateLeadTaskModalOpen(true);
                         setSelecedLeadTask(activity);
                       }}
-                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs"
+                      className="px-2 py-1 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
                     >
                       Edit
                     </button>
@@ -591,7 +591,7 @@ function LeadTaskList({
                         setIsLeadTaskHistoryModalOpen(true);
                         setSeletedLeadTaskForHistory(activity);
                       }}
-                      className="px-2 py-1 bg-white text-gray-500 rounded hover:bg-gray-200 transition-colors text-xs"
+                      className="px-2 py-1 bg-white caption-custom rounded hover:bg-gray-200 transition-colors"
                     >
                       <History size={16} /> {/* Adjusted size for better fit */}
                     </button>
