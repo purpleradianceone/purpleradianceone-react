@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import { Save, X } from "lucide-react";
+import { Edit, Save, Trash2, X } from "lucide-react";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 
@@ -72,35 +72,42 @@ export const ButtonBlock: React.FC = () => {
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      // onMouseEnter={() => setHovered(true)}
+     
       style={{
         position: "relative",
-        width:"fit-content",
+        width: "fit-content",
         border: "1px dashed #ccc",
         padding: "10px",
         cursor: "move",
         textAlign: props.align,
       }}
     >
-      {hovered && (
-        <>
-          <button
-            onClick={() => actions.delete(id)}
-            style={btnStyle("#ff5f5f", "right")}
-          >
-            ×
-          </button>
-          {!editing && (
-            <button
-              onClick={() => setEditing(true)}
-              style={btnStyle("#007bff", "left")}
-              title="Edit Button"
+      {(hovered) && (
+        <div className="absolute w-full flex justify-between items-center -top-4 left-0 z-10"
+        onMouseLeave={() => setHovered(false)}
+      onMouseOver={() => setHovered(true)}
+        >
+          <div className="w-fit h-fit">
+            <Button onClick={() => setEditing(true)} title="Edit Button">
+              <div className="flex items-center justify-center gap-0.5">
+                <Edit size={14} />
+                Edit
+              </div>
+            </Button>
+          </div>
+          <div className="w-fit h-fit">
+            <Button
+              onClick={() => actions.delete(id)}
+              // style={btnStyle("#ff5f5f", "right")}
             >
-              ✎
-            </button>
-          )}
-        </>
+              <div className="flex items-center justify-center gap-1">
+                <Trash2 size={14} />
+                Delete
+              </div>
+            </Button>
+          </div>
+        </div>
       )}
 
       {editing && (
@@ -159,10 +166,10 @@ export const ButtonBlock: React.FC = () => {
             onChange={(e) => setTempFontFamily(e.target.value)}
           /> */}
           <FormInput
-          label="Font Family"
-          placeholder=""
-          value={tempFontFamily}
-          defaultValue={tempFontFamily}
+            label="Font Family"
+            placeholder=""
+            value={tempFontFamily}
+            defaultValue={tempFontFamily}
             onChange={(e) => setTempFontFamily(e.target.value)}
           />
 
@@ -197,20 +204,30 @@ export const ButtonBlock: React.FC = () => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <Button onClick={() => setEditing(false)}>
-                <X />
+                 <div className="flex items-center justify-center gap-0.5">
+                                      <X size={16} />
+                                      Cancel
+                                    </div>
               </Button>
             </div>
 
             <div>
               <Button onClick={handleSave}>
-                <Save />
+               <div className="flex items-center justify-center gap-1">
+                                     <Save size={16} />
+                                     Save
+                                   </div>
               </Button>
             </div>
           </div>
         </div>
       )}
-
-      <ResizableBox
+      <div
+       onMouseLeave={() => setHovered(false)}
+      onMouseOver={() => setHovered(true)}
+      >
+        <ResizableBox
+      
         width={200}
         height={50}
         minConstraints={[100, 40]}
@@ -246,32 +263,17 @@ export const ButtonBlock: React.FC = () => {
           {props.text}
         </a>
       </ResizableBox>
+      </div>
+      
     </div>
   );
 };
-
-const btnStyle = (
-  bg: string,
-  position: "left" | "right"
-): React.CSSProperties => ({
-  position: "absolute",
-  top: "-10px",
-  [position]: "-10px",
-  background: bg,
-  color: "#fff",
-  border: "none",
-  borderRadius: "50%",
-  width: "24px",
-  height: "24px",
-  cursor: "pointer",
-  zIndex: 1,
-});
 
 const editPanelStyle: React.CSSProperties = {
   position: "absolute",
   top: "10%",
   left: "5%",
-  width:"fit-content",
+  width: "fit-content",
   transform: "translateX(-50%)",
   background: "#fff",
   padding: "10px",

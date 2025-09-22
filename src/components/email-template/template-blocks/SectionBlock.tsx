@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useNode, useEditor, Element } from "@craftjs/core";
+import Button from "../../ui/Button";
+import { Edit, Save, Trash2, X } from "lucide-react";
+import FormInput from "../../ui/FormInput";
 
 export const SectionBlock: React.FC = () => {
   const {
@@ -17,7 +20,9 @@ export const SectionBlock: React.FC = () => {
   const [hovered, setHovered] = useState(false);
   const [editing, setEditing] = useState(false);
 
-  const [tempBackground, setTempBackground] = useState(props.background || "#f7f7f7");
+  const [tempBackground, setTempBackground] = useState(
+    props.background || "#f7f7f7"
+  );
   const [tempPadding, setTempPadding] = useState(props.padding || "20px");
   const [tempAlign, setTempAlign] = useState(props.align || "left");
 
@@ -39,8 +44,6 @@ export const SectionBlock: React.FC = () => {
       ref={(ref: HTMLDivElement) => {
         if (ref) connect(drag(ref));
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
         textAlign: props.align,
         padding: props.padding,
@@ -53,39 +56,28 @@ export const SectionBlock: React.FC = () => {
         boxSizing: "border-box",
       }}
     >
-      {hovered && (
-        <div style={{ position: "absolute", top: "-10px", left: "-10px", display: "flex", gap: "6px", zIndex: 10 }}>
-          <button
-            onClick={() => setEditing(true)}
-            style={{
-              background: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "50%",
-              width: "24px",
-              height: "24px",
-              cursor: "pointer",
-
-            }}
-            title="Edit Section"
-          >
-            ✎
-          </button>
-          <button
-            onClick={handleDelete}
-            style={{
-              background: "#dc3545",
-              color: "#fff",
-              border: "none",
-              width: "140px",
-              height: "25px",
-              borderRadius: "4px", 
-              cursor: "pointer",
-            }}
-            title="Delete Section"
-          >
-            Section Block 🗑
-          </button>
+      {(hovered || editing) && (
+        <div
+          className="absolute w-full flex justify-between items-center -top-3 left-0 z-10 "
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <div className="w-fit">
+            <Button onClick={() => setEditing(true)} title="Edit Section">
+              <div className="flex items-center justify-center gap-1">
+                <Edit size={14} />
+                Edit Section Bock
+              </div>
+            </Button>
+          </div>
+          <div>
+            <Button onClick={handleDelete} title="Delete Section">
+              <div className="flex items-center justify-center gap-1">
+                <Trash2 size={14} />
+                Delete Section Block
+              </div>
+            </Button>
+          </div>
         </div>
       )}
 
@@ -94,7 +86,7 @@ export const SectionBlock: React.FC = () => {
           style={{
             position: "absolute",
             top: "-10px",
-            left: "50%",
+            left: "10%",
             transform: "translateX(-50%)",
             background: "#fff",
             padding: "10px",
@@ -106,25 +98,35 @@ export const SectionBlock: React.FC = () => {
             gap: "6px",
           }}
         >
-          <label>
+          {/* <label className="input-label-custom">
             Padding:
-            <input
+            <input className="caption-custom"
               type="text"
               value={tempPadding}
               onChange={(e) => setTempPadding(e.target.value)}
             />
-          </label>
-          <label>
+          </label> */}
+          <FormInput
+            type="text"
+            label="Padding"
+            placeholder="Enter padding(eg 16px)"
+            value={tempPadding}
+            defaultValue={tempPadding}
+            onChange={(e) => setTempPadding(e.target.value)}
+          />
+          <label className="input-label-custom flex justify-between items-center">
             Background:
             <input
+              className="caption-custom"
               type="color"
               value={tempBackground}
               onChange={(e) => setTempBackground(e.target.value)}
             />
           </label>
-          <label>
+          <label className="input-label-custom flex justify-between items-center">
             Align:
             <select
+              className="caption-custom"
               value={tempAlign}
               onChange={(e) => setTempAlign(e.target.value)}
             >
@@ -133,23 +135,42 @@ export const SectionBlock: React.FC = () => {
               <option value="right">Right</option>
             </select>
           </label>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <button onClick={handleSave}>✅</button>
-            <button onClick={() => setEditing(false)}>❌</button>
+          <div className="flex justify-between">
+            <div className="w-fit h-fit">
+              <Button onClick={() => setEditing(false)}>
+                <div className="flex items-center justify-center gap-0.5">
+                  <X size={14} />
+                  Cancel
+                </div>
+              </Button>
+            </div>
+            <div className="w-fit h-fit">
+              <Button onClick={handleSave}>
+                <div className="flex items-center justify-center gap-1">
+                  <Save size={14} />
+                  Save
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
-      <Element
-        id="section-content"
-        is="div"
-        canvas
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          minHeight: "50px",
-        }}
-      />
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <Element
+          id="section-content"
+          is="div"
+          canvas
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            minHeight: "50px",
+          }}
+        />
+      </div>
     </div>
   );
 };
