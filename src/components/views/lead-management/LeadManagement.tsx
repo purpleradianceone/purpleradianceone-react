@@ -17,7 +17,13 @@ import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-ma
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 
-function LeadManagement() {
+function LeadManagement({
+  isUsedInLeadModule,
+  handleRowSelectedForShowAccountLead,
+
+} :{isUsedInLeadModule : boolean;
+    handleRowSelectedForShowAccountLead? : (rowData: LeadDataProps | any) => void;
+}) {
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [leadData, setLeadData] = useState<LeadDataProps[]>([]);
@@ -283,6 +289,9 @@ function LeadManagement() {
       >
         {userHasAccessToViewLead ? (
           <LeadManagementList
+          // Note : differentaition done because this module is used in account-lead and for lead module also
+          isUsedInLeadModule={isUsedInLeadModule}
+          handleRowSelectedForShowAccountLead={handleRowSelectedForShowAccountLead}
             handleAddLead={handleAddLead}
             handleSearchOption={{
               handleSearchParameterChange,

@@ -54,8 +54,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     [key: string]: string;
   }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState<"contact" | "legal" | "address">(
-    "contact"
+  const [activeTab, setActiveTab] = useState<"primary contact" | "legal" | "address">(
+    "primary contact"
   );
   const { industryTypeData, loading: isIndustryTypeLoading } =
     useIndustryType();
@@ -395,7 +395,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "contact":
+      case "primary contact":
         return (
           // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
           <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
@@ -667,15 +667,15 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 mb-2">
             <button
-              onClick={() => setActiveTab("contact")}
+              onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${
-                activeTab === "contact"
+                activeTab === "primary contact"
                   ? "border-teal-600 table-header-custom active"
                   : "border-transparent table-header-custom"
               }`}
             >
               <Mail className="h-4 w-4 mr-2" />
-              Contact
+             Primary Contact
             </button>
             <button
               onClick={() => setActiveTab("legal")}

@@ -119,21 +119,29 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
         <>
           <div className="flex items-center justify-center">
             <span className="italic flex gap-1">
-              <CreateAccountLead account={account} />
+              <CreateAccountLead 
+              account={account}
+              getAccountLead={getAccountLead}
+              />
               No data available.
             </span>
           </div>
         </>
       )}
+
+      {accountLead.length > 0 && <CreateAccountLead
+      getAccountLead={getAccountLead}
+      account={account}
+      
+      />}
       {accountLead &&
         accountLead.map((item: AccountLeadType) => (
           <>
-            <CreateAccountLead account={account} />
             <div className="p-1 bg-white shadow-md rounded-xl border border-gray-200 flex flex-col gap-3 w-full max-w-md">
               {/* Header */}
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  {item.leadName}
+                  {item.leadName || "Name not given"}
                 </h2>
                 <label className="inline-flex items-center cursor-pointer relative">
                   <input
@@ -153,7 +161,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
               </div>
 
               {/* Meta Info */}
-              <div className="text-sm text-gray-600 space-y-1">
+              <div className="hidden text-sm text-gray-600 space-y-1">
                 <p>
                   <span className="font-medium text-gray-700">Created By:</span>{" "}
                   {item.createdBy}

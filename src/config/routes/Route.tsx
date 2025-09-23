@@ -236,7 +236,9 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <LeadManagement />
+              <LeadManagement
+              isUsedInLeadModule={true}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
