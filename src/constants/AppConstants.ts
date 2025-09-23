@@ -109,7 +109,7 @@ export const JSX_CHILDREN_NAME = {
     ADD_TEAM: "Add Team",
     TEAM : "Team",
     USER : "User",
-    UPDATE : "Update Plan",
+    UPDATE : "Update",
     MEETINGS : "Meetings",
 
 }

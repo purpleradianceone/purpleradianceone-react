@@ -62,7 +62,7 @@ const PanelCustomizer: React.FC = () => {
 
   return (
     <div className="w-full  min-h-screen relative max-h-full bg-gradient-to-br from-blue-50 to-purple-50  flex flex-col items-center">
-      <h1 className="text-xl font-bold text-indigo-700 mb-10 text-center">
+      <h1 className="section-header-custom-blue mb-10 text-center">
         Choose Your Panel Layout
       </h1>
 
@@ -75,12 +75,12 @@ const PanelCustomizer: React.FC = () => {
           }`}
         >
           <div className="relative w-full h-64 bg-gray-50 rounded-t-xl overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-14 bg-indigo-600 text-white flex items-center justify-center font-semibold shadow">
+            <div className="absolute top-0 left-0 w-full h-14 bg-indigo-600 table-header-custom-white flex items-center justify-center shadow">
               Panel (Top)
             </div>
           </div>
           <div className="p-4 flex justify-center">
-            <label className="flex items-center gap-2 text-lg font-medium">
+            <label className="flex items-center gap-2 section-header-custom">
               <input
                 type="radio"
                 name="panel"
@@ -101,7 +101,7 @@ const PanelCustomizer: React.FC = () => {
           }`}
         >
           <div className="relative w-full h-64 bg-gray-50 rounded-t-xl overflow-hidden">
-            <div className="absolute top-0 left-0 h-full w-20 bg-indigo-600 text-white flex items-center justify-center font-semibold shadow-md">
+            <div className="absolute top-0 left-0 h-full w-20 bg-indigo-600 table-header-custom-white flex items-center justify-center shadow-md">
               <div className="grid">
                 Panel
                 <span>(Left)</span>
@@ -109,7 +109,7 @@ const PanelCustomizer: React.FC = () => {
             </div>
           </div>
           <div className="p-4 flex justify-center">
-            <label className="flex items-center gap-2 text-lg font-medium">
+            <label className="flex items-center gap-2 section-header-custom">
               <input
                 type="radio"
                 name="panel"

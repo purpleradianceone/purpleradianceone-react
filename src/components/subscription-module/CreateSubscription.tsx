@@ -175,9 +175,9 @@ function CreateSubscription({
   return (
     <>
       <div className="  "></div>
-      <h2 className="font-semibold text-sm sm:text-base flex flex-wrap">
+      <h2 className="table-header-custom flex flex-wrap">
         <span>Active Users in the Company:</span>
-        <span className="text-red-600 font-bold ml-1">
+        <span className="input-label-custom-inactive ml-1">
           {loginStatus.activeUsersInCompany}
         </span>
       </h2>

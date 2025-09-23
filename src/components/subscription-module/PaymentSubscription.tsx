@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createPortal } from "react-dom";
 import Button from "../ui/Button";
-import { CheckCircle2, CreditCard,  X } from "lucide-react";
+import { CheckCircle2, CreditCard, X } from "lucide-react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useState } from "react";
 import axios from "axios";
@@ -9,7 +9,6 @@ import { STATUS_CODE, SUBSCRIPTION } from "../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import POST_API from "../../constants/PostApi";
-import COLORS from "../../constants/Colors";
 import PaymentSuccess from "../../assets/animations/PaymentSuccessfull";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
@@ -270,51 +269,53 @@ export default function PaymentSubscription({
           />
           {/* Subscription Details in Proper Column Format */}
           <div className=" space-y-1 py-2 grid grid-cols-[auto_10px_1fr] gap-y-2 text-gray-900 text-sm font-semibold">
-            <span className="pr-2 text-gray-700">Order ID</span>
-            <span className="text-gray-700">:</span>
-            <span className="pl-1 break-words truncate">{orderId}</span>
+            <span className="pr-2 table-header-custom">Order ID</span>
+            <span className="table-header-custom">:</span>
+            <span className="pl-1 input-label-custom break-words truncate">
+              {orderId}
+            </span>
 
-            <span className="pr-2 text-gray-700">User Count</span>
-            <span className="text-gray-700">:</span>
-            <span className="pl-1">{numberOfCompanyUsers}</span>
+            <span className="pr-2 table-header-custom">User Count</span>
+            <span className="table-header-custom">:</span>
+            <span className="pl-1 input-label-custom">
+              {numberOfCompanyUsers}
+            </span>
 
             {!isSubscriptionForUpdate && (
               <>
-                <span className="pr-2 text-gray-700">
+                <span className="pr-2 table-header-custom">
                   Subscription Duration
                 </span>
-                <span className="text-gray-700">:</span>
-                <span className="pl-1">
+                <span className="table-header-custom">:</span>
+                <span className="pl-1 input-label-custom">
                   {monthsOfSubscription}{" "}
                   {monthsOfSubscription === 1 ? "month" : "months"}
                 </span>
               </>
             )}
 
-            <span className="pr-2 text-gray-700">Amount</span>
-            <span className="text-gray-700">:</span>
-            <span className="pl-1">₹{amount}</span>
+            <span className="pr-2 table-header-custom">Amount</span>
+            <span className="table-header-custom">:</span>
+            <span className="pl-1 input-label-custom">₹{amount}</span>
           </div>
           <hr className="my-3 border-gray-300" /> {/* Divider */}
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
-            <button
-              onClick={onCancel}
-              className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-             <div className="flex items-center gap-0.5">
-              <X size={16}/>
-               {cancelText}
-              </div>
-            </button>
+            <div>
+              <Button onClick={onCancel}>
+                <div className="flex items-center gap-0.5">
+                  <X size={16} />
+                  {cancelText}
+                </div>
+              </Button>
+            </div>
 
-            <Button
-              onClick={handlePaymentProceed}
-              className={`flex items-center gap-2  text-white px-3 rounded-lg ${COLORS.BG_BLUE_600_COLOR}  ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
-            >
-              <CheckCircle2 className="h-5 w-5" />
-              <span>Confirm Payment</span>
-            </Button>
+            <div>
+              <Button onClick={handlePaymentProceed}>
+                <CheckCircle2 className="h-5 w-5" />
+                <span>Confirm Payment</span>
+              </Button>
+            </div>
           </div>
         </div>
       )}
