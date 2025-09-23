@@ -10,21 +10,6 @@ import {
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import AccountContactType from "../../../../@types/account/AccountContact";
-import {
-  Briefcase,
-  Edit,
-  Edit3,
-  Globe,
-  Languages,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Phone,
-  Save,
-  User,
-  X,
-} from "lucide-react";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
@@ -33,6 +18,8 @@ import Button from "../../../ui/Button";
 import FormHeader from "../../../ui/FormHeader";
 import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
+import AccountContactType from "../../../../@types/account/AccountContactType";
+import { Briefcase, Edit, Edit3, Globe, Languages, Mail, MapPin, MessageCircle, Phone, Save, User, X } from "lucide-react";
 
 type AccountContactTypeComponent = {
   accountId: number;
