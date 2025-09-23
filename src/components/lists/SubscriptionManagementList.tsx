@@ -24,6 +24,7 @@ import {  useState } from "react";
 import CreateSubscription from "../subscription-module/CreateSubscription";
 import UpdateSubscription from "../subscription-module/UpdateSubscription";
 import { useUserPreference } from "../../context/user/UserPreference";
+import FormHeader from "../ui/FormHeader";
 
 function SubscriptionManagementList({
   subscriptionList,
@@ -280,19 +281,19 @@ function SubscriptionManagementList({
             <div
               className={
                 isSmallScreen
-                  ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
-                  : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+                  ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+                  : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"
               }
             >
               <div className="flex min-h-screen mb-5 items-center justify-center">
                 <div
-                  className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+                  className="relative w-full max-w-xl max-h-[100vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
       [&::-webkit-scrollbar-track]:bg-gray-300
       [&::-webkit-scrollbar-thumb]:bg-gray-400
        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
                 >
-                  <div className="py-4 px-6">
-                    <div className="flex items-center gap-1 mb-4">
+                  <div className="py-3 px-4">
+                    {/* <div className="flex items-center gap-1 mb-4">
                       <CalendarRange
                         className="text-blue-500"
                         size={SIZE.TWENTY_FOUR}
@@ -308,7 +309,16 @@ function SubscriptionManagementList({
                       >
                         <X size={SIZE.TWENTY} />
                       </button>
-                    </div>
+                    </div> */}
+
+                    <FormHeader
+                      icon={CalendarRange}
+                      preText="Subscribe for future access"
+                      description="Subscribe now to secure future access in advance."
+                      onClose={() => {
+                          setIsAddSubscriptionModalOpen(false);
+                        }}
+                    />
                     <CreateSubscription
                       handleSubscriptionListChange={
                         handleSubscriptionListChange
