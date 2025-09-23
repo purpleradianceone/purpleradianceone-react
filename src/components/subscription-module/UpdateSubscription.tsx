@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditIcon, X } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
+import { EditIcon, Save, Users, X } from "lucide-react";
+import {  STATUS_CODE } from "../../constants/AppConstants";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
@@ -14,6 +14,7 @@ import POST_API from "../../constants/PostApi";
 import PaymentSubscription from "./PaymentSubscription";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
+import FormHeader from "../ui/FormHeader";
 
 export default function UpdateSubscription({
   isOpen,
@@ -65,7 +66,9 @@ export default function UpdateSubscription({
   const handleOnCancelPaymentPage = () => {
     setIsPaymentSubscriptionOpen(false);
   };
-  const handleUpdateFormSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
     if (
@@ -100,7 +103,6 @@ export default function UpdateSubscription({
           { withCredentials: true }
         )
         .then((response) => {
-
           if (response.status === STATUS_CODE.OK) {
             setResponseSusbcriptionAmtOrderID({
               amount: response.data.subscription_amount,
@@ -108,14 +110,17 @@ export default function UpdateSubscription({
             });
             setIsPaymentSubscriptionOpen(true);
           }
-        }).catch(async(error : ApiError | any) => {
-          if(error.status === STATUS_CODE.UNATHORISED){
-            const refreshTokenResponse = await RefreshToken({callFunctionWithEvent : handleUpdateFormSubmit})
-            if(refreshTokenResponse){
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenResponse = await RefreshToken({
+              callFunctionWithEvent: handleUpdateFormSubmit,
+            });
+            if (refreshTokenResponse) {
               handleUpdateFormSubmit(event);
             }
           }
-        })
+        });
     }
   };
 
@@ -125,9 +130,7 @@ export default function UpdateSubscription({
       setUpdateSubscriptionErrors({
         companyUserCountForUpdateSubscription: "",
       });
-      
     }
-    
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -136,20 +139,20 @@ export default function UpdateSubscription({
       <div
         className={
           isSmallScreen
-            ? "fixed inset-0 z-50 pl-12 pt-6 overflow-hidden bg-black bg-opacity-45"
-            : "fixed inset-0 z-50 p-8 pt-4 overflow-hidden bg-black bg-opacity-45"
+            ? "fixed inset-0 z-50 pl-12 pt-6 overflow-hidden bg-black bg-opacity-5"
+            : "fixed inset-0 z-50 p-8 pt-4 overflow-hidden bg-black bg-opacity-5"
         }
       >
-        <div className="flex min-h-screen items-center justify-center">
+        <div className="flex  min-h-screen items-center justify-center">
           <div
-            className="relative w-full max-w-md max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg animate-fadeIn 
+            className="relative w-full border border-gray-300 max-w-md max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg animate-fadeIn 
         [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
         [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full p-4"
           >
             {/* Header */}
-            <div className="flex items-center gap-2 bg-white py-2">
+            {/* <div className="flex items-center gap-2 bg-white py-2">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
               <h2 className="text-base font-semibold text-gray-800">
                 Subscription for {startDate} - {endDate}
@@ -160,10 +163,13 @@ export default function UpdateSubscription({
               >
                 <X size={16} />
               </button>
-            </div>
-
-            {/* Divider Line */}
-            <hr className="border-gray-300 mb-3" />
+            </div> */}
+            <FormHeader
+              icon={EditIcon}
+              onClose={onClose}
+              preText={`Update Subscription for  ${startDate} - ${endDate}`}
+              description="Update the subscription plan as per the needs."
+            />
 
             {/* Information Section - Two Column Layout */}
             <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-gray-700 mb-3">
@@ -177,11 +183,14 @@ export default function UpdateSubscription({
 
             {/* Input */}
             <form onSubmit={handleUpdateFormSubmit}>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              {/* <label className="block text-xs font-medium text-gray-700 mb-1">
                 Users to Add in Subscription* :
-              </label>
+              </label> */}
               <FormInput
+                logo={Users}
+                label="Users to Add in Subscription :"
                 type="number"
+                required
                 value={createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()}
                 placeholder="Number of users to add in subscription"
                 name="companyUserCountForUpdateSubscription"
@@ -195,8 +204,21 @@ export default function UpdateSubscription({
               />
 
               {/* Submit Button */}
-              <div className="flex justify-center mt-3">
-                <Button type="submit">Submit</Button>
+              <div className="flex justify-end   mt-3">
+               <div className="flex gap-1">
+                 <Button onClick={onClose} type="reset">
+                  <div className="flex items-center ">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button type="submit">
+                  <div className="flex items-center  gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+               </div>
               </div>
             </form>
           </div>
