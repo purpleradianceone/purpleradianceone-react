@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SideNavBarItemProps from "../../../../@types/home/navbar/SideNavBarItemProps";
+import { useLocation } from "react-router-dom";
 
 function SideNavBarItem({
   icon: Icon,
@@ -8,23 +9,51 @@ function SideNavBarItem({
   children,
   isOpen,
   onClick,
-  disabled
-}: SideNavBarItemProps){
+  disabled,
+  isActive,
+}: SideNavBarItemProps) {
   const [expanded, setExpanded] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [hoveredItem, setHoveredItem] = useState(false);
+
+  const location = useLocation();
+
+  const hasActiveChild = React.Children.toArray(children).some((child) => {
+    // Check if the child is a valid React element and if it has props
+    if (React.isValidElement(child) && child.props) {
+      // Now you can safely access the props
+      const to = child.props.to;
+      return to && location.pathname.startsWith(to);
+    }
+    setHoveredItem(false);
+    return false;
+  });
+
+  const isIconActive = isActive || hasActiveChild;
+
+  useEffect(() => {
+    if (hasActiveChild && isOpen) {
+      setExpanded(true);
+    }
+  }, [hasActiveChild, isOpen]);
+
+  useEffect(() => {
+    if (hoveredItem) {
+      setIsTooltipVisible(false);
+    }
+  }, [hoveredItem]);
 
   useEffect(() => {
     if (isTooltipVisible && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setTooltipPosition({
-        top: rect.top + 15, // Position above the button
-        left: rect.left + 60, // Center horizontally
+        top: rect.top + 15,
+        left: rect.left + 60,
       });
     }
-  }, [isTooltipVisible]); // Add isTooltipVisible as dependency
+  }, [isTooltipVisible]);
 
   const updateTooltipPosition = () => {
     if (buttonRef.current) {
@@ -36,147 +65,117 @@ function SideNavBarItem({
     }
   };
 
-  if(disabled){
+  const baseClasses = "w-full flex items-center px-4 py-2.5 table-header-custom rounded-lg";
+  const hoverClasses = "hover:bg-blue-50";
+  const iconActiveClasses = "table-header-custom-blue";
+  const iconBaseClasses = "table-header-custom";
+
+  if (disabled) {
+    // Disabled state
     return (
       <div className="cursor-not-allowed opacity-50">
         {isOpen ? (
-          <>
-            <button
-              onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
-              className="w-full cursor-not-allowed opacity-50 flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50 text-gray-700"
-            >
-              <div className="flex items-center cursor-not-allowed">
-                <Icon size={20} className="mr-3" />
-                <span>{label}</span>
-              </div>
-              {children && (
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
-                />
-              )}
-            </button>
-            {children && expanded && (
-              <div className="ml-4 mt-1 space-y-1">
-                {children.map((child, index) => (
-                  <button
-                    key={index}
-                    className="w-full cursor-not-allowed opacity-50 flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg"
-                  >
-                    {child}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
+          <button className={`${baseClasses} text-gray-700`}>
+            <div className="flex items-center">
+              <Icon size={20} className={`mr-3 ${iconBaseClasses}`} />
+              <span className={iconBaseClasses}>{label}</span>
+            </div>
+            {children && <ChevronDown size={16} />}
+          </button>
         ) : (
-          <div
-            className="relative"
-            onClick={() => setHoveredItem(true)}
-            onMouseLeave={() => setIsTooltipVisible(false)}
-          >
+          <div className="relative">
             <button
               ref={buttonRef}
-              onClick={onClick}
-              onMouseEnter={() => {
-                setIsTooltipVisible(true);
-                updateTooltipPosition();
-              }}
-              onMouseMove={updateTooltipPosition}
-              className="w-full cursor-not-allowed opacity-50 flex items-center justify-center px-0 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+              onMouseEnter={() => setIsTooltipVisible(true)}
+              onMouseLeave={() => setIsTooltipVisible(false)}
+              className="w-full flex items-center justify-center px-0 py-2.5 text-sm font-medium rounded-lg"
             >
-              <Icon size={20} />
+              <Icon size={20} className={iconBaseClasses} />
             </button>
             {isTooltipVisible && (
               <div
-                className="fixed cursor-not-allowed z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded transform -translate-x"
-                style={{
-                  top: `${tooltipPosition.top}px`,
-                  left: `${tooltipPosition.left}px`,
-                }}
+                className="fixed z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded"
+                style={{ top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px` }}
               >
                 {label}
-                
               </div>
             )}
           </div>
         )}
       </div>
     );
-  }
-  else{
+  } else {
+    // Enabled state
     return (
-      <div>
+      <div className="w-full">
         {isOpen ? (
           <>
             <button
               onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
-              className="w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50 text-gray-700"
+              className={`${baseClasses} ${hoverClasses} text-gray-700 ${isActive ? 'bg-blue-100 font-semibold' : ""}`}
             >
               <div className="flex items-center">
-                <Icon size={20} className="mr-3" />
-                <span>{label}</span>
+                <Icon
+                  size={20}
+                  className={`mr-3 ${isIconActive ? iconActiveClasses : iconBaseClasses}`}
+                />
+                <span className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}>{label}</span>
               </div>
               {children && (
                 <ChevronDown
                   size={20}
-                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                  className={`transition-transform ${expanded ? "rotate-180" : ""} ${isIconActive ? iconActiveClasses : iconBaseClasses}`}
                 />
               )}
             </button>
             {children && expanded && (
               <div className="ml-4 mt-1 space-y-1">
                 {children.map((child, index) => (
-                  <button
-                    key={index}
-                    className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg"
-                  >
-                    {child}
-                  </button>
+                  <div key={index} className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}>{child}</div>
                 ))}
               </div>
             )}
           </>
         ) : (
           <div
-            className="relative"
+            className={`relative`}
+            onMouseEnter={() => {
+              setIsTooltipVisible(true);
+              updateTooltipPosition();
+            }}
             onClick={() => setHoveredItem(true)}
-            onMouseLeave={() => setIsTooltipVisible(false)}
+            onMouseLeave={() => {
+              setIsTooltipVisible(false);
+            }}
           >
             <button
               ref={buttonRef}
               onClick={onClick}
-              onMouseEnter={() => {
-                setIsTooltipVisible(true);
-                updateTooltipPosition();
-              }}
-              onMouseMove={updateTooltipPosition}
-              className="w-full cursor-pointer flex items-center justify-center px-0 py-2.5 text-sm font-medium rounded-lg hover:bg-blue-50"
+              className={`w-full cursor-pointer flex items-center justify-center px-0 py-2.5 rounded-lg ${hoverClasses} ${isIconActive ? 'bg-blue-100' : ''}`}
             >
-              <Icon size={20} />
+              <Icon
+                size={20}
+                className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
+              />
             </button>
             {isTooltipVisible && (
               <div
-                className="fixed cursor-pointer z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded transform -translate-x"
-                style={{
-                  top: `${tooltipPosition.top}px`,
-                  left: `${tooltipPosition.left}px`,
-                }}
+                className="fixed z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded"
+                style={{ top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px` }}
               >
                 {label}
-                
               </div>
             )}
             {children && hoveredItem && (
               <div
                 onMouseLeave={() => setHoveredItem(false)}
-                onMouseEnter={()=> setIsTooltipVisible(false)}
-                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36 z-50"
+                onMouseEnter={() => setIsTooltipVisible(false)}
+                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36"
               >
-                {children.map((child, index) => (
+                {React.Children.toArray(children).map((child, index) => (
                   <button
                     key={index}
-                    className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50"
+                    className={`w-full flex items-center px-4 py-2 min-w-full ${isIconActive ? iconActiveClasses : iconBaseClasses} hover:bg-blue-50`}
                   >
                     {child}
                   </button>
@@ -188,8 +187,6 @@ function SideNavBarItem({
       </div>
     );
   }
-
-  
-};
+}
 
 export default SideNavBarItem;
