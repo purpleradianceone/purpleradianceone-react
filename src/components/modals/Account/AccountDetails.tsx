@@ -29,10 +29,10 @@ import {
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import AccountContact from "./account-contact/AccountContact";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import AccountLead from "./account-lead/AccountLead";
+import AccountContact from "./account-contact/AccountContact";
 
 interface AccountDetailsProps {
   company: Account;
