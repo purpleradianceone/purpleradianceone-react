@@ -829,60 +829,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 }
                 onClose={
                   handleStateClearFunctionOnClickOfCancelOrXButton
-                  // setEditingContactId(null);
-                  // setIsOpenAddAccountContactForm(false);
-                  // setEditContactData(null);
-                  // setErrors({
-                  //   email: "",
-                  //   mobileNumber : "",
-                  //   name : ""
-                  // })
-                  // // note
-                  // setAccountContactForm({
-                  //   name: "",
-                  //   email: "",
-                  //   address: "",
-                  //   department: "",
-                  //   designation: "",
-                  //   mobileNumber: "",
-                  //   preferredCommunicationChannel: "",
-                  //   preferredLanguage: "",
-                  // });
                 }
               />
-              {/* <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {editContactData ? "Edit Contact" : "Add New Contact"}
-                  </h2>
-                  <p className="text-gray-600 mt-1">
-                    {editContactData
-                      ? "Update contact information"
-                      : "Create new account contact"}
-                  </p>
-                </div>             
-                <button
-                  onClick={() => {
-                    setEditingContactId(null);
-                    setIsOpenAddAccountContactForm(false);
-                    setEditContactData(null);
-                    // note
-                    setAccountContactForm({
-                      name: "",
-                      email: "",
-                      address: "",
-                      department: "",
-                      designation: "",
-                      mobileNumber: "",
-                      preferredCommunicationChannel: "",
-                      preferredLanguage: "",
-                    });
-                  }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X size={24} />
-                </button>
-              </div> */}
             </div>
 
             {/* Form Grid */}
