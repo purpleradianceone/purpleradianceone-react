@@ -32,7 +32,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import AccountLead from "./account-lead/AccountLead";
-import AccountContact from "./account-contact/AccountContact";
+import AccountContact from "./account-contact-temp/AccountContact";
 // Note this is the type
 interface AccountDetailsProps {
   company: Account;
@@ -710,7 +710,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Contact
           </h3>
-          <AccountContact accountId={company.id} />
+          <AccountContact
+           accountId={company.id} />
         </div>
         {/* Account Lead */}
         <div>
