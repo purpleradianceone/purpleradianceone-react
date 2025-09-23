@@ -242,12 +242,12 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
       className="absolute -right-72 mt-1 w-96 bg-white border border-gray-300 rounded-2xl shadow-2xl z-50"
     >
       {/* Header with Clear All */}
-      <div className="flex justify-between items-center p-3 border-b text-sm font-semibold text-gray-800 bg-gray-100 rounded-t-2xl">
+      <div className="flex justify-between items-center p-3 border-b table-header-custom bg-gray-100 rounded-t-2xl">
         <span>Notifications!</span>
         <button
           type="button"
           onClick={handleUpdateNotificationListWebClear}
-          className="text-xs text-red-600 hover:text-red-700"
+          className="input-label-custom-inactive hover:text-red-700"
         >
           Clear All
         </button>
@@ -256,7 +256,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
       {/* Notifications List */}
       <div className="max-h-[500px]  overflow-y-auto custom-scrollbar">
         {notificationList.length === 0 && !showLoadingSpinner ? (
-          <div className="p-6 text-center text-gray-500 text-sm">
+          <div className="p-6 text-center caption-custom">
             No notifications to display
           </div>
         ) : showLoadingSpinner && notificationList.length === 0 ? (
@@ -279,7 +279,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
               >
                 {/* Subject and Date */}
                 <div className="flex justify-between items-center ">
-                  <p className="font-medium text-sm text-gray-900">
+                  <p className="input-label-custom-blue">
                     {notification.notification_subject}
                   </p>
                   {/* Mark as Read Button */}
@@ -287,14 +287,14 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
                   {!notification.is_read ? (
                     loadingId === notification.id ? (
                       <div className="w-auto mr-7 h-auto flex items-center justify-end ">
-                        <Loader2Icon className="w-4 h-4 text-gray-600 animate-spin " />
+                        <Loader2Icon className="w-4 h-4 caption-custom animate-spin " />
                       </div>
                     ) : (
                       <button
                         onClick={() =>
                           handleUpdateNotificationListWeb(notification.id)
                         }
-                        className="text-xs underline  text-gray-400 bg-blue-00"
+                        className="caption-custom-blue bg-blue-00"
                       >
                         Mark as Read
                       </button>
@@ -303,11 +303,11 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
                 </div>
 
                 {/* Body */}
-                <p className="text-xs text-gray-700 ">
+                <p className="caption-custom ">
                   {notification.notification_body}
                 </p>
 
-                <span className="text-xs text-gray-600">
+                <span className="caption-custom">
                   {notification.notification_request_date}
                 </span>
               </div>
@@ -315,7 +315,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
 
             {/* Bottom Loader */}
             {showLoadingSpinner && (
-              <div className="p-4 flex justify-center text-sm text-gray-500 animate-pulse">
+              <div className="p-4 flex justify-center caption-custom animate-pulse">
                 <span>Loading more data...</span>
               </div>
             )}

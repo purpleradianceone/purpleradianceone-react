@@ -173,12 +173,12 @@ export default function UpdateSubscription({
 
             {/* Information Section - Two Column Layout */}
             <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-gray-700 mb-3">
-              <span className="font-medium">Subscription allowed users</span>{" "}
-              <span>: {existingUserCount}</span>
-              <span className="font-medium">Start Date</span>{" "}
-              <span>: {startDate}</span>
-              <span className="font-medium">End Date</span>{" "}
-              <span>: {endDate}</span>
+              <span className="table-header-custom">Subscription allowed users</span>{" "}
+              <span className="input-label-custom">: {existingUserCount}</span>
+              <span className="table-header-custom">Start Date</span>{" "}
+              <span className="input-label-custom">: {startDate}</span>
+              <span className="table-header-custom">End Date</span>{" "}
+              <span className="input-label-custom">: {endDate}</span>
             </div>
 
             {/* Input */}

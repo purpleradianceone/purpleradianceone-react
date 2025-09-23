@@ -4,6 +4,7 @@ import {
   Bell,
   Building2,
   Calendar,
+  CreditCard,
   Handshake,
   Home,
   LayoutPanelLeft,
@@ -15,6 +16,7 @@ import {
   Settings,
   SettingsIcon,
   Store,
+  User2,
   UserCogIcon,
   X,
 } from "lucide-react";
@@ -151,6 +153,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const handleClickOnUserProfile = () => {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
   };
+
+  const handleClickOnSettings = () => {
+    Navigate(ROUTES_URL.COMPANY_SETTING)
+  }
 
   // const notifications = useNotifications();
 
@@ -326,7 +332,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
               >
                 <div className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className="font-sora ">{loginStatus.companyName}</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -335,9 +341,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       <SideNavBar
                         isOpen={sidebarOpen}
                         onToggle={() => setSidebarOpen(!sidebarOpen)}
-                        onNextTab={() => {
-                          setSidebarOpen(false);
-                        }}
                       />
                     </div>
                   </>
@@ -586,9 +589,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           }}
                           className="p-2 rounded-lg hover:bg-gray-100"
                         >
-                          <Bell className="h-5 w-5" />
+                          <Bell className=" table-header-custom" />
                           {notificationCount > 0 && (
-                            <span className="absolute -top-0.5 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                            <span className="absolute -top-0.5 -right-1 bg-red-500 caption-custom white-text px-1.5 py-0.5 rounded-full">
                               {notificationCount > 9 ? "9+" : notificationCount}
                             </span>
                           )}
@@ -608,7 +611,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             title="Panel Layout"
                             className="p-2 rounded-lg hover:bg-gray-100"
                           >
-                            <LayoutPanelLeft className="h-5 w-5" />
+                            <LayoutPanelLeft className="table-header-custom" />
                           </button>
                         </Link>
                       ) : (
@@ -622,7 +625,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           title="Panel Layout"
                           className="p-2 rounded-lg opacity-50 cursor-not-allowed hover:bg-gray-100"
                         >
-                          <LayoutPanelLeft className="h-5 w-5" />
+                          <LayoutPanelLeft className="table-header-custom" />
                         </button>
                       )}
                     </>
@@ -632,7 +635,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                     onClick={toggleCard}
                   >
                     <div
-                      className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
+                      className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
                         loginStatus.email
                       )}`}
                     >
@@ -643,10 +646,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                     {/* Name & Email */}
                     <div className="ml-3 min-w-0">
-                      <span className="text-sm font-semibold text-gray-800 block truncate w-40">
+                      <span className="table-header-custom block truncate w-40">
                         {loginStatus?.fullName || "User Name"}
                       </span>
-                      <span className="text-xs text-gray-500 block truncate w-40">
+                      <span className="caption-custom block truncate w-40">
                         {loginStatus?.email || "user@example.com"}
                       </span>
                     </div>
@@ -660,7 +663,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         {/* Profile Section */}
                         <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
                           <div
-                            className={`w-9 h-9 rounded-full grid place-content-center text-white text-xl font-semibold border border-gray-300 ${getColor(
+                            className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
                               loginStatus.email
                             )}`}
                           >
@@ -669,10 +672,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               : ""}
                           </div>
                           <div className="min-w-0">
-                            <span className="text-sm font-semibold text-gray-800 block truncate w-40">
+                            <span className="table-header-custom  block truncate w-40">
                               {loginStatus?.fullName || "User Name"}
                             </span>
-                            <span className="text-xs text-gray-500 block truncate w-40">
+                            <span title={loginStatus?.email || "User email"} className="caption-custom block truncate w-40">
                               {loginStatus?.email || "User email"}
                             </span>
                           </div>
@@ -683,9 +686,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           {/* {userHasAccessToViewUser ? ( */}
                             <button
                               onClick={handleClickOnUserProfile}
-                              className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
-                              👤 Profile
+                              <div className="flex gap-2">
+                              <User2 className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Profile</span>
+                              </div>
+                              {/* 👤 Profile */}
                             </button>
                           {/* ) : ( */}
                             {/* <button
@@ -697,25 +704,36 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               👤 Profile
                             </button>
                           )} */}
-                          <Link to={ROUTES_URL.COMPANY_SETTING}>
-                            <button className="px-4 py-2 w-full hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                              ⚙️ Settings
+                            <button 
+                            onClick={handleClickOnSettings}
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                              {/* ⚙️ Settings */}
+                              <div className="flex gap-2">
+                              <Settings className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Settings</span>
+                              </div>
                             </button>
-                          </Link>
 
                           {userHasAccessToViewSubscription ? (
                             <button
                               onClick={handleSubscription}
-                              className="px-4 py-2 text-left flex items-center gap-2 transition hover:bg-gray-200 rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
-                              💳 Subscription
+                              <div className="flex gap-2">
+                              <CreditCard className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Subscription</span>
+                              </div>
+                              {/* 💳 Subscription */}
                             </button>
                           ) : (
                             <button
                               onClick={() => setAccessDeniedPopUpView(true)}
-                              className="px-4 py-2 text-left flex items-center gap-2 transition bg-gray-50 text-gray-400 cursor-not-allowed hover:bg-gray-100 rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom text-left flex items-center gap-2 transition bg-gray-50 cursor-not-allowed hover:bg-gray-100 rounded-md mx-2 my-1"
                             >
-                              💳 Subscription
+                              <div className="flex gap-2">
+                              <CreditCard className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Subscription</span>
+                              </div>
                             </button>
                           )}
 
@@ -724,10 +742,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                           <button
                             onClick={handleLogout}
-                            className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-3"
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                           >
-                            <LogOut className="w-4 h-4 text-gray-500" />
-                            Sign Out
+                            {/* <LogOut className="input-label-custom" />
+                            Sign Out */}
+                            <div className="flex gap-2">
+                              <LogOut className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Sign Out</span>
+                              </div>
                           </button>
                         </div>
                       </div>
@@ -741,8 +763,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
         <main
           className={
             position === "left"
-              ? sidebarOpen && !isSmallScreen
-                ? "mt-16 ml-60 flex justify-center items-center"
+              ? sidebarOpen
+                ? "mt-12 ml-60 flex justify-center items-center"
                 : "mt-12 ml-10 flex justify-center items-center"
               : "mt-14 ml-0 flex justify-center items-center"
           }

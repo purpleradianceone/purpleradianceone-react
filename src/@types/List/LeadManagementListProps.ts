@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import PaginationDataProps from "../ag-grid/PaginationDataProps";
 import CompanyUser from "../company-users/CompanyUser";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
@@ -18,6 +19,8 @@ type LeadManagementListProps = {
     leadSource : PostDataTypeForLeadSourceAndStatusAndStates[];
     handleLeadSelectedStatus : (selectedValue: number | undefined) => void;
     handleLeadSelectedSource : (selectedValue: number | undefined) => void;
+    isUsedInLeadModule : boolean,
+    handleRowSelectedForShowAccountLead? : (rowData: LeadDataProps | any) => void;
 }
 
 export default LeadManagementListProps;

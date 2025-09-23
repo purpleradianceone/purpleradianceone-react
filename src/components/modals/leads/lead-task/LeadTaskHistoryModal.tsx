@@ -234,17 +234,17 @@ function LeadTaskHistoryModal({
         {/* Close Button */}
         <button
           onClick={() => handleClose(false)}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors"
+          className="absolute top-3 right-6 section-header-custom hover:text-red-500 transition-colors"
           aria-label="Close"
         >
           <XCircle size={24} />
         </button>
 
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
+        <h2 className="section-header-custom mb-4 border-b pb-2">
           Lead Task History
         </h2>
         <div className="h-96 overflow-y-auto pr-2">
-          <h3 className="text-lg font-medium text-gray-800 mb-3">
+          <h3 className="table-header-custom mb-3">
             Activity Log
           </h3>
 
@@ -258,10 +258,10 @@ function LeadTaskHistoryModal({
               {historyLog.map((entry, index) => (
                 <><li key={index} className="bg-gray-50 p-3 rounded-md shadow-sm border border-gray-200">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-gray-600">
+                    <span className="input-label-custom">
                       {entry.timestamp}
                     </span>
-                    <span className="text-sm font-medium text-purple-700">
+                    <span className="table-header-custom active">
                       {entry.event}
                     </span>
                   </div>
@@ -269,12 +269,12 @@ function LeadTaskHistoryModal({
                     <>
                       <ul className="list-disc pl-5 text-sm text-gray-800 space-y-1">
                         {entry.details.map((detail, detailIndex) => (
-                          <li key={detailIndex}>{detail}</li>
+                          <li key={detailIndex} className="caption-custom">{detail}</li>
                         ))}
                       </ul>
                       <button
                         onClick={() => toggleExpand(entry.id)}
-                        className="text-blue-500 hover:underline text-xs focus:outline-none mt-2"
+                        className="caption-custom-blue hover:underline focus:outline-none mt-2"
                       >
                         Hide Details
                       </button>
@@ -282,7 +282,7 @@ function LeadTaskHistoryModal({
                   ) : (
                     <button
                       onClick={() => toggleExpand(entry.id)}
-                      className="text-blue-500 hover:underline text-xs focus:outline-none"
+                      className="caption-custom-blue hover:underline focus:outline-none"
                     >
                       Show details ({entry.details.length} changes)
                     </button>
@@ -296,7 +296,7 @@ function LeadTaskHistoryModal({
               
             </ul>
           ) : (
-            <p className="text-gray-500 text-sm">No history available for this task.</p>
+            <p className="caption-custom">No history available for this task.</p>
           )}
          
         </div>

@@ -52,7 +52,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     mobileNumber: "",
   });
 
-  // this is the change
   const [isOpenAddAccountContactForm, setIsOpenAddAccountContactForm] =
     useState(false);
   const [selectedContactCard, setSelectedContactCard] =

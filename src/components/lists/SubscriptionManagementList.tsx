@@ -1,7 +1,5 @@
 import {
   Calendar,
-  X,
-  Filter,
   IndianRupee,
   CreditCard,
   CalendarRange,
@@ -13,7 +11,6 @@ import Pagination from "../ag-grid/Pagination";
 import SubscriptionListAggrid from "../ag-grid/SubscriptionListAggrid";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
-import SearchInput from "../ui/SearchInput";
 import SubscriptionListProps from "../../@types/subscription/SubscriptionListProps";
 import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
@@ -50,10 +47,6 @@ function SubscriptionManagementList({
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { isCustomDateOptionSelected, handleDateRangeIdChange } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
-    useState(false);
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const [isUpdateSubscriptionModalOpen, setIsUpdateSubscriptionModalOpen] =
@@ -86,10 +79,10 @@ function SubscriptionManagementList({
       >
         <div className="sticky z-10 top-9 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
           <div className="flex  gap-2">
-            {!isSmallScreen && <CreditCard className="w-6 h-6 text-blue-600" />}
+            {!isSmallScreen && <CreditCard className="w-7 h-7 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">Subscription</span>
+              <span className="section-header-custom">Subscription</span>
             )}
           </div>
 
@@ -112,12 +105,13 @@ function SubscriptionManagementList({
                 <div className="flex mx-3">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar className="mt-2" />
+                      <Calendar className="input-label-custom -mt-1" />
                     </div>
 
                     <DateRangeFilterDropdown
                       dropdownOptions={dateRangeDropdownOptions}
                       handleDateIdChange={handleDateRangeIdChange}
+
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
@@ -136,144 +130,6 @@ function SubscriptionManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
-            </>
-          )}
-
-          {isMediumScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative  gap-2  ">
-                <div className="mt-1 flex ">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                    <Calendar />
-                  </div>
-
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.TWENTY} />
-                    </button>
-
-                    <div className="my-10 justify-items-center mb-5">
-                      <div className="mb-5">
-                        <DateRangePicker
-                          onStartDateChange={onStartDateChange}
-                          onEndDateChange={onEndDateChange}
-                        />
-                      </div>
-                      <div className="w-full justify-items-center">
-                        <div className="w-24">
-                          <Button>Done</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {isSmallScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative gap-2">
-                <Button
-                  onClick={() => {
-                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                  }}
-                >
-                  <Filter size={SIZE.EIGHT} />
-                </Button>
-              </div>
-              {isFiltersOpenInMobileView && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
-                        );
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.EIGHT} />
-                    </button>
-                    {/* Date FIlters Dropdown */}
-
-                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                      <div className="mt-1 flex ">
-                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                          <Calendar size={SIZE.TWENTY} />
-                        </div>
-
-                        <DateRangeFilterDropdown
-                          dropdownOptions={dateRangeDropdownOptions}
-                          handleDateIdChange={handleDateRangeIdChange}
-                        ></DateRangeFilterDropdown>
-                      </div>
-                    </div>
-
-                    {/* Custom Date Picker Div Flex Box*/}
-                    <div
-                      className="mb-10 justify-items-center"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-
-                    {
-                      <div className="flex w-full justify-center items-center mb-5">
-                        <div className="w-28">
-                          <Button
-                            onClick={() => {
-                              setIsFiltersOpenInMobileView(
-                                !isFiltersOpenInMobileView
-                              );
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              )}
             </>
           )}
 
