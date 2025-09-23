@@ -15,6 +15,12 @@
   font-weight: 600;
   color: #333333;
 }
+.section-header-custom-blue {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2563eb;
+}
 
 /* Main Navigation Links */
 .main-nav-custom {
@@ -57,6 +63,13 @@
   font-size: 14px;
   font-weight: 700;
   color: #333333;
+}
+
+.table-header-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
 }
 
 .table-header-custom.active {

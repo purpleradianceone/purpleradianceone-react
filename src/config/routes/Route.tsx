@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../../components/views/auth/AuthLayout";
 import SignInForm from "../../components/forms/SignInForm";
@@ -356,9 +355,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <ViewLeadManagement />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -368,9 +369,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <MeetingScheduler></MeetingScheduler>
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -380,9 +383,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <TemplatesPage />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -392,9 +397,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EditorCanvas />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -404,9 +411,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EditorCanvasWithJson />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -416,9 +425,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EmailSetting />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -428,9 +439,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <UserPrerefenceManagement />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -466,9 +479,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <Meetings></Meetings>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -478,10 +493,12 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           {/* <LeadImportCsv/> */}
           <LeadImportCsvManagement />
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -491,6 +508,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <CreateLeadModal
             isOpen={true}
@@ -499,6 +517,7 @@ export const router = createBrowserRouter([
             }}
           ></CreateLeadModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -508,6 +527,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddCompanyUserModal
             isOpen={true}
@@ -516,6 +536,7 @@ export const router = createBrowserRouter([
             }}
           ></AddCompanyUserModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -525,6 +546,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddProductModal
             isOpen={true}
@@ -534,6 +556,7 @@ export const router = createBrowserRouter([
             handleProductChangeOnAdd={() => {}}
           ></AddProductModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -543,6 +566,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddTeamModal
             isOpen={true}
@@ -552,6 +576,7 @@ export const router = createBrowserRouter([
             handleCompanyTeamChangeOnAdd={() => {}}
           ></AddTeamModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -561,9 +586,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <GetAccounts/>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -583,9 +610,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
         <IntegrationsPage/>
         </Navbar>
+        </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),

@@ -12,21 +12,19 @@ import {
 } from "lucide-react";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import SideNavBarItem from "./SideNavBarItem";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import useScreenSize from "../../../../config/hooks/useScreenSize";
 
-function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
+function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
     userHasAccessToViewUser,
     userHasAccessToViewLead,
     userHasAccessToViewAccount,
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
-    userHasAccessToViewMeeting
+    userHasAccessToViewMeeting,
   } = useUserAccessModules();
-  const { isSmallScreen } = useScreenSize();
 
   return (
     <aside
@@ -34,264 +32,193 @@ function SideNavBar({ isOpen, onToggle, onNextTab }: SideBarProps) {
           ${isOpen ? "w-64" : "w-14"}`}
     >
       <div className="flex items-center border-b justify-between px-4 h-12">
-        {isOpen && <span className="text-xl font-bold">Purple CRM</span>}
-        <button onClick={onToggle} className="hover:bg-gray-100 rounded-lg">
+        {isOpen && (
+          <span className="section-header-custom-blue">PurpleRadiance One</span>
+        )}
+        <button
+          onClick={onToggle}
+          className="section-header-custom hover:text-blue-800 rounded-lg"
+        >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
       <nav className="p-3 space-y-1">
-        <Link to={ROUTES_URL.HOME}>
-          <SideNavBarItem  icon={Home} label="Home" isOpen={isOpen} />
-        </Link>
+        <NavLink to={ROUTES_URL.HOME}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Home}
+              label="Home"
+              isOpen={isOpen}
+              isActive={isActive}
+            />
+          )}
+        </NavLink>
 
+        {/* Enabled Nav Links */}
         {userHasAccessToViewUser && (
-          <Link
-            to={ROUTES_URL.GET_COMPANY_USERS}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={Building2}
-              label="Manage Users"
-              isOpen={isOpen}
-            />
-          </Link>
+          <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={Building2}
+                label="Manage Users"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
         )}
-
-        {!userHasAccessToViewUser && (
-          <Link
-            to={ROUTES_URL.GET_COMPANY_USERS}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={Building2}
-              label="Manage Users"
-              isOpen={isOpen}
-              disabled={true}
-            />
-          </Link>
-        )}
-
         {userHasAccessToViewLead && (
-          <Link
-            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem icon={Handshake} label="Leads" isOpen={isOpen} />
-          </Link>
+          <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={Handshake}
+                label="Leads"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
         )}
-
-        {!userHasAccessToViewLead && (
-          <Link
-            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={Handshake}
-              label="Leads"
-              isOpen={isOpen}
-              disabled={true}
-            />
-          </Link>
-        )}
-
         {userHasAccessToViewAccount && (
-          <Link
-            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem icon={UserCogIcon} label="Accounts" isOpen={isOpen} />
-          </Link>
+          <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={UserCogIcon}
+                label="Accounts"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
         )}
-
-        {!userHasAccessToViewAccount && (
-          <Link
-            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={UserCogIcon}
-              label="Accounts"
-              isOpen={isOpen}
-              disabled={true}
-            />
-          </Link>
-        )}
-
         {userHasAccessToViewProduct && (
-          <Link
-            to={ROUTES_URL.PRODUCT_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem icon={Store} label="Products" isOpen={isOpen} />
-          </Link>
+          <NavLink to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={Store}
+                label="Products"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
         )}
-
-        {!userHasAccessToViewProduct && (
-          <Link
-            to={ROUTES_URL.PRODUCT_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={Store}
-              label="Products"
-              isOpen={isOpen}
-              disabled={true}
-            />
-          </Link>
-        )}
-
         {userHasAccessToViewTeamManagement && (
-          <Link
-            to={ROUTES_URL.TEAM_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem icon={Network} isOpen={isOpen} label="Teams" />
-          </Link>
+          <NavLink to={ROUTES_URL.TEAM_MANAGEMENT}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={Network}
+                label="Teams"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
+        )}
+        {userHasAccessToViewMeeting && (
+          <NavLink to={ROUTES_URL.MEETINGS}>
+            {({ isActive }) => (
+              <SideNavBarItem
+                icon={Calendar}
+                label="Meetings"
+                isOpen={isOpen}
+                isActive={isActive}
+              />
+            )}
+          </NavLink>
+        )}
+
+        {/* Disabled Nav Links - Don't need NavLink, as they don't navigate */}
+        {!userHasAccessToViewUser && (
+          <SideNavBarItem
+            icon={Building2}
+            label="Manage Users"
+            isOpen={isOpen}
+            disabled={true}
+          />
+        )}
+        {!userHasAccessToViewLead && (
+          <SideNavBarItem
+            icon={Handshake}
+            label="Leads"
+            isOpen={isOpen}
+            disabled={true}
+          />
+        )}
+        {!userHasAccessToViewAccount && (
+          <SideNavBarItem
+            icon={UserCogIcon}
+            label="Accounts"
+            isOpen={isOpen}
+            disabled={true}
+          />
+        )}
+        {!userHasAccessToViewProduct && (
+          <SideNavBarItem
+            icon={Store}
+            label="Products"
+            isOpen={isOpen}
+            disabled={true}
+          />
         )}
         {!userHasAccessToViewTeamManagement && (
-          <Link
-            to={ROUTES_URL.TEAM_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={Network}
-              isOpen={isOpen}
-              label="Teams"
-              disabled={true}
-            />
-          </Link>
+          <SideNavBarItem
+            icon={Network}
+            label="Teams"
+            isOpen={isOpen}
+            disabled={true}
+          />
+        )}
+        {!userHasAccessToViewMeeting && (
+          <SideNavBarItem
+            icon={Calendar}
+            label="Meetings"
+            isOpen={isOpen}
+            disabled={true}
+          />
         )}
 
-        {/* {userHasAccessToViewProductTeam && (
-          <Link
-            to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={BoxesIcon}
-              isOpen={isOpen}
-              label=" Product Teams/Users"
-            ></SideNavBarItem>
-          </Link>
-        )} */}
-        {/* {!userHasAccessToViewProductTeam && (
-          <Link
-            to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem
-              icon={BoxesIcon}
-              isOpen={isOpen}
-              label=" Product Teams/Users"
-              disabled={true}
-            ></SideNavBarItem>
-          </Link>
-        )} */}
-        {userHasAccessToViewMeeting && (
-          <Link
-            to={ROUTES_URL.MEETINGS}
-            onClick={() => {
-              if (isSmallScreen) {
-                onNextTab();
-              }
-            }}
-          >
-            <SideNavBarItem icon={Calendar} label="Meetings" isOpen={isOpen} />
-          </Link>
-        )}
-
-         {!userHasAccessToViewMeeting && (
-          
-            <SideNavBarItem
-            disabled = {true}
-             icon={Calendar} 
-             label="Meetings" 
-             isOpen={isOpen} />
-          
-        )}
-
-
+        {/* CRM Settings Dropdown */}
         <SideNavBarItem
           icon={Settings}
-          label="Crm Settings"
+          label="App Settings"
           isOpen={isOpen}
           children={[
-            <Link
-              to={ROUTES_URL.COMPANY_SETTING}
-              onClick={() => {
-                if (isSmallScreen) {
-                  onNextTab();
-                 
-                }
-              }}
-            >
-              Settings
-            </Link>,
-            <Link
-            to= {ROUTES_URL.EMAIL_TEMPLATE}
-            >
-            Email Template
-            </Link>, 
-            <Link
-            to= {ROUTES_URL.INTEGRATIONS_SETTINGS}
-            >
-            Integration
-            </Link>
-            //   <Link
-            // to= {ROUTES_URL.USER_PROFILE_SETTING}
-            // >
-            // Profile/Preferences
-            // </Link>            
+            <NavLink key="company-settings" to={ROUTES_URL.COMPANY_SETTING}>
+              {({ isActive }) => (
+                <div
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
+                >
+                  Settings
+                </div>
+              )}
+            </NavLink>,
+            <NavLink key="email-template" to={ROUTES_URL.EMAIL_TEMPLATE}>
+              {({ isActive }) => (
+                <div
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 text-nowrap ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
+                >
+                  Email Template
+                </div>
+              )}
+            </NavLink>,
+            <NavLink key="integrations" to={ROUTES_URL.INTEGRATIONS_SETTINGS}>
+              {({ isActive }) => (
+                <div
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
+                >
+                  Integration
+                </div>
+              )}
+            </NavLink>,
           ]}
-        ></SideNavBarItem>
+        />
       </nav>
     </aside>
   );

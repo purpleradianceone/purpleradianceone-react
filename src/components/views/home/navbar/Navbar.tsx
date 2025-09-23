@@ -326,7 +326,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
               >
                 <div className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className="font-sora ">{loginStatus.companyName}</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -335,9 +335,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       <SideNavBar
                         isOpen={sidebarOpen}
                         onToggle={() => setSidebarOpen(!sidebarOpen)}
-                        onNextTab={() => {
-                          setSidebarOpen(false);
-                        }}
                       />
                     </div>
                   </>
@@ -741,8 +738,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
         <main
           className={
             position === "left"
-              ? sidebarOpen && !isSmallScreen
-                ? "mt-16 ml-60 flex justify-center items-center"
+              ? sidebarOpen
+                ? "mt-12 ml-60 flex justify-center items-center"
                 : "mt-12 ml-10 flex justify-center items-center"
               : "mt-14 ml-0 flex justify-center items-center"
           }
