@@ -33,10 +33,11 @@ import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import AccountLead from "./account-lead/AccountLead";
 import AccountContact from "./account-contact/AccountContact";
-
+// Note this is the type
 interface AccountDetailsProps {
   company: Account;
   onClose: () => void;
+
   fetchAccounts: () => Promise<void>;
 }
 
