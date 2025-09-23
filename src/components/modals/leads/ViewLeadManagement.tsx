@@ -764,23 +764,28 @@ const ViewLeadManagement = () => {
         <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
           
           <div  className="flex w-full">
-            <div className="flex w-[100%] border rounded-r-full   bg-white">
+            <div className="flex w-[100%] border bg-white" style={{
+                  clipPath:
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  
+                }}>
             {leadStatus!.map((item: any) => (
               <button
                 title={item.name}
                 key={item.id}
-                className={`flex-1 table-data-custom  overflow-hidden ${
+                className={`flex-1 overflow-hidden ${
                   selectedLeadData.leadStatus === item.name
-                    ? "bg-blue-700  hover:bg-blue-500 hover:text-white"
-                    : "hover:bg-blue-700 hover:text-white"
+                    ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                    : "hover:bg-blue-700 table-header-custom hover:text-white"
                 }
               ${
                 selectedStatusId === item.id &&
-                "bg-sky-400 hover:bg-sky-500"
-              } text-center`}
+                "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
+              } text-center p-1`}
                 style={{
                   clipPath:
-                    "polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)",
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  
                 }}
                 onClick={() => {
                   if (userHasAccessToUpdateLead) {
