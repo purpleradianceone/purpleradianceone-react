@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, UserRoundCogIcon, } from "lucide-react";
+import { Calendar, Plus, UserRoundCogIcon } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
@@ -8,7 +8,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import {  useState } from "react";
+import { useState } from "react";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Pagination from "../ag-grid/Pagination";
@@ -17,6 +17,11 @@ import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
 import AccountDetails from "../modals/Account/AccountDetails";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 function AccountManagementList({
   accounts,
@@ -27,14 +32,15 @@ function AccountManagementList({
   fetchAccounts,
   handleCreateCompanyAccountType,
 }: {
-  fetchAccounts : () => Promise<void>;
+  fetchAccounts: () => Promise<void>;
   accounts: Account[];
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
-  handleCreateCompanyAccountType : () => void;
+  handleCreateCompanyAccountType: () => void;
 }) {
+  const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -51,10 +57,15 @@ function AccountManagementList({
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: any) => {
     setAccountDataToShowFullDetails(data);
-      setShowAccountDetails(true);
+    setShowAccountDetails(true);
   };
 
-  
+  const { userHasAccessToAddAccount } = useUserAccessModules();
+
+  const handleShowImportModule = () => {
+    navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
+  };
+
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -111,16 +122,37 @@ function AccountManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
+
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                onClick={() => {
+                  if (userHasAccessToAddAccount) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                    );
+                  }
+                }}
+              >
+                <Plus className=" h-5 w-5" />
+                <span>Import </span>
+              </Button>
+
               <Button
                 onClick={() => {
                   setOpenAccountForm(!openCreateAccountForm);
                 }}
-              ><span>+ Create</span>
+              >
+                <span>+ Create</span>
               </Button>
               {openCreateAccountForm && (
-                <CreateAccount 
-                onClose={() => setOpenAccountForm(false)} 
-                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+                <CreateAccount
+                  onClose={() => setOpenAccountForm(false)}
+                  handleCreateCompanyAccountType={
+                    handleCreateCompanyAccountType
+                  }
                 />
               )}
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
@@ -191,7 +223,6 @@ function AccountManagementList({
             </div>
           </>
         )}
-
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
@@ -221,15 +252,15 @@ function AccountManagementList({
       </div>
 
       {showAccountDetails && (
-          <div className="account-data">
+        <div className="account-data">
           <AccountDetails
-          fetchAccounts ={fetchAccounts}
-          // indutryTypeData={industryTypeData!}
-          // businessTypeData = {businessTypeData!}
-           company={AccountDataToShowFullDetails!}
-           onClose={() => setShowAccountDetails(false)}
-           />
-           </div>
+            fetchAccounts={fetchAccounts}
+            // indutryTypeData={industryTypeData!}
+            // businessTypeData = {businessTypeData!}
+            company={AccountDataToShowFullDetails!}
+            onClose={() => setShowAccountDetails(false)}
+          />
+        </div>
       )}
     </div>
   );

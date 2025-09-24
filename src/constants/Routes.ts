@@ -62,6 +62,8 @@ const ROUTES_URL = {
     INTEGRATIONS_SETTINGS : "/settings/integrations",
 
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
+    ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
+
 
 }
 export default ROUTES_URL;
