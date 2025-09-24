@@ -1,7 +1,7 @@
-import { X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import Button from '../ui/Button';
 import { createPortal } from 'react-dom';
-import { STATUS_CODE, STRING_VALUES } from '../../constants/AppConstants';
+import { SIZE, STATUS_CODE, STRING_VALUES } from '../../constants/AppConstants';
 import { useLoggedInUserContext } from '../../context/user/LoggedInUserContext';
 import axios from 'axios';
 import POST_API from '../../constants/PostApi';
@@ -99,31 +99,39 @@ function ZoomMeetingsOAuthConsent() {
         </button>
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In With Zoom Meetings</h2>
-          <p className="text-gray-600">Do you want to signin with your Zoom account for managing meetings</p>
+          <h2 className="section-header-custom mb-2">Sign In With Zoom Meetings</h2>
+          <p className="input-label-custom">Do you want to signin with your Zoom account for managing meetings</p>
         </div>
 
         <div className="flex justify-end gap-3">
           <div className='flex'>
-          <button
+          <Button
+          type='button'
              onClick={()=> {
           handleClose(false);
         }}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
           >
-            {STRING_VALUES.CANCEL}
-          </button>
+             <div className='flex items-center gap-1'>
+              <X size={SIZE.SIXTEEN}/>
+               {STRING_VALUES.CONFIRM}
+            </div>
+          </Button>
           </div>
          
 
          <div className="flex">
          <Button
-            onClick={() => {
+         type='submit'
+            onClick={(e) => {
+              e.preventDefault();
               handleConfirm();
               // handleClose(true);
             }}
           >
-            {STRING_VALUES.CONFIRM}
+            <div className='flex items-center gap-1'>
+              <Check size={SIZE.SIXTEEN}/>
+               {STRING_VALUES.CONFIRM}
+            </div>
           </Button>
          </div>
           

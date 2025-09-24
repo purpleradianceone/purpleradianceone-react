@@ -109,7 +109,7 @@ export const JSX_CHILDREN_NAME = {
     ADD_TEAM: "Add Team",
     TEAM : "Team",
     USER : "User",
-    UPDATE : "Update Plan",
+    UPDATE : "Update",
     MEETINGS : "Meetings",
 
 }
@@ -120,6 +120,7 @@ export const SIZE = {
     TWENTY_FOUR : 24,
     TWELEVE : 12,
     FOURTEEN : 14,
+    SIXTEEN : 16,
 }
 
 export const INNERHTML = {

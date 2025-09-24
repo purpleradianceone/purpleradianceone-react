@@ -17,7 +17,7 @@
 //   );
 // export default NavItem;  
 
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -43,6 +43,17 @@ interface NavItemProps {
 const NavItem = ({ to, icon, label, onClick, dropdownItems , disable }: NavItemProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+
+
+const location = useLocation();
+
+const hasActiveChild = dropdownItems ? dropdownItems.some((child) => {
+  // Directly access the 'to' property of the plain object
+  const to = child.to;
+  // Use startsWith for a partial match
+  return to && location.pathname.startsWith(to);
+}) : false;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -71,40 +82,43 @@ const NavItem = ({ to, icon, label, onClick, dropdownItems , disable }: NavItemP
   };
 
   return (
-    <div className="relative rounded-2xl transition-all py-1" ref={dropdownRef}>
-      {dropdownItems ? (
-        // Render as a dropdown trigger
-        <div
-          className="flex flex-col items-center cursor-pointer hover:text-blue-700"
-          onClick={handleItemClick}
-        >
+    <div className="relative rounded-2xl transition-all py-1 " ref={dropdownRef}>
+    {dropdownItems ? (
+      // Render as a dropdown trigger
+      <div
+        className="flex flex-col items-center cursor-pointer hover:text-blue-700"
+        onClick={handleItemClick}
+      >
+        <span className={`${hasActiveChild ? 'table-header-custom-blue' : 'table-header-custom'} text-center flex items-center hover:text-blue-700`}>
           {icon}
-          <span className="text-xs text-gray-600 font-medium text-center hover:text-blue-700 flex items-center">
-            {label}
-            {isDropdownOpen ? (
-              <ChevronUp size={12} className="ml-1" />
-            ) : (
-              <ChevronDown size={12} className="ml-1" />
-            )}
-          </span>
-        </div>
-      ) : (
-        // Render as a single link
-        <Link to={to as string} onClick={onClick}>
-          <div className={`flex flex-col ${disable ? "opacity-50 cursor-not-allowed" : ""} items-center hover:text-blue-700`}>
+        </span>
+        <span className={`text-xs font-medium text-center hover:text-blue-700 flex items-center ${hasActiveChild ? 'table-header-custom-blue' : 'table-header-custom'}`}>
+          {label}
+          {isDropdownOpen ? (
+            <ChevronUp size={12} className="ml-1" />
+          ) : (
+            <ChevronDown size={12} className="ml-1" />
+          )}
+        </span>
+      </div>
+    ) : (
+      // Render as a single link
+      <NavLink to={to as string} onClick={onClick}>
+        {({isActive}) => (
+          <div className={`flex flex-col ${disable ? "opacity-50 cursor-not-allowed" : ""} ${isActive ? 'table-header-custom-blue' : 'table-header-custom'} items-center hover:text-blue-700`}>
             {icon}
-            <span className="text-xs text-gray-600 font-medium text-center hover:text-blue-700">
+            <span className={`text-xs text-gray-600 font-medium text-center hover:text-blue-700 ${isActive ? 'table-header-custom-blue' : 'table-header-custom'}`}>
               {label}
             </span>
           </div>
-        </Link>
-      )}
-
+        )}
+      </NavLink>
+    )}
       {/* Dropdown content */}
       {dropdownItems && isDropdownOpen && (
         <div className={`absolute ${disable ? "opacity-50 cursor-not-allowed" : ""}left-1/2 transform -translate-x-1/2 mt-1 bg-white shadow-lg rounded-md   z-50 flex flex-col  min-w-max`}>
           {dropdownItems.map((item, index) => (
-            <Link
+            <NavLink
               key={index} // Consider a more robust key if items can be reordered/removed
               to={item.to}
               onClick={() => {
@@ -117,9 +131,14 @@ const NavItem = ({ to, icon, label, onClick, dropdownItems , disable }: NavItemP
               }}
               className="flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors duration-200"
             >
-              {item.icon && <span className="mr-2">{item.icon}</span>}
-              <span className="text-xs text-gray-700">{item.label}</span>
-            </Link>
+              {({isActive}) => (
+                <>
+                {item.icon && <span className={`mr-2 ${isActive ? 'input-label-custom-blue' : 'input-label-custom'}`}>{item.icon}</span>}
+              <span className={`${isActive ? 'input-label-custom-blue' : 'input-label-custom'}`}>{item.label}</span>
+              </>
+              )}
+              
+            </NavLink>
           ))}
         </div>
       )}

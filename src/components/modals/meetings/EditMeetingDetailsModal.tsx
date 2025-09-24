@@ -690,7 +690,9 @@ function EditMeetingDetailsModal({
             {meetingDetails.isActive &&
               serverCurrentTime! < parsedEndDateTime! && (
                 <Button
-                  onClick={() => {
+                type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
                     if (meetingDetails.platform === 1) {
                       window.open(meetingDetails.meetingLink, "_blank");
                     } else if (meetingDetails.platform === 2) {
@@ -954,21 +956,32 @@ function EditMeetingDetailsModal({
                 </div>
                 <div className="col-span-1 mt-7">
                   <Button
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyUserEmailAttedeesModalOpen(true);
                     }}
                   >
-                    <UserPlus className="h-4 w-4" />
+                    <div className="flex gap-0.5">
+                      <UserPlus className="h-4 w-4" />
+                    <span>Users</span>
+                    </div>
                   </Button>
                 </div>
                 <div className="col-span-1 mt-7">
+                  
                   <Button
-                    onClick={() => {
+                  type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       handleAddAttendee();
                     }}
                     // disabled={!newAttendeeEmail.trim()}
                   >
-                    <Plus className="h-4 w-4" />
+                    <div className="flex gap-0 5">
+                      <Plus className="h-4 w-4" />
+                    <span>Add</span>
+                    </div>
                   </Button>
                 </div>
               </div>
@@ -1019,6 +1032,7 @@ function EditMeetingDetailsModal({
             <div className="flex justify-end gap-3">
               <div className="max-w-28 mt-1 place-self-center">
                 <Button
+                type="button"
                   onClick={() => {
                     onClose();
                   }}
@@ -1031,7 +1045,9 @@ function EditMeetingDetailsModal({
               </div>
               <div className="max-w-48 mt-1 place-self-center">
                 <Button
-                  onClick={() => {
+                type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
                     if (
                       googleMeetStatus.isConnected ||
                       zoomMeetingStatus.isConnected

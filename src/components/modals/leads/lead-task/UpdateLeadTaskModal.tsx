@@ -545,8 +545,9 @@ function UpdateLeadTaskModal({
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
@@ -704,8 +705,11 @@ function UpdateLeadTaskModal({
                 <span>Assign Users : </span>
               </div>
             <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsAssignUsersModalOpen(true);
+              }}
             >
               <span className="flex gap-2">
                 <UserPlus size={14}></UserPlus>
@@ -762,7 +766,7 @@ function UpdateLeadTaskModal({
             {/* Cancel */}
             <Button onClick={() => {
             handleClose(false);
-          }} type="reset">
+          }} type="button">
               <div className="flex items-center gap-1">
                 <X size={16} />
                 Cancel

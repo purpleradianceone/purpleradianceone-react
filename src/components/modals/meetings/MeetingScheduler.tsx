@@ -785,32 +785,49 @@ const MeetingScheduler = () => {
             </div>
             <div className="col-span-1 mt-7">
               <Button
-                onClick={() => {
+              type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
                   setIsAddCompanyUserEmailAttedeesModalOpen(true);
                 }}
               >
-                <UserPlus className="h-6 w-4"/>
+                <div className="flex gap-0.5">
+                      <UserPlus className="h-4 w-4 mt-0.5" />
+                    <span>Users</span>
+                    </div>
               </Button>
             </div>
             {isModalForLead && (
               <div className="col-span-1 mt-7">
                 <Button
-                  onClick={() => {
+                type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
                     setIsAddCompanyLeadContactModalOpen(true);
                   }}
                 >
-                  <Contact2 className="h-6 w-4" />
+                  {/* <Contact2 className="h-6 w-4" /> */}
+                  <div className="flex gap-0.5">
+                      <Contact2 className="h-4 w-4 mt-0.5" />
+                    <span>Contact</span>
+                    </div>
                 </Button>
               </div>
             )}
             <div className="col-span-1 mt-7">
               <Button
-                onClick={() => {
+              type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
                   handleAddAttendee();
                 }}
                 // disabled={!newAttendeeEmail.trim()}
               >
-                <Plus className="h-6 w-4" />
+                {/* <Plus className="h-6 w-4" /> */}
+                <div className="flex gap-0.5">
+                      <Plus className="h-4 w-4 mt-0.5" />
+                    <span>Add</span>
+                    </div>
               </Button>
             </div>
           </div>
@@ -853,6 +870,7 @@ const MeetingScheduler = () => {
         <div className="flex justify-end gap-3">
           <div className="max-w-28 mt-1 place-self-center">
             <Button
+            type="button"
               onClick={() => {
                 handleCloseMeetingModal();
               }}
@@ -865,7 +883,9 @@ const MeetingScheduler = () => {
           </div>
           <div className="max-w-48 mt-1 place-self-center">
             <Button
-              onClick={() => {
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 if (selectedMeetingPlatform === meetingPlatform[0].name) {
                   if (googleMeetStatus.isConnected) {
                     createGoogleMeetMeeting();

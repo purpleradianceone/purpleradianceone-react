@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditIcon, Network } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import CompanyProductTeamsAgGrid from "../../ag-grid/CompanyProductTeamsAgGrid";
 import TeamManagementAgGrid from "../../ag-grid/TeamManagementAgGrid";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -15,13 +15,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyTeamSearchProps from "../../../@types/team-management/CompanyTeamListProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../@types/ui/MessageSnackbarProps";
-// import MessageSnackBar from "../../ui/MessageSnackbar";
 import Button from "../../ui/Button";
-import { CLASS_NAMES } from "../../../constants/ClassNames";
 import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductTeamsModalProps";
 import SearchInput from "../../ui/SearchInput";
 import toast from "react-hot-toast";
@@ -678,9 +672,12 @@ function CompanyProductTeamsModal({
                   </div>
                   <div>
                     {" "}
-                    <Button onClick={handleAddCompanyProductTeam}>
+                    <Button type="submit" onClick={(e) => {
+                      e.preventDefault();
+                      handleAddCompanyProductTeam();
+                    }}>
                       <Network
-                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        size={SIZE.SIXTEEN}
                       ></Network>
                       Add
                     </Button>

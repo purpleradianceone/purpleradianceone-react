@@ -32,7 +32,7 @@ function ProductsManagementList({
   handleCreateCompanyProductTax,
   // isListForProductUser,
 }: ProductsManagementListProps) {
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isMediumScreen } = useScreenSize();
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
     useState<boolean>(false);
@@ -168,24 +168,29 @@ function ProductsManagementList({
 
               <div className="flex gap-1 mt-1">
                 {userHasAccessToAddProduct ? (
-                  <Button onClick={() => setIsAddProductModalOpen(true)}>
-                    {!isSmallScreen && <Plus size={18} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                  <Button type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    setIsAddProductModalOpen(true);
+                  }}>
+                    
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
+        
                   </Button>
                 ) : (
                   <Button
                     disabled
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       toast.error(
                         MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
                           .DENIED_ADD_ACCESS
                       );
                     }}
                   >
-                    {!isSmallScreen && <Plus size={18} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
                   </Button>
                 )}
               </div>

@@ -218,7 +218,9 @@ const AccountTypeSetting: React.FC = () => {
           {!showAddForm && (
             <div>
               <Button
-              onClick={() => {
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 if (userHasAccessToAddCompanyAccountType) {
                   setShowAddForm(true);
                 } else {

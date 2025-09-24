@@ -5,6 +5,7 @@ type SideNavBarItemProps =  {
     isOpen: boolean;
     onClick?: () => void;
     disabled?:boolean;
+    isActive?: boolean;
   }
 
   export default SideNavBarItemProps;

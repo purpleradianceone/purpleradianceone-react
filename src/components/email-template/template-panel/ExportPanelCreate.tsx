@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { TemplateSettingsPanelCreate } from "./TemplateSettingsPanelCreate ";
 import Button from "../../ui/Button";
 import { ClipboardCopy, Eye } from "lucide-react";
+import { SIZE } from "../../../constants/AppConstants";
 
 interface ExportPanelProps {
   onPreview: (html: string) => void;
@@ -45,18 +46,24 @@ export const ExportPanelCreate: React.FC<ExportPanelProps> = ({
   return (
     <div style={{ display: "flex", gap: 5 }}>
       <div>
-        <Button onClick={handlePreview}>
+        <Button type="submit" onClick={(e) => {
+          e.preventDefault();
+          handlePreview();
+        }}>
           <div className="flex items-center justify-center gap-0.5">
-            <Eye size={16} />
+            <Eye size={SIZE.SIXTEEN} />
             Preview HTML
           </div>
         </Button>
       </div>
 
       <div>
-        <Button onClick={handleCopy}>
+        <Button type="submit" onClick={(e) => {
+          e.preventDefault();
+          handleCopy();
+        }}>
           <div className="flex items-center justify-center gap-0.5">
-            <ClipboardCopy size={16} />
+            <ClipboardCopy size={SIZE.SIXTEEN} />
             Copy HTML
           </div>
         </Button>

@@ -8,7 +8,7 @@ const ROUTES_URL = {
     FORGOT_PASSWORD_REQUEST_PAGE : "/forgotpasswordrequestpage",
     CREATE_PASSWORD : "/createpassword",
     EMAIL_VERIFICATION : "/emailverfication/verify",
-    HOME : "/home",
+    HOME : "/home-dashboard",
     GET_COMPANY_USERS : "/home/manage-users/users",
     GET_LEAD_MANAGEMENT : "/home/manage-leads/leads",
     GET_LEAD_MANAGEMENT_DETAILS : "/home/manage-leads/leads",

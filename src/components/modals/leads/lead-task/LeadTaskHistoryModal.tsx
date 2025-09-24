@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { XCircle } from "lucide-react";
+import { History } from "lucide-react";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { createPortal } from "react-dom";
+import FormHeader from "../../../ui/FormHeader";
 
 interface LeadTaskHistoryModalProps {
   isOpen: boolean;
@@ -232,19 +233,27 @@ function LeadTaskHistoryModal({
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center  z-50 pt-24 pb-14">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl min-h-full p-6 relative">
         {/* Close Button */}
-        <button
+        {/* <button
           onClick={() => handleClose(false)}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors"
+          className="absolute top-3 right-6 section-header-custom hover:text-red-500 transition-colors"
           aria-label="Close"
         >
           <XCircle size={24} />
         </button>
 
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
+        <h2 className="section-header-custom mb-4 border-b pb-2">
           Lead Task History
-        </h2>
+        </h2> */}
+        <FormHeader
+        icon={History}
+        onClose={()=>{
+          handleClose(false)
+        }}
+        preText="Lead Task History"
+        description="View your lead task history and track down the changes done in your task"
+        />
         <div className="h-96 overflow-y-auto pr-2">
-          <h3 className="text-lg font-medium text-gray-800 mb-3">
+          <h3 className="table-header-custom mb-3">
             Activity Log
           </h3>
 
@@ -258,10 +267,10 @@ function LeadTaskHistoryModal({
               {historyLog.map((entry, index) => (
                 <><li key={index} className="bg-gray-50 p-3 rounded-md shadow-sm border border-gray-200">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-gray-600">
+                    <span className="input-label-custom">
                       {entry.timestamp}
                     </span>
-                    <span className="text-sm font-medium text-purple-700">
+                    <span className="table-header-custom active">
                       {entry.event}
                     </span>
                   </div>
@@ -269,12 +278,12 @@ function LeadTaskHistoryModal({
                     <>
                       <ul className="list-disc pl-5 text-sm text-gray-800 space-y-1">
                         {entry.details.map((detail, detailIndex) => (
-                          <li key={detailIndex}>{detail}</li>
+                          <li key={detailIndex} className="caption-custom">{detail}</li>
                         ))}
                       </ul>
                       <button
                         onClick={() => toggleExpand(entry.id)}
-                        className="text-blue-500 hover:underline text-xs focus:outline-none mt-2"
+                        className="caption-custom-blue hover:underline focus:outline-none mt-2"
                       >
                         Hide Details
                       </button>
@@ -282,7 +291,7 @@ function LeadTaskHistoryModal({
                   ) : (
                     <button
                       onClick={() => toggleExpand(entry.id)}
-                      className="text-blue-500 hover:underline text-xs focus:outline-none"
+                      className="caption-custom-blue hover:underline focus:outline-none"
                     >
                       Show details ({entry.details.length} changes)
                     </button>
@@ -296,7 +305,7 @@ function LeadTaskHistoryModal({
               
             </ul>
           ) : (
-            <p className="text-gray-500 text-sm">No history available for this task.</p>
+            <p className="caption-custom">No history available for this task.</p>
           )}
          
         </div>

@@ -559,7 +559,9 @@ const LeadContact = ({
                 </div>
                 <div>
                   <Button
-                  onClick={() => {
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
                     if (userHasAccessToUpdateLead) {
                       handleEditLeadContactClick(selectedContactCard);
                     } else {
@@ -1017,7 +1019,10 @@ const LeadContact = ({
                       onChange={(e) => setTempHandle(e.target.value)}
                     />
                     <div className="flex justify-center items-center">
-                      <Button onClick={handleAddSocialMedia} type="button">
+                      <Button onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia()
+                      }} type="submit">
                         {/* <Plus size={14} /> */}+ Add
                       </Button>
                     </div>
@@ -1076,7 +1081,7 @@ const LeadContact = ({
               <div className="flex justify-end gap-4 mt-6 flex-wrap">
                 <div className="flex gap-2">
                   <Button
-                    type="reset"
+                    type="button"
                     onClick={() => setIsOpenAddLeadContactForm(false)}
                     // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                   >

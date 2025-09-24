@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
+import { SIZE } from "../../constants/AppConstants";
 
 function AccountManagementList({
   accounts,
@@ -64,6 +65,7 @@ function AccountManagementList({
 
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
+
   };
 
   return (
@@ -71,9 +73,9 @@ function AccountManagementList({
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
       <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-        <div className="flex gap-1">
+        <div className="flex items-center justify-center gap-2">
           {!isSmallScreen && (
-            <UserRoundCogIcon className="w-6= h-6 text-blue-600" />
+            <UserRoundCogIcon className="w-5 h-5 text-blue-600" />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
@@ -81,7 +83,7 @@ function AccountManagementList({
           )}
         </div>
 
-        {isLargeScreen && (
+        {/* {isLargeScreen && ( */}
           <>
             <div className="flex gap-2 justify-center items-center">
               {/* search box flex div */}
@@ -155,6 +157,7 @@ function AccountManagementList({
                   }
                 />
               )}
+
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
                   labelName="source"
@@ -222,7 +225,26 @@ function AccountManagementList({
               </div> */}
             </div>
           </>
+        {/* // )} */}
+       <div>
+         <Button
+         type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            setOpenAccountForm(!openCreateAccountForm);
+          }}
+        >
+          <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> Create</div>
+        </Button>
+        {openCreateAccountForm && (
+          <CreateAccount
+            onClose={() => setOpenAccountForm(false)}
+            handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+          />
         )}
+
+       </div>
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">

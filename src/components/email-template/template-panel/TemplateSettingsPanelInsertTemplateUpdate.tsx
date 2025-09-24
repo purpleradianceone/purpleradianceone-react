@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDynamicFields } from "../DynamicFieldsContext";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
@@ -127,9 +127,12 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
         }}
       >
         {/* Fixed Button to Open Settings */}
-        <Button onClick={() => setIsOpen(true)}>
+        <Button type="submit" onClick={(e) => {
+          e.preventDefault();
+          setIsOpen(true);
+        }}>
           <div className="flex items-center justify-center gap-0.5">
-            <Save size={16} />
+            <Save size={SIZE.SIXTEEN} />
             Save Template
           </div>
         </Button>
@@ -285,7 +288,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                   <div>
                     <Button type="button" onClick={() => setIsOpen(false)}>
                       <div className="flex items-center justify-center gap-0.5">
-                        <X size={16} />
+                        <X size={SIZE.SIXTEEN} />
                         Cancel
                       </div>
                     </Button>
@@ -295,7 +298,7 @@ export const TemplateSettingsPanelInsertTemplateUpdate: React.FC<
                     <Button type="submit">
                       {" "}
                       <div className="flex items-center justify-center gap-0.5">
-                        <Save size={16} />
+                        <Save size={SIZE.SIXTEEN} />
                         Save
                       </div>
                     </Button>

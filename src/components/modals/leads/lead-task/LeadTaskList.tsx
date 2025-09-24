@@ -9,6 +9,8 @@ import {
   Clipboard,
   History,
   LucideLaptop,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react"; // Corrected import for Lucide React icons
 import CustomDropdown from "../CustomDropdown";
 import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
@@ -397,12 +399,10 @@ function LeadTaskList({
               {leadTasks.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`${
-                    activity.isActive ? "bg-green-200 border-green-300 " : "bg-red-100 border-red-300 "
-                  } min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
+                  className={`bg-white min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
                 >
                   {/* Activity Icon */}
-                  <div className="flex-shrink-0 p-1 bg-white rounded-full">
+                  <div className="flex-shrink-0 p-1 bg-gray-200 rounded-full">
                     {" "}
                     {getActivityIcon(
                       activity.leadActivityId,
@@ -439,11 +439,11 @@ function LeadTaskList({
                               {activity.assignedToName!.map((name) => (
                                 <span
                                   key={name} // Added key for list items
-                                  className="bg-white border caption-custom-blue rounded-md"
+                                  className="bg-gray-50 border caption-custom-blue mx-1 rounded-md px-1 py-0"
                                   title={name} // Added title for better UX
                                 >
-                                  {name.length > 15
-                                    ? name.substring(0, 15) + "..."
+                                  {name.length > 20
+                                    ? name.substring(0, 20) + "..."
                                     : name}
                                 </span>
                               ))}
@@ -550,7 +550,7 @@ function LeadTaskList({
                             {activity.assignedToName!.map((name) => (
                               <span
                                 key={name} // Added key for list items
-                                className="bg-white border caption-custom-blue  mx-1 rounded-md px-1"
+                                className="bg-gray-50 border caption-custom-blue  mx-1 rounded-md px-1"
                                 title={name} // Added title for better UX
                               >
                                 {name.length > 20
@@ -573,7 +573,7 @@ function LeadTaskList({
                   </div>
 
                   {/* Date and Action Buttons */}
-                  <div className="absolute top-2  right-2 flex items-center space-x-1">
+                  <div className="absolute top-2  right-2 flex items-center space-x-0.5">
                     <span className="caption-custom">
                       {activity.dueDateTime}
                     </span>
@@ -582,7 +582,7 @@ function LeadTaskList({
                         setIsUpdateLeadTaskModalOpen(true);
                         setSelecedLeadTask(activity);
                       }}
-                      className="px-2 py-1 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
+                      className="px-2 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
                     >
                       Edit
                     </button>
@@ -593,8 +593,34 @@ function LeadTaskList({
                       }}
                       className="px-2 py-1 bg-white caption-custom rounded hover:bg-gray-200 transition-colors"
                     >
-                      <History size={16} /> {/* Adjusted size for better fit */}
+                      <History size={16} className="caption-custom" /> {/* Adjusted size for better fit */}
                     </button>
+                  </div>
+                  
+                  {/*right corner*/}
+                  <div className="absolute bottom-2  right-2 flex items-center space-x-1">
+                    <button
+                          type="button"
+                          className="caption-custom px-2 py-1 min-w-20  hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                        >
+                          
+                    {activity.isActive ? 
+                    <span className="caption-custom-active">
+                      <span className="flex gap-1">
+                        <CheckCircle2 className="caption-custom-active w-4 h-4"/>
+                        Active
+                      </span>
+                    </span>
+                    : <span className="caption-custom-inactive">
+                      <span className="flex gap-1">
+                        <XCircle className="caption-custom-inactive w-4 h-4"/>
+                        Active
+                      </span>
+                    </span>
+                    }
+                    </button>
+                    
+                   
                   </div>
                 </div>
               ))}

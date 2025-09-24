@@ -6,7 +6,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
-import { STATUS_CODE } from "../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import { LucidePlus, Calendar, LayoutDashboard } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import Button from "../ui/Button";
@@ -378,15 +378,21 @@ export const TemplatesPage: React.FC = () => {
           </div>
           <div className="flex max-w-60 min-h-7 h-8">
             <Button
+            type="submit"
               disabled={!userHasAccessToAddEmailTemplateSetting}
-              onClick={() =>
-                userHasAccessToAddEmailTemplateSetting
-                  ? setShowModal(true)
-                  : toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+              onClick={(e) =>{
+                e.preventDefault();
+                 if(userHasAccessToAddEmailTemplateSetting){
+                    setShowModal(true)
+                 }
+                 else{
+                    toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+                 }
+              }
               }
             >
               <div className="flex items-center justify-center gap-0.5">
-                <LucidePlus size={18} />
+                <LucidePlus size={SIZE.SIXTEEN} />
                 Template
               </div>
             </Button>

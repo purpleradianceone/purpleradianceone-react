@@ -46,6 +46,8 @@ function LeadManagementList({
   handleLeadSelectedStatus,
   leadSource,
   handleLeadSelectedSource,
+  isUsedInLeadModule,
+  handleRowSelectedForShowAccountLead,
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -110,17 +112,25 @@ function LeadManagementList({
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
   const handleRowClickedForShowLead = (event: any) => {
-    const rowData: LeadDataProps = event.data;
-    const queryParams = qs.stringify({
-      leadData: JSON.stringify(rowData),
-    });
-    navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
+    if (isUsedInLeadModule) {
+      const rowData: LeadDataProps = event.data;
+      const queryParams = qs.stringify({
+        leadData: JSON.stringify(rowData),
+      });
+      navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
+    }
   };
+
   const handleRowSelectedForShowLead = (rowData: LeadDataProps | any) => {
-    const queryParams = qs.stringify({
-      leadData: JSON.stringify(rowData),
-    });
-    navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
+    // Note : If used in the lead module then below if block will work
+    if (isUsedInLeadModule) {
+      const queryParams = qs.stringify({
+        leadData: JSON.stringify(rowData),
+      });
+      navigate(ROUTES_URL.LEAD_DETAILS + `?${queryParams}`);
+    } else {
+      handleRowSelectedForShowAccountLead!(rowData);
+    }
   };
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.LEAD_IMPORT_CSV);
@@ -135,14 +145,21 @@ function LeadManagementList({
       <div
         className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
       >
-        <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex">
+        {/* sticky */}
+        <div className=" z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+          {
+            isUsedInLeadModule && (
+              <>
+              <div className="flex">
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
+              </>
+            )
+          }
 
           {isLargeScreen && (
             <>
@@ -185,20 +202,24 @@ function LeadManagementList({
                     onEndDateChange={onEndDateChange}
                   />
                 </div>
-                <div className="ml-0.5 min-w-[120px] max-h-[40px]">
-                  <CustomDropdown
-                    labelName="source"
-                    options={leadSource!}
-                    onSelect={handleLeadSelectedSource}
-                  />
-                </div>
-                <div className="ml-0.5 min-w-[120px]">
-                  <CustomDropdown
-                    labelName="status"
-                    options={leadStatus!}
-                    onSelect={handleLeadSelectedStatus}
-                  />
-                </div>
+                {isUsedInLeadModule && (
+                  <>
+                    <div className="ml-0.5 min-w-[120px] max-h-[40px]">
+                      <CustomDropdown
+                        labelName="source"
+                        options={leadSource!}
+                        onSelect={handleLeadSelectedSource}
+                      />
+                    </div>
+                    <div className="ml-0.5 min-w-[120px]">
+                      <CustomDropdown
+                        labelName="status"
+                        options={leadStatus!}
+                        onSelect={handleLeadSelectedStatus}
+                      />
+                    </div>
+                  
+               
 
                 <div className="relative flex items-center justify-center w-auto ">
                   <div className="grid ">
@@ -250,50 +271,58 @@ function LeadManagementList({
                     )}
                   </div>
                 </div>
+                </>
+                 )}
               </div>
             </>
           )}
 
-          <div className="flex  gap-1  ">
-            <Button
-              disabled={!userHasAccessToAddLead}
-              onClick={() => {
-                if (userHasAccessToAddLead) {
-                  handleShowImportModule();
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .DENIED_ADD_LEAD_IMPORT_ACCESS
-                  );
-                }
-              }}
-            >
-              <Plus className=" h-5 w-5" />
-              <span>Import </span>
-            </Button>
-            <Button
-              disabled={!userHasAccessToAddLead}
-              onClick={() => {
-                if (!userHasAccessToAddLead) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS
-                  );
-                  return;
-                } else {
-                  setIsCreateLeadModalOpen(true);
-                }
-              }}
-            >
-              <span className="flex">
-                {!isSmallScreen && <ClipboardPlus size={16} />}
-                {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
-              </span>
-            </Button>
-          </div>
+          {isUsedInLeadModule && (
+            <div className="flex  gap-1  ">
+              <Button
+              type="submit"
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToAddLead) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                    );
+                  }
+                }}
+              >
+                <Plus size={SIZE.SIXTEEN} />
+                <span>Import </span>
+              </Button>
+              <Button
+              type="submit"
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!userHasAccessToAddLead) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS
+                    );
+                    return;
+                  } else {
+                    setIsCreateLeadModalOpen(true);
+                  }
+                }}
+              >
+                <span className="flex">
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
+                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                </span>
+              </Button>
+            </div>
+          )}
         </div>
 
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
+        <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
           <div
             className={
               userPreference.isLeftMenu
@@ -302,6 +331,7 @@ function LeadManagementList({
             }
           >
             <LeadManagementAgGrid
+              isUsedInLeadModule={isUsedInLeadModule}
               handleRowClick={handleRowClickedForShowLead}
               onRowSelect={handleRowSelectedForShowLead}
               handleLeadDataFormChange={handleLeadDataFormChange}
@@ -339,12 +369,12 @@ function LeadManagementList({
                   <X size={20} />
                 </button>
               </div> */}
-               <FormHeader
-            icon={User}
-            onClose={() => setOpenPopUpOfCompanyUserModal(false)}
-            preText="Select Company User"
-            description="Select the user to view him/her owned leads"
-            />
+              <FormHeader
+                icon={User}
+                onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+                preText="Select Company User"
+                description="Select the user to view him/her owned leads"
+              />
               {/* NOTE : CALL TO THE MODAL COMPONENT */}
               <div className="p-1">
                 <GetCompanyUsersForLead

@@ -15,6 +15,19 @@
   font-weight: 600;
   color: #333333;
 }
+.section-header-custom-blue {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.section-header-custom-white {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
 
 /* Main Navigation Links */
 .main-nav-custom {
@@ -57,6 +70,20 @@
   font-size: 14px;
   font-weight: 700;
   color: #333333;
+}
+
+.table-header-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.table-header-custom-white {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .table-header-custom.active {
@@ -157,6 +184,13 @@
   font-size: 14px;
   font-weight: 400; /* Maps to Regular */
   color: #333333;
+}
+
+.input-label-custom-white {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #fff;
 }
 
 .input-label-custom-active-tab {

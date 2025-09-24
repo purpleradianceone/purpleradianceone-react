@@ -29,13 +29,15 @@ import {
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import AccountContact from "./Account-contact/AccountContact";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
-
+import AccountLead from "./account-lead/AccountLead";
+import AccountContact from "./account-contact-temp/AccountContact";
+// Note this is the type
 interface AccountDetailsProps {
   company: Account;
   onClose: () => void;
+
   fetchAccounts: () => Promise<void>;
 }
 
@@ -52,8 +54,8 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     [key: string]: string;
   }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState<"contact" | "legal" | "address">(
-    "contact"
+  const [activeTab, setActiveTab] = useState<"primary contact" | "legal" | "address">(
+    "primary contact"
   );
   const { industryTypeData, loading: isIndustryTypeLoading } =
     useIndustryType();
@@ -393,12 +395,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "contact":
+      case "primary contact":
         return (
           // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
           <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
             {/* Email */}
-            <div className="col-span-2 flex justify-between p-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition">
+            <div className="col-span-2 flex justify-between p-1 bg-slate-50 border rounded-xl px-2 hover:shadow-sm transition">
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
               </div>
@@ -416,7 +418,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
             {/* Mobile */}
             {/* <div className=" col-span-2  justify-between p-0.5 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition"> */}
-            <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-2 px-3 hover:shadow-sm transition">
+            <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-1 px-2 hover:shadow-sm transition">
               <div className="flex  items-center gap-2">
                 <Phone className="h-5 w-5 text-green-600" />
               </div>
@@ -433,7 +435,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
 
             {/* Website */}
-            <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition sm:col-span-2">
+            <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-2 hover:shadow-sm transition sm:col-span-2">
               <div className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-purple-600" />
               </div>
@@ -477,20 +479,20 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
       case "legal":
         return (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+          <div className="grid grid-cols-2 gap-2 p-1">
+            <div className="p-2 bg-green-50 rounded-lg border border-green-100">
               <p className="input-label-custom-active mb-1">PAN</p>
               {renderEditableField("pan", formData.pan, "Enter PAN number")}
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="p-2 bg-blue-50 rounded-lg border border-blue-100">
               <p className="input-label-custom-blue mb-1">GST</p>
               {renderEditableField("gst", formData.gst, "Enter GST number")}
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+            <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
               <p className="input-label-custom-purple mb-1">TAN</p>
               {renderEditableField("tan", formData.tan, "Enter TAN number")}
             </div>
-            <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+            <div className="p-2 bg-orange-50 rounded-lg border border-orange-100">
               <p className="input-label-custom-orange mb-1">Registration</p>
               {renderEditableField(
                 "businessResgistrationNumber",
@@ -503,7 +505,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
       case "address":
         return (
-          <div className="grid grid-cols-1 gap-4   overflow-auto">
+          <div className="grid grid-cols-1 gap-4 p-1  overflow-auto">
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -553,7 +555,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   if (isIndustryTypeLoading || isBusinessTypeLoading) {
     return (
-      <div className="fixed  inset-0 z-10 bg-white p-8 ml-11 mt-11">
+      <div className={` ${userPreference.isLeftMenu ? " ml-11 " :""}fixed mt-11  inset-0 z-10 bg-white p-8`}>
         <Skeleton/>
       </div>
     );
@@ -562,10 +564,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     <div
       className={`${
         userPreference.isLeftMenu ? "ml-14" : ""
-      } mt-8 mb-9 fixed inset-0 bg-white z-10 overflow-auto mx-auto p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
+      } mt-8  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-2 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
+
     >
-      {/* Header Section */}
-      <div className="bg-white rounded-2xl shadow p-2 mb-2 border">
+      <div className="pb-3">
+        {/* Header Section */}
+      <div className="bg-white rounded-2xl  p-2 mb-2 border">
         <button
           className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
           onClick={onClose}
@@ -657,21 +661,21 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 max-h-72   gap-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2    gap-1">
         {/* Left Card with Tabs */}
-        <div className="bg-white rounded-xl   p-3 border border-slate-200">
+        <div className="bg-white rounded-xl p-1 border border-slate-200">
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 mb-2">
             <button
-              onClick={() => setActiveTab("contact")}
+              onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${
-                activeTab === "contact"
+                activeTab === "primary contact"
                   ? "border-teal-600 table-header-custom active"
                   : "border-transparent table-header-custom"
               }`}
             >
               <Mail className="h-4 w-4 mr-2" />
-              Contact
+             Primary Contact
             </button>
             <button
               onClick={() => setActiveTab("legal")}
@@ -702,12 +706,20 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         </div>
 
         {/* Right Card - Empty for future use */}
-        <div className="bg-white rounded-xl h-72 border p-1 border-slate-200">
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Contact
           </h3>
-          <AccountContact accountId={company.id} />
+          <AccountContact
+           accountId={company.id} />
         </div>
+        {/* Account Lead */}
+        <div>
+          <AccountLead
+          account={company}
+          />
+        </div>
+      </div>
       </div>
     </div>
   );

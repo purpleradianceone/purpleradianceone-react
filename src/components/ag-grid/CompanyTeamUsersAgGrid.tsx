@@ -9,6 +9,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   INNERHTML,
+  SIZE,
   STATUS_CODE,
 } from "../../constants/AppConstants";
 import { UserPlus2 } from "lucide-react";
@@ -21,7 +22,6 @@ import CompanyUsersSearchProps from "../../@types/company-users/CompanyUserProps
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import Button from "../ui/Button";
-import { CLASS_NAMES } from "../../constants/ClassNames";
 import SearchInput from "../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
 import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
@@ -545,10 +545,13 @@ function CompanyTeamUsersAgGrid({
           </div>
           <div className="justify-self-end mr-3">
             {!isGridForProductUser && (
-              <Button onClick={handleAddCompanyTeamUsers}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleAddCompanyTeamUsers();
+              }}>
                 <div className="flex justify-center items-center">
                   <UserPlus2
-                    className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                    size={SIZE.SIXTEEN}
                   ></UserPlus2>
                   <span>Add</span>
                 </div>
@@ -556,10 +559,13 @@ function CompanyTeamUsersAgGrid({
             )}
 
             {isGridForProductUser && (
-              <Button onClick={handleAddCompanyTeamUsers}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleAddCompanyTeamUsers();
+              }}>
                 {" "}
                 <UserPlus2
-                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                  size={SIZE.SIXTEEN}
                 ></UserPlus2>{" "}
                 Add
               </Button>

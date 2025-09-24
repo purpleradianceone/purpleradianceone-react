@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import Button from "../../ui/Button";
@@ -116,19 +116,23 @@ export const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
         <div className="flex items-center justify-end gap-3 mt-4">
           <div className="rounded">
             <Button
+            type="button"
               // className="text-sm text-gray-600 hover:underline"
               onClick={onClose}
             >
               <div className="flex items-center justify-center gap-0.5">
-                <X size={16} />
+                <X size={SIZE.SIXTEEN} />
                 Cancel
               </div>{" "}
             </Button>
           </div>
           <div className="rounded">
-            <Button disabled={selectedTypeId === ""} onClick={handleSubmit}>
+            <Button type="submit" disabled={selectedTypeId === ""} onClick={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}>
               <div className="flex items-center justify-center gap-0.5">
-                <LucideArrowBigRight size={16} />
+                <LucideArrowBigRight size={SIZE.SIXTEEN} />
                 Continue
               </div>
             </Button>

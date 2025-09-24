@@ -66,19 +66,6 @@ function EditSubscriptionUsersModal({
 
   const companyUserSearchParameterRef = useRef<string>("");
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //     open: false,
-  //     message: "",
-  //     type: "success",
-  //   });
-
-  //   const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //     setMessageSnackbar({ open: true, message, type });
-  //   };
-
-  //   const handleMessageSnackbarClose = () => {
-  //     setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  //   };
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
     if (
@@ -248,10 +235,6 @@ function EditSubscriptionUsersModal({
   };
 
   const handleCompanyUserToggleChange = (message: string, status: boolean) => {
-    // showMessageSnackbar({
-    //   message: message,
-    //   type : status ? 'success' : 'error',
-    // })
     if (status) {
       toast.success(message);
     } else {

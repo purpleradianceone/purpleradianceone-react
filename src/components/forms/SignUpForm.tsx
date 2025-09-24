@@ -273,11 +273,11 @@ function SignUpForm() {
           Sign Up
         </Button>
         <div className="text-center">
-          <span className="text-gray-600 text-sm">
+          <span className="caption-custom">
             Already Have an account?{" "}
             <button
               type="button"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="caption-custom-blue hover:text-blue-700"
             >
               <Link to={ROUTES_URL.SIGN_IN}>Log In</Link>
             </button>

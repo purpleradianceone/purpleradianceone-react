@@ -28,6 +28,7 @@ import {
 import { DynamicFieldsContext } from "../DynamicFieldsContext";
 import { Trash2 } from "lucide-react";
 import Button from "../../ui/Button";
+import { SIZE } from "../../../constants/AppConstants";
 
 // Styled Components
 const EditorContainer = React.forwardRef<
@@ -55,9 +56,9 @@ const EditorContainer = React.forwardRef<
 
 const DeleteButton = ({ onClick }: { onClick: () => void }) => (
   <div className="absolute top-3 right-2 w-fit h-fit cursor-pointer">
-    <Button onClick={onClick}>
+    <Button type="button" onClick={onClick}>
       <div className="flex items-center justify-center gap-1">
-        <Trash2 size={14} />
+        <Trash2 size={SIZE.SIXTEEN} />
         Delete Text Block
       </div>
     </Button>
@@ -74,10 +75,14 @@ const ToolbarButton = ({
   active?: boolean;
 }) => (
   <Button
+    type="submit"
     className={`table-data-custom color:${active ? "#4f46e5" : "#4b5563"} ${
       active ? "bg-indigo-100" : "bg-transparent"
     } border border-gray-300 rounded-[4px] px-[10px] py-[6px] cursor-pointer flex items-center gap-[6px]`}
-    onClick={onClick}
+    onClick={(e) => {
+      e.preventDefault();
+      onClick();
+    }}
   >
     {children}
   </Button>

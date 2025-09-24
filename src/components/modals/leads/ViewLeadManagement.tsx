@@ -40,6 +40,7 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import COLORS from "../../../constants/Colors";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -764,23 +765,28 @@ const ViewLeadManagement = () => {
         <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
           
           <div  className="flex w-full">
-            <div className="flex w-[100%] border rounded-r-full   bg-white">
+            <div className="flex w-[100%] border bg-white" style={{
+                  clipPath:
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  
+                }}>
             {leadStatus!.map((item: any) => (
               <button
                 title={item.name}
                 key={item.id}
-                className={`flex-1 table-data-custom  overflow-hidden ${
+                className={`flex-1 overflow-hidden ${
                   selectedLeadData.leadStatus === item.name
-                    ? "bg-blue-700  hover:bg-blue-500 hover:text-white"
-                    : "hover:bg-blue-700 hover:text-white"
+                    ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                    : "hover:bg-blue-700 table-header-custom hover:text-white"
                 }
               ${
                 selectedStatusId === item.id &&
-                "bg-sky-400 hover:bg-sky-500"
-              } text-center`}
+                "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
+              } text-center p-1`}
                 style={{
                   clipPath:
-                    "polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)",
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  
                 }}
                 onClick={() => {
                   if (userHasAccessToUpdateLead) {
@@ -833,19 +839,25 @@ const ViewLeadManagement = () => {
                 onChange={(e) => setReasonText(e.target.value)}
               />
               <button
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4  rounded w-fit"
+                className={`input-label-custom-white ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}  px-4  rounded w-fit`}
                 onClick={handleSaveStatusUpdate}
               >
-                Save
+                <div className="flex gap-0.5 items-center">
+                  <Save className="w-4 h-4 -mt-0.5"/>
+                  <span>Save</span>
+                </div>
               </button>
               <button
-               className="bg-gray-500 px-2 rounded text-white" 
+               className={`px-2 rounded input-label-custom-white ${COLORS.BG_GRAY_500_COLOR} ${COLORS.HOVER_BG_GRAY_600_COLOR_HOVER}`} 
                onClick={()=>{
                 setReasonInputBoxOpen(!reasonInputBoxOpen
                 )
                 setSelectedStatusId(null)
               }}>
-                Cancel
+                <div className="flex gap-0.5 items-center">
+                  <X className="w-4 h-4 -mt-0.5"/>
+                  <span>Cancel</span>
+                </div>
               </button>
             </div>
           )}
@@ -1028,7 +1040,9 @@ const ViewLeadManagement = () => {
                       <div className="flex justify-end ">
                        <div className="flex gap-1">
                          <Button
-                          onClick={() => {
+                         type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
                             handleLeadOwnerChange();
                           }}
                         >
@@ -1038,6 +1052,7 @@ const ViewLeadManagement = () => {
                           </div>
                         </Button>
                         <Button
+                        type="button"
                           onClick={handleLeadOwnerChangeStateClear}
                         >
                            <div className="flex items-center ">
@@ -1140,8 +1155,9 @@ const ViewLeadManagement = () => {
                       </p>
                       <div>
                         <Button
-                        className="bg-blue-600 hover:bg-blue-700  text-xs md:text-sm p-2 text-white rounded-md "
-                        onClick={() => {
+                        type="submit"
+                        onClick={(e) => {
+                          e.preventDefault();
                           const leadDataSearchParams = JSON.parse(
                             searchParams.get("leadData") || "{}"
                           );

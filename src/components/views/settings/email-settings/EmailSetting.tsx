@@ -266,8 +266,10 @@ export default function EmailSettingsTabs() {
         >
           <div className="absolute right-3">
             <Button
+            type="submit"
             disabled={!userHasAccessToUpdateEmailSetting}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               if (userHasAccessToUpdateEmailSetting) {
                 setModalType("company");
                 setEditData(setting);
@@ -411,8 +413,10 @@ export default function EmailSettingsTabs() {
             >
               <div className="absolute w-fit right-3">
                 <Button
+                type="submit"
                 disabled={!userHasAccessToUpdateEmailSetting}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (userHasAccessToUpdateEmailSetting) {
                     setModalType("user");
                     setEditData(setting);
@@ -607,8 +611,10 @@ export default function EmailSettingsTabs() {
 
                       <div >
                         <Button
+                          type="submit"
                           disabled={!userHasAccessToAddEmailSetting}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             if (userHasAccessToAddEmailSetting) {
                               setModalType("company");
                               setEditData(null);
@@ -652,8 +658,10 @@ export default function EmailSettingsTabs() {
                       </div>
                       <div >
                         <Button
+                          type="submit"
                           disabled={!userHasAccessToAddEmailSetting}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             if (userHasAccessToAddEmailSetting) {
                               setModalType("user");
                               setEditData(null);

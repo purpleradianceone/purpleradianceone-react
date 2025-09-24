@@ -4,28 +4,13 @@ import POST_API from "../../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import {
   MOBILE_NUMBER_VALIDATION,
+  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../../constants/AppConstants";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import AccountContactType from "../../../../@types/account/AccountContact";
-import {
-  Briefcase,
-  Edit,
-  Edit3,
-  Globe,
-  Languages,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Phone,
-  Plus,
-  Save,
-  User,
-  X,
-} from "lucide-react";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
@@ -34,6 +19,8 @@ import Button from "../../../ui/Button";
 import FormHeader from "../../../ui/FormHeader";
 import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
+import AccountContactType from "../../../../@types/account/AccountContactType";
+import { Briefcase, Edit, Edit3, Globe, Languages, Mail, MapPin, MessageCircle, Phone, Save, User, X } from "lucide-react";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -404,25 +391,25 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   }, [selectedContactCard]);
 
   function handleStateClearFunctionOnClickOfCancelOrXButton() {
-     setEditingContactId(null);
-                  setIsOpenAddAccountContactForm(false);
-                  setEditContactData(null);
-                  setErrors({
-                    email: "",
-                    mobileNumber : "",
-                    name : ""
-                  })
-                  // note
-                  setAccountContactForm({
-                    name: "",
-                    email: "",
-                    address: "",
-                    department: "",
-                    designation: "",
-                    mobileNumber: "",
-                    preferredCommunicationChannel: "",
-                    preferredLanguage: "",
-                  });
+    setEditingContactId(null);
+    setIsOpenAddAccountContactForm(false);
+    setEditContactData(null);
+    setErrors({
+      email: "",
+      mobileNumber: "",
+      name: "",
+    });
+    // note
+    setAccountContactForm({
+      name: "",
+      email: "",
+      address: "",
+      department: "",
+      designation: "",
+      mobileNumber: "",
+      preferredCommunicationChannel: "",
+      preferredLanguage: "",
+    });
   }
   if (showLoadingSpinner)
     return (
@@ -459,7 +446,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         <>
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <span>Add</span>
             <button
               onClick={() => {
                 if (userHasAccessToUpdateAccount) {
@@ -470,9 +456,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
             >
-              <Plus size={10} />
+              {/* <Plus size={10} /> */}
+              <span>+Add</span>
             </button>
           </div>
 
@@ -500,7 +487,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                     {/* Text Info */}
                     <div className="flex flex-col">
-                      <p className="inpul-label-custom ">
+                      <p
+                      // className="table-header-custom"
+                       className="input-label-custom "
+                       >
                         {contact.name || "Unknown Contact"}
                       </p>
                       <p className="caption-custom flex flex-wrap items-center gap-x-1">
@@ -566,8 +556,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
           {/* view in pop up card  */}
           {selectedContactCard && (
-            <div className="fixed top-8 inset-0 flex justify-center items-center z-50 p-4">
-              <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+            <div className="fixed border  top-8 inset-0 flex justify-center items-center z-50 p-4">
+              <div className="bg-white border rounded-2xl shadow-xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="relative px-8 pt-5 pb-4">
                   <button
@@ -765,12 +755,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             <h4 className="font-medium text-gray-900 mb-2">
                               Status
                             </h4>
-                            <label className="relative inline-flex items-center cursor-pointer">
+                            <label className="inline-flex items-center cursor-pointer relative self-end">
                               <input
                                 type="checkbox"
                                 checked={isActive}
                                 onChange={
-                                  // !selectedContactCard.isPrimary &&
                                   userHasAccessToUpdateAccount
                                     ? () => {
                                         handleActiveStatusChange(
@@ -778,40 +767,26 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                                         );
                                       }
                                     : () => {
-                                        // if (selectedContactCard.isPrimary) {
-                                        //   toast.error(
-                                        //     "Update request denied — the user is designated as the Primary Contact."
-                                        //   );
-                                        // } else {
                                         toast.error(
                                           MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
                                             .DENIED_UPDATE_ACCESS
                                         );
                                       }
-                                  // }
                                 }
                                 className="sr-only peer"
                               />
-                              <div
-                                className="w-12 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
-                 after:content-[''] after:absolute after:top-[4px] after:left-[0px]
-                 after:bg-white after:border-gray-300 after:border after:rounded-full
-                 after:h-6 after:w-6 after:transition-all
-                 peer-checked:after:translate-x-full peer-checked:after:border-white"
-                              ></div>
-                              {/* <div className="w-11 h-6 bg-red-400 rounded-full peer peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[3px] after:left-[0px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" /> */}
-                              <span className="ml-3 text-sm font-medium text-gray-900">
-                                {selectedContactCard.isActive
-                                  ? "Active"
-                                  : "Inactive"}
-                              </span>
+                              <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                              {/* Adjusted size and colors */}
+                              <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                              {/* Adjusted size and position */}
                             </label>
+
+                            <span className="mt-3 text-sm font-medium text-gray-900">
+                              {selectedContactCard.isActive
+                                ? "Active"
+                                : "Inactive"}
+                            </span>
                           </div>
-                          {/* {selectedContactCard.isPrimary && (
-                        <div className="text-xs italic  text-gray-500 mt-1">
-                          Primary contact status cannot be changed
-                        </div>
-                      )} */}
                         </div>
                       </div>
                     </div>
@@ -858,60 +833,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 }
                 onClose={
                   handleStateClearFunctionOnClickOfCancelOrXButton
-                  // setEditingContactId(null);
-                  // setIsOpenAddAccountContactForm(false);
-                  // setEditContactData(null);
-                  // setErrors({
-                  //   email: "",
-                  //   mobileNumber : "",
-                  //   name : ""
-                  // })
-                  // // note
-                  // setAccountContactForm({
-                  //   name: "",
-                  //   email: "",
-                  //   address: "",
-                  //   department: "",
-                  //   designation: "",
-                  //   mobileNumber: "",
-                  //   preferredCommunicationChannel: "",
-                  //   preferredLanguage: "",
-                  // });
                 }
               />
-              {/* <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {editContactData ? "Edit Contact" : "Add New Contact"}
-                  </h2>
-                  <p className="text-gray-600 mt-1">
-                    {editContactData
-                      ? "Update contact information"
-                      : "Create new account contact"}
-                  </p>
-                </div>             
-                <button
-                  onClick={() => {
-                    setEditingContactId(null);
-                    setIsOpenAddAccountContactForm(false);
-                    setEditContactData(null);
-                    // note
-                    setAccountContactForm({
-                      name: "",
-                      email: "",
-                      address: "",
-                      department: "",
-                      designation: "",
-                      mobileNumber: "",
-                      preferredCommunicationChannel: "",
-                      preferredLanguage: "",
-                    });
-                  }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X size={24} />
-                </button>
-              </div> */}
             </div>
 
             {/* Form Grid */}
@@ -920,7 +843,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* name */}
                 <div>
                   <FormInput
-                  logo={User}
+                    logo={User}
                     label="Full Name: "
                     required
                     id="name"
@@ -941,7 +864,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* email */}
                 <div>
                   <FormInput
-                  logo={Mail}
+                    logo={Mail}
                     label="Email: "
                     id="email"
                     required
@@ -961,7 +884,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* mobile number */}
                 <div>
                   <FormInput
-                  logo={Phone}
+                    logo={Phone}
                     label="Mobile number: "
                     required
                     id="mobileNumber"
@@ -984,9 +907,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* designation */}
                 <div>
                   <FormInput
-                  logo={Briefcase}
-                  label="Designation:"
-                   id="designation"
+                    logo={Briefcase}
+                    label="Designation:"
+                    id="designation"
                     type="text"
                     name="designation"
                     maxLength={100}
@@ -1000,9 +923,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* department */}
                 <div>
                   <FormInput
-                  logo={Briefcase}
-                  label="Department:"
-                   id="department"
+                    logo={Briefcase}
+                    label="Department:"
+                    id="department"
                     type="text"
                     name="department"
                     maxLength={100}
@@ -1016,9 +939,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* Preferrd language */}
                 <div>
                   <FormInput
-                  logo={Languages}
-                  label="Preferred Language:"
-                     id="preferredLanguage"
+                    logo={Languages}
+                    label="Preferred Language:"
+                    id="preferredLanguage"
                     type="text"
                     name="preferredLanguage"
                     maxLength={100}
@@ -1033,9 +956,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* Preferred communication channel */}
                 <div>
                   <FormInput
-                  logo={MessageCircle}
-                  label="Preferred Communication Channel:"
-                   id="preferredCommunicationChannel"
+                    logo={MessageCircle}
+                    label="Preferred Communication Channel:"
+                    id="preferredCommunicationChannel"
                     type="text"
                     maxLength={100}
                     name="preferredCommunicationChannel"
@@ -1052,10 +975,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                 {/* Address */}
                 <div className="sm:col-span-2">
                   <TextAreaInput
-                  logo={MapPin}
-                  cols={5}
-                  label="Address:"
-                   id="address"
+                    logo={MapPin}
+                    cols={5}
+                    label="Address:"
+                    id="address"
                     placeholder="Enter full address"
                     name="address"
                     rows={4}
@@ -1072,12 +995,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             <div className="flex items-center justify-end gap-4 mt-3 ">
               <div className="flex gap-2">
                 <Button
-                  type="submit"
+                  type="button"
                   onClick={handleStateClearFunctionOnClickOfCancelOrXButton}
                   // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                 >
                   <div className="flex items-center gap-0.5">
-                    <X size={16} />
+                    <X size={SIZE.SIXTEEN} />
                     Cancel
                   </div>
                 </Button>
@@ -1087,7 +1010,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   onClick={handleSubmit}
                 >
                   <div className="flex items-center gap-1">
-                    <Save size={16} />
+                    <Save size={SIZE.SIXTEEN} />
                     Save
                   </div>
                 </Button>
