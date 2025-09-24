@@ -147,13 +147,19 @@ function LeadManagementList({
       >
         {/* sticky */}
         <div className=" z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex">
+          {
+            isUsedInLeadModule && (
+              <>
+              <div className="flex">
             {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
 
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
+              </>
+            )
+          }
 
           {isLargeScreen && (
             <>

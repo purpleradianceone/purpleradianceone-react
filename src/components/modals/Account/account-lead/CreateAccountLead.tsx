@@ -11,6 +11,8 @@ import ApiError from "../../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
+import { Handshake } from "lucide-react";
 
 const CreateAccountLead = ({
   account,
@@ -73,22 +75,22 @@ const CreateAccountLead = ({
           onClick={() => {
             setShowLeadsData(!showLeadsData);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+          className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
         >
           <span>+Add</span>
         </Button>
       </div>
       {showLeadsData && (
         <div className="fixed inset-0 z-50 mt-10 flex items-center justify-center bg-black bg-opacity-5 ">
-          <div className="relative bg-white border rounded-2xl shadow-xl w-full max-w-6xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
-            {/* Close button */}
-            <button
-              className="absolute z-50 top-2 right-2 text-gray-500 hover:text-gray-800"
-              onClick={() => setShowLeadsData(false)}
-            >
-              ✕
-            </button>
-
+          <div className=" bg-white border rounded-2xl shadow-xl w-full max-w-6xl p-3 max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+            <FormHeader
+              icon={Handshake}
+              onClose={()=>{
+                setShowLeadsData(false)
+              }}
+              preText="Leads"
+              description="Choose the lead that is linked to this account."
+            />
             {/* Lead Management Content */}
             <LeadManagement
               isUsedInLeadModule={false}

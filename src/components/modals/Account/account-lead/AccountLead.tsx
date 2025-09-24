@@ -11,12 +11,16 @@ import CreateAccountLead from "./CreateAccountLead";
 import AccountLeadType from "../../../../@types/account/AccountLead";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import toast from "react-hot-toast";
+import ROUTES_URL from "../../../../constants/Routes";
+import qs from "query-string";
+import { useNavigate } from "react-router-dom";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
 
+  const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
     const postData = {
@@ -39,6 +43,8 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
             accountName: item.account_name,
             leadId: item.lead_id,
             leadName: item.lead_name,
+            leadEmail: item.lead_email,
+            leadMobileNumber: item.lead_mobilenumber,
             isActive: item.isactive,
             createdBy: item.createdby,
             createdOn: item.createdon,
@@ -102,80 +108,146 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       });
   };
 
-  if (isLoading) {
-    return (
-      <>
-        <LoadingSpinner />
-      </>
-    );
+  const getLeadDetails = async (leadId: number) => {
+    // if(companyUserId === null || companyUserId !== loginStatus.id){
+    //   toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
+    //   return ;
+    // }
+    const postDataToGetLead = {
+      company_id: loginStatus.companyId,
+      id: leadId,
+      requestedby: loginStatus.id,
+    };
+    await axios
+      .post(POST_API.GET_LEAD, postDataToGetLead, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const leadData = response.data.map((item: any) => {
+          const queryParams = qs.stringify({
+            leadData: JSON.stringify({
+              id: item.id,
+              name: item.name,
+              email: item.email,
+              mobileNumber: item.mobilenumber,
+              companyId: item.company_id,
+              companyUserId: item.ownerid,
+              count: item.count,
+              createdBy: item.createdby,
+              createdOn: item.createdon,
+              leadOwner: item["Lead Owner"],
+              leadSource: item["Lead Source"],
+              leadSourceId: item.lead_source_id,
+              leadStatus: item["Lead Status"],
+              leadStatusId: item.lead_status_id,
+              updatedBy: item.updatedby,
+              updatedOn: item.updatedon,
+            }),
+          });
+          return queryParams;
+        });
+        navigate(ROUTES_URL.LEAD_DETAILS + `?${leadData}`);
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithParamsNotEvent: getLeadDetails,
+          });
+
+          // setIsDialogueOpen(!refreshTokenStatus);
+          if (refreshTokenStatus) {
+            getLeadDetails(leadId);
+          }
+        }
+      });
+  };
+
+  const handleAccountLead = (leadId :number) =>{
+    if(leadId!==0) {
+      getLeadDetails(leadId);
+    }
   }
 
-  return (
-    <div className="bg-white border flex flex-col gap-1 rounded-md p-2">
-      <div className="bg-gray-100 table-header-custom rounded-t-md px-2">
-        <span>Account lead</span>
-      </div>
-      {accountLead.length === 0 && (
-        <>
-          <div className="flex items-center justify-center">
-            <span className="italic flex gap-1">
-              <CreateAccountLead 
-              account={account}
-              getAccountLead={getAccountLead}
-              />
-              No data available.
-            </span>
-          </div>
-        </>
-      )}
-
-      {accountLead.length > 0 && <CreateAccountLead
-      getAccountLead={getAccountLead}
-      account={account}
-      
-      />}
-      {accountLead &&
-        accountLead.map((item: AccountLeadType) => (
-          <>
-            <div className="p-1 bg-white shadow-md rounded-xl border border-gray-200 flex flex-col gap-3 w-full max-w-md">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {item.leadName || "Name not given"}
-                </h2>
-                <label className="inline-flex items-center cursor-pointer relative">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={item.isActive}
-                    id={item.id.toString()}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      handleAccountLeadStatusChange(item);
-                    }}
-                    readOnly
-                  />
-                  <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                </label>
-              </div>
-
-              {/* Meta Info */}
-              <div className="hidden text-sm text-gray-600 space-y-1">
-                <p>
-                  <span className="font-medium text-gray-700">Created By:</span>{" "}
-                  {item.createdBy}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-700">Created On:</span>{" "}
-                  {item.createdOn}
-                </p>
-              </div>
-            </div>
-          </>
-        ))}
+return (
+  <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
+    {/* Header */}
+    <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+      <span>Account lead</span>
     </div>
-  );
+
+    {
+      isLoading && (
+        <div className="h-20 flex items-center justify-center">
+
+          <LoadingSpinner />
+        </div>
+      )
+    }
+    {/* Empty State */}
+    {!isLoading && accountLead.length === 0 && (
+      <div className="flex items-center justify-center py-4">
+        <span className="italic caption-custom flex gap-1 items-center ">
+          <CreateAccountLead account={account} getAccountLead={getAccountLead} />
+          No data available.
+        </span>
+      </div>
+    )}
+
+    {/* Add button (if data exists) */}
+    {accountLead.length > 0 && (
+      <div className="py-0.5">
+        <CreateAccountLead getAccountLead={getAccountLead} account={account} />
+      </div>
+    )}
+
+    {/* Leads Grid */}
+    {accountLead.length > 0 && (
+      <div className="grid md:grid-cols-2 gap-1 w-full">
+        {accountLead.map((item: AccountLeadType) => (
+          <div
+          onClick={() =>{
+            handleAccountLead(item.leadId)
+          }}
+            key={item.id}
+            className="p-2 cursor-pointer hover:white-text  hover:shadow-md  bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col "
+          >
+            {/* Header */}
+            <div className=" flex justify-between items-start">
+              <div className="flex flex-col">
+                <h2 title={item.leadName || ""} className="input-label-custom ">
+                  {item.leadName && item.leadName.length>35  ? item.leadName.substring(0,34)+"..." : item.leadName || <><span className="text-xs italic">Name not given</span></>}
+                </h2>
+                <p title={item.leadEmail || ""} className="caption-custom">{item.leadEmail || <><span className="italic">email - not given</span></>}</p>
+                <p  title={item.leadMobileNumber || ""} className="caption-custom">{item.leadMobileNumber || <><span className="italic">mobile number - not given</span></>}</p>
+              </div>
+
+              {/* Toggle */}
+              <label onClick={(e)=>{
+                  e.stopPropagation();
+              }}     className="inline-flex items-center cursor-pointer relative">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={item.isActive}
+                  id={item.id.toString()}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    // e.stopPropagation();
+                    handleAccountLeadStatusChange(item);
+                  }}
+                  readOnly
+                />
+                <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+              </label>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 };
 
 export default AccountLead;
