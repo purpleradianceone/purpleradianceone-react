@@ -111,7 +111,7 @@ function ForgotPasswordForm() {
       {showEmailSentAnimation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg animate-fade-in">
-            <h2 className="text-lg font-semibold">
+            <h2 className="section-header-custom">
               Sending mail in Progress...
             </h2>
             <ForgotPasswordRequestPage />

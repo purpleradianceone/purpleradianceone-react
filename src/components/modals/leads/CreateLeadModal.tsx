@@ -489,7 +489,10 @@ function CreateLeadModal({
             
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
-                <Button onClick={handleCompanyUserPopUp} type="button">
+                <Button onClick={(e) => {
+                  e.preventDefault();
+                  handleCompanyUserPopUp();
+                  }} type="submit">
                   <div className="flex gap-1 items-center whitespace-nowrap">
                     <UserRoundPlus size={16} />
                     <span>Assign Lead Owner</span>
@@ -547,7 +550,7 @@ function CreateLeadModal({
             <div className="flex gap-2">
               <Button  
               onClick={onClose}
-              type="reset">
+              type="button">
                 <div className="flex items-center gap-0.5">
                   <X size={16} />
                   <span>Cancel</span>

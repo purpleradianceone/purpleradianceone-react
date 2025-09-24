@@ -10,7 +10,7 @@ import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalP
 import POST_API from "../../../constants/PostApi";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import {  STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
+import {  SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -214,16 +214,16 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                 <div className="flex items-center justify-end">
                   <div className="flex gap-2">
 
-                <Button  onClick={onClose} type="reset">
+                <Button  onClick={onClose} type="button">
                   
                    <div className="flex items-center justify-center gap-0.5">
-                    <X size={16}/>
+                    <X size={SIZE.SIXTEEN}/>
                     Cancel
                     </div>
                     </Button>
                   <Button type="submit">
                    <div className="flex items-center justify-center gap-1">
-                     <Save size={16}/>
+                     <Save size={SIZE.SIXTEEN}/>
                     Save
                    </div>
                     </Button>

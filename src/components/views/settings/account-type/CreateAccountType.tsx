@@ -173,7 +173,7 @@ export default function CreateAccountType({
           <div className="flex items-center  justify-end gap-3 ">
            <div className="flex gap-2">
              <Button
-            type="submit"
+            type="button"
               onClick={() => {
                 setNewTypeName("");
                 setNewParentType(0);
@@ -187,8 +187,11 @@ export default function CreateAccountType({
               </div>
             </Button>
             <Button
-
-              onClick={handleAddAccountType}
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddAccountType();
+              }}
               disabled={!newTypeName.trim() || newParentType === 0}
               // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
             >

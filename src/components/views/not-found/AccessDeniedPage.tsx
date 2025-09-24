@@ -40,7 +40,11 @@ function AccessDeniedPopup({
           <div className='flex items-center justify-center'>
               <div>
               <Button
-            onClick={onClose}>
+              type='submit'
+            onClick={(e) => {
+              e.preventDefault();
+              onClose();
+            }}>
             Got it
           </Button>
               </div>

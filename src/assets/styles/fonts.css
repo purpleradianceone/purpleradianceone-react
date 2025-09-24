@@ -186,6 +186,13 @@
   color: #333333;
 }
 
+.input-label-custom-white {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #fff;
+}
+
 .input-label-custom-active-tab {
   font-family: "Roboto", sans-serif;
   font-size: 14px;

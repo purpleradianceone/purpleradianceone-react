@@ -574,7 +574,7 @@ function EditCompanyProductModal({
               </div>
 
               <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button onClick={onClose}>
+                <Button type="button" onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
                     <X size={16} />
                     Cancel
@@ -603,8 +603,9 @@ function EditCompanyProductModal({
               }
             >
               <Button
-                type="button"
-                onClick={() => {
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
                   handleCreateCompanyProductTaxModalOpen(true);
                 }}
               >

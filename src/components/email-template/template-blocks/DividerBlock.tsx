@@ -5,6 +5,7 @@ import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
 import Button from "../../ui/Button";
 import { Trash2 } from "lucide-react";
+import { SIZE } from "../../../constants/AppConstants";
 
 export const DividerBlock: React.FC = () => {
   const {
@@ -41,6 +42,7 @@ export const DividerBlock: React.FC = () => {
       {hovered && (
         <div className="absolute -top-4 -right-4 w-fit h-fit">
           <Button
+          type="button"
           onClick={() => actions.delete(id)}
           // style={{
           //   position: "absolute",
@@ -61,7 +63,7 @@ export const DividerBlock: React.FC = () => {
           // }}
         >
          <div className="flex items-center justify-center gap-1">
-                <Trash2 size={14} />
+                <Trash2 size={SIZE.SIXTEEN} />
               </div>
         </Button>
         </div>

@@ -302,7 +302,7 @@ export default function PaymentSubscription({
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
             <div>
-              <Button onClick={onCancel}>
+              <Button type="button" onClick={onCancel}>
                 <div className="flex items-center gap-0.5">
                   <X size={16} />
                   {cancelText}
@@ -311,7 +311,7 @@ export default function PaymentSubscription({
             </div>
 
             <div>
-              <Button onClick={handlePaymentProceed}>
+              <Button type="submit" onClick={handlePaymentProceed}>
                 <CheckCircle2 className="h-5 w-5" />
                 <span>Confirm Payment</span>
               </Button>

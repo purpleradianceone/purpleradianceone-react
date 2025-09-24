@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
+import { SIZE } from "../../constants/AppConstants";
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -47,9 +48,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         {/* Footer Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           <div>
-            <Button onClick={onCancel}>
+            <Button type="button" onClick={onCancel}>
               <div className="flex items-center justify-center gap-0.5">
-                <X size={16} />
+                <X size={SIZE.SIXTEEN} />
                 Cancel
               </div>
             </Button>
@@ -57,13 +58,15 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
           <div>
             <Button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 onConfirm();
                 onCancel();
               }}
+              type="submit"
             >
               <div className="flex items-center justify-center gap-0.5">
-                <Check size={16} />
+                <Check size={SIZE.SIXTEEN} />
                 Confirm
               </div>
             </Button>

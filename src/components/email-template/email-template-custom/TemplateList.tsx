@@ -8,7 +8,7 @@ import EmailTemplate from "../../../@types/email-template/EmailTemplateType";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import ROUTES_URL from "../../../constants/Routes";
@@ -126,23 +126,29 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
               </div>
               <div className="flex gap-2">
                 <Button
-                  onClick={() => setPreviewTemplate(template)}
+                type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPreviewTemplate(template);
+                  }}
                   // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Preview ${template.name}`}
                 >
                   <div className="flex items-center justify-center gap-0.5">
-                    <Eye size={16} />
+                    <Eye size={SIZE.SIXTEEN} />
                     View
                   </div>
                 </Button>
                 <Button
+                type="submit"
                   // className="px-3 py-1 text-sm border rounded"
                   aria-label={`Edit ${template.name}`}
                   disabled={
                     !userHasAccessToUpdateEmailTemplateSetting ||
                     template.is_master
                   }
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     if (
                       userHasAccessToUpdateEmailTemplateSetting &&
                       !template.is_master
@@ -158,7 +164,7 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                   }}
                 >
                   <div className="flex items-center justify-center gap-0.5">
-                    <Edit size={16} />
+                    <Edit size={SIZE.SIXTEEN} />
                     Edit
                   </div>
                 </Button>
@@ -327,9 +333,9 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
             />
             <div className="relative text-right justify-items-end justify-end items-end w-full">
               <div className="w-fit">
-                <Button onClick={() => setPreviewTemplate(null)}>
+                <Button type="button" onClick={() => setPreviewTemplate(null)}>
                   <div className="flex items-center justify-center gap-0.5">
-                    <X size={16} />
+                    <X size={SIZE.SIXTEEN} />
                     Close
                   </div>
                 </Button>

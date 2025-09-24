@@ -4,6 +4,7 @@ import POST_API from "../../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import {
   MOBILE_NUMBER_VALIDATION,
+  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../../constants/AppConstants";
@@ -991,12 +992,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             <div className="flex items-center justify-end gap-4 mt-3 ">
               <div className="flex gap-2">
                 <Button
-                  type="submit"
+                  type="button"
                   onClick={handleStateClearFunctionOnClickOfCancelOrXButton}
                   // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                 >
                   <div className="flex items-center gap-0.5">
-                    <X size={16} />
+                    <X size={SIZE.SIXTEEN} />
                     Cancel
                   </div>
                 </Button>
@@ -1006,7 +1007,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   onClick={handleSubmit}
                 >
                   <div className="flex items-center gap-1">
-                    <Save size={16} />
+                    <Save size={SIZE.SIXTEEN} />
                     Save
                   </div>
                 </Button>

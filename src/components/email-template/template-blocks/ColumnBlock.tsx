@@ -7,6 +7,7 @@ import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 import Button from "../../ui/Button";
 import { Plus, Trash2 } from "lucide-react";
+import { SIZE } from "../../../constants/AppConstants";
 
 interface ColumnBlockProps {
   columnIds?: string[];
@@ -174,9 +175,9 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
         {/* Delete entire block */}
         <div className="flex justify-end items-end w-full mb-2">
           <div className="w-fit">
-            <Button onClick={deleteEntireBlock}>
+            <Button type="button" onClick={deleteEntireBlock}>
               <div className="flex items-center justify-center gap-1">
-                <Trash2 size={16} />
+                <Trash2 size={SIZE.SIXTEEN} />
                 Delete Column Block
               </div>
             </Button>
@@ -207,11 +208,12 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
               {columns.length > 1 && (
                 <div className="absolute top-1 right-1 w-fit ">
                   <Button
+                    type="button"
                     onClick={() => removeColumn(columnId)}
                     title="Delete Column"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      <Trash2 size={14} />
+                      <Trash2 size={SIZE.SIXTEEN} />
                     </div>
                   </Button>
                 </div>
@@ -223,9 +225,12 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
         {/* ➕ Add Column */}
         <div className="flex justify-end items-end mt-2 text-right w-full">
           <div className="w-fit">
-            <Button onClick={addColumn}>
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+                addColumn();
+            }}>
               <div className="flex items-center justify-center gap-1">
-                <Plus size={16} />
+                <Plus size={SIZE.SIXTEEN} />
                 Add Column
               </div>
             </Button>

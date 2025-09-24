@@ -1,7 +1,8 @@
 import Button from '../ui/Button';
-import { STRING_VALUES } from '../../constants/AppConstants';
+import { SIZE, STRING_VALUES } from '../../constants/AppConstants';
 import DialogueBoxProps from '../../@types/dialogue/DialogueProps';
 import { createPortal } from 'react-dom';
+import { Check } from 'lucide-react';
 
 
 
@@ -31,8 +32,8 @@ export function DialogueBox({
         </button> */}
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">{title}</h2>
-          <p className="text-gray-600">{message}</p>
+          <h2 className="section-header-custom mb-2">{title}</h2>
+          <p className="input-label-custom">{message}</p>
         </div>
 
         <div className="flex justify-end gap-3">
@@ -48,12 +49,18 @@ export function DialogueBox({
 
          <div className="flex">
          <Button
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               onConfirm();
               
             }}
+            type='submit'
           >
-            {confirmText}
+            <div className='flex items-center gap-1'>
+              <Check size={SIZE.SIXTEEN}/>
+               {confirmText}
+            </div>
+           
           </Button>
          </div>
           

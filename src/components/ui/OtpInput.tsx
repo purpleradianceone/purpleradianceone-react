@@ -67,8 +67,8 @@ export function OTPInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Enter your OTP{required && <span className="text-red-500 align-top">*</span>}
+      <label className="block input-label-custom mb-2">
+        Enter your OTP{required && <span className="caption-custom-inactive align-top">*</span>}
       </label>
       <div className="flex gap-2 justify-between">
         {Array.from({ length }, (_, index) => (
@@ -82,7 +82,7 @@ export function OTPInput({
             onChange={(e) => handleChange(index, e.target.value.replace(/[^0-9]/g, ''))}
             onKeyDown={(e) => handleKeyDown(index, e)}
             onPaste={handlePaste}
-            className={`w-12 h-12 text-center border-2 rounded-lg text-lg font-semibold
+            className={`w-12 h-12 text-center border-2 rounded-lg input-label-custom
               ${
                 error
                   ? "border-red-500 focus:ring-red-200"
@@ -93,7 +93,7 @@ export function OTPInput({
         ))}
       </div>
       {error && (
-        <p className="mt-1 text-sm text-red-500">
+        <p className="mt-1 caption-custom-inactive">
           {error}
         </p>
       )}

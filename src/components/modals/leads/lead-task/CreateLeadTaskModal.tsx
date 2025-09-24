@@ -361,8 +361,10 @@ function CreateLeadTaskModal({
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
@@ -515,16 +517,20 @@ function CreateLeadTaskModal({
               {/* Assign button */}
               <div className="absolute left-28 max-w-28">
                 <Button
-                  type="button"
-                  onClick={() => setIsAssignUsersModalOpen(true)}
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
                 >
                   <span
                     title="Assign user to this task"
                     className="flex  text-center caption-custom white-text text-nowrap"
                   >
-                    <UserPlus size={14}></UserPlus>
-
-                    {/* <span>Assign user</span> */}
+                    <span className="flex gap-1 text-nowrap ">
+                      <UserPlus size={14}></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
                   </span>
                 </Button>
               </div>
@@ -577,7 +583,7 @@ function CreateLeadTaskModal({
           <div className=" flex w-full justify-end ">
             <div className="flex items-center gap-1 ">
               {/* Cancel */}
-              <Button onClick={handleClose} type="reset">
+              <Button onClick={handleClose} type="button">
                 <div className="flex items-center gap-1">
                   <X size={16} />
                   Cancel

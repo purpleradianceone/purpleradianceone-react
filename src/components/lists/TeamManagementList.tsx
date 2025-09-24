@@ -124,10 +124,16 @@ function TeamManagementList({
         {userHasAccessToAddTeamManagement ? (
           <>
             <div className="flex gap-1">
-              <Button onClick={() => setIsAddTeamModalOpen(true)}>
-                {!isSmallScreen && <Network size={SIZE.TWENTY} />}
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                setIsAddTeamModalOpen(true);
+              }}>
+                {/* {!isSmallScreen && <Network size={SIZE.TWENTY} />}
                 {isSmallScreen && <Network size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_TEAM}
+                {isLargeScreen && JSX_CHILDREN_NAME.ADD_TEAM} */}
+                <div className="flex items-center gap-0.5">
+            <Network size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_TEAM}</div>
+                
               </Button>
             </div>
             <AddTeamModal
@@ -149,11 +155,9 @@ function TeamManagementList({
           </>
         ) : (
           <div className="flex gap-1">
-            <Button disabled={true}>
-              {!isSmallScreen && <Network size={SIZE.TWENTY} />}
-              {isSmallScreen && <Network size={SIZE.EIGHT} />}
-
-              {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
+            <Button type="submit" onClick={(e) => e.preventDefault} disabled={true}>
+              <div className="flex items-center gap-0.5">
+            <Network size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_TEAM}</div>
             </Button>
           </div>
         )}

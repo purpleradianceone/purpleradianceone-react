@@ -313,7 +313,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
           <div className="flex justify-end  space-x-1 ">
             <div>
-              <Button onClick={onClose} disabled={loading}>
+              <Button type="button" onClick={onClose} disabled={loading}>
                 <div className="flex items-center justify-center gap-0.5">
                   <X size={16} />
                   Cancel
@@ -321,7 +321,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </Button>
             </div>
             <div>
-              <Button onClick={handleSubmit} disabled={loading}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }} disabled={loading}>
                 {loading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

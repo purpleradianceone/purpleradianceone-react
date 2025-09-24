@@ -6,6 +6,7 @@ import "react-resizable/css/styles.css";
 import Button from "../../ui/Button";
 import { AlignCenter, AlignLeft, AlignRight, Trash2 } from "lucide-react";
 import FormInput from "../../ui/FormInput";
+import { SIZE } from "../../../constants/AppConstants";
 
 type ImageBlockProps = {
   src: string;
@@ -91,9 +92,9 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
     >
       {/* Delete Button */}
       <div className="absolute top-0 right-0 w-fit h-fit">
-        <Button onClick={handleDelete}>
+        <Button type="button" onClick={handleDelete}>
           <div className="flex items-center justify-center gap-1">
-            <Trash2 size={14} />
+            <Trash2 size={SIZE.SIXTEEN} />
             Delete Image Block
           </div>
         </Button>
@@ -142,22 +143,30 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
           <div className="flex gap-2">
             <div className="w-fit">
             <Button
-              onClick={() => handleAlignmentChange("left")}
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAlignmentChange("left");
+              }}
             >
               
               <div className="flex items-center justify-center gap-1">
-            <AlignLeft size={14} />
+            <AlignLeft size={SIZE.SIXTEEN} />
             Left
           </div>
             </Button>
           </div>
           <div className="w-fit">
             <Button
-              onClick={() => handleAlignmentChange("center")}
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAlignmentChange("center");
+              }}
             >
              
                <div className="flex items-center justify-center gap-1">
-            <AlignCenter size={14} />
+            <AlignCenter size={SIZE.SIXTEEN} />
              Center
           </div>
             </Button>
@@ -165,10 +174,14 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
 
           <div className="w-fit">
             <Button
-              onClick={() => handleAlignmentChange("right")}
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAlignmentChange("right");
+              }}
             >
                <div className="flex items-center justify-center gap-1">
-            <AlignRight size={14} />
+            <AlignRight size={SIZE.SIXTEEN} />
              Right
           </div>
               
