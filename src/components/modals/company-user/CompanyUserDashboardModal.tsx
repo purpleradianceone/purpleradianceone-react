@@ -264,14 +264,16 @@ function CompanyUserDashboardModal({
 
       <div className="p-3 border-t bg-white">
         <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
-          <Button onClick={onClose}>
+          <Button type="button" onClick={onClose}>
             <div className="flex gap-0.5 items-center">
               <X size={16} />
               Cancel
             </div>
           </Button>
           <Button
-            onClick={() => {
+          type="submit"
+            onClick={(e) => {
+              e.preventDefault();
               if (userHasAccessToUpdateDashboard) {
                 handleSave();
               } else {

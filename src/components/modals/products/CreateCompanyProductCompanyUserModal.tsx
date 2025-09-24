@@ -166,7 +166,10 @@ function CreateCompanyProductCompanyUserModal({
           {/* Footer with Button */}
           <div className="p-6 border-t bg-white">
             <div className="flex justify-end">
-              <Button onClick={handleCreateCompanyProductCompanyUserSubmit}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleCreateCompanyProductCompanyUserSubmit();
+              }}>
                 Update Users
               </Button>
             </div>

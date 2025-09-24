@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, UserRoundCogIcon } from "lucide-react";
+import { Calendar, Plus, UserRoundCogIcon } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
@@ -17,6 +17,7 @@ import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
 import AccountDetails from "../modals/Account/AccountDetails";
+import { SIZE } from "../../constants/AppConstants";
 
 function AccountManagementList({
   accounts,
@@ -181,11 +182,14 @@ function AccountManagementList({
         {/* // )} */}
        <div>
          <Button
-          onClick={() => {
+         type="submit"
+          onClick={(e) => {
+            e.preventDefault();
             setOpenAccountForm(!openCreateAccountForm);
           }}
         >
-          <span>+ Create</span>
+          <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> Create</div>
         </Button>
         {openCreateAccountForm && (
           <CreateAccount

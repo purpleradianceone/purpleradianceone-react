@@ -194,22 +194,27 @@ function SubscriptionManagementList({
           {userHasAccessToAddSubscription ? (
             <>
               <div className="flex gap-1">
-                <Button onClick={() => setIsAddSubscriptionModalOpen(true)}>
-                  {!isSmallScreen && (
+                <Button type="submit" onClick={(e) => {
+                  e.preventDefault();
+                  setIsAddSubscriptionModalOpen(true);
+                }}>
+                  {/* {!isSmallScreen && (
                     <IndianRupee className="mt-0.5" size={17} />
                   )}
                   {isSmallScreen && <IndianRupee size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_SUBSCRIPTION}
+                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_SUBSCRIPTION} */}
+                  <div className="flex items-center gap-0.5">
+            <IndianRupee size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_SUBSCRIPTION}</div>
                 </Button>
               </div>
             </>
           ) : (
             <div className="flex gap-1">
-              <Button disabled={true}>
-                {!isSmallScreen && <IndianRupee className="mt-0.5" size={17} />}
-                {isSmallScreen && <IndianRupee size={SIZE.EIGHT} />}
-
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_SUBSCRIPTION}
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+              }} disabled={true}>
+               <div className="flex items-center gap-0.5">
+            <IndianRupee size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_SUBSCRIPTION}</div>
               </Button>
             </div>
           )}

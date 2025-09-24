@@ -4,6 +4,7 @@ import { useNode, useEditor, Element } from "@craftjs/core";
 import Button from "../../ui/Button";
 import { Edit, Save, Trash2, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
+import { SIZE } from "../../../constants/AppConstants";
 
 export const SectionBlock: React.FC = () => {
   const {
@@ -63,17 +64,20 @@ export const SectionBlock: React.FC = () => {
           onMouseLeave={() => setHovered(false)}
         >
           <div className="w-fit">
-            <Button onClick={() => setEditing(true)} title="Edit Section">
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+              setEditing(true);
+            }} title="Edit Section">
               <div className="flex items-center justify-center gap-1">
-                <Edit size={14} />
+                <Edit size={SIZE.SIXTEEN} />
                 Edit Section Bock
               </div>
             </Button>
           </div>
           <div>
-            <Button onClick={handleDelete} title="Delete Section">
+            <Button type="button" onClick={handleDelete} title="Delete Section">
               <div className="flex items-center justify-center gap-1">
-                <Trash2 size={14} />
+                <Trash2 size={SIZE.SIXTEEN} />
                 Delete Section Block
               </div>
             </Button>
@@ -137,17 +141,20 @@ export const SectionBlock: React.FC = () => {
           </label>
           <div className="flex justify-between">
             <div className="w-fit h-fit">
-              <Button onClick={() => setEditing(false)}>
+              <Button type="button" onClick={() => setEditing(false)}>
                 <div className="flex items-center justify-center gap-0.5">
-                  <X size={14} />
+                  <X size={SIZE.SIXTEEN} />
                   Cancel
                 </div>
               </Button>
             </div>
             <div className="w-fit h-fit">
-              <Button onClick={handleSave}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}>
                 <div className="flex items-center justify-center gap-1">
-                  <Save size={14} />
+                  <Save size={SIZE.SIXTEEN} />
                   Save
                 </div>
               </Button>

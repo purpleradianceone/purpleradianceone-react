@@ -1336,8 +1336,11 @@ const LeadImportCsv = ({
 
             <div className="mt-6 flex justify-end">
               <div>
- <Button
-                onClick={processCsvForReview} // Changed to trigger review first
+ <Button       type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  processCsvForReview();
+                }} // Changed to trigger review first
                 disabled={isParsing || !csvFile}
                 // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
               >
@@ -1414,6 +1417,7 @@ const LeadImportCsv = ({
             <div className="mt-6 flex justify-between">
               <div>
                 <Button
+                type="button"
                 onClick={() => setShowPreImportReview(false)}
                 // className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
               >
@@ -1423,7 +1427,11 @@ const LeadImportCsv = ({
               
               <div>
                  <Button
-                onClick={handleSubmitImport}
+                 type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSubmitImport();
+                }}
                 disabled={
                   isParsing ||
                   !csvFile ||

@@ -240,6 +240,7 @@ function CreateCompanyProductTaxModal({
               <div className="flex justify-end gap-2">
                 <div >
                   <Button
+                  type="button"
                   onClick={onClose}
                   >
                   

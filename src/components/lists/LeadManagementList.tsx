@@ -274,8 +274,10 @@ function LeadManagementList({
           {isUsedInLeadModule && (
             <div className="flex  gap-1  ">
               <Button
+              type="submit"
                 disabled={!userHasAccessToAddLead}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (userHasAccessToAddLead) {
                     handleShowImportModule();
                   } else {
@@ -286,12 +288,14 @@ function LeadManagementList({
                   }
                 }}
               >
-                <Plus className=" h-5 w-5" />
+                <Plus size={SIZE.SIXTEEN} />
                 <span>Import </span>
               </Button>
               <Button
+              type="submit"
                 disabled={!userHasAccessToAddLead}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (!userHasAccessToAddLead) {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS
@@ -303,7 +307,7 @@ function LeadManagementList({
                 }}
               >
                 <span className="flex">
-                  {!isSmallScreen && <ClipboardPlus size={16} />}
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
                   {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                 </span>

@@ -212,7 +212,7 @@ function CreateSubscription({
         />
         <div className="flex items-center justify-end">
           <div className="flex items-center gap-1 text-nowrap">
-            <Button onClick={onClose} type="reset">
+            <Button type="button" onClick={onClose}>
               <div className=" flex items-center">
                 <X size={16} /> Cancel
               </div>

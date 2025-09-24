@@ -361,8 +361,12 @@ const LeadImportData = ({
       {/* Move All Button */}
       <div>
  <Button
+        type="submit"
         title="By clicking, all leads from this tag will be moved to the Leads Table."
-        onClick={() => setOpenFinalPopup(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          setOpenFinalPopup(true);
+        }}
         // className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
       >
         Move all Leads To lead data
@@ -376,6 +380,7 @@ const LeadImportData = ({
       <div className="flex items-center gap-3">
         {/* Delete Button */}
         <Button
+          type="button"
           disabled={!userHasAccessToUpdateLead}
           onClick={() => {
             if (userHasAccessToUpdateLead) {

@@ -182,7 +182,11 @@ return id;
           </div>
           <div>
             <Button
-            onClick={addDomain}
+            type='submit'
+            onClick={(e) => {
+              e.preventDefault();
+              addDomain();
+            }}
             disabled={ domains.length >= maxDomains}
             // className="px-1 py-0.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium"
           >

@@ -174,6 +174,7 @@ const AssignProductToLead = ({
               <div className="p-1">
                 {showSaveButton && (
                   <Button
+                    type="submit"
                     onClick={handleProductAddToLead}
                     disabled={!showSaveButton}
                   >

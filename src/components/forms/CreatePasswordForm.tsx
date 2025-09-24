@@ -10,13 +10,13 @@ import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import FormInput from "../ui/FormInput";
 import Button from "../ui/Button";
-import { DATA_TYPE,  VALIDATIONS, } from "../../constants/AppConstants";
+import { DATA_TYPE,  SIZE,  VALIDATIONS, } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import { OTPInput } from "../ui/OtpInput";
 import REGEX from "../../constants/Regex";
 import toast from "react-hot-toast";
-import { KeySquare } from "lucide-react";
+import { KeySquare, Save } from "lucide-react";
 
 function CreatePasswordForm() {
   const [createPasswordFormData, setCreatePasswordFormData] =
@@ -163,9 +163,16 @@ function CreatePasswordForm() {
             />
           }
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating Password..." : "Create Password"}
+        <div>
+            <Button type="submit" disabled={isSubmitting}>
+          
+          <div className="flex items-center justify-center gap-0.5">
+                <Save size={SIZE.SIXTEEN} />
+                  {isSubmitting ? "Creating Password..." : "Create Password"}
+              </div>{" "}
         </Button>
+        </div>
+        
       </form>
     </>
   );

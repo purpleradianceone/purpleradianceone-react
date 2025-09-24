@@ -647,20 +647,31 @@ function LeadMeetingsModal({
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 justify-between w-full">
                   <div className="flex items-center gap-2">
-                    <Button title="Previous" onClick={goBack}>
+                    <Button type="submit" title="Previous" onClick={(e) => {
+                      e.preventDefault();
+                      goBack();
+                    }}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button title="Current Date" onClick={goToToday}>
+                    <Button type="submit" title="Current Date" onClick={(e) => {
+                      e.preventDefault();
+                      goToToday();
+                    }}>
                       <Clock className="h-4 w-4" />
                     </Button>
-                    <Button title="Next" onClick={goNext}>
+                    <Button type="submit" title="Next" onClick={(e) => {
+                      e.preventDefault();
+                      goNext();
+                    }}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="flex gap-1 justify-between w-full">
                     <div className="content-center">
                       <Button
-                        onClick={() => {
+                      type="submit"
+                        onClick={(e) => {
+                          e.preventDefault();
                           // setScheduleMeetingModalOpen(true);
                           if (isMeetingModalOpenFromProp) {
                             navigate(
@@ -757,7 +768,9 @@ function LeadMeetingsModal({
                             : "Agenda"
                         }
                         size="sm"
-                        onClick={() => {
+                        type="submit"
+                        onClick={(e) => {
+                          e.preventDefault();
                           handleViewChange(
                             viewName as "month" | "week" | "day" | "agenda"
                           );

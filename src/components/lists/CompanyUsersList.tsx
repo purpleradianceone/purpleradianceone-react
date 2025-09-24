@@ -20,6 +20,7 @@ import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboa
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import { SIZE } from "../../constants/AppConstants";
 
 function GetCompanyUsersList({
   users,
@@ -157,8 +158,10 @@ function GetCompanyUsersList({
             {/* <> */}
             <div className="flex gap-1">
               <Button
+              type="submit"
                 disabled={!userHasAccessToAddUser}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (!userHasAccessToAddUser) {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.COMPANY_USER
@@ -176,7 +179,7 @@ function GetCompanyUsersList({
                 {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
                 <div className="flex items-center gap-1">
                   
-                  <UserPlus size={16}/>
+                  <UserPlus size={SIZE.SIXTEEN}/>
                   Add
                 </div>
               </Button>

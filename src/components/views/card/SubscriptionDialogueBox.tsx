@@ -58,14 +58,16 @@ function SubscriptionDialogueBox({
 
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-2 animate-in fade-in zoom-in duration-200">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 ">{cardTitle}</h2>
-          <p className="text-gray-600 text-sm">{message}</p>
+          <h2 className="section-header-custom ">{cardTitle}</h2>
+          <p className="input-label-custom">{message}</p>
         </div>
 
         <div className="flex justify-end gap-3">
           <div className="flex">
             <Button
-              onClick={() => {
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 setIsEditSubscriptionUserModalOpen(true);
               }}
             >
@@ -75,7 +77,9 @@ function SubscriptionDialogueBox({
 
           <div className="flex">
             <Button
-              onClick={() => {
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 setIsUpgradeSubscriptionModalOpen(true);
               }}
             >

@@ -552,7 +552,7 @@ function EditCompanyTeamModal({
 
               {userHasAccessToUpdateTeamManagement ? (
                 <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button onClick={onClose}>
+                <Button type="button" onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
                     <X size={16} />
                     Cancel
@@ -566,9 +566,19 @@ function EditCompanyTeamModal({
                 </Button>
               </div>
               ) : (
-                <div className="flex justify-self-end max-w-36 m-3">
-                  <Button type="submit" onClick={() => {}} disabled>
+
+                <div className="flex justify-self-end max-w-70 m-2 gap-2">
+                  <Button type="button" onClick={onClose}>
+                  <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                  <Button type="submit" onClick={(e) => {e.preventDefault()}} disabled>
+                    <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
                     Save
+                  </div>
                   </Button>
                 </div>
               )}

@@ -40,6 +40,7 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import COLORS from "../../../constants/Colors";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -838,19 +839,25 @@ const ViewLeadManagement = () => {
                 onChange={(e) => setReasonText(e.target.value)}
               />
               <button
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4  rounded w-fit"
+                className={`input-label-custom-white ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}  px-4  rounded w-fit`}
                 onClick={handleSaveStatusUpdate}
               >
-                Save
+                <div className="flex gap-0.5 items-center">
+                  <Save className="w-4 h-4 -mt-0.5"/>
+                  <span>Save</span>
+                </div>
               </button>
               <button
-               className="bg-gray-500 px-2 rounded text-white" 
+               className={`px-2 rounded input-label-custom-white ${COLORS.BG_GRAY_500_COLOR} ${COLORS.HOVER_BG_GRAY_600_COLOR_HOVER}`} 
                onClick={()=>{
                 setReasonInputBoxOpen(!reasonInputBoxOpen
                 )
                 setSelectedStatusId(null)
               }}>
-                Cancel
+                <div className="flex gap-0.5 items-center">
+                  <X className="w-4 h-4 -mt-0.5"/>
+                  <span>Cancel</span>
+                </div>
               </button>
             </div>
           )}
@@ -1033,7 +1040,9 @@ const ViewLeadManagement = () => {
                       <div className="flex justify-end ">
                        <div className="flex gap-1">
                          <Button
-                          onClick={() => {
+                         type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
                             handleLeadOwnerChange();
                           }}
                         >
@@ -1043,6 +1052,7 @@ const ViewLeadManagement = () => {
                           </div>
                         </Button>
                         <Button
+                        type="button"
                           onClick={handleLeadOwnerChangeStateClear}
                         >
                            <div className="flex items-center ">
@@ -1145,8 +1155,9 @@ const ViewLeadManagement = () => {
                       </p>
                       <div>
                         <Button
-                        className="bg-blue-600 hover:bg-blue-700  text-xs md:text-sm p-2 text-white rounded-md "
-                        onClick={() => {
+                        type="submit"
+                        onClick={(e) => {
+                          e.preventDefault();
                           const leadDataSearchParams = JSON.parse(
                             searchParams.get("leadData") || "{}"
                           );
