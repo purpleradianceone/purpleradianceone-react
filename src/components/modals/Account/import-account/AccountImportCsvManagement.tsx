@@ -1,0 +1,57 @@
+import AccountCsvMapper from "./AccountCsvMapper";
+
+const AccountImportCsvManagement = () => {
+ 
+
+
+
+  return (
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 p-6">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Import Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 space-y-6 transition-all duration-300 hover:shadow-xl">
+          {/* Header */}
+          <div className="border-b pb-1">
+            <h1 className="section-header-custom flex items-center gap-2">
+              📂 Import Accounts
+            </h1>
+            <div className="flex flex-col gap-1 mt-2">
+              <p className="table-header-custom">
+                Upload your{" "}
+                <span className="text-indigo-600">CSV file</span>{" "}
+                and import accounts in just a few easy steps.
+              </p>
+              <p className="caption-custom">
+                Supported format: <span className="font-medium">.csv</span> •
+                Ensure your file follows the required template.
+              </p>
+            </div>
+          </div>
+
+          {/* CSV Upload Component */}
+          <div className="bg-gray-50 border-2 border-dashed border-indigo-300 rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-center hover:border-indigo-500 transition-all duration-200">
+      <AccountCsvMapper />
+          </div>
+        </div>
+
+        {/* Imported Data Section */}
+        { (
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 space-y-4 transition-all duration-300 hover:shadow-xl">
+            <h2 className="section-header-custom flex items-center gap-2">
+              📊 Imported Data
+            </h2>
+            <p className="input-label-custom -mt-2 mb-2">
+              View, manage and move accounts associated with your import tags.
+            </p>
+
+            <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100">
+              {/* <LeadImportTagView /> */}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+};
+export default AccountImportCsvManagement;

@@ -58,6 +58,7 @@ import Home from "../../components/views/home/Home";
 import GetAccounts from "../../components/views/account/AccountManagement";
 import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
+import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
 
 export const router = createBrowserRouter([
   {
@@ -68,7 +69,7 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.DOWNLOAD_APP,
     element: <DownloadAppPage></DownloadAppPage>,
   },
-   {
+  {
     path: ROUTES_URL.NOT_AUTHORIZED,
     element: <NotAuthorized></NotAuthorized>,
   },
@@ -83,12 +84,12 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Hero />
-            <AboutUs/>
+            <AboutUs />
             <Features />
             <Testimonials />
             <ContactUs />
             <CallToAction />
-            <Footer/>
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -100,8 +101,8 @@ export const router = createBrowserRouter([
       <LoggedInRoute>
         <div className="min-h-screen">
           <Navbar>
-            <CareersPage/>
-            <Footer/>
+            <CareersPage />
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -113,8 +114,8 @@ export const router = createBrowserRouter([
       <LoggedInRoute>
         <div className="min-h-screen">
           <Navbar>
-            <Pricing/>
-            <Footer/>
+            <Pricing />
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -206,7 +207,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div className="min-h-95vh">
             <Navbar>
-              <Home/>
+              <Home />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -307,7 +308,6 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <LoginRequiredRouteNoContent>
-
           <div>
             <AuthLayout
               title="Activate Subscription!"
@@ -319,8 +319,7 @@ export const router = createBrowserRouter([
               />
             </AuthLayout>
           </div>
-          </LoginRequiredRouteNoContent>
-       
+        </LoginRequiredRouteNoContent>
       </MobileRedirectWrapper>
     ),
   },
@@ -490,18 +489,32 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-  {
+{
     path: ROUTES_URL.LEAD_IMPORT_CSV,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          {/* <LeadImportCsv/> */}
-          <LeadImportCsvManagement />
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+          <Navbar>
+            {/* <LeadImportCsv/> */}
+            <LeadImportCsvManagement />
+          </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.ACCOUNT_IMPORT_CSV,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountImportCsvManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -602,12 +615,12 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-        <FacebookOAuthConsent></FacebookOAuthConsent>
+          <FacebookOAuthConsent></FacebookOAuthConsent>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
-    {
+  {
     path: ROUTES_URL.INTEGRATIONS_SETTINGS,
     element: (
       <MobileRedirectWrapper>

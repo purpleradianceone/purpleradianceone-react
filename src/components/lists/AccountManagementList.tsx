@@ -17,6 +17,11 @@ import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
 import AccountDetails from "../modals/Account/AccountDetails";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 import { SIZE } from "../../constants/AppConstants";
 
 function AccountManagementList({
@@ -36,6 +41,7 @@ function AccountManagementList({
   paginationData: PaginationDataProps;
   handleCreateCompanyAccountType: () => void;
 }) {
+  const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -53,6 +59,13 @@ function AccountManagementList({
   const handleRowSelectedToShowAccountDetails = (data: any) => {
     setAccountDataToShowFullDetails(data);
     setShowAccountDetails(true);
+  };
+
+  const { userHasAccessToAddAccount } = useUserAccessModules();
+
+  const handleShowImportModule = () => {
+    navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
+
   };
 
   return (
@@ -111,6 +124,39 @@ function AccountManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
+
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                onClick={() => {
+                  if (userHasAccessToAddAccount) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                    );
+                  }
+                }}
+              >
+                <Plus className=" h-5 w-5" />
+                <span>Import </span>
+              </Button>
+
+              <Button
+                onClick={() => {
+                  setOpenAccountForm(!openCreateAccountForm);
+                }}
+              >
+                <span>+ Create</span>
+              </Button>
+              {openCreateAccountForm && (
+                <CreateAccount
+                  onClose={() => setOpenAccountForm(false)}
+                  handleCreateCompanyAccountType={
+                    handleCreateCompanyAccountType
+                  }
+                />
+              )}
 
               {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
@@ -197,6 +243,7 @@ function AccountManagementList({
             handleCreateCompanyAccountType={handleCreateCompanyAccountType}
           />
         )}
+
        </div>
       </div>
 
