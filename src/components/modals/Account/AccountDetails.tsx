@@ -400,7 +400,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
           <div className="grid max-h-full overflow-auto  grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
             {/* Email */}
-            <div className="col-span-2 flex justify-between p-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition">
+            <div className="col-span-2 flex justify-between p-1 bg-slate-50 border rounded-xl px-2 hover:shadow-sm transition">
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
               </div>
@@ -418,7 +418,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
             {/* Mobile */}
             {/* <div className=" col-span-2  justify-between p-0.5 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition"> */}
-            <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-2 px-3 hover:shadow-sm transition">
+            <div className="flex  col-span-2  bg-slate-50 border rounded-xl p-1 px-2 hover:shadow-sm transition">
               <div className="flex  items-center gap-2">
                 <Phone className="h-5 w-5 text-green-600" />
               </div>
@@ -435,7 +435,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
 
             {/* Website */}
-            <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-3 hover:shadow-sm transition sm:col-span-2">
+            <div className="p-2 flex gap-2 bg-slate-50 border rounded-xl px-2 hover:shadow-sm transition sm:col-span-2">
               <div className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-purple-600" />
               </div>
@@ -479,20 +479,20 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
       case "legal":
         return (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+          <div className="grid grid-cols-2 gap-2 p-1">
+            <div className="p-2 bg-green-50 rounded-lg border border-green-100">
               <p className="input-label-custom-active mb-1">PAN</p>
               {renderEditableField("pan", formData.pan, "Enter PAN number")}
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="p-2 bg-blue-50 rounded-lg border border-blue-100">
               <p className="input-label-custom-blue mb-1">GST</p>
               {renderEditableField("gst", formData.gst, "Enter GST number")}
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+            <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
               <p className="input-label-custom-purple mb-1">TAN</p>
               {renderEditableField("tan", formData.tan, "Enter TAN number")}
             </div>
-            <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+            <div className="p-2 bg-orange-50 rounded-lg border border-orange-100">
               <p className="input-label-custom-orange mb-1">Registration</p>
               {renderEditableField(
                 "businessResgistrationNumber",
@@ -505,7 +505,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
       case "address":
         return (
-          <div className="grid grid-cols-1 gap-4   overflow-auto">
+          <div className="grid grid-cols-1 gap-4 p-1  overflow-auto">
             <div className="space-y-2">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -663,7 +663,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2    gap-1">
         {/* Left Card with Tabs */}
-        <div className="bg-white rounded-xl   p-3 border border-slate-200">
+        <div className="bg-white rounded-xl p-1 border border-slate-200">
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 mb-2">
             <button

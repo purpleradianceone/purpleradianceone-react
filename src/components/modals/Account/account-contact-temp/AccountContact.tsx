@@ -487,7 +487,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                     {/* Text Info */}
                     <div className="flex flex-col">
-                      <p className="inpul-label-custom ">
+                      <p
+                      // className="table-header-custom"
+                       className="input-label-custom "
+                       >
                         {contact.name || "Unknown Contact"}
                       </p>
                       <p className="caption-custom flex flex-wrap items-center gap-x-1">

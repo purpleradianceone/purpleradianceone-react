@@ -4,6 +4,8 @@ type AccountLead ={
     accountName : string,
     leadId: number,
     leadName: string,
+    leadEmail : string,
+    leadMobileNumber : string,
     isActive: boolean,
     createdBy: string,
     createdOn : string, 
