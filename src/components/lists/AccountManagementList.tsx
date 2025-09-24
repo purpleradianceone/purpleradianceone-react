@@ -65,7 +65,6 @@ function AccountManagementList({
 
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
-
   };
 
   return (
@@ -84,81 +83,48 @@ function AccountManagementList({
         </div>
 
         {/* {isLargeScreen && ( */}
-          <>
-            <div className="flex gap-2 justify-center items-center">
-              {/* search box flex div */}
-              <div className="relative flex items-center justify-center w-auto">
-                <div className="grid w-56">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
-              </div>
-
-              {/* Date FIlters Dropdown */}
-              <div className="flex">
-                <div className="flex">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                    <Calendar />
-                  </div>
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
-
-              <Button
-                disabled={!userHasAccessToAddAccount}
-                onClick={() => {
-                  if (userHasAccessToAddAccount) {
-                    handleShowImportModule();
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+        <>
+          <div className="flex gap-2 justify-center items-center">
+            {/* search box flex div */}
+            <div className="relative flex items-center justify-center w-auto">
+              <div className="grid w-56">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
                     );
-                  }
-                }}
-              >
-                <Plus className=" h-5 w-5" />
-                <span>Import </span>
-              </Button>
+                  }}
+                ></SearchInput>
+              </div>
+            </div>
 
-              <Button
-                onClick={() => {
-                  setOpenAccountForm(!openCreateAccountForm);
-                }}
-              >
-                <span>+ Create</span>
-              </Button>
-              {openCreateAccountForm && (
-                <CreateAccount
-                  onClose={() => setOpenAccountForm(false)}
-                  handleCreateCompanyAccountType={
-                    handleCreateCompanyAccountType
-                  }
-                />
-              )}
+            {/* Date FIlters Dropdown */}
+            <div className="flex">
+              <div className="flex">
+                <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
+                  <Calendar />
+                </div>
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                ></DateRangeFilterDropdown>
+              </div>
+            </div>
+            {/* Custom Date Picker Div Flex Box*/}
+            <div
+              style={
+                isCustomDateOptionSelected
+                  ? { visibility: "visible" }
+                  : { visibility: "hidden" }
+              }
+            >
+              <DateRangePicker
+                onStartDateChange={onStartDateChange}
+                onEndDateChange={onEndDateChange}
+              />
+            </div>
 
-              {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
+            {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
                   labelName="source"
                   options={leadSource!}
@@ -173,7 +139,7 @@ function AccountManagementList({
                 />
               </div> */}
 
-              {/* <div className="relative flex items-center justify-center w-auto ">
+            {/* <div className="relative flex items-center justify-center w-auto ">
                 <div className="grid ">
                   {selectedLeadOwner.id === 0 && (
                     <Button
@@ -223,28 +189,49 @@ function AccountManagementList({
                   )}
                 </div>
               </div> */}
-            </div>
-          </>
-        {/* // )} */}
-       <div>
-         <Button
-         type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            setOpenAccountForm(!openCreateAccountForm);
-          }}
-        >
-          <div className="flex items-center gap-0.5">
-            <Plus size={SIZE.SIXTEEN}/> Create</div>
-        </Button>
-        {openCreateAccountForm && (
-          <CreateAccount
-            onClose={() => setOpenAccountForm(false)}
-            handleCreateCompanyAccountType={handleCreateCompanyAccountType}
-          />
-        )}
+          </div>
+        </>
 
-       </div>
+        <div className="flex gap-2">
+          <div className="w-fit h-fit">
+            <Button
+              disabled={!userHasAccessToAddAccount}
+              onClick={() => {
+                if (userHasAccessToAddAccount) {
+                  handleShowImportModule();
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .DENIED_ADD_LEAD_IMPORT_ACCESS
+                  );
+                }
+              }}
+            >
+              <Plus size={SIZE.SIXTEEN} />
+              Import
+            </Button>
+          </div>
+
+          <div>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenAccountForm(!openCreateAccountForm);
+              }}
+            >
+              <div className="flex items-center gap-0.5">
+                <Plus size={SIZE.SIXTEEN} /> Create
+              </div>
+            </Button>
+            {openCreateAccountForm && (
+              <CreateAccount
+                onClose={() => setOpenAccountForm(false)}
+                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
