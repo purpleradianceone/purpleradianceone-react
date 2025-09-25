@@ -15,6 +15,9 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import toast from "react-hot-toast";
+import COLORS from "../../../constants/Colors";
+import StatusChip from "../../ui/StatusChip";
+import ToggleButton from "../../ui/ToggleButton";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
@@ -240,7 +243,7 @@ const LeadAssignedTeams = ({
                   );
                 }
               }}
-              className="border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 "
+              className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
             >
               +Add
             </button>
@@ -266,7 +269,7 @@ const LeadAssignedTeams = ({
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+              className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
             >
               +Add
             </button>
@@ -282,7 +285,7 @@ const LeadAssignedTeams = ({
                     getComapnyTeamUsers(companyTeam);
                     setIsLoadingCompanyTeamCompanyUser(true);
                   }}
-                  className="bg-blue-0 border border-blue-100 cursor-pointer px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow-sm hover:text-blue-600 hover:border-blue-200 transition"
+                  className={COLORS.CONTACT_CARD}
                 >
                   {/* Left: Avatar + Team Info */}
                   <div className="flex items-center gap-3">
@@ -331,16 +334,10 @@ const LeadAssignedTeams = ({
                   </div>
 
                   {/* Right: Status Badge */}
-                  <div className="flex text-[11px] font-semibold items-center">
-                    <span
-                      className={`px-2 py-0.5 rounded-full border ${
-                        companyTeam.isActive
-                          ? "bg-green-100 caption-custom-active border-green-400"
-                          : "bg-red-100 caption-custom-inactive border-red-300"
-                      }`}
-                    >
-                      {companyTeam.isActive ? "Active" : "Inactive"}
-                    </span>
+                  <div className="flex items-center">
+                  <StatusChip
+                  isActive={companyTeam.isActive}
+                  />
                   </div>
                 </div>
               ))
@@ -433,7 +430,7 @@ const LeadAssignedTeams = ({
                     <div className="flex flex-col items-end gap-1 lg:min-w-[200px]">
                       {/* Status Badge */}
                       <div className="flex items-center gap-3">
-                        <span
+                        {/* <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm
                         ${
                           isActive
@@ -446,13 +443,16 @@ const LeadAssignedTeams = ({
                           ${isActive ? "bg-green-600" : "bg-red-600"}`}
                           ></span>
                           {isActive ? "Active" : "Inactive"}
-                        </span>
+                        </span> */}
+                        <StatusChip
+                        isActive={isActive}
+                        />
                       </div>
 
                       {/* Toggle Switch */}
                       <div className="flex items-center gap-3">
                         <span className="input-label-custom">Status:</span>
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        {/* <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
                             checked={isActive}
@@ -469,7 +469,21 @@ const LeadAssignedTeams = ({
                             className="sr-only peer"
                           />
                           <div className="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all duration-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-6 shadow-inner"></div>
-                        </label>
+                        </label> */}
+                        <ToggleButton
+                        checked={isActive}
+                        name="isActive"
+                        onToggle={() => {
+                              if (userHasAccessToUpdateLead) {
+                                updateLeadCompanyTeam(selectedCompanyTeamCard);
+                              } else {
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                    .UPDATE_LEAD_ACCESS_DENIED_message
+                                );
+                              }
+                            }}
+                        />
                       </div>
                     </div>
                   </div>

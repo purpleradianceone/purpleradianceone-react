@@ -11,6 +11,7 @@ import CreateAccountLead from "./CreateAccountLead";
 import AccountLeadType from "../../../../@types/account/AccountLead";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import toast from "react-hot-toast";
+import ToggleButton from "../../../ui/ToggleButton";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -119,9 +120,9 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
         <>
           <div className="flex items-center justify-center">
             <span className="italic flex gap-1">
-              <CreateAccountLead 
-              account={account}
-              getAccountLead={getAccountLead}
+              <CreateAccountLead
+                account={account}
+                getAccountLead={getAccountLead}
               />
               No data available.
             </span>
@@ -129,11 +130,9 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
         </>
       )}
 
-      {accountLead.length > 0 && <CreateAccountLead
-      getAccountLead={getAccountLead}
-      account={account}
-      
-      />}
+      {accountLead.length > 0 && (
+        <CreateAccountLead getAccountLead={getAccountLead} account={account} />
+      )}
       {accountLead &&
         accountLead.map((item: AccountLeadType) => (
           <>
@@ -143,7 +142,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
                 <h2 className="text-lg font-semibold text-gray-800">
                   {item.leadName || "Name not given"}
                 </h2>
-                <label className="inline-flex items-center cursor-pointer relative">
+                {/* <label className="inline-flex items-center cursor-pointer relative">
                   <input
                     type="checkbox"
                     className="sr-only peer"
@@ -157,7 +156,15 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
                   />
                   <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                   <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                </label>
+                </label> */}
+                <ToggleButton
+                  checked={item.isActive}
+                  name={item.id.toString()}
+                  onToggle={(e) => {
+                    e.preventDefault();
+                    handleAccountLeadStatusChange(item);
+                  }}
+                />
               </div>
 
               {/* Meta Info */}

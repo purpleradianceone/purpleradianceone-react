@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import ToggleButton from "./ToggleButton";
+
 
 interface SettingToggleCardProps {
   setting: any;
@@ -18,7 +20,7 @@ const SettingToggleCard: React.FC<SettingToggleCardProps> = ({ setting, onToggle
         </h3>
       </div>
 <p className="caption-custom m-0 p-0">{description}</p>
-      <label className="inline-flex items-center cursor-pointer relative self-end"> 
+      {/* <label className="inline-flex items-center cursor-pointer relative self-end"> 
         <input
           type="checkbox"
           className="sr-only peer"
@@ -28,7 +30,12 @@ const SettingToggleCard: React.FC<SettingToggleCardProps> = ({ setting, onToggle
         />
         <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-      </label>
+      </label> */}
+      <ToggleButton
+      checked={setting.isActive}
+      name={setting.id.toString()}
+      onToggle={onToggle}
+      />
     </div>
   );
 };

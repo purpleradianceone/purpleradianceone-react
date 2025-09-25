@@ -18,6 +18,7 @@ import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
 import AccountDetails from "../modals/Account/AccountDetails";
 import { SIZE } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
 
 function AccountManagementList({
   accounts,
@@ -59,10 +60,10 @@ function AccountManagementList({
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
-      <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+      <div className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
         <div className="flex items-center justify-center gap-2">
           {!isSmallScreen && (
-            <UserRoundCogIcon className="w-5 h-5 text-blue-600" />
+            <UserRoundCogIcon className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
@@ -74,8 +75,9 @@ function AccountManagementList({
           <>
             <div className="flex gap-2 justify-center items-center">
               {/* search box flex div */}
-              <div className="relative flex items-center justify-center w-auto">
-                <div className="grid w-56">
+              <div className="flex gap-1">
+                {/* search box flex div */}
+                <div className="relative flex items-start w-80 ">
                   <SearchInput
                     onChange={(e) => {
                       handleSearchOption.handleSearchParameterChange(
@@ -84,18 +86,19 @@ function AccountManagementList({
                     }}
                   ></SearchInput>
                 </div>
-              </div>
 
-              {/* Date FIlters Dropdown */}
-              <div className="flex">
-                <div className="flex">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                    <Calendar />
+                {/* Date FIlters Dropdown */}
+                <div className="flex mx-3">
+                  <div className="flex">
+                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                      <Calendar className="input-label-custom mt-1" />
+                    </div>
+
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
+                    ></DateRangeFilterDropdown>
                   </div>
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
                 </div>
               </div>
               {/* Custom Date Picker Div Flex Box*/}

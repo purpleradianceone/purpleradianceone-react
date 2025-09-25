@@ -89,6 +89,7 @@
 
 import FormInputProps from "../../@types/ui/FormInputProps";
 import useScreenSize from "../../config/hooks/useScreenSize";
+import COLORS from "../../constants/Colors";
 
 function FormInput({
   label,
@@ -126,7 +127,7 @@ function FormInput({
   return (
     <div className={isSmallScreen ? "mt-1" : "mt-2"}>
       <label htmlFor={name} className={(center ? 'text-center ' : '') + 'flex items-center input-label-custom'}>
-      {Icon  && <Icon size={14} className="inline mr-1 text-blue-500"/>}
+      {Icon  && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR}/>}
         {label}{required && <span className="caption-custom-inactive align-top">*</span> }
       </label>
       <div className={isSmallScreen ? "mt-1 relative" : "mt-0 relative"}>
@@ -137,8 +138,7 @@ function FormInput({
               value={dialCodeValue}
               onChange={selectOnChange}
               onBlur={selectOnBlur} // Apply blur to the select as well
-              className={`block py-2 px-2 border text-wrap min-w-24 max-w-min border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm
-                ${readonly ? 'bg-gray-100' : ''}`}
+              className={`block py-2 px-2 border text-wrap min-w-24 max-w-min ${COLORS.INPUT_BORDER_COLOR} rounded-l-md shadow-sm ${COLORS.INPUT_FOCUS_COLOR}  ${readonly ? COLORS.INPUT_READONLY_BG_COLOR : ''}`}
             >
               {countries?.length !==0 ? countries!.map((country) => (
                 <option key={country.id} value={country.id!.toString()}>

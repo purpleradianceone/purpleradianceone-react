@@ -170,17 +170,17 @@ return id;
               type="text"
               value={inputValue}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder={placeholder}
-              className={`w-full px-1 py-0.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+              className={`w-full px-1 py-1.5 input-label-custom border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                 error ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
               }`}
             />
             {error && (
-              <p className="text-red-600 text-xs mt-2 animate-fadeIn">{error}</p>
+              <p className="caption-custom-inactive mt-2 animate-fadeIn">{error}</p>
             )}
           </div>
-          <div>
+          <div className=''>
             <Button
             type='submit'
             onClick={(e) => {
@@ -199,10 +199,10 @@ return id;
           </div>
         </div>
         
-        <div className="flex justify-between items-center mt-0.5 text-xs text-gray-500">
+        <div className="flex justify-between items-center mt-0.5 caption-custom">
           <span>{domains.length} of {maxDomains} domains added</span>
           {domains.length > 0 && (
-            <span className="text-green-600 text-xs font-light">
+            <span className="caption-custom-active">
               ✓ {domains.length} domain{domains.length !== 1 ? 's' : ''} configured
             </span>
           )}
@@ -213,16 +213,16 @@ return id;
         {domains.length === 0 ? (
           <div className="text-center py-1">
             <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <Globe className="w-3 h-3 text-gray-400" />
+              <Globe className="w-3 h-3 caption-custom-active" />
             </div>
-            <p className="text-gray-500 font-light mb-2">No domains added yet</p>
-            <p className="text-gray-400 text-xs">
+            <p className="table-header-custom mb-2">No domains added yet</p>
+            <p className="input-label-custom">
               Start by adding your first allowed domain above
             </p>
           </div>
         ) : (
           <div className="space-y-0.5">
-            <h4 className="text-xs font-normal text-gray-700 mb-0.5">
+            <h4 className="caption-custom mb-0.5">
               Configured Domains ({domains.length})
             </h4>
             {domains.map((domain, index) => (
@@ -232,16 +232,16 @@ return id;
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center gap-1">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <Globe className="w-3 h-3 text-green-600" />
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center hover:bg-gray-100">
+                    <Globe className="w-3 h-3 caption-custom-active" />
                   </div>
-                  <span className="font-mono text-sm text-gray-800 font-light">
+                  <span className="caption-custom">
                     {domain}
                   </span>
                 </div>
                 <button
                   onClick={() => removeDomain(domain)}
-                  className="opacity-0 group-hover:opacity-100 p-0.5  text-gray-400 hover:text-red-500 hover:bg-white shadow-lg rounded-full transition-all duration-200"
+                  className="opacity-0 group-hover:opacity-100 p-0.5  caption-custom hover:text-red-500 hover:bg-white shadow-lg rounded-full transition-all duration-200"
                   title="Remove domain"
                 >
                   <X className="w-3 h-3" />

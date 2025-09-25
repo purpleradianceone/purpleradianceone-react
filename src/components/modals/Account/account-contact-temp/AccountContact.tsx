@@ -21,6 +21,9 @@ import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import AccountContactType from "../../../../@types/account/AccountContactType";
 import { Briefcase, Edit, Edit3, Globe, Languages, Mail, MapPin, MessageCircle, Phone, Save, User, X } from "lucide-react";
+import StatusChip from "../../../ui/StatusChip";
+import COLORS from "../../../../constants/Colors";
+import ToggleButton from "../../../ui/ToggleButton";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -435,7 +438,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
+              className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
             >
               +Add
             </button>
@@ -456,7 +459,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+              className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
             >
               {/* <Plus size={10} /> */}
               <span>+Add</span>
@@ -532,15 +535,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                       >
                         {contact.isPrimary ? "Primary" : "Secondary"}
                       </span> */}
-                    <span
-                      className={`px-2 py-0.5 rounded-full border ${
-                        contact.isActive
-                          ? "bg-green-100 caption-custom-active border-green-400"
-                          : "bg-red-100 caption-custom-inactive border-red-400"
-                      }`}
-                    >
-                      {contact.isActive ? "Active" : "Inactive"}
-                    </span>
+                    <StatusChip isActive={contact.isActive}/>
                   </div>
                 </div>
               ))
@@ -607,15 +602,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         ? "Primary Contact"
                         : "Secondary Contact"}
                     </span> */}
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            selectedContactCard.isActive
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : "bg-red-100 text-red-800 border border-red-200"
-                          }`}
-                        >
-                          {selectedContactCard.isActive ? "Active" : "Inactive"}
-                        </span>
+                        <StatusChip isActive={isActive}/>
                       </div>
                     </div>
                     <button
@@ -741,18 +728,18 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         <div className="w-5 h-5 mt-1 flex items-center justify-center">
                           <div
                             className={`w-3 h-3 rounded-full ${
-                              selectedContactCard.isActive
+                              isActive
                                 ? "bg-green-500"
                                 : "bg-red-500"
                             }`}
                           />
                         </div>
                         <div className="">
-                          <div className="flex gap-4">
-                            <h4 className="font-medium text-gray-900 mb-2">
+                          <div className="flex gap-2">
+                            <h4 className="font-medium text-gray-900 ">
                               Status
                             </h4>
-                            <label className="inline-flex items-center cursor-pointer relative self-end">
+                            {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                               <input
                                 type="checkbox"
                                 checked={isActive}
@@ -773,12 +760,29 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                                 className="sr-only peer"
                               />
                               <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                              {/* Adjusted size and colors */}
                               <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                              {/* Adjusted size and position */}
-                            </label>
+                            </label> */}
+                            <ToggleButton
+                            checked={isActive}
+                            name="isActive"
+                            onToggle={
+                              userHasAccessToUpdateAccount
+                                    ? () => {
+                                        handleActiveStatusChange(
+                                          selectedContactCard
+                                        );
+                                      }
+                                    : () => {
+                                        toast.error(
+                                          MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                                            .DENIED_UPDATE_ACCESS
+                                        );
+                                      }
+                            }
+                            />
 
-                            <span className="mt-3 text-sm font-medium text-gray-900">
+
+                            <span className="mt-1 caption-custom">
                               {selectedContactCard.isActive
                                 ? "Active"
                                 : "Inactive"}

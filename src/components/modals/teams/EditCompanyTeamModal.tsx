@@ -24,6 +24,7 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -521,7 +522,7 @@ function EditCompanyTeamModal({
                       </div>
                     )}
                   </label>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -532,7 +533,12 @@ function EditCompanyTeamModal({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={isTeamActive}
+                  name="isActive"
+                  onToggle={handleComapnyTeamToggle}
+                  />
                 </div>
               </div>
 

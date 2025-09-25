@@ -21,6 +21,7 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { SIZE } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
 
 function GetCompanyUsersList({
   users,
@@ -95,9 +96,9 @@ function GetCompanyUsersList({
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
-        <div className="sticky z-10 top-9 py-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+        <div className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
           <div className="flex  gap-2">
-            {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
+            {!isSmallScreen && <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
 
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">Company Users</span>
@@ -122,7 +123,7 @@ function GetCompanyUsersList({
                 <div className="flex mx-3">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="mt-2" />
+                      <Calendar className="input-label-custom mt-1" />
                     </div>
 
                     <DateRangeFilterDropdown

@@ -19,6 +19,8 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../constants/Messages";
+import COLORS from "../../../constants/Colors";
+import { Save } from "lucide-react";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -373,10 +375,14 @@ const LeadDetails = ({
           <span className="table-header-custom">Details</span>
           {showSaveLeadButton && (
             <button
-              className="text-xs text-white mb-0 px-2  rounded-sm bg-blue-600  hover:bg-blue-700"
+              className={`caption-custom white-text mb-0 px-2 rounded-sm ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
               onClick={handleSave}
             >
-              Save
+              
+              <div className="flex items-center gap-0.5">
+                <Save className="w-3 h-3 -mt-0.5"/>
+                Save
+              </div>
             </button>
           )}
         </div>

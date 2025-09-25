@@ -43,6 +43,7 @@ import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
 
 function EditCompanyProductModal({
   isOpen,
@@ -558,7 +559,7 @@ function EditCompanyProductModal({
                       </div>
                     )}
                   </label>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -569,7 +570,12 @@ function EditCompanyProductModal({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={productIsActive}
+                      name="isActive"
+                      onToggle={handleProductToggle}
+                  />
                 </div>
               </div>
 
