@@ -156,9 +156,7 @@ function LeadManagementList({
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
-              </>
-            )
-          }
+              
 
           {isLargeScreen && (
             <>
