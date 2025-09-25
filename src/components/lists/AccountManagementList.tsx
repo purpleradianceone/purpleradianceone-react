@@ -125,6 +125,7 @@ function AccountManagementList({
                 onEndDateChange={onEndDateChange}
               />
             </div>
+            </div>
 
             {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
