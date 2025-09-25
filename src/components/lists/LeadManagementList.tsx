@@ -151,10 +151,14 @@ function LeadManagementList({
           <div className="flex gap-2">
             {!isSmallScreen && <Handshake className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
 
+
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
+              </>
+            )
+          }
 
           {isLargeScreen && (
             <>
