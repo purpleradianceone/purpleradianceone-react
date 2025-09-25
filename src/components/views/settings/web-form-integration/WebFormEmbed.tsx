@@ -92,7 +92,6 @@
 //   return;
 //  }
 
-
 //     const refreshCompanySecretPostData = {
 //       company_id: loginStatus.companyId,
 //       id: getId(),
@@ -276,7 +275,7 @@
 // export default WebFormEmbed;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Check, Copy, RefreshCcw } from "lucide-react";
+import { Check, Copy, Info, RefreshCcw } from "lucide-react";
 import { useState } from "react";
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanySecret from "../../../../@types/settings/CompanySecret";
@@ -364,13 +363,16 @@ function WebFormEmbed({
         });
     </script>
 </body>
-</html>`
+</html>`,
     },
     {
       id: "react",
       name: "React",
       language: "jsx",
-      getCode: (iframeCode, integrationFor) => `import React, { useEffect } from 'react';
+      getCode: (
+        iframeCode,
+        integrationFor
+      ) => `import React, { useEffect } from 'react';
 
 function ContactForm() {
     useEffect(() => {
@@ -390,7 +392,9 @@ function ContactForm() {
 
     return (
         <div className="contact-form-container">
-            <h2>Contact Form - ${integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)}</h2>
+            <h2>Contact Form - ${
+              integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)
+            }</h2>
             <div dangerouslySetInnerHTML={{
                 __html: \`${iframeCode}\`
             }} />
@@ -398,7 +402,7 @@ function ContactForm() {
     );
 }
 
-export default ContactForm;`
+export default ContactForm;`,
     },
     {
       id: "vue",
@@ -406,7 +410,9 @@ export default ContactForm;`
       language: "vue",
       getCode: (iframeCode, integrationFor) => `<template>
   <div class="contact-form-container">
-    <h2>Contact Form - ${integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)}</h2>
+    <h2>Contact Form - ${
+      integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)
+    }</h2>
     <div v-html="iframeCode"></div>
   </div>
 </template>
@@ -439,20 +445,25 @@ export default {
     };
   }
 };
-</script>`
+</script>`,
     },
     {
       id: "angular",
       name: "Angular",
       language: "typescript",
-      getCode: (iframeCode, integrationFor) => `import { Component, OnInit } from '@angular/core';
+      getCode: (
+        iframeCode,
+        integrationFor
+      ) => `import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-contact-form',
   template: \`
     <div class="contact-form-container">
-      <h2>Contact Form - ${integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)}</h2>
+      <h2>Contact Form - ${
+        integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)
+      }</h2>
       <div [innerHTML]="safeIframeCode"></div>
     </div>
   \`
@@ -481,7 +492,7 @@ export class ContactFormComponent implements OnInit {
       }
     }, 100);
   }
-}`
+}`,
     },
     {
       id: "svelte",
@@ -509,7 +520,9 @@ export class ContactFormComponent implements OnInit {
 </script>
 
 <div class="contact-form-container">
-  <h2>Contact Form - ${integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)}</h2>
+  <h2>Contact Form - ${
+    integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)
+  }</h2>
   {@html iframeCode}
 </div>
 
@@ -517,7 +530,7 @@ export class ContactFormComponent implements OnInit {
   .contact-form-container {
     padding: 2rem;
   }
-</style>`
+</style>`,
     },
     {
       id: "nextjs",
@@ -545,7 +558,9 @@ export default function ContactForm() {
 
   return (
     <div className="contact-form-container">
-      <h2>Contact Form - ${integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)}</h2>
+      <h2>Contact Form - ${
+        integrationFor.charAt(0).toUpperCase() + integrationFor.slice(1)
+      }</h2>
       <div
         dangerouslySetInnerHTML={{
           __html: \`${iframeCode}\`
@@ -553,8 +568,8 @@ export default function ContactForm() {
       />
     </div>
   );
-}`
-    }
+}`,
+    },
   ];
 
   const copyToClipboard = (code: string, tabId: string) => {
@@ -623,7 +638,6 @@ export default function ContactForm() {
     }
   };
 
-
   const refreshCompanySecret = async () => {
     if (!userHasAccessToUpdateSettingGeneral) {
       toast.error(MESSAGE.ERROR.NOT_ATHORISED);
@@ -639,9 +653,13 @@ export default function ContactForm() {
     };
 
     try {
-      const response = await axios.post(POST_API.UPDATE_COMPANY_SECRET, refreshCompanySecretPostData,{
-        withCredentials : true
-      });
+      const response = await axios.post(
+        POST_API.UPDATE_COMPANY_SECRET,
+        refreshCompanySecretPostData,
+        {
+          withCredentials: true,
+        }
+      );
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
           toast.success(response.data.message);
@@ -654,7 +672,9 @@ export default function ContactForm() {
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({callFunction : refreshCompanySecret});
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: refreshCompanySecret,
+        });
         if (refreshTokenStatus) {
           refreshCompanySecret();
         }
@@ -662,13 +682,11 @@ export default function ContactForm() {
     }
   };
 
-  
-
   return (
     <div className="p-8 max-w-full mx-auto min-h-full bg-white rounded-xl shadow-lg border border-gray-200 relative overflow-y-auto">
       {comingSoon && (
         <div className="absolute inset-0 bg-gray-200 bg-opacity-75 flex pt-16 justify-center z-10 rounded-xl">
-          <p className="text-green-600 text-3xl font-bold hover:text-green-700">
+          <p className="main-title-custom-green hover:text-green-700">
             Coming Soon!
           </p>
         </div>
@@ -676,11 +694,21 @@ export default function ContactForm() {
 
       <div className={`${comingSoon ? "opacity-95 pointer-events-none" : ""}`}>
         <div className="flex items-center justify-between">
-          <span title={`last updated on : ${getUpdatedOn()}`} className="font-normal text-[11px]">last updated on : {getUpdatedOn()}</span>
-          <span title={`last updated on : ${getUpdatedBy()}`} className="font-normal text-[11px]">last updated by : {getUpdatedBy()}</span>
+          <span
+            title={`last updated on : ${getUpdatedOn()}`}
+            className="caption-custom"
+          >
+            last updated on : {getUpdatedOn()}
+          </span>
+          <span
+            title={`last updated on : ${getUpdatedBy()}`}
+            className="caption-custom"
+          >
+            last updated by : {getUpdatedBy()}
+          </span>
         </div>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-bold text-center text-gray-800">
+          <h2 className="text-center section-header-custom ml-20">
             Integrate Your Contact Form For
             {integrationFor === "lead"
               ? " Leads"
@@ -693,8 +721,8 @@ export default function ContactForm() {
             onClick={refreshCompanySecret}
             className={`p-2 rounded-full transition-all duration-200 ${
               refresh
-                ? "text-green-600 bg-green-100 scale-110"
-                : "text-blue-600 hover:bg-blue-100 hover:scale-110"
+                ? "caption-custom-active bg-green-100 scale-110"
+                : "caption-custom-blue hover:bg-blue-100 hover:scale-110"
             } focus:outline-none focus:ring-2 focus:ring-blue-300`}
           >
             {refresh ? (
@@ -705,7 +733,7 @@ export default function ContactForm() {
           </button>
         </div>
 
-        <p className="mb-2 text-gray-600 leading-relaxed text-center text-base">
+        <p className="mb-2 input-label-custom leading-relaxed text-center">
           Choose your frontend framework and copy the integration code
         </p>
 
@@ -715,15 +743,15 @@ export default function ContactForm() {
               <button
                 key={framework.id}
                 onClick={() => setActiveTab(framework.id)}
-                className={`relative px-2 py-1 text-xs font-medium rounded-t-lg transition-all duration-200 ${
+                className={`relative px-2 py-1  rounded-t-lg transition-all duration-200 ${
                   activeTab === framework.id
-                    ? "text-blue-600 bg-blue-50 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    ? "caption-custom-teal bg-blue-50 border-b-1 border-teal-400"
+                    : "caption-custom hover:text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {framework.name}
                 {activeTab === framework.id && (
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full" />
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-400 rounded-full" />
                 )}
               </button>
             ))}
@@ -735,8 +763,8 @@ export default function ContactForm() {
             <div
               key={framework.id}
               className={`transition-all duration-300 ${
-                activeTab === framework.id 
-                  ? "opacity-100 scale-100" 
+                activeTab === framework.id
+                  ? "opacity-100 scale-100"
                   : "opacity-0 scale-95 absolute pointer-events-none"
               }`}
             >
@@ -749,17 +777,22 @@ export default function ContactForm() {
                         <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-700">
+                      <span className="input-label-custom">
                         {framework.name} Integration
                       </span>
                     </div>
                     <button
                       title={`Copy ${framework.name} Code`}
-                      onClick={() => copyToClipboard(framework.getCode(getIframeCode(), integrationFor), framework.id)}
+                      onClick={() =>
+                        copyToClipboard(
+                          framework.getCode(getIframeCode(), integrationFor),
+                          framework.id
+                        )
+                      }
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         copied === framework.id
-                          ? "text-green-600 bg-green-100 scale-110"
-                          : "text-blue-600 hover:bg-blue-100 hover:scale-110"
+                          ? "caption-custom-active bg-green-100 scale-110"
+                          : "caption-custom-blue hover:bg-blue-100 hover:scale-110"
                       } focus:outline-none focus:ring-2 focus:ring-blue-300`}
                     >
                       {copied === framework.id ? (
@@ -770,10 +803,9 @@ export default function ContactForm() {
                     </button>
                   </div>
 
-
-                  <div className="p-3">
-                    <pre className="overflow-x-auto text-xs leading-relaxed">
-                      <code className="language-javascript text-gray-800 whitespace-pre-wrap">
+                  <div className="p-3 bg-white">
+                    <pre className="overflow-x-auto  leading-relaxed">
+                      <code className="language-javascript caption-custom-black whitespace-pre-wrap">
                         {framework.getCode(getIframeCode(), integrationFor)}
                       </code>
                     </pre>
@@ -785,41 +817,68 @@ export default function ContactForm() {
         </div>
 
         <div className="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-200">
-          <h3 className="text-base font-semibold text-blue-800 mb-1">Implementation Steps</h3>
-          <ol className="list-decimal list-inside space-y-1 text-xs text-gray-700">
+          <h3 className="input-label-custom-blue mb-1">
+            Implementation Steps
+          </h3>
+          <ol className="list-decimal list-inside space-y-1 caption-custom">
             <li>Copy the code for your chosen frontend framework</li>
             <li>Paste the code into your project</li>
             <li>Ensure your website uses HTTPS for secure form submissions</li>
             <li>Test the form integration thoroughly</li>
-            <li>Customize colors by appending query parameters to the iframe URL</li>
+            <li>
+              Customize colors by appending query parameters to the iframe URL
+            </li>
           </ol>
         </div>
 
         <div className="mt-3 bg-amber-50 rounded-lg p-3 border border-amber-200">
-          <h3 className="text-base font-semibold text-amber-800 mb-1">Color Customization</h3>
-          <p className="text-gray-700 mb-1 text-sm">
-            Customize the form's appearance by adding these query parameters to the iframe URL:
+          <h3 className="input-label-custom-orange mb-1">
+            Color Customization
+          </h3>
+          <p className="caption-custom">
+            Customize the form's appearance by adding these query parameters to
+            the iframe URL:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 caption-custom">
             <div className="space-y-1">
-              <div><span className="font-semibold">color</span> - Background color</div>
-              <div><span className="font-semibold">header-color</span> - Heading text color</div>
-              <div><span className="font-semibold">label-color</span> - Labels text color</div>
+              <div>
+                <span className="input-label-custom">color</span> - Background color
+              </div>
+              <div>
+                <span className="input-label-custom">header-color</span> - Heading
+                text color
+              </div>
+              <div>
+                <span className="input-label-custom">label-color</span> - Labels text
+                color
+              </div>
             </div>
             <div className="space-y-1">
-              <div><span className="font-semibold">button-color</span> - Button background</div>
-              <div><span className="font-semibold">button-text-color</span> - Button text</div>
+              <div>
+                <span className="input-label-custom">button-color</span> - Button
+                background
+              </div>
+              <div>
+                <span className="input-label-custom">button-text-color</span> -
+                Button text
+              </div>
             </div>
           </div>
-          <p className="text-xs text-gray-600 mt-1">
-            <strong>Note:</strong> Use hex codes without the # symbol (e.g., ffffff for white)
+          <p className="caption-custom mt-1">
+            <strong className="caption-custom-blue">Note :</strong> Use hex codes without the # symbol (e.g.,
+            ffffff for white)
           </p>
         </div>
 
         {/* Security Notes */}
         <div className="mt-6 bg-red-50 rounded-lg p-3 border border-red-200">
-          <h3 className="text-base font-semibold text-red-800 mb-1">⚠️ Important Security Notes</h3>
-          <ul className="list-disc list-inside space-y-1 text-xs text-gray-700">
+          <h3 className="input-label-custom-inactive mb-1">
+             <span className="flex gap-2">
+              <Info className="w-4 h-4 mt-0.5"/>
+              <span>Important Security Notes</span>
+             </span>
+          </h3>
+          <ul className="list-disc list-inside space-y-1 caption-custom">
             <li>Always use HTTPS for secure form submissions</li>
             <li>Never share your Client ID with unauthorized individuals</li>
             <li>Test the form thoroughly before going live</li>

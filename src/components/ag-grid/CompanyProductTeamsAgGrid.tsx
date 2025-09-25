@@ -10,6 +10,7 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import CompanyProductTeamsAgGridProps from "../../@types/ag-grid/CompanyProductTeamsAgGridProps";
+import ToggleButton from "../ui/ToggleButton";
 
 function CompanyProductTeamsAgGrid({
   companyProductTeams,
@@ -17,9 +18,8 @@ function CompanyProductTeamsAgGrid({
   handleViewPortChanged,
   onGridReady,
 }: CompanyProductTeamsAgGridProps) {
-
-  const {userHasAccessToUpdateProductTeam} = useUserAccessModules();
-  const {loginStatus} = useLoggedInUserContext();
+  const { userHasAccessToUpdateProductTeam } = useUserAccessModules();
+  const { loginStatus } = useLoggedInUserContext();
 
   const companyProductTeamsColDefs = useMemo<ColDef[]>(
     () => [
@@ -47,27 +47,33 @@ function CompanyProductTeamsAgGrid({
             params.data.isActive
           );
 
-          const handleUpdateCompanyProductTeamToggle = async (event :React.ChangeEvent<HTMLInputElement>) => {
-            if(userHasAccessToUpdateProductTeam){
+          const handleUpdateCompanyProductTeamToggle = async (
+            event: React.ChangeEvent<HTMLInputElement>
+          ) => {
+            if (userHasAccessToUpdateProductTeam) {
               const updateCompanyProductTeamPostData = {
-                company_id : loginStatus.companyId,
-                id :parseInt(event.currentTarget.id),
-                isactive : !isActive,
-                updatedby : loginStatus.id
-              }
-              await axios.post(POST_API.UPDATE_COMPANY_PRODUCT_TEAM,updateCompanyProductTeamPostData,{
-                withCredentials:true
-              })
-              .then((response) => {
-                if(response.data.status){
-                  setIsActive(!isActive)
-                  params.data.isActive = !isActive;
-                  handleCompanyProductTeamUpdate(response.data.message)
-              }
-              })
-
+                company_id: loginStatus.companyId,
+                id: parseInt(event.currentTarget.id),
+                isactive: !isActive,
+                updatedby: loginStatus.id,
+              };
+              await axios
+                .post(
+                  POST_API.UPDATE_COMPANY_PRODUCT_TEAM,
+                  updateCompanyProductTeamPostData,
+                  {
+                    withCredentials: true,
+                  }
+                )
+                .then((response) => {
+                  if (response.data.status) {
+                    setIsActive(!isActive);
+                    params.data.isActive = !isActive;
+                    handleCompanyProductTeamUpdate(response.data.message);
+                  }
+                });
             }
-          }
+          };
           return (
             <div className="flex flex-col items-center mt-1">
               {/* <button
@@ -87,7 +93,7 @@ function CompanyProductTeamsAgGrid({
                   }`}
                 ></div>
               </button> */}
-              <label className="inline-flex items-center cursor-pointer relative">
+              {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -100,7 +106,14 @@ function CompanyProductTeamsAgGrid({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+              <ToggleButton
+                checked={isActive}
+                name={params.data.id.toString()}
+                onToggle={(e) => {
+                  handleUpdateCompanyProductTeamToggle(e);
+                }}
+              />
             </div>
           );
         },
@@ -121,19 +134,17 @@ function CompanyProductTeamsAgGrid({
 
   return (
     <div className="ag-theme-balham w-full h-full mt-2">
-<AgGridReact
-    rowData={companyProductTeams}
-      columnDefs={companyProductTeamsColDefs}
-      defaultColDef={defaultColDef}
-      modules={[AllCommunityModule]}
-      overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-      theme={themeAlpine}
-      onViewportChanged={handleViewPortChanged}
-      onGridReady={onGridReady}
-      
-    />
+      <AgGridReact
+        rowData={companyProductTeams}
+        columnDefs={companyProductTeamsColDefs}
+        defaultColDef={defaultColDef}
+        modules={[AllCommunityModule]}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        theme={themeAlpine}
+        onViewportChanged={handleViewPortChanged}
+        onGridReady={onGridReady}
+      />
     </div>
-    
   );
 }
 

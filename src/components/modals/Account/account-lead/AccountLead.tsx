@@ -11,6 +11,7 @@ import CreateAccountLead from "./CreateAccountLead";
 import AccountLeadType from "../../../../@types/account/AccountLead";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import toast from "react-hot-toast";
+import ToggleButton from "../../../ui/ToggleButton";
 import ROUTES_URL from "../../../../constants/Routes";
 import qs from "query-string";
 import { useNavigate } from "react-router-dom";
@@ -222,24 +223,14 @@ return (
               </div>
 
               {/* Toggle */}
-              <label onClick={(e)=>{
-                  e.stopPropagation();
-              }}     className="inline-flex items-center cursor-pointer relative">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
+              <ToggleButton
                   checked={item.isActive}
-                  id={item.id.toString()}
-                  onChange={(e) => {
+                  name={item.id.toString()}
+                  onToggle={(e) => {
                     e.preventDefault();
-                    // e.stopPropagation();
                     handleAccountLeadStatusChange(item);
                   }}
-                  readOnly
                 />
-                <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-              </label>
             </div>
           </div>
         ))}

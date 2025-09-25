@@ -15,6 +15,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
 
 export type TemplateListProps = {
   templates: EmailTemplate[];
@@ -183,7 +184,7 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                     <XCircle className="text-gray-400" size={16} />
                   )}
                   <strong className="input-label-custom">Active: </strong>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -221,7 +222,40 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={template.isactive}
+                  name={`active-${template.id}`}
+                  onToggle={() => {
+                        if (!template.is_master) {
+                          if (!template.is_default) {
+                            if (
+                              userHasAccessToUpdateEmailTemplateSetting &&
+                              !template.is_master
+                            ) {
+                              template.isactive = !template.isactive;
+                              handleDefaultToggle(template);
+                            } else {
+                              if (template.is_master) {
+                                toast.error(
+                                  "Can't change active status of master template."
+                                );
+                              } else {
+                                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              }
+                            }
+                          } else {
+                            toast.error(
+                              "To make this inactive, please set another template as default first."
+                            );
+                          }
+                        } else {
+                          toast.error(
+                            "The master template cannot be deactivated."
+                          );
+                        }
+                      }}
+                  />
                 </span>
 
                 {/* Default */}
@@ -232,7 +266,7 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                     <XCircle className="text-gray-400" size={16} />
                   )}
                   <strong className="input-label-custom">Default: </strong>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -261,7 +295,31 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={template.is_default}
+                  name={`default-${template.id}`}
+                  onToggle={() => {
+                        if (template.isactive) {
+                          if (!template.is_default) {
+                            if (userHasAccessToUpdateEmailTemplateSetting) {
+                              template.is_default = !template.is_default;
+                              handleDefaultToggle(template);
+                            } else {
+                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            }
+                          } else {
+                            toast.error(
+                              "Please make another template the default to remove this one as default."
+                            );
+                          }
+                        } else {
+                          toast.error(
+                            "Set this template as active to make it your default email template."
+                          );
+                        }
+                      }}
+                  />
                 </span>
 
                 {/* Master (readonly toggle → disabled) */}

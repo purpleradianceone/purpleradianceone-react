@@ -1,5 +1,6 @@
 import {  LucideIcon, X } from "lucide-react"
 import { SIZE } from "../../constants/AppConstants"
+import COLORS from "../../constants/Colors";
 
 const FormHeader =({
     onClose,
@@ -20,7 +21,7 @@ const FormHeader =({
   <div className="flex justify-between items-center  border-b pb-1">
     {/* Left side */}
     <div className="flex items-center gap-3">
-      <Icon className="text-blue-500 mt-1" size={SIZE.TWENTY} />
+      <Icon className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
 
       <div>
         <h2 className="table-header-custom">

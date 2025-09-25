@@ -766,13 +766,9 @@ const MeetingScheduler = () => {
         </div>
         <div className="mb-1">
           <div
-            className={
-              isModalForLead
-                ? "grid grid-cols-8 gap-2"
-                : "grid grid-cols-7 gap-2"
-            }
+            className="grid grid-cols-9 gap-2"
           >
-            <div className="col-span-5">
+            <div className="col-span-8">
               <FormInput
                 type="email"
                 value={newAttendeeEmail === "" ? "" : newAttendeeEmail}
@@ -783,37 +779,6 @@ const MeetingScheduler = () => {
                 logo={UserPlus}
               />
             </div>
-            <div className="col-span-1 mt-7">
-              <Button
-              type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsAddCompanyUserEmailAttedeesModalOpen(true);
-                }}
-              >
-                <div className="flex gap-0.5">
-                      <UserPlus className="h-4 w-4 mt-0.5" />
-                    <span>Users</span>
-                    </div>
-              </Button>
-            </div>
-            {isModalForLead && (
-              <div className="col-span-1 mt-7">
-                <Button
-                type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsAddCompanyLeadContactModalOpen(true);
-                  }}
-                >
-                  {/* <Contact2 className="h-6 w-4" /> */}
-                  <div className="flex gap-0.5">
-                      <Contact2 className="h-4 w-4 mt-0.5" />
-                    <span>Contact</span>
-                    </div>
-                </Button>
-              </div>
-            )}
             <div className="col-span-1 mt-7">
               <Button
               type="submit"
@@ -830,6 +795,54 @@ const MeetingScheduler = () => {
                     </div>
               </Button>
             </div>
+           
+            
+          </div>
+          <div className={isModalForLead 
+          ? "grid grid-cols-9 gap-2 mt-1"
+          : "grid grid-cols-9 gap-2 mt-1"
+        }>
+            <div className={isModalForLead 
+            ? "col-span-7 input-label-custom mt-2"
+            : "col-span-8 input-label-custom mt-2"
+          }>
+              <span className="flex gap-2 items-start">
+                <UserPlus size={14} className="inline mt-0.5 text-blue-500"/>
+                <span>{isModalForLead ? "Select company users and lead contacts to be added into the meeting" : "Select company users to be added into the meeting"}</span>
+              </span>
+            </div>
+             <div className="col-span-1 max-w-24">
+              <Button
+              type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsAddCompanyUserEmailAttedeesModalOpen(true);
+                }}
+              >
+                <div className="flex gap-0.5">
+                      <UserPlus className="h-4 w-4 mt-0.5" />
+                    <span>Users</span>
+                    </div>
+              </Button>
+            </div>
+            {isModalForLead && (
+              <div className="col-span-1 max-w-24">
+                <Button
+                type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAddCompanyLeadContactModalOpen(true);
+                  }}
+                >
+                  {/* <Contact2 className="h-6 w-4" /> */}
+                  <div className="flex gap-0.5">
+                      <Contact2 className="h-4 w-4 mt-0.5" />
+                    <span>Contact</span>
+                    </div>
+                </Button>
+              </div>
+            )}
+          
           </div>
           {attendees.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">

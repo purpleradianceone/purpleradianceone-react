@@ -14,6 +14,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import ToggleButton from "../../../ui/ToggleButton";
 
 function LeadSettingForLead({
   isOpen,
@@ -206,7 +207,7 @@ function LeadSettingForLead({
 
                      
                         {/* toggel button */}
-                      <label className="inline-flex items-center cursor-pointer relative self-end">
+                      {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                         <input
                           type="checkbox"
                           className="sr-only peer"
@@ -215,10 +216,13 @@ function LeadSettingForLead({
                           onChange={handleLeadSettingCheckBoxChange}
                         />
                         <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                        {/* Adjusted size and colors */}
                         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                        {/* Adjusted size and position */}
-                      </label>
+                      </label> */}
+                      <ToggleButton
+                      checked={per.isActive}
+                      name={per.id.toString()}
+                      onToggle={handleLeadSettingCheckBoxChange}
+                      />
                     </div>
                   ))
                 )}

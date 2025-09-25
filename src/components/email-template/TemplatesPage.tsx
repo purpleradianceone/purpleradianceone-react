@@ -27,6 +27,7 @@ import { EmailTypeDropdown } from "./email-template-custom/EmailTypeDropdown";
 import { EmailTemplateList } from "./email-template-custom/TemplateList";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
+import COLORS from "../../constants/Colors";
 
 export type TemplateType = {
   id: number;
@@ -323,12 +324,12 @@ export const TemplatesPage: React.FC = () => {
       }  gap-1 h-screen flex flex-col `}
     >
       {/* Header */}
-      <div className="sticky z-10 top-12 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full mb-2">
-        <div className="flex  justify-between w-full h-9 items-center">
+      <div className={`sticky z-10 top-12 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm w-full mb-2`}>
+        <div className="flex  justify-between w-full items-center">
           <div className="flex gap-2">
-            {<LayoutDashboard className="w-7 h-7 text-blue-600 " />}
+            {<LayoutDashboard className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
 
-            <span className="section-header-custom">Email Templates</span>
+            <span className="section-header-custom">Templates</span>
           </div>
           <div>
             <EmailTypeDropdown
@@ -340,7 +341,7 @@ export const TemplatesPage: React.FC = () => {
 
           <div className="flex">
             {/* search box flex div */}
-            <div className="relative flex items-start w-80 transition-colors hover:border-gray-400">
+            <div className="relative flex items-start w-52 transition-colors hover:border-gray-400">
               <div className="grid w-full">
                 <SearchInput
                   onChange={(e) => {
@@ -349,11 +350,13 @@ export const TemplatesPage: React.FC = () => {
                 ></SearchInput>
               </div>
             </div>
+          </div>
 
-            {/* Date FIlters Dropdown */}
+          {/* Date FIlters Dropdown */}
+          <div className={`flex gap-0.5 flex-wrap ${isCustomDateOptionSelected ? 'max-h-14' : 'max-h-9'}`}>
             <div className="flex mx-1">
               <div className="flex">
-                <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
+                <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
                   <Calendar className="mt-1 input-label-custom" />
                 </div>
                 <DateRangeFilterDropdown
@@ -362,34 +365,34 @@ export const TemplatesPage: React.FC = () => {
                 ></DateRangeFilterDropdown>
               </div>
             </div>
+            {/* Custom Date Picker Div Flex Box*/}
+
+            <div
+              style={
+                isCustomDateOptionSelected
+                  ? { visibility: "visible" }
+                  : { visibility: "hidden" }
+              }
+            >
+              <DateRangePicker
+                onStartDateChange={handleStartDateChange}
+                onEndDateChange={handleEndDateChange}
+              />
+            </div>
           </div>
-          {/* Custom Date Picker Div Flex Box*/}
-          <div
-            style={
-              isCustomDateOptionSelected
-                ? { visibility: "visible" }
-                : { visibility: "hidden" }
-            }
-          >
-            <DateRangePicker
-              onStartDateChange={handleStartDateChange}
-              onEndDateChange={handleEndDateChange}
-            />
-          </div>
+
           <div className="flex max-w-60 min-h-7 h-8">
             <Button
-            type="submit"
+              type="submit"
               disabled={!userHasAccessToAddEmailTemplateSetting}
-              onClick={(e) =>{
+              onClick={(e) => {
                 e.preventDefault();
-                 if(userHasAccessToAddEmailTemplateSetting){
-                    setShowModal(true)
-                 }
-                 else{
-                    toast.error(MESSAGE.ERROR.NOT_ATHORISED)
-                 }
-              }
-              }
+                if (userHasAccessToAddEmailTemplateSetting) {
+                  setShowModal(true);
+                } else {
+                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                }
+              }}
             >
               <div className="flex items-center justify-center gap-0.5">
                 <LucidePlus size={SIZE.SIXTEEN} />

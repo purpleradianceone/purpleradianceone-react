@@ -454,6 +454,7 @@ function CreateLeadTaskModal({
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
                 }}
+                 maxLength={500}
               ></TextAreaInput>
             </div>
 
@@ -498,11 +499,12 @@ function CreateLeadTaskModal({
               <TextAreaInput
                 logo={FileText}
                 cols={5}
-                rows={5}
+                rows={4}
                 label="Description"
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
           </div>

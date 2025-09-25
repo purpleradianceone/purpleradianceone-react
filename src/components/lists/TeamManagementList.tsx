@@ -16,6 +16,7 @@ import Pagination from "../ag-grid/Pagination";
 import EditCompanyTeamModal from "../modals/teams/EditCompanyTeamModal";
 import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
 import { useUserPreference } from "../../context/user/UserPreference";
+import COLORS from "../../constants/Colors";
 
 function TeamManagementList({
   companyTeamList,
@@ -65,12 +66,12 @@ function TeamManagementList({
         userPreference.isLeftMenu ? "pl-5" : "pl-1"
       } pr-1 gap-1`}
     >
-      <div className="sticky z-10 top-9 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+      <div className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full`}>
         <div className="flex  gap-2">
-          {!isSmallScreen && <Network className="w-6 h-6 text-blue-600" />}
+          {!isSmallScreen && <Network className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-1`} />}
 
           {(isMediumScreen || isLargeScreen) && (
-            <span className="section-header-custom">Team Management</span>
+            <span className="section-header-custom">Teams</span>
           )}
         </div>
 
@@ -92,7 +93,7 @@ function TeamManagementList({
               <div className="flex mx-3">
                 <div className="flex">
                   <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                    <Calendar className="mt-2" />
+                    <Calendar className="input-label-custom" />
                   </div>
 
                   <DateRangeFilterDropdown

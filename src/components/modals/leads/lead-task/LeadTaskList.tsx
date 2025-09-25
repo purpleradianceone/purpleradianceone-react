@@ -9,8 +9,6 @@ import {
   Clipboard,
   History,
   LucideLaptop,
-  CheckCircle2,
-  XCircle,
 } from "lucide-react"; // Corrected import for Lucide React icons
 import CustomDropdown from "../CustomDropdown";
 import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
@@ -33,6 +31,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import EditMeetingDetailsModal from "../../meetings/EditMeetingDetailsModal";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import MeetingPlatforms from "../../../../@types/meeting/MeetingPlatform";
+import StatusChip from "../../../ui/StatusChip";
 
 function LeadTaskList({
   leadTaskPriority,
@@ -599,28 +598,9 @@ function LeadTaskList({
                   
                   {/*right corner*/}
                   <div className="absolute bottom-2  right-2 flex items-center space-x-1">
-                    <button
-                          type="button"
-                          className="caption-custom px-2 py-1 min-w-20  hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-                        >
-                          
-                    {activity.isActive ? 
-                    <span className="caption-custom-active">
-                      <span className="flex gap-1">
-                        <CheckCircle2 className="caption-custom-active w-4 h-4"/>
-                        Active
-                      </span>
-                    </span>
-                    : <span className="caption-custom-inactive">
-                      <span className="flex gap-1">
-                        <XCircle className="caption-custom-inactive w-4 h-4"/>
-                        Active
-                      </span>
-                    </span>
-                    }
-                    </button>
-                    
-                   
+                   <StatusChip
+                   isActive={activity.isActive}
+                   />
                   </div>
                 </div>
               ))}

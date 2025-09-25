@@ -11,6 +11,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
 import { Save } from "lucide-react";
+import COLORS from "../../../constants/Colors";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -219,7 +220,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
           <button
             onClick={handleAddProductToLeadButtonClick}
-            className="border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 "
+            className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
           >
             +Add
           </button>
@@ -241,7 +242,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 );
               }
             }}
-            className="bg-blue-500 hover:bg-blue-600 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+            className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
           >
            +Add
           </button>

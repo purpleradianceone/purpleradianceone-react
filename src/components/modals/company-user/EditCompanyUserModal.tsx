@@ -18,6 +18,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
 function EditCompanyUserModal({
   isOpen,
   onClose,
@@ -257,7 +258,7 @@ function EditCompanyUserModal({
                     Status :
                   </label>
 
-                  <label className="inline-flex items-center cursor-pointer relative self-end">
+                  {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                     <input
                       type="checkbox"
                       id="isActive"
@@ -267,10 +268,13 @@ function EditCompanyUserModal({
                       className="sr-only peer"
                     />
                     <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                    {/* Adjusted size and colors */}
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                    {/* Adjusted size and position */}
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={userIsActive}
+                  name="isActive"
+                  onToggle={handleCompanyUserToggle}
+                  />
                 </div>
                 <FormInput
                   logo={Mail}

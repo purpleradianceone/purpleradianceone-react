@@ -10,6 +10,7 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferences";
 import toast from "react-hot-toast";
+import ToggleButton from "../../../ui/ToggleButton";
 
 // New, reusable card component for each company preference
 interface PreferenceCardProps {
@@ -35,7 +36,7 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
         </h3>
       </div>
 <p className="caption-custom m-0 p-0">{description}</p>
-      <label className="inline-flex items-center cursor-pointer relative self-end"> 
+      {/* <label className="inline-flex items-center cursor-pointer relative self-end"> 
         <input
           type="checkbox"
           className="sr-only peer"
@@ -45,7 +46,12 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
         />
         <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-      </label>
+      </label> */}
+      <ToggleButton
+      checked={checked}
+      name={name}
+      onToggle={onToggle}
+      />
     </div>
   );
 };
