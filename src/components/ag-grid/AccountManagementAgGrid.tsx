@@ -4,7 +4,7 @@ import Account from "../../@types/account/Account";
 import { useMemo, useRef } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
-import { CheckCircle2, XCircle } from "lucide-react";
+import StatusIndicator from "../ui/StatusIndicator";
 
 function AccountManagementAgGrid({
   accounts,
@@ -180,17 +180,7 @@ function AccountManagementAgGrid({
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              {params.value ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-green-600">Active</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-xs text-red-600">Inactive</span>
-                </>
-              )}
+             <StatusIndicator isActive={params.value}/>
             </div>
           );
         },

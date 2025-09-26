@@ -20,6 +20,7 @@ import useScreenSize from "../../../config/hooks/useScreenSize";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -125,13 +126,13 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       <div
         className={
           isSmallScreen
-            ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
-            : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-5"
+            ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+            : "fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5"
         }
       >
         <div className="flex min-h-screen items-center justify-center">
@@ -234,7 +235,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

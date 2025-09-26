@@ -3,13 +3,14 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import {  CheckCircle2, Edit, XCircle } from "lucide-react";
+import { Edit } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import TeamManagementAgGridProps from "../../@types/ag-grid/TeamManagementAgGridProps";
+import StatusChip from "../ui/StatusChip";
 
 function TeamManagementAgGrid({
   companyTeamList,
@@ -51,18 +52,21 @@ function TeamManagementAgGrid({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-1">
-              {params.value ? (
+            <div className="flex items-center">
+              {/* {params.value ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">Active</span>
+                  <CheckCircle2 className="w-4 h-4 caption-custom-active" />
+                  <span className="caption-custom-active">Active</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">Inactive</span>
+                  <XCircle className="w-4 h-4 caption-custom-inactive" />
+                  <span className="caption-custom-inactive">Inactive</span>
                 </>
-              )}
+              )} */}
+              <StatusChip
+              isActive={params.value}
+              />
             </div>
           );
         },

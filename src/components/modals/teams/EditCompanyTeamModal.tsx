@@ -25,6 +25,7 @@ import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -466,7 +467,7 @@ function EditCompanyTeamModal({
   },[companyTeam])
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -611,7 +612,8 @@ function EditCompanyTeamModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 export default EditCompanyTeamModal;

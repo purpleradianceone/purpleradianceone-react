@@ -6,11 +6,12 @@ import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import { CheckCircle2, Edit, Network, UserPlus, XCircle } from "lucide-react";
+import { Edit, Network, UserPlus } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import StatusIndicator from "../ui/StatusIndicator";
 
 function ProductsManagementGrid({
   products,
@@ -80,18 +81,8 @@ function ProductsManagementGrid({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-1">
-              {params.value ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-green-600">Active</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-xs text-red-600">Inactive</span>
-                </>
-              )}
+            <div className="flex items-center gap-1">
+              <StatusIndicator isActive={params.value}/>
             </div>
           );
         },

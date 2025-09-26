@@ -17,6 +17,7 @@ import axios from "axios";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 function CompanyProductUsersModal({
   isOpen,
   onClose,
@@ -350,7 +351,7 @@ function CompanyProductUsersModal({
   }, [isOpen, companyProductUserUpdateCount]);
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -412,7 +413,8 @@ function CompanyProductUsersModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

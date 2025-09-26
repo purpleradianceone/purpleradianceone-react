@@ -30,6 +30,7 @@ import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
 import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function AddTeamModal({
   isOpen,
@@ -328,7 +329,7 @@ function AddTeamModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -440,7 +441,8 @@ function AddTeamModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

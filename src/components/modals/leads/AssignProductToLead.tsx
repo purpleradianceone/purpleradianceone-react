@@ -18,6 +18,7 @@ import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssi
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import Button from "../../ui/Button";
+import { createPortal } from "react-dom";
 
 const AssignProductToLead = ({
   selectedLeadData,
@@ -127,7 +128,7 @@ const AssignProductToLead = ({
   }, [itemData]);
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div>
       <div
         className={`${
@@ -194,7 +195,8 @@ const AssignProductToLead = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
