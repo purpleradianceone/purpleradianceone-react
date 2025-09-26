@@ -26,6 +26,13 @@ type LeadImportDataType = {
     state_name : string,
     updatedby_name : string,
     updatedon : string,
-    website : string
+    website : string,
+    lead_interest : string,
+    lead_interest_id : number,
+    company_product_id : number,
+    company_product_name : string,
+    lead_created_on : string,
+    description : string,
+
 }
 export default LeadImportDataType;

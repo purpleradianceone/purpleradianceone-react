@@ -215,11 +215,11 @@ return (
             {/* Header */}
             <div className=" flex justify-between items-start">
               <div className="flex flex-col">
-                <h2 title={item.leadName || ""} className="input-label-custom ">
+                <h2 title={item.leadName || ""} className=" input-label-custom hover:text-blue-500 ">
                   {item.leadName && item.leadName.length>35  ? item.leadName.substring(0,34)+"..." : item.leadName || <><span className="text-xs italic">Name not given</span></>}
                 </h2>
-                <p title={item.leadEmail || ""} className="caption-custom">{item.leadEmail || <><span className="italic">email - not given</span></>}</p>
-                <p  title={item.leadMobileNumber || ""} className="caption-custom">{item.leadMobileNumber || <><span className="italic">mobile number - not given</span></>}</p>
+                <p title={item.leadEmail || ""} className="caption-custom hover:text-blue-500">{item.leadEmail || <><span className="italic">email - not given</span></>}</p>
+                <p  title={item.leadMobileNumber || ""} className="caption-custom hover:text-blue-500">{item.leadMobileNumber || <><span className="italic">mobile number - not given</span></>}</p>
               </div>
 
               {/* Toggle */}

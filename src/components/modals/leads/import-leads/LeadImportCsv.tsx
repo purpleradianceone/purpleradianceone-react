@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
@@ -17,6 +18,7 @@ import {
   Info,
   ArrowLeft,
 } from "lucide-react";
+// import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -36,6 +38,9 @@ import {
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
 import Button from "../../../ui/Button";
+import InterestType from "../../../../@types/lead-management/InterestType";
+import ApiError from "../../../../@types/error/ApiError";
+import { Product } from "../../../../@types/products/ProductsManagementProps";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -65,6 +70,9 @@ const ItemTypes = {
   CSV_STATUS_VALUE: "csv_status_value",
   CSV_SOURCE_VALUE: "csv_source_value",
   CSV_OWNER_VALUE: "csv_owner_value",
+  CSV_INTEREST_VALUE: "csv_interest_value",
+  CSV_PRODUCT_VALUE: "csv_product_value",
+
 };
 
 interface DragItem {
@@ -165,45 +173,6 @@ const DroppableCrmField: React.FC<{
         )}
       </div>
     </div>
-    // <div key={field.id} className="grid grid-cols-2 gap-2 items-start ">
-    //     <label
-    //       htmlFor={`map-${field.id}`}
-    //       className="text-sm font-medium text-gray-700 pt-2"
-    //     >
-    //       {field.label}
-    //       {field.required && <span className="text-red-500 ml-1">*</span>}
-    //     </label>
-
-    //     <div
-    //       ref={drop}
-    //       className={`min-h-[40px] border rounded-md p-2 flex flex-wrap gap-2 items-center transition-all
-    //   ${
-    //     isOver && canDrop
-    //       ? "border-blue-500 bg-blue-50 ring-2"
-    //       : "border-gray-300 bg-gray-50"
-    //   }
-    //   ${canDrop ? "border-dashed" : ""}`}
-    //     >
-    //       {mappedHeaders.length > 0 ? (
-    //         mappedHeaders.map((header) => (
-    //           <span
-    //             key={header}
-    //             className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium"
-    //           >
-    //             {header}
-    //             <XCircle
-    //               className="ml-1 w-4 h-4 cursor-pointer"
-    //               onClick={() => onRemoveMapping(field.id, header)}
-    //             />
-    //           </span>
-    //         ))
-    //       ) : (
-    //         <span className="text-gray-500 text-sm italic">
-    //           Drag column here
-    //         </span>
-    //       )}
-    //     </div>
-    //   </div>
   );
 };
 
@@ -211,7 +180,7 @@ const DroppableCrmField: React.FC<{
 interface ValueMappingCardProps<T extends MappableItem> {
   title: string;
   csvValues: string[];
-  crmData: T[] | PostDataTypeForLeadSourceAndStatusAndStates[] | null;
+  crmData: T[] | PostDataTypeForLeadSourceAndStatusAndStates[] |Product[] | null;
   mapping: ValueMapping;
   onDrop: (crmItem: T, csvValue: string) => void;
   onRemove: (crmItem: T) => void;
@@ -428,6 +397,9 @@ const LeadImportCsv = ({
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
   const leadSourceMappingRef = useRef<HTMLDivElement>(null);
   const leadOwnerMappingRef = useRef<HTMLDivElement>(null);
+    const productDataMappingRef = useRef<HTMLDivElement>(null);
+
+  const leadInterestTypeMappingRef = useRef<HTMLDivElement>(null);
 
   // Mappings
   const [fieldMappings, setFieldMappings] = useState<FieldMapping>({});
@@ -438,11 +410,20 @@ const LeadImportCsv = ({
     {}
   );
   const [ownerValueMapping, setOwnerValueMapping] = useState<ValueMapping>({});
+    const [productDataValueMapping, setProductDataValueMapping] = useState<ValueMapping>({});
+
+  const [InterestTypeValueMapping, setInterestTypeValueMapping] =
+    useState<ValueMapping>({});
 
   // Unique values from CSV
   const [csvUniqueStatuses, setCsvUniqueStatuses] = useState<string[]>([]);
   const [csvUniqueSources, setCsvUniqueSources] = useState<string[]>([]);
   const [csvUniqueOwners, setCsvUniqueOwners] = useState<string[]>([]);
+    const [csvUniqueProductData, setCsvUniqueProductData] = useState<string[]>([]);
+
+  const [csvUniqueInterestType, setCsvUniqueInterestType] = useState<string[]>(
+    []
+  );
 
   // Data from API
   const [leadStatus, setLeadStatus] = useState<
@@ -452,6 +433,13 @@ const LeadImportCsv = ({
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
   const [companyUsers, setCompanyUsers] = useState<CompanyUser[]>([]);
+  // Note : For getting the product data
+  const [productsData, setProductsData] = useState<Product[]>([]);
+  const [totalProductData, setTotalProductData] = useState<number>(0); // Total count for pagination
+  const [productDataCurrentPage, setProductDataCurrentPage] =
+    useState<number>(0);
+
+
   const [totalCompanyUsers, setTotalCompanyUsers] = useState<number>(0); // Total count for pagination
   const [companyUsersCurrentPage, setCompanyUsersCurrentPage] =
     useState<number>(0);
@@ -461,11 +449,15 @@ const LeadImportCsv = ({
     useState<boolean>(false);
   const [showLeadImportResultPopUp, setShowLeadImportResultPopUp] =
     useState<boolean>(false);
-  const [LeadImportReponse, setLeadImportResponse] =
+  const [LeadImportResponse, setLeadImportResponse] =
     useState<LeadImportResponse>({
       message: "",
       status: false,
     });
+
+  const [interestTypeData, setInterestTypeData] = React.useState<
+    InterestType[]
+  >([]);
 
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -507,7 +499,8 @@ const LeadImportCsv = ({
       { id: "name", label: "Full Name", required: false },
       { id: "email", label: "Email", required: false },
       { id: "mobilenumber", label: "Mobile Number", required: false },
-
+      { id: "description", label: "Description", required: false },
+      { id: "lead_interest_id", label: "Interest Type", required: false },
       { id: "job_title", label: "Job Title", required: false },
       { id: "industry_name", label: "Industry", required: false },
       { id: "country", label: "Country", required: false },
@@ -522,6 +515,8 @@ const LeadImportCsv = ({
       },
       { id: "leadSource", label: "Lead Source", required: false },
       { id: "address", label: "Address", required: false },
+      { id: "lead_created_on_string", label: "Created On", required: false },
+      { id: "company_product_id", label: "Product", required: false },
 
       { id: "leadOwner", label: "Lead Owner", required: false },
     ],
@@ -563,6 +558,122 @@ const LeadImportCsv = ({
     await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
   }, []);
 
+  // API call to get lead interest data
+  async function getLeadInterestData() {
+    try {
+      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
+        params: {
+          id: null,
+          name: null,
+          isActive: true,
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        setInterestTypeData(response.data);
+      }
+    } catch (error: any) {
+      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getLeadInterestData,
+        });
+        if (refreshTokenStatus) {
+          getLeadInterestData();
+        }
+      }
+    }
+  }
+  // Note : called the above function , will get the data once the component renders
+  useEffect(() => {
+    getLeadInterestData();
+  }, []);
+
+  // Note : api call to get company product
+  const fetchCompanyProducts = async ( 
+    searchParameter: string,
+    offset: number,
+    limit: number) => {
+    const getProductPostData = {
+      company_id: loginStatus.companyId,
+      id: null,
+      limit: limit,
+      offset: offset,
+      search_company_specific_date_range_id: null,
+      search_parameter: searchParameter,
+      search_parameter_date: null,
+      requestedby_id: loginStatus.id,
+    };
+
+    try {
+      const response = await axios.post(
+        POST_API.GET_PRODUCTS,
+        getProductPostData,
+        {
+          withCredentials: true,
+        }
+      );
+
+
+      const normalizedProductData = response.data.map((product: any) => ({
+        ...product,
+        name: `${product.name}`.trim(),
+      }));
+      setProductsData(normalizedProductData);
+
+       // Assuming the API response includes a total count in a 'count' field
+      if (response.data.length > 0 && response.data[0].count !== undefined) {
+        setTotalProductData(response.data[0].count);
+      } else {
+        setTotalProductData(normalizedProductData.length); // Fallback if count is not provided
+      }
+      // if (response.data && response.status === STATUS_CODE.OK) {
+      //   const formattedData: Product[] = response.data.map((res: any) => ({
+      //     count: res.count,
+      //     id: res.id,
+      //     companyId: res.company_id,
+      //     productTypeId: res.product_type_id,
+      //     productTypeName: res.product_type_name,
+      //     defaultWarrantyIntervalTypeId: res.default_warranty_interval_type_id,
+      //     defaultWarranty: res.default_warranty,
+      //     defaultWarrantyName: res.default_warranty_name,
+      //     defaultAmcCycleIntervalTypeId: res.default_amc_cycle_interval_type_id,
+      //     defaultAmcCycle: res.default_amc_cycle,
+      //     defaultAmcCycleName: res.default_amc_cycle_name,
+      //     name: res.name,
+      //     code: res.code,
+      //     cost: res.cost,
+      //     description: res.description,
+      //     version: res.version,
+      //     url: res.url,
+      //     isActive: res.isactive,
+      //     hsn: res.hsn,
+      //     sac: res.sac,
+      //     taxRate: res.tax_rate,
+      //     validFrom: res.valid_from,
+      //     createdBy: res.createdby,
+      //     createdOn: res.createdon,
+      //   }));
+      //   setProductsData(formattedData);
+      // }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: () => fetchCompanyProducts(searchParameter, offset, limit),
+        });
+
+        if (refreshTokenStatus) {
+          fetchCompanyProducts(searchParameter, offset, limit);
+        }
+      }
+    }
+  };
+
+   
+  useEffect(() =>{
+    console.log(productsData); 
+  },[productsData])
   // Note : Api call to get the data Company User with offset and limit
   const fetchCompanyUsers = async (
     searchParameter: string,
@@ -610,6 +721,7 @@ const LeadImportCsv = ({
 
   useEffect(() => {
     fetchApiData();
+    fetchCompanyProducts("", 0 , userPreference.rowsInGrid || 40);
     fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
@@ -628,8 +740,9 @@ const LeadImportCsv = ({
     }
   }, [originalCsvHeaders, crmLeadFields]);
 
+  // Note : extract the unique values
   const extractUniqueValues = (
-    fieldId: "leadStatus" | "leadSource" | "leadOwner",
+    fieldId: "leadStatus" | "leadSource" | "leadOwner" | "lead_interest_id" | "company_product_id",
     setUniqueValues: (v: string[]) => void
   ) => {
     const mappedHeaders = fieldMappings[fieldId];
@@ -649,6 +762,7 @@ const LeadImportCsv = ({
     setUniqueValues(Array.from(unique));
   };
 
+  // Note
   useEffect(() => {
     extractUniqueValues("leadStatus", setCsvUniqueStatuses);
     setStatusValueMapping({});
@@ -661,6 +775,16 @@ const LeadImportCsv = ({
     extractUniqueValues("leadOwner", setCsvUniqueOwners);
     setOwnerValueMapping({});
   }, [csvData, fieldMappings.leadOwner]);
+  // for Product Data
+   useEffect(() => {
+    extractUniqueValues("company_product_id", setCsvUniqueProductData);
+    setProductDataValueMapping({});
+  }, [csvData, fieldMappings.company_product_id]);
+  // for interest type
+  useEffect(() => {
+    extractUniqueValues("lead_interest_id", setCsvUniqueInterestType);
+    setInterestTypeValueMapping({});
+  }, [csvData, fieldMappings.lead_interest_id]);
 
   // --- HANDLERS ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -676,10 +800,14 @@ const LeadImportCsv = ({
     setFieldMappings({});
     setStatusValueMapping({});
     setSourceValueMapping({});
+    setInterestTypeValueMapping({});
+    setProductDataValueMapping({})
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
+    setCsvUniqueProductData([])
+    setCsvUniqueInterestType([])
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
 
@@ -709,10 +837,14 @@ const LeadImportCsv = ({
     setFieldMappings({});
     setStatusValueMapping({});
     setSourceValueMapping({});
+    setInterestTypeValueMapping({});
+    setProductDataValueMapping({})
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
+    setCsvUniqueInterestType([])
+    setCsvUniqueProductData([])
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
   };
@@ -747,21 +879,25 @@ const LeadImportCsv = ({
     reader.readAsText(file);
   };
 
-  // const handleDropField = useCallback(
-  //   (crmFieldId: string, csvHeader: string) => {
-  //     const singleMapFields = ["leadStatus", "leadSource", "leadOwner"];
-  //     if (singleMapFields.includes(crmFieldId)) {
-  //       setFieldMappings((prev) => ({ ...prev, [crmFieldId]: [csvHeader] }));
-  //     } else {
-  //       setFieldMappings((prev) => ({
-  //         ...prev,
-  //         [crmFieldId]: [...(prev[crmFieldId] || []), csvHeader],
-  //       }));
-  //     }
-  //   },
-  //   []
-  // );
 
+//   const readCsv = (file: File) => {
+//   setIsParsing(true);
+//   Papa.parse(file, {
+//     complete: (result :any) => {
+//       setCsvData(result.data);
+//       setOriginalCsvHeaders(result.data[0]);
+//       handleCloseSnackbar();
+//       setIsParsing(false);
+//     },
+//     error: (err :any) => {
+//       showMessageSnackbar({
+//         message: err.message || "Failed to parse CSV.",
+//         type: "error",
+//       });
+//       setIsParsing(false);
+//     },
+//   });
+// };
   const handleDropField = useCallback(
     (crmFieldId: string, csvHeader: string) => {
       setFieldMappings((prev) => {
@@ -796,6 +932,26 @@ const LeadImportCsv = ({
                 block: "start",
               });
             }
+            // product data
+            else if (
+              crmFieldId === "company_product_id" &&
+              productDataMappingRef.current
+            ) {
+              productDataMappingRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+            // for lead interest type
+            else if (
+              crmFieldId === "lead_interest_id" &&
+              leadInterestTypeMappingRef.current
+            ) {
+              leadInterestTypeMappingRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
           }, 100); // Small delay, adjust if needed
 
           return { ...prev, [crmFieldId]: newMappings };
@@ -803,7 +959,14 @@ const LeadImportCsv = ({
         return prev; // If header already mapped, return previous state
       });
     },
-    [leadStatusMappingRef, leadSourceMappingRef, leadOwnerMappingRef] // Add refs to dependency array
+    [
+      leadStatusMappingRef,
+      leadSourceMappingRef,
+      leadOwnerMappingRef,
+      productDataMappingRef,
+      leadInterestTypeMappingRef,
+      leadOwnerMappingRef,
+    ] // Add refs to dependency array
   );
   const handleRemoveFieldMapping = useCallback(
     (crmFieldId: string, csvHeader: string) => {
@@ -891,7 +1054,7 @@ const LeadImportCsv = ({
         mobileSet.add(mobile);
       }
 
-      const mappedData: { [key: string]: string | number | null } = {};
+      const mappedData: { [key: string]: string | number | null | undefined} = {};
       const displayData: { [key: string]: string | null | undefined } = {};
 
       // Iterate through all CRM fields to process them
@@ -916,6 +1079,23 @@ const LeadImportCsv = ({
           );
           mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
           displayData[field.id] = crmOwner ? crmOwner.fullname : csvValue; // Display Name or original CSV
+        }
+        // Note : product data 
+        else if (field.id === "company_product_id" && csvValue) {
+          const crmProduct = productsData?.find(
+            (product) => productDataValueMapping[String(product.id)] === csvValue
+          );
+          mappedData[field.id] = crmProduct ? crmProduct.id : null; // Store ID
+          displayData[field.id] = crmProduct ? crmProduct.name : csvValue; // Display Name or original CSV
+        }
+        // NOte : lead interest type leadInterestType
+        else if (field.id === "lead_interest_id" && csvValue) {
+          const crmInterestType = interestTypeData?.find(
+            (interest) =>
+              InterestTypeValueMapping[String(interest.id)] === csvValue
+          );
+          mappedData[field.id] = crmInterestType ? crmInterestType.id : null; // Store ID
+          displayData[field.id] = crmInterestType ? crmInterestType.name : csvValue; // Display Name or original CSV
         } else {
           // For other fields (including 'name', 'email', etc.), store the concatenated CSV value
           mappedData[field.id] = csvValue;
@@ -953,6 +1133,10 @@ const LeadImportCsv = ({
     statusValueMapping,
     sourceValueMapping,
     ownerValueMapping,
+    productDataValueMapping,
+    InterestTypeValueMapping,
+    productsData,
+    interestTypeData,
     leadStatus,
     leadSource,
     companyUsers,
@@ -1046,7 +1230,6 @@ const LeadImportCsv = ({
       })), // Sending only necessary data
     };
     console.log("Submitting payload:", payload);
-
     try {
       // const formData = new FormData();
       // formData.append("csvFile", csvFile);
@@ -1098,15 +1281,19 @@ const LeadImportCsv = ({
   const showOwnerMapping =
     fieldMappings.leadOwner?.length > 0 && csvUniqueOwners.length > 0;
 
+  // NOte : product data
+  const showProductDataMapping =
+    fieldMappings.company_product_id?.length > 0 && csvUniqueProductData.length > 0;
+  const showLeadInterestTypeMapping =
+    fieldMappings.lead_interest_id?.length > 0 &&
+    csvUniqueInterestType.length > 0;
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="w-full h-full bg-gray-100 rounded-md overflow-auto flex flex-col p-1  space-y-2">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
           {csvImportButtonClicked && (
-            // <button className="flex text-xs gap-3 items-center text-gray-800" onClick={resetState}>
-            //   <ArrowLeft size={16}/> <span>Go back and Choose another file/ see import tags.</span>
-            // </button>
             <button
               className="flex items-center gap-2 table-header-custom hover:text-blue-600 transition-colors"
               onClick={resetState}
@@ -1140,7 +1327,9 @@ const LeadImportCsv = ({
         </div>
 
         {isParsing && (
-          <div className="p-3 input-label-custom bg-blue-100 rounded-md">Parsing CSV...</div>
+          <div className="p-3 input-label-custom bg-blue-100 rounded-md">
+            Parsing CSV...
+          </div>
         )}
         {error && (
           <div className="p-3 bg-red-100 input-label-inactive rounded-md ">
@@ -1152,9 +1341,7 @@ const LeadImportCsv = ({
         {csvData && (
           <div className="flex-shrink-0 p-2 border rounded-lg bg-white shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="table-header-custom">
-                Preview (First 5 Rows)
-              </h4>
+              <h4 className="table-header-custom">Preview (First 5 Rows)</h4>
               <button
                 onClick={() => setShowPreview(!showPreview)}
                 className="input-label-custom-blue text-blue-600 hover:underline"
@@ -1168,7 +1355,10 @@ const LeadImportCsv = ({
                   <thead className="bg-gray-50">
                     <tr>
                       {originalCsvHeaders.map((h, i) => (
-                        <th key={i} className="px-3 py-2 text-left table-header-custom">
+                        <th
+                          key={i}
+                          className="px-3 py-2 text-left table-header-custom"
+                        >
                           {h}
                         </th>
                       ))}
@@ -1332,22 +1522,88 @@ const LeadImportCsv = ({
                   }}
                 />
               )}
+              {/* for product mapping */}
+
+              {showProductDataMapping && (
+                <GenericValueMappingCard
+                  ref={productDataMappingRef}
+                  title="Map Product assigned to lead"
+                  csvValues={csvUniqueProductData}
+                  crmData={productsData}
+                  mapping={productDataValueMapping}
+                  onDrop={(c, v) =>
+                    handleValueMap(
+                      c,
+                      v,
+                      productDataValueMapping,
+                      setProductDataValueMapping
+                    )
+                  }
+                  onRemove={(c) =>
+                    handleRemoveValueMap(
+                      c,
+                      productDataValueMapping,
+                      setProductDataValueMapping
+                    )
+                  }
+                  itemType={ItemTypes.CSV_PRODUCT_VALUE}
+                  onSearch={fetchCompanyProducts} // This is already good
+                  searchPlaceholder="Search users by Product Name."
+                  totalCrmItems={totalProductData}
+                  currentPage={productDataCurrentPage}
+                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  onPageChange={(newPage) => {
+                    setProductDataCurrentPage(newPage);
+                    fetchCompanyProducts(
+                      "",
+                      newPage * (userPreference.rowsInGrid || 40),
+                      userPreference.rowsInGrid || 40
+                    );
+                  }}
+                />
+              )}
+              {/* For lead interest type data  */}
+              {showLeadInterestTypeMapping && (
+                <GenericValueMappingCard
+                  ref={leadInterestTypeMappingRef}
+                  title=" Map Interest Type"
+                  csvValues={csvUniqueInterestType}
+                  crmData={interestTypeData}
+                  mapping={InterestTypeValueMapping}
+                  onDrop={(c, v) =>
+                    handleValueMap(
+                      c,
+                      v,
+                      InterestTypeValueMapping,
+                      setInterestTypeValueMapping
+                    )
+                  }
+                  onRemove={(c) =>
+                    handleRemoveValueMap(
+                      c,
+                      InterestTypeValueMapping,
+                      setInterestTypeValueMapping
+                    )
+                  }
+                  itemType={ItemTypes.CSV_INTEREST_VALUE}
+                />
+              )}
             </div>
 
             <div className="mt-6 flex justify-end">
               <div>
- <Button       type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  processCsvForReview();
-                }} // Changed to trigger review first
-                disabled={isParsing || !csvFile}
-                // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
-              >
-                Review and Finalize Import
-              </Button>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    processCsvForReview();
+                  }} // Changed to trigger review first
+                  disabled={isParsing || !csvFile}
+                  // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                >
+                  Review and Finalize Import
+                </Button>
               </div>
-             
             </div>
           </>
         )}
@@ -1417,33 +1673,32 @@ const LeadImportCsv = ({
             <div className="mt-6 flex justify-between">
               <div>
                 <Button
-                type="button"
-                onClick={() => setShowPreImportReview(false)}
-                // className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
-              >
-                Back to Mapping
-              </Button>
+                  type="button"
+                  onClick={() => setShowPreImportReview(false)}
+                  // className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
+                >
+                  Back to Mapping
+                </Button>
               </div>
-              
+
               <div>
-                 <Button
-                 type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSubmitImport();
-                }}
-                disabled={
-                  isParsing ||
-                  !csvFile ||
-                  processedLeads.filter((l) => l.isSelectedForImport).length ===
-                    0
-                }
-                // className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
-              >
-                Confirm and Import Selected Leads
-              </Button>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmitImport();
+                  }}
+                  disabled={
+                    isParsing ||
+                    !csvFile ||
+                    processedLeads.filter((l) => l.isSelectedForImport)
+                      .length === 0
+                  }
+                  // className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                >
+                  Confirm and Import Selected Leads
+                </Button>
               </div>
-             
             </div>
           </div>
         )}
@@ -1451,7 +1706,7 @@ const LeadImportCsv = ({
       {isLoadingSpinnerAfterSubmission && <LoadingSpinner />}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
-          data={LeadImportReponse}
+          data={LeadImportResponse}
           onClose={() => {
             setShowLeadImportResultPopUp(false);
             handleFileChange({ target: { files: null } } as any);
