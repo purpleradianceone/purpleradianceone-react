@@ -39,7 +39,12 @@ const gridRef = useRef<AgGridReact>(null);
        },
       { headerName: "Name", field: "name" },
       
-     
+      { headerName: "Product", field: "company_product_name" },
+      { headerName: "Product Interest", field: "lead_interest" },
+      { headerName: "Description", field: "description" },
+      { headerName: "Lead Created On", field: "lead_created_on" },
+
+
       { headerName: "Email", field: "email" },
       { headerName: "Mobile Number", field: "mobilenumber" },
       { headerName: "Address", field: "address" },
