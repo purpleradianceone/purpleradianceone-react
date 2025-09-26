@@ -44,6 +44,7 @@ import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyProductModal({
   isOpen,
@@ -357,7 +358,7 @@ function EditCompanyProductModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -657,7 +658,8 @@ function EditCompanyProductModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

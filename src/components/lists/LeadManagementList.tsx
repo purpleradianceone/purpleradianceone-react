@@ -33,6 +33,7 @@ import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
 import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
+import { createPortal } from "react-dom";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -353,8 +354,8 @@ function LeadManagementList({
             onPageSizeChange={paginationData.selectedPageSize}
           />
         </div>
-        {openPopUpOfCompanyUserModal && (
-          <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
+        {openPopUpOfCompanyUserModal && createPortal(
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
               {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
@@ -384,7 +385,8 @@ function LeadManagementList({
                 />
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     );

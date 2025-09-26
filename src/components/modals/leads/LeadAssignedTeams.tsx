@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
 import StatusChip from "../../ui/StatusChip";
 import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
@@ -347,18 +348,20 @@ const LeadAssignedTeams = ({
               </p>
             )}
           </div>
-          {/* view in pop up card  */}
-          {selectedCompanyTeamCard && (
-            <div className="fixed z-50 inset-0 flex justify-center items-center p-4">
+        </div>
+      )}
+      {/* view in pop up card  */}
+          {selectedCompanyTeamCard && createPortal(
+            <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
               {/* Overlay */}
-              <div
+              {/* <div
                 className="fixed inset-0 bg-black bg-opacity-5 "
                 onClick={() => {
                   setSelectedCompanyTeamCard(null);
                   setCompanyTeamCompanyUser([]);
                   setIsLoadingCompanyTeamCompanyUser(false);
                 }}
-              ></div>
+              ></div> */}
 
               {/* Modal */}
               <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden z-10 animate-[fadeInScale_0.3s_ease]">
@@ -588,12 +591,12 @@ const LeadAssignedTeams = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
-        </div>
-      )}
+
       {/* Add Company Team Form */}
-      {openCreateLeadCompanyTeam && (
+      {openCreateLeadCompanyTeam && createPortal(
         <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center p-2 sm-p-6 ">
           <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
             <div>
@@ -608,7 +611,8 @@ const LeadAssignedTeams = ({
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

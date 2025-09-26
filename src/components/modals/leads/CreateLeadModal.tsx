@@ -26,6 +26,7 @@ import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import FormInput from "../../ui/FormInput";
+import { createPortal } from "react-dom";
 
 function CreateLeadModal({
   isOpen,
@@ -567,8 +568,8 @@ function CreateLeadModal({
         </form>
       </div>
 
-      {openPopUpOfCompanyUserModal && (
-        <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
+      {openPopUpOfCompanyUserModal && createPortal(
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
             {/* Header with Close Button */}
             {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
@@ -600,7 +601,8 @@ function CreateLeadModal({
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

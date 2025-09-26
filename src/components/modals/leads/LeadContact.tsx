@@ -37,6 +37,7 @@ import COLORS from "../../../constants/Colors";
 import StatusChip from "../../ui/StatusChip";
 import PrimarySecondaryChip from "../../ui/PrimarySecondaryChip";
 import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -483,8 +484,8 @@ const LeadContact = ({
         )}
       </div>
       {/* view in pop up card  */}
-      {selectedContactCard && (
-        <div className="fixed top-8 inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
+      {selectedContactCard && createPortal(
+        <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
             {/* Header */}
             <div className="relative px-8 pt-5 pb-4">
@@ -793,11 +794,12 @@ const LeadContact = ({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Add Contact Form Modal */}
-      {isOpenAddLeadContactForm && (
+      {isOpenAddLeadContactForm && createPortal(
         <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
@@ -1124,7 +1126,8 @@ const LeadContact = ({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

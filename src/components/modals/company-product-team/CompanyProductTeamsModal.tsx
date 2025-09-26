@@ -20,6 +20,7 @@ import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductT
 import SearchInput from "../../ui/SearchInput";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
@@ -581,7 +582,7 @@ function CompanyProductTeamsModal({
   }, [isCompanyTeamsNotAssignedReadyToFetch, isOpen]);
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -710,7 +711,8 @@ function CompanyProductTeamsModal({
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       /> */}
-    </div>
+    </div>,
+    document.body
   );
 }
 

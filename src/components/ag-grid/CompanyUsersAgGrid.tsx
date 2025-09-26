@@ -3,11 +3,9 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  CheckCircle2,
   Edit,
   LucideLayoutDashboard,
   UserCheck,
-  XCircle,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
@@ -17,6 +15,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import StatusIndicator from "../ui/StatusIndicator";
 // import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
@@ -78,17 +77,7 @@ function CompanyUserAgGrid({
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              {params.value ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-green-600">Active</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-xs text-red-600">Inactive</span>
-                </>
-              )}
+             <StatusIndicator isActive={params.value}/>
             </div>
           );
         },

@@ -19,6 +19,8 @@ import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
+
 function EditCompanyUserModal({
   isOpen,
   onClose,
@@ -188,7 +190,7 @@ function EditCompanyUserModal({
   };
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
@@ -308,7 +310,8 @@ function EditCompanyUserModal({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

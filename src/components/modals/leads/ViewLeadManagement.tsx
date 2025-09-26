@@ -41,6 +41,7 @@ import { motion } from "framer-motion";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
 import COLORS from "../../../constants/Colors";
+import { createPortal } from "react-dom";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -1227,7 +1228,7 @@ const ViewLeadManagement = () => {
         />
 
         {/* lead owner pop up open */}
-        {isLeadOwnerPopUpOpen && (
+        {isLeadOwnerPopUpOpen && createPortal(
           <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
             <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
@@ -1278,7 +1279,8 @@ const ViewLeadManagement = () => {
                 />
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
         <AssignProductToLead
           selectedLeadData={selectedLeadData}

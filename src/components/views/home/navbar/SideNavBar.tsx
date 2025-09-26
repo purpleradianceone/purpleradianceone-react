@@ -55,7 +55,6 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         </NavLink>
 
         {/* Enabled Nav Links */}
-        {userHasAccessToViewUser && (
           <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -63,11 +62,11 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Manage Users"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewUser}
               />
             )}
           </NavLink>
-        )}
-        {userHasAccessToViewLead && (
+
           <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -75,11 +74,12 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Leads"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewLead}
               />
             )}
           </NavLink>
-        )}
-        {userHasAccessToViewAccount && (
+
+
           <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -87,11 +87,11 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Accounts"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewAccount}
               />
             )}
           </NavLink>
-        )}
-        {userHasAccessToViewProduct && (
+
           <NavLink to={ROUTES_URL.PRODUCT_MANAGEMENT}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -99,11 +99,11 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Products"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewProduct}
               />
             )}
           </NavLink>
-        )}
-        {userHasAccessToViewTeamManagement && (
+
           <NavLink to={ROUTES_URL.TEAM_MANAGEMENT}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -111,11 +111,10 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Teams"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewTeamManagement}
               />
             )}
           </NavLink>
-        )}
-        {userHasAccessToViewMeeting && (
           <NavLink to={ROUTES_URL.MEETINGS}>
             {({ isActive }) => (
               <SideNavBarItem
@@ -123,60 +122,11 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 label="Meetings"
                 isOpen={isOpen}
                 isActive={isActive}
+                disabled={!userHasAccessToViewMeeting}
               />
             )}
           </NavLink>
-        )}
 
-        {/* Disabled Nav Links - Don't need NavLink, as they don't navigate */}
-        {!userHasAccessToViewUser && (
-          <SideNavBarItem
-            icon={Building2}
-            label="Manage Users"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
-        {!userHasAccessToViewLead && (
-          <SideNavBarItem
-            icon={Handshake}
-            label="Leads"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
-        {!userHasAccessToViewAccount && (
-          <SideNavBarItem
-            icon={UserCogIcon}
-            label="Accounts"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
-        {!userHasAccessToViewProduct && (
-          <SideNavBarItem
-            icon={Store}
-            label="Products"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
-        {!userHasAccessToViewTeamManagement && (
-          <SideNavBarItem
-            icon={Network}
-            label="Teams"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
-        {!userHasAccessToViewMeeting && (
-          <SideNavBarItem
-            icon={Calendar}
-            label="Meetings"
-            isOpen={isOpen}
-            disabled={true}
-          />
-        )}
 
         {/* CRM Settings Dropdown */}
         <SideNavBarItem

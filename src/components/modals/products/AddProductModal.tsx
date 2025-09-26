@@ -40,6 +40,7 @@ import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function AddProductModal({
   isOpen,
@@ -222,7 +223,7 @@ function AddProductModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -490,7 +491,8 @@ function AddProductModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

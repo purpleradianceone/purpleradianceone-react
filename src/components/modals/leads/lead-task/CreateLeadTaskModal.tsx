@@ -40,6 +40,7 @@ import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -286,8 +287,8 @@ function CreateLeadTaskModal({
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
+  return createPortal(
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
       <div className="bg-white mt-12 min-h-[60vh]  rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <FormHeader
@@ -627,7 +628,8 @@ function CreateLeadTaskModal({
           }
         />
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
 
