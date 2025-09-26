@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, useRef, forwardRef, useEffect } from "react";
 import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { SIZE } from "../../../../constants/AppConstants";
-import { useIndustryType } from "../../../../config/hooks/useIndustryType";
-import { usebusinessType } from "../../../../config/hooks/useBusinessType";
 import { useCompanyAccountType } from "../../../../config/hooks/useCompanyAccountType";
+import { usebusinessType } from "../../../../config/hooks/useBusinessType";
+import { useIndustryType } from "../../../../config/hooks/useIndustryType";
 
 // ----------------- TYPES -----------------
 interface Account {
@@ -33,7 +33,7 @@ interface Account {
   pan: string;
   gst: string;
   tan: string;
-  buillingAddress: string;
+  billingAddress: string;
   shippingAddress: string;
   registeredOfficeAddress: string;
   businessResgistrationNumber: string;
@@ -47,8 +47,32 @@ type Mapping = Record<string, string[]>;
 interface MappableItem {
   id: number;
   name: string;
-  isactive : boolean;
+  isactive: boolean;
+}
 
+/**
+ * Maps any array of objects into MappableItem[]
+ * if they contain the required fields.
+ */
+function toMappableItems<
+  T extends {
+    id?: number | null;
+    name?: string | null;
+    companyAccountTypeName?: string | null;
+    accountTypeName?: string | null;
+    isactive?: boolean | null;
+  }
+>(data: T[]): MappableItem[] {
+  return data
+    .filter((item) => item.id !== null && item.id !== undefined) // skip invalid ids
+    .map((item) => ({
+      id: item.id ?? 0,
+      name:
+        item.name && item.name.trim() !== ""
+          ? item.name
+          : `${item.companyAccountTypeName} (${item.accountTypeName})`,
+      isactive: item.isactive ?? false, // null → false
+    }));
 }
 
 interface ValueMappingCardProps<T> {
@@ -78,7 +102,7 @@ const crmRequiredFields: (keyof Account)[] = [
   "pan",
   "gst",
   "tan",
-  "buillingAddress",
+  "billingAddress",
   "shippingAddress",
   "registeredOfficeAddress",
   "businessResgistrationNumber",
@@ -87,6 +111,25 @@ const crmRequiredFields: (keyof Account)[] = [
   // "leadId",
   // "createdBy",
 ];
+const fieldVariables: Record<string, string> = {
+  name: "Name",
+  email: "Email",
+  mobileNumber: "Mobile Number",
+  industryTypeId: "Industry Type Name",
+  businessTypeId: "Business Type Name",
+  companyAccountTypeIdArray: "Account Type Name",
+  pan: "PAN",
+  gst: "GST",
+  tan: "TAN",
+  billingAddress: "Billing Address",
+  shippingAddress: "Shipping Address",
+  registeredOfficeAddress: "Registered Office Address",
+  businessResgistrationNumber: "Business Reg No",
+  website: "Website",
+  accountCreatedOn: "Account Created On",
+  // leadId: "Lead ID",
+  // createdBy: "Created By",
+};
 
 // ----------------- DRAGGABLE CSV COLUMN -----------------
 const CsvColumn: React.FC<{ col: string; type?: string }> = ({
@@ -123,7 +166,9 @@ const CrmFieldDrop: React.FC<{
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="grid grid-cols-2 w-full gap-2">
-        <span className="text-sm font-medium flex items-center">{field} :</span>
+        <span className="text-sm font-medium flex items-center">
+          {fieldVariables[field]} :
+        </span>
         <div
           ref={drop}
           className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
@@ -457,53 +502,50 @@ export default function AccountCsvMapper({
   };
 
   //Dummy filds
-  // const { industryTypeData, loading } = useIndustryType();
-  // const { businessType, isLoading: businessTypeLoading } = usebusinessType();
-  // const { companyAccountType, isLoading: companyTypeLoading } =
+  const { industryTypeData, loading } = useIndustryType();
+  const { businessType, isLoading: businessTypeLoading } = usebusinessType();
+  const { companyAccountType, isLoading: companyTypeLoading } =
     useCompanyAccountType();
 
-  const industryTypes: MappableItem[] = [
-    { id: 1, name: "Retail", isactive:true },
-    { id: 2, name: "Healthcare", isactive:true },
-    { id: 3, name: "Education" , isactive:true},
+  let industryTypes: MappableItem[] = [
+    { id: 1, name: "Retail", isactive: true },
+    { id: 2, name: "Healthcare", isactive: true },
+    { id: 3, name: "Education", isactive: true },
   ];
-  const [industryTypeFromDatabase, setIndustryTypeFromDatabase] =
-    useState<MappableItem[]>(industryTypes);
+  industryTypes = toMappableItems(industryTypeData);
 
-  const businessTypes: MappableItem[] = [
-    { id: 1, name: "Sole Proprietorship" , isactive:true},
-    { id: 2, name: "Partnership" , isactive:true},
-    { id: 3, name: "LLP" , isactive:true},
-    { id: 4, name: "Private Limited" , isactive:true},
-    { id: 5, name: "Public Limited" , isactive:true},
-    { id: 6, name: "OPC" , isactive:true},
-    { id: 7, name: "Government Office" , isactive:true},
-    { id: 8, name: "Individual" , isactive:true},
+  let businessTypes: MappableItem[] = [
+    { id: 1, name: "Sole Proprietorship", isactive: true },
+    { id: 2, name: "Partnership", isactive: true },
+    { id: 3, name: "LLP", isactive: true },
+    { id: 4, name: "Private Limited", isactive: true },
+    { id: 5, name: "Public Limited", isactive: true },
+    { id: 6, name: "OPC", isactive: true },
+    { id: 7, name: "Government Office", isactive: true },
+    // { id: 8, name: "Individual" , isactive:true},
   ];
 
-  const [businessTypesFromDatabase, setBusinessTypesFromDatabase] =
-    useState<MappableItem[]>(businessTypes);
+  businessTypes = toMappableItems(businessType);
 
   // ---------- companyAccountTypes (from your JSON) ----------
-  const companyAccountTypes: MappableItem[] = [
-    { id: 25, name: "Etc (Reseller)" , isactive:true},
-    { id: 9, name: "Goverment (Customer)" , isactive:true},
-    { id: 19, name: "HCL Tech. (Customer)" , isactive:true},
-    { id: 30, name: "Partner 1 (Partner)", isactive:true },
-    { id: 18, name: "Police (Customer)" , isactive:true},
-    { id: 10, name: "Private (Customer)" , isactive:true},
-    { id: 17, name: "RAW1 (Customer)" , isactive:true},
-    { id: 11, name: "Shop (Reseller)" , isactive:true},
-    { id: 12, name: "test1 (Vendor)" , isactive:true},
-    { id: 13, name: "test2 (Customer)" , isactive:true},
-    { id: 14, name: "test3 (Reseller)" , isactive:true},
-    { id: 15, name: "test4 (Customer)" , isactive:true},
-    { id: 16, name: "test5 (Vendor)" , isactive:true},
-    { id: 36, name: "uuuuuu (Customer)" , isactive:true},
+  let companyAccountTypes: MappableItem[] = [
+    { id: 25, name: "Etc (Reseller)", isactive: true },
+    { id: 9, name: "Goverment (Customer)", isactive: true },
+    { id: 19, name: "HCL Tech. (Customer)", isactive: true },
+    { id: 30, name: "Partner 1 (Partner)", isactive: true },
+    { id: 18, name: "Police (Customer)", isactive: true },
+    { id: 10, name: "Private (Customer)", isactive: true },
+    { id: 17, name: "RAW1 (Customer)", isactive: true },
+    { id: 11, name: "Shop (Reseller)", isactive: true },
+    { id: 12, name: "test1 (Vendor)", isactive: true },
+    { id: 13, name: "test2 (Customer)", isactive: true },
+    { id: 14, name: "test3 (Reseller)", isactive: true },
+    { id: 15, name: "test4 (Customer)", isactive: true },
+    { id: 16, name: "test5 (Vendor)", isactive: true },
+    { id: 36, name: "uuuuuu (Customer)", isactive: true },
   ];
 
-  const [companyAccountTypesFromDatabase, setcompanyAccountTypesFromDatabase] =
-    useState<MappableItem[]>(companyAccountTypes);
+  companyAccountTypes = toMappableItems(companyAccountType);
 
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -520,12 +562,51 @@ export default function AccountCsvMapper({
     setShowConfirm(false);
   }
 
+  const industryCardRef = useRef<HTMLDivElement | null>(null);
+  const businessCarRef = useRef<HTMLDivElement | null>(null);
+  const companyAccountCarRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (industryCsvValues.length > 0 && industryCardRef.current) {
+      industryCardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [industryCsvValues.length]); // run when values change
+
+  useEffect(() => {
+    if (businessCsvValues.length > 0 && businessCarRef.current) {
+      businessCarRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [businessCsvValues.length]);
+
+  useEffect(() => {
+    if (
+      companyAccountArrayCsvValues.length > 0 &&
+      companyAccountCarRef.current
+    ) {
+      companyAccountCarRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [companyAccountArrayCsvValues.length]);
+
   // ----------------- RENDER -----------------
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="p-4 border-2 border-dashed rounded-md">
         <h2 className="section-header-custom">Account CSV Import & Mapper</h2>
-        {!(csvHeaders.length > 0) && (
+
+        {!(
+          csvHeaders.length > 0 ||
+          loading ||
+          businessTypeLoading ||
+          companyTypeLoading
+        ) && (
           <Button onClick={() => inputRef.current?.click()}>
             <div className="flex items-center justify-center gap-0.5">
               <LucideFolderInput size={SIZE.SIXTEEN} />
@@ -540,159 +621,176 @@ export default function AccountCsvMapper({
           className="hidden"
           onChange={handleFileUpload}
         />
-
-        {csvHeaders.length > 0 && (
-          <div className="grid w-full grid-cols-1 gap-4">
-            <div className="w-full flex justify-end">
-              <div className="w-fit h-fit">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setShowConfirm(true);
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-0.5">
-                    <TrashIcon size={SIZE.SIXTEEN} />
-                    Remove file
+        {(loading || businessTypeLoading || companyTypeLoading) && (
+          <div className="flex justify-center items-center h-fit">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+          </div>
+        )}
+        {!loading && !businessTypeLoading && !companyTypeLoading && (
+          <div>
+            {csvHeaders.length > 0 && (
+              <div className="grid w-full grid-cols-1 gap-4">
+                {/* CSV Preview */}
+                <div>
+                  <div className="w-full flex justify-end gap-3 mt-4">
+                    <div className="w-fit h-fit">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setShowConfirm(true);
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-0.5">
+                          <TrashIcon size={SIZE.SIXTEEN} />
+                          Remove file
+                        </div>
+                      </Button>
+                    </div>
+                    <div className="w-fit h-fit">
+                      <Button onClick={() => setShowPreview(!showPreview)}>
+                        {showPreview ? (
+                          <div className="flex items-center justify-center gap-0.5">
+                            <EyeOff size={SIZE.SIXTEEN} />
+                            Hide CSV Preview
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Eye size={SIZE.SIXTEEN} />
+                            Show CSV Preview
+                          </div>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </Button>
-              </div>
-            </div>
-            {/* CSV Preview */}
-            <div>
-              <div className="w-full flex justify-end">
-                <div className="w-fit h-fit">
-                  <Button onClick={() => setShowPreview(!showPreview)}>
-                    {showPreview ? (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <EyeOff size={SIZE.SIXTEEN} />
-                        Hide CSV Preview
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <Eye size={SIZE.SIXTEEN} />
-                        Show CSV Preview
-                      </div>
-                    )}
-                  </Button>
-                </div>
-              </div>
 
-              {showPreview && (
-                <div className="mt-4 border rounded p-4 bg-white overflow-x-auto">
-                  <h3 className="font-semibold mb-2">
-                    CSV Preview (First 5 Rows)
-                  </h3>
-                  <table className="border-collapse border w-full text-xs min-w-[600px]">
-                    <thead>
-                      <tr>
-                        {csvHeaders.map((h) => (
-                          <th key={h} className="border p-1">
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {csvData.slice(0, 5).map((row, i) => (
-                        <tr key={i}>
-                          {csvHeaders.map((h) => (
-                            <td key={h} className="border p-1">
-                              {row[h]}
-                            </td>
+                  {showPreview && (
+                    <div className="mt-4 border rounded p-4 bg-white overflow-x-auto">
+                      <h3 className="font-semibold mb-2">
+                        CSV Preview (First 5 Rows)
+                      </h3>
+                      <table className="border-collapse border w-full text-xs min-w-[600px]">
+                        <thead>
+                          <tr>
+                            {csvHeaders.map((h) => (
+                              <th key={h} className="border p-1">
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvData.slice(0, 5).map((row, i) => (
+                            <tr key={i}>
+                              {csvHeaders.map((h) => (
+                                <td key={h} className="border p-1">
+                                  {row[h]}
+                                </td>
+                              ))}
+                            </tr>
                           ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Normal CRM Fields */}
-            <div className="grid grid-cols-1 w-full mt-4 gap-4">
-              <div className="flex col-span-2 gap-6 min-w-[600px]">
-                <div className="border rounded p-4 bg-gray-50 w-1/2">
-                  <h3 className="font-semibold mb-2 w-fit">1. CSV Columns</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {csvHeaders.map((col) => (
-                      <CsvColumn key={col} col={col} />
-                    ))}
+                {/* Normal CRM Fields */}
+                <div className="grid grid-cols-1 w-full mt-4 gap-4">
+                  <div className="flex col-span-2 gap-6 w-full">
+                    <div className="border rounded p-4 bg-gray-50 w-full">
+                      <h3 className="font-semibold mb-2 w-fit">
+                        1. CSV Columns
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        {csvHeaders.map((col) => (
+                          <CsvColumn key={col} col={col} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="border w-full rounded p-4 bg-gray-50">
+                      <h3 className="font-semibold mb-2">
+                        2. Map Columns to CRM Fields
+                      </h3>
+
+                      {crmRequiredFields.map((field) => (
+                        <CrmFieldDrop
+                          key={field}
+                          field={field}
+                          mappedCols={mapping[field] || []}
+                          onDrop={handleDrop}
+                          onRemove={handleRemove}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="border w-fit rounded p-4 bg-gray-50">
-                  <h3 className="font-semibold mb-2">
-                    2. Map Columns to CRM Fields
-                  </h3>
 
-                  {crmRequiredFields.map((field) => (
-                    <CrmFieldDrop
-                      key={field}
-                      field={field}
-                      mappedCols={mapping[field] || []}
-                      onDrop={handleDrop}
-                      onRemove={handleRemove}
+                {/* Industry & Business & Company Account Drag-Drop */}
+                {industryCsvValues.length > 0 && (
+                  <div ref={industryCardRef}>
+                    <GenericValueMappingCard
+                      title="Map Industry Type Values"
+                      csvValues={industryCsvValues}
+                      crmData={industryTypes}
+                      mapping={industryValueMapping}
+                      onDrop={handleIndustryDrop}
+                      onRemove={handleIndustryRemove}
+                      itemType="CSV_COLUMN"
                     />
-                  ))}
+                  </div>
+                )}
+                {businessCsvValues.length > 0 && (
+                  <div ref={businessCarRef}>
+                    <GenericValueMappingCard
+                      title="Map Business Types"
+                      csvValues={businessCsvValues}
+                      crmData={businessTypes}
+                      mapping={businessValueMapping}
+                      onDrop={handleBusinessDrop}
+                      onRemove={handleBusinessRemove}
+                      itemType="CSV_COLUMN"
+                    />
+                  </div>
+                )}
+
+                {companyAccountArrayCsvValues.length > 0 && (
+                  <div ref={companyAccountCarRef}>
+                    <CheckboxMappingCard
+                      title="Map Company Account Types"
+                      csvValues={companyAccountArrayCsvValues}
+                      crmData={companyAccountTypes}
+                      mapping={companyAccountArrayMapping}
+                      onChange={handleCompanyAccountArrayCheckboxChange}
+                    />
+                  </div>
+                )}
+
+                {/* Import Button */}
+                <div className="flex w-full justify-end items-center">
+                  <div className="items-end mt-4 flex gap-3">
+                    <div className="w-fit h-fit">
+                      <Button
+                        type="button"
+                        onClick={() => setShowConfirm(true)}
+                      >
+                        <div className="flex items-center justify-center gap-0.5">
+                          <X size={SIZE.SIXTEEN} />
+                          Cancel
+                        </div>
+                      </Button>
+                    </div>
+                    <div className="w-fit h-fit">
+                      <Button onClick={handleImport}>
+                        <div className="flex items-center justify-center gap-0.5">
+                          <Import size={SIZE.SIXTEEN} />
+                          Import Accounts
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Industry & Business & Company Account Drag-Drop */}
-            {industryCsvValues.length > 0 && (
-              <GenericValueMappingCard
-                title="Map Industry Type Values"
-                csvValues={industryCsvValues}
-                crmData={industryTypeFromDatabase}
-                mapping={industryValueMapping}
-                onDrop={handleIndustryDrop}
-                onRemove={handleIndustryRemove}
-                itemType="CSV_COLUMN"
-              />
             )}
-            {businessCsvValues.length > 0 && (
-              <GenericValueMappingCard
-                title="Map Business Types"
-                csvValues={businessCsvValues}
-                crmData={businessTypesFromDatabase}
-                mapping={businessValueMapping}
-                onDrop={handleBusinessDrop}
-                onRemove={handleBusinessRemove}
-                itemType="CSV_COLUMN"
-              />
-            )}
-
-            {companyAccountArrayCsvValues.length > 0 && (
-              <CheckboxMappingCard
-                title="Map Company Account Type Array Values"
-                csvValues={companyAccountArrayCsvValues}
-                crmData={companyAccountTypesFromDatabase}
-                mapping={companyAccountArrayMapping}
-                onChange={handleCompanyAccountArrayCheckboxChange}
-              />
-            )}
-
-            {/* Import Button */}
-            <div className="flex w-full justify-end items-center">
-              <div className="items-end mt-4 flex gap-3">
-                <div className="w-fit h-fit">
-                  <Button type="button" onClick={() => setShowConfirm(true)}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <X size={SIZE.SIXTEEN} />
-                      Cancel
-                    </div>
-                  </Button>
-                </div>
-                <div className="w-fit h-fit">
-                  <Button onClick={handleImport}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <Import size={SIZE.SIXTEEN} />
-                      Import Accounts
-                    </div>
-                  </Button>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>
