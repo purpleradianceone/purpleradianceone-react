@@ -220,7 +220,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
           <button
             onClick={handleAddProductToLeadButtonClick}
-            className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
+            className={COLORS.ADD_BUTTON}
           >
             +Add
           </button>
@@ -242,7 +242,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                 );
               }
             }}
-            className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
+            className={COLORS.ADD_BUTTON}
           >
            +Add
           </button>

@@ -375,7 +375,7 @@ const LeadDetails = ({
           <span className="table-header-custom">Details</span>
           {showSaveLeadButton && (
             <button
-              className={`caption-custom white-text mb-0 px-2 rounded-sm ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
+              className={COLORS.ADD_BUTTON}
               onClick={handleSave}
             >
               

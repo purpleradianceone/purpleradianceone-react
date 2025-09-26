@@ -39,6 +39,7 @@ import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import FormSkeleton from "./FormSkeleton";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 type CreateAccountType = {
   onClose: () => void;
@@ -366,16 +367,17 @@ const CreateAccount: React.FC<CreateAccountType> = ({
 
   const loadingState = loading || businessTypeLoading || companyTypeLoading;
   if (loadingState) {
-    return (
-      <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
+    return createPortal(
+      <div className="fixed top-8 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
         <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
           <FormSkeleton />
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
-  return (
-    <div className="fixed top-8 inset-0 z-20 border  flex items-center justify-center  shadow-2xl ">
+  return createPortal(
+    <div className="fixed inset-0 z-50 border bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
       <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
         <motion.section
           ref={ref}
@@ -699,7 +701,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           </form>
         </motion.section>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 export default CreateAccount;

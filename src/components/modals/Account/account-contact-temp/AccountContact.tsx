@@ -24,6 +24,7 @@ import { Briefcase, Edit, Edit3, Globe, Languages, Mail, MapPin, MessageCircle, 
 import StatusChip from "../../../ui/StatusChip";
 import COLORS from "../../../../constants/Colors";
 import ToggleButton from "../../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -438,7 +439,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
+              className={COLORS.ADD_BUTTON}
             >
               +Add
             </button>
@@ -459,7 +460,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
+              className={COLORS.ADD_BUTTON}
             >
               {/* <Plus size={10} /> */}
               <span>+Add</span>
@@ -472,7 +473,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               accountContact.map((contact, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-blue-200 cursor-pointer text-xs font-medium text-gray-800 px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+                  className={COLORS.CONTACT_CARD}
                   onClick={() => setSelectedContactCard(contact)}
                 >
                   {/* Left: Contact Info */}
@@ -550,8 +551,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           </div>
 
           {/* view in pop up card  */}
-          {selectedContactCard && (
-            <div className="fixed border  top-8 inset-0 flex justify-center items-center z-50 p-4">
+          {selectedContactCard && createPortal(
+            <div className="fixed border inset-0 bg-black bg-opacity-5 flex justify-center items-center z-50 p-4">
               <div className="bg-white border rounded-2xl shadow-xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="relative px-8 pt-5 pb-4">
@@ -812,13 +813,14 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   )}
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </>
       )}
       {/* Add Contact Form Modal */}
-      {isOpenAddAccountContactForm && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
+      {isOpenAddAccountContactForm && createPortal(
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-2">
             {/* Header */}
 
@@ -1021,9 +1023,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
+   
   );
 };
 export default AccountContact;

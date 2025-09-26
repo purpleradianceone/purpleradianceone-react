@@ -17,7 +17,8 @@ const COLORS={
     CHIP_ACTIVE : "bg-white px-2  border-green-400 border rounded-full caption-custom-active",
     CHIP_INACTIVE : "bg-white px-2  border-red-400 border rounded-full caption-custom-inactive",
     CHIP_SECONDARY : "bg-white px-2  border-blue-400 border rounded-full caption-custom-blue",
-    CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+    CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
+    ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700"
 }
 
 export const chartColors = [

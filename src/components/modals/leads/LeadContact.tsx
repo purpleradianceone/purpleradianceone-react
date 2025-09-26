@@ -406,7 +406,7 @@ const LeadContact = ({
               );
             }
           }}
-          className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
+          className={COLORS.ADD_BUTTON}
         >
           +Add
         </button>
