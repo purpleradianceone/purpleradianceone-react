@@ -244,7 +244,7 @@ const LeadAssignedTeams = ({
                   );
                 }
               }}
-              className={`border rounded-md caption-custom white-text px-1 py-0.5 ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}`}
+              className={COLORS.ADD_BUTTON}
             >
               +Add
             </button>
@@ -270,7 +270,7 @@ const LeadAssignedTeams = ({
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
               }}
-              className={`${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1`}
+              className={COLORS.ADD_BUTTON}
             >
               +Add
             </button>
@@ -541,22 +541,11 @@ const LeadAssignedTeams = ({
 
                                 {/* Status Indicator */}
                                 <div
-                                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2
-                                ${
-                                  userData.isActive
-                                    ? "bg-green-100 caption-custom-active"
-                                    : "bg-red-100 caption-custom-inactive"
-                                }`}
+                                  
                                 >
-                                  <span
-                                    className={`w-2 h-2 rounded-full
-                                  ${
-                                    userData.isActive
-                                      ? "bg-green-600"
-                                      : "bg-red-600"
-                                  }`}
-                                  ></span>
-                                  {userData.isActive ? "Active" : "Inactive"}
+                                  <StatusChip 
+                                  isActive={userData.isActive}
+                                  />
                                 </div>
                               </div>
                             </div>

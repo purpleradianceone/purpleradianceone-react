@@ -195,7 +195,7 @@ function UpdateLeadTaskModal({
   };
 
   const generateTaskDetailsJson = () => {
-    if (leadActivityId !== 3) {
+    if (leadActivityId !== 3 && leadActivityId !== 4) {
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -209,18 +209,29 @@ function UpdateLeadTaskModal({
     }
   };
 
+  useEffect(()=> {
+    console.log("intial values of json");
+    console.log(leadTask.leadActivityDetails)
+  },[])
+
   const UpdateLeadTask = async (event: React.FormEvent) => {
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();
+    console.log(jsonData);
+    
+
+    
 
     const originalLeadActivityDetailsString = leadTask.leadActivityDetails;
 
-    // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
-    // This is safer if you've already parsed it and use the parsed object
+    // // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
+    // // This is safer if you've already parsed it and use the parsed object
     const originalLeadDetailsObject = JSON.parse(
       originalLeadActivityDetailsString
     );
     const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+    console.log("second stringfy")
+    console.log(stringifiedOriginalData);
 
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
@@ -265,7 +276,7 @@ function UpdateLeadTaskModal({
       result_outcome: resultOutcome,
       assignedto: assignedTo,
       due_date_time: `${dueDate} ${dueTime}:00`,
-      lead_activity_details: jsonData,
+      lead_activity_details: leadActivityId !== 4 ? jsonData : leadTask.leadActivityDetails,
       isactive: isActive,
       updatedby_id: loginStatus.id,
     };
@@ -454,10 +465,10 @@ function UpdateLeadTaskModal({
                 <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
                 <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
               </label> */}
-              <ToggleButton 
-              name="isActive" 
-              checked={isActive} 
-              onToggle={handleIsActiveCheckboxChange}
+              <ToggleButton
+                name="isActive"
+                checked={isActive}
+                onToggle={handleIsActiveCheckboxChange}
               />
             </div>
             {/* type */}

@@ -840,7 +840,7 @@ const ViewLeadManagement = () => {
                 onChange={(e) => setReasonText(e.target.value)}
               />
               <button
-                className={`input-label-custom-white ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}  px-4  rounded w-fit`}
+                className={COLORS.ADD_BUTTON}
                 onClick={handleSaveStatusUpdate}
               >
                 <div className="flex gap-0.5 items-center">
