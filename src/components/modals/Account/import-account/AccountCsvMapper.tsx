@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, useRef, forwardRef, useEffect } from "react";
 import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -16,12 +16,16 @@ import {
 } from "lucide-react";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { SIZE } from "../../../../constants/AppConstants";
+import { useCompanyAccountType } from "../../../../config/hooks/useCompanyAccountType";
+import { usebusinessType } from "../../../../config/hooks/useBusinessType";
+import { useIndustryType } from "../../../../config/hooks/useIndustryType";
 
 // ----------------- TYPES -----------------
 interface Account {
   companyId: number;
+  companyAccountTypeIdArray: number[];
+  importTag: string;
   name: string;
-  company_account_type_id: number;
   email: string;
   mobileNumber: string;
   industryTypeId: number;
@@ -29,13 +33,12 @@ interface Account {
   pan: string;
   gst: string;
   tan: string;
-  buillingAddress: string;
+  billingAddress: string;
   shippingAddress: string;
   registeredOfficeAddress: string;
   businessResgistrationNumber: string;
   website: string;
-  leadId: number;
-  companyAccountTypeIdArray: number[];
+  accountCreatedOn: string;
   createdBy: number;
 }
 
@@ -44,6 +47,32 @@ type Mapping = Record<string, string[]>;
 interface MappableItem {
   id: number;
   name: string;
+  isactive: boolean;
+}
+
+/**
+ * Maps any array of objects into MappableItem[]
+ * if they contain the required fields.
+ */
+function toMappableItems<
+  T extends {
+    id?: number | null;
+    name?: string | null;
+    companyAccountTypeName?: string | null;
+    accountTypeName?: string | null;
+    isactive?: boolean | null;
+  }
+>(data: T[]): MappableItem[] {
+  return data
+    .filter((item) => item.id !== null && item.id !== undefined) // skip invalid ids
+    .map((item) => ({
+      id: item.id ?? 0,
+      name:
+        item.name && item.name.trim() !== ""
+          ? item.name
+          : `${item.companyAccountTypeName} (${item.accountTypeName})`,
+      isactive: item.isactive ?? false, // null → false
+    }));
 }
 
 interface ValueMappingCardProps<T> {
@@ -64,60 +93,43 @@ interface ValueMappingCardProps<T> {
 
 // ----------------- DUMMY DATA -----------------
 const crmRequiredFields: (keyof Account)[] = [
-  "companyId",
   "name",
-  "company_account_type_id",
   "email",
   "mobileNumber",
   "industryTypeId",
   "businessTypeId",
+  "companyAccountTypeIdArray",
   "pan",
   "gst",
   "tan",
-  "buillingAddress",
+  "billingAddress",
   "shippingAddress",
   "registeredOfficeAddress",
   "businessResgistrationNumber",
   "website",
-  "leadId",
-  "companyAccountTypeIdArray",
-  "createdBy",
+  "accountCreatedOn",
+  // "leadId",
+  // "createdBy",
 ];
-
-const industryTypes: MappableItem[] = [
-  { id: 1, name: "Retail" },
-  { id: 2, name: "Healthcare" },
-  { id: 3, name: "Education" },
-];
-
-const businessTypes: MappableItem[] = [
-  { id: 1, name: "Sole Proprietorship" },
-  { id: 2, name: "Partnership" },
-  { id: 3, name: "LLP" },
-  { id: 4, name: "Private Limited" },
-  { id: 5, name: "Public Limited" },
-  { id: 6, name: "OPC" },
-  { id: 7, name: "Government Office" },
-  { id: 8, name: "Individual" },
-];
-
-// ---------- companyAccountTypes (from your JSON) ----------
-const companyAccountTypes: MappableItem[] = [
-  { id: 25, name: "Etc (Reseller)" },
-  { id: 9, name: "Goverment (Customer)" },
-  { id: 19, name: "HCL Tech. (Customer)" },
-  { id: 30, name: "Partner 1 (Partner)" },
-  { id: 18, name: "Police (Customer)" },
-  { id: 10, name: "Private (Customer)" },
-  { id: 17, name: "RAW1 (Customer)" },
-  { id: 11, name: "Shop (Reseller)" },
-  { id: 12, name: "test1 (Vendor)" },
-  { id: 13, name: "test2 (Customer)" },
-  { id: 14, name: "test3 (Reseller)" },
-  { id: 15, name: "test4 (Customer)" },
-  { id: 16, name: "test5 (Vendor)" },
-  { id: 36, name: "uuuuuu (Customer)" },
-];
+const fieldVariables: Record<string, string> = {
+  name: "Name",
+  email: "Email",
+  mobileNumber: "Mobile Number",
+  industryTypeId: "Industry Type Name",
+  businessTypeId: "Business Type Name",
+  companyAccountTypeIdArray: "Account Type Name",
+  pan: "PAN",
+  gst: "GST",
+  tan: "TAN",
+  billingAddress: "Billing Address",
+  shippingAddress: "Shipping Address",
+  registeredOfficeAddress: "Registered Office Address",
+  businessResgistrationNumber: "Business Reg No",
+  website: "Website",
+  accountCreatedOn: "Account Created On",
+  // leadId: "Lead ID",
+  // createdBy: "Created By",
+};
 
 // ----------------- DRAGGABLE CSV COLUMN -----------------
 const CsvColumn: React.FC<{ col: string; type?: string }> = ({
@@ -129,15 +141,14 @@ const CsvColumn: React.FC<{ col: string; type?: string }> = ({
     item: { name: col },
   }));
   return (
-    <div >
+    <div>
       <div
-      ref={drag}
-      className="border rounded px-2 py-1 bg-gray-100 cursor-move text-sm mb-2"
-    >
-      {col}
+        ref={drag}
+        className="border rounded px-2 py-1 bg-gray-100 cursor-move text-sm mb-2"
+      >
+        {col}
+      </div>
     </div>
-    </div>
-    
   );
 };
 
@@ -155,7 +166,9 @@ const CrmFieldDrop: React.FC<{
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="grid grid-cols-2 w-full gap-2">
-        <span className="text-sm font-medium flex items-center">{field} :</span>
+        <span className="text-sm font-medium flex items-center">
+          {fieldVariables[field]} :
+        </span>
         <div
           ref={drop}
           className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
@@ -202,7 +215,9 @@ const GenericValueMappingCard = forwardRef(
     const unmappedCsvValues = csvValues.filter((v) => !mappedKeys.includes(v));
 
     const getMappedCsvValue = (crmId: number | null) =>
-      crmId ? Object.keys(mapping).find((k) => mapping[k] === crmId) : undefined;
+      crmId
+        ? Object.keys(mapping).find((k) => mapping[k] === crmId)
+        : undefined;
 
     const DroppableTarget: React.FC<{ crmItem: T }> = ({ crmItem }) => {
       const [{ isOver, canDrop }, drop] = useDrop(() => ({
@@ -221,7 +236,9 @@ const GenericValueMappingCard = forwardRef(
           <div
             ref={drop}
             className={`flex-1 p-2 border rounded-md transition-all text-center h-10 flex items-center justify-center ${
-              isOver && canDrop ? "border-green-500 bg-green-50 ring-2" : "border-gray-300"
+              isOver && canDrop
+                ? "border-green-500 bg-green-50 ring-2"
+                : "border-gray-300"
             } ${mappedValue ? "bg-green-100" : "bg-white"}`}
           >
             {mappedValue ? (
@@ -245,7 +262,10 @@ const GenericValueMappingCard = forwardRef(
     };
 
     return (
-      <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm mt-4">
+      <div
+        ref={ref}
+        className="border rounded-lg p-3 bg-gray-50/80 shadow-sm mt-4"
+      >
         <h3 className="font-semibold mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -259,7 +279,10 @@ const GenericValueMappingCard = forwardRef(
           <div>
             <h4 className="mb-2 text-center">CRM Values (Drop)</h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {crmData.map((item) => item.id && <DroppableTarget key={item.id} crmItem={item} />)}
+              {crmData.map(
+                (item) =>
+                  item.id && <DroppableTarget key={item.id} crmItem={item} />
+              )}
             </div>
           </div>
         </div>
@@ -269,22 +292,22 @@ const GenericValueMappingCard = forwardRef(
 );
 
 // ----------------- MAIN COMPONENT -----------------
-export default function AccountCsvMapper() {
+export default function AccountCsvMapper({
+  handleButtonClicked,
+}: {
+  handleButtonClicked: (value: boolean) => void;
+}) {
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [csvData, setCsvData] = useState<any[]>([]);
   const [mapping, setMapping] = useState<Mapping>({});
   const [showPreview, setShowPreview] = useState(false);
 
-  const [industryValueMapping, setIndustryValueMapping] = useState<Record<string, number>>(
-    {}
-  );
-  const [businessValueMapping, setBusinessValueMapping] = useState<Record<string, number>>(
-    {}
-  );
-  // NEW: company account mapping state (csvValue -> companyAccountType id)
-  const [companyAccountValueMapping, setCompanyAccountValueMapping] = useState<Record<string, number>>(
-    {}
-  );
+  const [industryValueMapping, setIndustryValueMapping] = useState<
+    Record<string, number>
+  >({});
+  const [businessValueMapping, setBusinessValueMapping] = useState<
+    Record<string, number>
+  >({});
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -302,6 +325,7 @@ export default function AccountCsvMapper() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+    handleButtonClicked(true);
     parseCsv(e.target.files[0]);
   };
 
@@ -309,13 +333,17 @@ export default function AccountCsvMapper() {
   const handleDrop = (crmField: string, col: string) => {
     setMapping((prev) => {
       const prevCols = prev[crmField] || [];
-      if (!prevCols.includes(col)) return { ...prev, [crmField]: [...prevCols, col] };
+      if (!prevCols.includes(col))
+        return { ...prev, [crmField]: [...prevCols, col] };
       return prev;
     });
   };
 
   const handleRemove = (crmField: string, col: string) => {
-    setMapping((prev) => ({ ...prev, [crmField]: prev[crmField].filter((c) => c !== col) }));
+    setMapping((prev) => ({
+      ...prev,
+      [crmField]: prev[crmField].filter((c) => c !== col),
+    }));
   };
 
   // ----------------- VALUE MAPPING CARDS -----------------
@@ -324,9 +352,6 @@ export default function AccountCsvMapper() {
     : [];
   const businessCsvValues = mapping["businessTypeId"]?.length
     ? Array.from(new Set(csvData.map((r) => r[mapping["businessTypeId"][0]])))
-    : [];
-  const companyAccountCsvValues = mapping["company_account_type_id"]?.length
-    ? Array.from(new Set(csvData.map((r) => r[mapping["company_account_type_id"][0]])))
     : [];
 
   const handleIndustryDrop = (crmItem: MappableItem, csvValue: string) => {
@@ -350,16 +375,83 @@ export default function AccountCsvMapper() {
     setBusinessValueMapping(newMap);
   };
 
-  // NEW: company account handlers
-  const handleCompanyAccountDrop = (crmItem: MappableItem, csvValue: string) => {
-    setCompanyAccountValueMapping((prev) => ({ ...prev, [csvValue]: crmItem.id }));
+  //--------------------companyAccountTypeArrayMapper-----------------------
+
+  const [companyAccountArrayMapping, setCompanyAccountArrayMapping] = useState<
+    Record<string, number[]>
+  >({});
+
+  const handleCompanyAccountArrayCheckboxChange = (
+    csvValue: string,
+    selectedIds: number[]
+  ) => {
+    setCompanyAccountArrayMapping((prev) => ({
+      ...prev,
+      [csvValue]: selectedIds,
+    }));
   };
-  const handleCompanyAccountRemove = (crmItem: MappableItem) => {
-    const newMap = { ...companyAccountValueMapping };
-    Object.keys(newMap).forEach((k) => {
-      if (newMap[k] === crmItem.id) delete newMap[k];
-    });
-    setCompanyAccountValueMapping(newMap);
+
+  const companyAccountArrayCsvValues = mapping["companyAccountTypeIdArray"]
+    ?.length
+    ? Array.from(
+        new Set(csvData.map((r) => r[mapping["companyAccountTypeIdArray"][0]]))
+      )
+    : [];
+
+  // ----------------- CHECKBOX MAPPING CARD -----------------
+  interface CheckboxMappingCardProps {
+    title: string;
+    csvValues: string[];
+    crmData: MappableItem[];
+    mapping: Record<string, number[]>; // csvValue -> array of crm ids
+    onChange: (csvValue: string, selectedIds: number[]) => void;
+  }
+
+  const CheckboxMappingCard: React.FC<CheckboxMappingCardProps> = ({
+    title,
+    csvValues,
+    crmData,
+    mapping,
+    onChange,
+  }) => {
+    return (
+      <div className="border rounded-lg p-3 bg-gray-50/80 shadow-sm mt-4">
+        <h3 className="font-semibold mb-3">{title}</h3>
+
+        {csvValues.map((csvValue) => (
+          <div
+            key={csvValue}
+            className="border rounded-md p-3 mb-3 bg-white shadow-sm"
+          >
+            <h4 className="text-sm font-medium mb-2">CSV Value: {csvValue}</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {crmData.map((item) => {
+                const isChecked = (mapping[csvValue] || []).includes(item.id);
+                return (
+                  <label
+                    key={item.id}
+                    className="flex items-center gap-2 text-sm cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const current = mapping[csvValue] || [];
+                        const updated = e.target.checked
+                          ? [...current, item.id]
+                          : current.filter((id) => id !== item.id);
+                        onChange(csvValue, updated);
+                      }}
+                    />
+                    {item.name}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   // ----------------- IMPORT -----------------
@@ -377,15 +469,17 @@ export default function AccountCsvMapper() {
                   .trim()
               : row[csvFields[0]];
 
-          if (crmField === "industryTypeId") value = industryValueMapping[value] || null;
+          if (crmField === "industryTypeId")
+            value = industryValueMapping[value] || null;
           else if (crmField === "businessTypeId")
             value = businessValueMapping[value] || null;
-          else if (crmField === "company_account_type_id")
-            value = companyAccountValueMapping[value] || null;
           else if (crmField === "companyAccountTypeIdArray") {
-            obj[crmField] = value
-              ? value.split(",").map((v: string) => parseInt(v.trim(), 10))
+            const raw = value
+              ? value.split(",").map((v: string) => v.trim())
               : [];
+            obj[crmField] = raw.flatMap(
+              (csvVal: string) => companyAccountArrayMapping[csvVal] || []
+            );
             return;
           }
 
@@ -396,7 +490,6 @@ export default function AccountCsvMapper() {
               "businessTypeId",
               "leadId",
               "createdBy",
-              "company_account_type_id",
             ].includes(crmField)
           )
             obj[crmField] = value ? parseInt(value, 10) : null;
@@ -408,35 +501,118 @@ export default function AccountCsvMapper() {
     console.log("✅ Final Accounts JSON:", mappedData);
   };
 
+  //Dummy filds
+  const { industryTypeData, loading } = useIndustryType();
+  const { businessType, isLoading: businessTypeLoading } = usebusinessType();
+  const { companyAccountType, isLoading: companyTypeLoading } =
+    useCompanyAccountType();
+
+  let industryTypes: MappableItem[] = [
+    { id: 1, name: "Retail", isactive: true },
+    { id: 2, name: "Healthcare", isactive: true },
+    { id: 3, name: "Education", isactive: true },
+  ];
+  industryTypes = toMappableItems(industryTypeData);
+
+  let businessTypes: MappableItem[] = [
+    { id: 1, name: "Sole Proprietorship", isactive: true },
+    { id: 2, name: "Partnership", isactive: true },
+    { id: 3, name: "LLP", isactive: true },
+    { id: 4, name: "Private Limited", isactive: true },
+    { id: 5, name: "Public Limited", isactive: true },
+    { id: 6, name: "OPC", isactive: true },
+    { id: 7, name: "Government Office", isactive: true },
+    // { id: 8, name: "Individual" , isactive:true},
+  ];
+
+  businessTypes = toMappableItems(businessType);
+
+  // ---------- companyAccountTypes (from your JSON) ----------
+  let companyAccountTypes: MappableItem[] = [
+    { id: 25, name: "Etc (Reseller)", isactive: true },
+    { id: 9, name: "Goverment (Customer)", isactive: true },
+    { id: 19, name: "HCL Tech. (Customer)", isactive: true },
+    { id: 30, name: "Partner 1 (Partner)", isactive: true },
+    { id: 18, name: "Police (Customer)", isactive: true },
+    { id: 10, name: "Private (Customer)", isactive: true },
+    { id: 17, name: "RAW1 (Customer)", isactive: true },
+    { id: 11, name: "Shop (Reseller)", isactive: true },
+    { id: 12, name: "test1 (Vendor)", isactive: true },
+    { id: 13, name: "test2 (Customer)", isactive: true },
+    { id: 14, name: "test3 (Reseller)", isactive: true },
+    { id: 15, name: "test4 (Customer)", isactive: true },
+    { id: 16, name: "test5 (Vendor)", isactive: true },
+    { id: 36, name: "uuuuuu (Customer)", isactive: true },
+  ];
+
+  companyAccountTypes = toMappableItems(companyAccountType);
+
   const [showConfirm, setShowConfirm] = useState(false);
 
   function onclose() {
+    handleButtonClicked(false);
     setCsvHeaders([]);
     setCsvData([]);
     setMapping({});
     setIndustryValueMapping({});
     setBusinessValueMapping({});
-    setCompanyAccountValueMapping({});
+    setCompanyAccountArrayMapping({});
     setShowPreview(false);
     if (inputRef.current) inputRef.current.value = "";
     setShowConfirm(false);
   }
 
+  const industryCardRef = useRef<HTMLDivElement | null>(null);
+  const businessCarRef = useRef<HTMLDivElement | null>(null);
+  const companyAccountCarRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (industryCsvValues.length > 0 && industryCardRef.current) {
+      industryCardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [industryCsvValues.length]); // run when values change
+
+  useEffect(() => {
+    if (businessCsvValues.length > 0 && businessCarRef.current) {
+      businessCarRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [businessCsvValues.length]);
+
+  useEffect(() => {
+    if (
+      companyAccountArrayCsvValues.length > 0 &&
+      companyAccountCarRef.current
+    ) {
+      companyAccountCarRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [companyAccountArrayCsvValues.length]);
+
   // ----------------- RENDER -----------------
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="p-4 border-2 border-dashed rounded-md">
-        <h2 className="text-lg font-bold mb-2">Account CSV Import & Mapper</h2>
-        {!(csvHeaders.length > 0) && (
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="px-4 py-2 bg-blue-600 text-white rounded mb-4"
-          >
+        <h2 className="section-header-custom">Account CSV Import & Mapper</h2>
+
+        {!(
+          csvHeaders.length > 0 ||
+          loading ||
+          businessTypeLoading ||
+          companyTypeLoading
+        ) && (
+          <Button onClick={() => inputRef.current?.click()}>
             <div className="flex items-center justify-center gap-0.5">
               <LucideFolderInput size={SIZE.SIXTEEN} />
               Browse CSV
             </div>
-          </button>
+          </Button>
         )}
         <input
           ref={inputRef}
@@ -445,171 +621,190 @@ export default function AccountCsvMapper() {
           className="hidden"
           onChange={handleFileUpload}
         />
-
-        {csvHeaders.length > 0 && (
-          <div className="grid w-full grid-cols-1 gap-4">
-            <div className="w-full flex justify-end">
-              <div className="w-fit h-fit">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setShowConfirm(true);
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-0.5">
-                    <TrashIcon size={SIZE.SIXTEEN} />
-                    Remove file
-                  </div>
-                </Button>
-              </div>
-            </div>
-            {/* CSV Preview */}
-            <div>
-              <div className="w-full flex justify-end">
-                <div className="w-fit h-fit">
-                  <Button onClick={() => setShowPreview(!showPreview)}>
-                    {showPreview ? (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <EyeOff size={SIZE.SIXTEEN} />
-                        Hide CSV Preview
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <Eye size={SIZE.SIXTEEN} />
-                        Show CSV Preview
-                      </div>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {showPreview && (
-                <div className="mt-4 border rounded p-4 bg-white overflow-x-auto">
-                  <h3 className="font-semibold mb-2">CSV Preview (First 5 Rows)</h3>
-                  <table className="border-collapse border w-full text-xs min-w-[600px]">
-                    <thead>
-                      <tr>
-                        {csvHeaders.map((h) => (
-                          <th key={h} className="border p-1">
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {csvData.slice(0, 5).map((row, i) => (
-                        <tr key={i}>
-                          {csvHeaders.map((h) => (
-                            <td key={h} className="border p-1">
-                              {row[h]}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Normal CRM Fields */}
-            <div className="grid grid-cols-1 w-full mt-4 gap-4">
-              <div className="flex col-span-2 gap-6 min-w-[600px]">
-                <div className="border rounded p-4 bg-gray-50 w-1/2">
-                  <h3 className="font-semibold mb-2 w-fit">1. CSV Columns</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {csvHeaders.map((col) => (
-                    <CsvColumn key={col} col={col} />
-                  ))}
-                  </div>
-                  
-                </div>
-                <div className="border w-fit rounded p-4 bg-gray-50">
-                  <h3 className="font-semibold mb-2">2. Map Columns to CRM Fields</h3>
-
-                  {crmRequiredFields.map((field) => (
-                    <CrmFieldDrop
-                      key={field}
-                      field={field}
-                      mappedCols={mapping[field] || []}
-                      onDrop={handleDrop}
-                      onRemove={handleRemove}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Industry & Business & Company Account Drag-Drop */}
-            {industryCsvValues.length > 0 && (
-              <GenericValueMappingCard
-                title="Map Industry Type Values"
-                csvValues={industryCsvValues}
-                crmData={industryTypes}
-                mapping={industryValueMapping}
-                onDrop={handleIndustryDrop}
-                onRemove={handleIndustryRemove}
-                itemType="CSV_COLUMN"
-              />
-            )}
-            {businessCsvValues.length > 0 && (
-              <GenericValueMappingCard
-                title="Map Business Type Values"
-                csvValues={businessCsvValues}
-                crmData={businessTypes}
-                mapping={businessValueMapping}
-                onDrop={handleBusinessDrop}
-                onRemove={handleBusinessRemove}
-                itemType="CSV_COLUMN"
-              />
-            )}
-            {companyAccountCsvValues.length > 0 && (
-              <GenericValueMappingCard
-                title="Map Company Account Type Values"
-                csvValues={companyAccountCsvValues}
-                crmData={companyAccountTypes}
-                mapping={companyAccountValueMapping}
-                onDrop={handleCompanyAccountDrop}
-                onRemove={handleCompanyAccountRemove}
-                itemType="CSV_COLUMN"
-              />
-            )}
-
-            {/* Import Button */}
-            <div className="flex w-full justify-end items-center">
-              <div className="items-end mt-4 flex gap-3">
-                <div className="w-fit h-fit">
-                  <Button type="button" onClick={() => setShowConfirm(true)}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <X size={SIZE.SIXTEEN} />
-                      Cancel
-                    </div>
-                  </Button>
-                </div>
-                <div className="w-fit h-fit">
-                  <Button onClick={handleImport}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <Import size={SIZE.SIXTEEN} />
-                      Import Accounts
-                    </div>
-                  </Button>
-                </div>
-              </div>
-            </div>
+        {(loading || businessTypeLoading || companyTypeLoading) && (
+          <div className="flex justify-center items-center h-fit">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
           </div>
         )}
-        {showConfirm && (
-          <ConfirmationDialog
-            open={showConfirm}
-            title="Are you sure to remove changes?"
-            message={
-              "Are you sure you want to cancel all changes on page?\nAll unsaved work will be lost."
-            }
-            onConfirm={() => onclose()}
-            onCancel={() => setShowConfirm(false)}
-          />
+        {!loading && !businessTypeLoading && !companyTypeLoading && (
+          <div>
+            {csvHeaders.length > 0 && (
+              <div className="grid w-full grid-cols-1 gap-4">
+                {/* CSV Preview */}
+                <div>
+                  <div className="w-full flex justify-end gap-3 mt-4">
+                    <div className="w-fit h-fit">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setShowConfirm(true);
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-0.5">
+                          <TrashIcon size={SIZE.SIXTEEN} />
+                          Remove file
+                        </div>
+                      </Button>
+                    </div>
+                    <div className="w-fit h-fit">
+                      <Button onClick={() => setShowPreview(!showPreview)}>
+                        {showPreview ? (
+                          <div className="flex items-center justify-center gap-0.5">
+                            <EyeOff size={SIZE.SIXTEEN} />
+                            Hide CSV Preview
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Eye size={SIZE.SIXTEEN} />
+                            Show CSV Preview
+                          </div>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {showPreview && (
+                    <div className="mt-4 border rounded p-4 bg-white overflow-x-auto">
+                      <h3 className="font-semibold mb-2">
+                        CSV Preview (First 5 Rows)
+                      </h3>
+                      <table className="border-collapse border w-full text-xs min-w-[600px]">
+                        <thead>
+                          <tr>
+                            {csvHeaders.map((h) => (
+                              <th key={h} className="border p-1">
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvData.slice(0, 5).map((row, i) => (
+                            <tr key={i}>
+                              {csvHeaders.map((h) => (
+                                <td key={h} className="border p-1">
+                                  {row[h]}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Normal CRM Fields */}
+                <div className="grid grid-cols-1 w-full mt-4 gap-4">
+                  <div className="flex col-span-2 gap-6 w-full">
+                    <div className="border rounded p-4 bg-gray-50 w-full">
+                      <h3 className="font-semibold mb-2 w-fit">
+                        1. CSV Columns
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        {csvHeaders.map((col) => (
+                          <CsvColumn key={col} col={col} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="border w-full rounded p-4 bg-gray-50">
+                      <h3 className="font-semibold mb-2">
+                        2. Map Columns to CRM Fields
+                      </h3>
+
+                      {crmRequiredFields.map((field) => (
+                        <CrmFieldDrop
+                          key={field}
+                          field={field}
+                          mappedCols={mapping[field] || []}
+                          onDrop={handleDrop}
+                          onRemove={handleRemove}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Industry & Business & Company Account Drag-Drop */}
+                {industryCsvValues.length > 0 && (
+                  <div ref={industryCardRef}>
+                    <GenericValueMappingCard
+                      title="Map Industry Type Values"
+                      csvValues={industryCsvValues}
+                      crmData={industryTypes}
+                      mapping={industryValueMapping}
+                      onDrop={handleIndustryDrop}
+                      onRemove={handleIndustryRemove}
+                      itemType="CSV_COLUMN"
+                    />
+                  </div>
+                )}
+                {businessCsvValues.length > 0 && (
+                  <div ref={businessCarRef}>
+                    <GenericValueMappingCard
+                      title="Map Business Types"
+                      csvValues={businessCsvValues}
+                      crmData={businessTypes}
+                      mapping={businessValueMapping}
+                      onDrop={handleBusinessDrop}
+                      onRemove={handleBusinessRemove}
+                      itemType="CSV_COLUMN"
+                    />
+                  </div>
+                )}
+
+                {companyAccountArrayCsvValues.length > 0 && (
+                  <div ref={companyAccountCarRef}>
+                    <CheckboxMappingCard
+                      title="Map Company Account Types"
+                      csvValues={companyAccountArrayCsvValues}
+                      crmData={companyAccountTypes}
+                      mapping={companyAccountArrayMapping}
+                      onChange={handleCompanyAccountArrayCheckboxChange}
+                    />
+                  </div>
+                )}
+
+                {/* Import Button */}
+                <div className="flex w-full justify-end items-center">
+                  <div className="items-end mt-4 flex gap-3">
+                    <div className="w-fit h-fit">
+                      <Button
+                        type="button"
+                        onClick={() => setShowConfirm(true)}
+                      >
+                        <div className="flex items-center justify-center gap-0.5">
+                          <X size={SIZE.SIXTEEN} />
+                          Cancel
+                        </div>
+                      </Button>
+                    </div>
+                    <div className="w-fit h-fit">
+                      <Button onClick={handleImport}>
+                        <div className="flex items-center justify-center gap-0.5">
+                          <Import size={SIZE.SIXTEEN} />
+                          Import Accounts
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
+      {showConfirm && (
+        <ConfirmationDialog
+          open={showConfirm}
+          title="Are you sure to remove changes?"
+          message={
+            "Are you sure you want to cancel all changes on page?\nAll unsaved work will be lost."
+          }
+          onConfirm={() => onclose()}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </DndProvider>
   );
 }

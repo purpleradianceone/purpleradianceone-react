@@ -1,10 +1,13 @@
+import { useState } from "react";
 import AccountCsvMapper from "./AccountCsvMapper";
 
 const AccountImportCsvManagement = () => {
  
+const [isImpoetedFile,setIsImportedFile] = useState(false);
 
-
-
+const handleButtonClicked = (status: boolean) => {
+    setIsImportedFile(status);
+  };
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -18,11 +21,11 @@ const AccountImportCsvManagement = () => {
             <div className="flex flex-col gap-1 mt-2">
               <p className="table-header-custom">
                 Upload your{" "}
-                <span className="text-indigo-600">CSV file</span>{" "}
+                <span className="table-header-custom-blue">CSV file</span>{" "}
                 and import accounts in just a few easy steps.
               </p>
               <p className="caption-custom">
-                Supported format: <span className="font-medium">.csv</span> •
+                Supported format: <span className="caption-custom-blue">.csv</span> •
                 Ensure your file follows the required template.
               </p>
             </div>
@@ -30,12 +33,12 @@ const AccountImportCsvManagement = () => {
 
           {/* CSV Upload Component */}
           <div className="bg-gray-50 border-2 border-dashed border-indigo-300 rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-center hover:border-indigo-500 transition-all duration-200">
-      <AccountCsvMapper />
+      <AccountCsvMapper handleButtonClicked={handleButtonClicked} />
           </div>
         </div>
 
         {/* Imported Data Section */}
-        { (
+        { !isImpoetedFile&&(
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 space-y-4 transition-all duration-300 hover:shadow-xl">
             <h2 className="section-header-custom flex items-center gap-2">
               📊 Imported Data
