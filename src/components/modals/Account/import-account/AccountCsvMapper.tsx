@@ -8,43 +8,49 @@ import {
   XCircle,
   ArrowRight,
   X,
-  Import,
   LucideFolderInput,
   Eye,
   EyeOff,
   TrashIcon,
+  LucideScanEye,
+  Info,
 } from "lucide-react";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { SIZE } from "../../../../constants/AppConstants";
 import { useCompanyAccountType } from "../../../../config/hooks/useCompanyAccountType";
 import { usebusinessType } from "../../../../config/hooks/useBusinessType";
 import { useIndustryType } from "../../../../config/hooks/useIndustryType";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import MappedAccountDataPopup from "./MappedAccountDataPreview";
 
 // ----------------- TYPES -----------------
-interface Account {
-  companyId: number;
-  companyAccountTypeIdArray: number[];
-  importTag: string;
+export interface Account {
+  company_id: number;
+  company_account_type_id: number[];
+  import_tag: string;
   name: string;
   email: string;
-  mobileNumber: string;
-  industryTypeId: number;
-  businessTypeId: number;
+  mobilenumber: string;
+  industry_type_id: number;
+  business_type_id: number;
+  country_id: number;
+  state_id: number;
+  district_id: number;
   pan: string;
   gst: string;
   tan: string;
-  billingAddress: string;
-  shippingAddress: string;
-  registeredOfficeAddress: string;
-  businessResgistrationNumber: string;
+  billing_address: string;
+  shipping_address: string;
+  registered_office_address: string;
+  business_registration_number: string;
   website: string;
-  accountCreatedOn: string;
-  createdBy: number;
+  account_created_on: string;
+  createdby: number;
 }
 
 type Mapping = Record<string, string[]>;
 
-interface MappableItem {
+export interface MappableItem {
   id: number;
   name: string;
   isactive: boolean;
@@ -95,40 +101,40 @@ interface ValueMappingCardProps<T> {
 const crmRequiredFields: (keyof Account)[] = [
   "name",
   "email",
-  "mobileNumber",
-  "industryTypeId",
-  "businessTypeId",
-  "companyAccountTypeIdArray",
+  "mobilenumber",
+  "industry_type_id",
+  "business_type_id",
+  "company_account_type_id",
   "pan",
   "gst",
   "tan",
-  "billingAddress",
-  "shippingAddress",
-  "registeredOfficeAddress",
-  "businessResgistrationNumber",
+  "billing_address",
+  "shipping_address",
+  "registered_office_address",
+  "business_registration_number",
   "website",
-  "accountCreatedOn",
+  "account_created_on",
   // "leadId",
-  // "createdBy",
+  // "createdby",
 ];
 const fieldVariables: Record<string, string> = {
   name: "Name",
   email: "Email",
-  mobileNumber: "Mobile Number",
-  industryTypeId: "Industry Type Name",
-  businessTypeId: "Business Type Name",
-  companyAccountTypeIdArray: "Account Type Name",
+  mobilenumber: "Mobile Number",
+  industry_type_id: "Industry Type Name",
+  business_type_id: "Business Type Name",
+  company_account_type_id: "Account Type Name",
   pan: "PAN",
   gst: "GST",
   tan: "TAN",
-  billingAddress: "Billing Address",
-  shippingAddress: "Shipping Address",
-  registeredOfficeAddress: "Registered Office Address",
-  businessResgistrationNumber: "Business Reg No",
+  billing_address: "Billing Address",
+  shipping_address: "Shipping Address",
+  registered_office_address: "Registered Office Address",
+  business_registration_number: "Business Reg No",
   website: "Website",
-  accountCreatedOn: "Account Created On",
+  account_created_on: "Account Created On",
   // leadId: "Lead ID",
-  // createdBy: "Created By",
+  // createdby: "Created By",
 };
 
 // ----------------- DRAGGABLE CSV COLUMN -----------------
@@ -163,38 +169,83 @@ const CrmFieldDrop: React.FC<{
     accept: "CSV_COLUMN",
     drop: (item: any) => onDrop(field, item.name),
   }));
+
   return (
-    <div className="flex items-center justify-between mb-3">
-      <div className="grid grid-cols-2 w-full gap-2">
-        <span className="text-sm font-medium flex items-center">
-          {fieldVariables[field]} :
-        </span>
-        <div
-          ref={drop}
-          className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
-        >
-          {mappedCols.length === 0 && (
-            <span className="text-xs text-gray-400">Drag column here</span>
-          )}
-          {mappedCols.map((col) => (
-            <div
-              key={col}
-              className="flex items-center bg-blue-100 text-xs px-2 py-1 rounded"
+    <div className="grid grid-cols-2 gap-2 items-center mb-3">
+      {/* Field Label */}
+      <span className="text-sm font-medium flex items-center">
+        {fieldVariables[field]} :
+      </span>
+
+      {/* Droppable Area */}
+      <div
+        ref={drop}
+        className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
+      >
+        {mappedCols.length === 0 && (
+          <span className="text-xs text-gray-400">Drag column here</span>
+        )}
+        {mappedCols.map((col) => (
+          <div
+            key={col}
+            className="flex items-center bg-blue-100 text-xs px-2 py-1 rounded"
+          >
+            {col}
+            <button
+              className="ml-1 text-red-500 font-bold"
+              onClick={() => onRemove(field, col)}
             >
-              {col}
-              <button
-                className="ml-1 text-red-500 font-bold"
-                onClick={() => onRemove(field, col)}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
+              ×
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
+
+// const CrmFieldDrop: React.FC<{
+//   field: string;
+//   mappedCols: string[];
+//   onDrop: (field: string, col: string) => void;
+//   onRemove: (field: string, col: string) => void;
+// }> = ({ field, mappedCols, onDrop, onRemove }) => {
+//   const [, drop] = useDrop(() => ({
+//     accept: "CSV_COLUMN",
+//     drop: (item: any) => onDrop(field, item.name),
+//   }));
+//   return (
+//     <div className="grid items-center justify-between mb-3">
+//       <div className="grid grid-cols-2 gap-2">
+//         <span className="text-sm font-medium flex items-center">
+//           {fieldVariables[field]} :
+//         </span>
+//         <div
+//           ref={drop}
+//           className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
+//         >
+//           {mappedCols.length === 0 && (
+//             <span className="text-xs text-gray-400">Drag column here</span>
+//           )}
+//           {mappedCols.map((col) => (
+//             <div
+//               key={col}
+//               className="flex items-center bg-blue-100 text-xs px-2 py-1 rounded"
+//             >
+//               {col}
+//               <button
+//                 className="ml-1 text-red-500 font-bold"
+//                 onClick={() => onRemove(field, col)}
+//               >
+//                 ×
+//               </button>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // ----------------- GENERIC VALUE MAPPING CARD -----------------
 const GenericValueMappingCard = forwardRef(
@@ -308,7 +359,7 @@ export default function AccountCsvMapper({
   const [businessValueMapping, setBusinessValueMapping] = useState<
     Record<string, number>
   >({});
-
+  const { loginStatus } = useLoggedInUserContext();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // ----------------- CSV PARSE -----------------
@@ -347,11 +398,11 @@ export default function AccountCsvMapper({
   };
 
   // ----------------- VALUE MAPPING CARDS -----------------
-  const industryCsvValues = mapping["industryTypeId"]?.length
-    ? Array.from(new Set(csvData.map((r) => r[mapping["industryTypeId"][0]])))
+  const industryCsvValues = mapping["industry_type_id"]?.length
+    ? Array.from(new Set(csvData.map((r) => r[mapping["industry_type_id"][0]])))
     : [];
-  const businessCsvValues = mapping["businessTypeId"]?.length
-    ? Array.from(new Set(csvData.map((r) => r[mapping["businessTypeId"][0]])))
+  const businessCsvValues = mapping["business_type_id"]?.length
+    ? Array.from(new Set(csvData.map((r) => r[mapping["business_type_id"][0]])))
     : [];
 
   const handleIndustryDrop = (crmItem: MappableItem, csvValue: string) => {
@@ -391,10 +442,10 @@ export default function AccountCsvMapper({
     }));
   };
 
-  const companyAccountArrayCsvValues = mapping["companyAccountTypeIdArray"]
+  const companyAccountArrayCsvValues = mapping["company_account_type_id"]
     ?.length
     ? Array.from(
-        new Set(csvData.map((r) => r[mapping["companyAccountTypeIdArray"][0]]))
+        new Set(csvData.map((r) => r[mapping["company_account_type_id"][0]]))
       )
     : [];
 
@@ -454,6 +505,8 @@ export default function AccountCsvMapper({
     );
   };
 
+  const [mappedData, setMappedData] = useState<Account[]>([]);
+
   // ----------------- IMPORT -----------------
   const handleImport = () => {
     const mappedData: Account[] = csvData.map((row) => {
@@ -469,11 +522,11 @@ export default function AccountCsvMapper({
                   .trim()
               : row[csvFields[0]];
 
-          if (crmField === "industryTypeId")
+          if (crmField === "industry_type_id")
             value = industryValueMapping[value] || null;
-          else if (crmField === "businessTypeId")
+          else if (crmField === "business_type_id")
             value = businessValueMapping[value] || null;
-          else if (crmField === "companyAccountTypeIdArray") {
+          else if (crmField === "company_account_type_id") {
             const raw = value
               ? value.split(",").map((v: string) => v.trim())
               : [];
@@ -485,28 +538,33 @@ export default function AccountCsvMapper({
 
           if (
             [
-              "companyId",
-              "industryTypeId",
-              "businessTypeId",
+              "company_id",
+              "industry_type_id",
+              "business_type_id",
               "leadId",
-              "createdBy",
+              "createdby",
             ].includes(crmField)
           )
             obj[crmField] = value ? parseInt(value, 10) : null;
           else obj[crmField] = value;
         }
       });
+
+      obj.company_id = loginStatus.companyId;
+      obj.createdby = loginStatus.id;
       return obj as Account;
     });
+    setMappedData(mappedData);
     console.log("✅ Final Accounts JSON:", mappedData);
+    setShowPopup(true);
   };
 
-  //Dummy filds
   const { industryTypeData, loading } = useIndustryType();
   const { businessType, isLoading: businessTypeLoading } = usebusinessType();
   const { companyAccountType, isLoading: companyTypeLoading } =
     useCompanyAccountType();
 
+  //Dummy filds
   let industryTypes: MappableItem[] = [
     { id: 1, name: "Retail", isactive: true },
     { id: 2, name: "Healthcare", isactive: true },
@@ -548,6 +606,7 @@ export default function AccountCsvMapper({
   companyAccountTypes = toMappableItems(companyAccountType);
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   function onclose() {
     handleButtonClicked(false);
@@ -598,7 +657,7 @@ export default function AccountCsvMapper({
   // ----------------- RENDER -----------------
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="p-4 border-2 border-dashed rounded-md">
+      <div className="p-4 border-2 w-full border-dashed rounded-md">
         <h2 className="section-header-custom">Account CSV Import & Mapper</h2>
 
         {!(
@@ -607,12 +666,16 @@ export default function AccountCsvMapper({
           businessTypeLoading ||
           companyTypeLoading
         ) && (
-          <Button onClick={() => inputRef.current?.click()}>
-            <div className="flex items-center justify-center gap-0.5">
-              <LucideFolderInput size={SIZE.SIXTEEN} />
-              Browse CSV
+          <div className="flex justify-center items-center w-full">
+            <div className="w-fit h-fit">
+              <Button onClick={() => inputRef.current?.click()}>
+                <div className="flex items-center justify-center gap-0.5">
+                  <LucideFolderInput size={SIZE.SIXTEEN} />
+                  Browse CSV
+                </div>
+              </Button>
             </div>
-          </Button>
+          </div>
         )}
         <input
           ref={inputRef}
@@ -632,7 +695,7 @@ export default function AccountCsvMapper({
               <div className="grid w-full grid-cols-1 gap-4">
                 {/* CSV Preview */}
                 <div>
-                  <div className="w-full flex justify-end gap-3 mt-4">
+                  <div className="w-full flex justify-end gap-3 mt-4 mb-4">
                     <div className="w-fit h-fit">
                       <Button
                         type="button"
@@ -646,81 +709,119 @@ export default function AccountCsvMapper({
                         </div>
                       </Button>
                     </div>
-                    <div className="w-fit h-fit">
-                      <Button onClick={() => setShowPreview(!showPreview)}>
-                        {showPreview ? (
-                          <div className="flex items-center justify-center gap-0.5">
-                            <EyeOff size={SIZE.SIXTEEN} />
-                            Hide CSV Preview
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center gap-0.5">
-                            <Eye size={SIZE.SIXTEEN} />
-                            Show CSV Preview
-                          </div>
-                        )}
-                      </Button>
-                    </div>
                   </div>
-
-                  {showPreview && (
-                    <div className="mt-4 border rounded p-4 bg-white overflow-x-auto">
-                      <h3 className="font-semibold mb-2">
-                        CSV Preview (First 5 Rows)
-                      </h3>
-                      <table className="border-collapse border w-full text-xs min-w-[600px]">
-                        <thead>
-                          <tr>
-                            {csvHeaders.map((h) => (
-                              <th key={h} className="border p-1">
-                                {h}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {csvData.slice(0, 5).map((row, i) => (
-                            <tr key={i}>
-                              {csvHeaders.map((h) => (
-                                <td key={h} className="border p-1">
-                                  {row[h]}
-                                </td>
+                  {/* Preview Section */}
+                  {csvData && (
+                    <div className="flex-shrink-0 p-2 border rounded-lg bg-white shadow-sm">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="table-header-custom">
+                          Preview (First 5 Rows)
+                        </h4>
+                        <div className="w-fit h-fit">
+                          <Button onClick={() => setShowPreview(!showPreview)}>
+                            {showPreview ? (
+                              <div className="flex items-center justify-center gap-0.5">
+                                <EyeOff size={SIZE.SIXTEEN} />
+                                Hide CSV Preview
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center gap-0.5">
+                                <Eye size={SIZE.SIXTEEN} />
+                                Show CSV Preview
+                              </div>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {showPreview && (
+                        <div className="w-full overflow-x-auto border rounded-md">
+                          <table className="w-full text-sm min-w-[2500px]">
+                            <thead className="bg-gray-50 ">
+                              <tr>
+                                {csvHeaders.map((h, i) => (
+                                  <th
+                                    key={i}
+                                    className="border p-1 px-3 py-2 text-left table-header-custom w-fit"
+                                  >
+                                    {h}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {csvData.slice(0, 5).map((row, i) => (
+                                <tr
+                                  key={i}
+                                  className="border-t table-data-custom"
+                                >
+                                  {csvHeaders.map((h) => (
+                                    <td
+                                      key={h}
+                                      className="border p-1 px-3 py-2"
+                                    >
+                                      {row[h]}
+                                    </td>
+                                  ))}
+                                </tr>
                               ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      <div className="caption-custom">
+                        Total records in csv file : {csvData.length - 1}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Normal CRM Fields */}
+
                 <div className="grid grid-cols-1 w-full mt-4 gap-4">
                   <div className="flex col-span-2 gap-6 w-full">
-                    <div className="border rounded p-4 bg-gray-50 w-full">
-                      <h3 className="font-semibold mb-2 w-fit">
-                        1. CSV Columns
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {csvHeaders.map((col) => (
-                          <CsvColumn key={col} col={col} />
-                        ))}
+                    {/*  CSV Fields */}
+                    <div className="w-full lg:w-5/12 xl:w-4/12 flex flex-col gap-4">
+                      <div className="border rounded-lg p-3 bg-white shadow-sm">
+                        <h3 className=" flex items-center gap-1 table-header-custom mb-3">
+                          <span>1. CSV Columns</span>
+                          <span
+                            className="cursor-pointer"
+                            title="Available Columns From Given CSV File."
+                          >
+                            <Info size={12} className="" />
+                          </span>
+                        </h3>
+                        <ul className="grid max-h-[600px] overflow-y-auto grid-col-1 sm:grid-cols-2 gap-2">
+                          {csvHeaders.map((col) => (
+                            <CsvColumn key={col} col={col} />
+                          ))}
+                        </ul>
                       </div>
                     </div>
-                    <div className="border w-full rounded p-4 bg-gray-50">
-                      <h3 className="font-semibold mb-2">
-                        2. Map Columns to CRM Fields
-                      </h3>
 
-                      {crmRequiredFields.map((field) => (
-                        <CrmFieldDrop
-                          key={field}
-                          field={field}
-                          mappedCols={mapping[field] || []}
-                          onDrop={handleDrop}
-                          onRemove={handleRemove}
-                        />
-                      ))}
+                {/* Normal CRM Fields */}
+                    <div className="w-full  lg:w-7/12 xl:w-8/12 flex flex-col">
+                      <div className="border rounded-lg p-4 bg-white flex-grow shadow-sm">
+                        <h3 className=" flex items-center gap-2 table-header-custom mb-4">
+                          <span>2. Map Columns to CRM Fields </span>
+                          <span
+                            className="cursor-pointer"
+                            title="You can add multiple columns for single crn fields for concatination. Eg: for Full Name : if in CSV File available data is first name and last name then you can add both in Full Name field. Data will be concatinated"
+                          >
+                            <Info size={12} />
+                          </span>
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {crmRequiredFields.map((field) => (
+                            <CrmFieldDrop
+                              key={field}
+                              field={field}
+                              mappedCols={mapping[field] || []}
+                              onDrop={handleDrop}
+                              onRemove={handleRemove}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -782,8 +883,8 @@ export default function AccountCsvMapper({
                     <div className="w-fit h-fit">
                       <Button onClick={handleImport}>
                         <div className="flex items-center justify-center gap-0.5">
-                          <Import size={SIZE.SIXTEEN} />
-                          Import Accounts
+                          <LucideScanEye size={SIZE.SIXTEEN} />
+                          Preview Mapped Data
                         </div>
                       </Button>
                     </div>
@@ -793,6 +894,15 @@ export default function AccountCsvMapper({
             )}
           </div>
         )}
+        <MappedAccountDataPopup
+          open={showPopup}
+          onClose={() => setShowPopup(false)}
+          mappedData={mappedData}
+          fieldVariables={fieldVariables}
+          industryTypes={industryTypes}
+          businessTypes={businessTypes}
+          companyAccountTypes={companyAccountTypes}
+        />
       </div>
       {showConfirm && (
         <ConfirmationDialog
