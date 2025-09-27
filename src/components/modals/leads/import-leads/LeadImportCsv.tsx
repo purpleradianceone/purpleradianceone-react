@@ -72,7 +72,6 @@ const ItemTypes = {
   CSV_OWNER_VALUE: "csv_owner_value",
   CSV_INTEREST_VALUE: "csv_interest_value",
   CSV_PRODUCT_VALUE: "csv_product_value",
-
 };
 
 interface DragItem {
@@ -180,7 +179,11 @@ const DroppableCrmField: React.FC<{
 interface ValueMappingCardProps<T extends MappableItem> {
   title: string;
   csvValues: string[];
-  crmData: T[] | PostDataTypeForLeadSourceAndStatusAndStates[] |Product[] | null;
+  crmData:
+    | T[]
+    | PostDataTypeForLeadSourceAndStatusAndStates[]
+    | Product[]
+    | null;
   mapping: ValueMapping;
   onDrop: (crmItem: T, csvValue: string) => void;
   onRemove: (crmItem: T) => void;
@@ -397,7 +400,7 @@ const LeadImportCsv = ({
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
   const leadSourceMappingRef = useRef<HTMLDivElement>(null);
   const leadOwnerMappingRef = useRef<HTMLDivElement>(null);
-    const productDataMappingRef = useRef<HTMLDivElement>(null);
+  const productDataMappingRef = useRef<HTMLDivElement>(null);
 
   const leadInterestTypeMappingRef = useRef<HTMLDivElement>(null);
 
@@ -410,7 +413,8 @@ const LeadImportCsv = ({
     {}
   );
   const [ownerValueMapping, setOwnerValueMapping] = useState<ValueMapping>({});
-    const [productDataValueMapping, setProductDataValueMapping] = useState<ValueMapping>({});
+  const [productDataValueMapping, setProductDataValueMapping] =
+    useState<ValueMapping>({});
 
   const [InterestTypeValueMapping, setInterestTypeValueMapping] =
     useState<ValueMapping>({});
@@ -419,7 +423,9 @@ const LeadImportCsv = ({
   const [csvUniqueStatuses, setCsvUniqueStatuses] = useState<string[]>([]);
   const [csvUniqueSources, setCsvUniqueSources] = useState<string[]>([]);
   const [csvUniqueOwners, setCsvUniqueOwners] = useState<string[]>([]);
-    const [csvUniqueProductData, setCsvUniqueProductData] = useState<string[]>([]);
+  const [csvUniqueProductData, setCsvUniqueProductData] = useState<string[]>(
+    []
+  );
 
   const [csvUniqueInterestType, setCsvUniqueInterestType] = useState<string[]>(
     []
@@ -438,7 +444,6 @@ const LeadImportCsv = ({
   const [totalProductData, setTotalProductData] = useState<number>(0); // Total count for pagination
   const [productDataCurrentPage, setProductDataCurrentPage] =
     useState<number>(0);
-
 
   const [totalCompanyUsers, setTotalCompanyUsers] = useState<number>(0); // Total count for pagination
   const [companyUsersCurrentPage, setCompanyUsersCurrentPage] =
@@ -591,10 +596,11 @@ const LeadImportCsv = ({
   }, []);
 
   // Note : api call to get company product
-  const fetchCompanyProducts = async ( 
+  const fetchCompanyProducts = async (
     searchParameter: string,
     offset: number,
-    limit: number) => {
+    limit: number
+  ) => {
     const getProductPostData = {
       company_id: loginStatus.companyId,
       id: null,
@@ -615,14 +621,13 @@ const LeadImportCsv = ({
         }
       );
 
-
       const normalizedProductData = response.data.map((product: any) => ({
         ...product,
         name: `${product.name}`.trim(),
       }));
       setProductsData(normalizedProductData);
 
-       // Assuming the API response includes a total count in a 'count' field
+      // Assuming the API response includes a total count in a 'count' field
       if (response.data.length > 0 && response.data[0].count !== undefined) {
         setTotalProductData(response.data[0].count);
       } else {
@@ -660,7 +665,8 @@ const LeadImportCsv = ({
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: () => fetchCompanyProducts(searchParameter, offset, limit),
+          callFunction: () =>
+            fetchCompanyProducts(searchParameter, offset, limit),
         });
 
         if (refreshTokenStatus) {
@@ -670,10 +676,9 @@ const LeadImportCsv = ({
     }
   };
 
-   
-  useEffect(() =>{
-    console.log(productsData); 
-  },[productsData])
+  useEffect(() => {
+    console.log(productsData);
+  }, [productsData]);
   // Note : Api call to get the data Company User with offset and limit
   const fetchCompanyUsers = async (
     searchParameter: string,
@@ -721,7 +726,7 @@ const LeadImportCsv = ({
 
   useEffect(() => {
     fetchApiData();
-    fetchCompanyProducts("", 0 , userPreference.rowsInGrid || 40);
+    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 40);
     fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
@@ -742,7 +747,12 @@ const LeadImportCsv = ({
 
   // Note : extract the unique values
   const extractUniqueValues = (
-    fieldId: "leadStatus" | "leadSource" | "leadOwner" | "lead_interest_id" | "company_product_id",
+    fieldId:
+      | "leadStatus"
+      | "leadSource"
+      | "leadOwner"
+      | "lead_interest_id"
+      | "company_product_id",
     setUniqueValues: (v: string[]) => void
   ) => {
     const mappedHeaders = fieldMappings[fieldId];
@@ -762,6 +772,43 @@ const LeadImportCsv = ({
     setUniqueValues(Array.from(unique));
   };
 
+  const extractUniqueValuesForMultipleMapping = (
+    fieldId: "company_product_id",
+    setUniqueValues: (v: string[]) => void
+  ) => {
+    const mappedHeaders = fieldMappings[fieldId];
+    if (!csvData || !mappedHeaders?.length) {
+      setUniqueValues([]);
+      return;
+    }
+
+    const indices = mappedHeaders
+      .map((h) => originalCsvHeaders.indexOf(h))
+      .filter((i) => i !== -1);
+
+    const unique = new Set<string>();
+
+    csvData.slice(1).forEach((row) => {
+      indices.forEach((index: number) => {
+        const cellValue = row[index];
+
+        if (cellValue?.trim().includes(`"`)) {
+          const values = cellValue
+            .replace(/"/g, "")
+            .split(":")
+            .map((v) => v.trim())
+            .filter((v) => v.length > 0);
+
+          values.forEach((v) => {
+            unique.add(v);
+          });
+        }
+      });
+    });
+
+    setUniqueValues(Array.from(unique));
+  };
+
   // Note
   useEffect(() => {
     extractUniqueValues("leadStatus", setCsvUniqueStatuses);
@@ -776,8 +823,11 @@ const LeadImportCsv = ({
     setOwnerValueMapping({});
   }, [csvData, fieldMappings.leadOwner]);
   // for Product Data
-   useEffect(() => {
-    extractUniqueValues("company_product_id", setCsvUniqueProductData);
+  useEffect(() => {
+    extractUniqueValuesForMultipleMapping(
+      "company_product_id",
+      setCsvUniqueProductData
+    );
     setProductDataValueMapping({});
   }, [csvData, fieldMappings.company_product_id]);
   // for interest type
@@ -801,13 +851,13 @@ const LeadImportCsv = ({
     setStatusValueMapping({});
     setSourceValueMapping({});
     setInterestTypeValueMapping({});
-    setProductDataValueMapping({})
+    setProductDataValueMapping({});
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
-    setCsvUniqueProductData([])
-    setCsvUniqueInterestType([])
+    setCsvUniqueProductData([]);
+    setCsvUniqueInterestType([]);
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
 
@@ -838,13 +888,13 @@ const LeadImportCsv = ({
     setStatusValueMapping({});
     setSourceValueMapping({});
     setInterestTypeValueMapping({});
-    setProductDataValueMapping({})
+    setProductDataValueMapping({});
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
-    setCsvUniqueInterestType([])
-    setCsvUniqueProductData([])
+    setCsvUniqueInterestType([]);
+    setCsvUniqueProductData([]);
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
   };
@@ -859,9 +909,26 @@ const LeadImportCsv = ({
           .map((l) => l.trim())
           .filter(Boolean);
         if (lines.length < 1) throw new Error("CSV file is empty.");
-        const parsedData = lines.map((line) =>
-          line.split(",").map((cell) => cell.trim().replace(/^"|"$/g, ""))
+
+        const parsedData = lines.map((line) => {
+          const newLine = line.replace(/"(.*?)"/g, (content) => {
+            // match: The entire quoted string (e.g., '"cdc,csc"')
+            // content: The content inside the quotes (e.g., 'cdc,csc')
+
+            // 1. Replace all commas inside the content with colons (:)
+            const newContent = content.replace(/,/g, ":");
+
+            // 2. Re-wrap the modified content with double quotes
+            return `"${newContent}"`;
+          });
+
+          return newLine.split(",").map((cell) => cell.trim());
+        });
+
+        console.log(
+          "_____________________________ line ______________________________"
         );
+        console.log(parsedData);
         setCsvData(parsedData);
         setOriginalCsvHeaders(parsedData[0]);
         // setError(null);
@@ -879,25 +946,24 @@ const LeadImportCsv = ({
     reader.readAsText(file);
   };
 
-
-//   const readCsv = (file: File) => {
-//   setIsParsing(true);
-//   Papa.parse(file, {
-//     complete: (result :any) => {
-//       setCsvData(result.data);
-//       setOriginalCsvHeaders(result.data[0]);
-//       handleCloseSnackbar();
-//       setIsParsing(false);
-//     },
-//     error: (err :any) => {
-//       showMessageSnackbar({
-//         message: err.message || "Failed to parse CSV.",
-//         type: "error",
-//       });
-//       setIsParsing(false);
-//     },
-//   });
-// };
+  //   const readCsv = (file: File) => {
+  //   setIsParsing(true);
+  //   Papa.parse(file, {
+  //     complete: (result :any) => {
+  //       setCsvData(result.data);
+  //       setOriginalCsvHeaders(result.data[0]);
+  //       handleCloseSnackbar();
+  //       setIsParsing(false);
+  //     },
+  //     error: (err :any) => {
+  //       showMessageSnackbar({
+  //         message: err.message || "Failed to parse CSV.",
+  //         type: "error",
+  //       });
+  //       setIsParsing(false);
+  //     },
+  //   });
+  // };
   const handleDropField = useCallback(
     (crmFieldId: string, csvHeader: string) => {
       setFieldMappings((prev) => {
@@ -990,6 +1056,8 @@ const LeadImportCsv = ({
       if (newMapping[key] === csvValue) delete newMapping[key];
     });
     newMapping[String(crmItem.id)] = csvValue;
+    console.log("new Mapping : ");
+    console.log(newMapping);
     setMapping(newMapping);
   };
 
@@ -1025,7 +1093,14 @@ const LeadImportCsv = ({
       const values = mappedHeaders
         .map((header) => {
           const index = originalCsvHeaders.indexOf(header);
-          return index !== -1 ? row[index]?.trim() : null;
+
+          if (row[index].replace(/"/g, "").split(":").length === 1) {
+            return index !== -1 ? row[index]?.trim() : null;
+          } else {
+            return index !== -1
+              ? row[index].replace(/"/g, "").split(":")
+              : null;
+          }
         })
         .filter(Boolean); // Filter out null, undefined, empty strings
 
@@ -1038,6 +1113,11 @@ const LeadImportCsv = ({
       // Get email and mobile for duplicate checking using the new helper
       const email = getConcatenatedCsvValue(row, "email");
       const mobile = getConcatenatedCsvValue(row, "mobileNumber");
+      const product = getConcatenatedCsvValue(row, "company_product_id");
+      console.log("valuse");
+      // console.log(row)
+      console.log(product);
+      console.log("valuse");
 
       let isDuplicate = false;
       if (email && emailSet.has(email)) {
@@ -1054,10 +1134,15 @@ const LeadImportCsv = ({
         mobileSet.add(mobile);
       }
 
-      const mappedData: { [key: string]: string | number | null | undefined} = {};
-      const displayData: { [key: string]: string | null | undefined } = {};
+      const mappedData: {
+        [key: string]: string | number | null | undefined | number[] | string[];
+      } = {};
+      const displayData: {
+        [key: string]: string | null | undefined | number[] | string[];
+      } = {};
 
       // Iterate through all CRM fields to process them
+
       crmLeadFields.forEach((field) => {
         const csvValue = getConcatenatedCsvValue(row, field.id); // Use helper for any field
 
@@ -1080,13 +1165,75 @@ const LeadImportCsv = ({
           mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
           displayData[field.id] = crmOwner ? crmOwner.fullname : csvValue; // Display Name or original CSV
         }
-        // Note : product data 
-        else if (field.id === "company_product_id" && csvValue) {
-          const crmProduct = productsData?.find(
-            (product) => productDataValueMapping[String(product.id)] === csvValue
-          );
-          mappedData[field.id] = crmProduct ? crmProduct.id : null; // Store ID
-          displayData[field.id] = crmProduct ? crmProduct.name : csvValue; // Display Name or original CSV
+        // Note : product data
+        else if (field.id === "company_product_id") {
+          // console.log("inside product cond");
+          // console.log(csvValue);
+          //  console.log("inside product cond");
+          const prodArr = product?.split(",").map(item => item.trim());
+          // const crmProduct = productsData.filter((p) => {
+          //   console.log(
+          //     " ___________________________________________ data ___________________________________________"
+          //   );
+          //   console.log(p);
+           
+          //   const idArr : number[] = [];
+          //    prodArr?.map((x) => {
+
+          //     console.log(
+          //   );
+          //   console.log(x);
+          //   console.log(productDataValueMapping[String(p.id)]);
+          //   console.log(
+          //   );
+            
+          //     if (productDataValueMapping[String(p.id)] === x){
+          //           idArr.push(p.id!)
+          //     }
+          //   });
+
+          //    console.log(
+          //     " ___________________________________________ data ___________________________________________"
+          //   );
+          //    console.log(
+          //     " ___________________________________________ IDARR ___________________________________________"
+          //   );
+
+          //   console.log(idArr);
+
+          //   console.log(
+          //     " ___________________________________________ IDARR ___________________________________________"
+          //   );
+          //   return idArr;
+          // });
+
+          const crmProduct = productsData.filter((p) => {
+  // Check for valid ID and if the mapped value is included in prodArr
+   console.log(
+              " ___________________________________________ IDARR ___________________________________________"
+            );
+              console.log(prodArr);
+
+  const mappedValue = productDataValueMapping[String(p.id)];
+
+  console.log(mappedValue)
+  console.log(
+              " ___________________________________________ IDARR ___________________________________________"
+            );
+  return p.id !== undefined && p.id !== null && prodArr?.includes(mappedValue);
+});
+
+
+
+// 2. Use map() on the filtered array to extract only the 'id' property.
+const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
+
+          mappedData[field.id] = crmProduct
+            ? crmProductIds
+            : null; // Store ID
+          displayData[field.id] = crmProduct
+            ? "kjebfvkrsebfk"
+            : null; // Display Name or original CSV
         }
         // NOte : lead interest type leadInterestType
         else if (field.id === "lead_interest_id" && csvValue) {
@@ -1095,7 +1242,9 @@ const LeadImportCsv = ({
               InterestTypeValueMapping[String(interest.id)] === csvValue
           );
           mappedData[field.id] = crmInterestType ? crmInterestType.id : null; // Store ID
-          displayData[field.id] = crmInterestType ? crmInterestType.name : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmInterestType
+            ? crmInterestType.name
+            : csvValue; // Display Name or original CSV
         } else {
           // For other fields (including 'name', 'email', etc.), store the concatenated CSV value
           mappedData[field.id] = csvValue;
@@ -1283,7 +1432,8 @@ const LeadImportCsv = ({
 
   // NOte : product data
   const showProductDataMapping =
-    fieldMappings.company_product_id?.length > 0 && csvUniqueProductData.length > 0;
+    fieldMappings.company_product_id?.length > 0 &&
+    csvUniqueProductData.length > 0;
   const showLeadInterestTypeMapping =
     fieldMappings.lead_interest_id?.length > 0 &&
     csvUniqueInterestType.length > 0;

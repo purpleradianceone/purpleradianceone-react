@@ -40,7 +40,7 @@ const gridRef = useRef<AgGridReact>(null);
       { headerName: "Name", field: "name" },
       
       { headerName: "Product", field: "company_product_name" },
-      { headerName: "Product Interest", field: "lead_interest" },
+      { headerName: "Interest", field: "lead_interest" },
       { headerName: "Description", field: "description" },
       { headerName: "Lead Created On", field: "lead_created_on" },
 
@@ -60,6 +60,7 @@ const gridRef = useRef<AgGridReact>(null);
       { headerName: "Lead Status", field: "lead_status" },
        { headerName: "Lead Source", field: "lead_source" },
        { headerName: "Lead Owner", field: "lead_owner" },
+       {headerName : "Products" , field:"company_product_name"},
       { headerName: "Owner ID", field: "ownerid" , hide:true },
      
       { headerName: "Lead Source ID", field: "lead_source_id"  , hide:true},
