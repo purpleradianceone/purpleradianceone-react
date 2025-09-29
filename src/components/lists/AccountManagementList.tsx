@@ -34,7 +34,7 @@ function AccountManagementList({
   fetchAccounts,
   handleCreateCompanyAccountType,
   isUsedForAccountLead,
-  handleRowSelectedForLead
+  handleRowSelectedForLead,
 }: {
   fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -43,8 +43,8 @@ function AccountManagementList({
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
   handleCreateCompanyAccountType: () => void;
-  isUsedForAccountLead : boolean;
-  handleRowSelectedForLead? : (data: Account | any) => void;
+  isUsedForAccountLead: boolean;
+  handleRowSelectedForLead?: (data: Account | any) => void;
 }) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -62,12 +62,11 @@ function AccountManagementList({
   const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: any) => {
-    if(!isUsedForAccountLead){
-        setAccountDataToShowFullDetails(data);
-    setShowAccountDetails(true);
-    }
-    else{
-        handleRowSelectedForLead!(data);
+    if (!isUsedForAccountLead) {
+      setAccountDataToShowFullDetails(data);
+      setShowAccountDetails(true);
+    } else {
+      handleRowSelectedForLead!(data);
     }
   };
 
@@ -81,10 +80,14 @@ function AccountManagementList({
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
-      <div className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
+      <div
+        className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+      >
         <div className="flex items-center justify-center gap-2">
           {!isSmallScreen && (
-            <UserRoundCogIcon className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+            <UserRoundCogIcon
+              className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+            />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
@@ -93,47 +96,47 @@ function AccountManagementList({
         </div>
 
         {/* {isLargeScreen && ( */}
-          <>
-            <div className="flex gap-2 justify-center items-center">
+        <>
+          <div className="flex gap-2 justify-center items-center">
+            {/* search box flex div */}
+            <div className="flex gap-1">
               {/* search box flex div */}
-              <div className="flex gap-1">
-                {/* search box flex div */}
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                ></SearchInput>
+              </div>
 
-                {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="input-label-custom mt-1" />
-                    </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
+              {/* Date FIlters Dropdown */}
+              <div className="flex mx-3">
+                <div className="flex">
+                  <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                    <Calendar className="input-label-custom mt-1" />
                   </div>
-            </div>
-            {/* Custom Date Picker Div Flex Box*/}
-            <div
-              style={
-                isCustomDateOptionSelected
-                  ? { visibility: "visible" }
-                  : { visibility: "hidden" }
-              }
-            >
-              <DateRangePicker
-                onStartDateChange={onStartDateChange}
-                onEndDateChange={onEndDateChange}
-              />
-            </div>
+
+                  <DateRangeFilterDropdown
+                    dropdownOptions={dateRangeDropdownOptions}
+                    handleDateIdChange={handleDateRangeIdChange}
+                  ></DateRangeFilterDropdown>
+                </div>
+              </div>
+              {/* Custom Date Picker Div Flex Box*/}
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
             </div>
 
             {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
@@ -204,26 +207,27 @@ function AccountManagementList({
           </div>
         </>
 
-        {!isUsedForAccountLead && (
-<div className="flex gap-2">
-          <div className="w-fit h-fit">
-            <Button
-              disabled={!userHasAccessToAddAccount}
-              onClick={() => {
-                if (userHasAccessToAddAccount) {
-                  handleShowImportModule();
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .DENIED_ADD_LEAD_IMPORT_ACCESS
-                  );
-                }
-              }}
-            >
-              <Plus size={SIZE.SIXTEEN} />
-              Import
-            </Button>
-          </div>
+        <div className="flex gap-2">
+          {!isUsedForAccountLead && (
+            <div className="w-fit h-fit">
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                onClick={() => {
+                  if (userHasAccessToAddAccount) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                    );
+                  }
+                }}
+              >
+                <Plus size={SIZE.SIXTEEN} />
+                Import
+              </Button>
+            </div>
+          )}
 
           <div>
             <Button
@@ -245,17 +249,16 @@ function AccountManagementList({
             )}
           </div>
         </div>
-        )}
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
         <div
           className={
-            !isUsedForAccountLead ?
-            userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-128px)]"
-              : "ag-theme-balham w-full h-[calc(100vh-280px)]"
+            !isUsedForAccountLead
+              ? userPreference.isLeftMenu
+                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+              : "ag-theme-balham w-full h-[calc(100vh-320px)]"
           }
         >
           <AccountManagementAgGrid
