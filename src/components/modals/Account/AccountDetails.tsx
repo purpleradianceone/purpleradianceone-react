@@ -33,6 +33,10 @@ import { useIndustryType } from "../../../config/hooks/useIndustryType";
 import { usebusinessType } from "../../../config/hooks/useBusinessType";
 import AccountLead from "./account-lead/AccountLead";
 import AccountContact from "./account-contact-temp/AccountContact";
+import ToggleButton from "../../ui/ToggleButton";
+import { useCountries } from "../../../config/hooks/useCountries";
+import { useStates } from "../../../config/hooks/useStates";
+import { useDistricts } from "../../../config/hooks/useDisctricts";
 // Note this is the type
 interface AccountDetailsProps {
   company: Account;
@@ -54,13 +58,17 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     [key: string]: string;
   }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState<"primary contact" | "legal" | "address">(
-    "primary contact"
+  const [activeTab, setActiveTab] = useState<"primary contact" | "legal" | "address" | "details">(
+    "details"
   );
   const { industryTypeData, loading: isIndustryTypeLoading } =
     useIndustryType();
   const { businessType, isLoading: isBusinessTypeLoading } = usebusinessType();
 
+  const {countries} = useCountries();
+  const {states} = useStates(formData.countryId);
+  const {districts} = useDistricts(formData.stateId);
+ 
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
       case "name":
@@ -111,6 +119,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       mobilenumber: formData.mobileNumber.trim(),
       industry_type_id: formData.industryTypeId,
       business_type_id: formData.businessTypeId,
+      country_id : formData.countryId,
+      state_id : formData.stateId,
+      district_id : formData.districtId,
       pan: formData.pan.trim(),
       gst: formData.gst.trim(),
       tan: formData.tan.trim(),
@@ -160,6 +171,58 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       });
   };
 
+  const handleAccountStatusToggle = async(event : React.ChangeEvent<HTMLInputElement>) => {
+    const {checked} = event.target;
+     const postData = {
+      id: formData.id,
+      company_id: loginStatus.companyId,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      mobilenumber: formData.mobileNumber.trim(),
+      industry_type_id: formData.industryTypeId,
+      business_type_id: formData.businessTypeId,
+      country_id : formData.countryId,
+      state_id : formData.stateId,
+      district_id : formData.districtId,
+      pan: formData.pan.trim(),
+      gst: formData.gst.trim(),
+      tan: formData.tan.trim(),
+      billing_address: formData.billingAddress.trim(),
+      shipping_address: formData.shippingAddress.trim(),
+      registered_office_address: formData.registeredOfficeAddress.trim(),
+      business_registration_number: formData.businessResgistrationNumber.trim(),
+      website: formData.website.trim(),
+      isactive: checked,
+      updatedby_id: loginStatus.id,
+    };
+
+    await axios
+      .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+          setFormData((prev) => ({ ...prev, isActive: checked }));
+        } else {
+          toast.error(response.data.message);
+          
+        }
+        fetchAccounts();
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: handleUpdateAccountDetails,
+          });
+          if (refreshTokenResponse) {
+            handleAccountStatusToggle(event);
+          }
+        } else {
+          toast.error(error.response.data);
+         
+        }
+      });
+  }
+
   const handleFieldClick = (fieldName: string) => {
     if (!["createdOn", "createdBy"].includes(fieldName)) {
       setEditingField(fieldName);
@@ -206,6 +269,33 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         industryTypeName: selectedName,
       }));
     }
+    else if (fieldName === "countryName") {
+      setFormData((prev) => ({
+        ...prev,
+        countryId: parseInt(selectedId),
+        countryName: selectedName,
+        stateId : 0,
+        stateName : "",
+        districtId : 0,
+        districtName : ""
+      }));
+    }
+    else if (fieldName === "stateName") {
+      setFormData((prev) => ({
+        ...prev,
+        stateId: parseInt(selectedId),
+        stateName: selectedName,
+        districtId : 0,
+        districtName : ""
+      }));
+    }
+    else if (fieldName === "districtName") {
+      setFormData((prev) => ({
+        ...prev,
+        districtId: parseInt(selectedId),
+        districtName: selectedName,
+      }));
+    }
   };
 
   const handleInputBlur = (fieldName: string) => {
@@ -225,16 +315,28 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     const currentValue =
       fieldName === "businessTypeName"
         ? formData.businessTypeName
-        : formData.industryTypeName;
-    const originalValue =
-      fieldName === "businessTypeName"
-        ? company.businessTypeName
-        : company.industryTypeName;
+        : fieldName === "industryTypeName" 
+        ? formData.industryTypeName 
+        : fieldName === "countryName" 
+        ? formData.countryName 
+        : fieldName === "stateName" 
+        ? formData.stateName 
+        : formData.districtName;
+    // const originalValue =
+    //   fieldName === "businessTypeName"
+    //     ? company.businessTypeName
+    //      : fieldName === "industryTypeName" 
+    //     ? formData.industryTypeName 
+    //     : fieldName === "countryName" 
+    //     ? formData.countryName 
+    //     : fieldName === "stateName" 
+    //     ? formData.stateName 
+    //     : formData.districtName;
 
     // Only call API if value actually changed
-    if (currentValue !== originalValue) {
+    // if (currentValue !== originalValue) {
       handleUpdateAccountDetails(fieldName, currentValue || "");
-    }
+    // }
     setEditingField(null);
   };
 
@@ -270,7 +372,13 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               value={
                 fieldName === "businessTypeName"
                   ? formData.businessTypeId || ""
-                  : formData.industryTypeId || ""
+                  : fieldName === "industryTypeName"
+                  ? formData.industryTypeId || "" 
+                  : fieldName === "countryName" 
+                  ? formData.countryId || ""
+                  : fieldName === "stateName" 
+                  ? formData.stateId 
+                  : formData.districtId
               }
               onChange={(e) => {
                 const selectedOption = options.find(
@@ -395,6 +503,135 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   const renderTabContent = () => {
     switch (activeTab) {
+      case "details":
+        return (
+          <div className="grid grid-cols-2 gap-2 p-1">
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Industry Type</span>
+              </h3>
+             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+
+                <div className="ml-1 truncate">
+                  {renderDropdownField(
+                    "industryTypeName",
+                    formData.industryTypeName,
+                    industryTypeData,
+                    "Select industry type"
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Account Status</span>
+              </h3>
+               <div className="text-sm text-slate-600 bg-white p-2 rounded-lg border border-green-100">
+              <div className="flex items-center gap-4">
+                {formData.isActive ? (
+                  <div className="flex items-center text-green-600">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    <span className="input-label-custom-active">Active</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center text-red-600">
+                    <XCircle className="h-4 w-4 mr-1" />
+                    <span className="input-label-custom-inactive">
+                      Inactive
+                    </span>
+                  </div>
+                )}
+
+                <ToggleButton
+                checked={formData.isActive}
+                name="isActive"
+                onToggle={handleAccountStatusToggle}
+
+                />
+              </div>
+            </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Business Type</span>
+              </h3>
+               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+              <div className="grid items-center text-slate-700">
+                <div className="flex items-center">
+                  <Factory className="h-4 w-4 mr-2" />
+                  <div className="caption-custom truncate">
+                    {renderDropdownField(
+                      "businessTypeName",
+                      formData.businessTypeName,
+                      businessType || [],
+                      "Select business type"
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Country</span>
+              </h3>
+             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+
+                <div className="ml-1 truncate">
+                  {renderDropdownField(
+                    "countryName",
+                    formData.countryName,
+                    countries,
+                    "Select Country"
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">State</span>
+              </h3>
+               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+
+                <div className="ml-1 truncate">
+                  {renderDropdownField(
+                    "stateName",
+                    formData.stateName,
+                    states,
+                    "Select State"
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">District</span>
+              </h3>
+               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+              <div className="grid items-center text-slate-700">
+                <div className="flex items-center">
+                  <Factory className="h-4 w-4 mr-2" />
+                  <div className="caption-custom truncate">
+                    {renderDropdownField(
+                      "districtName",
+                      formData.districtName,
+                      districts,
+                      "Select District"
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        );
+
       case "primary contact":
         return (
           // <div className="grid  grid-cols-1 sm:grid-cols-2 gap-3 justify-evenly h-full bg-pink-300   items-stretch">
@@ -581,7 +818,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         {/* Main header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-4 rounded-xl">
+            <div className={`p-4 rounded-xl ${formData.isActive ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-red-500 to-amber-600' }`}>
               <Building2 className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -592,7 +829,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   "Enter company name"
                 )}
               </h1>
-              <div className="text-slate-600 flex items-center">
+              {/* <div className="text-slate-600 flex items-center">
                 <span className="input-label-custom">Industry type:</span>
 
                 <div className="ml-1 truncate">
@@ -618,7 +855,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                     </span>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -640,7 +877,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
 
             {/* Business type */}
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
+            {/* <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
               <div className="grid items-center text-slate-700">
                 <div className="input-label-custom">Business type</div>
                 <div className="flex items-center">
@@ -655,7 +892,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -666,6 +903,17 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         <div className="bg-white rounded-xl p-1 border border-slate-200">
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 mb-2">
+            <button
+              onClick={() => setActiveTab("details")}
+              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
+                activeTab === "details"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
+              }`}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Details
+            </button>
             <button
               onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${

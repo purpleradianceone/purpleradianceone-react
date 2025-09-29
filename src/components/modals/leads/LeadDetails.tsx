@@ -459,6 +459,7 @@ const LeadDetails = ({
             label="Country"
             handleGetDropdownData={() => {
               getAllCountries();
+              ;
             }}
             selectOptions={countryOptions}
             value={editLeadDetails.country_name}
