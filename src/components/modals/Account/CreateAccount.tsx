@@ -48,7 +48,7 @@ import { useDistricts } from "../../../config/hooks/useDisctricts";
 
 type CreateAccountType = {
   onClose: () => void;
-  handleCreateCompanyAccountType: () => void;
+  handleCreateAccount: () => void;
 };
 type AccountFormType = {
   name: string;
@@ -70,7 +70,7 @@ type AccountFormType = {
 };
 const CreateAccount: React.FC<CreateAccountType> = ({
   onClose,
-  handleCreateCompanyAccountType,
+  handleCreateAccount,
 }) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -329,7 +329,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
         if (data.status === true) {
           toast.success(data.message);
           handleStateClear();
-          handleCreateCompanyAccountType();
+          handleCreateAccount();
           onClose();
         } else {
           toast.error(data.message);

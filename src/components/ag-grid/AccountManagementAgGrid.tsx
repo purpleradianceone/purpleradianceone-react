@@ -10,10 +10,12 @@ function AccountManagementAgGrid({
   accounts,
   handleRowClick,
   onRowSelect,
+  isUsedForAccountLead
 }: {
   accounts: Account[];
   handleRowClick?: (event:  any) => void;
   onRowSelect?: (data: Account | any) => void;
+  isUsedForAccountLead : boolean
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -35,6 +37,7 @@ function AccountManagementAgGrid({
         filter: true,
         flex: 1.5,
         minWidth: 200,
+        
       },
       {
         field: "mobileNumber",
@@ -50,6 +53,7 @@ function AccountManagementAgGrid({
         flex: 1,
         minWidth: 180,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+        hide: isUsedForAccountLead
       },
       {
         field: "businessTypeName",
@@ -57,6 +61,7 @@ function AccountManagementAgGrid({
         sortable: true,
         filter: true,
         minWidth: 200,
+        hide: isUsedForAccountLead,
         tooltipValueGetter(params) {
           return params.data.businessTypeName;
         },
@@ -70,6 +75,7 @@ function AccountManagementAgGrid({
         tooltipValueGetter(params) {
           return params.data.countryName;
         },
+        hide: isUsedForAccountLead
       },
        {
         field: "stateName",
@@ -80,6 +86,7 @@ function AccountManagementAgGrid({
         tooltipValueGetter(params) {
           return params.data.stateName;
         },
+        hide: isUsedForAccountLead
       },
        {
         field: "districtName",
@@ -90,13 +97,16 @@ function AccountManagementAgGrid({
         tooltipValueGetter(params) {
           return params.data.districtName;
         },
+        hide: isUsedForAccountLead
       },
       {
         field: "pan",
         headerName: "PAN",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead
       },
+      
       {
         field: "gst",
         headerName: "GST",
@@ -106,18 +116,21 @@ function AccountManagementAgGrid({
         tooltipValueGetter(params) {
           return params.data.gst;
         },
+        hide: isUsedForAccountLead
       },
       {
         field: "tan",
         headerName: "TAN",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead
       },
       {
         field: "billingAddress",
         headerName: "Billing address",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead,
         minWidth: 250,
         tooltipValueGetter(params) {
           return params.data.billingAddress;
@@ -137,6 +150,7 @@ function AccountManagementAgGrid({
         headerName: "Shipping address",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead,
         minWidth: 250,
         tooltipValueGetter(params) {
           return params.data.shippingAddress;
@@ -156,6 +170,7 @@ function AccountManagementAgGrid({
         headerName: "Registered Office Add.",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead,
         minWidth: 250,
         tooltipValueGetter(params) {
           return params.data.registeredOfficeAddress;
@@ -174,6 +189,7 @@ function AccountManagementAgGrid({
         field: "businessResgistrationNumber",
         headerName: "Business registration number",
         sortable: true,
+        hide: isUsedForAccountLead,
         filter: true,
       },
       {
@@ -182,6 +198,7 @@ function AccountManagementAgGrid({
         sortable: true,
         filter: true,
         minWidth: 250,
+        hide: isUsedForAccountLead,
         cellDataType: "text",
         tooltipValueGetter(params) {
           return params.data.website;
@@ -207,6 +224,7 @@ function AccountManagementAgGrid({
         headerName: "Status",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
@@ -219,12 +237,14 @@ function AccountManagementAgGrid({
         field: "createdBy",
         headerName: "Created by",
         filter: true,
+        hide: isUsedForAccountLead
       },
       {
         field: "createdOn",
         headerName: "Created on",
         sortable: true,
         filter: true,
+        hide: isUsedForAccountLead
       },
       {
         hide: true,
@@ -248,16 +268,16 @@ function AccountManagementAgGrid({
         maxWidth: 80,
         // cellRenderer : ()=> "View",
         cellRenderer: (params: Account | any) => {
+          
           return (
               <div className="flex items-center justify-center  hover:underline decoration-white ">
-
             <span
               className="lead-details"
               onClick={() => {
                 params.context.handleRowSelect(params.data);
               }}
               >
-              Details
+              {isUsedForAccountLead ? "Select" : "Details"}
             </span>
               </div>
           );
