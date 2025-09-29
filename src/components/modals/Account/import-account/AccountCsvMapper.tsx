@@ -33,9 +33,9 @@ export interface Account {
   mobilenumber: string;
   industry_type_id: number;
   business_type_id: number;
-  country_id: number;
-  state_id: number;
-  district_id: number;
+  country_name: string;
+  state_name: string;
+  district_name: string;
   pan: string;
   gst: string;
   tan: string;
@@ -104,6 +104,9 @@ const crmRequiredFields: (keyof Account)[] = [
   "mobilenumber",
   "industry_type_id",
   "business_type_id",
+  "country_name",
+  "state_name",
+  "district_name",
   "company_account_type_id",
   "pan",
   "gst",
@@ -123,6 +126,9 @@ const fieldVariables: Record<string, string> = {
   mobilenumber: "Mobile Number",
   industry_type_id: "Industry Type Name",
   business_type_id: "Business Type Name",
+  country_name: "Country Name",
+  state_name: "State Name",
+  district_name: "District Name",
   company_account_type_id: "Account Type Name",
   pan: "PAN",
   gst: "GST",
@@ -203,49 +209,6 @@ const CrmFieldDrop: React.FC<{
     </div>
   );
 };
-
-// const CrmFieldDrop: React.FC<{
-//   field: string;
-//   mappedCols: string[];
-//   onDrop: (field: string, col: string) => void;
-//   onRemove: (field: string, col: string) => void;
-// }> = ({ field, mappedCols, onDrop, onRemove }) => {
-//   const [, drop] = useDrop(() => ({
-//     accept: "CSV_COLUMN",
-//     drop: (item: any) => onDrop(field, item.name),
-//   }));
-//   return (
-//     <div className="grid items-center justify-between mb-3">
-//       <div className="grid grid-cols-2 gap-2">
-//         <span className="text-sm font-medium flex items-center">
-//           {fieldVariables[field]} :
-//         </span>
-//         <div
-//           ref={drop}
-//           className="flex flex-wrap items-center gap-2 border rounded px-2 py-1 min-h-[40px] bg-white"
-//         >
-//           {mappedCols.length === 0 && (
-//             <span className="text-xs text-gray-400">Drag column here</span>
-//           )}
-//           {mappedCols.map((col) => (
-//             <div
-//               key={col}
-//               className="flex items-center bg-blue-100 text-xs px-2 py-1 rounded"
-//             >
-//               {col}
-//               <button
-//                 className="ml-1 text-red-500 font-bold"
-//                 onClick={() => onRemove(field, col)}
-//               >
-//                 ×
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 // ----------------- GENERIC VALUE MAPPING CARD -----------------
 const GenericValueMappingCard = forwardRef(
@@ -507,8 +470,20 @@ export default function AccountCsvMapper({
 
   const [mappedData, setMappedData] = useState<Account[]>([]);
 
+  //------------------ unique account tag ------------
+
+  function generateUniqueAccountId(): string {
+    const prefix = "ACC_";
+    const randomLength = 20 - prefix.length;
+    const randomStr = Math.random()
+      .toString(36)
+      .substring(2, 2 + randomLength);
+    return prefix + randomStr;
+  }
+
   // ----------------- IMPORT -----------------
   const handleImport = () => {
+    const accountTag = generateUniqueAccountId();
     const mappedData: Account[] = csvData.map((row) => {
       const obj: any = {};
       crmRequiredFields.forEach((crmField) => {
@@ -552,10 +527,11 @@ export default function AccountCsvMapper({
 
       obj.company_id = loginStatus.companyId;
       obj.createdby = loginStatus.id;
+      obj.import_tag = accountTag;
       return obj as Account;
     });
     setMappedData(mappedData);
-    console.log("✅ Final Accounts JSON:", mappedData);
+    // console.log("✅ Final Accounts JSON:", mappedData); // for debugging
     setShowPopup(true);
   };
 
@@ -608,7 +584,7 @@ export default function AccountCsvMapper({
   const [showConfirm, setShowConfirm] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
-  function onclose() {
+  function onCloseSuccessOrConfirmation() {
     handleButtonClicked(false);
     setCsvHeaders([]);
     setCsvData([]);
@@ -693,23 +669,7 @@ export default function AccountCsvMapper({
           <div>
             {csvHeaders.length > 0 && (
               <div className="grid w-full grid-cols-1 gap-4">
-                {/* CSV Preview */}
                 <div>
-                  <div className="w-full flex justify-end gap-3 mt-4 mb-4">
-                    <div className="w-fit h-fit">
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          setShowConfirm(true);
-                        }}
-                      >
-                        <div className="flex items-center justify-center gap-0.5">
-                          <TrashIcon size={SIZE.SIXTEEN} />
-                          Remove file
-                        </div>
-                      </Button>
-                    </div>
-                  </div>
                   {/* Preview Section */}
                   {csvData && (
                     <div className="flex-shrink-0 p-2 border rounded-lg bg-white shadow-sm">
@@ -717,20 +677,37 @@ export default function AccountCsvMapper({
                         <h4 className="table-header-custom">
                           Preview (First 5 Rows)
                         </h4>
-                        <div className="w-fit h-fit">
-                          <Button onClick={() => setShowPreview(!showPreview)}>
-                            {showPreview ? (
+                        <div className="flex gap-3">
+                          <div className="w-fit h-fit">
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                setShowConfirm(true);
+                              }}
+                            >
                               <div className="flex items-center justify-center gap-0.5">
-                                <EyeOff size={SIZE.SIXTEEN} />
-                                Hide CSV Preview
+                                <TrashIcon size={SIZE.SIXTEEN} />
+                                Remove file
                               </div>
-                            ) : (
-                              <div className="flex items-center justify-center gap-0.5">
-                                <Eye size={SIZE.SIXTEEN} />
-                                Show CSV Preview
-                              </div>
-                            )}
-                          </Button>
+                            </Button>
+                          </div>
+                          <div className="w-fit h-fit">
+                            <Button
+                              onClick={() => setShowPreview(!showPreview)}
+                            >
+                              {showPreview ? (
+                                <div className="flex items-center justify-center gap-0.5">
+                                  <EyeOff size={SIZE.SIXTEEN} />
+                                  Hide CSV Preview
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-center gap-0.5">
+                                  <Eye size={SIZE.SIXTEEN} />
+                                  Show CSV Preview
+                                </div>
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                       {showPreview && (
@@ -769,12 +746,11 @@ export default function AccountCsvMapper({
                         </div>
                       )}
                       <div className="caption-custom">
-                        Total records in csv file : {csvData.length - 1}
+                        Total records in csv file : {csvData.length}
                       </div>
                     </div>
                   )}
                 </div>
-
 
                 <div className="grid grid-cols-1 w-full mt-4 gap-4">
                   <div className="flex col-span-2 gap-6 w-full">
@@ -798,7 +774,7 @@ export default function AccountCsvMapper({
                       </div>
                     </div>
 
-                {/* Normal CRM Fields */}
+                    {/* Normal CRM Fields */}
                     <div className="w-full  lg:w-7/12 xl:w-8/12 flex flex-col">
                       <div className="border rounded-lg p-4 bg-white flex-grow shadow-sm">
                         <h3 className=" flex items-center gap-2 table-header-custom mb-4">
@@ -897,6 +873,7 @@ export default function AccountCsvMapper({
         <MappedAccountDataPopup
           open={showPopup}
           onClose={() => setShowPopup(false)}
+          onCloseSuccessOrConfirmation={()=> onCloseSuccessOrConfirmation()}
           mappedData={mappedData}
           fieldVariables={fieldVariables}
           industryTypes={industryTypes}
@@ -911,7 +888,7 @@ export default function AccountCsvMapper({
           message={
             "Are you sure you want to cancel all changes on page?\nAll unsaved work will be lost."
           }
-          onConfirm={() => onclose()}
+          onConfirm={() => onCloseSuccessOrConfirmation()}
           onCancel={() => setShowConfirm(false)}
         />
       )}
