@@ -3,12 +3,17 @@ import { Account, MappableItem } from "./AccountCsvMapper";
 import FormHeader from "../../../ui/FormHeader";
 import { Import, LucideScanEye, X } from "lucide-react";
 import Button from "../../../ui/Button";
-import { SIZE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import axios from "axios";
+import POST_API from "../../../../constants/PostApi";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
   onClose: () => void;
+  onCloseSuccessOrConfirmation:() => void;
   mappedData: Account[];
   fieldVariables: Record<string, string>;
   industryTypes: MappableItem[];
@@ -17,15 +22,16 @@ interface MappedAccountDataPopupProps {
   onImport?: (uniqueData: Account[]) => void; // callback to parent
 }
 
-interface postDataPropAccountImport{
-    company_id:number;
-    account_import_mapped_data_list:Account[];
-    createdby:number;
+interface postDataPropAccountImport {
+  company_id: number;
+  account_import_mapped_data_list: Account[];
+  createdby: number;
 }
 
 const MappedAccountDataPopup = ({
   open,
   onClose,
+onCloseSuccessOrConfirmation,
   mappedData,
   fieldVariables,
   industryTypes,
@@ -39,9 +45,9 @@ const MappedAccountDataPopup = ({
   );
   const { loginStatus } = useLoggedInUserContext();
 
-  useEffect(() => {
-    setSelectedRows(mappedData.map(() => true));
+  
 
+  useEffect(() => {
     const duplicates = new Set<number>();
     const seen: Record<string, number> = {};
 
@@ -54,6 +60,9 @@ const MappedAccountDataPopup = ({
         seen[key] = index;
       }
     });
+
+    // select only non-duplicate rows
+    setSelectedRows(mappedData.map((_, index) => !duplicates.has(index)));
 
     setDuplicateIndexes(duplicates);
   }, [mappedData]);
@@ -68,20 +77,44 @@ const MappedAccountDataPopup = ({
     setSelectedRows(updated);
   };
 
-
-  const handleImport = () => {
+  const handleImport = async () => {
     const uniqueData = mappedData.filter((_, index) => selectedRows[index]);
     if (onImport) onImport(uniqueData);
-    console.log("Unique Data:", uniqueData); // for debugging
+    // console.log("Unique Data:", uniqueData); // for debugging
 
-    const postDataForAccountImport:postDataPropAccountImport ={
-        company_id:loginStatus.companyId,
-        account_import_mapped_data_list:uniqueData,
-        createdby:loginStatus.id,
-    }
-        console.log("Post Data For import:", postDataForAccountImport); // for debugging
+    const postDataForAccountImport: postDataPropAccountImport = {
+      company_id: loginStatus.companyId,
+      account_import_mapped_data_list: uniqueData,
+      createdby: loginStatus.id,
+    };
+    // console.log("Post Data For import:", postDataForAccountImport); // for debugging
 
+    await axios
+      .post(POST_API.IMPORT_ACCOUNT_VIA_CSV, postDataForAccountImport, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const data = response.data;
 
+        if (data.status) {
+          toast.success(data.message);
+          onClose();
+          onCloseSuccessOrConfirmation();
+        } else {
+          toast.error(data.message);
+        }
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: handleImport,
+          });
+          if (refreshTokenStatus) {
+            handleImport();
+          }
+        }
+      });
   };
 
   return (
@@ -227,7 +260,7 @@ const MappedAccountDataPopup = ({
             <Button onClick={handleImport}>
               <div className="flex items-center justify-center gap-0.5">
                 <Import size={SIZE.SIXTEEN} />
-                Import Unique Data
+                Import Account Data
               </div>
             </Button>
           </div>

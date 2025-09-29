@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AccountCsvMapper from "./AccountCsvMapper";
+import AccountImportTagView from "./AccountImportTagView";
 
 const AccountImportCsvManagement = () => {
  
@@ -48,7 +49,7 @@ const handleButtonClicked = (status: boolean) => {
             </p>
 
             <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100">
-              {/* <LeadImportTagView /> */}
+              <AccountImportTagView />
             </div>
           </div>
         )}
