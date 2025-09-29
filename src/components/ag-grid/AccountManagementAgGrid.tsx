@@ -61,6 +61,36 @@ function AccountManagementAgGrid({
           return params.data.businessTypeName;
         },
       },
+       {
+        field: "countryName",
+        headerName: "Country",
+        sortable: true,
+        filter: true,
+        minWidth: 200,
+        tooltipValueGetter(params) {
+          return params.data.countryName;
+        },
+      },
+       {
+        field: "stateName",
+        headerName: "State",
+        sortable: true,
+        filter: true,
+        minWidth: 200,
+        tooltipValueGetter(params) {
+          return params.data.stateName;
+        },
+      },
+       {
+        field: "districtName",
+        headerName: "District",
+        sortable: true,
+        filter: true,
+        minWidth: 200,
+        tooltipValueGetter(params) {
+          return params.data.districtName;
+        },
+      },
       {
         field: "pan",
         headerName: "PAN",

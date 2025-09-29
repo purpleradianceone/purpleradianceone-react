@@ -9,6 +9,12 @@ type Account = {
     industryTypeName : string;
     businessTypeId : number;
     businessTypeName : string;
+    countryId : number;
+    stateId : number;
+    districtId : number;
+    countryName : string;
+    stateName : string;
+    districtName : string;
     pan : string;
     gst : string;
     tan : string;

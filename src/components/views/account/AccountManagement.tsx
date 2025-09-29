@@ -20,11 +20,11 @@ function GetAccounts() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-  const [accountChangeCount,setAccountChangeCount] = useState<number>(0);
+  const [accountChangeCount, setAccountChangeCount] = useState<number>(0);
 
   const handleCreateCompanyAccountType = () => {
     setAccountChangeCount(accountChangeCount + 1);
-  }
+  };
 
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
@@ -79,6 +79,12 @@ function GetAccounts() {
         industryTypeName: res.industry_type_name,
         businessTypeId: res.business_type_id,
         businessTypeName: res.business_type_name,
+        countryId: res.country_id,
+        stateId: res.state_id,
+        districtId: res.district_id,
+        countryName: res.country_name,
+        stateName: res.state_name,
+        districtName: res.district_name,
         pan: res.pan,
         gst: res.gst,
         tan: res.tan,
@@ -137,7 +143,14 @@ function GetAccounts() {
     fetchAccounts();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate,accountChangeCount]);
+  }, [
+    pageSize,
+    currentPage,
+    dateRangeId,
+    searchParameter,
+    concatDate,
+    accountChangeCount,
+  ]);
 
   useEffect(() => {
     if (!userHasAccessToViewAccount) {
@@ -157,7 +170,7 @@ function GetAccounts() {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <AccountManagementList
-                fetchAccounts ={fetchAccounts}
+                fetchAccounts={fetchAccounts}
                 accounts={accounts}
                 handleSearchOption={{
                   handleSearchParameterChange,
