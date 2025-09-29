@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
-import { Handshake } from "lucide-react";
+import { Handshake, Save, X } from "lucide-react";
 import RadioButtons from "../../../ui/RadioButton";
 import { useState } from "react";
 import GetAccounts from "../../../views/account/AccountManagement";
-import CreateAccount from "../../Account/CreateAccount";
 import Account from "../../../../@types/account/Account";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
@@ -14,9 +13,10 @@ import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FormInput from "../../../ui/FormInput";
+import Button from "../../../ui/Button";
 
 function ConvertLeadModal({
   isOpen,
@@ -34,7 +34,7 @@ function ConvertLeadModal({
   onReasonChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const [accountTypeSelected, setAccountTypeSelected] = useState<
-    "existingAccount" | "newAccount"
+    "existingAccount" | "noAccount"
   >("existingAccount");
   const [finalConfirm, setFinalConfirm] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
@@ -49,11 +49,11 @@ function ConvertLeadModal({
       checked: accountTypeSelected === "existingAccount" ? true : false,
     },
     {
-      label: "New Account",
-      value: "newAccount",
+      label: "Don't Map to any Account",
+      value: "noAccount",
       id: "account",
       name: "accountType",
-      checked: accountTypeSelected === "newAccount" ? true : false,
+      checked: accountTypeSelected === "noAccount" ? true : false,
     },
   ];
 
@@ -62,7 +62,7 @@ function ConvertLeadModal({
       company_id: loginStatus.companyId,
       account_id: selectedAccount!.id,
       lead_id: leadData.id,
-      is_lead_converted: null,
+      is_lead_converted: true,
       createdby_id: loginStatus.id,
     };
 
@@ -94,7 +94,7 @@ function ConvertLeadModal({
       <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
-            className="relative w-full max-w-6xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+            className="relative w-full max-w-6xl max-h-[90vh] min-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
@@ -103,26 +103,70 @@ function ConvertLeadModal({
               <FormHeader
                 icon={Handshake}
                 onClose={onClose}
-                preText="Add Company User"
-                description="Create and manage a new user account for your company."
+                preText="Convert the lead and map it to the accounts"
+                description="Convert and manage a lead for your accounts."
               />
 
-              <form className="space-y-3">
-                <div className="flex justify-center">
-                  <FormInput
+              <form className="space-y-0">
+                
+                <div className="grid grid-cols-9 gap-2">
+                    <div className={accountTypeSelected === "noAccount" ? "col-span-7" : "col-span-9"}>
+                     <FormInput
                     type="text"
                     placeholder="Enter reason for status update"
                     value={reasonText}
                     onChange={onReasonChange}
+                    label="Reason(Optional)"
                   />
+                    </div>
+                    {accountTypeSelected === "noAccount" && (
+                        <div className="col-span-1">
+                        <div className="max-w-32 mt-7">
+                                <Button
+                        type="button"
+                        onClick={()=>{
+                            onClose();
+                        }}
+                        >
+                            <div className="flex gap-1 justify-center items-center">
+                                <X size={SIZE.SIXTEEN}/>
+                                <span>Cancel</span>
+                            </div>
+                        </Button>
+                        </div>
+                        
+                    </div>
+                    )}
+                    {accountTypeSelected === "noAccount" && (
+                        <div className="col-span-1">
+                        <div className="max-w-32 mt-7">
+                                 <Button
+                        type="submit"
+                        onClick={(e)=>{
+                            e.preventDefault();
+                            handleLeadConversion();
+                        }}
+                        >
+                            <div className="flex gap-1 justify-center items-center">
+                                <Save size={SIZE.SIXTEEN}/>
+                                <span>Convert</span>
+                            </div>
+                        </Button>
+                        </div>
+                       
+                    </div>
+                    )}
+                    
                 </div>
+                 
+                
                 <div className="flex justify-center">
                   <RadioButtons
                     options={convertLeadRadioButtonOptions}
                     onChange={(e) => {
                       if (
                         e.target.value === "existingAccount" ||
-                        e.target.value === "newAccount"
+                        e.target.value === "noAccount"
                       ) {
                         setAccountTypeSelected(e.target.value);
                       }
@@ -142,14 +186,9 @@ function ConvertLeadModal({
                   </div>
                 )}
 
-                {accountTypeSelected === "newAccount" && (
-                  <div>
-                    <CreateAccount
-                      handleCreateAccount={() => {}}
-                      onClose={() => {
-                        setAccountTypeSelected("existingAccount");
-                      }}
-                    />
+                {accountTypeSelected === "noAccount" && (
+                  <div className="min-w-36">
+                    
                   </div>
                 )}
 
