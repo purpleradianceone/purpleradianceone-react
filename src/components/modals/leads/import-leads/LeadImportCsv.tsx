@@ -676,9 +676,6 @@ const LeadImportCsv = ({
     }
   };
 
-  useEffect(() => {
-    console.log(productsData);
-  }, [productsData]);
   // Note : Api call to get the data Company User with offset and limit
   const fetchCompanyUsers = async (
     searchParameter: string,
@@ -802,8 +799,7 @@ const LeadImportCsv = ({
           values.forEach((v) => {
             unique.add(v);
           });
-        }
-        else{
+        } else {
           const values = cellValue
             .split(",")
             .map((v) => v.trim())
@@ -935,10 +931,10 @@ const LeadImportCsv = ({
           return newLine.split(",").map((cell) => cell.trim());
         });
 
-        console.log(
-          "_____________________________ line ______________________________"
-        );
-        console.log(parsedData);
+        // console.log(
+        //   "_____________________________ line ______________________________"
+        // );
+        // console.log(parsedData);
         setCsvData(parsedData);
         setOriginalCsvHeaders(parsedData[0]);
         // setError(null);
@@ -1066,8 +1062,8 @@ const LeadImportCsv = ({
       if (newMapping[key] === csvValue) delete newMapping[key];
     });
     newMapping[String(crmItem.id)] = csvValue;
-    console.log("new Mapping : ");
-    console.log(newMapping);
+    // console.log("new Mapping : ");
+    // console.log(newMapping);
     setMapping(newMapping);
   };
 
@@ -1124,10 +1120,10 @@ const LeadImportCsv = ({
       const email = getConcatenatedCsvValue(row, "email");
       const mobile = getConcatenatedCsvValue(row, "mobileNumber");
       const product = getConcatenatedCsvValue(row, "company_product_id");
-      console.log("valuse");
+      // console.log("valuse");
       // console.log(row)
-      console.log(product);
-      console.log("valuse");
+      // console.log(product);
+      // console.log("valuse");
 
       let isDuplicate = false;
       if (email && emailSet.has(email)) {
@@ -1180,13 +1176,13 @@ const LeadImportCsv = ({
           // console.log("inside product cond");
           // console.log(csvValue);
           //  console.log("inside product cond");
-          const prodArr = product?.split(",").map(item => item.trim());
+          const prodArr = product?.split(",").map((item) => item.trim());
           // const crmProduct = productsData.filter((p) => {
           //   console.log(
           //     " ___________________________________________ data ___________________________________________"
           //   );
           //   console.log(p);
-           
+
           //   const idArr : number[] = [];
           //    prodArr?.map((x) => {
 
@@ -1196,7 +1192,7 @@ const LeadImportCsv = ({
           //   console.log(productDataValueMapping[String(p.id)]);
           //   console.log(
           //   );
-            
+
           //     if (productDataValueMapping[String(p.id)] === x){
           //           idArr.push(p.id!)
           //     }
@@ -1218,31 +1214,31 @@ const LeadImportCsv = ({
           // });
 
           const crmProduct = productsData.filter((p) => {
-  // Check for valid ID and if the mapped value is included in prodArr
-   console.log(
-              " ___________________________________________ IDARR ___________________________________________"
+            // Check for valid ID and if the mapped value is included in prodArr
+            // console.log(
+            //   " ___________________________________________ IDARR ___________________________________________"
+            // );
+            // console.log(prodArr);
+
+            const mappedValue = productDataValueMapping[String(p.id)];
+
+            // console.log(mappedValue);
+            // console.log(
+            //   " ___________________________________________ IDARR ___________________________________________"
+            // );
+            return (
+              p.id !== undefined &&
+              p.id !== null &&
+              prodArr?.includes(mappedValue)
             );
-              console.log(prodArr);
+          });
 
-  const mappedValue = productDataValueMapping[String(p.id)];
+          // 2. Use map() on the filtered array to extract only the 'id' property.
+          const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
 
-  console.log(mappedValue)
-  console.log(
-              " ___________________________________________ IDARR ___________________________________________"
-            );
-  return p.id !== undefined && p.id !== null && prodArr?.includes(mappedValue);
-});
-
-
-
-// 2. Use map() on the filtered array to extract only the 'id' property.
-const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
-
-          mappedData[field.id] = crmProduct
-            ? crmProductIds
-            : null; // Store ID
+          mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
           displayData[field.id] = crmProduct
-            ? "kjebfvkrsebfk"
+            ? crmProduct.map((item) => item.name).join(",")
             : null; // Display Name or original CSV
         }
         // NOte : lead interest type leadInterestType
@@ -1388,7 +1384,7 @@ const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
         },
       })), // Sending only necessary data
     };
-    console.log("Submitting payload:", payload);
+    // console.log("Submitting payload:", payload);
     try {
       // const formData = new FormData();
       // formData.append("csvFile", csvFile);
@@ -1822,7 +1818,7 @@ const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
                           key={field.id}
                           className="px-6 py-4 whitespace-nowrap table-data-custom"
                         >
-                          {lead.mappedData[field.id]}
+                          {lead.displayData[field.id]}
                         </td>
                       ))}
                     </tr>
