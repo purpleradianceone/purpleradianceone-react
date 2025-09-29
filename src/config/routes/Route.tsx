@@ -603,7 +603,7 @@ export const router = createBrowserRouter([
       <PrivateRoute>
         <div>
         <Navbar>
-          <GetAccounts/>
+          <GetAccounts isUsedForAccountLead={false}/>
         </Navbar>
         </div>
       </PrivateRoute>

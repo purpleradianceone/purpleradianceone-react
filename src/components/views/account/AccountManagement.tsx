@@ -15,7 +15,13 @@ import { motion } from "framer-motion";
 import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
 
-function GetAccounts() {
+function GetAccounts({
+  isUsedForAccountLead,
+  handleRowSelectedForLead
+} : {
+  isUsedForAccountLead : boolean;
+  handleRowSelectedForLead? : (data: Account | any) => void;
+}) {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
@@ -186,6 +192,8 @@ function GetAccounts() {
                   pageSize,
                 }}
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+                isUsedForAccountLead={isUsedForAccountLead}
+                handleRowSelectedForLead={handleRowSelectedForLead}
               />
             </motion.section>
           </div>

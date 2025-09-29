@@ -803,6 +803,16 @@ const LeadImportCsv = ({
             unique.add(v);
           });
         }
+        else{
+          const values = cellValue
+            .split(",")
+            .map((v) => v.trim())
+            .filter((v) => v.length > 0);
+
+          values.forEach((v) => {
+            unique.add(v);
+          });
+        }
       });
     });
 

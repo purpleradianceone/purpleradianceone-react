@@ -40,8 +40,9 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
-import COLORS from "../../../constants/Colors";
 import { createPortal } from "react-dom";
+import StatusUpdateModal from "./lead-status/StatusUpdateModal";
+import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -827,40 +828,31 @@ const ViewLeadManagement = () => {
 
           
         </div>
-        {reasonInputBoxOpen && (
-            <div className="  flex m-3 w-full pr-40   gap-1">
-              <label className="input-label-custom">
-                Reason (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="Enter reason for status update"
-                className="border rounded px-3 w-72 input-label-custom"
-                value={reasonText}
-                onChange={(e) => setReasonText(e.target.value)}
-              />
-              <button
-                className={COLORS.ADD_BUTTON}
-                onClick={handleSaveStatusUpdate}
-              >
-                <div className="flex gap-0.5 items-center">
-                  <Save className="w-4 h-4 -mt-0.5"/>
-                  <span>Save</span>
-                </div>
-              </button>
-              <button
-               className={`px-2 rounded input-label-custom-white ${COLORS.BG_GRAY_500_COLOR} ${COLORS.HOVER_BG_GRAY_600_COLOR_HOVER}`} 
-               onClick={()=>{
+        {reasonInputBoxOpen && selectedStatusId !== 9 &&(
+            <StatusUpdateModal
+            handleCancel={()=>{
                 setReasonInputBoxOpen(!reasonInputBoxOpen
                 )
                 setSelectedStatusId(null)
-              }}>
-                <div className="flex gap-0.5 items-center">
-                  <X className="w-4 h-4 -mt-0.5"/>
-                  <span>Cancel</span>
-                </div>
-              </button>
-            </div>
+              }}
+              handleSaveStatusUpdate={handleSaveStatusUpdate}
+              onReasonChange={(e) => setReasonText(e.target.value)}
+              reasonText={reasonText}
+            />
+          )}
+
+          {reasonInputBoxOpen && selectedStatusId === 9 &&(
+            <ConvertLeadModal
+            isOpen={reasonInputBoxOpen}
+            onClose={()=>{
+              setReasonInputBoxOpen(!reasonInputBoxOpen);
+              setSelectedStatusId(null);
+            }}
+            leadData={selectedLeadData}
+            handleLeadConversion={handleSaveStatusUpdate}
+            onReasonChange={(e) => setReasonText(e.target.value)}
+              reasonText={reasonText}
+            />
           )}
 
         {/* Sections  */}

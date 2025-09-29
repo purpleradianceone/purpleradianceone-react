@@ -33,6 +33,8 @@ function AccountManagementList({
   paginationData,
   fetchAccounts,
   handleCreateCompanyAccountType,
+  isUsedForAccountLead,
+  handleRowSelectedForLead
 }: {
   fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -41,6 +43,8 @@ function AccountManagementList({
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
   handleCreateCompanyAccountType: () => void;
+  isUsedForAccountLead : boolean;
+  handleRowSelectedForLead? : (data: Account | any) => void;
 }) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -58,8 +62,13 @@ function AccountManagementList({
   const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: any) => {
-    setAccountDataToShowFullDetails(data);
+    if(!isUsedForAccountLead){
+        setAccountDataToShowFullDetails(data);
     setShowAccountDetails(true);
+    }
+    else{
+        handleRowSelectedForLead!(data);
+    }
   };
 
   const { userHasAccessToAddAccount } = useUserAccessModules();
@@ -195,7 +204,8 @@ function AccountManagementList({
           </div>
         </>
 
-        <div className="flex gap-2">
+        {!isUsedForAccountLead && (
+<div className="flex gap-2">
           <div className="w-fit h-fit">
             <Button
               disabled={!userHasAccessToAddAccount}
@@ -230,25 +240,29 @@ function AccountManagementList({
             {openCreateAccountForm && (
               <CreateAccount
                 onClose={() => setOpenAccountForm(false)}
-                handleCreateCompanyAccountType={handleCreateCompanyAccountType}
+                handleCreateAccount={handleCreateCompanyAccountType}
               />
             )}
           </div>
         </div>
+        )}
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
         <div
           className={
+            !isUsedForAccountLead ?
             userPreference.isLeftMenu
               ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
               : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+              : "ag-theme-balham w-full h-[calc(100vh-280px)]"
           }
         >
           <AccountManagementAgGrid
             accounts={accounts}
             // handleRowClick={(e) => {handleRowClick}}
             onRowSelect={handleRowSelectedToShowAccountDetails}
+            isUsedForAccountLead={isUsedForAccountLead}
           />
         </div>
       </div>

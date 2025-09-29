@@ -3,6 +3,7 @@ import { AlertTriangle, Check, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
 import { SIZE } from "../../constants/AppConstants";
+import { createPortal } from "react-dom";
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -23,8 +24,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-1000">
+  return createPortal(
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
         <FormHeader
           icon={AlertTriangle}
@@ -73,7 +74,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
