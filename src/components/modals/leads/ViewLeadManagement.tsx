@@ -1,6 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ArrowLeft,  Handshake, History, Pen, Plus, Save, Settings, User2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit3,
+  Handshake,
+  History,
+  Plus,
+  Save,
+  Settings,
+  User2,
+  X,
+} from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -664,10 +674,8 @@ const ViewLeadManagement = () => {
   const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
     useState<boolean>(false);
 
-
-
   // Note : Clears the states when user clicks on lead owner change button
-  function handleLeadOwnerChangeStateClear(){
+  function handleLeadOwnerChangeStateClear() {
     setReasonTextForLeadOwnerChange("");
     setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
     setPersistedSelectedUserId(selectedLeadData.companyUserId);
@@ -694,7 +702,7 @@ const ViewLeadManagement = () => {
               }}
             >
               <ArrowLeft size={14} />
-              <span >Leads</span>
+              <span>Leads</span>
             </button>
           </div>
 
@@ -765,95 +773,91 @@ const ViewLeadManagement = () => {
 
         {/* Lead Status Section */}
         <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
-          
-          <div  className="flex w-full">
-            <div className="flex w-[100%] border bg-white" style={{
-                  clipPath:
-                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                  
-                }}>
-            {leadStatus!.map((item: any) => (
-              <button
-                title={item.name}
-                key={item.id}
-                className={`flex-1 overflow-hidden ${
-                  selectedLeadData.leadStatus === item.name
-                    ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
-                    : "hover:bg-blue-700 table-header-custom hover:text-white"
-                }
+          <div className="flex w-full">
+            <div
+              className="flex w-[100%] border bg-white"
+              style={{
+                clipPath:
+                  "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+              }}
+            >
+              {leadStatus!.map((item: any) => (
+                <button
+                  title={item.name}
+                  key={item.id}
+                  className={`flex-1 overflow-hidden ${
+                    selectedLeadData.leadStatus === item.name
+                      ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                      : "hover:bg-blue-700 table-header-custom hover:text-white"
+                  }
               ${
                 selectedStatusId === item.id &&
                 "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
               } text-center p-1`}
-                style={{
-                  clipPath:
-                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                  
-                }}
+                  style={{
+                    clipPath:
+                      "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  }}
+                  onClick={() => {
+                    if (userHasAccessToUpdateLead) {
+                      setReasonInputBoxOpen(true);
+                      setSelectedStatusId(item.id);
+                    } else {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+            {/* status history */}
+            <div className="flex justify-end caption-custom  mb-1 px-2">
+              {/* <span className="font-semibold ">Lead Status</span> */}
+              <button
                 onClick={() => {
-                  if (userHasAccessToUpdateLead) {
-                    setReasonInputBoxOpen(true);
-                    setSelectedStatusId(item.id);
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
-                    );
-                  }
+                  setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
                 }}
               >
-                {item.name}
+                <span
+                  title="Status history"
+                  className="flex items-center justify-center hover:text-blue-600 "
+                >
+                  <History size={12} className="mt-0" />
+                  History
+                </span>
               </button>
-            ))}
-            
+            </div>
           </div>
-          {/* status history */}
-          <div className="flex justify-end caption-custom  mb-1 px-2">
-            {/* <span className="font-semibold ">Lead Status</span> */}
-            <button
-              onClick={() => {
-                setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
-              }}
-            >
-              <span
-                title="Status history"
-                className="flex items-center justify-center hover:text-blue-600 "
-              >
-                <History size={12} className="mt-0" />
-                History
-              </span>
-            </button>
-          </div>
-          </div>
-
-          
         </div>
-        {reasonInputBoxOpen && selectedStatusId !== 9 &&(
-            <StatusUpdateModal
-            handleCancel={()=>{
-                setReasonInputBoxOpen(!reasonInputBoxOpen
-                )
-                setSelectedStatusId(null)
-              }}
-              handleSaveStatusUpdate={handleSaveStatusUpdate}
-              onReasonChange={(e) => setReasonText(e.target.value)}
-              reasonText={reasonText}
-            />
-          )}
+        {reasonInputBoxOpen && selectedStatusId !== 9 && (
+          <StatusUpdateModal
+            handleCancel={() => {
+              setReasonInputBoxOpen(!reasonInputBoxOpen);
+              setSelectedStatusId(null);
+            }}
+            handleSaveStatusUpdate={handleSaveStatusUpdate}
+            onReasonChange={(e) => setReasonText(e.target.value)}
+            reasonText={reasonText}
+          />
+        )}
 
-          {reasonInputBoxOpen && selectedStatusId === 9 &&(
-            <ConvertLeadModal
+        {reasonInputBoxOpen && selectedStatusId === 9 && (
+          <ConvertLeadModal
             isOpen={reasonInputBoxOpen}
-            onClose={()=>{
+            onClose={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
             }}
             leadData={selectedLeadData}
             handleLeadConversion={handleSaveStatusUpdate}
             onReasonChange={(e) => setReasonText(e.target.value)}
-              reasonText={reasonText}
-            />
-          )}
+            reasonText={reasonText}
+          />
+        )}
 
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 p-2">
@@ -861,11 +865,11 @@ const ViewLeadManagement = () => {
           <div className="w-full md:w-1/2 flex flex-col gap-2">
             {/* Lead Basic Info */}
             <div className=" flex   shadow-sm border rounded-sm p-1  ">
-              <div className="mx-1 grid md:grid-cols-3 bg-pink-00 sm:grid-cols-1  gap-2  w-full    whitespace-nowrap overflow-auto">
+              <div className="mx-1 grid md:grid-cols-3 bg-pink-00 sm:grid-cols-1  gap-2  ">
                 <div className=" flex items-center gap-3 col-span-3  ">
-                 <div className="bg-blue-600  p-2 rounded text-white">
-                   <Handshake  size={30}/>
-                 </div>
+                  <div className="bg-blue-600  p-2 rounded text-white">
+                    <Handshake size={30} />
+                  </div>
                   <div
                     title={
                       userHasAccessToUpdateLead
@@ -900,6 +904,7 @@ const ViewLeadManagement = () => {
                   </div>
                 </div>
                 <div
+                
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -931,6 +936,7 @@ const ViewLeadManagement = () => {
                 </div>
 
                 <div
+                className="ml-4"
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -970,11 +976,14 @@ const ViewLeadManagement = () => {
                   label="Created on"
                   value={selectedLeadData?.createdOn}
                 />
+                <div className="ml-4">
+
                 <Detail
                   type="none"
                   label="Created by"
                   value={selectedLeadData?.createdBy}
-                />
+                  />
+                  </div>
                 <div
                   className="flex"
                   title={
@@ -1000,22 +1009,20 @@ const ViewLeadManagement = () => {
                       value={selectedLeadData?.leadOwner}
                       handleClickLeadOwnerChange={handleClickLeadOwnerChange}
                     />
-                     <button
-                    title="Lead owner history"
-                    className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
-                    onClick={() => {
-                      setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
-                    }}
-                  >
-                    <History size={12} className="mt-0" />
-                  </button>
+                    <button
+                      title="Lead owner history"
+                      className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
+                      onClick={() => {
+                        setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+                      }}
+                    >
+                      <History size={12} className="mt-0" />
+                    </button>
                   </div>
-
-                 
                 </div>
               </div>
               {reasonInputBoxOpenForLeadOwner && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
                   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                     <div className="flex flex-col gap-1">
                       <label className="table-header-custom">
@@ -1031,29 +1038,29 @@ const ViewLeadManagement = () => {
                         }
                       />
                       <div className="flex justify-end ">
-                       <div className="flex gap-1">
-                         <Button
-                         type="submit"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleLeadOwnerChange();
-                          }}
-                        >
-                          <div className="flex items-center gap-1">
-                            <Save size={16}/>
-                          Save
-                          </div>
-                        </Button>
-                        <Button
-                        type="button"
-                          onClick={handleLeadOwnerChangeStateClear}
-                        >
-                           <div className="flex items-center ">
-                            <X size={18}/>
-                          Cancel
-                          </div>
-                        </Button>
-                       </div>
+                        <div className="flex gap-1">
+                          <Button
+                            type="submit"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleLeadOwnerChange();
+                            }}
+                          >
+                            <div className="flex items-center gap-1">
+                              <Save size={16} />
+                              Save
+                            </div>
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleLeadOwnerChangeStateClear}
+                          >
+                            <div className="flex items-center ">
+                              <X size={18} />
+                              Cancel
+                            </div>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1148,23 +1155,22 @@ const ViewLeadManagement = () => {
                       </p>
                       <div>
                         <Button
-                        type="submit"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          const leadDataSearchParams = JSON.parse(
-                            searchParams.get("leadData") || "{}"
-                          );
-                          sessionStorage.setItem(
-                            "leadData",
-                            JSON.stringify(leadDataSearchParams!)
-                          );
-                          navigate(ROUTES_URL.SCHEDULE_MEETING);
-                        }}
-                      >
-                        + Schedule Meeting
-                      </Button>
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const leadDataSearchParams = JSON.parse(
+                              searchParams.get("leadData") || "{}"
+                            );
+                            sessionStorage.setItem(
+                              "leadData",
+                              JSON.stringify(leadDataSearchParams!)
+                            );
+                            navigate(ROUTES_URL.SCHEDULE_MEETING);
+                          }}
+                        >
+                          + Schedule Meeting
+                        </Button>
                       </div>
-                      
                     </div>
                   </div>
                 )}
@@ -1220,11 +1226,12 @@ const ViewLeadManagement = () => {
         />
 
         {/* lead owner pop up open */}
-        {isLeadOwnerPopUpOpen && createPortal(
-          <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
-            <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
-              {/* Header with Close Button */}
-              {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
+        {isLeadOwnerPopUpOpen &&
+          createPortal(
+            <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
+              <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+                {/* Header with Close Button */}
+                {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800">
                   Select Company User
                 </h3>
@@ -1245,10 +1252,10 @@ const ViewLeadManagement = () => {
                   <X size={20} />
                 </button>
               </div> */}
-              <FormHeader
-                preText="Assign new lead owner."
-                description="Select and assign a new owner to manage this lead."
-                onClose={() => {
+                <FormHeader
+                  preText="Assign new lead owner."
+                  description="Select and assign a new owner to manage this lead."
+                  onClose={() => {
                     setIsLeadOwnerPopUpOpen(false);
 
                     if (
@@ -1260,20 +1267,20 @@ const ViewLeadManagement = () => {
                     }
                   }}
                   icon={User2}
-              />
-              {/* NOTE : CALL TO THE MODAL COMPONENT */}
-              <div className="">
-                <GetCompanyUsersForLead
-                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                  handleSelectedCompanyUserChange={
-                    handleSelectedCompanyUserChange
-                  }
                 />
+                {/* NOTE : CALL TO THE MODAL COMPONENT */}
+                <div className="">
+                  <GetCompanyUsersForLead
+                    selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                    handleSelectedCompanyUserChange={
+                      handleSelectedCompanyUserChange
+                    }
+                  />
+                </div>
               </div>
-            </div>
-          </div>,
-          document.body
-        )}
+            </div>,
+            document.body
+          )}
         <AssignProductToLead
           selectedLeadData={selectedLeadData}
           isOpen={isAddProductModalOpen}
@@ -1400,12 +1407,12 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="input-label-custom border border-gray-400 rounded-sm  p-0 m-0 w-44 focus:outline-none focus:ring-0 "
+              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${label==="Name" ? "w-fit" : "w-48"} focus:outline-none focus:ring-0 `}
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
               autoFocus
-              maxLength={100}
+              maxLength={60}
               size={value ? value.length : 10}
             />
           )
@@ -1449,41 +1456,67 @@ const Detail: React.FC<DetailProps> = ({
       ) : label === "Lead owner" ? (
         <div
           title={value}
-          className={`input-label-custom border border-gray-100 px-1 rounded-md   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`input-label-custom hover:bg-slate-100      cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
-          {value ?? (
-            <span className="input-label-custom">
-              Add here...
-            </span>
-          )}
+          {
+          value?
+          <>
+          
+         {value} {/* Icon never gets truncated */}
+            <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" /> 
+          </>
+            :<span className="input-label-custom">Add here...</span>}
         </div>
       ) : (
         <div
           title={value ?? "Enter value "}
-          className={`table-header-custom flex items-center  justify-between ${
-            label === "Name"
-              ? "table-header-custom p-0  border-gray-200 "
-              : "input-label-custom"
-          }   truncate overflow-hidden ${
-            hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
-          }   cursor-pointer`}
+          className={`table-header-custom flex items-center min-w-48 
+    ${label === "Name" ? "table-header-custom" : "input-label-custom"}
+    ${hasBorder ? "border rounded-md px-1 border-gray-200" : ""}
+    cursor-pointer`}
           onClick={handleClick}
         >
-          {value ? (
+          <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
+            {/* Only the text truncates */}
+            <span className={`truncate ${label==="Name" ? "" : " max-w-[205px]"} `}>
+              {value ? (
+                value
+              ) : (
+                <span className="p-1 caption-custom italic">Add here...</span>
+              )}
+            </span>
 
-            <>
-            {value}
-            </>
-          ) : (
-            <>
-              <span className=" p-1 caption-custom flex items-center justify-between italic">
-                Add here... 
-              </span>
-            </>
-          )}
-          <Pen size={12} className="caption-custom "/>
+            {/* Icon never gets truncated */}
+            <Edit3 className="ml-1 h-3 w-3 text-slate-400 flex-shrink-0" />
+          </div>
         </div>
+
+        // <div
+        //   title={value ?? "Enter value "}
+        //   className={`table-header-custom flex items-center min-w-48 max-w-fit gap-3 justify-between ${
+        //     label === "Name"
+        //       ? "table-header-custom p-0  border-gray-200 "
+        //       : "input-label-custom"
+        //   }   truncate overflow-hidden ${
+        //     hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
+        //   }   cursor-pointer`}
+        //   onClick={handleClick}
+        // >
+        //   {value ? (
+
+        //     <>
+        //     {value}
+        //     </>
+        //   ) : (
+        //     <>
+        //       <span className=" p-1 caption-custom flex items-center justify-between italic">
+        //         Add here...
+        //       </span>
+        //     </>
+        //   )}
+        //   <Pen size={12} className="caption-custom "/>
+        // </div>
       )}
     </div>
   );

@@ -539,7 +539,7 @@ function LeadTaskList({
                               Description :{" "}
                             </span>{" "}
                             <span className="caption-custom">
-                              {activity.description}
+                              {activity.description || ""}
                             </span>{" "}
                           </div>
                           <div className="mt-1">

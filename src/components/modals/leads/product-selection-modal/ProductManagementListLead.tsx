@@ -38,7 +38,7 @@ function ProductsManagementListLead({
 
   if (userHasAccessToViewProduct) {
     return (
-      <div className="w-full p-2">
+      <div className="w-full ">
         <div className="sticky z-10 top-9  flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
           <div className="flex justify-between w-full ">
             {/* <div className="flex  gap-2"> */}

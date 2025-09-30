@@ -129,40 +129,18 @@ const AssignProductToLead = ({
 
   if (!isOpen) return null;
   return createPortal(
-    <div>
+    <>
       <div
         className={`${
           position === "top" ? "top-12" : ""
-        } fixed inset-0 z-30 bg-black bg-opacity-5 flex items-center justify-center p-4`}
+        } fixed inset-0 z-30 bg-black bg-opacity-5 flex items-center justify-center `}
       >
         <div
           className={` ${
             position === "left" ? " inset-0 top-6 left-6 " : ""
-          }bg-white rounded-2xl shadow-lg p-3 min-w-fit  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
+          }bg-white rounded-2xl shadow-lg p-3  w-full max-w-6xl  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
         >
           {/* Header with Close Button */}
-          {/* <div className="flex justify-between items-center ml-4 p-1 border-b border-gray-200">
-            <h3 className="text-md font-medium text-gray-800 hover:shadow-sm">
-              Assign Product to Lead
-            </h3>
-            <div className="flex items-center gap-5">
-              <button
-                onClick={handleProductAddToLead}
-                className={`${
-                  showSaveButton ? "bg-blue-700" : "bg-blue-400"
-                }  text-white px-2 rounded-xl text-md `}
-                disabled={!showSaveButton}
-              >
-                Save
-              </button>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-          </div> */}
           <FormHeader
             icon={Package}
             onClose={onClose}
@@ -172,7 +150,7 @@ const AssignProductToLead = ({
           {/* NOTE : CALL TO THE MODAL COMPONENT */}
           <div className="    w-full bg">
             <div className=" flex   justify-end">
-              <div className="p-1">
+              <div className="p-0.5">
                 {showSaveButton && (
                   <Button
                     type="submit"
@@ -195,7 +173,7 @@ const AssignProductToLead = ({
           </div>
         </div>
       </div>
-    </div>,
+    </>,
     document.body
   );
 };

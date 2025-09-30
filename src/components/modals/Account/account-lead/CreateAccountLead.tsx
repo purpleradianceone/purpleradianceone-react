@@ -82,7 +82,7 @@ const CreateAccountLead = ({
       </div>
       {showLeadsData && (
         <div className="fixed inset-0 z-50 mt-10 flex items-center justify-center bg-black bg-opacity-5 ">
-          <div className=" bg-white border rounded-2xl shadow-xl w-full max-w-6xl p-3 max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className=" bg-white border rounded-2xl shadow-xl w-full max-w-6xl p-2 max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
             <FormHeader
               icon={Handshake}
               onClose={()=>{

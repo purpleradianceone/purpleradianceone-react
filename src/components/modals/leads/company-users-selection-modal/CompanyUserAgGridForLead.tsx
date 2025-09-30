@@ -76,7 +76,8 @@ function CompanyUserAgGridForLead({
           const isChecked = localSelectedUserId === user.id;
 
           return (
-            <input
+            <div className="flex items-center  justify-center mt-1">
+              <input
               type="checkbox"
               checked={isChecked}
               onChange={() => {
@@ -90,6 +91,7 @@ function CompanyUserAgGridForLead({
               }}
               className="cursor-pointer accent-blue-500 checkbox"
             />
+            </div>
           );
         },
       },
