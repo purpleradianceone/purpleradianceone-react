@@ -322,21 +322,21 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         : fieldName === "stateName" 
         ? formData.stateName 
         : formData.districtName;
-    // const originalValue =
-    //   fieldName === "businessTypeName"
-    //     ? company.businessTypeName
-    //      : fieldName === "industryTypeName" 
-    //     ? formData.industryTypeName 
-    //     : fieldName === "countryName" 
-    //     ? formData.countryName 
-    //     : fieldName === "stateName" 
-    //     ? formData.stateName 
-    //     : formData.districtName;
+    const originalValue =
+      fieldName === "businessTypeName"
+        ? company.businessTypeName
+         : fieldName === "industryTypeName" 
+        ? company.industryTypeName 
+        : fieldName === "countryName" 
+        ? company.countryName 
+        : fieldName === "stateName" 
+        ? company.stateName 
+        : company.districtName;
 
     // Only call API if value actually changed
-    // if (currentValue !== originalValue) {
+    if (currentValue !== originalValue) {
       handleUpdateAccountDetails(fieldName, currentValue || "");
-    // }
+    }
     setEditingField(null);
   };
 
@@ -505,24 +505,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     switch (activeTab) {
       case "details":
         return (
-          <div className="grid grid-cols-2 gap-2 p-1">
-            <div className="space-y-0">
-              <h3 className="font-medium text-slate-700 flex items-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                <span className="input-label-custom">Industry Type</span>
-              </h3>
-             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-
-                <div className="ml-1 truncate">
-                  {renderDropdownField(
-                    "industryTypeName",
-                    formData.industryTypeName,
-                    industryTypeData,
-                    "Select industry type"
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-2 p-1" >
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -555,27 +538,6 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             </div>
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
-                <span className="input-label-custom">Business Type</span>
-              </h3>
-               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-              <div className="grid items-center text-slate-700">
-                <div className="flex items-center">
-                  <Factory className="h-4 w-4 mr-2" />
-                  <div className="caption-custom truncate">
-                    {renderDropdownField(
-                      "businessTypeName",
-                      formData.businessTypeName,
-                      businessType || [],
-                      "Select business type"
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div>
-            <div className="space-y-0">
-              <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">Country</span>
               </h3>
@@ -587,6 +549,23 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                     formData.countryName,
                     countries,
                     "Select Country"
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Industry Type</span>
+              </h3>
+             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+
+                <div className="ml-1 truncate">
+                  {renderDropdownField(
+                    "industryTypeName",
+                    formData.industryTypeName,
+                    industryTypeData,
+                    "Select industry type"
                   )}
                 </div>
               </div>
@@ -607,6 +586,27 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   )}
                 </div>
               </div>
+            </div>
+            <div className="space-y-0">
+              <h3 className="font-medium text-slate-700 flex items-center">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
+                <span className="input-label-custom">Business Type</span>
+              </h3>
+               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+              <div className="grid items-center text-slate-700">
+                <div className="flex items-center">
+                  <Factory className="h-4 w-4 mr-2" />
+                  <div className="caption-custom truncate">
+                    {renderDropdownField(
+                      "businessTypeName",
+                      formData.businessTypeName,
+                      businessType || [],
+                      "Select business type"
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
             </div>
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">

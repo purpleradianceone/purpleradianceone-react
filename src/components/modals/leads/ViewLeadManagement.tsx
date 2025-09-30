@@ -159,6 +159,7 @@ const ViewLeadManagement = () => {
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
+        
           const updatedStatusName = leadStatus?.find(
             (item) => item.id === selectedStatusId
           )?.name;
@@ -851,13 +852,33 @@ const ViewLeadManagement = () => {
             onClose={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
+              setReasonText("");
             }}
             leadData={selectedLeadData}
             handleLeadConversion={handleSaveStatusUpdate}
             onReasonChange={(e) => setReasonText(e.target.value)}
-            reasonText={reasonText}
-          />
-        )}
+              reasonText={reasonText}
+              handleLeadMappedToAccount={()=>{
+               const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadStatusId = "9";
+          parsedQuery.leadStatus = "Converted";
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
+
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadStatus: "Converted",
+          }));
+          setReasonInputBoxOpen(false);
+          setReasonText("");
+          setSelectedStatusId(null);
+
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
+              }}
+            />
+          )}
 
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 p-2">
