@@ -258,7 +258,7 @@ function AccountManagementList({
               ? userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
                 : "ag-theme-balham w-full h-[calc(100vh-128px)]"
-              : "ag-theme-balham w-full h-[calc(100vh-320px)]"
+              : "ag-theme-balham w-full h-[calc(100vh-270px)]"
           }
         >
           <AccountManagementAgGrid

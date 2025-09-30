@@ -322,21 +322,21 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         : fieldName === "stateName" 
         ? formData.stateName 
         : formData.districtName;
-    // const originalValue =
-    //   fieldName === "businessTypeName"
-    //     ? company.businessTypeName
-    //      : fieldName === "industryTypeName" 
-    //     ? formData.industryTypeName 
-    //     : fieldName === "countryName" 
-    //     ? formData.countryName 
-    //     : fieldName === "stateName" 
-    //     ? formData.stateName 
-    //     : formData.districtName;
+    const originalValue =
+      fieldName === "businessTypeName"
+        ? company.businessTypeName
+         : fieldName === "industryTypeName" 
+        ? company.industryTypeName 
+        : fieldName === "countryName" 
+        ? company.countryName 
+        : fieldName === "stateName" 
+        ? company.stateName 
+        : company.districtName;
 
     // Only call API if value actually changed
-    // if (currentValue !== originalValue) {
+    if (currentValue !== originalValue) {
       handleUpdateAccountDetails(fieldName, currentValue || "");
-    // }
+    }
     setEditingField(null);
   };
 
