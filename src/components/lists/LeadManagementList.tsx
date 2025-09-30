@@ -145,11 +145,13 @@ function LeadManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
+        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
       >
         {/* sticky */}
         <div className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
-          <div className="flex gap-2">
+         {
+          isUsedInLeadModule && (
+             <div className="flex gap-2">
             {!isSmallScreen && <Handshake className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
 
 
@@ -157,6 +159,8 @@ function LeadManagementList({
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
+          )
+         }
               
 
           {isLargeScreen && (
@@ -294,8 +298,10 @@ function LeadManagementList({
                   }
                 }}
               >
-                <Plus size={SIZE.SIXTEEN} />
+                <span className="flex items-center">
+                  <Plus size={SIZE.SIXTEEN} />
                 <span>Import </span>
+                </span>
               </Button>
               <Button
               type="submit"
@@ -312,7 +318,7 @@ function LeadManagementList({
                   }
                 }}
               >
-                <span className="flex">
+                <span className="flex items-center ">
                   {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
                   {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
@@ -355,7 +361,7 @@ function LeadManagementList({
           />
         </div>
         {openPopUpOfCompanyUserModal && createPortal(
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
               {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">

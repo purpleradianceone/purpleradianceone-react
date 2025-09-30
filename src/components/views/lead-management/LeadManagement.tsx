@@ -280,7 +280,7 @@ function LeadManagement({
   }, [userHasAccessToViewLead]);
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}

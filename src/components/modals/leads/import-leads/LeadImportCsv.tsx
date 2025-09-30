@@ -11,12 +11,12 @@ import React, {
   forwardRef,
 } from "react";
 import {
-  FileUp,
   XCircle,
   ArrowRight,
   Search,
   Info,
   ArrowLeft,
+  LucideFolderInput,
 } from "lucide-react";
 // import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -396,6 +396,11 @@ const LeadImportCsv = ({
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
 
+  const [isLoadingLeadInterestData, setIsLoadingLeadInterestData] =
+    useState<boolean>(true);
+    const [isLoadingLeadSourceAndStatusData, setIsLoadingLeadSourceAndSourceData] =
+    useState<boolean>(true);
+
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
   const leadSourceMappingRef = useRef<HTMLDivElement>(null);
@@ -561,6 +566,9 @@ const LeadImportCsv = ({
     };
     await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
     await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
+    await function(){
+    setIsLoadingLeadSourceAndSourceData(false);
+    }()
   }, []);
 
   // API call to get lead interest data
@@ -576,6 +584,7 @@ const LeadImportCsv = ({
       });
 
       if (response.status === STATUS_CODE.OK) {
+        setIsLoadingLeadInterestData(false);
         setInterestTypeData(response.data);
       }
     } catch (error: any) {
@@ -633,35 +642,6 @@ const LeadImportCsv = ({
       } else {
         setTotalProductData(normalizedProductData.length); // Fallback if count is not provided
       }
-      // if (response.data && response.status === STATUS_CODE.OK) {
-      //   const formattedData: Product[] = response.data.map((res: any) => ({
-      //     count: res.count,
-      //     id: res.id,
-      //     companyId: res.company_id,
-      //     productTypeId: res.product_type_id,
-      //     productTypeName: res.product_type_name,
-      //     defaultWarrantyIntervalTypeId: res.default_warranty_interval_type_id,
-      //     defaultWarranty: res.default_warranty,
-      //     defaultWarrantyName: res.default_warranty_name,
-      //     defaultAmcCycleIntervalTypeId: res.default_amc_cycle_interval_type_id,
-      //     defaultAmcCycle: res.default_amc_cycle,
-      //     defaultAmcCycleName: res.default_amc_cycle_name,
-      //     name: res.name,
-      //     code: res.code,
-      //     cost: res.cost,
-      //     description: res.description,
-      //     version: res.version,
-      //     url: res.url,
-      //     isActive: res.isactive,
-      //     hsn: res.hsn,
-      //     sac: res.sac,
-      //     taxRate: res.tax_rate,
-      //     validFrom: res.valid_from,
-      //     createdBy: res.createdby,
-      //     createdOn: res.createdon,
-      //   }));
-      //   setProductsData(formattedData);
-      // }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -1157,19 +1137,19 @@ const LeadImportCsv = ({
             (status) => statusValueMapping[String(status.id)] === csvValue
           );
           mappedData[field.id] = crmStatus ? crmStatus.id : null; // Store ID
-          displayData[field.id] = crmStatus ? crmStatus.name : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmStatus ? crmStatus.name : ""; // Display Name or original CSV
         } else if (field.id === "leadSource" && csvValue) {
           const crmSource = leadSource?.find(
             (source) => sourceValueMapping[String(source.id)] === csvValue
           );
           mappedData[field.id] = crmSource ? crmSource.id : null; // Store ID
-          displayData[field.id] = crmSource ? crmSource.name : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmSource ? crmSource.name : ""; // Display Name or original CSV
         } else if (field.id === "leadOwner" && csvValue) {
           const crmOwner = companyUsers?.find(
             (owner) => ownerValueMapping[String(owner.id)] === csvValue
           );
           mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
-          displayData[field.id] = crmOwner ? crmOwner.fullname : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
         }
         // Note : product data
         else if (field.id === "company_product_id") {
@@ -1248,9 +1228,7 @@ const LeadImportCsv = ({
               InterestTypeValueMapping[String(interest.id)] === csvValue
           );
           mappedData[field.id] = crmInterestType ? crmInterestType.id : null; // Store ID
-          displayData[field.id] = crmInterestType
-            ? crmInterestType.name
-            : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmInterestType ? crmInterestType.name : ""; // Display Name or original CSV
         } else {
           // For other fields (including 'name', 'email', etc.), store the concatenated CSV value
           mappedData[field.id] = csvValue;
@@ -1446,9 +1424,9 @@ const LeadImportCsv = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full h-full bg-gray-100 rounded-md overflow-auto flex flex-col p-1  space-y-2">
+      <div className="w-full h-full   overflow-auto flex flex-col   space-y-2">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
+        <div className="flex-shrink-0 flex items-center justify-between p-2 border-b-2 bg-white rounded-lg z-10">
           {csvImportButtonClicked && (
             <button
               className="flex items-center gap-2 table-header-custom hover:text-blue-600 transition-colors"
@@ -1460,25 +1438,38 @@ const LeadImportCsv = ({
           )}
 
           {!csvImportButtonClicked && (
-            <>
-              <h2 className="table-header-custom hover:text-blue-500 rounded  px-1 shadow-sm">
-                Import leads from csv file.
+            <div className="flex items-center justify-between w-full">
+              <h2 className="table-header-custom hover:text-blue-500   px-1 ">
+                Import leads via CSV file
+                {/* Import leads via CSV */}
               </h2>
-              <label
+
+             
+                {!isLoadingLeadInterestData && !isLoadingLeadSourceAndStatusData ? (
+                  <>
+                   <label
                 htmlFor="csv-upload"
                 className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
               >
-                <FileUp className="w-5 h-5" />
-                <span>{csvFile ? "Change File" : "Select CSV"}</span>
-                <input
-                  id="csv-upload"
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </label>
-            </>
+
+                    <LucideFolderInput className="w-5 h-5" />
+                    <span>{csvFile ? "Change File" : "Browse CSV"}</span>
+                    <input
+                      id="csv-upload"
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      />
+                      </label>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center w-24 ">
+                    <LoadingSpinner />
+                  </div>
+                )}
+              
+            </div>
           )}
         </div>
 
@@ -1776,13 +1767,13 @@ const LeadImportCsv = ({
               potential duplicates (based on Email or Mobile Number). Check the
               box for each record you wish to import.
             </p>
-            <div className="w-full overflow-x-auto border rounded-md">
+            <div className="w-full overflow-x-auto overflow-y-auto max-h-96  border rounded-md">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left table-header-custom uppercase tracking-wider"
+                      className="px-6  text-left table-header-custom uppercase tracking-wider"
                     >
                       Import
                     </th>
@@ -1790,7 +1781,7 @@ const LeadImportCsv = ({
                       <th
                         key={field.id}
                         scope="col"
-                        className="px-6 py-3 text-left table-header-custom uppercase tracking-wider"
+                        className="px-6  text-left table-header-custom uppercase tracking-wider"
                       >
                         {field.label}
                       </th>
@@ -1805,18 +1796,18 @@ const LeadImportCsv = ({
                         lead.isDuplicate ? "bg-red-100" : "bg-green-50" // Apply red background for duplicates, green for unique
                       }
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6  whitespace-nowrap">
                         <input
                           type="checkbox"
                           checked={lead.isSelectedForImport}
                           onChange={() => handleToggleLeadSelection(index)}
-                          className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          className="focus:ring-blue-500 h-3 w-3 text-blue-600 border-gray-300 rounded"
                         />
                       </td>
                       {crmLeadFields.map((field) => (
                         <td
                           key={field.id}
-                          className="px-6 py-4 whitespace-nowrap table-data-custom"
+                          className="px-6 py-1 whitespace-nowrap table-data-custom"
                         >
                           {lead.displayData[field.id]}
                         </td>

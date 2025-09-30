@@ -99,7 +99,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       };
 
       return (
-        <div title={title} onClick={handleShowToaster}>
+        <div className="flex items-center justify-center mt-1" title={title} onClick={handleShowToaster}>
           <input
             type="checkbox"
             onChange={handleCheckboxChangeLocal}
@@ -202,7 +202,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
               type="text"
               value={value}
               onChange={handleChange}
-              className="w-full h-6 border border-gray-300 rounded px-1"
+              className="w-full h-6 border cursor-pointer border-gray-300 rounded px-1"
               inputMode="numeric"
               pattern="\d*"
             />
@@ -248,7 +248,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
               type="text"
               value={value}
               onChange={handleChange}
-              className="w-full h-6 border border-gray-300 rounded px-1"
+              className="w-full h-6 border cursor-pointer border-gray-300 rounded px-1"
               inputMode="decimal"
               pattern="\d*\.?\d*"
             />

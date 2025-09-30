@@ -270,7 +270,7 @@ function AccountManagementAgGrid({
         cellRenderer: (params: Account | any) => {
           
           return (
-              <div className="flex items-center justify-center  hover:underline decoration-white ">
+              <div className="flex items-center justify-center">
             <span
               className="lead-details"
               onClick={() => {
