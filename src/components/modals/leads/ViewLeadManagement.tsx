@@ -848,11 +848,31 @@ const ViewLeadManagement = () => {
             onClose={()=>{
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
+              setReasonText("");
             }}
             leadData={selectedLeadData}
             handleLeadConversion={handleSaveStatusUpdate}
             onReasonChange={(e) => setReasonText(e.target.value)}
               reasonText={reasonText}
+              handleLeadMappedToAccount={()=>{
+               const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadStatusId = "9";
+          parsedQuery.leadStatus = "Converted";
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
+
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadStatus: "Converted",
+          }));
+          setReasonInputBoxOpen(false);
+          setReasonText("");
+          setSelectedStatusId(null);
+
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
+              }}
             />
           )}
 

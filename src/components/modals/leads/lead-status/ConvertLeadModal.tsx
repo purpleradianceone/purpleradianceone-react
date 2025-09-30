@@ -15,8 +15,8 @@ import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import FormInput from "../../../ui/FormInput";
 import Button from "../../../ui/Button";
+import TextAreaInput from "../../../ui/TextAreaInput";
 
 function ConvertLeadModal({
   isOpen,
@@ -25,13 +25,15 @@ function ConvertLeadModal({
   handleLeadConversion,
   reasonText,
   onReasonChange,
+  handleLeadMappedToAccount
 }: {
-  isOpen: boolean;
-  onClose: () => void;
-  leadData: Lead;
-  handleLeadConversion: () => void;
-  reasonText: string;
-  onReasonChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isOpen : boolean;
+  onClose : () => void;
+  leadData : Lead;
+  handleLeadConversion : () => void;
+  reasonText : string;
+  onReasonChange : (event : React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleLeadMappedToAccount : () => void;
 }) {
   const [accountTypeSelected, setAccountTypeSelected] = useState<
     "existingAccount" | "noAccount"
@@ -71,7 +73,8 @@ function ConvertLeadModal({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-          handleLeadConversion();
+            handleLeadMappedToAccount();
+          onClose();
         } else {
           toast.error(response.data.message);
         }
@@ -109,55 +112,7 @@ function ConvertLeadModal({
 
               <form className="space-y-0">
                 
-                <div className="grid grid-cols-9 gap-2">
-                    <div className={accountTypeSelected === "noAccount" ? "col-span-7" : "col-span-9"}>
-                     <FormInput
-                    type="text"
-                    placeholder="Enter reason for status update"
-                    value={reasonText}
-                    onChange={onReasonChange}
-                    label="Reason(Optional)"
-                  />
-                    </div>
-                    {accountTypeSelected === "noAccount" && (
-                        <div className="col-span-1">
-                        <div className="max-w-32 mt-7">
-                                <Button
-                        type="button"
-                        onClick={()=>{
-                            onClose();
-                        }}
-                        >
-                            <div className="flex gap-1 justify-center items-center">
-                                <X size={SIZE.SIXTEEN}/>
-                                <span>Cancel</span>
-                            </div>
-                        </Button>
-                        </div>
-                        
-                    </div>
-                    )}
-                    {accountTypeSelected === "noAccount" && (
-                        <div className="col-span-1">
-                        <div className="max-w-32 mt-7">
-                                 <Button
-                        type="submit"
-                        onClick={(e)=>{
-                            e.preventDefault();
-                            handleLeadConversion();
-                        }}
-                        >
-                            <div className="flex gap-1 justify-center items-center">
-                                <Save size={SIZE.SIXTEEN}/>
-                                <span>Convert</span>
-                            </div>
-                        </Button>
-                        </div>
-                       
-                    </div>
-                    )}
-                    
-                </div>
+               
                  
                 
                 <div className="flex justify-center">
@@ -186,11 +141,57 @@ function ConvertLeadModal({
                   </div>
                 )}
 
-                {accountTypeSelected === "noAccount" && (
+                {/* {accountTypeSelected === "noAccount" && (
                   <div className="min-w-36">
                     
                   </div>
-                )}
+                )} */}
+                {accountTypeSelected === "noAccount" && (
+                    <div className="grid grid-cols-1">
+                    <div>
+                     <TextAreaInput
+                    placeholder="Enter reason for status update"
+                    value={reasonText}
+                    cols={3}
+                    rows={5}
+                    onChange={onReasonChange}
+                    label="Reason(Optional)"
+                  />
+                    </div>
+                        <div className="flex gap-2 col-span-1 justify-end">
+                        <div className="max-w-32 mt-7">
+                                <Button
+                        type="button"
+                        onClick={()=>{
+                            onClose();
+                        }}
+                        >
+                            <div className="flex gap-1 justify-center items-center">
+                                <X size={SIZE.SIXTEEN}/>
+                                <span>Cancel</span>
+                            </div>
+                        </Button>
+                        </div>
+                        <div className="max-w-32 mt-7">
+                                 <Button
+                        type="submit"
+                        onClick={(e)=>{
+                            e.preventDefault();
+                            handleLeadConversion();
+                        }}
+                        >
+                            <div className="flex gap-1 justify-center items-center">
+                                <Save size={SIZE.SIXTEEN}/>
+                                <span>Save</span>
+                            </div>
+                        </Button>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                </div>
+               )} 
 
                 <ConfirmationDialog
                   message="Please confirm! Map the lead to selected Account!"
@@ -198,7 +199,13 @@ function ConvertLeadModal({
                     setFinalConfirm(false);
                   }}
                   onConfirm={() => {
-                    createAccountLead();
+                    if(accountTypeSelected === "existingAccount"){
+                            createAccountLead();
+                    }
+                    // else{
+                    //     handleLeadConversion()
+                    // }
+                    
                   }}
                   open={finalConfirm}
                   title="Are You Sure?"
