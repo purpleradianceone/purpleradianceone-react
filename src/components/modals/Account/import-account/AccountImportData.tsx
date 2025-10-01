@@ -11,7 +11,7 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
-import { LucideImport, Search, Trash2, X } from "lucide-react";
+import { LucideImport, Search, Trash2, XCircle } from "lucide-react";
 import Button from "../../../ui/Button";
 import AccountImportPreSaveDataAgGrid from "../../../ag-grid/AccountImportPreSaveDataAgGrid";
 import { AccountImportDataType } from "../../../../@types/account/AccountImportDataType";
@@ -221,14 +221,11 @@ const AccountImportData = ({
           <span className="input-label-custom-blue bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
             <div className="flex gap-1 items-center justify-between">
               {selectedAccountTag}
-              <div className="w-fit h-fit">
-                <button
-                  className={`${COLORS.ADD_BUTTON}`}
-                  onClick={onCloseOrUnselectTag}
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
+                <XCircle
+                    className={`w-4 h-4 ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
+                                      onClick={onCloseOrUnselectTag}
+
+                  />
             </div>
           </span>
         </span>

@@ -20,10 +20,22 @@ const handleButtonClicked = (status: boolean) => {
           });
         }
    }
+
+   const tagCloseRef = useRef<HTMLDivElement | null>(null);
+
+   function tagClosed(){
+     if ( tagCloseRef.current) {
+          tagCloseRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline:"start"
+          });
+        }
+   }
        
   
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 p-6 " ref={tagCloseRef}>
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Import Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 space-y-6 transition-all duration-300 hover:shadow-xl">
@@ -61,8 +73,9 @@ const handleButtonClicked = (status: boolean) => {
               View, manage and move accounts associated with your import tags.
             </p>
 
-            <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100"ref={tagRef}>
+            <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100 transition-colors duration-300 ease-in-out"ref={tagRef}>
               <AccountImportTagView 
+              tagClosed={tagClosed}
               isTagClick={tagClicked}
               />
             </div>
