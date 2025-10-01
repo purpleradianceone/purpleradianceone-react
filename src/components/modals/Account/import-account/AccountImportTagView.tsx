@@ -10,10 +10,12 @@ import AccountImportData from "./AccountImportData";
 import AccountImportTagData from "../../../../@types/account/AccountImportTagData";
 
 const AccountImportTagView = ({
-  isTagClick
+  isTagClick,
+  tagClosed
  
 }: {
   isTagClick: () => void;
+  tagClosed: () => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [accountImportTagData, setAccountImportTagData] = useState<
@@ -50,6 +52,7 @@ const AccountImportTagView = ({
   };
 
    function  onCloseOrUnselectTag(){
+    tagClosed();
     setSelectedAccountTag("");
   }
 
