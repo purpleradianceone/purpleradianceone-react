@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { useEffect, useState } from "react";
 import POST_API from "../../../../constants/PostApi";
 import { useUserPreference } from "../../../../context/user/UserPreference";
@@ -8,23 +7,23 @@ import axios from "axios";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import Pagination from "../../../ag-grid/Pagination";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
+
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
-import { Search } from "lucide-react";
+import { LucideImport, Search, Trash2, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import AccountImportPreSaveDataAgGrid from "../../../ag-grid/AccountImportPreSaveDataAgGrid";
 import { AccountImportDataType } from "../../../../@types/account/AccountImportDataType";
+import COLORS from "../../../../constants/Colors";
+import toast from "react-hot-toast";
 
 const AccountImportData = ({
+  onCloseOrUnselectTag,
   selectedAccountTag,
   getAccountImportTags,
 }: {
+  onCloseOrUnselectTag: () => void;
   selectedAccountTag: string;
   getAccountImportTags: () => Promise<void>;
 }) => {
@@ -45,19 +44,6 @@ const AccountImportData = ({
   const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(false);
   const [openFinalPopup, setOpenFinalPopup] = useState<boolean>(false);
   //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   const getAccountImportData = async () => {
     setAccountImportData([]);
@@ -159,15 +145,9 @@ const AccountImportData = ({
       )
       .then((response) => {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          toast.success(response.data.message);
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
       })
       .catch(async (error: any) => {
@@ -199,19 +179,14 @@ const AccountImportData = ({
       })
       .then((reposne) => {
         if (reposne.data.status) {
-          showMessageSnackbar({
-            message: reposne.data.message,
-            type: "success",
-          });
+          toast.success(reposne.data.message);
+
           getAccountImportTags();
           setOpenFinalPopup(false);
           // making aggrid table null
           setAccountImportData([]);
         } else {
-          showMessageSnackbar({
-            message: reposne.data.message,
-            type: "error",
-          });
+          toast.error(reposne.data.message);
         }
       })
       .catch(async (error: any) => {
@@ -223,10 +198,7 @@ const AccountImportData = ({
             handleCreateMoveAccountsToAccountTable();
           }
         } else if (error.status === 500) {
-          showMessageSnackbar({
-            message: error.response.data,
-            type: "error",
-          });
+          toast.error(error.response.data);
           setOpenFinalPopup(false);
         }
       })
@@ -247,7 +219,17 @@ const AccountImportData = ({
         <span className="flex items-center gap-2 table-header-custom">
           These are the accounts from selected tag:
           <span className="input-label-custom-blue bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
-            {selectedAccountTag}
+            <div className="flex gap-1 items-center justify-between">
+              {selectedAccountTag}
+              <div className="w-fit h-fit">
+                <button
+                  className={`${COLORS.ADD_BUTTON}`}
+                  onClick={onCloseOrUnselectTag}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
           </span>
         </span>
 
@@ -260,9 +242,11 @@ const AccountImportData = ({
               e.preventDefault();
               setOpenFinalPopup(true);
             }}
-            // className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
           >
-            Move all Accounts To account data
+            <div className="flex items-center justify-center gap-0.5">
+              <LucideImport size={SIZE.SIXTEEN} />
+              Move all Accounts To account data
+            </div>
           </Button>
         </div>
       </div>
@@ -270,7 +254,6 @@ const AccountImportData = ({
       {/* Actions Row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          {/* Delete Button */}
           <Button
             type="button"
             disabled={!userHasAccessToUpdateLead}
@@ -279,15 +262,15 @@ const AccountImportData = ({
                 if (selectedIds.length !== 0) {
                   updateAccountImport();
                 } else {
-                  showMessageSnackbar({
-                    message: "Please select at least one lead to delete.",
-                    type: "error",
-                  });
+                  toast.error("Please select at least one Account to delete.");
                 }
               }
             }}
           >
-            Delete Selected
+            <div className="flex items-center justify-center gap-0.5">
+              <Trash2 size={SIZE.SIXTEEN} />
+              Delete Selected
+            </div>
           </Button>
 
           {/* Search */}
@@ -312,7 +295,7 @@ const AccountImportData = ({
       </div>
 
       {/* Table */}
-      <div className="h-[75vh] mt-2 border rounded-lg overflow-hidden bg-white shadow">
+      <div className="h-[65vh] mt-2 border rounded-lg overflow-hidden bg-white shadow">
         <AccountImportPreSaveDataAgGrid
           accountImportData={accountImportData}
           onSelectedRow={handleSelectRow}
@@ -330,15 +313,6 @@ const AccountImportData = ({
           totalPages={Math.ceil(totalCount / pageSize)}
         />
       </div>
-
-      {/* Snackbar */}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
 
       {/* Confirmation Modal */}
       <FinalConfirmationModal

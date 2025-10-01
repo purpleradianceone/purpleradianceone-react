@@ -2,6 +2,7 @@ export interface AccountImportDataType {
   id:number,  
   company_id: number;
   company_account_type_id: number[];
+  company_account_type_name: string;
   import_tag: string;
   name: string;
   email: string;

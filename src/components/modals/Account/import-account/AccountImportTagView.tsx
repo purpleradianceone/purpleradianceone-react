@@ -9,7 +9,12 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import AccountImportData from "./AccountImportData";
 import AccountImportTagData from "../../../../@types/account/AccountImportTagData";
 
-const AccountImportTagView = () => {
+const AccountImportTagView = ({
+  isTagClick
+ 
+}: {
+  isTagClick: () => void;
+}) => {
   const { loginStatus } = useLoggedInUserContext();
   const [accountImportTagData, setAccountImportTagData] = useState<
     AccountImportTagData[]
@@ -43,6 +48,17 @@ const AccountImportTagView = () => {
         }
       });
   };
+
+   function  onCloseOrUnselectTag(){
+    setSelectedAccountTag("");
+  }
+
+  useEffect(()=>{
+
+    if(selectedAccountTag){
+      isTagClick();
+    }
+  },[selectedAccountTag])
 
   useEffect(() => {
     getAccountImportTags();
@@ -116,7 +132,7 @@ const AccountImportTagView = () => {
               className={`px-3 py-1.5 rounded-lg transition-all duration-200 border shadow-sm
               ${
                 selectedAccountTag === data.import_tag
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md table-header-custom"
+                  ? " text-white border-blue-600 shadow-md table-header-custom-blue "
                   : "bg-white hover:bg-blue-50 hover:border-blue-300 table-header-custom"
               }`}
             >
@@ -129,6 +145,7 @@ const AccountImportTagView = () => {
       {selectedAccountTag && (
         <div className="pt-4">
           <AccountImportData
+            onCloseOrUnselectTag = {onCloseOrUnselectTag}
             selectedAccountTag={selectedAccountTag}
             getAccountImportTags={getAccountImportTags}
           />
