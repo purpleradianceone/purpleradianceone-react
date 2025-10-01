@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useRef, useState } from "react";
 import AccountCsvMapper from "./AccountCsvMapper";
 import AccountImportTagView from "./AccountImportTagView";
 
@@ -9,6 +9,19 @@ const [isImpoetedFile,setIsImportedFile] = useState(false);
 const handleButtonClicked = (status: boolean) => {
     setIsImportedFile(status);
   };
+
+  const tagRef = useRef<HTMLDivElement | null>(null);
+   function tagClicked(){
+     if ( tagRef.current) {
+          tagRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline:"center"
+          });
+        }
+   }
+       
+  
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -48,8 +61,10 @@ const handleButtonClicked = (status: boolean) => {
               View, manage and move accounts associated with your import tags.
             </p>
 
-            <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100">
-              <AccountImportTagView />
+            <div className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100"ref={tagRef}>
+              <AccountImportTagView 
+              isTagClick={tagClicked}
+              />
             </div>
           </div>
         )}
