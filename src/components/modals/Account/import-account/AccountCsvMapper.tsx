@@ -372,7 +372,17 @@ export default function AccountCsvMapper({
     : [];
 
   const handleIndustryDrop = (crmItem: MappableItem, csvValue: string) => {
-    setIndustryValueMapping((prev) => ({ ...prev, [csvValue]: crmItem.id }));
+    setIndustryValueMapping((prev) => {
+      const newMap = { ...prev };
+      Object.keys(newMap).forEach((k) => {
+        if (newMap[k] === crmItem.id) {
+          delete newMap[k];
+        }
+      });
+      // Then, assign the new csvValue -> crmItem.id
+      newMap[csvValue] = crmItem.id;
+      return newMap;
+    });
   };
   const handleIndustryRemove = (crmItem: MappableItem) => {
     const newMap = { ...industryValueMapping };
@@ -382,8 +392,22 @@ export default function AccountCsvMapper({
     setIndustryValueMapping(newMap);
   };
   const handleBusinessDrop = (crmItem: MappableItem, csvValue: string) => {
-    setBusinessValueMapping((prev) => ({ ...prev, [csvValue]: crmItem.id }));
+    setBusinessValueMapping((prev) => {
+      const newMap = { ...prev };
+      // First, remove any existing mapping for this crmItem (like handleIndustryRemove does)
+      Object.keys(newMap).forEach((k) => {
+        if (newMap[k] === crmItem.id) {
+          delete newMap[k];
+        }
+      });
+      // Then, assign the new csvValue -> crmItem.id
+      newMap[csvValue] = crmItem.id;
+
+      return newMap;
+    });
   };
+
+
   const handleBusinessRemove = (crmItem: MappableItem) => {
     const newMap = { ...businessValueMapping };
     Object.keys(newMap).forEach((k) => {
@@ -400,7 +424,6 @@ export default function AccountCsvMapper({
     : [];
 
   // ----------------- DRAG AND DROP MAPPING FOR COMPANY_ACCOUNT_TYPE-----------------
-
   const accountTypeNamesFromCsv: string[] = Array.from(
     new Set(
       companyAccountArrayCsvValues.flatMap((row) =>
