@@ -219,13 +219,12 @@ const AccountImportData = ({
         <span className="flex items-center gap-2 table-header-custom">
           These are the accounts from selected tag:
           <span className="input-label-custom-blue bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
-            <div className="flex gap-1 items-center justify-between">
+            <div className="flex gap-1 items-center justify-between table-header-custom-blue">
               {selectedAccountTag}
-                <XCircle
-                    className={`w-4 h-4 ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
-                                      onClick={onCloseOrUnselectTag}
-
-                  />
+              <XCircle
+                className={`w-4 h-4 ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
+                onClick={onCloseOrUnselectTag}
+              />
             </div>
           </span>
         </span>
