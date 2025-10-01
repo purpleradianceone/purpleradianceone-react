@@ -41,6 +41,7 @@ import Button from "../../../ui/Button";
 import InterestType from "../../../../@types/lead-management/InterestType";
 import ApiError from "../../../../@types/error/ApiError";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
+import COLORS from "../../../../constants/Colors";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -162,7 +163,7 @@ const DroppableCrmField: React.FC<{
             >
               {header}
               <XCircle
-                className="ml-1 w-4 h-4 cursor-pointer"
+                className={`ml-1 w-4 h-4 ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
                 onClick={() => onRemoveMapping(field.id, header)}
               />
             </span>
@@ -263,7 +264,7 @@ const GenericValueMappingCard = forwardRef(
               <div className="flex justify-between items-center w-full input-label-custom-active">
                 <span>{mappedValue}</span>
                 <XCircle
-                  className="w-4 h-4 text-red-500 cursor-pointer"
+                  className={`w-4 h-4  ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
                   onClick={() => onRemove(crmItem)}
                 />
               </div>
