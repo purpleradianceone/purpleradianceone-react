@@ -25,6 +25,7 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
+import TaskStageChip from "../../../ui/TaskStageChip";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: LeadTaskType) => {
@@ -41,22 +42,22 @@ const getActivityIcon = (activity: LeadTaskType) => {
 };
 
 // Helper function to get background color from hex color code
-const getBgColorFromHex = (colorCode: string) => {
-  const hex = colorCode.replace("#", "");
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  return `rgba(${r}, ${g}, ${b}, 0.2)`;
-};
+// const getBgColorFromHex = (colorCode: string) => {
+//   const hex = colorCode.replace("#", "");
+//   const r = parseInt(hex.substr(0, 2), 16);
+//   const g = parseInt(hex.substr(2, 2), 16);
+//   const b = parseInt(hex.substr(4, 2), 16);
+//   return `rgba(${r}, ${g}, ${b}, 0.2)`;
+// };
 
 // Helper function to get border color from hex color code
-const getBorderColorFromHex = (colorCode: string) => {
-  const hex = colorCode.replace("#", "");
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  return `rgba(${r}, ${g}, ${b}, 0.3)`;
-};
+// const getBorderColorFromHex = (colorCode: string) => {
+//   const hex = colorCode.replace("#", "");
+//   const r = parseInt(hex.substr(0, 2), 16);
+//   const g = parseInt(hex.substr(2, 2), 16);
+//   const b = parseInt(hex.substr(4, 2), 16);
+//   return `rgba(${r}, ${g}, ${b}, 0.3)`;
+// };
 
 const getIconColorFromHex = (colorCode: string) => {
   const hex = colorCode.replace("#", "");
@@ -70,11 +71,11 @@ const getIconColorFromHex = (colorCode: string) => {
 const getPriorityColor = (activity: LeadTaskType) => {
   switch (activity.leadTaskPriorityId) {
     case 1:
-      return `bg-red-200 text-red-800 border-red-200`;
+      return `bg-green-200 text-green-800 border-green-200`;
     case 2:
       return `bg-yellow-200 text-yellow-800 border-yellow-200`;
     case 3:
-      return `bg-blue-200 text-blue-800 border-blue-200`;
+      return `bg-red-200 text-red-800 border-red-200`;
     default:
       return "bg-gray-100 text-gray-800 border-gray-200";
   }
@@ -225,8 +226,8 @@ function Tasks({
                   key={task.id}
                   className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group"
                   style={{
-                    backgroundColor: getBgColorFromHex(task.colorCode),
-                    borderColor: getBorderColorFromHex(task.colorCode),
+                    // backgroundColor: getBgColorFromHex(task.colorCode),
+                    // borderColor: getBorderColorFromHex(task.colorCode),
                     animationDelay: `${index * 0.1}s`,
                   }}
                 >
@@ -246,7 +247,7 @@ function Tasks({
                           onClick={() => {
                             getLeadDetails(task.leadId);
                           }}
-                          className="input-label-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                          className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
                         >
                           {task.subject}
                         </h4>
@@ -316,24 +317,33 @@ function Tasks({
                           </div>
                         )}
                       </div> */}
-                        <span className="caption-custom px-1.5 py-0.5 bg-white rounded-full">
-                          {task.leadTaskStageName}
-                        </span>
-                        <button
-                          type="button"
-                          className="caption-custom px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                        {/* <span className="caption-custom px-2 py-1 border border-gray-300 hover:bg-gray-200 rounded-full">
+                          {task.leadTaskStageName/,l }
+                        </span> */}
+                        <TaskStageChip
+                        stageName={task.leadTaskStageName}
+                        stageId={task.leadTaskStageId}
+                        />
+                        {/* <div
+                          
+                          className="caption-custom px-1 py-0.5 border border-gray-300 rounded-full transition-colors flex-shrink-0"
                         >
                           {taskType === "completed"
                             ? `${task.completedAt}`
                             : `${task.overdueStatus}`}
-                        </button>
+                        </div> */}
+                        <TaskStageChip
+                        stageName={taskType === "completed"
+                            ? task.completedAt!
+                            : task.overdueStatus!}
+                        stageId={task.leadTaskStageId}
+                        />
                         {taskType === "completed" && (
-                          <button
-                            type="button"
-                            className="caption-custom px-2 py-1 hover:bg-white rounded transition-colors flex-shrink-0"
+                          <div
+                            className="caption-custom px-2 py-1 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
                           >
                             {task.overdueStatus}
-                          </button>
+                          </div>
                         )}
                       </div>
                       {/* <button

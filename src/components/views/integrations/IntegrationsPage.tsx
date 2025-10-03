@@ -24,7 +24,7 @@ function IntegrationsPage() {
           <div className="sticky top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
             <div className="flex w-full gap-2 justify-center">
               <div className="flexr">
-                <span className="text-base font-bold">
+                <span className="section-header-custom">
                   Tailor Inegrations to Your Needs
                 </span>
               </div>

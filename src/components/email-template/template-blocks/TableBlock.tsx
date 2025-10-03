@@ -4,6 +4,7 @@ import { Element, useNode, useEditor } from "@craftjs/core";
 import "react-resizable/css/styles.css";
 import Button from "../../ui/Button";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { SIZE } from "../../../constants/AppConstants";
 
 type TableBlockProps = {
   width?: number;
@@ -119,9 +120,9 @@ const removeColumn = () => {
       >
         <div className="relative flex  justify-end items-center -top-4  -right-4 z-10">
           <div className="w-fit h-fit">
-            <Button onClick={handleDeleteTable}>
+            <Button type="button" onClick={handleDeleteTable}>
               <div className="flex items-center justify-center gap-1">
-                <Trash2 size={14} />
+                <Trash2 size={SIZE.SIXTEEN} />
                 Delete Table Block
               </div>
             </Button>
@@ -163,9 +164,12 @@ const removeColumn = () => {
           }}
         >
           <div className="w-fit h-fit">
-            <Button onClick={() => setRows((r) => r + 1)}>
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+              setRows((r) => r + 1);
+            }}>
               <div className="flex items-center justify-center gap-1">
-                <Plus size={14} />
+                <Plus size={SIZE.SIXTEEN} />
                Row
               </div>
               </Button>
@@ -173,18 +177,21 @@ const removeColumn = () => {
 
           {rows > 1 && (
             <div className="w-fit h-fit">
-              <Button onClick={() => removeRow()}>
+              <Button type="button" onClick={() => removeRow()}>
               <div className="flex items-center justify-center gap-1">
-                <Minus size={14} />
+                <Minus size={SIZE.SIXTEEN} />
                Row
               </div>
                </Button>
             </div>
           )}
           <div className="w-fit h-fit">
-            <Button onClick={addColumn}>
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+              addColumn();
+            }}>
               <div className="flex items-center justify-center gap-1">
-                <Plus size={14} />
+                <Plus size={SIZE.SIXTEEN} />
                Column
               </div>
               </Button>
@@ -192,9 +199,9 @@ const removeColumn = () => {
 
           {columns > 1 && (
             <div className="w-fit h-fit">
-              <Button onClick={removeColumn}>
+              <Button type="button" onClick={removeColumn}>
                 <div className="flex items-center justify-center gap-1">
-                <Minus size={14} />
+                <Minus size={SIZE.SIXTEEN} />
                Column
               </div>
                 
@@ -202,9 +209,9 @@ const removeColumn = () => {
             </div>
           )}
           {/* <div className="w-fit h-fit">
-            <Button onClick={handleDeleteTable}>
+            <Button type="button" onClick={handleDeleteTable}>
               <div className="flex items-center justify-center gap-1">
-                <Trash2 size={14} />
+                <Trash2 size={SIZE.SIXTEEN} />
                 Delete Table Block
               </div>
             </Button>

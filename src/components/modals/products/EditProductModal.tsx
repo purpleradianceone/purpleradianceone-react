@@ -43,6 +43,8 @@ import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyProductModal({
   isOpen,
@@ -356,7 +358,7 @@ function EditCompanyProductModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -558,7 +560,7 @@ function EditCompanyProductModal({
                       </div>
                     )}
                   </label>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -569,12 +571,17 @@ function EditCompanyProductModal({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={productIsActive}
+                      name="isActive"
+                      onToggle={handleProductToggle}
+                  />
                 </div>
               </div>
 
               <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button onClick={onClose}>
+                <Button type="button" onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
                     <X size={16} />
                     Cancel
@@ -603,8 +610,9 @@ function EditCompanyProductModal({
               }
             >
               <Button
-                type="button"
-                onClick={() => {
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
                   handleCreateCompanyProductTaxModalOpen(true);
                 }}
               >
@@ -650,7 +658,8 @@ function EditCompanyProductModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

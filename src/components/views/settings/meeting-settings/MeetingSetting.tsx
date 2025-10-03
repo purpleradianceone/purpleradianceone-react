@@ -61,6 +61,7 @@ function MeetingSettings() {
           <div className="min-w-32">
             {platform.id !== 3 ? (
               <Button
+              type="submit"
                 disabled={platform.isConnected}
                 onClick={(e) => {
                   e.preventDefault();

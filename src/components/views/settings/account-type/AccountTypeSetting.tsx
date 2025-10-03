@@ -3,13 +3,7 @@ import React, { useEffect, useState } from "react";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import AccountType from "../../../../@types/settings/AccountType";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import {
-  ChevronDown,
-  ChevronUp,
-  Pen,
-  Plus,
-  UserRoundPlus,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Pen, Plus, UserRoundPlus } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
@@ -20,6 +14,7 @@ import MESSAGE from "../../../../constants/Messages";
 import CreateAccountType from "./CreateAccountType";
 import Button from "../../../ui/Button";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import ToggleButton from "../../../ui/ToggleButton";
 
 const AccountTypeSetting: React.FC = () => {
   const {
@@ -36,7 +31,7 @@ const AccountTypeSetting: React.FC = () => {
 
   const [editingTypeId, setEditingTypeId] = useState<number | null>(null);
   const [editingTypeName, setEditingTypeName] = useState("");
-  const [loading , setIsLoading] = useState<boolean>(true);
+  const [loading, setIsLoading] = useState<boolean>(true);
   // --- Fetch Account Types ---
   const getAccountType = async () => {
     const PostDataToGetAccountType: AccountType = {
@@ -154,7 +149,8 @@ const AccountTypeSetting: React.FC = () => {
           );
           setCompanyAccountType(companyAccountData);
         }
-      }).catch(async (error: any) => {
+      })
+      .catch(async (error: any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
             callFunction: getComapnyAccountType,
@@ -166,7 +162,7 @@ const AccountTypeSetting: React.FC = () => {
           toast.error(error.response.status + error.response.data);
         }
       })
-      .finally(()=>{
+      .finally(() => {
         setIsLoading(false);
       });
   };
@@ -198,15 +194,14 @@ const AccountTypeSetting: React.FC = () => {
     return acc;
   }, {} as Record<string, CompanyAccountType[]>);
 
-  if(loading){
-    return(
+  if (loading) {
+    return (
       <div className="h-56 flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-
-       <span>Loading...</span> <LoadingSpinner/>
+          <span>Loading...</span> <LoadingSpinner />
         </div>
       </div>
-    )
+    );
   }
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
@@ -218,22 +213,25 @@ const AccountTypeSetting: React.FC = () => {
           {!showAddForm && (
             <div>
               <Button
-              onClick={() => {
-                if (userHasAccessToAddCompanyAccountType) {
-                  setShowAddForm(true);
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS.DENIED_ADD_ACCESS
-                  );
-                }
-              }}
-              // className="flex items-center m-3 bg-blue-600 px-2 rounded-md action-btn-custom hover:bg-blue-700 transition-colors"
-            >
-              <div className="flex items-center ">
-                <Plus size={16} className="action-btn-custom"/>
-              Create
-              </div>
-            </Button>
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToAddCompanyAccountType) {
+                    setShowAddForm(true);
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
+                        .DENIED_ADD_ACCESS
+                    );
+                  }
+                }}
+                // className="flex items-center m-3 bg-blue-600 px-2 rounded-md action-btn-custom hover:bg-blue-700 transition-colors"
+              >
+                <div className="flex items-center ">
+                  <Plus size={16} className="action-btn-custom" />
+                  Create
+                </div>
+              </Button>
             </div>
           )}
         </div>
@@ -284,9 +282,7 @@ const AccountTypeSetting: React.FC = () => {
                       className="flex items-center justify-between p-1 cursor-pointer bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
                       onClick={() => toggleParentExpand(parentType)}
                     >
-                      <h3 className="table-header-custom pl-3">
-                        {parentType}
-                      </h3>
+                      <h3 className="table-header-custom pl-3">{parentType}</h3>
                       <button className=" hidden p-1 rounded-full hover:bg-blue-200 transition-colors">
                         {isOpen ? (
                           <ChevronUp size={20} className="text-slate-700" />
@@ -364,7 +360,7 @@ const AccountTypeSetting: React.FC = () => {
                         {/* Status Toggle */}
                         <div className="flex  items-center justify-end mt-2">
                           {/* Toggle for Active/Inactive */}
-                          <label className="inline-flex items-center cursor-pointer relative self-end">
+                          {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                              <input
                                 type="checkbox"
                                 className="sr-only peer"
@@ -379,10 +375,20 @@ const AccountTypeSetting: React.FC = () => {
                                 }}
                               />
                             <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                            {/* Adjusted size and colors */}
                             <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                            {/* Adjusted size and position */}
-                          </label>
+                          </label> */}
+                          <ToggleButton
+                            checked={item.isActive}
+                            onToggle={async () => {
+                              handleSaveEdit({
+                                ...item,
+                                company_account_type_name:
+                                  item.companyAccountTypeName,
+                                isactive: !item.isActive,
+                              });
+                            }}
+                            name="isActive"
+                          />
                         </div>
                       </div>
                     ))}

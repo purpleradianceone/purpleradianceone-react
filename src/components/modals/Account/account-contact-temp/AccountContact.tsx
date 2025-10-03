@@ -4,6 +4,7 @@ import POST_API from "../../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import {
   MOBILE_NUMBER_VALIDATION,
+  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../../constants/AppConstants";
@@ -20,6 +21,10 @@ import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import AccountContactType from "../../../../@types/account/AccountContactType";
 import { Briefcase, Edit, Edit3, Globe, Languages, Mail, MapPin, MessageCircle, Phone, Save, User, X } from "lucide-react";
+import StatusChip from "../../../ui/StatusChip";
+import COLORS from "../../../../constants/Colors";
+import ToggleButton from "../../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -434,7 +439,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
+              className={COLORS.ADD_BUTTON}
             >
               +Add
             </button>
@@ -455,7 +460,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   );
                 }
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 py-0.5 rounded-md flex items-center gap-1"
+              className={COLORS.ADD_BUTTON}
             >
               {/* <Plus size={10} /> */}
               <span>+Add</span>
@@ -468,7 +473,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               accountContact.map((contact, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-blue-200 cursor-pointer text-xs font-medium text-gray-800 px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+                  className={COLORS.CONTACT_CARD}
                   onClick={() => setSelectedContactCard(contact)}
                 >
                   {/* Left: Contact Info */}
@@ -486,7 +491,10 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                     {/* Text Info */}
                     <div className="flex flex-col">
-                      <p className="inpul-label-custom ">
+                      <p
+                      // className="table-header-custom"
+                       className="input-label-custom "
+                       >
                         {contact.name || "Unknown Contact"}
                       </p>
                       <p className="caption-custom flex flex-wrap items-center gap-x-1">
@@ -531,15 +539,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                       >
                         {contact.isPrimary ? "Primary" : "Secondary"}
                       </span> */}
-                    <span
-                      className={`px-2 py-0.5 rounded-full border ${
-                        contact.isActive
-                          ? "bg-green-100 caption-custom-active border-green-400"
-                          : "bg-red-100 caption-custom-inactive border-red-400"
-                      }`}
-                    >
-                      {contact.isActive ? "Active" : "Inactive"}
-                    </span>
+                    <StatusChip isActive={contact.isActive}/>
                   </div>
                 </div>
               ))
@@ -551,8 +551,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           </div>
 
           {/* view in pop up card  */}
-          {selectedContactCard && (
-            <div className="fixed border  top-8 inset-0 flex justify-center items-center z-50 p-4">
+          {selectedContactCard && createPortal(
+            <div className="fixed border inset-0 bg-black bg-opacity-5 flex justify-center items-center z-50 p-4">
               <div className="bg-white border rounded-2xl shadow-xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="relative px-8 pt-5 pb-4">
@@ -606,15 +606,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         ? "Primary Contact"
                         : "Secondary Contact"}
                     </span> */}
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            selectedContactCard.isActive
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : "bg-red-100 text-red-800 border border-red-200"
-                          }`}
-                        >
-                          {selectedContactCard.isActive ? "Active" : "Inactive"}
-                        </span>
+                        <StatusChip isActive={isActive}/>
                       </div>
                     </div>
                     <button
@@ -740,18 +732,18 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         <div className="w-5 h-5 mt-1 flex items-center justify-center">
                           <div
                             className={`w-3 h-3 rounded-full ${
-                              selectedContactCard.isActive
+                              isActive
                                 ? "bg-green-500"
                                 : "bg-red-500"
                             }`}
                           />
                         </div>
                         <div className="">
-                          <div className="flex gap-4">
-                            <h4 className="font-medium text-gray-900 mb-2">
+                          <div className="flex gap-2">
+                            <h4 className="font-medium text-gray-900 ">
                               Status
                             </h4>
-                            <label className="inline-flex items-center cursor-pointer relative self-end">
+                            {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                               <input
                                 type="checkbox"
                                 checked={isActive}
@@ -772,12 +764,29 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                                 className="sr-only peer"
                               />
                               <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                              {/* Adjusted size and colors */}
                               <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                              {/* Adjusted size and position */}
-                            </label>
+                            </label> */}
+                            <ToggleButton
+                            checked={isActive}
+                            name="isActive"
+                            onToggle={
+                              userHasAccessToUpdateAccount
+                                    ? () => {
+                                        handleActiveStatusChange(
+                                          selectedContactCard
+                                        );
+                                      }
+                                    : () => {
+                                        toast.error(
+                                          MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                                            .DENIED_UPDATE_ACCESS
+                                        );
+                                      }
+                            }
+                            />
 
-                            <span className="mt-3 text-sm font-medium text-gray-900">
+
+                            <span className="mt-1 caption-custom">
                               {selectedContactCard.isActive
                                 ? "Active"
                                 : "Inactive"}
@@ -804,13 +813,14 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   )}
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </>
       )}
       {/* Add Contact Form Modal */}
-      {isOpenAddAccountContactForm && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
+      {isOpenAddAccountContactForm && createPortal(
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-2">
             {/* Header */}
 
@@ -991,12 +1001,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             <div className="flex items-center justify-end gap-4 mt-3 ">
               <div className="flex gap-2">
                 <Button
-                  type="submit"
+                  type="button"
                   onClick={handleStateClearFunctionOnClickOfCancelOrXButton}
                   // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                 >
                   <div className="flex items-center gap-0.5">
-                    <X size={16} />
+                    <X size={SIZE.SIXTEEN} />
                     Cancel
                   </div>
                 </Button>
@@ -1006,16 +1016,18 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   onClick={handleSubmit}
                 >
                   <div className="flex items-center gap-1">
-                    <Save size={16} />
+                    <Save size={SIZE.SIXTEEN} />
                     Save
                   </div>
                 </Button>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
+   
   );
 };
 export default AccountContact;

@@ -10,7 +10,7 @@ import AddCompanyUserModalProps from "../../../@types/modal/AddCompanyUserModalP
 import POST_API from "../../../constants/PostApi";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import {  STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
+import {  SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,6 +20,7 @@ import useScreenSize from "../../../config/hooks/useScreenSize";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -125,13 +126,13 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       <div
         className={
           isSmallScreen
-            ? "fixed inset-0 z-10 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
-            : "fixed inset-0 z-10 p-5 overflow-hidden bg-black bg-opacity-5"
+            ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+            : "fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5"
         }
       >
         <div className="flex min-h-screen items-center justify-center">
@@ -214,16 +215,16 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
                 <div className="flex items-center justify-end">
                   <div className="flex gap-2">
 
-                <Button  onClick={onClose} type="reset">
+                <Button  onClick={onClose} type="button">
                   
                    <div className="flex items-center justify-center gap-0.5">
-                    <X size={16}/>
+                    <X size={SIZE.SIXTEEN}/>
                     Cancel
                     </div>
                     </Button>
                   <Button type="submit">
                    <div className="flex items-center justify-center gap-1">
-                     <Save size={16}/>
+                     <Save size={SIZE.SIXTEEN}/>
                     Save
                    </div>
                     </Button>
@@ -234,7 +235,8 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

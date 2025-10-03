@@ -4,6 +4,7 @@ import FormHeader from "../ui/FormHeader";
 import { Eye, Save, X } from "lucide-react";
 import Button from "../ui/Button";
 import { createPortal } from "react-dom";
+import { SIZE } from "../../constants/AppConstants";
 
 interface HtmlPreviewModalProps {
   isOpen: boolean;
@@ -81,18 +82,21 @@ export const HtmlPreviewModal: React.FC<HtmlPreviewModalProps> = ({
 
               <div className="flex justify-end items-end">
                 <div>
-                  <Button onClick={onClose}>
+                  <Button type="button" onClick={onClose}>
                     <div className="flex items-center justify-center gap-0.5">
-                      <X size={16} />
+                      <X size={SIZE.SIXTEEN} />
                       Close
                     </div>
                   </Button>
                 </div>
                 {editable && (
                   <div>
-                    <Button onClick={handleSave}>
+                    <Button type="submit" onClick={(e) => {
+                      e.preventDefault();
+                      handleSave();
+                    }}>
                       <div className="flex items-center justify-center gap-0.5">
-                        <Save size={16} />
+                        <Save size={SIZE.SIXTEEN} />
                         Save
                       </div>
                     </Button>

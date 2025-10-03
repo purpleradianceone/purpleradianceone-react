@@ -9,13 +9,14 @@ import axios from "axios";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import POST_API from "../../../constants/PostApi";
 import { AccessManagementType } from "../../../@types/company-users/AccessManagementContextType";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -227,9 +228,9 @@ function CompanyUserAccessManagementModal({
     checkbox: "w-[16.67%] table-header-custom",
   };
 
-  return (
-    <>
-      <div className="fixed inset-0 z-10 p-4 overflow-hidden bg-black bg-opacity-5">
+  return createPortal(
+
+      <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div className="relative p-5 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
             {/* Header */}
@@ -383,15 +384,20 @@ function CompanyUserAccessManagementModal({
               <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
                  <Button type="button" onClick={onClose}>
                   <div className="flex gap-0.5 items-center">
-              <X size={16} />
+              <X size={SIZE.SIXTEEN} />
               Cancel
             </div>
                 </Button>
                 <Button
+                  type="submit"
                   onClick={
                     userHasAccessToUpdateAccess && users.id !== loginStatus.id
-                      ? handleSaveAccessModule
-                      : ()=>{
+                      ? (e) => {
+                        e.preventDefault();
+                        handleSaveAccessModule();
+                      }
+                      : (e)=>{
+                        e.preventDefault();
                          if (users.id === loginStatus.id) {
                           toast.error("For security reasons, users are unable to update their own Access Module.");
                         }else if(!userHasAccessToUpdateAccess){
@@ -409,7 +415,7 @@ function CompanyUserAccessManagementModal({
                   }
                 >
                  <div className="flex gap-1 items-center">
-              <Save size={16} />
+              <Save size={SIZE.SIXTEEN} />
               Save
             </div>
                 </Button>
@@ -419,7 +425,8 @@ function CompanyUserAccessManagementModal({
           </div>
         </div>
       </div>
-    </>
+    ,
+    document.body
   );
 }
 

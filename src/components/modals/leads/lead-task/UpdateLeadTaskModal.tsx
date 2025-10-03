@@ -42,6 +42,7 @@ import { createPortal } from "react-dom";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
+import ToggleButton from "../../../ui/ToggleButton";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -194,7 +195,7 @@ function UpdateLeadTaskModal({
   };
 
   const generateTaskDetailsJson = () => {
-    if (leadActivityId !== 3) {
+    if (leadActivityId !== 3 && leadActivityId !== 4) {
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -208,18 +209,29 @@ function UpdateLeadTaskModal({
     }
   };
 
+  useEffect(()=> {
+    console.log("intial values of json");
+    console.log(leadTask.leadActivityDetails)
+  },[])
+
   const UpdateLeadTask = async (event: React.FormEvent) => {
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();
+    console.log(jsonData);
+    
+
+    
 
     const originalLeadActivityDetailsString = leadTask.leadActivityDetails;
 
-    // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
-    // This is safer if you've already parsed it and use the parsed object
+    // // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
+    // // This is safer if you've already parsed it and use the parsed object
     const originalLeadDetailsObject = JSON.parse(
       originalLeadActivityDetailsString
     );
     const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+    console.log("second stringfy")
+    console.log(stringifiedOriginalData);
 
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
@@ -264,7 +276,7 @@ function UpdateLeadTaskModal({
       result_outcome: resultOutcome,
       assignedto: assignedTo,
       due_date_time: `${dueDate} ${dueTime}:00`,
-      lead_activity_details: jsonData,
+      lead_activity_details: leadActivityId !== 4 ? jsonData : leadTask.leadActivityDetails,
       isactive: isActive,
       updatedby_id: loginStatus.id,
     };
@@ -441,7 +453,7 @@ function UpdateLeadTaskModal({
 
               {/* new */}
               <span className="input-label-custom">Status :</span>
-              <label className="inline-flex items-center cursor-pointer relative self-end">
+              {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                 <input
                   type="checkbox"
                   id="isActive"
@@ -451,10 +463,13 @@ function UpdateLeadTaskModal({
                   className="sr-only peer"
                 />
                 <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                {/* Adjusted size and colors */}
                 <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                {/* Adjusted size and position */}
-              </label>
+              </label> */}
+              <ToggleButton
+                name="isActive"
+                checked={isActive}
+                onToggle={handleIsActiveCheckboxChange}
+              />
             </div>
             {/* type */}
             <CustomDropdown
@@ -545,8 +560,9 @@ function UpdateLeadTaskModal({
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
@@ -638,6 +654,7 @@ function UpdateLeadTaskModal({
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
 
@@ -688,24 +705,28 @@ function UpdateLeadTaskModal({
               <TextAreaInput
                 logo={FileText}
                 cols={5}
-                rows={5}
+                rows={4}
                 label="Description: "
                 defaultValue={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
             {/* status  */}
           </div>
           <div className=" flex w-28 items-center text-nowrap gap-6">
-             <div className="flex gap-2 text-center">
-                <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
-                <span>Assign Users : </span>
-              </div>
+            <div className="flex gap-2 text-center">
+              <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
+              <span>Assign Users : </span>
+            </div>
             <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsAssignUsersModalOpen(true);
+              }}
             >
               <span className="flex gap-2">
                 <UserPlus size={14}></UserPlus>
@@ -729,9 +750,7 @@ function UpdateLeadTaskModal({
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
-                      <span className="caption-custom">
-                        {user.fullname}
-                      </span>
+                      <span className="caption-custom">{user.fullname}</span>
                     </span>
                     <Button
                       size="sm"
@@ -757,26 +776,29 @@ function UpdateLeadTaskModal({
 
         {/* Footer Buttons */}
         <div className="flex justify-center gap-4 mt-6">
-           <div className=" flex w-full justify-end ">
-           <div className="flex items-center gap-1 ">
-            {/* Cancel */}
-            <Button onClick={() => {
-            handleClose(false);
-          }} type="reset">
-              <div className="flex items-center gap-1">
-                <X size={16} />
-                Cancel
-              </div>
-            </Button>
-            {/* Save */}
-            <Button type="submit" onClick={UpdateLeadTask}>
-            <div className="flex items-center gap-1">
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button
+                onClick={() => {
+                  handleClose(false);
+                }}
+                type="button"
+              >
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button type="submit" onClick={UpdateLeadTask}>
+                <div className="flex items-center gap-1">
                   <Save size={16} />
                   Save
                 </div>
-            </Button>
+              </Button>
+            </div>
           </div>
-        </div>
         </div>
       </div>
       <LeadAssociatedUsersModal

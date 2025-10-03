@@ -20,6 +20,7 @@ import CompanyTeamsNotAssignedToLeadModalProps from "../../../../@types/lead-man
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 /** simple debounce without external deps */
 function useDebouncedCallback<T extends (...args: any[]) => void>(
@@ -376,12 +377,12 @@ function CompanyTeamsNotAssignedToLead({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden  bg-opacity-5"
-          : "fixed inset-0 z-50 justify-content-center p-28 pt-2 overflow-hidden  bg-opacity-5"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center p-28 pt-2 overflow-hidden bg-black bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
@@ -462,7 +463,8 @@ function CompanyTeamsNotAssignedToLead({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

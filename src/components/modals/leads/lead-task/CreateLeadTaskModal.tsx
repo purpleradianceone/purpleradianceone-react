@@ -40,6 +40,7 @@ import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -286,8 +287,8 @@ function CreateLeadTaskModal({
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
+  return createPortal(
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
       <div className="bg-white mt-12 min-h-[60vh]  rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
         <FormHeader
@@ -361,8 +362,10 @@ function CreateLeadTaskModal({
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
@@ -452,6 +455,7 @@ function CreateLeadTaskModal({
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
                 }}
+                 maxLength={500}
               ></TextAreaInput>
             </div>
 
@@ -496,11 +500,12 @@ function CreateLeadTaskModal({
               <TextAreaInput
                 logo={FileText}
                 cols={5}
-                rows={5}
+                rows={4}
                 label="Description"
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
           </div>
@@ -515,16 +520,20 @@ function CreateLeadTaskModal({
               {/* Assign button */}
               <div className="absolute left-28 max-w-28">
                 <Button
-                  type="button"
-                  onClick={() => setIsAssignUsersModalOpen(true)}
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
                 >
                   <span
                     title="Assign user to this task"
                     className="flex  text-center caption-custom white-text text-nowrap"
                   >
-                    <UserPlus size={14}></UserPlus>
-
-                    {/* <span>Assign user</span> */}
+                    <span className="flex gap-1 text-nowrap ">
+                      <UserPlus size={14}></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
                   </span>
                 </Button>
               </div>
@@ -577,7 +586,7 @@ function CreateLeadTaskModal({
           <div className=" flex w-full justify-end ">
             <div className="flex items-center gap-1 ">
               {/* Cancel */}
-              <Button onClick={handleClose} type="reset">
+              <Button onClick={handleClose} type="button">
                 <div className="flex items-center gap-1">
                   <X size={16} />
                   Cancel
@@ -619,7 +628,8 @@ function CreateLeadTaskModal({
           }
         />
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
 

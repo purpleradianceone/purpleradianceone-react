@@ -13,6 +13,7 @@ import ApiError from "../../../../@types/error/ApiError";
 import FormHeader from "../../../ui/FormHeader";
 import { Edit, KeySquareIcon, LucideIcon, LucideMailPlus, NetworkIcon, Save, ServerCog, Shield, User, X } from "lucide-react";
 import FormInput from "../../../ui/FormInput";
+import { createPortal } from "react-dom";
 
 type SettingType = "company" | "user";
 
@@ -21,15 +22,16 @@ const Dialog: React.FC<{
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
 }> = ({ open, children }) =>
-  !open ? null : (
-    <div className="fixed pt-14  inset-0 bg-black bg-opacity-5  flex justify-center items-center overflow-y-auto ">
+  !open ? null : createPortal(
+    <div className="fixed pt-14 z-50  inset-0 bg-black bg-opacity-5  flex justify-center items-center overflow-y-auto ">
       <div
-        className="h-10 min-w-[50%] max-w-xl min-h-fit max-h-fit z-50"
+        className="h-10 min-w-[50%] max-w-xl min-h-fit max-h-fit"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
@@ -313,7 +315,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
           <div className="flex justify-end  space-x-1 ">
             <div>
-              <Button onClick={onClose} disabled={loading}>
+              <Button type="button" onClick={onClose} disabled={loading}>
                 <div className="flex items-center justify-center gap-0.5">
                   <X size={16} />
                   Cancel
@@ -321,7 +323,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </Button>
             </div>
             <div>
-              <Button onClick={handleSubmit} disabled={loading}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }} disabled={loading}>
                 {loading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

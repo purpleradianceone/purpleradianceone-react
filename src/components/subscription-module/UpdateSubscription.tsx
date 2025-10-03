@@ -206,7 +206,7 @@ export default function UpdateSubscription({
               {/* Submit Button */}
               <div className="flex justify-end   mt-3">
                <div className="flex gap-1">
-                 <Button onClick={onClose} type="reset">
+                 <Button onClick={onClose} type="button">
                   <div className="flex items-center ">
                     <X size={16} />
                     Cancel

@@ -30,7 +30,7 @@ import { LexicalText } from "../template-blocks/LexicalText";
 import { GenericBlock } from "../template-blocks/GenericBlock";
 import { TemplateSettingsPanelInsert } from "../template-panel/TemplateSettingsPanelInsert";
 import { Sidebar } from "../sidebar/Sidebar";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -250,9 +250,12 @@ export const EditorCanvas: React.FC = () => {
         >
           {/* Show Fields Button - Always Visible */}
           <div>
-            <Button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+              setShowDynamicEditor(!showDynamicEditor);
+            }}>
               <div className="flex justify-center gap-1">
-                <Settings size={16} className="mt-0.5" />
+                <Settings size={SIZE.SIXTEEN} className="mt-0.5" />
                 <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
               </div>
             </Button>
@@ -382,16 +385,21 @@ export const EditorCanvas: React.FC = () => {
 
                 <div className="mt-2 flex gap-4">
                   <div>
-                    <Button onClick={insertHtmlTemplate}>
+                    <Button type="submit" onClick={(e) => {
+                      e.preventDefault();
+                      insertHtmlTemplate();
+                    }}>
                       <div className="flex items-center justify-center gap-0.5">
-                        <Eye size={16} />
+                        <Eye size={SIZE.SIXTEEN} />
                         View HTML Template
                       </div>
                     </Button>
                   </div>
                   <div>
                     <Button
-                      onClick={() => {
+                    type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
                         const beautified = DOMPurify.sanitize(htmlInput);
                         navigator.clipboard.writeText(beautified);
                         toast.success("Email Template copied to clipboard!");
@@ -405,7 +413,9 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                   <div>
                     <Button
-                      onClick={() => {
+                    type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
                         const beautified = DOMPurify.sanitize(htmlInput);
                         const blob = new Blob([beautified], {
                           type: "text/html",
@@ -418,7 +428,7 @@ export const EditorCanvas: React.FC = () => {
                       }}
                     >
                       <div className="flex items-center justify-center gap-0.5">
-                        <Save size={16} />
+                        <Save size={SIZE.SIXTEEN} />
                         Export HTML Email
                       </div>
                     </Button>

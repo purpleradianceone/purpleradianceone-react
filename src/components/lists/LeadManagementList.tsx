@@ -32,6 +32,8 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
 import FormHeader from "../ui/FormHeader";
+import COLORS from "../../constants/Colors";
+import { createPortal } from "react-dom";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -143,17 +145,23 @@ function LeadManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
+        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
       >
         {/* sticky */}
-        <div className=" z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex">
-            {!isSmallScreen && <Handshake className="w-6= h-6 text-blue-600" />}
+        <div className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
+         {
+          isUsedInLeadModule && (
+             <div className="flex gap-2">
+            {!isSmallScreen && <Handshake className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
+
 
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">{" Leads"} </span>
             )}
           </div>
+          )
+         }
+              
 
           {isLargeScreen && (
             <>
@@ -172,10 +180,11 @@ function LeadManagementList({
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex ">
-                  <div className="flex">
+                <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
+                <div className="flex">
+                  <div className="flex ">
                     <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                      <Calendar />
+                      <Calendar className="input-label-custom" />
                     </div>
                     <DateRangeFilterDropdown
                       dropdownOptions={dateRangeDropdownOptions}
@@ -196,8 +205,9 @@ function LeadManagementList({
                     onEndDateChange={onEndDateChange}
                   />
                 </div>
+                </div>
                 {isUsedInLeadModule && (
-                  <>
+                  <div className="flex gap-1">
                     <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                       <CustomDropdown
                         labelName="source"
@@ -265,17 +275,19 @@ function LeadManagementList({
                     )}
                   </div>
                 </div>
-                </>
+                </div>
                  )}
               </div>
             </>
           )}
 
           {isUsedInLeadModule && (
-            <div className="flex  gap-1  ">
+            <div className="flex  gap-1">
               <Button
+              type="submit"
                 disabled={!userHasAccessToAddLead}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (userHasAccessToAddLead) {
                     handleShowImportModule();
                   } else {
@@ -286,12 +298,16 @@ function LeadManagementList({
                   }
                 }}
               >
-                <Plus className=" h-5 w-5" />
+                <span className="flex items-center">
+                  <Plus size={SIZE.SIXTEEN} />
                 <span>Import </span>
+                </span>
               </Button>
               <Button
+              type="submit"
                 disabled={!userHasAccessToAddLead}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (!userHasAccessToAddLead) {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS
@@ -302,8 +318,8 @@ function LeadManagementList({
                   }
                 }}
               >
-                <span className="flex">
-                  {!isSmallScreen && <ClipboardPlus size={16} />}
+                <span className="flex items-center ">
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
                   {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
                   {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
                 </span>
@@ -344,8 +360,8 @@ function LeadManagementList({
             onPageSizeChange={paginationData.selectedPageSize}
           />
         </div>
-        {openPopUpOfCompanyUserModal && (
-          <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
+        {openPopUpOfCompanyUserModal && createPortal(
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
               {/* Header with Close Button */}
               {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
@@ -375,7 +391,8 @@ function LeadManagementList({
                 />
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     );

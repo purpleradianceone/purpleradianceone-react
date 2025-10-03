@@ -132,7 +132,7 @@ function SettingsTabs() {
                 value={value}
                 onClick={() => setActiveTab(value)}
                 className={
-                  activeTab === value ? "main-nav-custom active-tab" : "main-nav-custom"
+                  activeTab === value ? "main-nav-custom active-tab mt-0.5" : "main-nav-custom"
                 }
               >
                 {label}

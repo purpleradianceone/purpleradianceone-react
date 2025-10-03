@@ -10,6 +10,7 @@ import LeadOwnerHistoryData from "../../../@types/lead-management/LeadOwnerHisto
 import LeadOwnerHistoryAgGrid from "../../ag-grid/LeadOwnerHistoryAgGrid";
 import { History } from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
   isOpen,
@@ -75,8 +76,8 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
 
 
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0  flex justify-center items-center bg-black bg-opacity-0 z-50">
+  return createPortal(
+    <div className="fixed inset-0  flex justify-center items-center bg-black bg-opacity-5 z-50">
       <div className=" bg-white border p-1 rounded-lg shadow-lg w-1/2 h-1/2 flex flex-col ">
         {/* <button
           onClick={onClose} 
@@ -103,7 +104,8 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 export default LeadOwnerHistory;

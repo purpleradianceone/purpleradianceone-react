@@ -13,6 +13,7 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import FormInput from "../../../ui/FormInput";
 import Button from "../../../ui/Button";
 import FormHeader from "../../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 export default function CreateAccountType({
   onClose,
@@ -99,7 +100,7 @@ export default function CreateAccountType({
         return "bg-gray-100 text-gray-800";
     }
   };
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5 ">
       <div className="bg-white w-full max-w-xl rounded-lg border border-blue-200 shadow-lg p-2 relative">
         {/* Close button */}
@@ -173,7 +174,7 @@ export default function CreateAccountType({
           <div className="flex items-center  justify-end gap-3 ">
            <div className="flex gap-2">
              <Button
-            type="submit"
+            type="button"
               onClick={() => {
                 setNewTypeName("");
                 setNewParentType(0);
@@ -187,8 +188,11 @@ export default function CreateAccountType({
               </div>
             </Button>
             <Button
-
-              onClick={handleAddAccountType}
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddAccountType();
+              }}
               disabled={!newTypeName.trim() || newParentType === 0}
               // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
             >
@@ -202,6 +206,7 @@ export default function CreateAccountType({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

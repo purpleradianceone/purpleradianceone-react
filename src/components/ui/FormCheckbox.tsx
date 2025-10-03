@@ -21,7 +21,7 @@ function FormCheckbox({ label, name,onChange,checked }: FormCheckboxProps){
         onChange={onChange}
         checked={checked}
       />
-      <label htmlFor={name} className="ml-2 block text-sm text-gray-900">
+      <label htmlFor={name} className="ml-2 block caption-custom">
         {label}
       </label>
     </div>

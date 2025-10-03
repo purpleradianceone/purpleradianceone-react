@@ -30,7 +30,7 @@ import { GenericBlock } from "../template-blocks/GenericBlock";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { Sidebar } from "../sidebar/Sidebar";
@@ -249,9 +249,12 @@ export const EditorCanvasWithJson = () => {
           fontSize: "12px",
         }}
       >
-        <Button onClick={() => setShowDynamicEditor(!showDynamicEditor)}>
+        <Button type="submit" onClick={(e) => {
+          e.preventDefault();
+          setShowDynamicEditor(!showDynamicEditor);
+        }}>
           <div className="flex justify-center gap-1">
-            <Settings size={16} className="mt-0.5" />
+            <Settings size={SIZE.SIXTEEN} className="mt-0.5" />
             <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
           </div>
         </Button>
@@ -359,16 +362,21 @@ export const EditorCanvasWithJson = () => {
 
               <div className="mt-2 flex gap-4">
                 <div>
-                  <Button onClick={insertHtmlTemplate}>
+                  <Button type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    insertHtmlTemplate();
+                  }}>
                     <div className="flex items-center justify-center gap-0.5">
-                      <Eye size={16} />
+                      <Eye size={SIZE.SIXTEEN} />
                       View HTML Template
                     </div>
                   </Button>
                 </div>
                 <div>
                   <Button
-                    onClick={() => {
+                  type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const beautified = htmlInput;
                       navigator.clipboard.writeText(beautified);
                       toast.success("Html copied to clipboard!");
@@ -376,7 +384,7 @@ export const EditorCanvasWithJson = () => {
                     }}
                   >
                     <div className="flex items-center justify-center gap-0.5">
-                      <ClipboardCopy size={16} />
+                      <ClipboardCopy size={SIZE.SIXTEEN} />
                       Copy HTML Email
                     </div>
                   </Button>
@@ -384,7 +392,9 @@ export const EditorCanvasWithJson = () => {
 
                 <div>
                   <Button
-                    onClick={() => {
+                  type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const beautified = htmlInput;
                       const blob = new Blob([beautified], {
                         type: "text/html",
@@ -397,7 +407,7 @@ export const EditorCanvasWithJson = () => {
                     }}
                   >
                     <div className="flex items-center justify-center gap-0.5">
-                      <Save size={16} />
+                      <Save size={SIZE.SIXTEEN} />
                       Export HTML Email
                     </div>
                   </Button>

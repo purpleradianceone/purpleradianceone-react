@@ -4,7 +4,7 @@ import { useEditor } from "@craftjs/core";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import { useNavigate } from "react-router-dom";
 import { craftJsonToHtml } from "../template-util/CraftJsonToHtml";
 import ROUTES_URL from "../../../constants/Routes";
@@ -127,9 +127,12 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
     <>
       {/* Fixed Button to Open Settings */}
       <div>
-        <Button onClick={() => setIsOpen(true)}>
+        <Button type="submit" onClick={(e) => {
+            e.preventDefault();
+            setIsOpen(true);
+        }}>
           <div className="flex items-center justify-center gap-0.5">
-            <Save size={16} />
+            <Save size={SIZE.SIXTEEN} />
             Save Template
           </div>
         </Button>
@@ -266,7 +269,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                 <div>
                   <Button type="button" onClick={() => setIsOpen(false)}>
                     <div className="flex items-center justify-center gap-0.5">
-                      <X size={16} />
+                      <X size={SIZE.SIXTEEN} />
                       Cancel
                     </div>
                   </Button>
@@ -275,7 +278,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                 <div>
                   <Button type="submit">
                     <div className="flex items-center justify-center gap-0.5">
-                      <Save size={16} />
+                      <Save size={SIZE.SIXTEEN} />
                       Save
                     </div>
                   </Button>

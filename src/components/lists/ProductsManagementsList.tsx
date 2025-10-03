@@ -20,6 +20,7 @@ import ProductsManagementListProps from "../../@types/List/ProductsManagementLis
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import COLORS from "../../constants/Colors";
 
 function ProductsManagementList({
   products,
@@ -32,7 +33,7 @@ function ProductsManagementList({
   handleCreateCompanyProductTax,
   // isListForProductUser,
 }: ProductsManagementListProps) {
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isMediumScreen } = useScreenSize();
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
     useState<boolean>(false);
@@ -103,18 +104,18 @@ function ProductsManagementList({
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
-        <div className="sticky z-10 top-9   flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
+        <div className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
           <div className="flex justify-between w-full ">
             <div className="flex  gap-2">
               
-                <Store className="w-6 h-6 text-blue-600 mt-2" />
+                <Store className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-2`} />
 
 
               {(isMediumScreen || isLargeScreen) && (
                 <>
 
                     <span className="section-header-custom mt-2">
-                      Product Management
+                      Products
                     </span>
 
                 </>
@@ -123,32 +124,32 @@ function ProductsManagementList({
 
             {isLargeScreen && (
               <>
-                <div className="flex gap-1 mt-2">
-                  {/* search box flex div */}
-                  <div className="relative flex items-start w-80 ">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
+                <div className="flex gap-1">
+                {/* search box flex div */}
+                <div className="relative flex items-start w-80 mt-1">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value
+                      );
+                    }}
+                  ></SearchInput>
+                </div>
 
-                  {/* Date FIlters Dropdown */}
-                  <div className="flex mx-3">
-                    <div className="flex">
-                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                        <Calendar className="mt-2" />
-                      </div>
-
-                      <DateRangeFilterDropdown
-                        dropdownOptions={dateRangeDropdownOptions}
-                        handleDateIdChange={handleDateRangeIdChange}
-                      ></DateRangeFilterDropdown>
+                {/* Date FIlters Dropdown */}
+                <div className="flex mx-3 mt-1">
+                  <div className="flex">
+                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                      <Calendar className="input-label-custom mt-1" />
                     </div>
+
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
+                    ></DateRangeFilterDropdown>
                   </div>
                 </div>
+              </div>
 
                 {/* Custom Date Picker Div Flex Box*/}
                 <div
@@ -168,24 +169,29 @@ function ProductsManagementList({
 
               <div className="flex gap-1 mt-1">
                 {userHasAccessToAddProduct ? (
-                  <Button onClick={() => setIsAddProductModalOpen(true)}>
-                    {!isSmallScreen && <Plus size={18} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                  <Button type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    setIsAddProductModalOpen(true);
+                  }}>
+                    
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
+        
                   </Button>
                 ) : (
                   <Button
                     disabled
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       toast.error(
                         MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
                           .DENIED_ADD_ACCESS
                       );
                     }}
                   >
-                    {!isSmallScreen && <Plus size={18} />}
-                    {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                    {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
                   </Button>
                 )}
               </div>

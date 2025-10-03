@@ -24,6 +24,8 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -465,7 +467,7 @@ function EditCompanyTeamModal({
   },[companyTeam])
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -521,7 +523,7 @@ function EditCompanyTeamModal({
                       </div>
                     )}
                   </label>
-                  <label className="inline-flex items-center cursor-pointer relative">
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
                     <input
                       type="checkbox"
                       className="sr-only peer"
@@ -532,7 +534,12 @@ function EditCompanyTeamModal({
                     />
                     <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={isTeamActive}
+                  name="isActive"
+                  onToggle={handleComapnyTeamToggle}
+                  />
                 </div>
               </div>
 
@@ -552,7 +559,7 @@ function EditCompanyTeamModal({
 
               {userHasAccessToUpdateTeamManagement ? (
                 <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button onClick={onClose}>
+                <Button type="button" onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
                     <X size={16} />
                     Cancel
@@ -566,9 +573,19 @@ function EditCompanyTeamModal({
                 </Button>
               </div>
               ) : (
-                <div className="flex justify-self-end max-w-36 m-3">
-                  <Button type="submit" onClick={() => {}} disabled>
+
+                <div className="flex justify-self-end max-w-70 m-2 gap-2">
+                  <Button type="button" onClick={onClose}>
+                  <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                  <Button type="submit" onClick={(e) => {e.preventDefault()}} disabled>
+                    <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
                     Save
+                  </div>
                   </Button>
                 </div>
               )}
@@ -595,7 +612,8 @@ function EditCompanyTeamModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 export default EditCompanyTeamModal;

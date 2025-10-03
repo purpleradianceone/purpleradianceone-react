@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormInput from "../../ui/FormInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -19,11 +19,13 @@ import {
   Globe,
   Mail,
   MapPin,
+  MapPinnedIcon,
   Phone,
   ReceiptText,
   Save,
   User,
   UserCogIcon,
+  Waypoints,
   X,
 } from "lucide-react";
 import ApiError from "../../../@types/error/ApiError";
@@ -39,10 +41,14 @@ import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import FormSkeleton from "./FormSkeleton";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
+import { useCountries } from "../../../config/hooks/useCountries";
+import { useStates } from "../../../config/hooks/useStates";
+import { useDistricts } from "../../../config/hooks/useDisctricts";
 
 type CreateAccountType = {
   onClose: () => void;
-  handleCreateCompanyAccountType: () => void;
+  handleCreateAccount: () => void;
 };
 type AccountFormType = {
   name: string;
@@ -64,7 +70,7 @@ type AccountFormType = {
 };
 const CreateAccount: React.FC<CreateAccountType> = ({
   onClose,
-  handleCreateCompanyAccountType,
+  handleCreateAccount,
 }) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -89,12 +95,18 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       createdby: loginStatus.id,
     });
 
-  const { industryTypeData, loading } = useIndustryType();
+  const { industryTypeData, loading: industryTypeLoading } = useIndustryType();
   const { businessType, isLoading: businessTypeLoading } = usebusinessType();
   const { companyAccountType, isLoading: companyTypeLoading } =
     useCompanyAccountType();
 
   const [companTypeId, setCompanyTypeId] = useState<number[]>([]);
+  const [selectedCountryId, setSelectedCountryId] = useState<number>(0);
+  const [selectedState, setSelectedState] = useState<number>(0);
+  const [selectedDisctrict, setSelectedDisctrict] = useState<number>(0);
+  const { countries } = useCountries();
+  const { states } = useStates(selectedCountryId);
+  const { districts } = useDistricts(selectedState);
 
   const [errors, setErrors] = useState({
     name: "",
@@ -104,6 +116,10 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     industryType: "",
   });
 
+  useEffect(() => {
+    setSelectedState(0);
+    setSelectedDisctrict(0);
+  }, [selectedCountryId]);
   function handleSelectedBusinessType(
     selectedBusinessType: number | undefined
   ) {
@@ -283,6 +299,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       email: createAccountFormData.email.trim(),
       industry_type_id: createAccountFormData.industry_type_id,
       business_type_id: createAccountFormData.business_type_id,
+      country_id: selectedCountryId,
+      state_id: selectedState,
+      district_id: selectedDisctrict,
       pan: createAccountFormData.pan.trim(),
       gst: createAccountFormData.gst.trim(),
       tan: createAccountFormData.tan.trim(),
@@ -298,6 +317,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       createdby_id: loginStatus.id,
       company_id: loginStatus.companyId,
     };
+    console.log(postData);
 
     await axios
       .post(POST_API.CREATE_ACCOUNT, postData, {
@@ -308,7 +328,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
         if (data.status === true) {
           toast.success(data.message);
           handleStateClear();
-          handleCreateCompanyAccountType();
+          handleCreateAccount();
           onClose();
         } else {
           toast.error(data.message);
@@ -352,7 +372,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       company_account_type_id_array: [],
       createdby: loginStatus.id,
     });
-    onClose()
+    onClose();
   }
 
   // --- Group companyAccountType by parent ---
@@ -364,18 +384,21 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     return acc;
   }, {} as Record<string, CompanyAccountType[]>);
 
-  const loadingState = loading || businessTypeLoading || companyTypeLoading;
+  const loadingState =
+    industryTypeLoading || businessTypeLoading || companyTypeLoading;
+
   if (loadingState) {
-    return (
-      <div className="fixed top-8 inset-0 z-20 flex items-center justify-center  shadow-2xl ">
+    return createPortal(
+      <div className="fixed top-8 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
         <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
           <FormSkeleton />
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
-  return (
-    <div className="fixed top-8 inset-0 z-20 border  flex items-center justify-center  shadow-2xl ">
+  return createPortal(
+    <div className="fixed inset-0 z-50 border bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
       <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
         <motion.section
           ref={ref}
@@ -386,25 +409,14 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           {/* Close Button */}
 
           <FormHeader
-          icon={UserCogIcon}
-          preText="Create new account"
-          description="Complete the form below to add a new account and manage it effectively"
-          onClose={() => {
-                handleStateClear();
-                onClose();
-              }}
+            icon={UserCogIcon}
+            preText="Create new account"
+            description="Complete the form below to add a new account and manage it effectively"
+            onClose={() => {
+              handleStateClear();
+              onClose();
+            }}
           />
-          {/* <div className="flex justify-end">
-            <button
-              onClick={() => {
-                handleStateClear();
-                onClose();
-              }}
-              className="input-label-custom"
-            >
-              ✕
-            </button>
-          </div> */}
 
           {/* Form */}
           <form className=" grid grid-cols-2 gap-3">
@@ -538,6 +550,57 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                   {errors.industryType}
                 </p>
               )}
+            </div>
+            <div className="flex flex-col col-span-1">
+              {/* Country*/}
+              <CustomDropdown
+                logo={Globe}
+                labelName="Country"
+                preselectedOption={selectedCountryId}
+                onSelect={(selectedValue) => {
+                  if (selectedValue) {
+                    setSelectedCountryId(selectedValue);
+                  } else {
+                    setSelectedCountryId(0);
+                  }
+                }}
+                options={countries}
+              />
+            </div>
+
+            <div className="flex flex-col col-span-1">
+              {/* Country*/}
+              <CustomDropdown
+                logo={Waypoints}
+                labelName="State"
+                selectedValue={selectedState}
+                preselectedOption={selectedState}
+                onSelect={(value) => {
+                  if (value) {
+                    setSelectedState(value);
+                  } else {
+                    setSelectedState(0);
+                  }
+                }}
+                options={states}
+              />
+            </div>
+            <div className="flex flex-col col-span-1">
+              {/* Country*/}
+              <CustomDropdown
+                logo={MapPinnedIcon}
+                labelName="district"
+                selectedValue={selectedDisctrict}
+                preselectedOption={selectedDisctrict}
+                onSelect={(value) => {
+                  if (value) {
+                    setSelectedDisctrict(value);
+                  } else {
+                    setSelectedDisctrict(0);
+                  }
+                }}
+                options={districts}
+              />
             </div>
 
             <div className="col-span-2  rounded-md">
@@ -683,7 +746,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               <div>
                 <Button type="button" onClick={handleStateClear}>
                   <div className="flex items-center gap-0.5">
-                    <X size={16}/> Cancel
+                    <X size={16} /> Cancel
                   </div>
                 </Button>
               </div>
@@ -691,7 +754,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               <div>
                 <Button type="submit" onClick={handleSubmit}>
                   <div className="flex items-center gap-1">
-                    <Save size={16}/> Save
+                    <Save size={16} /> Save
                   </div>
                 </Button>
               </div>
@@ -699,7 +762,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           </form>
         </motion.section>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 export default CreateAccount;

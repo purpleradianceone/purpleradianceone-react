@@ -26,6 +26,7 @@ import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
 import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import ToggleButton from "../../../ui/ToggleButton";
 
 interface CompanyEmailSetting {
   id: number;
@@ -266,24 +267,25 @@ export default function EmailSettingsTabs() {
         >
           <div className="absolute right-3">
             <Button
-            disabled={!userHasAccessToUpdateEmailSetting}
-            onClick={() => {
-              if (userHasAccessToUpdateEmailSetting) {
-                setModalType("company");
-                setEditData(setting);
-                setIsModalOpen(true);
-              } else {
-                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-              }
-            }}
-          >
-           <div className="flex items-center justify-center gap-0.5">
-                      <Edit size={16} />
-                      Edit
-                    </div>
-          </Button>
+              type="submit"
+              disabled={!userHasAccessToUpdateEmailSetting}
+              onClick={(e) => {
+                e.preventDefault();
+                if (userHasAccessToUpdateEmailSetting) {
+                  setModalType("company");
+                  setEditData(setting);
+                  setIsModalOpen(true);
+                } else {
+                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                }
+              }}
+            >
+              <div className="flex items-center justify-center gap-0.5">
+                <Edit size={16} />
+                Edit
+              </div>
+            </Button>
           </div>
-          
 
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
@@ -352,7 +354,7 @@ export default function EmailSettingsTabs() {
             <p className="text-gray-700 text-sm">
               <strong className="input-label-custom">Active:</strong>
             </p>
-            <label className="inline-flex items-center cursor-pointer relative self-end">
+            {/* <label className="inline-flex items-center cursor-pointer relative self-end">
               <input
                 type="checkbox"
                 className="sr-only peer"
@@ -363,10 +365,15 @@ export default function EmailSettingsTabs() {
                 }}
               />
               <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-              {/* Adjusted size and colors */}
               <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-              {/* Adjusted size and position */}
-            </label>
+            </label> */}
+            <ToggleButton
+              checked={setting.isactive}
+              name={setting.id.toString()}
+              onToggle={(e) => {
+                onEmailSettingToggle(e, setting, true);
+              }}
+            />
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
@@ -411,24 +418,26 @@ export default function EmailSettingsTabs() {
             >
               <div className="absolute w-fit right-3">
                 <Button
-                disabled={!userHasAccessToUpdateEmailSetting}
-                onClick={() => {
-                  if (userHasAccessToUpdateEmailSetting) {
-                    setModalType("user");
-                    setEditData(setting);
-                    setIsModalOpen(true);
-                  } else {
-                    toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                  }
-                }}
-              >
-                <div className="flex items-center justify-center gap-0.5">
-                      <Edit size={16} />
-                      Edit
-                    </div>
-              </Button>
+                  type="submit"
+                  disabled={!userHasAccessToUpdateEmailSetting}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (userHasAccessToUpdateEmailSetting) {
+                      setModalType("user");
+                      setEditData(setting);
+                      setIsModalOpen(true);
+                    } else {
+                      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                    }
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Edit size={16} />
+                    Edit
+                  </div>
+                </Button>
               </div>
-              
+
               <div className="flex items-center space-x-2 mb-2">
                 <Mail className="text-blue-600 w-5 h-5" />
                 <p className="text-gray-700 text-sm">
@@ -498,9 +507,7 @@ export default function EmailSettingsTabs() {
                 <p className="text-gray-700 text-sm">
                   <strong className="input-label-custom">Active:</strong>
                 </p>
-                <label className="inline-flex items-center cursor-pointer relative self-end">
-                  {" "}
-                  {/* Align toggle to bottom-right */}
+                {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                   <input
                     type="checkbox"
                     className="sr-only peer"
@@ -511,10 +518,15 @@ export default function EmailSettingsTabs() {
                     }}
                   />
                   <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                  {/* Adjusted size and colors */}
                   <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                  {/* Adjusted size and position */}
-                </label>
+                </label> */}
+                <ToggleButton
+                  checked={setting.isactive}
+                  name={setting.id.toString()}
+                  onToggle={(e) => {
+                    onEmailSettingToggle(e, setting, false);
+                  }}
+                />
               </div>
 
               <div className="flex items-center space-x-2">
@@ -600,15 +612,16 @@ export default function EmailSettingsTabs() {
                     companySettings.map(renderCompanyEmailCard)
                   ) : (
                     <div className="flex col-span-2 w-full items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
-                      
                       <div>
                         <span>No Email Settings For company </span>
                       </div>
 
-                      <div >
+                      <div>
                         <Button
+                          type="submit"
                           disabled={!userHasAccessToAddEmailSetting}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             if (userHasAccessToAddEmailSetting) {
                               setModalType("company");
                               setEditData(null);
@@ -624,7 +637,6 @@ export default function EmailSettingsTabs() {
                           </div>
                         </Button>
                       </div>
-                      
                     </div>
                   )}
                 </div>
@@ -646,14 +658,15 @@ export default function EmailSettingsTabs() {
                     userSettings.map(renderUserEmailCard)
                   ) : (
                     <div className="flex col-span-2 w-full justify-items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
-                      
                       <div>
                         <span>No Email Settings For User </span>
                       </div>
-                      <div >
+                      <div>
                         <Button
+                          type="submit"
                           disabled={!userHasAccessToAddEmailSetting}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             if (userHasAccessToAddEmailSetting) {
                               setModalType("user");
                               setEditData(null);
@@ -669,7 +682,6 @@ export default function EmailSettingsTabs() {
                           </div>
                         </Button>
                       </div>
-                      
                     </div>
                   )}
                 </div>

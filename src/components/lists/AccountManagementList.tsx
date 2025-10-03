@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, UserRoundCogIcon } from "lucide-react";
+import { Calendar, Plus, UserRoundCogIcon } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
@@ -17,6 +17,13 @@ import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
 import AccountDetails from "../modals/Account/AccountDetails";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { SIZE } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
 
 function AccountManagementList({
   accounts,
@@ -26,6 +33,8 @@ function AccountManagementList({
   paginationData,
   fetchAccounts,
   handleCreateCompanyAccountType,
+  isUsedForAccountLead,
+  handleRowSelectedForLead,
 }: {
   fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -34,7 +43,10 @@ function AccountManagementList({
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataProps;
   handleCreateCompanyAccountType: () => void;
+  isUsedForAccountLead: boolean;
+  handleRowSelectedForLead?: (data: Account | any) => void;
 }) {
+  const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -50,18 +62,32 @@ function AccountManagementList({
   const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: any) => {
-    setAccountDataToShowFullDetails(data);
-    setShowAccountDetails(true);
+    if (!isUsedForAccountLead) {
+      setAccountDataToShowFullDetails(data);
+      setShowAccountDetails(true);
+    } else {
+      handleRowSelectedForLead!(data);
+    }
+  };
+
+  const { userHasAccessToAddAccount } = useUserAccessModules();
+
+  const handleShowImportModule = () => {
+    navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
 
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
-      <div className="sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+      <div
+        className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+      >
         <div className="flex items-center justify-center gap-2">
           {!isSmallScreen && (
-            <UserRoundCogIcon className="w-5 h-5 text-blue-600" />
+            <UserRoundCogIcon
+              className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+            />
           )}
 
           {(isMediumScreen || isLargeScreen) && (
@@ -70,27 +96,28 @@ function AccountManagementList({
         </div>
 
         {/* {isLargeScreen && ( */}
-          <>
-            <div className="flex gap-2 justify-center items-center">
+        <>
+          <div className="flex gap-2 justify-center items-center">
+            {/* search box flex div */}
+            <div className="flex gap-1">
               {/* search box flex div */}
-              <div className="relative flex items-center justify-center w-auto">
-                <div className="grid w-56">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value
+                    );
+                  }}
+                ></SearchInput>
               </div>
 
               {/* Date FIlters Dropdown */}
-              <div className="flex">
+              <div className="flex mx-3">
                 <div className="flex">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 input-label-custom">
-                    <Calendar />
+                  <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                    <Calendar className="input-label-custom mt-1" />
                   </div>
+
                   <DateRangeFilterDropdown
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
@@ -110,8 +137,9 @@ function AccountManagementList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
+            </div>
 
-              {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
+            {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                 <CustomDropdown
                   labelName="source"
                   options={leadSource!}
@@ -126,7 +154,7 @@ function AccountManagementList({
                 />
               </div> */}
 
-              {/* <div className="relative flex items-center justify-center w-auto ">
+            {/* <div className="relative flex items-center justify-center w-auto ">
                 <div className="grid ">
                   {selectedLeadOwner.id === 0 && (
                     <Button
@@ -176,38 +204,70 @@ function AccountManagementList({
                   )}
                 </div>
               </div> */}
+          </div>
+        </>
+
+        <div className="flex gap-2">
+          {!isUsedForAccountLead && (
+            <div className="w-fit h-fit">
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                onClick={() => {
+                  if (userHasAccessToAddAccount) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                    );
+                  }
+                }}
+              >
+                <div className="flex items-center gap-0.5">
+                  <Plus size={SIZE.SIXTEEN} />
+                  Import
+                </div>
+              </Button>
             </div>
-          </>
-        {/* // )} */}
-       <div>
-         <Button
-          onClick={() => {
-            setOpenAccountForm(!openCreateAccountForm);
-          }}
-        >
-          <span>+ Create</span>
-        </Button>
-        {openCreateAccountForm && (
-          <CreateAccount
-            onClose={() => setOpenAccountForm(false)}
-            handleCreateCompanyAccountType={handleCreateCompanyAccountType}
-          />
-        )}
-       </div>
+          )}
+
+          <div>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenAccountForm(!openCreateAccountForm);
+              }}
+            >
+              <div className="flex items-center gap-0.5">
+                <Plus size={SIZE.SIXTEEN} /> Create
+              </div>
+            </Button>
+            {openCreateAccountForm && (
+              <CreateAccount
+                onClose={() => setOpenAccountForm(false)}
+                handleCreateAccount={handleCreateCompanyAccountType}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
         <div
           className={
-            userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+            !isUsedForAccountLead
+              ? userPreference.isLeftMenu
+                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+              : "ag-theme-balham w-full h-[calc(100vh-270px)]"
           }
         >
           <AccountManagementAgGrid
             accounts={accounts}
             // handleRowClick={(e) => {handleRowClick}}
             onRowSelect={handleRowSelectedToShowAccountDetails}
+            isUsedForAccountLead={isUsedForAccountLead}
           />
         </div>
       </div>

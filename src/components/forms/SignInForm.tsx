@@ -457,7 +457,7 @@ function SignInForm() {
               type="button"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              <Link to={ROUTES_URL.FORGOT_PASSWORD}>Forgot Password?</Link>
+              <Link to={ROUTES_URL.FORGOT_PASSWORD} className="table-header-custom-blue">Forgot Password?</Link>
             </button>
           </div>
 
@@ -476,11 +476,11 @@ function SignInForm() {
           </Button>
 
           <div className="text-center">
-            <span className="text-gray-600 text-sm">
+            <span className="caption-custom">
               Don't have an account yet?{" "}
               <button
                 type="button"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="caption-custom-blue hover:text-blue-700"
               >
                 <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>

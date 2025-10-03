@@ -40,6 +40,7 @@ import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function AddProductModal({
   isOpen,
@@ -222,7 +223,7 @@ function AddProductModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
@@ -450,7 +451,7 @@ function AddProductModal({
 
               {userHasAccessToAddProduct ? (
                 <div className="flex justify-self-end col-span-2 gap-2">
-                  <Button onClick={onClose}>
+                  <Button type="button" onClick={onClose}>
                     <div className="flex items-center justify-center gap-0.5">
                       <X size={16} />
                       Cancel
@@ -465,7 +466,7 @@ function AddProductModal({
                 </div>
               ) : (
                 <div className="flex justify-self-center col-span-2  gap-2 pt-4">
-                  <Button onClick={onClose}>
+                  <Button type="button" onClick={onClose}>
                     <div className="flex items-center justify-center gap-0.5">
                       <X size={16} />
                       Cancel
@@ -490,7 +491,8 @@ function AddProductModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

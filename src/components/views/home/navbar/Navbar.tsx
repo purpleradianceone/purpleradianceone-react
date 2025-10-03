@@ -7,6 +7,7 @@ import {
   CreditCard,
   Handshake,
   Home,
+  Layers,
   LayoutPanelLeft,
   LogOut,
   LucideSettings,
@@ -452,6 +453,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               icon: <Aperture size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
                               label: "Email Template", 
+                            },
+                            {
+                              icon : <Layers size={SIZE.TWENTY}/>,
+                              to :ROUTES_URL.INTEGRATIONS_SETTINGS,
+                              label : "Integrations"
                             }
                           ]}
                         />

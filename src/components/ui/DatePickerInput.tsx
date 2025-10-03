@@ -28,6 +28,7 @@ function DatePickerInput(props : FormInputProps){
            }
           inputMode={props.inputMode}
           max={props.maxDate}
+          
         />
         </div>
         {props.error && <div className="mt-3 ml-2 caption-custom-inactive">{props.error}</div>}

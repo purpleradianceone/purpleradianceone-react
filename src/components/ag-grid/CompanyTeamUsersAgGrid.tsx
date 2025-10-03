@@ -7,10 +7,7 @@ import {
   ViewportChangedEvent,
 } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  INNERHTML,
-  STATUS_CODE,
-} from "../../constants/AppConstants";
+import { INNERHTML, SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import { UserPlus2 } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
@@ -21,11 +18,11 @@ import CompanyUsersSearchProps from "../../@types/company-users/CompanyUserProps
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import Button from "../ui/Button";
-import { CLASS_NAMES } from "../../constants/ClassNames";
 import SearchInput from "../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
 import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
 import toast from "react-hot-toast";
+import ToggleButton from "../ui/ToggleButton";
 
 function CompanyTeamUsersAgGrid({
   companyTeam,
@@ -447,7 +444,7 @@ function CompanyTeamUsersAgGrid({
           };
           return (
             <div className="flex flex-col items-center mt-2">
-              <label className="inline-flex items-center cursor-pointer relative">
+              {/* <label className="inline-flex items-center cursor-pointer relative">
                 <input
                   type="checkbox"
                   className="sr-only peer"
@@ -464,7 +461,18 @@ function CompanyTeamUsersAgGrid({
                 />
                 <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
                 <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-              </label>
+              </label> */}
+              <ToggleButton
+                checked={isActive}
+                name={params.data.id.toString()}
+                onToggle={(e) => {
+                  if (!isGridForProductUser) {
+                    handleCompanyTeamUsersToggle(e);
+                  } else if (isGridForProductUser) {
+                    handleCompanyProductUsersToggle(e);
+                  }
+                }}
+              />
             </div>
           );
         },
@@ -493,9 +501,7 @@ function CompanyTeamUsersAgGrid({
 
   return (
     <div className="flex justify-around gap-2 mb-9 py-10">
-      <div
-        style={{ height: "300px", width: "45%" }}
-      >
+      <div style={{ height: "300px", width: "45%" }}>
         <div className="flex w-full  gap-4 mb-2 mt-1 ml-1 justify-between">
           <div className="w-[60%]">
             <SearchInput
@@ -531,9 +537,7 @@ function CompanyTeamUsersAgGrid({
           />
         </div>
       </div>
-      <div
-        style={{ height: "300px", width: "49%" }}
-      >
+      <div style={{ height: "300px", width: "49%" }}>
         <div className="flex w-full gap-2 mb-2 justify-between mt-1 ml-1">
           <div className="w-[60%]">
             <SearchInput
@@ -545,23 +549,30 @@ function CompanyTeamUsersAgGrid({
           </div>
           <div className="justify-self-end mr-3">
             {!isGridForProductUser && (
-              <Button onClick={handleAddCompanyTeamUsers}>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddCompanyTeamUsers();
+                }}
+              >
                 <div className="flex justify-center items-center">
-                  <UserPlus2
-                    className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                  ></UserPlus2>
+                  <UserPlus2 size={SIZE.SIXTEEN}></UserPlus2>
                   <span>Add</span>
                 </div>
               </Button>
             )}
 
             {isGridForProductUser && (
-              <Button onClick={handleAddCompanyTeamUsers}>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddCompanyTeamUsers();
+                }}
+              >
                 {" "}
-                <UserPlus2
-                  className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                ></UserPlus2>{" "}
-                Add
+                <UserPlus2 size={SIZE.SIXTEEN}></UserPlus2> Add
               </Button>
             )}
           </div>

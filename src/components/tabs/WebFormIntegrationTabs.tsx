@@ -74,8 +74,8 @@ function WebFormIntegrationTabs({
                   //     activeTab === value ? "border-teal-600 text-teal-600"
                   // : "border-transparent text-gray-600 hover:text-gray-500"
                   activeTab === value
-                    ? "text-teal-600 text-sm font-semibold "
-                    : "border-transparent text-sm font-semibold text-gray-600 hover:text-gray-500"
+                    ? "table-header-custom active "
+                    : "border-transparent table-header-custom hover:text-gray-700"
                 }
               >
                 {label}

@@ -18,6 +18,9 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
+
 function EditCompanyUserModal({
   isOpen,
   onClose,
@@ -187,7 +190,7 @@ function EditCompanyUserModal({
   };
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
@@ -257,7 +260,7 @@ function EditCompanyUserModal({
                     Status :
                   </label>
 
-                  <label className="inline-flex items-center cursor-pointer relative self-end">
+                  {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                     <input
                       type="checkbox"
                       id="isActive"
@@ -267,10 +270,13 @@ function EditCompanyUserModal({
                       className="sr-only peer"
                     />
                     <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                    {/* Adjusted size and colors */}
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                    {/* Adjusted size and position */}
-                  </label>
+                  </label> */}
+                  <ToggleButton
+                  checked={userIsActive}
+                  name="isActive"
+                  onToggle={handleCompanyUserToggle}
+                  />
                 </div>
                 <FormInput
                   logo={Mail}
@@ -286,7 +292,7 @@ function EditCompanyUserModal({
                 />
                 <div className="flex justify-end  ">
                   <div className="flex gap-1">
-                    <Button onClick={onClose} type="reset">
+                    <Button onClick={onClose} type="button">
                       <div className="flex items-center">
                         <X size={16} /> Cancel
                       </div>
@@ -304,7 +310,8 @@ function EditCompanyUserModal({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

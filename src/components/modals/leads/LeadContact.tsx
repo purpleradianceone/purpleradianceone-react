@@ -33,6 +33,11 @@ import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
 import FormInput from "../../ui/FormInput";
 import FormHeader from "../../ui/FormHeader";
+import COLORS from "../../../constants/Colors";
+import StatusChip from "../../ui/StatusChip";
+import PrimarySecondaryChip from "../../ui/PrimarySecondaryChip";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -401,7 +406,7 @@ const LeadContact = ({
               );
             }
           }}
-          className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+          className={COLORS.ADD_BUTTON}
         >
           +Add
         </button>
@@ -413,7 +418,7 @@ const LeadContact = ({
           leadContact.map((contact, index) => (
             <div
               key={index}
-              className="bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition"
+              className={COLORS.CONTACT_CARD}
               onClick={() => setSelectedContactCard(contact)}
             >
               {/* Left: Contact Info */}
@@ -462,25 +467,13 @@ const LeadContact = ({
               </div>
 
               {/* Right: Badges */}
-              <div className="flex  items-end gap-1 text-[10px] font-semibold">
-                <span
-                  className={`px-2 py-0.5 rounded-full border ${
-                    contact.isPrimary
-                      ? "bg-green-100 caption-custom-active border-green-400"
-                      : "bg-yellow-50 caption-custom-orange border-yellow-400"
-                  }`}
-                >
-                  {contact.isPrimary ? "Primary" : "Secondary"}
-                </span>
-                <span
-                  className={`px-2 py-0.5 rounded-full border ${
-                    contact.isActive
-                      ? "bg-green-100 caption-custom-active border-green-400"
-                      : "bg-red-100 caption-custom-inactive border-red-400"
-                  }`}
-                >
-                  {contact.isActive ? "Active" : "Inactive"}
-                </span>
+              <div className="flex  items-end gap-1">
+                <PrimarySecondaryChip
+                isPrimary={contact.isPrimary}
+                />
+                <StatusChip
+                  isActive={contact.isActive}
+                  />
               </div>
             </div>
           ))
@@ -491,8 +484,8 @@ const LeadContact = ({
         )}
       </div>
       {/* view in pop up card  */}
-      {selectedContactCard && (
-        <div className="fixed top-8 inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
+      {selectedContactCard && createPortal(
+        <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
             {/* Header */}
             <div className="relative px-8 pt-5 pb-4">
@@ -506,7 +499,7 @@ const LeadContact = ({
               <div className="flex items-center gap-6">
                 <div
                   className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white ${
-                    isActive ? "bg-blue-500" : "bg-gray-400"
+                    isActive ? "bg-blue-500" : "bg-red-500"
                   }`}
                 >
                   {selectedContactCard.name !== null
@@ -535,7 +528,7 @@ const LeadContact = ({
                     )}
                   </p>
                   <div className="flex items-center gap-3 mt-3">
-                    <span
+                    {/* <span
                       className={`px-3 py-1 rounded-full ${
                         selectedContactCard.isPrimary
                           ? "bg-green-100 input-label-custom-active border border-green-200"
@@ -545,8 +538,11 @@ const LeadContact = ({
                       {selectedContactCard.isPrimary
                         ? "Primary Contact"
                         : "Secondary Contact"}
-                    </span>
-                    <span
+                    </span> */}
+                    <PrimarySecondaryChip
+                    isPrimary={selectedContactCard.isPrimary}
+                    />
+                    {/* <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         isActive
                           ? "bg-green-100 input-label-custom-active border border-green-200"
@@ -554,12 +550,15 @@ const LeadContact = ({
                       }`}
                     >
                       {isActive ? "Active" : "Inactive"}
-                    </span>
+                    </span> */}
+                    <StatusChip isActive={isActive}/>
                   </div>
                 </div>
                 <div>
                   <Button
-                  onClick={() => {
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
                     if (userHasAccessToUpdateLead) {
                       handleEditLeadContactClick(selectedContactCard);
                     } else {
@@ -681,7 +680,7 @@ const LeadContact = ({
                         <h4 className="table-header-custom ">
                           Status
                         </h4>
-                        <label className="inline-flex items-center cursor-pointer relative self-end">
+                        {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                           <input
                             type="checkbox"
                             checked={isActive}
@@ -714,12 +713,36 @@ const LeadContact = ({
                             className="sr-only peer"
                           />
                           <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                          {/* Adjusted size and colors */}
                           <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
                           <span className="ml-3 text-sm table-header-custom">
                             {isActive ? "Active" : "Inactive"}
                           </span>
-                        </label>
+                        </label> */}
+                        <ToggleButton
+                        checked={isActive}
+                        name="isActive"
+                        onToggle={
+                          !selectedContactCard.isPrimary &&
+                              userHasAccessToUpdateLead
+                                ? () => {
+                                    handleActiveStatusChange(
+                                      selectedContactCard
+                                    );
+                                  }
+                                : () => {
+                                    if (selectedContactCard.isPrimary) {
+                                      toast.error(
+                                        "Update request denied — the user is designated as the Primary Contact."
+                                      );
+                                    } else {
+                                      toast.error(
+                                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                          .UPDATE_LEAD_ACCESS_DENIED_message
+                                      );
+                                    }
+                                  }
+                        }
+                        />
                       </div>
                       {selectedContactCard.isPrimary && (
                         <div className="caption-custom italic mt-1">
@@ -771,11 +794,12 @@ const LeadContact = ({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Add Contact Form Modal */}
-      {isOpenAddLeadContactForm && (
+      {isOpenAddLeadContactForm && createPortal(
         <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
           <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
             {/* Header */}
@@ -1017,7 +1041,10 @@ const LeadContact = ({
                       onChange={(e) => setTempHandle(e.target.value)}
                     />
                     <div className="flex justify-center items-center">
-                      <Button onClick={handleAddSocialMedia} type="button">
+                      <Button onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia()
+                      }} type="submit">
                         {/* <Plus size={14} /> */}+ Add
                       </Button>
                     </div>
@@ -1076,7 +1103,7 @@ const LeadContact = ({
               <div className="flex justify-end gap-4 mt-6 flex-wrap">
                 <div className="flex gap-2">
                   <Button
-                    type="reset"
+                    type="button"
                     onClick={() => setIsOpenAddLeadContactForm(false)}
                     // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
                   >
@@ -1099,7 +1126,8 @@ const LeadContact = ({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
