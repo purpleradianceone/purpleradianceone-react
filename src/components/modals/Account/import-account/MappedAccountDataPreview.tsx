@@ -3,7 +3,7 @@ import { Account, MappableItem } from "./AccountCsvMapper";
 import FormHeader from "../../../ui/FormHeader";
 import { Import, LucideScanEye, X } from "lucide-react";
 import Button from "../../../ui/Button";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { OPACITY, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
@@ -118,7 +118,7 @@ onCloseSuccessOrConfirmation,
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className={`fixed inset-0 ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} flex items-center justify-center z-50`}>
       <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-6xl h-[80%] flex flex-col">
         {/* Header */}
         <div className="p-3">

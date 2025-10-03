@@ -2,14 +2,16 @@ import React from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
-import { SIZE } from "../../constants/AppConstants";
+import { OPACITY, SIZE } from "../../constants/AppConstants";
 import { createPortal } from "react-dom";
+import LoadingSpinner from "../../assets/animations/LoadingSpinner";
 
 interface ConfirmationDialogProps {
   open: boolean;
   title: string;
   message: string;
   description?: string;
+  showLoadingSpinner?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -19,13 +21,16 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   title,
   message,
   description,
+  showLoadingSpinner,
   onConfirm,
   onCancel,
 }) => {
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+    <div
+      className={`fixed inset-0 flex items-center justify-center ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} z-50`}
+    >
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
         <FormHeader
           icon={AlertTriangle}
@@ -44,8 +49,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               {message}
             </div>
           }
+          
         </p>
-
+{showLoadingSpinner && (
+            <div className="flex h-full w-full bg-transparent opacity-100   justify-center items-center">
+              <LoadingSpinner />
+            </div>
+          )}
         {/* Footer Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           <div>
@@ -68,7 +78,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             >
               <div className="flex items-center justify-center gap-0.5">
                 <Check size={SIZE.SIXTEEN} />
-                Confirm
+                {showLoadingSpinner ? "Loading..." : "Comfirm"}
               </div>
             </Button>
           </div>
