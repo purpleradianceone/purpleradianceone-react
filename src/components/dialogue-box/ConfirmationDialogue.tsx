@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, Check, X } from "lucide-react";
+import { AlertTriangle, Check, LucideIcon, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
 import { OPACITY, SIZE } from "../../constants/AppConstants";
@@ -8,20 +8,28 @@ import LoadingSpinner from "../../assets/animations/LoadingSpinner";
 
 interface ConfirmationDialogProps {
   open: boolean;
+  icon?: LucideIcon;
   title: string;
   message: string;
   description?: string;
   showLoadingSpinner?: boolean;
+  showCancelButton?: boolean;
+  cancelButtonText?: string;
+  confirmButtonText?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
+  icon = AlertTriangle,
   title,
   message,
   description,
   showLoadingSpinner,
+  showCancelButton = true,
+  cancelButtonText = "Cancel",
+  confirmButtonText = "Comfirm",
   onConfirm,
   onCancel,
 }) => {
@@ -33,7 +41,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     >
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
         <FormHeader
-          icon={AlertTriangle}
+          icon={icon}
           postText={title}
           onClose={onCancel}
           description={
@@ -42,6 +50,11 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               : "Click Confirm to continue or Cancel to stay on this page."
           }
         />
+         {showLoadingSpinner && (
+          <div className="flex h-full w-full bg-transparent opacity-100 mt-4 justify-center items-center">
+            <LoadingSpinner />
+          </div>
+        )}
         <p className="caption-custom">
           {
             <div>
@@ -49,24 +62,20 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               {message}
             </div>
           }
-          
         </p>
-{showLoadingSpinner && (
-            <div className="flex h-full w-full bg-transparent opacity-100   justify-center items-center">
-              <LoadingSpinner />
-            </div>
-          )}
+       
         {/* Footer Buttons */}
         <div className="mt-6 flex justify-end gap-3">
-          <div>
-            <Button type="button" onClick={onCancel}>
-              <div className="flex items-center justify-center gap-0.5">
-                <X size={SIZE.SIXTEEN} />
-                Cancel
-              </div>
-            </Button>
-          </div>
-
+          {showCancelButton && (
+            <div>
+              <Button type="button" onClick={onCancel}>
+                <div className="flex items-center justify-center gap-0.5">
+                  <X size={SIZE.SIXTEEN} />
+                  {cancelButtonText}
+                </div>
+              </Button>
+            </div>
+          )}
           <div>
             <Button
               onClick={(e) => {
@@ -78,7 +87,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             >
               <div className="flex items-center justify-center gap-0.5">
                 <Check size={SIZE.SIXTEEN} />
-                {showLoadingSpinner ? "Loading..." : "Comfirm"}
+                {showLoadingSpinner ? "Loading..." : confirmButtonText}
               </div>
             </Button>
           </div>

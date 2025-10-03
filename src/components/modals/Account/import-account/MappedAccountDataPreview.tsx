@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Account, MappableItem } from "./AccountCsvMapper";
 import FormHeader from "../../../ui/FormHeader";
-import { Import, LucideScanEye, X } from "lucide-react";
+import { Import, LucideCheckCircle, LucideScanEye, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import { OPACITY, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -9,11 +9,12 @@ import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
+import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
   onClose: () => void;
-  onCloseSuccessOrConfirmation:() => void;
+  onCloseSuccessOrConfirmation: () => void;
   mappedData: Account[];
   fieldVariables: Record<string, string>;
   industryTypes: MappableItem[];
@@ -31,7 +32,7 @@ interface postDataPropAccountImport {
 const MappedAccountDataPopup = ({
   open,
   onClose,
-onCloseSuccessOrConfirmation,
+  onCloseSuccessOrConfirmation,
   mappedData,
   fieldVariables,
   industryTypes,
@@ -45,7 +46,8 @@ onCloseSuccessOrConfirmation,
   );
   const { loginStatus } = useLoggedInUserContext();
 
-  
+  const [isConfirmationPopup, setIsConfirmationPopup] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const duplicates = new Set<number>();
@@ -98,8 +100,7 @@ onCloseSuccessOrConfirmation,
 
         if (data.status) {
           toast.success(data.message);
-          onClose();
-          onCloseSuccessOrConfirmation();
+          setIsConfirmationPopup(true);
         } else {
           toast.error(data.message);
         }
@@ -118,7 +119,9 @@ onCloseSuccessOrConfirmation,
   };
 
   return (
-    <div className={`fixed inset-0 ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} flex items-center justify-center z-50`}>
+    <div
+      className={`fixed inset-0 ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} flex items-center justify-center z-50`}
+    >
       <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-6xl h-[80%] flex flex-col">
         {/* Header */}
         <div className="p-3">
@@ -266,6 +269,25 @@ onCloseSuccessOrConfirmation,
           </div>
         </div>
       </div>
+      <ConfirmationDialog
+        icon={LucideCheckCircle}
+        open={isConfirmationPopup}
+        title="New account-import-tag created successfully!"
+        description="New tag for current accounts data created"
+        message="For further process select generated account-import-tag. "
+        showCancelButton={false}
+        confirmButtonText="Proceed"
+        onCancel={() => {
+          onClose();
+          onCloseSuccessOrConfirmation();
+          setIsConfirmationPopup(false);
+        }}
+        onConfirm={() => {
+          onClose();
+          onCloseSuccessOrConfirmation();
+          setIsConfirmationPopup(false);
+        }}
+      />
     </div>
   );
 };
