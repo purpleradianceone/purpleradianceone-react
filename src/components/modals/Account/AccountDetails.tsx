@@ -37,6 +37,7 @@ import ToggleButton from "../../ui/ToggleButton";
 import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
+import AccountCompanyType from "./AccountCompanyType";
 // Note this is the type
 interface AccountDetailsProps {
   company: Account;
@@ -88,6 +89,23 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         if (!MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value))
           return "Please enter a valid 10-digit mobile number";
         return "";
+      case "pan":
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value))
+          return "Please enter the valid pan.";
+        return ""
+      case "tan":
+        if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value))
+          return "Please enter the valid tan.";
+        return ""
+       case "gst":
+        if (!/ ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value))
+          return "Please enter the valid gst.";
+        return ""
+      case "registration" : 
+        if(value.length > 100 ){
+          return "registration number length is greater that 100."
+        }
+        return ""
       default:
         return "";
     }
@@ -965,6 +983,15 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         <div>
           <AccountLead
           account={company}
+          />
+        </div>
+        {/* Account company type */}
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
+           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Company Account Type
+          </h3>
+          <AccountCompanyType
+            accountId={company.id}
           />
         </div>
       </div>

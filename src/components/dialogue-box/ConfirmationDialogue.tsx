@@ -11,6 +11,7 @@ interface ConfirmationDialogProps {
   icon?: LucideIcon;
   title: string;
   message: string;
+  messageDescription? :string
   description?: string;
   showLoadingSpinner?: boolean;
   showCancelButton?: boolean;
@@ -32,10 +33,12 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   confirmButtonText = "Comfirm",
   onConfirm,
   onCancel,
+  messageDescription
 }) => {
   if (!open) return null;
 
   return createPortal(
+
     <div
       className={`fixed inset-0 flex items-center justify-center ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} z-50`}
     >
@@ -50,6 +53,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               : "Click Confirm to continue or Cancel to stay on this page."
           }
         />
+
          {showLoadingSpinner && (
           <div className="flex h-full w-full bg-transparent opacity-100 mt-4 justify-center items-center">
             <LoadingSpinner />
@@ -57,14 +61,27 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         )}
         <p className="caption-custom">
           {
-            <div>
-              <br />
-              {message}
+            <div className="p-2 py-3 grid gap-2">
+             <div className="input-label-custom">
+               {message}
+             </div>
+              <div className="caption-custom">
+                {messageDescription}
+              </div>
             </div>
           }
         </p>
        
-        {/* Footer Buttons */}
+        <div className="mt-1 flex justify-end gap-3">
+          <div>
+            <Button type="button" onClick={onCancel}>
+              <div className="flex items-center justify-center gap-0.5">
+                <X size={SIZE.SIXTEEN} />
+                Cancel
+              </div>
+            </Button>
+          </div>
+
         <div className="mt-6 flex justify-end gap-3">
           {showCancelButton && (
             <div>
@@ -76,6 +93,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               </Button>
             </div>
           )}
+
           <div>
             <Button
               onClick={(e) => {

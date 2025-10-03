@@ -1656,7 +1656,7 @@ const LeadImportCsv = ({
                   }
                   itemType={ItemTypes.CSV_OWNER_VALUE}
                   onSearch={fetchCompanyUsers} // This is already good
-                  searchPlaceholder="Search users by Name, Email ,Mobile number."
+                  searchPlaceholder="Search user..."
                   totalCrmItems={totalCompanyUsers}
                   currentPage={companyUsersCurrentPage}
                   itemsPerPage={userPreference.rowsInGrid || 40}
@@ -1696,7 +1696,7 @@ const LeadImportCsv = ({
                   }
                   itemType={ItemTypes.CSV_PRODUCT_VALUE}
                   onSearch={fetchCompanyProducts} // This is already good
-                  searchPlaceholder="Search users by Product Name."
+                  searchPlaceholder="Search product..."
                   totalCrmItems={totalProductData}
                   currentPage={productDataCurrentPage}
                   itemsPerPage={userPreference.rowsInGrid || 40}
