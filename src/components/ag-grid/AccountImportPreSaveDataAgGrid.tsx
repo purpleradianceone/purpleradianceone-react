@@ -16,12 +16,12 @@ const gridRef = useRef<AgGridReact>(null);
     () => [
       {
         headerName : "Delete" , field: "delete", width:30,
+        cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
         cellRenderer: (params: any) => {
           const rowId = params.data.id;
-          // const isChecked = params.context.selectedIds.has(rowId)
           const isChecked = params.context.selectedIds.includes(rowId)
           return (
-            <div>
+            <div className="flex justify-center items-center">
               <input 
               type="checkbox"
                className="checkbox"
@@ -39,8 +39,8 @@ const gridRef = useRef<AgGridReact>(null);
       { headerName: "Name", field: "name" },
       { headerName: "Email", field: "email" },
       { headerName: "Mobile Number", field: "mobilenumber" },
-      { headerName: "Address", field: "address" },
-      { headerName: "Account Created On", field: "account_created_on" },
+      {headerName: "Company Account Type", field: "company_account_type_name", minWidth:190, },
+      { headerName: "Account Created On", field: "account_created_on", minWidth:165 },
       { headerName: "Company ID",
          field: "company_id",
         hide:true },
