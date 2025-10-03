@@ -223,8 +223,10 @@ function AccountManagementList({
                   }
                 }}
               >
-                <Plus size={SIZE.SIXTEEN} />
-                Import
+                <div className="flex items-center gap-0.5">
+                  <Plus size={SIZE.SIXTEEN} />
+                  Import
+                </div>
               </Button>
             </div>
           )}
