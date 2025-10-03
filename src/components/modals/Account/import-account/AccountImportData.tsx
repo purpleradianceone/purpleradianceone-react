@@ -10,13 +10,13 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import FinalConfirmationModal from "./FinalConfirmationalModal";
 import { LucideImport, Search, Trash2, XCircle } from "lucide-react";
 import Button from "../../../ui/Button";
 import AccountImportPreSaveDataAgGrid from "../../../ag-grid/AccountImportPreSaveDataAgGrid";
 import { AccountImportDataType } from "../../../../@types/account/AccountImportDataType";
 import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
+import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 
 const AccountImportData = ({
   onCloseOrUnselectTag,
@@ -180,7 +180,7 @@ const AccountImportData = ({
       .then((reposne) => {
         if (reposne.data.status) {
           toast.success(reposne.data.message);
-
+          setShowLoadingSpinner(false);
           getAccountImportTags();
           setOpenFinalPopup(false);
           // making aggrid table null
@@ -310,14 +310,15 @@ const AccountImportData = ({
         />
       </div>
 
-      {/* Confirmation Modal */}
-      <FinalConfirmationModal
+      {/* Confirmation */}
+      <ConfirmationDialog
+        title="Final Confirmation!"
+        description={`Import Tag: ${selectedAccountTag}`}
+        message={`⚠️ This is the final confirmation. \nAll accounts from "${selectedAccountTag}" will be PERMANENTLY moved to the Account table. \nThis action cannot be undone.`}
+        open={openFinalPopup}
         showLoadingSpinner={showLoadingSpinner}
-        importTag={selectedAccountTag}
-        isOpen={openFinalPopup}
-        message={`⚠️ This is the final confirmation. All accounts from "${selectedAccountTag}" will be PERMANENTLY moved to the Account table. This action cannot be undone.`}
+        onConfirm={handleCreateMoveAccountsToAccountTable}
         onCancel={() => setOpenFinalPopup(false)}
-        onSave={handleCreateMoveAccountsToAccountTable}
       />
     </div>
   );

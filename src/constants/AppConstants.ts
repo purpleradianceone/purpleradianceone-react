@@ -14,6 +14,10 @@ export const  STRING_VALUES = {
     
 }
 
+export const OPACITY = {
+  POPUP_OPACITY_AND_BACKGROUNG_COLOR : "bg-black bg-opacity-5 ",
+}
+
 export const TAX_CODE = {
     HSN : "hsn",
     SAC : "sac",
