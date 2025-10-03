@@ -9,6 +9,7 @@ interface ConfirmationDialogProps {
   open: boolean;
   title: string;
   message: string;
+  messageDescription? :string
   description?: string;
   onConfirm: () => void;
   onCancel: () => void;
@@ -21,12 +22,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   description,
   onConfirm,
   onCancel,
+  messageDescription
 }) => {
   if (!open) return null;
 
   return createPortal(
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-3 relative">
         <FormHeader
           icon={AlertTriangle}
           postText={title}
@@ -37,17 +39,21 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               : "Click Confirm to continue or Cancel to stay on this page."
           }
         />
-        <p className="caption-custom">
+        <p className="">
           {
-            <div>
-              <br />
-              {message}
+            <div className="p-2 py-3 grid gap-2">
+             <div className="input-label-custom">
+               {message}
+             </div>
+              <div className="caption-custom">
+                {messageDescription}
+              </div>
             </div>
           }
         </p>
 
         {/* Footer Buttons */}
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-1 flex justify-end gap-3">
           <div>
             <Button type="button" onClick={onCancel}>
               <div className="flex items-center justify-center gap-0.5">

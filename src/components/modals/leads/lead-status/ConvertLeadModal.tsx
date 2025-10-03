@@ -25,15 +25,15 @@ function ConvertLeadModal({
   handleLeadConversion,
   reasonText,
   onReasonChange,
-  handleLeadMappedToAccount
+  handleLeadMappedToAccount,
 }: {
-  isOpen : boolean;
-  onClose : () => void;
-  leadData : Lead;
-  handleLeadConversion : () => void;
-  reasonText : string;
-  onReasonChange : (event : React.ChangeEvent<HTMLTextAreaElement>) => void;
-  handleLeadMappedToAccount : () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  leadData: Lead;
+  handleLeadConversion: () => void;
+  reasonText: string;
+  onReasonChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleLeadMappedToAccount: () => void;
 }) {
   const [accountTypeSelected, setAccountTypeSelected] = useState<
     "existingAccount" | "noAccount"
@@ -46,14 +46,14 @@ function ConvertLeadModal({
     {
       label: "Existing Account",
       value: "existingAccount",
-      id: "account",
+      id: "account1",
       name: "accountType",
       checked: accountTypeSelected === "existingAccount" ? true : false,
     },
     {
       label: "Don't Map to any Account",
       value: "noAccount",
-      id: "account",
+      id: "account2",
       name: "accountType",
       checked: accountTypeSelected === "noAccount" ? true : false,
     },
@@ -73,7 +73,7 @@ function ConvertLeadModal({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-            handleLeadMappedToAccount();
+          handleLeadMappedToAccount();
           onClose();
         } else {
           toast.error(response.data.message);
@@ -97,12 +97,12 @@ function ConvertLeadModal({
       <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
-            className="relative w-full max-w-6xl max-h-[90vh] min-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+            className="relative w-full max-w-6xl max-h-[90vh] min-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
           >
-            <div className="py-6 px-4">
+            <div className="py-4 px-3">
               <FormHeader
                 icon={Handshake}
                 onClose={onClose}
@@ -111,10 +111,6 @@ function ConvertLeadModal({
               />
 
               <form className="space-y-0">
-                
-               
-                 
-                
                 <div className="flex justify-center">
                   <RadioButtons
                     options={convertLeadRadioButtonOptions}
@@ -140,72 +136,61 @@ function ConvertLeadModal({
                     />
                   </div>
                 )}
-
-                {/* {accountTypeSelected === "noAccount" && (
-                  <div className="min-w-36">
-                    
-                  </div>
-                )} */}
                 {accountTypeSelected === "noAccount" && (
-                    <div className="grid grid-cols-1">
+                  <div className="grid grid-cols-1">
                     <div>
-                     <TextAreaInput
-                    placeholder="Enter reason for status update"
-                    value={reasonText}
-                    cols={3}
-                    rows={5}
-                    onChange={onReasonChange}
-                    label="Reason(Optional)"
-                  />
+                      <TextAreaInput
+                        placeholder="Enter reason for status update"
+                        value={reasonText}
+                        cols={3}
+                        rows={5}
+                        onChange={onReasonChange}
+                        label="Reason(Optional)"
+                      />
                     </div>
-                        <div className="flex gap-2 col-span-1 justify-end">
-                        <div className="max-w-32 mt-7">
-                                <Button
-                        type="button"
-                        onClick={()=>{
+                    <div className="flex gap-2 col-span-1 justify-end">
+                      <div className="max-w-32 mt-7">
+                        <Button
+                          type="button"
+                          onClick={() => {
                             onClose();
-                        }}
+                          }}
                         >
-                            <div className="flex gap-1 justify-center items-center">
-                                <X size={SIZE.SIXTEEN}/>
-                                <span>Cancel</span>
-                            </div>
+                          <div className="flex gap-1 justify-center items-center">
+                            <X size={SIZE.SIXTEEN} />
+                            <span>Cancel</span>
+                          </div>
                         </Button>
-                        </div>
-                        <div className="max-w-32 mt-7">
-                                 <Button
-                        type="submit"
-                        onClick={(e)=>{
+                      </div>
+                      <div className="max-w-32 mt-7">
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
                             e.preventDefault();
                             handleLeadConversion();
-                        }}
+                          }}
                         >
-                            <div className="flex gap-1 justify-center items-center">
-                                <Save size={SIZE.SIXTEEN}/>
-                                <span>Save</span>
-                            </div>
+                          <div className="flex gap-1 justify-center items-center">
+                            <Save size={SIZE.SIXTEEN} />
+                            <span>Save</span>
+                          </div>
                         </Button>
-                        </div>
-                        
+                      </div>
                     </div>
-                    
-                    
-                </div>
-               )} 
+                  </div>
+                )}
 
                 <ConfirmationDialog
-                  message="Please confirm! Map the lead to selected Account!"
+                  message="Please confirm the action to proceed."
+                  messageDescription="We are about to map the selected lead to the designated account.
+Ensure all details are correct before finalizing the mapping"
                   onCancel={() => {
                     setFinalConfirm(false);
                   }}
                   onConfirm={() => {
-                    if(accountTypeSelected === "existingAccount"){
-                            createAccountLead();
+                    if (accountTypeSelected === "existingAccount") {
+                      createAccountLead();
                     }
-                    // else{
-                    //     handleLeadConversion()
-                    // }
-                    
                   }}
                   open={finalConfirm}
                   title="Are You Sure?"

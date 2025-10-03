@@ -95,7 +95,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       createdby: loginStatus.id,
     });
 
-  const { industryTypeData, loading } = useIndustryType();
+  const { industryTypeData, loading: industryTypeLoading } = useIndustryType();
   const { businessType, isLoading: businessTypeLoading } = usebusinessType();
   const { companyAccountType, isLoading: companyTypeLoading } =
     useCompanyAccountType();
@@ -117,10 +117,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   });
 
   useEffect(() => {
-      setSelectedState(0);
-      setSelectedDisctrict(0);
-
-  },[selectedCountryId])
+    setSelectedState(0);
+    setSelectedDisctrict(0);
+  }, [selectedCountryId]);
   function handleSelectedBusinessType(
     selectedBusinessType: number | undefined
   ) {
@@ -300,9 +299,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       email: createAccountFormData.email.trim(),
       industry_type_id: createAccountFormData.industry_type_id,
       business_type_id: createAccountFormData.business_type_id,
-      country_id : selectedCountryId,
-      state_id : selectedState,
-      district_id : selectedDisctrict,
+      country_id: selectedCountryId,
+      state_id: selectedState,
+      district_id: selectedDisctrict,
       pan: createAccountFormData.pan.trim(),
       gst: createAccountFormData.gst.trim(),
       tan: createAccountFormData.tan.trim(),
@@ -385,7 +384,9 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     return acc;
   }, {} as Record<string, CompanyAccountType[]>);
 
-  const loadingState = loading || businessTypeLoading || companyTypeLoading;
+  const loadingState =
+    industryTypeLoading || businessTypeLoading || companyTypeLoading;
+
   if (loadingState) {
     return createPortal(
       <div className="fixed top-8 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
@@ -416,17 +417,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               onClose();
             }}
           />
-          {/* <div className="flex justify-end">
-            <button
-              onClick={() => {
-                handleStateClear();
-                onClose();
-              }}
-              className="input-label-custom"
-            >
-              ✕
-            </button>
-          </div> */}
 
           {/* Form */}
           <form className=" grid grid-cols-2 gap-3">
@@ -570,8 +560,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 onSelect={(selectedValue) => {
                   if (selectedValue) {
                     setSelectedCountryId(selectedValue);
-                  }else{
-                    setSelectedCountryId(0)
+                  } else {
+                    setSelectedCountryId(0);
                   }
                 }}
                 options={countries}
@@ -588,8 +578,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 onSelect={(value) => {
                   if (value) {
                     setSelectedState(value);
-                  }
-                  else {
+                  } else {
                     setSelectedState(0);
                   }
                 }}
