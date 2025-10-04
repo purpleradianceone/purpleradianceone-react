@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle, Check, LucideIcon, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
-import { OPACITY, PADDING, SIZE } from "../../constants/AppConstants";
+import { GAP, OPACITY, PADDING, SIZE } from "../../constants/AppConstants";
 import { createPortal } from "react-dom";
 import LoadingSpinner from "../../assets/animations/LoadingSpinner";
 
@@ -10,9 +10,9 @@ interface ConfirmationDialogProps {
   open: boolean;
   icon?: LucideIcon;
   title: string;
+  description?: string;
   message: string;
   messageDescription?: string;
-  description?: string;
   showLoadingSpinner?: boolean;
   showCancelButton?: boolean;
   cancelButtonText?: string;
@@ -25,9 +25,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
   icon = AlertTriangle,
   title,
+  description,
   message,
   messageDescription,
-  description,
   showLoadingSpinner,
   showCancelButton = true,
   cancelButtonText = "Cancel",
@@ -41,7 +41,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <div
       className={`fixed inset-0 flex items-center justify-center ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} z-50`}
     >
-      <div className={`bg-white rounded-xl shadow-lg w-full max-w-md ${PADDING.CONFIRMATION_DIALOG_PADDING} relative`}>
+      <div
+        className={`bg-white rounded-xl shadow-lg w-full max-w-md ${PADDING.CONFIRMATION_DIALOG_PADDING} relative`}
+      >
         <FormHeader
           icon={icon}
           postText={title}
@@ -67,7 +69,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </p>
 
         {/* Footer Buttons */}
-        <div className="mt-6 flex justify-end gap-3">
+        <div
+          className={`mt-6 flex justify-end ${GAP.POPUP_GAP_BETWEEN_BUTTONS}`}
+        >
           {showCancelButton && (
             <div>
               <Button type="button" onClick={onCancel}>

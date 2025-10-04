@@ -16,7 +16,7 @@ import {
   Info,
 } from "lucide-react";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
-import { SIZE } from "../../../../constants/AppConstants";
+import { GAP, SIZE } from "../../../../constants/AppConstants";
 import { useCompanyAccountType } from "../../../../config/hooks/useCompanyAccountType";
 import { usebusinessType } from "../../../../config/hooks/useBusinessType";
 import { useIndustryType } from "../../../../config/hooks/useIndustryType";
@@ -406,7 +406,6 @@ export default function AccountCsvMapper({
       return newMap;
     });
   };
-
 
   const handleBusinessRemove = (crmItem: MappableItem) => {
     const newMap = { ...businessValueMapping };
@@ -820,7 +819,9 @@ export default function AccountCsvMapper({
                         <h4 className="table-header-custom">
                           Preview (First 5 Rows)
                         </h4>
-                        <div className="flex gap-3">
+                        <div
+                          className={`flex ${GAP.POPUP_GAP_BETWEEN_BUTTONS}`}
+                        >
                           <div className="w-fit h-fit">
                             <Button
                               type="button"
@@ -987,7 +988,9 @@ export default function AccountCsvMapper({
 
                 {/* Import Button */}
                 <div className="flex w-full justify-end items-center">
-                  <div className="items-end mt-4 flex gap-3">
+                  <div
+                    className={`items-end mt-4 flex ${GAP.POPUP_GAP_BETWEEN_BUTTONS}`}
+                  >
                     <div className="w-fit h-fit">
                       <Button
                         type="button"
@@ -1028,9 +1031,11 @@ export default function AccountCsvMapper({
         <ConfirmationDialog
           open={showConfirm}
           title="Are you sure to remove changes?"
-          message={
-            "Are you sure you want to cancel all changes on page?\nAll unsaved work will be lost."
-          }
+          description={`Click "Yes" to remove and "No" to stay on this page.`}
+          message="Are you sure you want to remove all changes on page?"
+          messageDescription="All unsaved work will be lost and your .csv file will be removed!"
+          cancelButtonText="No"
+          confirmButtonText="Yes"
           onConfirm={() => onCloseSuccessOrConfirmation()}
           onCancel={() => setShowConfirm(false)}
         />

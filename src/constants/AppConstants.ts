@@ -22,6 +22,10 @@ export const PADDING = {
   CONFIRMATION_DIALOG_PADDING : "p-4"
 }
 
+export const GAP = {
+  POPUP_GAP_BETWEEN_BUTTONS : "gap-3"
+}
+
 
 export const TAX_CODE = {
     HSN : "hsn",
