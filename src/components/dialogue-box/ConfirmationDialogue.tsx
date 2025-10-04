@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle, Check, LucideIcon, X } from "lucide-react";
 import FormHeader from "../ui/FormHeader";
 import Button from "../ui/Button";
-import { OPACITY, SIZE } from "../../constants/AppConstants";
+import { OPACITY, PADDING, SIZE } from "../../constants/AppConstants";
 import { createPortal } from "react-dom";
 import LoadingSpinner from "../../assets/animations/LoadingSpinner";
 
@@ -11,6 +11,7 @@ interface ConfirmationDialogProps {
   icon?: LucideIcon;
   title: string;
   message: string;
+  messageDescription?: string;
   description?: string;
   showLoadingSpinner?: boolean;
   showCancelButton?: boolean;
@@ -25,6 +26,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   icon = AlertTriangle,
   title,
   message,
+  messageDescription,
   description,
   showLoadingSpinner,
   showCancelButton = true,
@@ -39,7 +41,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <div
       className={`fixed inset-0 flex items-center justify-center ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} z-50`}
     >
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+      <div className={`bg-white rounded-xl shadow-lg w-full max-w-md ${PADDING.CONFIRMATION_DIALOG_PADDING} relative`}>
         <FormHeader
           icon={icon}
           postText={title}
@@ -50,20 +52,20 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               : "Click Confirm to continue or Cancel to stay on this page."
           }
         />
-         {showLoadingSpinner && (
+        {showLoadingSpinner && (
           <div className="flex h-full w-full bg-transparent opacity-100 mt-4 justify-center items-center">
             <LoadingSpinner />
           </div>
         )}
         <p className="caption-custom">
           {
-            <div>
-              <br />
-              {message}
+            <div className="flex-col col-span-1 gap-3 mt-2">
+              <div className="caption-custom-black">{message}</div>
+              <div>{messageDescription}</div>
             </div>
           }
         </p>
-       
+
         {/* Footer Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           {showCancelButton && (
