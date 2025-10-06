@@ -223,14 +223,16 @@ return (
               </div>
 
               {/* Toggle */}
+              <div onClick={(e) => e.stopPropagation()}>
               <ToggleButton
                   checked={item.isActive}
                   name={item.id.toString()}
-                  onToggle={(e) => {
-                    e.preventDefault();
+                  onToggle={() => {
+                    // e.stopPropagation();
                     handleAccountLeadStatusChange(item);
                   }}
                 />
+                </div>
             </div>
           </div>
         ))}
