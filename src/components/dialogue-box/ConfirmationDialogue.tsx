@@ -31,7 +31,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   showLoadingSpinner,
   showCancelButton = true,
   cancelButtonText = "Cancel",
-  confirmButtonText = "Comfirm",
+  confirmButtonText = "Confirm",
   onConfirm,
   onCancel,
 }) => {

@@ -314,7 +314,8 @@ const AccountImportData = ({
       <ConfirmationDialog
         title="Final Confirmation!"
         description={`Import Tag: ${selectedAccountTag}`}
-        message={`⚠️ This is the final confirmation. \nAll accounts from "${selectedAccountTag}" will be PERMANENTLY moved to the Account table. \nThis action cannot be undone.`}
+        message={`⚠️ This is the final confirmation. `}
+        messageDescription={`All accounts from "${selectedAccountTag}" will be PERMANENTLY moved to the Account table. \nThis action cannot be undone.`}
         open={openFinalPopup}
         showLoadingSpinner={showLoadingSpinner}
         onConfirm={handleCreateMoveAccountsToAccountTable}

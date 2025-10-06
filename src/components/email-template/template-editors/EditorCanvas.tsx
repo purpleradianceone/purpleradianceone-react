@@ -250,10 +250,13 @@ export const EditorCanvas: React.FC = () => {
         >
           {/* Show Fields Button - Always Visible */}
           <div>
-            <Button type="submit" onClick={(e) => {
-              e.preventDefault();
-              setShowDynamicEditor(!showDynamicEditor);
-            }}>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowDynamicEditor(!showDynamicEditor);
+              }}
+            >
               <div className="flex justify-center gap-1">
                 <Settings size={SIZE.SIXTEEN} className="mt-0.5" />
                 <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
@@ -265,8 +268,9 @@ export const EditorCanvas: React.FC = () => {
               open={showConfirm}
               title="Leave Create Email Template?"
               message={
-                "Are you sure you want to leave the Create Email Template page?\nAll unsaved work will be lost."
+                "Are you sure you want to leave the Create Email Template page?"
               }
+              messageDescription="All unsaved work will be lost."
               onConfirm={() => setMode("insert")}
               onCancel={() => setShowConfirm(false)}
             />
@@ -385,10 +389,13 @@ export const EditorCanvas: React.FC = () => {
 
                 <div className="mt-2 flex gap-4">
                   <div>
-                    <Button type="submit" onClick={(e) => {
-                      e.preventDefault();
-                      insertHtmlTemplate();
-                    }}>
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        insertHtmlTemplate();
+                      }}
+                    >
                       <div className="flex items-center justify-center gap-0.5">
                         <Eye size={SIZE.SIXTEEN} />
                         View HTML Template
@@ -397,7 +404,7 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                   <div>
                     <Button
-                    type="submit"
+                      type="submit"
                       onClick={(e) => {
                         e.preventDefault();
                         const beautified = DOMPurify.sanitize(htmlInput);
@@ -413,7 +420,7 @@ export const EditorCanvas: React.FC = () => {
                   </div>
                   <div>
                     <Button
-                    type="submit"
+                      type="submit"
                       onClick={(e) => {
                         e.preventDefault();
                         const beautified = DOMPurify.sanitize(htmlInput);
