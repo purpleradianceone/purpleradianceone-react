@@ -598,6 +598,7 @@ function CreateLeadModal({
                 handleSelectedCompanyUserChange={
                   handleSelectedCompanyUserChange
                 }
+                isUsedForSettings={false}
               />
             </div>
           </div>

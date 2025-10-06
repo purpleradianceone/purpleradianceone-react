@@ -8,6 +8,7 @@ type  CompanyUser = {
     isactive: boolean,
     requestedby: string,
     generate_password: string,
+    all_leads_visible? : boolean;
   };
 
   export default CompanyUser;

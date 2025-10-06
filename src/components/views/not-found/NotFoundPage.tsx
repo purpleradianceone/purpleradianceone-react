@@ -1,5 +1,6 @@
 import { ArrowLeft, Ghost, HomeIcon } from "lucide-react";
 import Button from "../../ui/Button";
+import ROUTES_URL from "../../../constants/Routes";
 
 
 function NotFoundPage() {
@@ -37,7 +38,7 @@ function NotFoundPage() {
           type="submit"
             onClick={(e) => {
               e.preventDefault();
-              window.location.href = '/home';
+              window.location.href = ROUTES_URL.HOME;
             }}>
             <HomeIcon className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
             Home Page

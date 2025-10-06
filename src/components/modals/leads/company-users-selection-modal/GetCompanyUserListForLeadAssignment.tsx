@@ -26,8 +26,10 @@ type GetCompanyUsersListForLeadProps = {
   onEndDateChange: (date: Date) => void;
   handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
   handleSelectedCompanyUserChange: (params: CompanyUser |null)  => void;
+  isUsedForSettings:boolean;
   //added
   selectedUserId : number | null;
+  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
 }
 
 function GetCompanyUserListForLeadAssignment({
@@ -37,7 +39,9 @@ function GetCompanyUserListForLeadAssignment({
   onStartDateChange,
   onEndDateChange,
   selectedUserId,
-  handleSelectedCompanyUserChange
+  handleSelectedCompanyUserChange,
+  isUsedForSettings,
+  handleUpdateLeadUser
 }: GetCompanyUsersListForLeadProps) {
   
 
@@ -265,8 +269,10 @@ function GetCompanyUserListForLeadAssignment({
             selectedUserId={selectedUserId}
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               users={users}
-              // selectedUserId={selectedUser?.id ?? null}
+              isUsedForSettings={isUsedForSettings}
+              handleUpdateLeadUser={handleUpdateLeadUser}
             />
+
           </div>
           {/* <CompanyUserAccessManagementModal
             isOpen={isAccessModalOpen}
