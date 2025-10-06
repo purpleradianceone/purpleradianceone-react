@@ -112,10 +112,35 @@ const LeadSetting: React.FC = () => {
     }
   };
 
+
+  const handleUpdate = (id : number  , allLeadsVisible :boolean | undefined )=>{
+    if(id === null || id ===undefined || allLeadsVisible ===null || allLeadsVisible === undefined){
+      return;
+    }
+    const postData ={
+      company_id : loginStatus.companyId,
+      id: id,
+      all_leads_visible :allLeadsVisible ,
+      updatedby : loginStatus.id
+    }
+
+
+    axios.post(POST_API.UPDATE_LEAD_COMPANY_USERS, postData, {withCredentials:true})
+    .then((response)=>{
+      toast.success(response.data.message)
+    })
+    .catch((error)=>{
+      toast.error(error)
+    })
+
+
+  }
   const handleUpdateLeadUser = (data : CompanyUser | null) => {
-    console.log("Updated thge nsifbndevb");
-    console.log(data);
-    console.log("Updated thge nsifbndevb");
+
+    if(data === null|| data ===undefined){
+      return;
+    }
+    handleUpdate(data?.id, data?.all_leads_visible);
   }
 
   const getDescription = (setting : CompanyLeadSettingType) => {
