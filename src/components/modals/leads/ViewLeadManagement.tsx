@@ -1292,6 +1292,7 @@ const ViewLeadManagement = () => {
                 {/* NOTE : CALL TO THE MODAL COMPONENT */}
                 <div className="">
                   <GetCompanyUsersForLead
+                  
                   isUsedForSettings={false}
                     selectedUserId={persistedSelectedUserId} // Pass the persisted ID
                     handleSelectedCompanyUserChange={
