@@ -14,6 +14,19 @@ export const  STRING_VALUES = {
     
 }
 
+export const OPACITY = {
+  POPUP_OPACITY_AND_BACKGROUNG_COLOR : "bg-black bg-opacity-5 ",
+}
+
+export const PADDING = {
+  CONFIRMATION_DIALOG_PADDING : "p-4"
+}
+
+export const GAP = {
+  POPUP_GAP_BETWEEN_BUTTONS : "gap-3"
+}
+
+
 export const TAX_CODE = {
     HSN : "hsn",
     SAC : "sac",

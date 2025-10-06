@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
+import { getQuickActionColor } from "../../../../constants/QuickActionsStyle";
 
 // const actions = [
 //   {
@@ -761,8 +762,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "New Deal",
       description: "Create opportunity",
       icon: Plus,
-      color:
-        "bg-gradient-to-r from-blue-600 to-blue-700 min-h-40 hover:from-blue-700 hover:to-blue-800", // Classic Business Blue
       shortcut: "Lead",
       route: ROUTES_URL.CREATE_LEAD,
       visibility:
@@ -777,8 +776,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "Add User",
       description: "New User",
       icon: UserPlus,
-      color:
-        "bg-gradient-to-r from-teal-600 to-teal-700 min-h-40 hover:from-teal-700 hover:to-teal-800", // Friendly Teal
       shortcut: "Users",
       route: ROUTES_URL.CREATE_COMPANY_USER,
       visibility:
@@ -793,8 +790,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "Schedule",
       description: "Book meeting",
       icon: Calendar,
-      color:
-        "bg-gradient-to-r from-violet-500 to-violet-600 min-h-40 hover:from-violet-600 hover:to-violet-700", // Bright but Muted Violet
       shortcut: "Meetings",
       route: ROUTES_URL.SCHEDULE_MEETING,
       visibility:
@@ -809,8 +804,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "Email Template",
       description: "Create Email Template",
       icon: Mail,
-      color:
-        "bg-gradient-to-r from-orange-500 to-orange-600 min-h-40 hover:from-orange-600 hover:to-orange-700", // Energetic Orange
       shortcut: "Templates",
       route: ROUTES_URL.EMAIL_TEMPLATE,
       visibility:
@@ -823,10 +816,8 @@ const QuickActions: React.FC<QuickActionsProp> = ({
     {
       id: 5,
       title: "Settings",
-      description: "Manage Settings",
+      description: "Manage Settings ",
       icon: Settings,
-      color:
-        "bg-gradient-to-r from-gray-600 to-gray-700 min-h-40 hover:from-gray-700 hover:to-gray-800", // Warm Gray
       shortcut: "Settings",
       route: ROUTES_URL.COMPANY_SETTING,
       visibility: moduleAccessCompanyUser.length !== 0 ? true : false,
@@ -836,8 +827,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "Prefrences",
       description: "Manage Prefrences",
       icon: LayoutPanelLeft,
-      color:
-        "bg-gradient-to-r from-stone-500 to-stone-600 min-h-40 hover:from-stone-600 hover:to-stone-700", // Earthy Stone
       shortcut: "Preferences",
       route: ROUTES_URL.USER_PROFILE_SETTING,
       visibility:
@@ -852,8 +841,6 @@ const QuickActions: React.FC<QuickActionsProp> = ({
       title: "Products",
       description: "Manage Products",
       icon: Store,
-      color:
-        "bg-gradient-to-r from-green-600 to-green-700 min-h-40 hover:from-green-700 hover:to-green-800", // Lively Green
       shortcut: "Product",
       route: ROUTES_URL.PRODUCT_MANAGEMENT,
       visibility:
@@ -866,10 +853,8 @@ const QuickActions: React.FC<QuickActionsProp> = ({
     {
       id: 8,
       title: "Teams",
-      description: "Manage Teams",
+      description: "Manage Teams  ",
       icon: Network,
-      color:
-        "bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 min-h-40 hover:from-fuchsia-700 hover:to-fuchsia-800", // Playful Fuchsia (used sparingly for unique actions)
       shortcut: "Team",
       route: ROUTES_URL.TEAM_MANAGEMENT,
       visibility:
@@ -879,29 +864,11 @@ const QuickActions: React.FC<QuickActionsProp> = ({
             )[0].view ?? false
           : false,
     },
-    // {
-    //   id: 9,
-    //   title: "Products Teams/Users",
-    //   description: "Manage Product Teams and Users",
-    //   icon: BarChart3,
-    //   color:
-    //     "bg-gradient-to-r from-yellow-500 to-yellow-600 min-h-40 hover:from-yellow-600 hover:to-yellow-700", // Bright Chart Yellow
-    //   shortcut: "Product",
-    //   route: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-    //   visibility:
-    //     moduleAccessCompanyUser.length !== 0
-    //       ? moduleAccessCompanyUser.filter(
-    //           (molule) => molule.crm_module_id === 8
-    //         )[0].view ?? false
-    //       : false,
-    // },
     {
       id: 10,
       title: "New Product",
       description: "Create Product",
       icon: Plus,
-      color:
-        "bg-gradient-to-r from-cyan-500 to-cyan-600 min-h-40 hover:from-cyan-600 hover:to-cyan-700", // Clear Cyan
       shortcut: "Product",
       route: ROUTES_URL.CREATE_PRODUCT,
       visibility:
@@ -914,10 +881,8 @@ const QuickActions: React.FC<QuickActionsProp> = ({
     {
       id: 11,
       title: "Create Team",
-      description: "New Team",
+      description: "New Team     ",
       icon: UserPlus,
-      color:
-        "bg-gradient-to-r from-red-500 to-red-600 min-h-40 hover:from-red-600 hover:to-red-700", // Action Red (for important new creation)
       shortcut: "Teams",
       route: ROUTES_URL.CREATE_TEAM,
       visibility:
@@ -925,6 +890,20 @@ const QuickActions: React.FC<QuickActionsProp> = ({
           ? moduleAccessCompanyUser.filter(
               (molule) => molule.crm_module_id === 6
             )[0].add ?? false
+          : false,
+    },
+    {
+      id: 12,
+      title: "Account Management",
+      description: "Account Section   ",
+      icon: UserPlus,
+      shortcut: "Accounts",
+      route: ROUTES_URL.ACCOUNT_MANAGEMENT,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 20
+            )[0].view ?? false
           : false,
     },
   ];
@@ -977,56 +956,61 @@ const QuickActions: React.FC<QuickActionsProp> = ({
   //   </div>
   // );
 
-
   return (
-  <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
-    <div className="mb-8">
-      <h3 className="section-header-custom mb-2">Quick Actions</h3>
-      <p className="table-header-custom">Frequently used CRM functions</p>
-    </div>
+    <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
+      <div className="mb-8">
+        <h3 className="section-header-custom mb-2">Quick Actions</h3>
+        <p className="table-header-custom">Frequently used CRM functions</p>
+      </div>
 
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {actions
-        .filter((action) => action.visibility)
-        .map((action, index) => (
-          <button
-            key={action.id}
-            onClick={() => {
-              if (loginStatus.id === companyUserId) {
-                if (action.id !== 3) {
-                  navigate(action.route);
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {actions
+          .filter((action) => action.visibility)
+          .map((action, index) => (
+            <button
+              key={action.id}
+              onClick={() => {
+                if (loginStatus.id === companyUserId) {
+                  if (action.id !== 3) {
+                    navigate(action.route);
+                  } else {
+                    navigate(
+                      ROUTES_URL.SCHEDULE_MEETING +
+                        "?from=" +
+                        window.location.pathname
+                    );
+                  }
                 } else {
-                  navigate(
-                    ROUTES_URL.SCHEDULE_MEETING +
-                    "?from=" +
-                    window.location.pathname
-                  );
+                  toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
                 }
-              } else {
-                toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD);
-              }
-            }}
-            className={`${action.color} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
-            style={{ animationDelay: `${index * 0.05}s` }}
-          >
-            {/* The change is in this div, specifically the flex classes */}
-            <div className="relative flex flex-col h-full"> 
-              <div className="flex items-start justify-between mb-3">
-                <action.icon className="w-6 h-6" />
-                <span className="caption-custom white-text opacity-75">
-                  {action.shortcut}
-                </span>
+              }}
+              className={`${getQuickActionColor(action.description.length)} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              {/* The change is in this div, specifically the flex classes */}
+              <div className="relative flex flex-col h-full">
+                <div className="flex items-start justify-between mb-3">
+                  <action.icon className="w-6 h-6" />
+                  <span className="caption-custom white-text opacity-75">
+                    {action.shortcut}
+                  </span>
+                </div>
+                <div className="text-left mt-auto">
+                  {" "}
+                  {/* mt-auto pushes this to the bottom */}
+                  <h4 className="caption-custom white-text mb-1">
+                    {action.title}
+                  </h4>
+                  <p className="caption-custom white-text opacity-90">
+                    {action.description}
+                  </p>
+                </div>
               </div>
-              <div className="text-left mt-auto"> {/* mt-auto pushes this to the bottom */}
-                <h4 className="caption-custom white-text mb-1">{action.title}</h4>
-                <p className="caption-custom white-text opacity-90">{action.description}</p>
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          ))}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default QuickActions;

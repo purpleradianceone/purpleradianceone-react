@@ -81,11 +81,22 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
       // First check if the node exists in the linkedNodes
       const nodeExists = linkedNodes[columnId] !== undefined;
 
+
+
+
       // Also check if it exists in the editor state
       const editorNodeExists = query.node(columnId).get();
 
       if (nodeExists || editorNodeExists) {
-        try {
+        try {try{
+
+          const nodeToDeleteId = linkedNodes[columnId];
+          actions.delete(nodeToDeleteId);
+
+        }catch(e){
+          console.log("error in deleting nodeToDeleteId"+e);
+        }
+
           actions.delete(columnId);
           actions.delete(linkedNodes[columnId][0]);
         } catch (deleteError) {
@@ -225,10 +236,13 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
         {/* ➕ Add Column */}
         <div className="flex justify-end items-end mt-2 text-right w-full">
           <div className="w-fit">
-            <Button type="submit" onClick={(e) => {
-              e.preventDefault();
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 addColumn();
-            }}>
+              }}
+            >
               <div className="flex items-center justify-center gap-1">
                 <Plus size={SIZE.SIXTEEN} />
                 Add Column

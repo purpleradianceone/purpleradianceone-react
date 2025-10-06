@@ -173,7 +173,7 @@ return (
   <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
     {/* Header */}
     <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-      <span>Account lead</span>
+      <span>Account Lead</span>
     </div>
 
     {
