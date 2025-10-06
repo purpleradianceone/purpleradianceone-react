@@ -1,4 +1,4 @@
-import {  Calendar, Filter, X } from "lucide-react";
+import { Calendar, Filter, X } from "lucide-react";
 import { useState } from "react";
 import { useComapanySpecificSearchDateRange } from "../../../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../../../config/hooks/useDateRangeIdChange";
@@ -17,7 +17,6 @@ import PaginationDataProps from "../../../../@types/ag-grid/PaginationDataProps"
 import HandleSearchOptionProps from "../../../../@types/company-users/HandleSearchOptionProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 
-
 type GetCompanyUsersListForLeadProps = {
   users: CompanyUsersSearchProps[];
   paginationData: PaginationDataProps;
@@ -25,12 +24,12 @@ type GetCompanyUsersListForLeadProps = {
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
-  handleSelectedCompanyUserChange: (params: CompanyUser |null)  => void;
-  isUsedForSettings:boolean;
+  handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
+  isUsedForSettings: boolean;
   //added
-  selectedUserId : number | null;
-  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
-}
+  selectedUserId: number | null;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => void;
+};
 
 function GetCompanyUserListForLeadAssignment({
   users,
@@ -41,34 +40,26 @@ function GetCompanyUserListForLeadAssignment({
   selectedUserId,
   handleSelectedCompanyUserChange,
   isUsedForSettings,
-  handleUpdateLeadUser
+  handleUpdateLeadUser,
 }: GetCompanyUsersListForLeadProps) {
-  
-
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
     useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    false
-  );
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState(false);
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const {
-    userHasAccessToViewUser,
-  } = useUserAccessModules();
-
-
+  const { userHasAccessToViewUser } = useUserAccessModules();
 
   return (
     userHasAccessToViewUser && (
       <div className="w-full">
         <div className=" z-10  mt-1  mb-2 flex items-center justify-between p-0.5  bg-gray-50 rounded-lg shadow-sm   w-full">
-
           {isLargeScreen && (
             <>
               <div className="flex  justify-between items-center gap-1">
@@ -119,7 +110,6 @@ function GetCompanyUserListForLeadAssignment({
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
-                    
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value
                     );
@@ -254,8 +244,6 @@ function GetCompanyUserListForLeadAssignment({
           )}
 
           {/* new end */}
-
-          
         </div>
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
@@ -263,16 +251,14 @@ function GetCompanyUserListForLeadAssignment({
             className="ag-theme-balhal w-full"
             style={{ height: "460px", width: "100%" }}
           >
-
             {/* NOTE : STATE MANAGEMENT NEED TO DO */}
             <CompanyUserAgGridForLead
-            selectedUserId={selectedUserId}
+              selectedUserId={selectedUserId}
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               users={users}
               isUsedForSettings={isUsedForSettings}
               handleUpdateLeadUser={handleUpdateLeadUser}
             />
-
           </div>
           {/* <CompanyUserAccessManagementModal
             isOpen={isAccessModalOpen}
