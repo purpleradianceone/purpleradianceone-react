@@ -10,11 +10,18 @@ import CompanyLeadSettingType from '../../../../@types/settings/CompanyLeadSetti
 import { useGoogleMeetStatus } from '../../../../config/hooks/useGoogleMeetStatus';
 import { useZoomMeetingsStatus } from '../../../../config/hooks/useZoomMeetingsStatus';
 import SettingToggleCard from '../../../ui/SettingToggleCard';
+import Button from '../../../ui/Button';
+import { User2, UserCheck2Icon } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import FormHeader from '../../../ui/FormHeader';
+import GetCompanyUsersForLead from '../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead';
+import CompanyUser from '../../../../@types/company-users/CompanyUser';
 
 
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
   useZoomMeetingsStatus();
+  const [companyUserModalOpen,setCompanyUserModalOpen] = useState<boolean>(false)
 
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -105,6 +112,12 @@ const LeadSetting: React.FC = () => {
     }
   };
 
+  const handleUpdateLeadUser = (data : CompanyUser | null) => {
+    console.log("Updated thge nsifbndevb");
+    console.log(data);
+    console.log("Updated thge nsifbndevb");
+  }
+
   const getDescription = (setting : CompanyLeadSettingType) => {
     if(setting.leadSettingMasterId === 1){
       return setting.isActive ? leadSettingDescriptions.active.leadsAreVisibleToProductUsers : leadSettingDescriptions.inactive.leadsAreVisibleToProductUsers;
@@ -118,10 +131,29 @@ const LeadSetting: React.FC = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
-      <div className="text-center mb-3">
-        <p className="table-data-custom mt-2">Manage your company's lead-related configurations.</p>
+    <div className="w-full min-h-screen bg-white">
+      <div className="flex justify-between items-center mb-3 w-full">
+    <div className="flex-1"></div> 
+    
+    <div className="flex justify-center items-center flex-1">
+     <p className="table-data-custom mt-2 text-center">Manage your company's lead-related configurations.</p>
+    </div>
+    
+    <div className="flex-1 flex justify-end min-w-36">
+      <div>
+ <Button 
+ onClick={()=>{
+  setCompanyUserModalOpen(true);
+ }}
+ >
+    <div className="flex items-center gap-2">
+      <UserCheck2Icon/>
+      MDLM
+    </div>
+     </Button>
       </div>
+    </div>
+   </div>
       {isLoading ? (
         <div className="flex justify-center items-center mt-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
@@ -133,6 +165,36 @@ const LeadSetting: React.FC = () => {
           ))}
           
         </div>
+      )}
+      {companyUserModalOpen && createPortal(
+        <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
+              <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+                <FormHeader
+                  preText="Assign new lead owner."
+                  description="Select and assign a new owner to manage this lead."
+                  onClose={() => {
+                    setCompanyUserModalOpen(false);
+                  }}
+                  icon={User2}
+                />
+         <div className="bg-white z-50 overflow-y-auto rounded-lg shadow-sm p-0">
+          <div
+            className="ag-theme-balhal w-full"
+            style={{ height: "460px", width: "100%" }}
+          >
+        <GetCompanyUsersForLead
+        handleSelectedCompanyUserChange={()=>{
+          setCompanyUserModalOpen(false);
+        }}
+        selectedUserId={null}
+        isUsedForSettings={true}
+        handleUpdateLeadUser={handleUpdateLeadUser}
+        />
+        </div>
+        </div>
+        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

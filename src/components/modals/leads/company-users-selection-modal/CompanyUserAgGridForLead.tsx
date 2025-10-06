@@ -8,17 +8,22 @@ import { INNERHTML } from "../../../../constants/AppConstants";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
+import ToggleButton from "../../../ui/ToggleButton";
 
 type CompanyUserAgGridPropsForLead = {
   users: CompanyUsersSearchProps[];
   handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
   selectedUserId: number | null; // Receive the prop
+  isUsedForSettings : boolean;
+  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
 };
 
 function CompanyUserAgGridForLead({
   users,
   handleSelectedCompanyUserChange,
   selectedUserId, // Destructure the prop
+  isUsedForSettings,
+  handleUpdateLeadUser
 }: CompanyUserAgGridPropsForLead) {
   const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(selectedUserId); // Initialize local state with the prop
   const gridRef = useRef<AgGridReactType<any>>(null);
@@ -73,11 +78,22 @@ function CompanyUserAgGridForLead({
         width: 100,
         cellRenderer: (params: any) => {
           const user: CompanyUser = params.data;
-          const isChecked = localSelectedUserId === user.id;
+          const isChecked = isUsedForSettings ? user!.all_leads_visible : localSelectedUserId === user.id;
 
           return (
             <div className="flex items-center  justify-center mt-1">
-              <input
+              {isUsedForSettings && (
+                <ToggleButton
+                checked={isChecked!}
+                name=""
+                onToggle={(e) => {
+                  e.preventDefault();
+                handleUpdateLeadUser!(user)
+                }}
+                />
+              )}
+              {!isUsedForSettings && (
+                <input
               type="checkbox"
               checked={isChecked}
               onChange={() => {
@@ -91,6 +107,7 @@ function CompanyUserAgGridForLead({
               }}
               className="cursor-pointer accent-blue-500 checkbox"
             />
+              )}
             </div>
           );
         },

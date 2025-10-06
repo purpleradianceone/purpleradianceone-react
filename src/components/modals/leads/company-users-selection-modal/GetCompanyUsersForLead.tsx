@@ -14,21 +14,22 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import GetCompanyUserListForLeadAssignment from "./GetCompanyUserListForLeadAssignment";
 // import ApiError from "../../../../@types/error/ApiError";
 
-
 function GetCompanyUsersForLead({
   handleSelectedCompanyUserChange,
-  selectedUserId 
-}:{
+  selectedUserId,
+  isUsedForSettings,
+  handleUpdateLeadUser
+}: {
   handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
   selectedUserId: number | null;
+  isUsedForSettings: boolean;
+  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
 }) {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
   const { loginStatus } = useLoggedInUserContext();
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -63,11 +64,9 @@ function GetCompanyUsersForLead({
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate
-        ? 0
-        : dateRangeId;
+      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
-    const postData = {
+    const postDataForLeads = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
       limit: pageSize,
@@ -75,34 +74,49 @@ function GetCompanyUsersForLead({
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
-      isactive : true,
+      isactive: true,
+    };
+
+    const postDataForSettings = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+      limit: pageSize,
+      offset,
+      search_company_specific_date_range_id: effectiveDateRangeId,
+      search_parameter: searchParameter,
+      search_parameter_date: concatDate,
+      ...
+        (!isUsedForSettings && {isactive: true}),
+      ...(isUsedForSettings && { all_leads_visible : null})
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        isUsedForSettings
+          ? POST_API.GET_LEAD_COMPANY_USERS
+          : POST_API.GET_COMPANY_USERS,
+        isUsedForSettings ? postDataForSettings : postDataForLeads,
+        {
+          withCredentials: true,
+        }
+      );
 
       setCompanyUsers(response.data);
       if (response.data[0]?.count) {
-        setTotalPages(
-          Math.ceil(response.data[0].count / pageSize)
-        );
+        setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
-      
-    } catch (error:  any) {
+    } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
           callFunction: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-         fetchCompanyUsers(); 
+          fetchCompanyUsers();
         }
       }
     }
   };
-
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -132,9 +146,9 @@ function GetCompanyUsersForLead({
         <>
           <div>
             <GetCompanyUserListForLeadAssignment
-            // selectedUserId={selectedUserId}
-            //note : added recently
-            handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+              // selectedUserId={selectedUserId}
+              //note : added recently
+              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               selectedUserId={selectedUserId}
               handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
               onEndDateChange={handleEndDateChange}
@@ -151,6 +165,8 @@ function GetCompanyUsersForLead({
                 pageSize,
               }}
               users={companyUsers}
+              isUsedForSettings={isUsedForSettings}
+              handleUpdateLeadUser={handleUpdateLeadUser}
             />
           </div>
         </>

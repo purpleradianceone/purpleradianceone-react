@@ -449,7 +449,8 @@ function LeadTaskList({
                             </div>
                           </div>
                           <div>
-                            <div className="mt-1 flex gap-2">
+                            {activity.leadActivityDetails && (
+<div className="mt-1 flex gap-2">
                               <span className="caption-custom-blue">
                                 {activity.leadActivityId !== 3 &&
                                 activity.leadActivityId !== 4
@@ -510,6 +511,8 @@ function LeadTaskList({
                                 )}
                               </div>
                             </div>
+                            )}
+                            
                             <span className="caption-custom-blue">
                               Outcome :{" "}
                             </span>{" "}
