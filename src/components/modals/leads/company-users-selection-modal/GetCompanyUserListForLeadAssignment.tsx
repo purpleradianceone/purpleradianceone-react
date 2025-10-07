@@ -28,7 +28,7 @@ type GetCompanyUsersListForLeadProps = {
   isUsedForSettings: boolean;
   //added
   selectedUserId: number | null;
-  handleUpdateLeadUser?: (params: CompanyUser | null) => void;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean ;
 };
 
 function GetCompanyUserListForLeadAssignment({
