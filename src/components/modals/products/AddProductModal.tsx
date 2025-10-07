@@ -334,11 +334,15 @@ function AddProductModal({
                     onSelect={(e) => {
                       if (e) {
                         setSelectedProductTypeId(e);
+                      }else{
+                        setSelectedProductTypeId(0);
                       }
                     }}
                     options={productTypeData}
+                    
                     requiredRedDot={true}
                   />
+
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

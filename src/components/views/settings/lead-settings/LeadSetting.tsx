@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -13,9 +14,9 @@ import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSetti
 import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
 import SettingToggleCard from "../../../ui/SettingToggleCard";
-import Button from "../../../ui/Button";
-import { User2, UserCheck2Icon } from "lucide-react";
-import { createPortal } from "react-dom";
+// import Button from "../../../ui/Button";
+import { User2, } from "lucide-react";
+// import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
 import GetCompanyUsersForLead from "../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
@@ -23,8 +24,8 @@ import CompanyUser from "../../../../@types/company-users/CompanyUser";
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
   useZoomMeetingsStatus();
-  const [companyUserModalOpen, setCompanyUserModalOpen] =
-    useState<boolean>(false);
+  // const [companyUserModalOpen, setCompanyUserModalOpen] =
+  //   useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -191,7 +192,7 @@ if (
   return (
     <div className="w-full min-h-screen bg-white">
       <div className="flex justify-between items-center mb-3 w-full">
-        <div className="flex-1"></div>
+        {/* <div className="flex-1"></div> */}
 
         <div className="flex justify-center items-center flex-1">
           <p className="table-data-custom mt-2 text-center">
@@ -199,7 +200,7 @@ if (
           </p>
         </div>
 
-        <div className="flex-1 flex justify-end min-w-36">
+        {/* <div className="flex-1 flex justify-end min-w-36">
           <div>
             <Button
               onClick={() => {
@@ -212,7 +213,7 @@ if (
               </div>
             </Button>
           </div>
-        </div>
+        </div> */}
       </div>
       {isLoading ? (
         <div className="flex justify-center items-center mt-20">
@@ -230,26 +231,26 @@ if (
           ))}
         </div>
       )}
-      {companyUserModalOpen &&
-        createPortal(
-          <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
-            <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+      
+          {/* <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 "> */}
+            <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
               <FormHeader
-                preText="Assign new lead owner."
-                description="Select and assign a new owner to manage this lead."
+                preText="Assign Users to whom all leads are visible"
+                description="Select and assign a user to whom all the lead's will be visible."
                 onClose={() => {
-                  setCompanyUserModalOpen(false);
+                  // setCompanyUserModalOpen(false);
                 }}
                 icon={User2}
+                isModal={false}
               />
               <div className="bg-white z-50 overflow-y-auto rounded-lg shadow-sm p-0">
                 <div
                   className="ag-theme-balhal w-full"
-                  style={{ height: "460px", width: "100%" }}
+                  
                 >
                   <GetCompanyUsersForLead
                     handleSelectedCompanyUserChange={() => {
-                      setCompanyUserModalOpen(false);
+                      // setCompanyUserModalOpen(false);
                     }}
                     selectedUserId={null}
                     isUsedForSettings={true}
@@ -258,9 +259,8 @@ if (
                 </div>
               </div>
             </div>
-          </div>,
-          document.body
-        )}
+          {/* </div> */}
+      
     </div>
   );
 };

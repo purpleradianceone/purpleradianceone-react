@@ -626,6 +626,7 @@ function CreateLeadTaskModal({
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={false}
         />
       )}
     </div>,

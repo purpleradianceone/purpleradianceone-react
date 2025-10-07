@@ -8,23 +8,25 @@ const FormHeader =({
     icon : Icon,
     preText,
     postText,
-    description
+    description,
+    isModal = true,
 }:{
     onClose : ()=>void;
     userName? : string;
     icon: LucideIcon;
     preText?:string,
     postText?: string,
-    description? : string
+    description? : string,
+    isModal? : boolean,
 })=>{
     return (
-  <div className="flex justify-between items-center  border-b pb-1">
+  <div className={`flex ${isModal ? 'justify-between' : 'justify-center'} items-center  border-b pb-1`}>
     {/* Left side */}
     <div className="flex items-center gap-3">
       <Icon className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
 
       <div>
-        <h2 className="table-header-custom">
+        <h2 className={isModal ? "table-header-custom" : "input-label-custom"}>
           {preText}{' '}
           <span className="table-header-custom ">{userName}</span>
           {postText}
@@ -36,12 +38,15 @@ const FormHeader =({
     </div>
 
     {/* Close button */}
-    <button
+    {isModal && (
+      <button
       onClick={onClose}
       className=" right-4 top-4 input-label-custom"
     >
       <X size={SIZE.TWENTY} />
     </button>
+    )}
+    
   </div>
 );
 
