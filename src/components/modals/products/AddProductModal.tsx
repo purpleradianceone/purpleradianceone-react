@@ -145,7 +145,7 @@ function AddProductModal({
     if (addProductFormData.name !== "" && addProductFormData.code !== "") {
       if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
         setSelectedProductTypeIdError(true);
-                      toast.error("Please select 'Product Type'");
+                      // toast.error("Please select 'Product Type'");
 
       } else {
         setSelectedProductTypeIdError(false);
@@ -154,7 +154,7 @@ function AddProductModal({
           selectedWarrantyIntervalTypeId === undefined
         ) {
           setSelectedWarrantyIntervalTypeIdError(true);
-                        toast.error("Please select 'Warranty Time Unit'");
+                        // toast.error("Please select 'Warranty Time Unit'");
 
         } else {
           setSelectedWarrantyIntervalTypeIdError(false);
@@ -163,7 +163,7 @@ function AddProductModal({
             selectedDefaultWarranty === undefined
           ) {
             setSelectedDefaultWarrantyError(true);
-                          toast.error("Please select 'Warranty Duration'");
+                          // toast.error("Please select 'Warranty Duration'");
 
           } else {
             setSelectedDefaultWarrantyError(false);
@@ -172,7 +172,7 @@ function AddProductModal({
               selectedAmcIntervalTypeId === undefined
             ) {
               setSelectedAmcIntervalTypeIdError(true);
-                            toast.error("Please select 'AMC Time Unit'");
+                            // toast.error("Please select 'AMC Time Unit'");
 
             } else {
               setSelectedAmcIntervalTypeIdError(false);
@@ -181,7 +181,7 @@ function AddProductModal({
                 selectedDefaultAmc === undefined
               ) {
                 setSelectedDefaultAmcError(true);
-                              toast.error("Please select 'AMC Cycle Duration'");
+                              // toast.error("Please select 'AMC Cycle Duration'");
 
 
               } else {
@@ -287,19 +287,19 @@ function AddProductModal({
                 }
               });
           } 
-          // else {
-          //   if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
-          //     toast.error("Please select 'Product Type'");
-          //   } else if (selectedWarrantyIntervalTypeId === 0 || selectedWarrantyIntervalTypeId === undefined) {
-          //     toast.error("Please select 'Warranty Time Unit'");
-          //   } else if (selectedDefaultWarranty === 0 || selectedDefaultWarranty === undefined) {
-          //     toast.error("Please select 'Warranty Duration'");
-          //   } else if (selectedAmcIntervalTypeId === 0 || selectedAmcIntervalTypeId === undefined) {
-          //     toast.error("Please select 'AMC Time Unit'");
-          //   } else if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
-          //     toast.error("Please select 'AMC Cycle Duration'");
-          //   }
-          // }
+          else {
+            if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+              toast.error("Please select 'Product Type'");
+            } else if (selectedWarrantyIntervalTypeId === 0 || selectedWarrantyIntervalTypeId === undefined) {
+              toast.error("Please select 'Warranty Time Unit'");
+            } else if (selectedDefaultWarranty === 0 || selectedDefaultWarranty === undefined) {
+              toast.error("Please select 'Warranty Duration'");
+            } else if (selectedAmcIntervalTypeId === 0 || selectedAmcIntervalTypeId === undefined) {
+              toast.error("Please select 'AMC Time Unit'");
+            } else if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
+              toast.error("Please select 'AMC Cycle Duration'");
+            }
+          }
         }
       }
     } else {
