@@ -13,7 +13,7 @@ export type Product = {
   name: string;
   code: string;
   cost?: number;
-  description: string;
+  description?: string;
   version?: string;
   url?: string;
   isActive: boolean;
