@@ -23,7 +23,7 @@ function GetCompanyUsersForLead({
   handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
   selectedUserId: number | null;
   isUsedForSettings: boolean;
-  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
+  handleUpdateLeadUser? : (params: CompanyUser | null) => boolean;
 }) {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []

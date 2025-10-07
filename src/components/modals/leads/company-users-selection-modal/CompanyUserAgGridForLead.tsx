@@ -9,13 +9,16 @@ import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import ToggleButton from "../../../ui/ToggleButton";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 type CompanyUserAgGridPropsForLead = {
   users: CompanyUsersSearchProps[];
   handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
   selectedUserId: number | null; // Receive the prop
-  isUsedForSettings : boolean;
-  handleUpdateLeadUser? : (params: CompanyUser | null) => void;
+  isUsedForSettings: boolean;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean;
 };
 
 function CompanyUserAgGridForLead({
@@ -23,22 +26,25 @@ function CompanyUserAgGridForLead({
   handleSelectedCompanyUserChange,
   selectedUserId, // Destructure the prop
   isUsedForSettings,
-  handleUpdateLeadUser
+  handleUpdateLeadUser,
 }: CompanyUserAgGridPropsForLead) {
-  const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(selectedUserId); // Initialize local state with the prop
+  const {userHasAccessToUpdateSettingLead} = useUserAccessModules();
+  const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(
+    selectedUserId
+  ); // Initialize local state with the prop
   const gridRef = useRef<AgGridReactType<any>>(null);
-  
+
   useEffect(() => {
     setLocalSelectedUserId(selectedUserId);
     // Refresh the Action column
     if (gridRef.current?.api) {
       gridRef.current.api.refreshCells({
         force: true,
-        columns: ['Action'], // Only refresh the checkbox column
+        columns: ["Action"], // Only refresh the checkbox column
       });
     }
   }, [selectedUserId]);
-  
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -78,35 +84,54 @@ function CompanyUserAgGridForLead({
         width: 100,
         cellRenderer: (params: any) => {
           const user: CompanyUser = params.data;
-          const isChecked = isUsedForSettings ? user!.all_leads_visible : localSelectedUserId === user.id;
+          const isChecked = isUsedForSettings
+            ? user!.all_leads_visible
+            : localSelectedUserId === user.id;
 
+          const onToggle = () => {
+            if(userHasAccessToUpdateSettingLead){
+            if (!handleUpdateLeadUser) return;
+             handleUpdateLeadUser(user);
+              if (isUsedForSettings) {
+              user.all_leads_visible = !user.all_leads_visible;
+              console.log(""+user.all_leads_visible);
+              params.api.refreshCells({
+                columns: ["Action"], 
+                force: true,
+              });
+            }
+          }else{
+            toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+          }
+            
+            
+          };
           return (
             <div className="flex items-center  justify-center mt-1">
               {isUsedForSettings && (
                 <ToggleButton
-                checked={isChecked!}
-                name=""
-                onToggle={(e) => {
-                  e.preventDefault();
-                handleUpdateLeadUser!(user)
-                }}
+                  checked={isChecked!}
+                  name=""
+                  onToggle={() => {
+                    onToggle();
+                  }}
                 />
               )}
               {!isUsedForSettings && (
                 <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => {
-                if (isChecked) {
-                  setLocalSelectedUserId(null);
-                  handleSelectedCompanyUserChange(null);
-                } else {
-                  setLocalSelectedUserId(user.id);
-                  handleSelectedCompanyUserChange(user);
-                }
-              }}
-              className="cursor-pointer accent-blue-500 checkbox"
-            />
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => {
+                    if (isChecked) {
+                      setLocalSelectedUserId(null);
+                      handleSelectedCompanyUserChange(null);
+                    } else {
+                      setLocalSelectedUserId(user.id);
+                      handleSelectedCompanyUserChange(user);
+                    }
+                  }}
+                  className="cursor-pointer accent-blue-500 checkbox"
+                />
               )}
             </div>
           );
@@ -156,7 +181,7 @@ function CompanyUserAgGridForLead({
       style={{ height: "460px", width: "100%" }}
     >
       <AgGridReact
-      ref={gridRef}
+        ref={gridRef}
         rowData={users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
