@@ -1,7 +1,4 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
@@ -23,6 +20,7 @@ function CompanyLeadContactsSelectionAgGrid({
   onClose,
   addCompanyLeadContactIdArray,
   handleCompanyLeadContactCheckBoxChange,
+  isUsedForMeetings
 }: {
   isOpen: boolean;
   selectedLeadId?: number;
@@ -32,10 +30,16 @@ function CompanyLeadContactsSelectionAgGrid({
     data: LeadContactType,
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  isUsedForMeetings : boolean;
 }) {
   const { loginStatus } = useLoggedInUserContext();
 
   const [leadContact, setLeadContact] = useState<LeadContactType[]>([]);
+
+  useEffect(() => {
+    console.log("Array of lead contact");
+    console.log(addCompanyLeadContactIdArray)
+  },[])
 
   const fetchLeadContact = async () => {
     const postDataGetLeadContact = {
@@ -127,7 +131,7 @@ function CompanyLeadContactsSelectionAgGrid({
             : false;
 
           return (
-            <div className="flex flex-col ml-2 items-center">
+            <div className="flex flex-col ml-2 items-center mt-2">
               <input
                 type="checkbox"
                 checked={isChecked}
@@ -181,8 +185,8 @@ function CompanyLeadContactsSelectionAgGrid({
         <FormHeader
           onClose={onClose}
           icon={Contact2Icon}
-          preText="Add Lead Contacts for this task"
-          description="Select and add lead contacts to associate with this task for better follow-up."
+          preText={isUsedForMeetings ? "Add lead contacts in your meeting" : "Add Lead Contacts for this task"}
+          description={isUsedForMeetings ? "Select and add lead contacts to associate with this lead in your meeting for better follow-up." : "Select and add lead contacts to associate with this task for better follow-up."}
           />
           </div>
 

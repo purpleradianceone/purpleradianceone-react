@@ -1,6 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Clock, Handshake, Link, Mail, Phone, Save, User, UserRoundPlus, X } from "lucide-react";
+import {
+  Clock,
+  Handshake,
+  Link,
+  Mail,
+  Phone,
+  Save,
+  User,
+  UserRoundPlus,
+  X,
+} from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
@@ -418,15 +428,16 @@ function CreateLeadModal({
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
           <div className="flex flex-col space-y-1">
             {/* <div className=""> */}
-              <FormInput
+            <FormInput
               label="Name:"
-              logo={User}                type="text"
-                name="name"
-                placeholder="Enter Name: "
-                value={createLeadModalFormData.name}
-                onChange={handleCreateLeadModalFormDataChange}
-              />
-              {/* <label className={createLeadLabelCss} htmlFor="name">
+              logo={User}
+              type="text"
+              name="name"
+              placeholder="Enter Name: "
+              value={createLeadModalFormData.name}
+              onChange={handleCreateLeadModalFormDataChange}
+            />
+            {/* <label className={createLeadLabelCss} htmlFor="name">
                 Name:
               </label>
               <input
@@ -440,9 +451,9 @@ function CreateLeadModal({
             {/* </div> */}
             {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
             <div className="">
-               <FormInput
-               label="Email:"
-               logo={Mail}
+              <FormInput
+                label="Email:"
+                logo={Mail}
                 type="email"
                 name="email"
                 placeholder="Enter Email: "
@@ -466,10 +477,10 @@ function CreateLeadModal({
               onBlur={handleBlur}
             /> */}
             <div className="">
-               <FormInput
-               type="text"
-               label="Mobile Number:"
-               logo={Phone}
+              <FormInput
+                type="text"
+                label="Mobile Number:"
+                logo={Phone}
                 className={createLeadInputTagCss}
                 name="mobileNumber"
                 placeholder="Enter Mobile Number: "
@@ -481,19 +492,24 @@ function CreateLeadModal({
                 Mobile Number:
               </label>
               <input */}
-               
+
               {/* /> */}
               {error.mobileNumber && (
-                <div className="caption-custom-inactive">{error.mobileNumber}</div>
+                <div className="caption-custom-inactive">
+                  {error.mobileNumber}
+                </div>
               )}
             </div>
-            
+
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
-                <Button onClick={(e) => {
-                  e.preventDefault();
-                  handleCompanyUserPopUp();
-                  }} type="submit">
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCompanyUserPopUp();
+                  }}
+                  type="submit"
+                >
                   <div className="flex gap-1 items-center whitespace-nowrap">
                     <UserRoundPlus size={16} />
                     <span>Assign Lead Owner</span>
@@ -508,8 +524,8 @@ function CreateLeadModal({
               </div>
 
               <span className="caption-custom">
-                <span className="">Note :</span> If a lead owner is
-                not selected, then lead will be assigned to the lead
+                <span className="">Note :</span> If a lead owner is not
+                selected, then lead will be assigned to the lead
                 <span className=""> Creator</span> by default.
               </span>
             </div>
@@ -517,8 +533,8 @@ function CreateLeadModal({
             {/* Lead Status */}
             <div className="space-y-1">
               <CustomDropdown
-              logo={Clock}
-              requiredRedDot
+                logo={Clock}
+                requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
@@ -533,8 +549,8 @@ function CreateLeadModal({
             {/* Lead Source */}
             <div className="space-y-1">
               <CustomDropdown
-              logo={Link}
-              requiredRedDot
+                logo={Link}
+                requiredRedDot
                 labelName="Lead Source :"
                 options={leadSource!}
                 onSelect={handleLeadSelectedSource}
@@ -549,9 +565,7 @@ function CreateLeadModal({
 
           <div className="flex justify-end ">
             <div className="flex gap-2">
-              <Button  
-              onClick={onClose}
-              type="button">
+              <Button onClick={onClose} type="button">
                 <div className="flex items-center gap-0.5">
                   <X size={16} />
                   <span>Cancel</span>
@@ -568,11 +582,12 @@ function CreateLeadModal({
         </form>
       </div>
 
-      {openPopUpOfCompanyUserModal && createPortal(
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-            {/* Header with Close Button */}
-            {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
+      {openPopUpOfCompanyUserModal &&
+        createPortal(
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+              {/* Header with Close Button */}
+              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">
                 Select Company User
               </h3>
@@ -584,26 +599,26 @@ function CreateLeadModal({
               </button>
             </div> */}
 
-              
-            <FormHeader
-            icon={UserRoundPlus}
-            onClose={() => setOpenPopUpOfCompanyUserModal(false)}
-            preText="Select Company User"
-            description="Select the user to assign him/her as lead owner"
-            />
-            {/* NOTE : CALL TO THE MODAL COMPONENT */}
-            <div className="p-1">
-              <GetCompanyUsersForLead
-                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
-                }
+              <FormHeader
+                icon={UserRoundPlus}
+                onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+                preText="Select Company User"
+                description="Select the user to assign him/her as lead owner"
               />
+              {/* NOTE : CALL TO THE MODAL COMPONENT */}
+              <div className="p-1">
+                <GetCompanyUsersForLead
+                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                  handleSelectedCompanyUserChange={
+                    handleSelectedCompanyUserChange
+                  }
+                  isUsedForSettings={false}
+                />
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

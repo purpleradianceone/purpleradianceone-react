@@ -388,6 +388,7 @@ function LeadManagementList({
                   handleSelectedCompanyUserChange={
                     handleSelectedCompanyUserCheckBoxChange
                   }
+                  isUsedForSettings={true}
                 />
               </div>
             </div>

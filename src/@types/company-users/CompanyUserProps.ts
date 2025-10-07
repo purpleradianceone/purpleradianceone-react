@@ -11,6 +11,7 @@
   updatedby ?: string,
   updatedon? : string,
   password?: string,
+  all_leads_visible? :boolean;
 };
 
 export default CompanyUsersSearchProps;

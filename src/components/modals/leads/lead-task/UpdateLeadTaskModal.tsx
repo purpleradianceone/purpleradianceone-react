@@ -113,7 +113,8 @@ function UpdateLeadTaskModal({
 
   useEffect(() => {
     const leadDetailsJsonData = JSON.parse(leadTask.leadActivityDetails);
-    if (leadDetailsJsonData.leadContact) {
+    if(leadDetailsJsonData){
+        if (leadDetailsJsonData.leadContact) {
       const leadContacts = leadDetailsJsonData.leadContact;
 
       if (leadContacts.length !== 0) {
@@ -129,6 +130,8 @@ function UpdateLeadTaskModal({
       const leadAddress = leadDetailsJsonData.address;
       setPhysicalMeetingAddress(leadAddress);
     }
+    }
+    
 
     if (parsedDate instanceof Date && !isNaN(parsedDate.getTime())) {
       setDueDate(format(parsedDate, "yyyy-MM-dd"));
@@ -524,7 +527,7 @@ function UpdateLeadTaskModal({
               options={leadTaskStage}
               selectedValue={leadTask.leadTaskStageId}
             ></CustomDropdown>
-            {leadActivityId !== 3 && (
+            {leadActivityId !== 3 && leadActivityId !== 8 && (
               // <div className="flex justify-between col-span-3 mb-0">
               //   <label
               //     htmlFor="phoneCallBtn"
@@ -824,6 +827,7 @@ function UpdateLeadTaskModal({
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={false}
         />
       )}
 
