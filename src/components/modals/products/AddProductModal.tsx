@@ -14,7 +14,12 @@ import {
   Text,
   X,
 } from "lucide-react";
-import { STATUS_CODE, TAX_CODE } from "../../../constants/AppConstants";
+import {
+  GAP,
+  OPACITY,
+  STATUS_CODE,
+  TAX_CODE,
+} from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -90,16 +95,23 @@ function AddProductModal({
 
   const { userHasAccessToAddProduct } = useUserAccessModules();
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
-    useState<number>(0);
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number | undefined>(0);
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -113,112 +125,232 @@ function AddProductModal({
     "registration"
   );
 
+  const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
+    useState<boolean>();
+
+  const [
+    selectedWarrantyIntervalTypeIdError,
+    setSelectedWarrantyIntervalTypeIdError,
+  ] = useState<boolean>();
+
+  const [selectedDefaultWarrantyError, setSelectedDefaultWarrantyError] =
+    useState<boolean>();
+
+  const [selectedAmcIntervalTypeIdError, setSelectedAmcIntervalTypeIdError] =
+    useState<boolean>();
+  const [selectedDefaultAmcError, setSelectedDefaultAmcError] =
+    useState<boolean>();
+
+  function validateDropdown() {
+    if (addProductFormData.name !== "" && addProductFormData.code !== "") {
+      if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+        setSelectedProductTypeIdError(true);
+                      toast.error("Please select 'Product Type'");
+
+      } else {
+        setSelectedProductTypeIdError(false);
+        if (
+          selectedWarrantyIntervalTypeId === 0 ||
+          selectedWarrantyIntervalTypeId === undefined
+        ) {
+          setSelectedWarrantyIntervalTypeIdError(true);
+                        toast.error("Please select 'Warranty Time Unit'");
+
+        } else {
+          setSelectedWarrantyIntervalTypeIdError(false);
+          if (
+            selectedDefaultWarranty === 0 ||
+            selectedDefaultWarranty === undefined
+          ) {
+            setSelectedDefaultWarrantyError(true);
+                          toast.error("Please select 'Warranty Duration'");
+
+          } else {
+            setSelectedDefaultWarrantyError(false);
+            if (
+              selectedAmcIntervalTypeId === 0 ||
+              selectedAmcIntervalTypeId === undefined
+            ) {
+              setSelectedAmcIntervalTypeIdError(true);
+                            toast.error("Please select 'AMC Time Unit'");
+
+            } else {
+              setSelectedAmcIntervalTypeIdError(false);
+              if (
+                selectedDefaultAmc === 0 ||
+                selectedDefaultAmc === undefined
+              ) {
+                setSelectedDefaultAmcError(true);
+                              toast.error("Please select 'AMC Cycle Duration'");
+
+
+              } else {
+                setSelectedDefaultAmcError(false);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  useEffect(() => {
+    validateDropdown();
+  }, [
+    selectedProductTypeId,
+    selectedWarrantyIntervalTypeId,
+    selectedDefaultWarranty,
+    selectedAmcIntervalTypeId,
+    selectedDefaultAmc,
+  ]);
+
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (addProductFormData.name !== "" || addProductFormData.code !== "") {
-      if (
-        (addProductFormData.hsn !== "" || addProductFormData.sac !== "") &&
-        (addProductFormData.taxRate === 0 ||
-          addProductFormData.validFrom === "")
-      ) {
-        toast.error("Please insert Tax Rate and Valid From");
-        return;
-      } else {
-        let formattedDate: string = "";
-        if (addProductFormData.validFrom) {
-          const dateObj = new Date(addProductFormData.validFrom);
-          const day = dateObj.getDate();
-          const month = dateObj
-            .toLocaleString("defalut", { month: "short" })
-            .toLowerCase();
-          const year = dateObj.getFullYear();
-          formattedDate = `${day}-${month}-${year}`;
-        }
-        let taxRateDecimal: number = 0;
-        if (addProductFormData.taxRate) {
-          taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
-        }
-        const addProductPostData = {
-          company_id: loginStatus.companyId,
-          product_type_id:
-            selectedProductTypeId ?? addProductFormData.productTypeId,
-          default_warranty_interval_type_id: selectedWarrantyIntervalTypeId,
-          default_warranty: selectedDefaultWarranty,
-          default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
-          default_amc_cycle: selectedDefaultAmc,
-          name: addProductFormData.name,
-          code: addProductFormData.code,
-          cost: addProductFormData.cost,
-          description: addProductFormData.description,
-          version: addProductFormData.version,
-          url: addProductFormData.url,
-          hsn: addProductFormData.hsn,
-          sac: addProductFormData.sac,
-          tax_rate: taxRateDecimal,
-          valid_from_string: formattedDate,
-          createdby_id: loginStatus.id,
-        };
-        console.log(addProductPostData);
-        await axios
-          .post(POST_API.ADD_PRODUCT, addProductPostData, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.data.status) {
-              toast.success(response.data.message);
-              handleProductChangeOnAdd(addProductFormData);
-              setTimeout(() => {
-                onClose();
-              }, 500);
-            } else {
-              toast.error(response.data.message);
-            }
-          })
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .catch(async (error: ApiError | any) => {
-            if (error.status === STATUS_CODE.UNATHORISED) {
-              const refreshTokenResponse = await RefreshToken({
-                callFunctionWithEvent: handleAddProductFormSubmit,
+    validateDropdown();
+    if (userHasAccessToAddProduct) {
+      if (addProductFormData.name !== "" || addProductFormData.code !== "") {
+        if (
+          (addProductFormData.hsn !== "" || addProductFormData.sac !== "") &&
+          (addProductFormData.taxRate === 0 ||
+            addProductFormData.validFrom === "")
+        ) {
+          toast.error("Please insert Tax Rate and Valid From");
+          return;
+        } else {
+          let formattedDate: string = "";
+          if (addProductFormData.validFrom) {
+            const dateObj = new Date(addProductFormData.validFrom);
+            const day = dateObj.getDate();
+            const month = dateObj
+              .toLocaleString("defalut", { month: "short" })
+              .toLowerCase();
+            const year = dateObj.getFullYear();
+            formattedDate = `${day}-${month}-${year}`;
+          }
+          let taxRateDecimal: number = 0;
+          if (addProductFormData.taxRate) {
+            taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
+          }
+          if (
+            selectedProductTypeId !== 0 && selectedProductTypeId !== undefined &&
+            selectedWarrantyIntervalTypeId !== 0 && selectedWarrantyIntervalTypeId !== undefined&&
+            selectedDefaultWarranty !== 0 && selectedDefaultWarranty !== undefined&&
+            selectedAmcIntervalTypeId !== 0 && selectedAmcIntervalTypeId !== undefined &&
+            selectedDefaultAmc !== 0 && selectedDefaultAmc !== undefined &&
+            addProductFormData.cost !== null
+          ) {
+            const addProductPostData = {
+              company_id: loginStatus.companyId,
+              product_type_id: selectedProductTypeId,
+              default_warranty_interval_type_id: selectedWarrantyIntervalTypeId,
+              default_warranty: selectedDefaultWarranty,
+              default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
+              default_amc_cycle: selectedDefaultAmc,
+              name: addProductFormData.name,
+              code: addProductFormData.code,
+              cost: addProductFormData.cost,
+              description: addProductFormData.description,
+              version: addProductFormData.version,
+              url: addProductFormData.url,
+              hsn: addProductFormData.hsn,
+              sac: addProductFormData.sac,
+              tax_rate: taxRateDecimal,
+              valid_from_string: formattedDate,
+              createdby_id: loginStatus.id,
+            };
+            console.log(addProductPostData);
+            await axios
+              .post(POST_API.ADD_PRODUCT, addProductPostData, {
+                withCredentials: true,
+              })
+              .then((response) => {
+                if (response.data.status) {
+                  toast.success(response.data.message);
+                  handleProductChangeOnAdd(addProductFormData);
+                  setTimeout(() => {
+                    onClose();
+                  }, 500);
+                } else {
+                  toast.error(response.data.message);
+                }
+              })
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .catch(async (error: ApiError | any) => {
+                if (error.status === STATUS_CODE.UNATHORISED) {
+                  const refreshTokenResponse = await RefreshToken({
+                    callFunctionWithEvent: handleAddProductFormSubmit,
+                  });
+                  if (refreshTokenResponse) {
+                    handleAddProductFormSubmit(event);
+                  }
+                }
               });
-              if (refreshTokenResponse) {
-                handleAddProductFormSubmit(event);
-              }
-            }
-          });
+          } 
+          // else {
+          //   if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+          //     toast.error("Please select 'Product Type'");
+          //   } else if (selectedWarrantyIntervalTypeId === 0 || selectedWarrantyIntervalTypeId === undefined) {
+          //     toast.error("Please select 'Warranty Time Unit'");
+          //   } else if (selectedDefaultWarranty === 0 || selectedDefaultWarranty === undefined) {
+          //     toast.error("Please select 'Warranty Duration'");
+          //   } else if (selectedAmcIntervalTypeId === 0 || selectedAmcIntervalTypeId === undefined) {
+          //     toast.error("Please select 'AMC Time Unit'");
+          //   } else if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
+          //     toast.error("Please select 'AMC Cycle Duration'");
+          //   }
+          // }
+        }
       }
+    } else {
+      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
     }
   };
+
+  function clearCreateForm() {
+    setSelectedProductTypeId(0);
+    setWarrantyIntervalTypeId(0);
+    setDefaultWarranty(0);
+    setAmcIntervalTypeId(0);
+    setDefaultAmc(0);
+    setSelectedDefaultAmcError(false);
+    setSelectedAmcIntervalTypeIdError(false);
+    setSelectedDefaultWarrantyError(false);
+    setSelectedWarrantyIntervalTypeIdError(false);
+    setSelectedProductTypeIdError(false);
+    setInitialAddProductFormData({
+      count: 0,
+      id: 0,
+      companyId: 0,
+      productTypeId: 0,
+      productTypeName: "",
+      defaultWarrantyIntervalTypeId: 0,
+      defaultWarranty: 0,
+      defaultWarrantyName: "",
+      defaultAmcCycleIntervalTypeId: 0,
+      defaultAmcCycle: 0,
+      defaultAmcCycleName: "",
+      name: "",
+      code: "",
+      cost: 0,
+      description: "",
+      version: "",
+      url: "",
+      isActive: false,
+      hsn: "",
+      sac: "",
+      taxRate: 0,
+      validFrom: "",
+      createdBy: "",
+      createdOn: "",
+    });
+
+    addProductFormData.description = "";
+  }
   useEffect(() => {
-    if (!isOpen) {
-      setInitialAddProductFormData({
-        count: 0,
-        id: 0,
-        companyId: 0,
-        productTypeId: 0,
-        productTypeName: "",
-        defaultWarrantyIntervalTypeId: 0,
-        defaultWarranty: 0,
-        defaultWarrantyName: "",
-        defaultAmcCycleIntervalTypeId: 0,
-        defaultAmcCycle: 0,
-        defaultAmcCycleName: "",
-        name: "",
-        code: "",
-        cost: 0,
-        description: "",
-        version: "",
-        url: "",
-        isActive: false,
-        hsn: "",
-        sac: "",
-        taxRate: 0,
-        validFrom: "",
-        createdBy: "",
-        createdOn: "",
-      });
-    }
+    // if (!isOpen) {
+    clearCreateForm();
+    // }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -227,8 +359,8 @@ function AddProductModal({
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pt-10   pr-2 overflow-hidden bg-black bg-opacity-5"
-          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
+          ? `fixed inset-0 z-50 pt-10   pr-2 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
+          : `fixed inset-0 z-50 p-6 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
       }
     >
       <div className="flex min-h-screen  items-center justify-center">
@@ -241,7 +373,10 @@ function AddProductModal({
           <div className="p-4">
             <FormHeader
               icon={Store}
-              onClose={onClose}
+              onClose={() => {
+                clearCreateForm();
+                onClose();
+              }}
               preText="Add New Product"
               description="Enter the necessary product details to add a new product to the CRM."
             />
@@ -314,89 +449,113 @@ function AddProductModal({
                     value={addProductFormData.cost?.toString()}
                     placeholder="Product Price"
                     onChange={handleAddProductFormDataChange}
+                    error={errors.cost}
                   />
                   <FormInput
                     label="Item Code : "
                     logo={LucideAirplay}
                     type="text"
                     name="code"
-                    required={true}
                     value={addProductFormData.code}
                     placeholder="Product Item Code"
                     onChange={handleAddProductFormDataChange}
                     onBlur={handleBlur}
+                    required={true}
                     error={errors.code}
                   />
-                  <CustomDropdown
-                    labelName="Product Type :"
-                    logo={LucideGroup}
-                    preselectedOption={0}
-                    onSelect={(e) => {
-                      if (e) {
+                  <div className="mt-2">
+                    <CustomDropdown
+                      labelName="Product Type :"
+                      logo={LucideGroup}
+                      preselectedOption={0}
+                      onSelect={(e) => {
+                        console.log(e);
                         setSelectedProductTypeId(e);
-                      }else{
-                        setSelectedProductTypeId(0);
-                      }
-                    }}
-                    options={productTypeData}
-                    
-                    requiredRedDot={true}
-                  />
-
+                      }}
+                      options={productTypeData}
+                      requiredRedDot={true}
+                    />
+                    {selectedProductTypeIdError && (
+                      <div className="caption-custom-inactive">
+                        Product Type is required
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <CustomDropdown
-                    labelName="Warranty Duration"
-                    logo={LucideClock}
-                    preselectedOption={0}
-                    onSelect={(e) => {
-                      if (e) {
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div>
+                    <CustomDropdown
+                      labelName="Warranty Duration"
+                      logo={LucideClock}
+                      preselectedOption={0}
+                      onSelect={(e) => {
                         setDefaultWarranty(e);
-                      }
-                    }}
-                    options={rangeOfNumber}
-                    requiredRedDot={true}
-                  />
-                  <CustomDropdown
-                    labelName="Warranty Time Unit"
-                    logo={LucideTimer}
-                    preselectedOption={0}
-                    onSelect={(e) => {
-                      if (e) {
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    {selectedDefaultWarrantyError && (
+                      <div className="caption-custom-inactive">
+                        Warranty Duration is required
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <CustomDropdown
+                      labelName="Warranty Time Unit"
+                      logo={LucideTimer}
+                      preselectedOption={0}
+                      onSelect={(e) => {
                         setWarrantyIntervalTypeId(e);
-                      }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                    {selectedWarrantyIntervalTypeIdError && (
+                      <div className="caption-custom-inactive">
+                        Warranty Time Unit is required
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <CustomDropdown
-                    labelName="AMC Cycle Duration"
-                    logo={LucideClock}
-                    preselectedOption={0}
-                    onSelect={(e) => {
-                      if (e) {
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div>
+                    <CustomDropdown
+                      labelName="AMC Cycle Duration"
+                      logo={LucideClock}
+                      preselectedOption={0}
+                      onSelect={(e) => {
                         setDefaultAmc(e);
-                      }
-                    }}
-                    options={rangeOfNumber}
-                    requiredRedDot={true}
-                  />
-                  <CustomDropdown
-                    labelName="AMC Time Unit"
-                    logo={LucideTimer}
-                    preselectedOption={0}
-                    onSelect={(e) => {
-                      if (e) {
+                      }}
+                      options={rangeOfNumber}
+                      requiredRedDot={true}
+                    />
+                    {selectedDefaultAmcError && (
+                      <div className="caption-custom-inactive">
+                        AMC Cycle Duration is required
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <CustomDropdown
+                      labelName="AMC Time Unit"
+                      logo={LucideTimer}
+                      preselectedOption={0}
+                      onSelect={(e) => {
                         setAmcIntervalTypeId(e);
-                      }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
+                      }}
+                      options={intervalTypeData}
+                      requiredRedDot={true}
+                    />
+                    {selectedAmcIntervalTypeIdError && (
+                      <div className="caption-custom-inactive">
+                        AMC Time Unit is required
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -453,9 +612,17 @@ function AddProductModal({
                 error={errors.validFrom}
               />
 
-              {userHasAccessToAddProduct ? (
-                <div className="flex justify-self-end col-span-2 gap-2">
-                  <Button type="button" onClick={onClose}>
+              {
+                <div
+                  className={`flex justify-self-end col-span-2 ${GAP.POPUP_GAP_BETWEEN_BUTTONS}`}
+                >
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      clearCreateForm();
+                      onClose();
+                    }}
+                  >
                     <div className="flex items-center justify-center gap-0.5">
                       <X size={16} />
                       Cancel
@@ -468,29 +635,7 @@ function AddProductModal({
                     </div>
                   </Button>
                 </div>
-              ) : (
-                <div className="flex justify-self-center col-span-2  gap-2 pt-4">
-                  <Button type="button" onClick={onClose}>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <X size={16} />
-                      Cancel
-                    </div>
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    onClick={() => {
-                      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                    }}
-                    disabled
-                  >
-                    <div className="flex items-center justify-center gap-1">
-                      <Save size={16} />
-                      Save
-                    </div>
-                  </Button>
-                </div>
-              )}
+              }
             </form>
           </div>
         </div>

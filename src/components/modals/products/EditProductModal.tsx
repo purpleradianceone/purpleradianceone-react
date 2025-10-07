@@ -465,7 +465,8 @@ function EditCompanyProductModal({
                       onBlur={handleBlur}
                       error={errors.code}
                     />
-                    <CustomDropdown
+                    <div className="mt-2">
+                      <CustomDropdown
                       labelName="Product Type"
                       logo={LucideGroup}
                       preselectedOption={
@@ -479,8 +480,10 @@ function EditCompanyProductModal({
                       options={productTypeData}
                       requiredRedDot={true}
                     />
+                    </div>
+                    
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 mt-2">
                     <CustomDropdown
                       logo={LucideClock}
                       labelName="Warranty Duration"
@@ -510,7 +513,7 @@ function EditCompanyProductModal({
                       requiredRedDot={true}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 mt-2">
                     <CustomDropdown
                       logo={LucideClock}
                       labelName="AMC Cycle Duration"
