@@ -827,6 +827,7 @@ function UpdateLeadTaskModal({
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={false}
         />
       )}
 

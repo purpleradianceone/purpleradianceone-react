@@ -104,6 +104,10 @@ const MeetingScheduler = () => {
 
   const [addCompanyLeadContactIdArray, setAddCompanyLeadContactIdArray] =
     useState<number[]>([]);
+  const [
+    addCompanyLeadContactDetailsArray,
+    setAddCompanyLeadContactDetailsArray,
+  ] = useState<LeadContactType[]>([]);
 
   const navigate = useNavigate();
   const { googleMeetStatus } = useGoogleMeetContext();
@@ -502,11 +506,28 @@ const MeetingScheduler = () => {
     }
   };
 
-  const handleRemoveAttendee = (email: string, id: number) => {
+  const handleRemoveAttendee = (
+    email: string,
+    id: number,
+    type: "user" | "leadContact" | "normal"
+  ) => {
+    console.log("remove lead attanfosdn");
+    console.log(email);
+    console.log(id);
     setAttendees(attendees.filter((attendee) => attendee !== email));
-    setSelectedCompanyUsersIdArray((prev) =>
-      prev.filter((userId) => userId !== id)
-    );
+    if (type === "user") {
+      setSelectedCompanyUsersIdArray((prev) =>
+        prev.filter((userId) => userId !== id)
+      );
+      setSelectedCompanyUserDetailArray((prev) => prev.filter((user) => user.id !== id));
+    }
+
+    if (type === "leadContact") {
+      setAddCompanyLeadContactIdArray((prev) =>
+        prev.filter((userId) => userId !== id)
+      );
+      setAddCompanyLeadContactDetailsArray((prev) => prev.filter((contact) => contact.id !== id));
+    }
   };
 
   const generateTimeOptions = () => {
@@ -559,6 +580,7 @@ const MeetingScheduler = () => {
     if (event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
       setAttendees((prev) => [...prev, data.email]);
+      setAddCompanyLeadContactDetailsArray((prev) => [...prev, data]);
     } else if (event.target.checked && !data.email) {
       // showMessageSnackbar({
       //   message: "please add email for contact and then try again",
@@ -568,6 +590,9 @@ const MeetingScheduler = () => {
     } else if (!event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) =>
         prev.filter((id) => id !== data.id)
+      );
+      setAddCompanyLeadContactDetailsArray((prev) =>
+        prev.filter((contact) => contact.id !== data.id)
       );
       setAttendees((prev) => prev.filter((email) => email !== data.email));
     }
@@ -692,10 +717,7 @@ const MeetingScheduler = () => {
           </div>
 
           <div className="mt-2 col-span-2">
-            <label
-              htmlFor="startTime"
-              className="input-label-custom"
-            >
+            <label htmlFor="startTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>Start Time</span>
@@ -727,10 +749,7 @@ const MeetingScheduler = () => {
           </div>
 
           <div className="mt-2 col-span-2">
-            <label
-              htmlFor="endTime"
-               className="input-label-custom"
-            >
+            <label htmlFor="endTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>End Time</span>
@@ -761,13 +780,11 @@ const MeetingScheduler = () => {
             onChange={(e) => {
               setDescription(e.target.value);
             }}
-           logo={Text}
+            logo={Text}
           />
         </div>
         <div className="mb-1">
-          <div
-            className="grid grid-cols-9 gap-2"
-          >
+          <div className="grid grid-cols-9 gap-2">
             <div className="col-span-8">
               <FormInput
                 type="email"
@@ -781,7 +798,7 @@ const MeetingScheduler = () => {
             </div>
             <div className="col-span-1 mt-7">
               <Button
-              type="submit"
+                type="submit"
                 onClick={(e) => {
                   e.preventDefault();
                   handleAddAttendee();
@@ -790,45 +807,53 @@ const MeetingScheduler = () => {
               >
                 {/* <Plus className="h-6 w-4" /> */}
                 <div className="flex gap-0.5">
-                      <Plus className="h-4 w-4 mt-0.5" />
-                    <span>Add</span>
-                    </div>
+                  <Plus className="h-4 w-4 mt-0.5" />
+                  <span>Add</span>
+                </div>
               </Button>
             </div>
-           
-            
           </div>
-          <div className={isModalForLead 
-          ? "grid grid-cols-9 gap-2 mt-1"
-          : "grid grid-cols-9 gap-2 mt-1"
-        }>
-            <div className={isModalForLead 
-            ? "col-span-7 input-label-custom mt-2"
-            : "col-span-8 input-label-custom mt-2"
-          }>
+          <div
+            className={
+              isModalForLead
+                ? "grid grid-cols-9 gap-2 mt-1"
+                : "grid grid-cols-9 gap-2 mt-1"
+            }
+          >
+            <div
+              className={
+                isModalForLead
+                  ? "col-span-7 input-label-custom mt-2"
+                  : "col-span-8 input-label-custom mt-2"
+              }
+            >
               <span className="flex gap-2 items-start">
-                <UserPlus size={14} className="inline mt-0.5 text-blue-500"/>
-                <span>{isModalForLead ? "Select company users and lead contacts to be added into the meeting" : "Select company users to be added into the meeting"}</span>
+                <UserPlus size={14} className="inline mt-0.5 text-blue-500" />
+                <span>
+                  {isModalForLead
+                    ? "Select company users and lead contacts to be added into the meeting"
+                    : "Select company users to be added into the meeting"}
+                </span>
               </span>
             </div>
-             <div className="col-span-1 max-w-24">
+            <div className="col-span-1 max-w-24">
               <Button
-              type="submit"
+                type="submit"
                 onClick={(e) => {
                   e.preventDefault();
                   setIsAddCompanyUserEmailAttedeesModalOpen(true);
                 }}
               >
                 <div className="flex gap-0.5">
-                      <UserPlus className="h-4 w-4 mt-0.5" />
-                    <span>Users</span>
-                    </div>
+                  <UserPlus className="h-4 w-4 mt-0.5" />
+                  <span>Users</span>
+                </div>
               </Button>
             </div>
             {isModalForLead && (
               <div className="col-span-1 max-w-24">
                 <Button
-                type="submit"
+                  type="submit"
                   onClick={(e) => {
                     e.preventDefault();
                     setIsAddCompanyLeadContactModalOpen(true);
@@ -836,13 +861,12 @@ const MeetingScheduler = () => {
                 >
                   {/* <Contact2 className="h-6 w-4" /> */}
                   <div className="flex gap-0.5">
-                      <Contact2 className="h-4 w-4 mt-0.5" />
+                    <Contact2 className="h-4 w-4 mt-0.5" />
                     <span>Contact</span>
-                    </div>
+                  </div>
                 </Button>
               </div>
             )}
-          
           </div>
           {attendees.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
@@ -859,15 +883,38 @@ const MeetingScheduler = () => {
                     <Button
                       size="sm"
                       onClick={() => {
-                        selectedCompanyUserDetailArray.map((user) => {
-                          if (user.email === attendee) {
-                            handleRemoveAttendee(attendee, user.id);
-                            return;
-                          } else {
-                            handleRemoveAttendee(attendee, 0);
-                            return;
+                        const userRemoved = selectedCompanyUserDetailArray.some(
+                          (user) => {
+                            if (user.email === attendee) {
+                              handleRemoveAttendee(attendee, user.id, "user");
+                              return true;
+                            }
+                            return false;
                           }
-                        });
+                        );
+
+                        if (userRemoved) {
+                          return;
+                        }
+
+                        const contactRemoved =
+                          addCompanyLeadContactDetailsArray.some((contact) => {
+                            if (contact.email === attendee) {
+                              handleRemoveAttendee(
+                                attendee,
+                                contact.id,
+                                "leadContact"
+                              );
+                              return true;
+                            }
+                            return false;
+                          });
+
+                        if (contactRemoved) {
+                          return;
+                        }
+
+                        handleRemoveAttendee(attendee, 0, "normal");
                       }}
                       className="text-gray-600 hover:text-red-500"
                     >
@@ -883,20 +930,20 @@ const MeetingScheduler = () => {
         <div className="flex justify-end gap-3">
           <div className="max-w-28 mt-1 place-self-center">
             <Button
-            type="button"
+              type="button"
               onClick={() => {
                 handleCloseMeetingModal();
               }}
             >
               <div className="flex items-center justify-center gap-1">
-                     <X size={16}/>
-                    Cancel
-                   </div>
+                <X size={16} />
+                Cancel
+              </div>
             </Button>
           </div>
           <div className="max-w-48 mt-1 place-self-center">
             <Button
-            type="submit"
+              type="submit"
               onClick={(e) => {
                 e.preventDefault();
                 if (selectedMeetingPlatform === meetingPlatform[0].name) {
@@ -923,15 +970,13 @@ const MeetingScheduler = () => {
                   toast.error("Select the Meeting platform first.");
                 }
               }}
-              disabled={
-                isCreating
-              }
+              disabled={isCreating}
             >
               {/* {isCreating ? "Creating..." : "Save"} */}
-               <div className="flex items-center justify-center gap-1">
-                     <Save size={16}/>
-                    {isCreating ? "Saving..." : "Save"}
-                   </div>
+              <div className="flex items-center justify-center gap-1">
+                <Save size={16} />
+                {isCreating ? "Saving..." : "Save"}
+              </div>
             </Button>
           </div>
         </div>
@@ -958,6 +1003,7 @@ const MeetingScheduler = () => {
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={true}
         />
       )}
     </div>,
