@@ -268,6 +268,10 @@ function UpdateLeadTaskModal({
       toast.error("Not made changes to task");
       return;
     }
+    else if (assignedTo.length === 0) {
+      toast.error("You haven't assigned a task yet, please assign it first");
+      return;
+    }
 
     const updateLeadTaskPostData = {
       company_id: loginStatus.companyId,
@@ -719,7 +723,7 @@ function UpdateLeadTaskModal({
             </div>
             {/* status  */}
           </div>
-          <div className=" flex w-28 items-center text-nowrap gap-6">
+          {/* <div className=" flex w-28 items-center text-nowrap gap-6">
             <div className="flex gap-2 text-center">
               <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
               <span>Assign Users : </span>
@@ -733,10 +737,51 @@ function UpdateLeadTaskModal({
             >
               <span className="flex gap-2">
                 <UserPlus size={14}></UserPlus>
-                <span></span>
+                <span>Assign Users</span>
               </span>
             </Button>
-          </div>
+          </div> */}
+          
+            <div className="flex items-center gap-4  mb-0">
+                <label htmlFor="assignUsersBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <User className="text-blue-600 mt-0.5" size={16} />
+                    <span>Assign Users : </span>
+                  </div>
+                </label>
+                <div id="assignUsersBtn" className=" max-w-32 m-0">
+                  {/* <Button
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
+                    </span>
+                  </Button> */}
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
+                >
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center text-nowrap"
+                  >
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
+                  </span>
+                </Button>
+                </div>
+              </div>
 
           {selectedCompanyUsers.length != 0 && (
             <div className="grid grid-cols-3 input-label-custom">
