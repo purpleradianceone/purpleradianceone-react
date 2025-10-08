@@ -142,7 +142,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
           >
             +Add
           </button>
-          <span className="caption-custom">No company account type available.</span>
+          <span className="italic caption-custom">No company account type available.</span>
         </div>
       </div>
     ) : (

@@ -169,43 +169,80 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "name" && !name.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        name: "Name is required",
-      }));
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        name: "",
-      }));
-    }
-    if (name === "email" && !VALIDATIONS.EMAIL.test(value) && value !== "") {
-      setErrors((prev) => ({
-        ...prev,
-        email: "please enter valid email address.",
-      }));
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        email: "",
-      }));
-    }
-    if (
-      name === "mobilenumber" &&
-      !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
-      value.length !== 0
-    ) {
-      setErrors((prev) => ({
-        ...prev,
-        mobileNumber: "Please enter a valid mobile number.",
-      }));
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        mobileNumber: "",
-      }));
-    }
+    if (name === "name") {
+  if (!value.trim()) {
+    setErrors(prev => ({ ...prev, name: "Name is required" }));
+  } else {
+    setErrors(prev => ({ ...prev, name: "" }));
+  }
+}
+
+if (name === "email") {
+  if(!value.trim()){
+    setErrors((prev ) =>({
+      ...prev, email :"Email is required"
+    }))
+  }
+  else if (!VALIDATIONS.EMAIL.test(value) && value !== "") {
+    setErrors(prev => ({ ...prev, email: "Please enter valid email address." }));
+  } else {
+    setErrors(prev => ({ ...prev, email: "" }));
+  }
+}
+
+if (name === "mobilenumber") {
+   if(!value.trim()){
+    setErrors((prev ) =>({
+      ...prev, mobileNumber :"Mobile number is required"
+    }))
+  }
+  else if (
+    !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
+    value.length !== 0
+  ) {
+    setErrors(prev => ({ ...prev, mobileNumber: "Please enter a valid mobile number." }));
+  } else {
+    setErrors(prev => ({ ...prev, mobileNumber: "" }));
+  }
+}
+
+    // if (name === "name" && !value.trim()) {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     name: "Name is required",
+    //   }));
+    // } else {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     name: "",
+    //   }));
+    // }
+    // if (name === "email" && !VALIDATIONS.EMAIL.test(value) && value !== "") {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     email: "please enter valid email address.",
+    //   }));
+    // } else {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     email: "",
+    //   }));
+    // }
+    // if (
+    //   name === "mobilenumber" &&
+    //   !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
+    //   value.length !== 0
+    // ) {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     mobileNumber: "Please enter a valid mobile number.",
+    //   }));
+    // } else {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     mobileNumber: "",
+    //   }));
+    // }
   };
   const handleFormInputChange = (
     e:
@@ -218,7 +255,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       ...createAccountFormData,
       [name]: value.trim(),
     });
-    console.log(createAccountFormData);
   };
 
   // create function call
@@ -610,30 +646,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               </span>
 
               <div className="grid grid-cols-2 gap-y-2 p-4 max-h-56 overflow-auto">
-                {/* {companyAccountType && companyAccountType.length > 0 ? (
-      companyAccountType.map((item) => (
-        <div key={item.id} className="flex items-center">
-          <input
-            id={`account-type-${item.id}`}
-            name="companyAccountType"
-            type="checkbox"
-            value={item.id}
-            checked={companTypeId.includes(item.id)} // controlled checkbox
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            onChange={() => handleAccountTypeCheckboxChange}
-          />
-          <label
-            htmlFor={`account-type-${item.id}`}
-            className="ml-2 block text-xs text-gray-800"
-          >
-            {item.companyAccountTypeName}
-          </label>
-        </div>
-      ))
-    ) : (
-      <p className="text-xs text-gray-500 col-span-3">No account types available</p>
-    )} */}
-
                 {companyAccountType.length === 0 ? (
                   <h1>No account type available.</h1>
                 ) : (

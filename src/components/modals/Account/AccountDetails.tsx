@@ -974,7 +974,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         {/* Right Card - Empty for future use */}
         <div className="bg-white rounded-xl border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Contact
+            Account Contacts
           </h3>
           <AccountContact
            accountId={company.id} />

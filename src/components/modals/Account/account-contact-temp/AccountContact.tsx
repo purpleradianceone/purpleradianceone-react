@@ -443,7 +443,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             >
               +Add
             </button>
-            <span className="caption-custom">No contacts available.</span>
+            <span className=" italic caption-custom">No contacts available.</span>
           </div>
         </div>
       ) : (
