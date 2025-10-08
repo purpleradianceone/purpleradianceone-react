@@ -74,16 +74,23 @@ function EditCompanyProductModal({
     isActive: product.isActive,
   };
 
-  const [selectedProductTypeId, setSelectedProductTypeId] = useState<number>(0);
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
-    useState<number>(0);
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedDefaultWarranty, setDefaultWarranty] = useState<number>(0);
+  const [selectedDefaultWarranty, setDefaultWarranty] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<
+    number | undefined
+  >(0);
 
-  const [selectedDefaultAmc, setDefaultAmc] = useState<number>(0);
+  const [selectedDefaultAmc, setDefaultAmc] = useState<number | undefined>(0);
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
@@ -173,6 +180,84 @@ function EditCompanyProductModal({
     "registration"
   );
 
+  const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
+    useState<boolean>();
+
+  const [
+    selectedWarrantyIntervalTypeIdError,
+    setSelectedWarrantyIntervalTypeIdError,
+  ] = useState<boolean>();
+
+  const [selectedDefaultWarrantyError, setSelectedDefaultWarrantyError] =
+    useState<boolean>();
+
+  const [selectedAmcIntervalTypeIdError, setSelectedAmcIntervalTypeIdError] =
+    useState<boolean>();
+  const [selectedDefaultAmcError, setSelectedDefaultAmcError] =
+    useState<boolean>();
+
+  function validateDropdown() {
+    if (
+      updateCompanyProductFormData.name !== null &&
+      updateCompanyProductFormData.name.trim() !== "" &&
+      updateCompanyProductFormData.code !== null &&
+      updateCompanyProductFormData.code.trim() !== ""
+    ) {
+      if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+        setSelectedProductTypeIdError(true);
+        // toast.error("Please select 'Product Type'");
+      } else {
+        setSelectedProductTypeIdError(false);
+        if (
+          selectedWarrantyIntervalTypeId === 0 ||
+          selectedWarrantyIntervalTypeId === undefined
+        ) {
+          setSelectedWarrantyIntervalTypeIdError(true);
+          // toast.error("Please select 'Warranty Time Unit'");
+        } else {
+          setSelectedWarrantyIntervalTypeIdError(false);
+          if (
+            selectedDefaultWarranty === 0 ||
+            selectedDefaultWarranty === undefined
+          ) {
+            setSelectedDefaultWarrantyError(true);
+            // toast.error("Please select 'Warranty Duration'");
+          } else {
+            setSelectedDefaultWarrantyError(false);
+            if (
+              selectedAmcIntervalTypeId === 0 ||
+              selectedAmcIntervalTypeId === undefined
+            ) {
+              setSelectedAmcIntervalTypeIdError(true);
+              // toast.error("Please select 'AMC Time Unit'");
+            } else {
+              setSelectedAmcIntervalTypeIdError(false);
+              if (
+                selectedDefaultAmc === 0 ||
+                selectedDefaultAmc === undefined
+              ) {
+                setSelectedDefaultAmcError(true);
+                // toast.error("Please select 'AMC Cycle Duration'");
+              } else {
+                setSelectedDefaultAmcError(false);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    validateDropdown();
+  }, [
+    selectedProductTypeId,
+    selectedWarrantyIntervalTypeId,
+    selectedDefaultWarranty,
+    selectedAmcIntervalTypeId,
+    selectedDefaultAmc,
+  ]);
+
   const handleCompanyProductTaxChange = (status: boolean) => {
     if (status) {
       setCompanyProductTaxChangeCount((prev) => prev + 1);
@@ -189,7 +274,14 @@ function EditCompanyProductModal({
   ) => {
     event.preventDefault();
 
-    if (updateCompanyProductFormData.name !== "") {
+    if (
+      updateCompanyProductFormData.name !== "" &&
+      updateCompanyProductFormData.name !== null &&
+      updateCompanyProductFormData.name !== undefined &&
+      updateCompanyProductFormData.code !== "" &&
+      updateCompanyProductFormData.code !== null &&
+      updateCompanyProductFormData.code !== undefined
+    ) {
       if (
         updateCompanyProductFormData.code !==
           intialEditCompanyProductFormData.code ||
@@ -200,18 +292,23 @@ function EditCompanyProductModal({
         updateCompanyProductFormData.cost !==
           intialEditCompanyProductFormData.cost ||
         (selectedProductTypeId !== 0 &&
+          selectedProductTypeId !== undefined &&
           selectedProductTypeId !==
             intialEditCompanyProductFormData.product_type_id) ||
         (selectedWarrantyIntervalTypeId !== 0 &&
+          selectedWarrantyIntervalTypeId !== undefined &&
           selectedWarrantyIntervalTypeId !==
             intialEditCompanyProductFormData.default_warranty_interval_type_id) ||
         (selectedDefaultWarranty !== 0 &&
+          selectedDefaultWarranty !== undefined &&
           selectedDefaultWarranty !==
             intialEditCompanyProductFormData.default_warranty) ||
         (selectedAmcIntervalTypeId !== 0 &&
+          selectedAmcIntervalTypeId !== undefined &&
           selectedAmcIntervalTypeId !==
             intialEditCompanyProductFormData.default_amc_cycle_interval_type_id) ||
         (selectedDefaultAmc !== 0 &&
+          selectedDefaultAmc !== undefined &&
           selectedDefaultAmc !==
             intialEditCompanyProductFormData.default_amc_cycle) ||
         updateCompanyProductFormData.version !==
@@ -286,7 +383,34 @@ function EditCompanyProductModal({
           );
         }
       } else {
-        toast.error(MESSAGE.ERROR.NO_CHANGES);
+        if (
+          selectedProductTypeId === 0 ||
+          selectedProductTypeId === undefined
+        ) {
+          toast.error("Please select 'Product Type'");
+        } else if (
+          selectedWarrantyIntervalTypeId === 0 ||
+          selectedWarrantyIntervalTypeId === undefined
+        ) {
+          toast.error("Please select 'Warranty Time Unit'");
+        } else if (
+          selectedDefaultWarranty === 0 ||
+          selectedDefaultWarranty === undefined
+        ) {
+          toast.error("Please select 'Warranty Duration'");
+        } else if (
+          selectedAmcIntervalTypeId === 0 ||
+          selectedAmcIntervalTypeId === undefined
+        ) {
+          toast.error("Please select 'AMC Time Unit'");
+        } else if (
+          selectedDefaultAmc === 0 ||
+          selectedDefaultAmc === undefined
+        ) {
+          toast.error("Please select 'AMC Cycle Duration'");
+        } else {
+          toast.error(MESSAGE.ERROR.NO_CHANGES);
+        }
       }
     } else {
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
@@ -467,81 +591,105 @@ function EditCompanyProductModal({
                     />
                     <div className="mt-2">
                       <CustomDropdown
-                      labelName="Product Type"
-                      logo={LucideGroup}
-                      preselectedOption={
-                        intialEditCompanyProductFormData.product_type_id
-                      }
-                      onSelect={(e) => {
-                        if (e) {
+                        labelName="Product Type"
+                        logo={LucideGroup}
+                        preselectedOption={
+                          intialEditCompanyProductFormData.product_type_id
+                        }
+                        onSelect={(e) => {
                           setSelectedProductTypeId(e);
-                        }
-                      }}
-                      options={productTypeData}
-                      requiredRedDot={true}
-                    />
+                        }}
+                        options={productTypeData}
+                        requiredRedDot={true}
+                      />
+                      {selectedProductTypeIdError && (
+                        <div className="caption-custom-inactive">
+                          Product Type is required
+                        </div>
+                      )}
                     </div>
-                    
                   </div>
                   <div className="grid grid-cols-2 gap-3 mt-2">
-                    <CustomDropdown
-                      logo={LucideClock}
-                      labelName="Warranty Duration"
-                      preselectedOption={
-                        intialEditCompanyProductFormData.default_warranty
-                      }
-                      onSelect={(e) => {
-                        if (e) {
+                    <div>
+                      <CustomDropdown
+                        logo={LucideClock}
+                        labelName="Warranty Duration"
+                        preselectedOption={
+                          intialEditCompanyProductFormData.default_warranty
+                        }
+                        onSelect={(e) => {
                           setDefaultWarranty(e);
+                        }}
+                        options={rangeOfNumber}
+                        requiredRedDot={true}
+                      />
+                      {selectedDefaultWarrantyError && (
+                        <div className="caption-custom-inactive">
+                          Warranty Duration is required
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <CustomDropdown
+                        logo={LucideTimer}
+                        labelName="Warranty Time Unit"
+                        preselectedOption={
+                          intialEditCompanyProductFormData.default_warranty_interval_type_id
                         }
-                      }}
-                      options={rangeOfNumber}
-                      requiredRedDot={true}
-                    />
-                    <CustomDropdown
-                      logo={LucideTimer}
-                      labelName="Warranty Time Unit"
-                      preselectedOption={
-                        intialEditCompanyProductFormData.default_warranty_interval_type_id
-                      }
-                      onSelect={(e) => {
-                        if (e) {
+                        onSelect={(e) => {
                           setWarrantyIntervalTypeId(e);
-                        }
-                      }}
-                      options={intervalTypeData}
-                      requiredRedDot={true}
-                    />
+                        }}
+                        options={intervalTypeData}
+                        requiredRedDot={true}
+                      />
+                      {selectedWarrantyIntervalTypeIdError && (
+                        <div className="caption-custom-inactive">
+                          Warranty Time Unit is required
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 mt-2">
-                    <CustomDropdown
-                      logo={LucideClock}
-                      labelName="AMC Cycle Duration"
-                      preselectedOption={
-                        intialEditCompanyProductFormData.default_amc_cycle
-                      }
-                      onSelect={(e) => {
-                        if (e) {
+                    <div>
+                      <CustomDropdown
+                        logo={LucideClock}
+                        labelName="AMC Cycle Duration"
+                        preselectedOption={
+                          intialEditCompanyProductFormData.default_amc_cycle
+                        }
+                        onSelect={(e) => {
                           setDefaultAmc(e);
+                        }}
+                        options={rangeOfNumber}
+                        requiredRedDot={true}
+                      />
+                      {selectedDefaultAmcError && (
+                        <div className="caption-custom-inactive">
+                          AMC Cycle Duration is required
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <CustomDropdown
+                        logo={LucideTimer}
+                        labelName="AMC Time Unit"
+                        preselectedOption={
+                          intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
                         }
-                      }}
-                      options={rangeOfNumber}
-                      requiredRedDot={true}
-                    />
-                    <CustomDropdown
-                      logo={LucideTimer}
-                      labelName="AMC Time Unit"
-                      preselectedOption={
-                        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
-                      }
-                      onSelect={(e) => {
-                        if (e) {
+                        onSelect={(e) => {
                           setAmcIntervalTypeId(e);
-                        }
-                      }}
-                      options={intervalTypeData}
-                      requiredRedDot={true}
-                    />
+                        }}
+                        options={intervalTypeData}
+                        requiredRedDot={true}
+                      />
+                      {selectedAmcIntervalTypeIdError && (
+                        <div className="caption-custom-inactive">
+                          AMC Time Unit is required
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -576,9 +724,9 @@ function EditCompanyProductModal({
                     <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
                   </label> */}
                   <ToggleButton
-                  checked={productIsActive}
-                      name="isActive"
-                      onToggle={handleProductToggle}
+                    checked={productIsActive}
+                    name="isActive"
+                    onToggle={handleProductToggle}
                   />
                 </div>
               </div>
@@ -627,16 +775,14 @@ function EditCompanyProductModal({
             </div>
 
             {isCreateCompanyProductTaxModalOpen && (
-              
-                <CreateCompanyProductTaxModal
-                  isOpen={isCreateCompanyProductTaxModalOpen}
-                  handleCreateCompanyProductTax={handleCreateCompanyProductTax}
-                  onClose={() => {
-                    setIsCreateCompanyProductTaxModalOpen(false);
-                  }}
-                  product={product}
-                />
-              
+              <CreateCompanyProductTaxModal
+                isOpen={isCreateCompanyProductTaxModalOpen}
+                handleCreateCompanyProductTax={handleCreateCompanyProductTax}
+                onClose={() => {
+                  setIsCreateCompanyProductTaxModalOpen(false);
+                }}
+                product={product}
+              />
             )}
 
             <CreateCompanyProductCompanyUserModal

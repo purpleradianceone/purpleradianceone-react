@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   LucideAirplay,
   LucideCalendar,
@@ -145,8 +146,7 @@ function AddProductModal({
     if (addProductFormData.name !== "" && addProductFormData.code !== "") {
       if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
         setSelectedProductTypeIdError(true);
-                      // toast.error("Please select 'Product Type'");
-
+        // toast.error("Please select 'Product Type'");
       } else {
         setSelectedProductTypeIdError(false);
         if (
@@ -154,8 +154,7 @@ function AddProductModal({
           selectedWarrantyIntervalTypeId === undefined
         ) {
           setSelectedWarrantyIntervalTypeIdError(true);
-                        // toast.error("Please select 'Warranty Time Unit'");
-
+          // toast.error("Please select 'Warranty Time Unit'");
         } else {
           setSelectedWarrantyIntervalTypeIdError(false);
           if (
@@ -163,8 +162,7 @@ function AddProductModal({
             selectedDefaultWarranty === undefined
           ) {
             setSelectedDefaultWarrantyError(true);
-                          // toast.error("Please select 'Warranty Duration'");
-
+            // toast.error("Please select 'Warranty Duration'");
           } else {
             setSelectedDefaultWarrantyError(false);
             if (
@@ -172,8 +170,7 @@ function AddProductModal({
               selectedAmcIntervalTypeId === undefined
             ) {
               setSelectedAmcIntervalTypeIdError(true);
-                            // toast.error("Please select 'AMC Time Unit'");
-
+              // toast.error("Please select 'AMC Time Unit'");
             } else {
               setSelectedAmcIntervalTypeIdError(false);
               if (
@@ -181,9 +178,7 @@ function AddProductModal({
                 selectedDefaultAmc === undefined
               ) {
                 setSelectedDefaultAmcError(true);
-                              // toast.error("Please select 'AMC Cycle Duration'");
-
-
+                // toast.error("Please select 'AMC Cycle Duration'");
               } else {
                 setSelectedDefaultAmcError(false);
               }
@@ -233,11 +228,16 @@ function AddProductModal({
             taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
           }
           if (
-            selectedProductTypeId !== 0 && selectedProductTypeId !== undefined &&
-            selectedWarrantyIntervalTypeId !== 0 && selectedWarrantyIntervalTypeId !== undefined&&
-            selectedDefaultWarranty !== 0 && selectedDefaultWarranty !== undefined&&
-            selectedAmcIntervalTypeId !== 0 && selectedAmcIntervalTypeId !== undefined &&
-            selectedDefaultAmc !== 0 && selectedDefaultAmc !== undefined &&
+            selectedProductTypeId !== 0 &&
+            selectedProductTypeId !== undefined &&
+            selectedWarrantyIntervalTypeId !== 0 &&
+            selectedWarrantyIntervalTypeId !== undefined &&
+            selectedDefaultWarranty !== 0 &&
+            selectedDefaultWarranty !== undefined &&
+            selectedAmcIntervalTypeId !== 0 &&
+            selectedAmcIntervalTypeId !== undefined &&
+            selectedDefaultAmc !== 0 &&
+            selectedDefaultAmc !== undefined &&
             addProductFormData.cost !== null
           ) {
             const addProductPostData = {
@@ -286,24 +286,38 @@ function AddProductModal({
                   }
                 }
               });
-          } 
-          else {
-            if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+          } else {
+            if (
+              selectedProductTypeId === 0 ||
+              selectedProductTypeId === undefined
+            ) {
               toast.error("Please select 'Product Type'");
-            } else if (selectedWarrantyIntervalTypeId === 0 || selectedWarrantyIntervalTypeId === undefined) {
+            } else if (
+              selectedWarrantyIntervalTypeId === 0 ||
+              selectedWarrantyIntervalTypeId === undefined
+            ) {
               toast.error("Please select 'Warranty Time Unit'");
-            } else if (selectedDefaultWarranty === 0 || selectedDefaultWarranty === undefined) {
+            } else if (
+              selectedDefaultWarranty === 0 ||
+              selectedDefaultWarranty === undefined
+            ) {
               toast.error("Please select 'Warranty Duration'");
-            } else if (selectedAmcIntervalTypeId === 0 || selectedAmcIntervalTypeId === undefined) {
+            } else if (
+              selectedAmcIntervalTypeId === 0 ||
+              selectedAmcIntervalTypeId === undefined
+            ) {
               toast.error("Please select 'AMC Time Unit'");
-            } else if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
+            } else if (
+              selectedDefaultAmc === 0 ||
+              selectedDefaultAmc === undefined
+            ) {
               toast.error("Please select 'AMC Cycle Duration'");
             }
           }
         }
       }
     } else {
-      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+      toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_ADD_ACCESS);
     }
   };
 
