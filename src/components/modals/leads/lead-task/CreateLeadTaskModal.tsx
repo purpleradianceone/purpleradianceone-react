@@ -159,7 +159,7 @@ function CreateLeadTaskModal({
   };
 
   const generateTaskDetailsJson = () => {
-    if (leadActivityId !== 3) {
+    if (leadActivityId !== 3 && leadActivityId !== 8) {
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -194,6 +194,7 @@ function CreateLeadTaskModal({
       return;
     } else if (assignedTo.length === 0) {
       toast.error("You haven't assigned a task yet, please assign it first");
+      return;
     }
 
     event.preventDefault();
@@ -352,7 +353,7 @@ function CreateLeadTaskModal({
               options={leadTaskStage}
             ></CustomDropdown>
 
-            {leadActivityId !== 3 && (
+            {leadActivityId !== 3 && leadActivityId !== 8 && leadActivityId !== 0 && (
               <div className="flex items-center gap-4  mb-0">
                 <label htmlFor="phoneCallBtn" className="input-label-custom">
                   <div className="flex gap-2">
@@ -510,15 +511,14 @@ function CreateLeadTaskModal({
             </div>
           </div>
 
-          {selectedCompanyUsers.length != 0 && (
-            <div className="relative grid grid-cols-3 input-label-custom">
-              <div className="flex gap-2 text-center">
-                <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
+         
+            {/* <div className="relative grid grid-cols-3 justify-center input-label-custom">
+              <div className="flex gap-2 mt-2">
+                <User className="text-blue-600  w-3 h-3 mt-1" />
                 <span>Assign Users : </span>
               </div>
 
-              {/* Assign button */}
-              <div className="absolute left-28 max-w-28">
+              <div className="absolute left-28 max-w-32">
                 <Button
                   type="submit"
                   onClick={(e) => {
@@ -528,17 +528,58 @@ function CreateLeadTaskModal({
                 >
                   <span
                     title="Assign user to this task"
-                    className="flex  text-center caption-custom white-text text-nowrap"
+                    className="flex  text-center text-nowrap"
                   >
-                    <span className="flex gap-1 text-nowrap ">
-                      <UserPlus size={14}></UserPlus>
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
                       <span>Assign Users</span>
                     </span>
                   </span>
                 </Button>
               </div>
-            </div>
-          )}
+            </div> */}
+
+            <div className="flex items-center gap-4  mb-0">
+                <label htmlFor="assignUsersBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <User className="text-blue-600 mt-0.5" size={16} />
+                    <span>Assign Users : </span>
+                  </div>
+                </label>
+                <div id="assignUsersBtn" className=" max-w-32 m-0">
+                  {/* <Button
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
+                    </span>
+                  </Button> */}
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
+                >
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center text-nowrap"
+                  >
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
+                  </span>
+                </Button>
+                </div>
+              </div>
+          
 
           {selectedCompanyUsers.length != 0 && (
             <div className="p-1">
