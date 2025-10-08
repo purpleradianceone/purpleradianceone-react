@@ -173,7 +173,7 @@ return (
   <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
     {/* Header */}
     <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-      <span>Account Lead</span>
+      <span>Account related leads</span>
     </div>
 
     {
@@ -189,7 +189,7 @@ return (
       <div className="flex items-center justify-center py-4">
         <span className="italic caption-custom flex gap-1 items-center ">
           <CreateAccountLead account={account} getAccountLead={getAccountLead} />
-          No data available.
+          No leads available.
         </span>
       </div>
     )}
