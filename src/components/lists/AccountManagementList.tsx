@@ -126,6 +126,7 @@ function AccountManagementList({
               </div>
               {/* Custom Date Picker Div Flex Box*/}
               <div
+              className="flex"
                 style={
                   isCustomDateOptionSelected
                     ? { visibility: "visible" }

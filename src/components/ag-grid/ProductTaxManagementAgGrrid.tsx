@@ -94,7 +94,7 @@ const {loginStatus} = useLoggedInUserContext();
                     .then((response) => {
                        if(response.data.status){
                         toast.success(response.data.message);
-                        handleCompanyProductTaxChange(true);
+                        handleCompanyProductTaxChange();
 
                        }
                        else if(!response.data.status){
