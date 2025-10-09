@@ -40,14 +40,8 @@ function ProductManagement() {
     handleSearchParameterChange,
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers();
-  const handleProductChangeOnAdd = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) =>
-        products.name !== product.name && products.code !== product.code
-    );
-    if (userMatches) {
-      setProductUpdateCount((prev) => prev + 1);
-    }
+  const handleProductChangeOnAdd = () => {
+      setProductUpdateCount((prev) => prev + 1);    
   };
 
   const handleEditProductChange = (product: Product) => {
@@ -150,8 +144,8 @@ function ProductManagement() {
   useEffect(() => {
     setTimeout(() => {
       setProductsData([]);
-      console.log("Product Data is cleared");
-      console.log(productsData);
+      // console.log("Product Data is cleared");
+      // console.log(productsData);
       fetchCompanyProducts();
     }, 200);
     // eslint-disable-next-line react-hooks/exhaustive-deps
