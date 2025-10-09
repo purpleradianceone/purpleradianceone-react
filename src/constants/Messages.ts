@@ -62,6 +62,8 @@ const MESSAGE = {
         },ACCOUNT_ACCESS : {
             DENIED_ADD_ACCESS : "You do not have permission to add new account.",
             DENIED_UPDATE_ACCESS : "You do not have permission to update account.",
+            DENIED_ADD_ACCOUNT_IMPORT_ACCESS : "You do not have permission to import accounts.",
+
         }
     }
 }
