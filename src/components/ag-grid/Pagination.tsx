@@ -71,13 +71,13 @@ function Pagination({
         Page{" "}
         <input
           type="number"
-          disabled
+   
           value={currentPage}
           onChange={(e) => {
             onPageChange(Number(e.target.value));
           }}
           style={{
-            width: "40px",
+            width: "50px",
             textAlign: "center",
             padding: "1px",
             border: "1px solid #ccc",
