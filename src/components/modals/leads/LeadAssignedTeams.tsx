@@ -19,6 +19,7 @@ import COLORS from "../../../constants/Colors";
 import StatusChip from "../../ui/StatusChip";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import Button from "../../ui/Button";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
@@ -226,8 +227,8 @@ const LeadAssignedTeams = ({
       {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
-            <button
-              // disabled={!userHasAccessToUpdateLead}
+            <Button
+              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (userHasAccessToUpdateLead) {
                   setOpenCreateLeadCompanyTeam(true);
@@ -247,7 +248,7 @@ const LeadAssignedTeams = ({
               className={COLORS.ADD_BUTTON}
             >
               +Add
-            </button>
+            </Button>
             <span className="caption-custom italic">
               Company Team is Not assigned to lead.
             </span>
@@ -258,8 +259,8 @@ const LeadAssignedTeams = ({
         <div className="w-full  px-1 mb-1">
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <button
-              // disabled={!userHasAccessToUpdateLead}
+            <Button
+              disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
                   toast.error(
@@ -273,7 +274,7 @@ const LeadAssignedTeams = ({
               className={COLORS.ADD_BUTTON}
             >
               +Add
-            </button>
+            </Button>
           </div>
           {/* Company team List */}
           <div className="space-y-2">

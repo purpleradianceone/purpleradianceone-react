@@ -13,9 +13,12 @@ import COLORS from "../../../constants/Colors";
 import { createPortal } from "react-dom";
 import CreateAccountCompanyAccountType from "./CreateAccountCompanyAccountType";
 import ToggleButton from "../../ui/ToggleButton";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../constants/Messages";
+import Button from "../../ui/Button";
 
 const AccountCompanyType = ({ accountId }: { accountId: number }) => {
-  // const {} = useUserAccessModules();
+  const {userHasAccessToUpdateAccount} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   // States
@@ -134,28 +137,42 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
     ) : accountCompanyAccountType.length === 0 && !isLoadingCompanyAccountType ? (
       <div className="flex items-center justify-center w-full  h-full">
         <div className="flex gap-1 w-full text-xs  h-full bg-green-0 items-center justify-center">
-          <button
-            onClick={() =>
-              setShowCompanyAccountTypeForCreate(!showCompanyAccountTypeForCreate)
+          <Button
+            disabled={!userHasAccessToUpdateAccount}
+            onClick={
+              () =>{
+                if(userHasAccessToUpdateAccount){
+                  setShowCompanyAccountTypeForCreate(!showCompanyAccountTypeForCreate)
+                }else{
+                   toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+                }
+              }
             }
             className={COLORS.ADD_BUTTON}
           >
             +Add
-          </button>
+          </Button>
           <span className="italic caption-custom">No company account type available.</span>
         </div>
       </div>
     ) : (
       <div className="grid md:grid-cols-2 gap-1 w-full">
          <div className="col-span-2 flex justify-end p-0.5">
-          <button
-            onClick={() =>
-              setShowCompanyAccountTypeForCreate(!showCompanyAccountTypeForCreate)
+          <Button
+            disabled={!userHasAccessToUpdateAccount}
+            onClick={
+              () =>{
+                if(userHasAccessToUpdateAccount){
+                  setShowCompanyAccountTypeForCreate(!showCompanyAccountTypeForCreate)
+                }else{
+                   toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+                }
+              }
             }
             className={COLORS.ADD_BUTTON}
           >
             +Add
-          </button>
+          </Button>
          </div>
         {accountCompanyAccountType.map((item: AccountCompanyAccountType) => (
           <div

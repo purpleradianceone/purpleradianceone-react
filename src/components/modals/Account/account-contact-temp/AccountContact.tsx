@@ -428,8 +428,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       {accountContact.length === 0 ? (
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
-            <button
-              // disabled={!userHasAccessToUpdateLead}
+            <Button
+              disabled={!userHasAccessToUpdateAccount}
               onClick={() => {
                 if (userHasAccessToUpdateAccount) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
@@ -442,7 +442,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               className={COLORS.ADD_BUTTON}
             >
               +Add
-            </button>
+            </Button>
             <span className=" italic caption-custom">No contacts available.</span>
           </div>
         </div>
@@ -450,7 +450,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         <>
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <button
+            <Button
+            disabled={!userHasAccessToUpdateAccount}
               onClick={() => {
                 if (userHasAccessToUpdateAccount) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
@@ -464,7 +465,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             >
               {/* <Plus size={10} /> */}
               <span>+Add</span>
-            </button>
+            </Button>
           </div>
 
           {/* Contacts List */}

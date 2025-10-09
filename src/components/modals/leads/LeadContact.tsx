@@ -395,7 +395,8 @@ const LeadContact = ({
     <div className={`w-full z-10 px-1 mb-1 `}>
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-1 py-1 text-gray-500">
-        <button
+        <Button
+        disabled={!userHasAccessToUpdateLead}
           onClick={() => {
             if (userHasAccessToUpdateLead) {
               setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
@@ -409,7 +410,7 @@ const LeadContact = ({
           className={COLORS.ADD_BUTTON}
         >
           +Add
-        </button>
+        </Button>
       </div>
 
       {/* Contacts List */}

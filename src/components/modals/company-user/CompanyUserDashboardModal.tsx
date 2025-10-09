@@ -1,21 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import CompanyUserDashboardProps from "../../../@types/company-users/CompanyUserDashboardProps";
 import { useEffect, useRef, useState } from "react";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import { Grid, Save, X } from "lucide-react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+
 import FormHeader from "../../ui/FormHeader";
+import toast from "react-hot-toast";
 
 interface CompanyUserDashboard {
   id: number;
@@ -50,16 +48,6 @@ function CompanyUserDashboardModal({
 
   const initialDataRef = useRef<CompanyUserDashboard[]>([]);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
     message: string;
@@ -68,9 +56,6 @@ function CompanyUserDashboardModal({
     message: "",
   });
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   // const { userHasAccessToUpdateAccess } = useUserAccessModules();
 
@@ -101,10 +86,8 @@ function CompanyUserDashboardModal({
         .then((response) => {
           if (response.data.status) {
             // toast.success(response.data.message);
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            
+            toast.success(response.data.message)
             setSpinnerAnimation({
               status: "success",
               message: MESSAGE.SUCCESS.SAVED,
@@ -117,18 +100,18 @@ function CompanyUserDashboardModal({
               });
             }, 1000);
           } else {
-            // toast.error(response.data.message);
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            toast.error(response.data.message);
           }
-        });
-
-      console.log("---------------------------");
-      console.log(POST_API.UPDATE_COMPANY_USER_DASHBOARD);
-      console.log("---------------------------");
-
+        }).catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleSave,
+          });
+          if (refreshTokenResponse) {
+            handleSave();
+          }
+        }
+      });
       // Update original data to match new state
       initialDataRef.current = [...companyUserDashboard];
 
@@ -272,18 +255,14 @@ function CompanyUserDashboardModal({
           </Button>
           <Button
           type="submit"
+          disabled={!userHasAccessToUpdateDashboard}
             onClick={(e) => {
               e.preventDefault();
               if (userHasAccessToUpdateDashboard) {
                 handleSave();
               } else {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.DASHBOARD
-                      .DENIED_UPDATE_ACCESS_DASHBOARD,
-                  type: "error",
-                });
-                return;
+                toast.error(MESSAGE.MODULE_ACCESS.DASHBOARD
+                      .DENIED_UPDATE_ACCESS_DASHBOARD)
               }
             }}
             spinner={spinnerAnimation}
@@ -295,14 +274,6 @@ function CompanyUserDashboardModal({
           </Button>
         </div>
       </div>
-
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </dialog>
   );
 }

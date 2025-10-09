@@ -217,8 +217,7 @@ function AccountManagementList({
                     handleShowImportModule();
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCOUNT_IMPORT_ACCESS
                     );
                   }
                 }}
@@ -233,10 +232,15 @@ function AccountManagementList({
 
           <div>
             <Button
+            disabled={!userHasAccessToAddAccount}
               type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenAccountForm(!openCreateAccountForm);
+               onClick={(e) => {
+                if(userHasAccessToAddAccount){
+                  e.preventDefault();
+                  setOpenAccountForm(!openCreateAccountForm);
+                }else{
+                  toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS)
+                }
               }}
             >
               <div className="flex items-center gap-0.5">
