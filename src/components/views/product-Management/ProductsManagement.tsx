@@ -40,28 +40,18 @@ function ProductManagement() {
     handleSearchParameterChange,
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers();
+
   const handleProductChangeOnAdd = () => {
       setProductUpdateCount((prev) => prev + 1);    
   };
 
-  const handleEditProductChange = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) => products.id === product.id
-    );
-
-    if (userMatches) {
+  const handleEditProductChange = () => {
       setProductUpdateCount((prev) => prev + 1);
-    }
+
   };
 
-  const handleCreateCompanyProductTax = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) =>
-        products.name !== product.name && products.code !== product.code
-    );
-    if (userMatches) {
+  const handleCreateCompanyProductTax = () => {
       setProductUpdateCount((prev) => prev + 1);
-    }
   };
 
   const fetchCompanyProducts = async () => {

@@ -4,7 +4,7 @@ type CreateCompanyProductTaxModalProps = {
 isOpen : boolean,
 onClose : () => void,
 product : Product,
-handleCreateCompanyProductTax : (product : Product) => void,
+handleCreateCompanyProductTax : () => void,
 }
 
 export default CreateCompanyProductTaxModalProps;

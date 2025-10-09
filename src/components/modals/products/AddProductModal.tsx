@@ -19,13 +19,11 @@ import {
   GAP,
   OPACITY,
   STATUS_CODE,
-  TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
 import RadioButtons from "../../ui/RadioButton";
-import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import React, { useEffect, useState } from "react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
@@ -53,13 +51,36 @@ function AddProductModal({
   onClose,
   handleProductChangeOnAdd,
 }: AddProductModalProps) {
-  const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
+  const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
+
+  const ProductsRadioButtonOptions = [
+  {
+    label : "HSN",
+    value : "hsn",
+    id : "hsn",
+    name : "taxCode",
+    checked : selectedTaxCode === "hsn" ? true : false,
+  },
+  {
+    label : "SAC",
+    value : "sac",
+    id : "sac",
+    name : "taxCode",
+    checked : selectedTaxCode === "sac" ? true : false,
+  },
+
+]
 
   const { isSmallScreen } = useScreenSize();
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    setSelectedTaxCode(event.target.value);
+    if(event.target.value === "hsn"){
+      setSelectedTaxCode("hsn");
+    }
+    else if(event.target.value === "sac"){
+      setSelectedTaxCode("sac");
+    }
   }
 
   const { intervalTypeData } = useIntervalType();
@@ -121,82 +142,71 @@ function AddProductModal({
     formData: addProductFormData,
   } = useFormChange(intialAddProductFormData);
 
-  const { errors, handleBlur } = useFormValidation(
+  const { errors, handleBlur ,setErrors} = useFormValidation(
     addProductFormData,
     "registration"
   );
 
   const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
-    useState<boolean>();
+    useState<boolean>(false);
 
   const [
     selectedWarrantyIntervalTypeIdError,
     setSelectedWarrantyIntervalTypeIdError,
-  ] = useState<boolean>();
+  ] = useState<boolean>(false);
 
   const [selectedDefaultWarrantyError, setSelectedDefaultWarrantyError] =
-    useState<boolean>();
+    useState<boolean>(false);
 
   const [selectedAmcIntervalTypeIdError, setSelectedAmcIntervalTypeIdError] =
-    useState<boolean>();
+    useState<boolean>(false);
   const [selectedDefaultAmcError, setSelectedDefaultAmcError] =
-    useState<boolean>();
+    useState<boolean>(false);
 
-  function validateDropdown() {
-    if (addProductFormData.name !== "" && addProductFormData.code !== "") {
+  const validateDropdown = () => {
       if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
         setSelectedProductTypeIdError(true);
         // toast.error("Please select 'Product Type'");
       } else {
         setSelectedProductTypeIdError(false);
-        if (
-          selectedWarrantyIntervalTypeId === 0 ||
-          selectedWarrantyIntervalTypeId === undefined
-        ) {
-          setSelectedWarrantyIntervalTypeIdError(true);
-          // toast.error("Please select 'Warranty Time Unit'");
-        } else {
-          setSelectedWarrantyIntervalTypeIdError(false);
-          if (
-            selectedDefaultWarranty === 0 ||
-            selectedDefaultWarranty === undefined
-          ) {
-            setSelectedDefaultWarrantyError(true);
-            // toast.error("Please select 'Warranty Duration'");
-          } else {
-            setSelectedDefaultWarrantyError(false);
-            if (
-              selectedAmcIntervalTypeId === 0 ||
-              selectedAmcIntervalTypeId === undefined
-            ) {
-              setSelectedAmcIntervalTypeIdError(true);
-              // toast.error("Please select 'AMC Time Unit'");
-            } else {
-              setSelectedAmcIntervalTypeIdError(false);
-              if (
-                selectedDefaultAmc === 0 ||
-                selectedDefaultAmc === undefined
-              ) {
-                setSelectedDefaultAmcError(true);
-                // toast.error("Please select 'AMC Cycle Duration'");
-              } else {
-                setSelectedDefaultAmcError(false);
-              }
-            }
-          }
-        }
       }
+
+    if (
+      selectedWarrantyIntervalTypeId === 0 ||
+      selectedWarrantyIntervalTypeId === undefined
+    ) {
+      setSelectedWarrantyIntervalTypeIdError(true);
+      // toast.error("Please select 'Warranty Time Unit'");
+    } else {
+      setSelectedWarrantyIntervalTypeIdError(false);
+    }
+
+    if (
+      selectedDefaultWarranty === 0 ||
+      selectedDefaultWarranty === undefined
+    ) {
+      setSelectedDefaultWarrantyError(true);
+      // toast.error("Please select 'Warranty Duration'");
+    } else {
+      setSelectedDefaultWarrantyError(false);
+    }
+    if (
+      selectedAmcIntervalTypeId === 0 ||
+      selectedAmcIntervalTypeId === undefined
+    ) {
+      setSelectedAmcIntervalTypeIdError(true);
+      // toast.error("Please select 'AMC Time Unit'");
+    } else {
+      setSelectedAmcIntervalTypeIdError(false);
+    }
+    if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
+      setSelectedDefaultAmcError(true);
+      // toast.error("Please select 'AMC Cycle Duration'");
+    } else {
+      setSelectedDefaultAmcError(false);
     }
   }
-  useEffect(() => {
-    validateDropdown();
-  }, [
-    selectedProductTypeId,
-    selectedWarrantyIntervalTypeId,
-    selectedDefaultWarranty,
-    selectedAmcIntervalTypeId,
-    selectedDefaultAmc,
-  ]);
+
 
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -253,8 +263,8 @@ function AddProductModal({
               description: addProductFormData.description,
               version: addProductFormData.version,
               url: addProductFormData.url,
-              hsn: addProductFormData.hsn,
-              sac: addProductFormData.sac,
+              hsn: selectedTaxCode === "hsn" ? addProductFormData.hsn : null,
+              sac: selectedTaxCode === "sac" ? addProductFormData.sac : null,
               tax_rate: taxRateDecimal,
               valid_from_string: formattedDate,
               createdby_id: loginStatus.id,
@@ -267,7 +277,7 @@ function AddProductModal({
               .then((response) => {
                 if (response.data.status) {
                   toast.success(response.data.message);
-                  handleProductChangeOnAdd(addProductFormData);
+                  handleProductChangeOnAdd();
                   setTimeout(() => {
                     onClose();
                   }, 500);
@@ -286,34 +296,7 @@ function AddProductModal({
                   }
                 }
               });
-          } else {
-            if (
-              selectedProductTypeId === 0 ||
-              selectedProductTypeId === undefined
-            ) {
-              toast.error("Please select 'Product Type'");
-            } else if (
-              selectedWarrantyIntervalTypeId === 0 ||
-              selectedWarrantyIntervalTypeId === undefined
-            ) {
-              toast.error("Please select 'Warranty Time Unit'");
-            } else if (
-              selectedDefaultWarranty === 0 ||
-              selectedDefaultWarranty === undefined
-            ) {
-              toast.error("Please select 'Warranty Duration'");
-            } else if (
-              selectedAmcIntervalTypeId === 0 ||
-              selectedAmcIntervalTypeId === undefined
-            ) {
-              toast.error("Please select 'AMC Time Unit'");
-            } else if (
-              selectedDefaultAmc === 0 ||
-              selectedDefaultAmc === undefined
-            ) {
-              toast.error("Please select 'AMC Cycle Duration'");
-            }
-          }
+          } 
         }
       }
     } else {
@@ -364,6 +347,10 @@ function AddProductModal({
   useEffect(() => {
     // if (!isOpen) {
     clearCreateForm();
+    setErrors({
+      code:"",
+      name : "",
+    })
     // }
   }, [isOpen]);
 
@@ -483,7 +470,9 @@ function AddProductModal({
                       logo={LucideGroup}
                       preselectedOption={0}
                       onSelect={(e) => {
-                        console.log(e);
+                        if(e){
+                          setSelectedProductTypeIdError(false);
+                        }
                         setSelectedProductTypeId(e);
                       }}
                       options={productTypeData}
@@ -504,6 +493,9 @@ function AddProductModal({
                       logo={LucideClock}
                       preselectedOption={0}
                       onSelect={(e) => {
+                         if(e){
+                          setSelectedDefaultWarrantyError(false);
+                        }
                         setDefaultWarranty(e);
                       }}
                       options={rangeOfNumber}
@@ -521,6 +513,9 @@ function AddProductModal({
                       logo={LucideTimer}
                       preselectedOption={0}
                       onSelect={(e) => {
+                         if(e){
+                          setSelectedWarrantyIntervalTypeIdError(false);
+                        }
                         setWarrantyIntervalTypeId(e);
                       }}
                       options={intervalTypeData}
@@ -541,6 +536,9 @@ function AddProductModal({
                       logo={LucideClock}
                       preselectedOption={0}
                       onSelect={(e) => {
+                        if(e){
+                          setSelectedDefaultAmcError(false);
+                        }
                         setDefaultAmc(e);
                       }}
                       options={rangeOfNumber}
@@ -559,6 +557,9 @@ function AddProductModal({
                       logo={LucideTimer}
                       preselectedOption={0}
                       onSelect={(e) => {
+                        if(e){
+                          setSelectedAmcIntervalTypeIdError(false);
+                        }
                         setAmcIntervalTypeId(e);
                       }}
                       options={intervalTypeData}
@@ -580,7 +581,7 @@ function AddProductModal({
                 />
               </div>
 
-              {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
+              {(selectedTaxCode === "hsn") && (
                 <FormInput
                   label="HSN : "
                   logo={LucideVerified}
@@ -592,7 +593,7 @@ function AddProductModal({
                 />
               )}
 
-              {selectedTaxCode === TAX_CODE.SAC && (
+              {selectedTaxCode === "sac" && (
                 <FormInput
                   logo={LucideVerified}
                   label="SAC : "

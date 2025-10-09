@@ -3,7 +3,6 @@ import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
   STATUS_CODE,
-  TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
@@ -21,7 +20,6 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import CreateCompanyProductTaxModalProps from "../../../@types/modal/CreateCompanyProductTaxModalProps";
 import RadioButtons from "../../ui/RadioButton";
-import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
@@ -42,13 +40,31 @@ function CreateCompanyProductTaxModal({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
 
-  const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
+  const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
 
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //   open: false,
   //   message: "",
   //   type: "success" as "success" | "error",
   // });
+
+  const ProductsRadioButtonOptions = [
+  {
+    label : "HSN",
+    value : "hsn",
+    id : "hsn",
+    name : "taxCode",
+    checked : selectedTaxCode === "hsn" ? true : false,
+  },
+  {
+    label : "SAC",
+    value : "sac",
+    id : "sac",
+    name : "taxCode",
+    checked : selectedTaxCode === "sac" ? true : false,
+  },
+
+]
 
   const {
     formData: createCompanyProductTaxFormData,
@@ -71,7 +87,15 @@ function CreateCompanyProductTaxModal({
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    setSelectedTaxCode(event.target.value);
+    if(event.target.value === "hsn"){
+      
+      setSelectedTaxCode("hsn");
+    }
+    else if(event.target.value === "sac") {
+
+        setSelectedTaxCode("sac");
+    }
+    
   }
 
   const hanldeUpdateCompanyProductFormSubmit = async (
@@ -88,8 +112,8 @@ function CreateCompanyProductTaxModal({
         const updateProductPostData = {
           company_id: loginStatus.companyId,
           company_product_id: product.id,
-          hsn: createCompanyProductTaxFormData.hsn,
-          sac: createCompanyProductTaxFormData.sac,
+          hsn: selectedTaxCode === "hsn" ? createCompanyProductTaxFormData.hsn : null,
+          sac: selectedTaxCode === "sac" ? createCompanyProductTaxFormData.sac : null,
           tax_rate: createCompanyProductTaxFormData.taxRate,
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
@@ -104,7 +128,7 @@ function CreateCompanyProductTaxModal({
               response.status === STATUS_CODE.OK
             ) {
               toast.success(response.data.message);
-              handleCreateCompanyProductTax(product);
+              handleCreateCompanyProductTax();
               setTimeout(() => {
                 onClose();
               }, 2000);
@@ -187,7 +211,7 @@ function CreateCompanyProductTaxModal({
                 options={ProductsRadioButtonOptions}
                 onChange={handleTaxRadioButtonChange}
               />
-              {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
+              {(selectedTaxCode === "hsn") && (
                 <FormInput
                   label="HSN "
                   type="text"
@@ -201,7 +225,7 @@ function CreateCompanyProductTaxModal({
                 />
               )}
 
-              {selectedTaxCode === TAX_CODE.SAC && (
+              {selectedTaxCode === "sac" && (
                 <FormInput
                   label="SAC "
                   type="text"
@@ -217,7 +241,7 @@ function CreateCompanyProductTaxModal({
 
               <FormInput
                 label="Tax Rate "
-                type="text"
+                type="decimal"
                 name="taxRate"
                 required={true}
                 placeholder="Enter Product Cost"
