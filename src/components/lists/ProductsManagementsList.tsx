@@ -124,7 +124,7 @@ function ProductsManagementList({
 
             {isLargeScreen && (
               <>
-                <div className="flex gap-1">
+                <div className="flex gap-1 justify-center">
                 {/* search box flex div */}
                 <div className="relative flex items-start w-80 mt-1">
                   <SearchInput
@@ -153,6 +153,7 @@ function ProductsManagementList({
 
                 {/* Custom Date Picker Div Flex Box*/}
                 <div
+                  className="flex"
                   style={
                     isCustomDateOptionSelected
                       ? { visibility: "visible" }
