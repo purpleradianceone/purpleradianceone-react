@@ -15,18 +15,20 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
-import { Search } from "lucide-react";
+import { LucideImport, Search, X } from "lucide-react";
 import Button from "../../../ui/Button";
 
 const LeadImportData = ({ 
     selectedLeadTag, 
-    getLeadImportTags
+    getLeadImportTags,
+    CancelSelectedLeadTag
  }: { 
     selectedLeadTag: string
     getLeadImportTags : () => Promise<void>
+    CancelSelectedLeadTag : ()=> void
  }) => {
   const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
@@ -214,6 +216,7 @@ const LeadImportData = ({
           setOpenFinalPopup(false);
         // making aggrid table null
           setLeadImportData([])
+          CancelSelectedLeadTag()
         } else {
           showMessageSnackbar({
             message: reposne.data.message,
@@ -250,13 +253,19 @@ const LeadImportData = ({
 
 
   return (
-  <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
+  <div className="p-4 bg-gray-300 border border-gray-200 rounded-xl shadow-sm">
     {/* Header */}
-    <div className="flex items-center justify-between mb-4 bg-white px-2 py-1 rounded-lg shadow-sm">
+    <div className="flex items-center justify-between mb-4  px-2 py-1 ">
       <span className="flex items-center gap-2 table-header-custom">
-        These are the leads from selected tag:
-        <span className="input-label-custom-blue bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
+        These are the leads from selected tag :
+        <span className=" flex gap-1 items-center justify-center input-label-custom-blue bg-blue-0  -blue-00 px-1 py-0.5 rounded-md">
           {selectedLeadTag}
+         <div className="">
+            <Button className="h-fit w-fit flex items-center justify-center text-gray-700 hover:text-black rounded-sm p-0.5  " onClick={CancelSelectedLeadTag} >
+            <X size={16}/>
+          </Button>
+           
+         </div>
         </span>
       </span>
 
@@ -269,8 +278,9 @@ const LeadImportData = ({
           e.preventDefault();
           setOpenFinalPopup(true);
         }}
-        // className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
+        className="flex items-center  gap-1 bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
       >
+        <LucideImport size={SIZE.SIXTEEN} />
         Move all Leads To lead data
       </Button>
       </div>

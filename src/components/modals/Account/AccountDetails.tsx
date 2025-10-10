@@ -10,7 +10,6 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  Factory,
   ArrowLeft,
   Edit3,
 } from "lucide-react";
@@ -613,7 +612,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
               <div className="grid items-center text-slate-700">
                 <div className="flex items-center">
-                  <Factory className="h-4 w-4 mr-2" />
+                  {/* <Factory className="h-4 w-4 mr-2" /> */}
                   <div className="caption-custom truncate">
                     {renderDropdownField(
                       "businessTypeName",
@@ -634,7 +633,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
               <div className="grid items-center text-slate-700">
                 <div className="flex items-center">
-                  <Factory className="h-4 w-4 mr-2" />
+                  {/* <Factory className="h-4 w-4 mr-2" /> */}
                   <div className="caption-custom truncate">
                     {renderDropdownField(
                       "districtName",

@@ -42,6 +42,7 @@ import InterestType from "../../../../@types/lead-management/InterestType";
 import ApiError from "../../../../@types/error/ApiError";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import COLORS from "../../../../constants/Colors";
+import toast from "react-hot-toast";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -139,13 +140,13 @@ const DroppableCrmField: React.FC<{
   }));
 
   return (
-    <div key={field.id} className="flex items-start gap-1">
+    <div key={field.id} className="flex items-start justify-evenly">
       <label
         htmlFor={`map-${field.id}`}
-        className="w-1/3 input-label-custom pt-2"
+        className="w-1/2 input-label-custom  pt-2"
       >
-        {field.label} :
-        {field.required && <span className="text-red-500 ml-1">*</span>}
+        {field.label }
+        {field.required && <span className="text-red-500 ">*</span> } :
       </label>
       <div
         ref={drop}
@@ -169,7 +170,7 @@ const DroppableCrmField: React.FC<{
             </span>
           ))
         ) : (
-          <span className="text-gray-500 text-sm italic">Drag column here</span>
+          <span className="text-gray-500 text-sm  italic">Drag column here</span>
         )}
       </div>
     </div>
@@ -507,7 +508,7 @@ const LeadImportCsv = ({
   // --- STATIC DATA ---
   const crmLeadFields: CrmField[] = useMemo(
     () => [
-      { id: "name", label: "Full Name", required: false },
+      { id: "name", label: "Full Name", required: true },
       { id: "email", label: "Email", required: false },
       { id: "mobilenumber", label: "Mobile Number", required: false },
       { id: "description", label: "Description", required: false },
@@ -1320,10 +1321,11 @@ const LeadImportCsv = ({
     // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
     if (!isContactMapped) {
       // setError('Please map "Name" and either "Email" or "Mobile Number".');
-      showMessageSnackbar({
-        message: 'Please map "Name" and either "Email" or "Mobile Number.',
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: 'Please map "Name" and either of "Email" or "Mobile Number".',
+      //   type: "error",
+      // });
+      toast.error('Please map "Name" and either of "Email" or "Mobile Number".')
       return;
     }
     setError(null);
@@ -1566,7 +1568,7 @@ const LeadImportCsv = ({
                       <Info size={12} />
                     </span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  text-xs">
                     {crmLeadFields.map((field) => (
                       <DroppableCrmField
                         key={field.id}
