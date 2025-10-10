@@ -379,7 +379,7 @@ function AddProductModal({
                 onClose();
               }}
               preText="Add New Product"
-              description="Enter the necessary product details to add a new product to the CRM."
+              description="Enter the necessary details to add a new product."
             />
 
             <form

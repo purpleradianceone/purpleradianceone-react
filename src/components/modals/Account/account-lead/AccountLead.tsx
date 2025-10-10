@@ -15,12 +15,14 @@ import ToggleButton from "../../../ui/ToggleButton";
 import ROUTES_URL from "../../../../constants/Routes";
 import qs from "query-string";
 import { useNavigate } from "react-router-dom";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
-
+  const {userHasAccessToViewLead} = useUserAccessModules();
   const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
@@ -207,7 +209,11 @@ return (
         {accountLead.map((item: AccountLeadType) => (
           <div
           onClick={() =>{
-            handleAccountLead(item.leadId)
+            if(userHasAccessToViewLead){
+              handleAccountLead(item.leadId)
+            }else{
+              toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_VIEW_ACCESS)
+            }
           }}
             key={item.id}
             className="p-2 cursor-pointer hover:white-text  hover:shadow-md  bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col "

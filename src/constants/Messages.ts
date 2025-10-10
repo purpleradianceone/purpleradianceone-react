@@ -38,6 +38,7 @@ const MESSAGE = {
     },
     MODULE_ACCESS: {
         LEAD_MODULE: {
+                        DENIED_VIEW_ACCESS : "You do not have permission to view lead.",
             DENIED_ADD_ACCESS : "You do not have permission to create lead.",
             DENIED_ADD_LEAD_IMPORT_ACCESS : "You do not have permission to import leads.",
             UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update this lead."

@@ -229,12 +229,11 @@ function CompanyUserAccessManagementModal({
   };
 
   return createPortal(
-
-      <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="relative p-5 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
-            {/* Header */}
-            {/* <div className="flex justify-between items-center p-3 border-b">
+    <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
+          {/* Header */}
+          {/* <div className="flex justify-between items-center p-3 border-b">
               <h2 className="text-xl flex items-center gap-2 font-medium text-gray-900">
                <ShieldCheck size={20}/> Update Access rights of <span className="text-blue-600">{users.fullname}</span>
               </h2>
@@ -245,187 +244,192 @@ function CompanyUserAccessManagementModal({
                 <X size={20} />
               </button>
             </div> */}
-            <FormHeader
-              icon={ShieldCheck}
-              preText="Update Access rights of User - "
-              userName={users.fullname}
-              onClose={onClose}
-              description="Manage who can view, edit, or control modules by updating access rights to align with user responsibilities."
-            />
+          <FormHeader
+            icon={ShieldCheck}
+            preText="Update Access rights of User - "
+            userName={users.fullname}
+            onClose={onClose}
+            description="Manage who can view, edit, or control modules by updating access rights to align with user responsibilities."
+          />
 
-
-            {/* Content Area */}
-            <div className="flex-1 overflow-hidden">
-              {dataStatus ? (
-                <div className="flex w-full h-full justify-center items-center">
-                  <LoadingSpinner />
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden">
+            {dataStatus ? (
+              <div className="flex w-full h-full justify-center items-center">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <div className="flex flex-col h-full">
+                {/* Fixed Header */}
+                <div className="bg-white border-b">
+                  <table className="w-full table-fixed">
+                    <colgroup>
+                      <col className={columnClasses.srNo} />
+                      <col className={columnClasses.moduleName} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                    </colgroup>
+                    <thead>
+                      <tr className="text-left">
+                        <th className="p-2">Sr. No.</th>
+                        <th className="p-2">Module Name</th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>Add</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("add")}
+                              onChange={() => handleColumnSelectAll("add")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>View</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("view")}
+                              onChange={() => handleColumnSelectAll("view")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>Update</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("update")}
+                              onChange={() => handleColumnSelectAll("update")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
                 </div>
-              ) : (
-                <div className="flex flex-col h-full">
-                  {/* Fixed Header */}
-                  <div className="bg-white border-b">
-                    <table className="w-full table-fixed">
-                      <colgroup>
-                        <col className={columnClasses.srNo} />
-                        <col className={columnClasses.moduleName} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                      </colgroup>
-                      <thead>
-                        <tr className="text-left">
-                          <th className="p-4">Sr. No.</th>
-                          <th className="p-4">Module Name</th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>Add</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("add")}
-                                onChange={() => handleColumnSelectAll("add")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>View</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("view")}
-                                onChange={() => handleColumnSelectAll("view")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>Update</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("update")}
-                                onChange={() => handleColumnSelectAll("update")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
 
-                  {/* Scrollable Body */}
-                  <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-                    <table className="w-full table-fixed">
-                      <colgroup>
-                        <col className={columnClasses.srNo} />
-                        <col className={columnClasses.moduleName} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                      </colgroup>
-                      <tbody>
-                        {modules
-                          .sort((a, b) => a.id - b.id)
-                          .map((module) => (
-                            <tr
-                              key={module.id}
-                              className="border-t hover:bg-gray-50"
-                            >
-                              <td className="p-4 table-data-custom">{module.crm_module_id}</td>
-                              <td className="p-4 table-data-custom">{module.module_name}</td>
-                              <td className="p-4 table-data-custom">
-                                <div className="flex flex-col ml-2 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.add}
-                                    onChange={() =>
-                                      handleCheckboxChange(module.id, "add")
-                                    }
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex flex-col ml-2 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.view}
-                                    onChange={() =>
-                                      handleCheckboxChange(module.id, "view")
-                                    }
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex flex-col ml-3 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.update}
-                                    onChange={() =>
-                                      handleCheckboxChange(module.id, "update")
-                                    }
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
+                {/* Scrollable Body */}
+                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                  <table className="w-full table-fixed">
+                    <colgroup>
+                      <col className={columnClasses.srNo} />
+                      <col className={columnClasses.moduleName} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                    </colgroup>
+                    <tbody>
+                      {modules
+                        .sort((a, b) => a.id - b.id)
+                        .map((module) => (
+                          <tr
+                            key={module.id}
+                            className="border-t  hover:bg-gray-50"
+                          >
+                            <td className="p-2 table-data-custom">
+                              {module.crm_module_id}
+                            </td>
+                            <td className=" table-data-custom">
+                              {module.module_name}
+                            </td>
+                            <td className=" table-data-custom">
+                              <div className="flex flex-col ml-2 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.add}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "add")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex flex-col ml-2 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.view}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "view")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex flex-col ml-3 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.update}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "update")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
 
-            {/* Footer */}
-            <div className="p-6 border-t bg-white">
-              <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
-                 <Button type="button" onClick={onClose}>
-                  <div className="flex gap-0.5 items-center">
-              <X size={SIZE.SIXTEEN} />
-              Cancel
-            </div>
-                </Button>
-                <Button
-                  type="submit"
-                  onClick={
-                    userHasAccessToUpdateAccess && users.id !== loginStatus.id
-                      ? (e) => {
+          {/* Footer */}
+          <div className="p-1 border-t  bg-white">
+            <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
+              <Button type="button" onClick={onClose}>
+                <div className="flex gap-0.5 items-center">
+                  <X size={SIZE.SIXTEEN} />
+                  Cancel
+                </div>
+              </Button>
+              <Button
+                type="submit"
+                onClick={
+                  userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                    ? (e) => {
                         e.preventDefault();
                         handleSaveAccessModule();
                       }
-                      : (e)=>{
+                    : (e) => {
                         e.preventDefault();
-                         if (users.id === loginStatus.id) {
-                          toast.error("For security reasons, users are unable to update their own Access Module.");
-                        }else if(!userHasAccessToUpdateAccess){
-                          toast.error("You do not have permission to Update the access modules of Another user.");
+                        if (users.id === loginStatus.id) {
+                          toast.error(
+                            "For security reasons, users are unable to update their own Access Module."
+                          );
+                        } else if (!userHasAccessToUpdateAccess) {
+                          toast.error(
+                            "You do not have permission to Update the access modules of Another user."
+                          );
                         }
                       }
-                  }
-                  disabled={
-                    !userHasAccessToUpdateAccess || users.id === loginStatus.id
-                  }
-                  spinner={
-                    userHasAccessToUpdateAccess && users.id !== loginStatus.id
-                      ? spinnerAnimation
-                      : undefined
-                  }
-                >
-                 <div className="flex gap-1 items-center">
-              <Save size={SIZE.SIXTEEN} />
-              Save
-            </div>
-                </Button>
-               
-              </div>
+                }
+                disabled={
+                  !userHasAccessToUpdateAccess || users.id === loginStatus.id
+                }
+                spinner={
+                  userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                    ? spinnerAnimation
+                    : undefined
+                }
+              >
+                <div className="flex gap-1 items-center">
+                  <Save size={SIZE.SIXTEEN} />
+                  Save
+                </div>
+              </Button>
             </div>
           </div>
         </div>
       </div>
-    ,
+    </div>,
     document.body
   );
 }
