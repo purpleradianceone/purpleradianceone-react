@@ -72,9 +72,9 @@ function AddProductModal({
 ]
 
   const { isSmallScreen } = useScreenSize();
-  function handleTaxRadioButtonChange(
+  const handleTaxRadioButtonChange = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) {
+  ) => {
     if(event.target.value === "hsn"){
       setSelectedTaxCode("hsn");
     }
@@ -304,7 +304,7 @@ function AddProductModal({
     }
   };
 
-  function clearCreateForm() {
+  const clearCreateForm = () => {
     setSelectedProductTypeId(0);
     setWarrantyIntervalTypeId(0);
     setDefaultWarranty(0);
