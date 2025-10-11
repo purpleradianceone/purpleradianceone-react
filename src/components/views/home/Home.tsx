@@ -14,6 +14,8 @@ import CompanyUserDropdown, {
 } from "./custom_company_user_dropdown/CustomCompanyUserDropdown";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import DashboardCRM from "./dashboard-crm/DashboardCRM";
+import AppTutorailManager from "../tutorails/AppTutorailManager";
+import { DashboardTabsSteps } from "../../../constants/AppTutorailsSteps";
 
 // ======= Dashboard Components =======
 const CRM: React.FC<{companyUserId:number|null}> = ({companyUserId}) => <DashboardCRM companyUserId={companyUserId} />;
@@ -38,9 +40,11 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const { userPreference } = useUserPreference();
+  const [tourFinished,setTourFinished] = useState<boolean>(false);
 
   const renderContent = () => {
-    switch (activeTab) {
+    if(tourFinished){
+      switch (activeTab) {
       case 1:
         return <CRM companyUserId={(selectedUser??loginStatus).id} />;
       case 2:
@@ -54,6 +58,8 @@ const Home: React.FC = () => {
       default:
         return <div>No content available for this dashboard.</div>;
     }
+    }
+    
   };
 
   const fetchCompanyUserDashboardAssigned = async () => {
@@ -106,6 +112,9 @@ const Home: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleTourEnd = () => {
+    setTourFinished(true);
+  }
 
   useEffect(() => {
     fetchCompanyUserDashboardAssigned();
@@ -139,10 +148,12 @@ const Home: React.FC = () => {
   }
 
 
+
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
+      <AppTutorailManager steps={DashboardTabsSteps} handleTourEnd={handleTourEnd}/>
       {loginStatus.isSuperUser && (
-        <div className="">
+        <div  className="">
           <CompanyUserDropdown
             limit={userPreference.rowsInGrid}
             companyId={loginStatus.companyId}
@@ -178,14 +189,16 @@ const Home: React.FC = () => {
             <div className="flex justify-start">
               {modules.map((module) => (
                 <button
+                  id={`${module.dashboard_name}DashboardTab`}
                   key={module.dashboard_id}
                   onClick={() => setActiveTab(module.dashboard_id)}
-                  className={`px-6 py-1 border-b-2 transition-colors
+                  className={`px-6 py-1 ${tourFinished ? 'pt-1' : 'pt-6'} border-b-2 transition-colors
                 ${
                   activeTab === module.dashboard_id
                     ? "main-nav-custom active-header"
                     : " main-nav-custom"
                 }`}
+                
                 >
                   {module.dashboard_name}
                 </button>

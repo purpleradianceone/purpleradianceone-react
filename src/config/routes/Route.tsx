@@ -222,6 +222,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
+              
               <GetCompanyUsers />
             </Navbar>
           </div>

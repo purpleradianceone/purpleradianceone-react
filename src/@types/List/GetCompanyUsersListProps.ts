@@ -10,6 +10,7 @@ type GetCompanyUsersListProps = {
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
     handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
+    isTourFinished? : boolean;
 }
 
 export default GetCompanyUsersListProps;

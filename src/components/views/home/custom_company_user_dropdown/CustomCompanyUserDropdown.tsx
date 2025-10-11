@@ -103,6 +103,7 @@ const CompanyUserDropdown: React.FC<Props> = ({
 
   return createPortal(
     <div
+    id="crmDashBoardCompanyUsersDropdown"
       className={`fixed ${
         userPreference.isLeftMenu ? "top-12 mt-1" : "top-14 mt-1"
       } right-0 `}

@@ -128,7 +128,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   return createPortal(
     <>
-      <div
+      <div id="add-company-user-modal"
         className={
           isSmallScreen
             ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
@@ -171,6 +171,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput
                 logo={User}
+                  id="company-user-module-add-name"
                   label="Name"
                   type="text"
                   name="name"

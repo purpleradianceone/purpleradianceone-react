@@ -42,10 +42,14 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { alphabets, backgroundColors } from "../../../../constants/Colors";
 import MESSAGE from "../../../../constants/Messages";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+    const [isDashboardRendered,setIsDashboardRendered] = useState<boolean>(false);
+      const [istourFinished,setIsTourFinished] = useState<boolean>(false);
 
   const {
     userHasAccessToViewLead,
@@ -101,6 +105,22 @@ function Navbar({ children }: { children: React.ReactNode }) {
       }
     }
   }, [location]);
+
+
+
+  useEffect(() => {
+
+    const element =location.pathname;
+    if(element === ROUTES_URL.HOME){
+      setIsTourFinished(false);
+      setIsDashboardRendered(true);
+    }
+    else{
+      setIsTourFinished(true);
+      setIsDashboardRendered(false);
+    }
+  },[location])
+ 
 
   const handleLogout = async () => {
     await axios
@@ -319,6 +339,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
   } else {
     return (
       <div>
+        {isDashboardRendered && <AppTutorailManager steps={NavbarSteps} handleTourEnd={()=>{setIsTourFinished(true)}}/>}
+        
         <header>
           <nav
             className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${
@@ -331,7 +353,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
+                <div id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
                     <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
                   </Link>
@@ -585,6 +607,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link> */}
                       <div className="relative">
                         <button
+                          id="notifications-navbar"
                           title="Show Notification"
                           onClick={() => {
                             resetNotificationCount();
@@ -614,6 +637,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       {userHasAccessToUpdateSettingGeneral ? (
                         <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
                           <button
+                            id="panel-layout-navbar"
                             title="Panel Layout"
                             className="p-2 rounded-lg hover:bg-gray-100"
                           >
@@ -628,6 +652,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                                 .DENIED_UPDATE_ACCESS
                             );
                           }}
+                          id="panel-layout-navbar"
                           title="Panel Layout"
                           className="p-2 rounded-lg opacity-50 cursor-not-allowed hover:bg-gray-100"
                         >
@@ -639,6 +664,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   <div
                     className="flex items-center cursor-pointer relative"
                     onClick={toggleCard}
+                    id="profile-actions-navbar"
                   >
                     <div
                       className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
@@ -775,7 +801,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
               : "mt-14 ml-0 flex justify-center items-center"
           }
         >
-          {children}
+
+          {istourFinished && children}
         </main>
         {accessDeniedPopUpView && (
           <AccessDeniedPopup

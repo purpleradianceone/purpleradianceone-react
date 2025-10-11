@@ -9,7 +9,8 @@ interface MetricCardProps {
   icon : React.ElementType,
   color: string;
   gradient: string;
-  visibility:boolean
+  visibility:boolean;
+  id : string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
@@ -18,7 +19,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
   icon: Icon,
   color, 
   gradient,
-  visibility 
+  visibility,
+  id
 }) => {
     const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
@@ -48,6 +50,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
   //   </motion.section>
   // );
   return (
+    <div id={id} className="w-full">
   <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
@@ -55,7 +58,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="w-full"
     >
-      <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+      <div  className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
         <div className={`absolute inset-0 ${gradient} opacity-5`}></div>
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-4">
@@ -70,6 +73,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
         </div>
       </div>
     </motion.section>
+    </div>
 );
 
 };

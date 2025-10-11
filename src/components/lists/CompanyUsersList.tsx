@@ -1,6 +1,6 @@
 import { Users, UserPlus, Calendar } from "lucide-react";
 import Button from "../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "../ag-grid/Pagination";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
@@ -9,7 +9,6 @@ import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
 import CompanyUser from "../../@types/company-users/CompanyUser";
 import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -22,6 +21,9 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
+import AppTutorailManager from "../views/tutorails/AppTutorailManager";
+import { CompanyUsersModuleSteps } from "../../constants/AppTutorailsSteps";
+
 
 function GetCompanyUsersList({
   users,
@@ -46,11 +48,18 @@ function GetCompanyUsersList({
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+      const [isAnimationComplete,setIsAnimationComplete] = useState<boolean>(false);
 
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const { userHasAccessToAddUser, userHasAccessToViewUser } =
+
+  const { userHasAccessToAddUser } =
     useUserAccessModules();
+
+     useEffect(() => {
+        setTimeout(() => {
+          setIsAnimationComplete(true);
+        },500)
+      },[])
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -89,28 +98,40 @@ function GetCompanyUsersList({
   const handleIsDashboardModalOpen = (status: boolean) => {
     setIsDashboardModalOpen(status);
   };
+
+  const handleTourModalOpen = (index : number) => {
+    if(index === 2){
+      setIsAddCompanyUserModalOpen(true);
+      return;
+    }
+    else if(index === 5){
+      setIsAddCompanyUserModalOpen(false);
+      return;
+    }
+  
+  }
   return (
-    userHasAccessToViewUser && (
+      
       <div
         className={`w-full  pt-1  ${
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
+              {isAnimationComplete && <AppTutorailManager  steps={CompanyUsersModuleSteps} handleTourEnd={()=>{}} isModalOpen={handleTourModalOpen} modalTriggerIndices={[2,4]}/>}
+
         <div className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
           <div className="flex  gap-2">
-            {!isSmallScreen && <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
-
-            {(isMediumScreen || isLargeScreen) && (
+             <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
               <span className="section-header-custom">Company Users</span>
-            )}
           </div>
-
-          {isLargeScreen && (
-            <>
+          
+            
               <div className="flex gap-1">
                 {/* search box flex div */}
-                <div className="relative flex items-start w-80 ">
+                
+                <div  className="relative flex items-start w-80">
                   <SearchInput
+                  id="company-user-module-search-box"
                     onChange={(e) => {
                       handleSearchOption.handleSearchParameterChange(
                         e.target.value
@@ -120,7 +141,7 @@ function GetCompanyUsersList({
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
+                <div id="company-users-module-date-range-filter" className="flex mx-3">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
                       <Calendar className="input-label-custom mt-1" />
@@ -147,8 +168,7 @@ function GetCompanyUsersList({
                   onEndDateChange={onEndDateChange}
                 />
               </div>
-            </>
-          )}
+
 
           
 
@@ -157,7 +177,7 @@ function GetCompanyUsersList({
           <>
             {/* {userHasAccessToAddUser ? ( */}
             {/* <> */}
-            <div className="flex gap-1">
+            <div id="company-users-module-add-button" className="flex gap-1">
               <Button
               type="submit"
                 disabled={!userHasAccessToAddUser}
@@ -242,7 +262,6 @@ function GetCompanyUsersList({
           />
         </div>
       </div>
-    )
   );
 }
 
