@@ -103,33 +103,8 @@ function GetAccounts({
         createdBy: res.createdby,
         createdOn: res.createdon,
       }));
-
       setAccounts(formattedData);
-      //       setAccounts([
-      //   {
-      //     count: 1,
-      //     id: 101,
-      //     companyId: 1,
-      //     name: "Acme Corp",
-      //     email: "contact@acmecorp.com",
-      //     mobileNumber: "9876543210",
-      //     industryTypeId: 5,
-      //     industryTypeName: "Technology",
-      //     businessTypeId: 2,
-      //     businessTypeName: "Limited Liability Partnership (LLP)",
-      //     pan: "ABCDE1234F",
-      //     gst: "27ABCDE1234F1Z5",
-      //     tan: "ABCDE1234F",
-      //     billingAddress: "123 Tech Park, Silicon Valley",
-      //     shippingAddress: "123 Tech Park, Silicon Valley",
-      //     registeredOfficeAddress: "123 Tech Park, Silicon Valley",
-      //     businessResgistrationNumber: "C1234567",
-      //     website: "https://www.acmecorp.com",
-      //     isActive: true,
-      //     createdBy: "admin",
-      //     createdOn: "2024-01-15T10:00:00Z",
-      //   },
-      // ])
+      
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
