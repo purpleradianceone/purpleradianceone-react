@@ -83,39 +83,66 @@ const MappedAccountDataPopup = ({
     const uniqueData = mappedData.filter((_, index) => selectedRows[index]);
     if (onImport) onImport(uniqueData);
     // console.log("Unique Data:", uniqueData); // for debugging
+    const allNamesAreNotMapped = uniqueData.every(
+      (account) => !account.name?.trim()
+    );
+    const allMobileNumbersAreNotMapped = uniqueData.every(
+      (account) => !account.mobilenumber?.trim()
+    );
+    const allEmailsAreNotMapped = uniqueData.every(
+      (account) => !account.email?.trim()
+    );
 
-    const postDataForAccountImport: postDataPropAccountImport = {
-      company_id: loginStatus.companyId,
-      account_import_mapped_data_list: uniqueData,
-      createdby: loginStatus.id,
-    };
-    // console.log("Post Data For import:", postDataForAccountImport); // for debugging
+    if (
+      !allNamesAreNotMapped &&
+      !allMobileNumbersAreNotMapped &&
+      !allEmailsAreNotMapped
+    ) {
+      const postDataForAccountImport: postDataPropAccountImport = {
+        company_id: loginStatus.companyId,
+        account_import_mapped_data_list: uniqueData,
+        createdby: loginStatus.id,
+      };
+      // console.log("Post Data For import:", postDataForAccountImport); // for debugging
 
-    await axios
-      .post(POST_API.IMPORT_ACCOUNT_VIA_CSV, postDataForAccountImport, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        const data = response.data;
+      await axios
+        .post(POST_API.IMPORT_ACCOUNT_VIA_CSV, postDataForAccountImport, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          const data = response.data;
 
-        if (data.status) {
-          toast.success(data.message);
-          setIsConfirmationPopup(true);
-        } else {
-          toast.error(data.message);
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch(async (error: any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({
-            callFunction: handleImport,
-          });
-          if (refreshTokenStatus) {
-            handleImport();
+          if (data.status) {
+            toast.success(data.message);
+            setIsConfirmationPopup(true);
+          } else {
+            toast.error(data.message);
           }
-        }
-      });
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch(async (error: any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: handleImport,
+            });
+            if (refreshTokenStatus) {
+              handleImport();
+            }
+          }
+        });
+    } else {
+      if (allNamesAreNotMapped) {
+        toast.error("Names are not mapped for Accounts Import!");
+      }
+
+      if (allMobileNumbersAreNotMapped) {
+        toast.error("Mobile numbers are not mapped for Accounts Import!");
+      }
+
+      if (allEmailsAreNotMapped) {
+        toast.error("Emails are not mapped for Accounts Import!");
+      }
+    }
   };
 
   return (
