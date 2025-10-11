@@ -124,10 +124,13 @@ function GetCompanyUsers() {
     }
   }, [userHasAccessToViewUser]);
 
+ 
+
   return (
     <div className="w-full">
       {userHasAccessToViewUser ? (
         <>
+        
           <div>
             <motion.section
       ref={ref}
@@ -136,6 +139,7 @@ function GetCompanyUsers() {
       transition={{ duration: 0.4, ease: "easeOut" }}
       
     >
+            
             <GetCompanyUsersList
               handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
               onEndDateChange={handleEndDateChange}

@@ -87,6 +87,7 @@ function CompanyUserAgGrid({
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        headerClass :"company-users-actions-column",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
@@ -143,7 +144,7 @@ function CompanyUserAgGrid({
 
           return (
             <>
-              <button
+              <button id="actions-button"
                 className="text-blue-600"
                 onClick={handleActionsButtonClick}
               >

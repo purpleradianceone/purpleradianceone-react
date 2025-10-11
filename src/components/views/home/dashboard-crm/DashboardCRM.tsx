@@ -28,6 +28,8 @@ import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverag
 import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
 import PieChart from "./PieChart";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -272,6 +274,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
           <MetricCard
             title="Total Leads"
+            id="totalLeadsMetricCard"
             value={(
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_LEADS]?.[0]
                 ?.total_leads ?? 0
@@ -289,6 +292,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Active Leads"
+            id="activeLeadsMetricCard"
             value={(
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_ACTIVE_LEADS]?.[0]
                 ?.active_leads ?? 0
@@ -306,6 +310,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Converted Leads"
+            id="convertedLeadsMetricCard"
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERTED_LEADS
@@ -324,6 +329,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Unqualified Leads"
+            id="unqualifiedLeadsMetricCard"
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_UNQUALIFIED_LEADS
@@ -342,6 +348,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Lost Leads"
+            id="lostLeadsMetricCard"
             value={
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_LOST_LEADS]?.[0]
                 ?.lost_leads ?? 0
@@ -360,6 +367,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
           <MetricCard
             title="Conversion Rate"
+            id="conversionRateMetricCard"
             value={`${(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERSION_RATE
@@ -385,7 +393,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         key="Leads by status"
         className="grid grid-cols-1 col-span-1 xl:grid-cols-1 gap-8"
       >
-        <div className="min-h-[500px]">
+        <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
             <PipelineChart
               pipelineData={leadSummaryReportData}
@@ -396,12 +404,13 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       </div>
     ),
     "12 months performance": (
-      <div key="12 months performance" className="min-h-[700px] col-span-1">
+      <div id="monthlyPerformance" key="12 months performance" className="min-h-[700px] col-span-1">
         <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
     "Pending tasks": (
       <div
+        id="pendingTasks"
         key="Pending tasks"
         className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-white
@@ -418,6 +427,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     ),
     "Upcoming tasks": (
       <div
+        id="upcomingTasks"
         key="Upcoming tasks"
         className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-white
@@ -434,6 +444,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     ),
     "Leads by source": (
       <div
+        id="leadBySource"
         key="Leads by source"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
@@ -448,6 +459,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     ),
     "Quick Actions": (
       <div
+        id="quickActions"
         key="Quick Actions"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
@@ -462,10 +474,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const componentMapPieChart: { [key: string]: JSX.Element } = {
     "Leads by status": (
       <div
+
         key="Leads by status"
         className="grid grid-cols-1 xl:grid-cols-1 gap-8"
       >
-        <div className="min-h-[500px]">
+        <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
             <PieChart data={leadSummaryReportData} chartFor="leadByStatus" />
           )}
@@ -475,6 +488,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     "Leads by source": (
       <div
         key="Leads by source"
+        id="leadBySource"
         className="h-full overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-50
@@ -533,6 +547,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         )}
         {!isTasksLoading && dashboardVisiblity.length !== 0 && (
           <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">
+            <AppTutorailManager steps={DashboardCrmSteps} handleTourEnd={()=>{}}/>
             {renderDashboardSections()}
           </div>
         )}
