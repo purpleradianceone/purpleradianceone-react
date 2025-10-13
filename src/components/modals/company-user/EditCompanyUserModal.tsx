@@ -192,7 +192,7 @@ function EditCompanyUserModal({
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
+      <div  className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
             className=" w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
@@ -200,7 +200,7 @@ function EditCompanyUserModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
-            <div className="p-5">
+            <div  className="p-5">
               {/* <div className="flex justify-between items-center  mb-3 border-b ">
                 <div className="flex gap-2">
                   <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
@@ -223,7 +223,7 @@ function EditCompanyUserModal({
                 description="Modify and manage user details, including contact information, as needed."
               />
 
-              <form className="space-y-5" onSubmit={handleEditUserSubmit}>
+              <form id="company-user-edit-modal" className="space-y-5" onSubmit={handleEditUserSubmit}>
                 <FormInput
                   logo={User}
                   label="Name"
