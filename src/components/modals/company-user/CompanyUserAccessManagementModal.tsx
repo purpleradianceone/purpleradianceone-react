@@ -229,9 +229,9 @@ function CompanyUserAccessManagementModal({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
+    <div  className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
       <div className="flex min-h-screen items-center justify-center">
-        <div className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
+        <div  className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
           {/* Header */}
           {/* <div className="flex justify-between items-center p-3 border-b">
               <h2 className="text-xl flex items-center gap-2 font-medium text-gray-900">
@@ -253,13 +253,13 @@ function CompanyUserAccessManagementModal({
           />
 
           {/* Content Area */}
-          <div className="flex-1 overflow-hidden">
+          <div  className="flex-1 overflow-hidden">
             {dataStatus ? (
               <div className="flex w-full h-full justify-center items-center">
                 <LoadingSpinner />
               </div>
             ) : (
-              <div className="flex flex-col h-full">
+              <div  className="flex flex-col h-full">
                 {/* Fixed Header */}
                 <div className="bg-white border-b">
                   <table className="w-full table-fixed">
@@ -313,7 +313,7 @@ function CompanyUserAccessManagementModal({
                 </div>
 
                 {/* Scrollable Body */}
-                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                <div id="company-user-access-management-modal" className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
                   <table className="w-full table-fixed">
                     <colgroup>
                       <col className={columnClasses.srNo} />

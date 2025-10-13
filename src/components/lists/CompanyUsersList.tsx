@@ -22,8 +22,9 @@ import MESSAGE from "../../constants/Messages";
 import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
-import { CompanyUsersModuleSteps } from "../../constants/AppTutorailsSteps";
-
+import {
+  CompanyUsersModuleSteps,
+} from "../../constants/AppTutorailsSteps";
 
 function GetCompanyUsersList({
   users,
@@ -36,6 +37,8 @@ function GetCompanyUsersList({
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
 
+  const [isActionsTourEnded,setIsActionsTourEnded] = useState<boolean>(false);
+
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
     useState<boolean>(false);
 
@@ -45,21 +48,18 @@ function GetCompanyUsersList({
     useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-      const [isAnimationComplete,setIsAnimationComplete] = useState<boolean>(false);
+  const [isAnimationComplete, setIsAnimationComplete] =
+    useState<boolean>(false);
 
+  const { userHasAccessToAddUser } = useUserAccessModules();
 
-
-  const { userHasAccessToAddUser } =
-    useUserAccessModules();
-
-     useEffect(() => {
-        setTimeout(() => {
-          setIsAnimationComplete(true);
-        },500)
-      },[])
+  useEffect(() => {
+    setTimeout(() => {
+      setIsAnimationComplete(true);
+    }, 500);
+  }, []);
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -99,169 +99,181 @@ function GetCompanyUsersList({
     setIsDashboardModalOpen(status);
   };
 
-  const handleTourModalOpen = (index : number) => {
-    if(index === 2){
+  const handleTourModalOpen = (index: number) => {
+    if (index === 2) {
       setIsAddCompanyUserModalOpen(true);
+
       return;
-    }
-    else if(index === 5){
+    } else if (index === 4) {
       setIsAddCompanyUserModalOpen(false);
       return;
     }
-  
-  }
+  };
+
+  const handleActionsTourEnd = () => {
+    setIsActionsTourEnded(true);
+  };
   return (
-      
+    <div
+      className={`w-full  pt-1  ${
+        userPreference.isLeftMenu ? "pl-5" : "pl-1"
+      } pr-1 gap-1`}
+    >
+      {isAnimationComplete && (
+        <AppTutorailManager
+          steps={CompanyUsersModuleSteps}
+          handleTourEnd={() => {}}
+          isModalOpen={handleTourModalOpen}
+          modalOpenTriggerIndices={[2, 3, 4]}
+        />
+      )}
+
       <div
-        className={`w-full  pt-1  ${
-          userPreference.isLeftMenu ? "pl-5" : "pl-1"
-        } pr-1 gap-1`}
+        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-              {isAnimationComplete && <AppTutorailManager  steps={CompanyUsersModuleSteps} handleTourEnd={()=>{}} isModalOpen={handleTourModalOpen} modalTriggerIndices={[2,4]}/>}
+        <div className="flex  gap-2">
+          <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+          <span className="section-header-custom">Company Users</span>
+        </div>
 
-        <div className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
-          <div className="flex  gap-2">
-             <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-              <span className="section-header-custom">Company Users</span>
+        <div className="flex gap-1">
+          {/* search box flex div */}
+
+          <div className="relative flex items-start w-80">
+            <SearchInput
+              id="company-user-module-search-box"
+              onChange={(e) => {
+                handleSearchOption.handleSearchParameterChange(e.target.value);
+              }}
+            ></SearchInput>
           </div>
-          
-            
-              <div className="flex gap-1">
-                {/* search box flex div */}
-                
-                <div  className="relative flex items-start w-80">
-                  <SearchInput
-                  id="company-user-module-search-box"
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
 
-                {/* Date FIlters Dropdown */}
-                <div id="company-users-module-date-range-filter" className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="input-label-custom mt-1" />
-                    </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                </div>
+          {/* Date FIlters Dropdown */}
+          <div
+            id="company-users-module-date-range-filter"
+            className="flex mx-3"
+          >
+            <div className="flex">
+              <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                <Calendar className="input-label-custom mt-1" />
               </div>
 
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
+              <DateRangeFilterDropdown
+                dropdownOptions={dateRangeDropdownOptions}
+                handleDateIdChange={handleDateRangeIdChange}
+              ></DateRangeFilterDropdown>
+            </div>
+          </div>
+        </div>
 
+        {/* Custom Date Picker Div Flex Box*/}
+        <div
+          style={
+            isCustomDateOptionSelected
+              ? { visibility: "visible" }
+              : { visibility: "hidden" }
+          }
+        >
+          <DateRangePicker
+            onStartDateChange={onStartDateChange}
+            onEndDateChange={onEndDateChange}
+          />
+        </div>
 
-          
+        {/* new end */}
 
-          {/* new end */}
-
-          <>
-            {/* {userHasAccessToAddUser ? ( */}
-            {/* <> */}
-            <div id="company-users-module-add-button" className="flex gap-1">
-              <Button
+        <>
+          {/* {userHasAccessToAddUser ? ( */}
+          {/* <> */}
+          <div id="company-users-module-add-button" className="flex gap-1">
+            <Button
               type="submit"
-                disabled={!userHasAccessToAddUser}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!userHasAccessToAddUser) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_USER
-                        .DENIED_ADD_ACCESS_COMPANY_USER
-                    );
-                    return;
-                  } else {
-                    setIsAddCompanyUserModalOpen(true);
-                  }
-                }}
-                // onClick={() => setIsAddCompanyUserModalOpen(true)}
-              >
-                {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+              disabled={!userHasAccessToAddUser}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!userHasAccessToAddUser) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.COMPANY_USER
+                      .DENIED_ADD_ACCESS_COMPANY_USER
+                  );
+                  return;
+                } else {
+                  setIsAddCompanyUserModalOpen(true);
+                }
+              }}
+              // onClick={() => setIsAddCompanyUserModalOpen(true)}
+            >
+              {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
-                <div className="flex items-center gap-1">
-                  
-                  <UserPlus size={SIZE.SIXTEEN}/>
-                  Add
-                </div>
-              </Button>
-            </div>
-            <AddCompanyUserModal
-              isOpen={isAddCompanyUserModalOpen}
-              onClose={() => setIsAddCompanyUserModalOpen(false)}
-            />
-
-            <EditCompanyUserModal
-              handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-              isOpen={isEditCompanyUserModalOpen}
-              onClose={() => {
-                setIsEditModalOpen(false);
-              }}
-              user={selectedCompanyUser}
-            />
-
-            <CompanyUserDashboardModal
-              isOpen={isDashboardModalOpen}
-              onClose={() => {
-                setIsDashboardModalOpen(false);
-              }}
-              users={selectedCompanyUser}
-            />
-          </>
-        </div>
-
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          <div
-            className={
-              userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-130px)]"
-            }
-          >
-            <CompanyUserAgGrid
-              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-              users={users}
-              handleIdIsEditModalOpen={handleIdIsEditModalOpen}
-              handleIsAccessModalOpen={handleIsAccessModalOpen}
-              handleIsDashboardModalOpen={handleIsDashboardModalOpen}
-            />
+              <div className="flex items-center gap-1">
+                <UserPlus size={SIZE.SIXTEEN} />
+                Add
+              </div>
+            </Button>
           </div>
-          <CompanyUserAccessManagementModal
-            isOpen={isAccessModalOpen}
-            onClose={() => setIsAccessModalOpen(false)}
-            users={selectedCompanyUser}
+          <AddCompanyUserModal
+            isOpen={isAddCompanyUserModalOpen}
+            onClose={() => setIsAddCompanyUserModalOpen(false)}
           />
-        </div>
-        {/* pagination component */}
-        <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
-            pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
-          />
-        </div>
+
+         
+        </>
       </div>
+
+      <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+        
+        <div
+          className={
+            userPreference.isLeftMenu
+              ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-130px)]"
+          }
+        >
+           
+          <CompanyUserAgGrid
+            handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+            users={users}
+            handleIdIsEditModalOpen={handleIdIsEditModalOpen}
+            handleIsAccessModalOpen={handleIsAccessModalOpen}
+            handleIsDashboardModalOpen={handleIsDashboardModalOpen}
+            isActionsTourEnded={isActionsTourEnded}
+            handleActionsTourEnd={handleActionsTourEnd}
+          />
+        </div>
+          <CompanyUserAccessManagementModal
+          isOpen={isAccessModalOpen}
+          onClose={() => setIsAccessModalOpen(false)}
+          users={selectedCompanyUser}
+        />
+        <EditCompanyUserModal
+            handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+            isOpen={isEditCompanyUserModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+            }}
+            user={selectedCompanyUser}
+          />
+        
+        <CompanyUserDashboardModal
+          isOpen={isDashboardModalOpen}
+          onClose={() => {
+            setIsDashboardModalOpen(false);
+          }}
+          users={selectedCompanyUser}
+        />
+      </div>
+      {/* pagination component */}
+      <div className="flex items-center justify-end ">
+        <Pagination
+          totalPages={paginationData.totalPages}
+          currentPage={paginationData.currentPage}
+          pageSize={paginationData.pageSize}
+          onPageChange={paginationData.handlePageChange}
+          onPageSizeChange={paginationData.selectedPageSize}
+        />
+      </div>
+    </div>
   );
 }
 

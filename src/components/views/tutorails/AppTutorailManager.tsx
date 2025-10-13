@@ -5,26 +5,30 @@ function AppTutorailManager({
     steps,
     handleTourEnd,
     isModalOpen,
-    modalTriggerIndices
+    modalOpenTriggerIndices,
 }: { 
     steps: Step[];
     handleTourEnd : () => void;
     isModalOpen? : (index : number) => void;
-    modalTriggerIndices? : number[];
+    modalOpenTriggerIndices? : number[];
 
 }) {
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status,index } = data;
-    console.log(data);
-
-   if(modalTriggerIndices?.includes(index)){
+    const { status,index ,lifecycle} = data;
     
-    isModalOpen!(index);
+
+   if(modalOpenTriggerIndices?.includes(index)){
+    console.log(index + " : " + status + " : " + lifecycle);
+        isModalOpen!(index);
+    
    }
 
     if(status === "finished" || status === "skipped" ){
+      console.log("ioierngoreugnre");
+      console.log(index);
         handleTourEnd();
     }
+   
     
     
   };
@@ -55,6 +59,9 @@ function AppTutorailManager({
             margin:"0px",
             padding:"0px",
            
+        },
+        overlay : {
+          zIndex : 100000,
         }
       }}
     />
