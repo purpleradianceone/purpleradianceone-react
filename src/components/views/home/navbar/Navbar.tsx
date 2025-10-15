@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import {
   Aperture,
@@ -44,11 +45,14 @@ import { alphabets, backgroundColors } from "../../../../constants/Colors";
 import MESSAGE from "../../../../constants/Messages";
 import AppTutorailManager from "../../tutorails/AppTutorailManager";
 import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
     const [isDashboardRendered,setIsDashboardRendered] = useState<boolean>(false);
+    const {tutorailData,setTutorailData} = useTutorailDataContext();
       const [istourFinished,setIsTourFinished] = useState<boolean>(false);
 
   const {
@@ -110,14 +114,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
 
+    
     const element =location.pathname;
     if(element === ROUTES_URL.HOME){
-      setIsTourFinished(false);
       setIsDashboardRendered(true);
+      setIsTourFinished(tutorailData.isNavbarSeen);
     }
     else{
-      setIsTourFinished(true);
       setIsDashboardRendered(false);
+      setIsTourFinished(tutorailData.isNavbarSeen);
     }
   },[location])
  
@@ -202,6 +207,52 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
+
+    const handleNavbarTutorailFinish = async() => {
+      console.log(tutorailData);
+      const updateTutorailPostData = {
+        company_id : loginStatus.companyId,
+        id : tutorailData.id,
+        column_name : TutorailColumnName.IS_NAVBAR_SEEN,
+        status : true,
+        updatedby_id : loginStatus.id
+      }
+      axios.post(POST_API.UPDATE_COMPANY_USER_TUTORAIL,updateTutorailPostData,{
+        withCredentials:true,
+      }).then((response) => {
+        if(response.data.status){
+            setIsTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+          companyUserId: tutorailData.companyUserId,
+          isNavbarSeen: true,
+          isDashboardSeen: tutorailData.isDashboardSeen,
+          isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+          isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+          isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+          isLeadSeen: tutorailData.isLeadSeen,
+          isAccountSeen: tutorailData.isAccountSeen,
+          isProductSeen: tutorailData.isProductSeen,
+          isTeamSeen: tutorailData.isTeamSeen,
+          isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+          isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+          isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+          createdBy: tutorailData.createdOn,
+          updatedBy: tutorailData.updatedBy,
+          createdOn: tutorailData.createdOn,
+          updatedOn: tutorailData.updatedOn,
+          });
+        }
+      }).catch(async(error) => {
+        if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenResponse = await RefreshToken({callFunction:handleNavbarTutorailFinish})
+          if(refreshTokenResponse){
+            handleNavbarTutorailFinish();
+          }
+        }
+      })
+      
+    }
 
   // useEffect(() => {
   //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
@@ -339,7 +390,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
   } else {
     return (
       <div>
-        {isDashboardRendered && <AppTutorailManager steps={NavbarSteps} handleTourEnd={()=>{setIsTourFinished(true)}}/>}
+        {istourFinished ? null : isDashboardRendered  && <AppTutorailManager steps={NavbarSteps} handleTourEnd={handleNavbarTutorailFinish}/>}
         
         <header>
           <nav
