@@ -19,11 +19,18 @@ import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboa
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
-import { SIZE } from "../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
-import { CompanyUsersModuleSteps } from "../../constants/AppTutorailsSteps";
-
+import {
+  CompanyUsersModuleSteps,
+} from "../../constants/AppTutorailsSteps";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../constants/Tutorail";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function GetCompanyUsersList({
   users,
@@ -36,6 +43,8 @@ function GetCompanyUsersList({
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
 
+  const [isActionsTourEnded,setIsActionsTourEnded] = useState<boolean>(false);
+
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
     useState<boolean>(false);
 
@@ -45,21 +54,26 @@ function GetCompanyUsersList({
     useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-      const [isAnimationComplete,setIsAnimationComplete] = useState<boolean>(false);
+  const [isAnimationComplete, setIsAnimationComplete] =
+    useState<boolean>(false);
 
+  const { userHasAccessToAddUser } = useUserAccessModules();
+  const {loginStatus} = useLoggedInUserContext();
+  const {tutorailData,setTutorailData} = useTutorailDataContext();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
 
+  useEffect(() => {
+    setTourFinished(tutorailData.isCompanyUserSeen)
+    setIsActionsTourEnded(tutorailData.isCompanyUserActionsSeen)
+  },[tutorailData])
 
-  const { userHasAccessToAddUser } =
-    useUserAccessModules();
-
-     useEffect(() => {
-        setTimeout(() => {
-          setIsAnimationComplete(true);
-        },500)
-      },[])
+  useEffect(() => {
+    setTimeout(() => {
+      setIsAnimationComplete(true);
+    }, 500);
+  }, []);
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -99,169 +113,276 @@ function GetCompanyUsersList({
     setIsDashboardModalOpen(status);
   };
 
-  const handleTourModalOpen = (index : number) => {
-    if(index === 2){
+  const handleTourModalOpen = (index: number) => {
+    if (index === 2) {
       setIsAddCompanyUserModalOpen(true);
+
       return;
-    }
-    else if(index === 5){
+    } else if (index === 4) {
       setIsAddCompanyUserModalOpen(false);
       return;
     }
-  
+  };
+
+  const handleActionsTourEnd = () => {
+    
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_ACTIONS_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setIsActionsTourEnded(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: true,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  };
+
+  const handleTourEnd = async() => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: true,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
   }
   return (
-      
+    <div
+      className={`w-full  pt-1  ${
+        userPreference.isLeftMenu ? "pl-5" : "pl-1"
+      } pr-1 gap-1`}
+    >
+      {tourFinished ? null : isAnimationComplete && (
+        <AppTutorailManager
+          steps={CompanyUsersModuleSteps}
+          handleTourEnd={handleTourEnd}
+          isModalOpen={handleTourModalOpen}
+          modalOpenTriggerIndices={[2, 3, 4]}
+        />
+      )}
+
       <div
-        className={`w-full  pt-1  ${
-          userPreference.isLeftMenu ? "pl-5" : "pl-1"
-        } pr-1 gap-1`}
+        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-              {isAnimationComplete && <AppTutorailManager  steps={CompanyUsersModuleSteps} handleTourEnd={()=>{}} isModalOpen={handleTourModalOpen} modalTriggerIndices={[2,4]}/>}
+        <div className="flex  gap-2">
+          <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+          <span className="section-header-custom">Company Users</span>
+        </div>
 
-        <div className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
-          <div className="flex  gap-2">
-             <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-              <span className="section-header-custom">Company Users</span>
+        <div className="flex gap-1">
+          {/* search box flex div */}
+
+          <div className="relative flex items-start w-80">
+            <SearchInput
+              id="company-user-module-search-box"
+              onChange={(e) => {
+                handleSearchOption.handleSearchParameterChange(e.target.value);
+              }}
+            ></SearchInput>
           </div>
-          
-            
-              <div className="flex gap-1">
-                {/* search box flex div */}
-                
-                <div  className="relative flex items-start w-80">
-                  <SearchInput
-                  id="company-user-module-search-box"
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
 
-                {/* Date FIlters Dropdown */}
-                <div id="company-users-module-date-range-filter" className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="input-label-custom mt-1" />
-                    </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                </div>
+          {/* Date FIlters Dropdown */}
+          <div
+            id="company-users-module-date-range-filter"
+            className="flex mx-3"
+          >
+            <div className="flex">
+              <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                <Calendar className="input-label-custom mt-1" />
               </div>
 
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
+              <DateRangeFilterDropdown
+                dropdownOptions={dateRangeDropdownOptions}
+                handleDateIdChange={handleDateRangeIdChange}
+              ></DateRangeFilterDropdown>
+            </div>
+          </div>
+        </div>
 
+        {/* Custom Date Picker Div Flex Box*/}
+        <div
+          style={
+            isCustomDateOptionSelected
+              ? { visibility: "visible" }
+              : { visibility: "hidden" }
+          }
+        >
+          <DateRangePicker
+            onStartDateChange={onStartDateChange}
+            onEndDateChange={onEndDateChange}
+          />
+        </div>
 
-          
+        {/* new end */}
 
-          {/* new end */}
-
-          <>
-            {/* {userHasAccessToAddUser ? ( */}
-            {/* <> */}
-            <div id="company-users-module-add-button" className="flex gap-1">
-              <Button
+        <>
+          {/* {userHasAccessToAddUser ? ( */}
+          {/* <> */}
+          <div id="company-users-module-add-button" className="flex gap-1">
+            <Button
               type="submit"
-                disabled={!userHasAccessToAddUser}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!userHasAccessToAddUser) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_USER
-                        .DENIED_ADD_ACCESS_COMPANY_USER
-                    );
-                    return;
-                  } else {
-                    setIsAddCompanyUserModalOpen(true);
-                  }
-                }}
-                // onClick={() => setIsAddCompanyUserModalOpen(true)}
-              >
-                {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+              disabled={!userHasAccessToAddUser}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!userHasAccessToAddUser) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.COMPANY_USER
+                      .DENIED_ADD_ACCESS_COMPANY_USER
+                  );
+                  return;
+                } else {
+                  setIsAddCompanyUserModalOpen(true);
+                }
+              }}
+              // onClick={() => setIsAddCompanyUserModalOpen(true)}
+            >
+              {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
                 {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
-                <div className="flex items-center gap-1">
-                  
-                  <UserPlus size={SIZE.SIXTEEN}/>
-                  Add
-                </div>
-              </Button>
-            </div>
-            <AddCompanyUserModal
-              isOpen={isAddCompanyUserModalOpen}
-              onClose={() => setIsAddCompanyUserModalOpen(false)}
-            />
-
-            <EditCompanyUserModal
-              handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-              isOpen={isEditCompanyUserModalOpen}
-              onClose={() => {
-                setIsEditModalOpen(false);
-              }}
-              user={selectedCompanyUser}
-            />
-
-            <CompanyUserDashboardModal
-              isOpen={isDashboardModalOpen}
-              onClose={() => {
-                setIsDashboardModalOpen(false);
-              }}
-              users={selectedCompanyUser}
-            />
-          </>
-        </div>
-
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          <div
-            className={
-              userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-130px)]"
-            }
-          >
-            <CompanyUserAgGrid
-              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-              users={users}
-              handleIdIsEditModalOpen={handleIdIsEditModalOpen}
-              handleIsAccessModalOpen={handleIsAccessModalOpen}
-              handleIsDashboardModalOpen={handleIsDashboardModalOpen}
-            />
+              <div className="flex items-center gap-1">
+                <UserPlus size={SIZE.SIXTEEN} />
+                Add
+              </div>
+            </Button>
           </div>
-          <CompanyUserAccessManagementModal
-            isOpen={isAccessModalOpen}
-            onClose={() => setIsAccessModalOpen(false)}
-            users={selectedCompanyUser}
+          <AddCompanyUserModal
+            isOpen={isAddCompanyUserModalOpen}
+            onClose={() => setIsAddCompanyUserModalOpen(false)}
           />
-        </div>
-        {/* pagination component */}
-        <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
-            pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
-          />
-        </div>
+
+         
+        </>
       </div>
+
+      <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+        
+        <div
+          className={
+            userPreference.isLeftMenu
+              ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-130px)]"
+          }
+        >
+           
+          <CompanyUserAgGrid
+            handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+            users={users}
+            handleIdIsEditModalOpen={handleIdIsEditModalOpen}
+            handleIsAccessModalOpen={handleIsAccessModalOpen}
+            handleIsDashboardModalOpen={handleIsDashboardModalOpen}
+            isActionsTourEnded={isActionsTourEnded}
+            handleActionsTourEnd={handleActionsTourEnd}
+          />
+        </div>
+          <CompanyUserAccessManagementModal
+          isOpen={isAccessModalOpen}
+          onClose={() => setIsAccessModalOpen(false)}
+          users={selectedCompanyUser}
+        />
+        <EditCompanyUserModal
+            handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+            isOpen={isEditCompanyUserModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+            }}
+            user={selectedCompanyUser}
+          />
+        
+        <CompanyUserDashboardModal
+          isOpen={isDashboardModalOpen}
+          onClose={() => {
+            setIsDashboardModalOpen(false);
+          }}
+          users={selectedCompanyUser}
+        />
+      </div>
+      {/* pagination component */}
+      <div className="flex items-center justify-end ">
+        <Pagination
+          totalPages={paginationData.totalPages}
+          currentPage={paginationData.currentPage}
+          pageSize={paginationData.pageSize}
+          onPageChange={paginationData.handlePageChange}
+          onPageSizeChange={paginationData.selectedPageSize}
+        />
+      </div>
+    </div>
   );
 }
 

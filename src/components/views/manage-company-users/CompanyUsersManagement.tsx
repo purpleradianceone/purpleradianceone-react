@@ -5,9 +5,7 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
-import {
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -23,9 +21,7 @@ function GetCompanyUsers() {
   );
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
@@ -60,9 +56,7 @@ function GetCompanyUsers() {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate
-        ? 0
-        : dateRangeId;
+      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -83,9 +77,7 @@ function GetCompanyUsers() {
       setCompanyUsers(response.data);
       // console.log(response.data);
       if (response.data[0]?.count) {
-        setTotalPages(
-          Math.ceil(response.data[0].count / pageSize)
-        );
+        setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
@@ -100,11 +92,11 @@ function GetCompanyUsers() {
     }
   };
 
-
-
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchCompanyUsers();
+      if (loginStatus.status) {
+        fetchCompanyUsers();
+      }
     }, 100); // Small delay to allow state updates to settle
 
     return () => clearTimeout(timeoutId);
@@ -124,39 +116,34 @@ function GetCompanyUsers() {
     }
   }, [userHasAccessToViewUser]);
 
- 
-
   return (
     <div className="w-full">
       {userHasAccessToViewUser ? (
         <>
-        
           <div>
             <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      
-    >
-            
-            <GetCompanyUsersList
-              handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
-              onEndDateChange={handleEndDateChange}
-              onStartDateChange={handleStartDateChange}
-              handleSearchOption={{
-                handleSearchParameterChange,
-                handleDateRangeIdChange: handleDatePageIdChange,
-              }}
-              paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
-                pageSize,
-              }}
-              users={companyUsers}
-            />
+              ref={ref}
+              initial={{ opacity: 0, y: 40 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <GetCompanyUsersList
+                handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
+                onEndDateChange={handleEndDateChange}
+                onStartDateChange={handleStartDateChange}
+                handleSearchOption={{
+                  handleSearchParameterChange,
+                  handleDateRangeIdChange: handleDatePageIdChange,
+                }}
+                paginationData={{
+                  selectedPageSize: handlePageSizeChange,
+                  currentPage,
+                  handlePageChange,
+                  totalPages,
+                  pageSize,
+                }}
+                users={companyUsers}
+              />
             </motion.section>
           </div>
         </>

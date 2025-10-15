@@ -1,34 +1,33 @@
 import Joyride from "react-joyride";
 import type { CallBackProps, Step } from "react-joyride";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 
-function AppTutorailManager({ 
-    steps,
-    handleTourEnd,
-    isModalOpen,
-    modalTriggerIndices
-}: { 
-    steps: Step[];
-    handleTourEnd : () => void;
-    isModalOpen? : (index : number) => void;
-    modalTriggerIndices? : number[];
-
+function AppTutorailManager({
+  steps,
+  handleTourEnd,
+  isModalOpen,
+  modalOpenTriggerIndices,
+}: {
+  steps: Step[];
+  handleTourEnd: () => void;
+  isModalOpen?: (index: number) => void;
+  modalOpenTriggerIndices?: number[];
 }) {
+  const { loginStatus } = useLoggedInUserContext();
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status,index } = data;
-    console.log(data);
+    const { status, index, lifecycle } = data;
 
-   if(modalTriggerIndices?.includes(index)){
-    
-    isModalOpen!(index);
-   }
-
-    if(status === "finished" || status === "skipped" ){
-        handleTourEnd();
+    if (modalOpenTriggerIndices?.includes(index)) {
+      console.log(index + " : " + status + " : " + lifecycle);
+      isModalOpen!(index);
     }
-    
-    
-  };
 
+    if (status === "finished" || status === "skipped") {
+      if (loginStatus.status) {
+        handleTourEnd();
+      }
+    }
+  };
 
   return (
     <Joyride
@@ -51,11 +50,13 @@ function AppTutorailManager({
           spotlightShadow: "white",
           textColor: "black",
         },
-        spotlight : {
-            margin:"0px",
-            padding:"0px",
-           
-        }
+        spotlight: {
+          margin: "0px",
+          padding: "0px",
+        },
+        overlay: {
+          zIndex: 100000,
+        },
       }}
     />
   );

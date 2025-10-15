@@ -35,10 +35,18 @@ export const NavbarSteps: Step[] = [
     placement: "bottom",
     disableBeacon: true,
     disableOverlayClose: true,
+    locale: { last: "Finish Tour" },
   },
 ]
 
 export const DashboardTabsSteps: Step[] = [
+  {
+    target: "#crmDashBoardCompanyUsersDropdown",
+    content: "Browse to other users dashboard and check there insights from here",
+    placement: "bottom",
+    disableBeacon: true,
+    disableOverlayClose: true,
+  },
   {
     target: "#CRMDashboardTab",
     content: "Navigate to Crm related dashboard from here",
@@ -73,15 +81,9 @@ export const DashboardTabsSteps: Step[] = [
     placement: "bottom",
     disableBeacon: true,
     disableOverlayClose: true,
-  },
-  {
-    target: "#crmDashBoardCompanyUsersDropdown",
-    content: "Browse to other users dashboard and check there insights from here",
-    placement: "bottom",
-    disableBeacon: true,
-    disableOverlayClose: true,
     locale: { last: "Finish Tour" },
   },
+  
 ];
 
 export const DashboardCrmSteps: Step[] = [
@@ -198,7 +200,7 @@ export const CompanyUsersModuleSteps: Step[] = [
   {
     target: "#company-users-module-add-button",
     content: "Add/Create the new company users from here",
-    placement: "bottom",
+    placement: "left",
     disableBeacon: true,
     disableOverlayClose: true,
   },
@@ -210,24 +212,81 @@ export const CompanyUsersModuleSteps: Step[] = [
     disableOverlayClose: true,
     styles : {
       overlay : {
-        accentColor: "white",
-        opacity : 0.6
+        accentColor: "#333333",
+        opacity : -1
       }
     }
   },
-  // {
-  //   target: ".company-users-actions-column",
-  //   content: "Manage your company users related actions from here",
-  //   placement: "bottom",
-  //   disableBeacon: true,
-  //   disableOverlayClose: true,
-  // },
   {
     target: "#actions-button",
     content: "Manage your company users related actions from here",
     placement: "bottom",
     disableBeacon: true,
     disableOverlayClose: true,
+    locale: { last: "Finish Tour" },
+    
   },
+  
+]
+
+export const CompanyUsersGridActionsButtonStep: Step[] = [
+   {
+    target: "#company-user-access-management-action-btn",
+    content: "Manage the access to individual users from here",
+    placement: "left",
+    disableBeacon: true,
+    disableOverlayClose: true,
+  },
+   {
+    target: "#company-user-access-management-modal",
+    content: "Manage the access of users like view/add/update for various modules and sections",
+    placement: "top",
+    disableBeacon: true,
+    disableOverlayClose: true,
+    // disableOverlay:true,
+    styles : {tooltip:{
+      margin : 1,
+      padding : 1,
+      maxHeight : "150px"
+    }}
+  },
+
+  {
+    target: "#company-user-edit-action-btn",
+    content: "Edit the company users details from here",
+    placement: "left",
+    disableBeacon: true,
+    disableOverlayClose: true,
+  },
+    {
+    target: "#company-user-edit-modal",
+    content: "Manage the access of users like view/add/update for various modules and sections",
+    placement: "top",
+    disableBeacon: true,
+    disableOverlayClose: true,
+    // disableOverlay:true,
+  },
+  {
+    target: "#company-user-dashboard-action-btn",
+    content: "Manage the dashboard's access to the user from here",
+    placement: "left",
+    disableBeacon: true,
+    disableOverlayClose: true,
+  },
+  {
+    target: "#company-user-dashboard-modal",
+    content: "Manage the dashboard's access to the user from here",
+    placement: "top",
+    disableBeacon: true,
+    disableOverlayClose: true,
+    styles : {tooltip:{
+      margin : 1,
+      padding : 1,
+      maxHeight : "150px"
+    }},
+    locale: { last: "Finish Tour" },
+  },
+  
+  
   
 ]
