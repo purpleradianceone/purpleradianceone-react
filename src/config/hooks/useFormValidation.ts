@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import validateEmail from '../validations/ValidateEmail';
 import validateMobileNumber from '../validations/ValidateMobileNumber';
-import {  STRING_VALUES } from '../../constants/AppConstants';
+import { STRING_VALUES } from '../../constants/AppConstants';
 import REGEX from '../../constants/Regex';
 import MESSAGE from '../../constants/Messages';
 import validateUrl from '../validations/ValidateUrl';
@@ -13,29 +13,34 @@ export type ErrorType = {
   confirmPassword?: string;
   mobileNumber?: string;
   name?: string;
-  code? : string;
-  description? : string;
-  cost? : string;
-  taxRate? : string;
-  validFrom? :string;
-  hsn? :string;
-  sac? : string;
-  url?:string;
+  code?: string;
+  description?: string;
+  cost?: string;
+  taxRate?: string;
+  validFrom?: string;
+  hsn?: string;
+  sac?: string;
+  url?: string;
   companyUserCount?: string;
   monthsToPurchase?: string;
-  companyUserCountForUpdateSubscription?:string
+  companyUserCountForUpdateSubscription?: string
+  purchaseDate?: string;
+  deliveryDate?: string;
+  installationDate?: string;
+  warrantyStartDate?: string;
+  quantity?: string;
 
 };
 
 export type FormType = 'registered' | 'registration';
 
-export const useFormValidation = (formData: Record<string, string|number|boolean|number[]|undefined >, formType: FormType) => {
+export const useFormValidation = (formData: Record<string, string | number | boolean | number[] | undefined>, formType: FormType) => {
   const [errors, setErrors] = useState<ErrorType>({});
 
 
 
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>| React.FocusEvent<HTMLTextAreaElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement> | React.FocusEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     switch (name) {
@@ -52,20 +57,20 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
         }
         break;
       case "url":
-        if(value===null || value.trim()===""){
+        if (value === null || value.trim() === "") {
           setErrors((prev) => ({ ...prev, url: "" }));
-        }else{
-         if (!validateUrl(value)) {
-          setErrors((prev) => ({
-            ...prev,
-            url: "Enter valid URL or leave it blank",
-          }));
         } else {
-          setErrors((prev) => ({ ...prev, url: "" }));
+          if (!validateUrl(value)) {
+            setErrors((prev) => ({
+              ...prev,
+              url: "Enter valid URL or leave it blank",
+            }));
+          } else {
+            setErrors((prev) => ({ ...prev, url: "" }));
+          }
         }
-        }
-      
-      break;
+
+        break;
 
       case "password":
         if (!value) {
@@ -73,14 +78,14 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
         } else if (formType === STRING_VALUES.REGISTRATION && !REGEX.PASSWORD.test(value)) {
           setErrors((prev) => ({
             ...prev,
-            password:MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
+            password: MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
           }));
-        } else if (formType === STRING_VALUES.REGISTRATION && formData.confirmPassword !== null && formData.confirmPassword !=="" && value !== formData.confirmPassword) {
-            setErrors((prev) => ({
-              ...prev,
-              password: "Passwords adas do not match.",
-            }));
-          } else {
+        } else if (formType === STRING_VALUES.REGISTRATION && formData.confirmPassword !== null && formData.confirmPassword !== "" && value !== formData.confirmPassword) {
+          setErrors((prev) => ({
+            ...prev,
+            password: "Passwords adas do not match.",
+          }));
+        } else {
           setErrors((prev) => ({ ...prev, password: "" }));
         }
         break;
@@ -97,12 +102,12 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
               ...prev,
               confirmPassword: "Passwords do not match.",
             }));
-          }else if (formType === STRING_VALUES.REGISTRATION && !REGEX.PASSWORD.test(value)) {
-          setErrors((prev) => ({
-            ...prev,
-            confirmPassword: MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
-          }));
-        } else {
+          } else if (formType === STRING_VALUES.REGISTRATION && !REGEX.PASSWORD.test(value)) {
+            setErrors((prev) => ({
+              ...prev,
+              confirmPassword: MESSAGE.ERROR.PASSWORD_VALIDATION_ERROR,
+            }));
+          } else {
             setErrors((prev) => ({ ...prev, confirmPassword: "" }));
           }
         }
@@ -122,97 +127,138 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
       case "name":
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, name: "Name is required" }));
-        }else if (formType === STRING_VALUES.REGISTRATION && !REGEX.NAME_SPACE_DOT_ALLOWED_ONLY.test(value)) {
+        } else if (formType === STRING_VALUES.REGISTRATION && !REGEX.NAME_SPACE_DOT_ALLOWED_ONLY.test(value)) {
           setErrors((prev) => ({ ...prev, name: MESSAGE.ERROR.NAME_SPACE_AND_DOT_ERROR }));
         }
-          else {
+        else {
           setErrors((prev) => ({ ...prev, name: "" }));
         }
         break;
 
-        case "code" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            console.log("inside code");
-            setErrors((prev) => ({ ...prev, code: "Item Code is required"}));
-          }
-          else{
-            setErrors((prev) => ({ ...prev, code: "" }));
-          }
-          break;
-
-        case "description" :
-          if(formType === STRING_VALUES.REGISTRATION){
-            if(value === "") {
-              setErrors((prev) => ({ ...prev, description: "Description is required"}));
-            }
-            else{
-              setErrors((prev) => ({ ...prev, description: "" }));
-            }
-          }
-          break;
-
-        case "taxRate" :
-          if(formType === STRING_VALUES.REGISTRATION){
-            if(value === "") {
-              setErrors((prev) => ({ ...prev, taxRate: "Tax Rate is required"}));
-            }
-            else{
-              setErrors((prev) => ({ ...prev, taxRate: "" }));
-            }
-          }
-          break;
-
-        case "validFrom" : 
-        if(formType === STRING_VALUES.REGISTRATION && value === "") {
-          setErrors((prev) => ({ ...prev, validFrom: "Valid From is required"}));
+      case "code":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          console.log("inside code");
+          setErrors((prev) => ({ ...prev, code: "Item Code is required" }));
         }
-        else{
-          setErrors((prev) => ({...prev,validFrom : ""}));
+        else {
+          setErrors((prev) => ({ ...prev, code: "" }));
         }
         break;
 
-        case "hsn" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            setErrors((prev) => ({ ...prev, hsn: "HSN is required"}));
+      case "description":
+        if (formType === STRING_VALUES.REGISTRATION) {
+          if (value === "") {
+            setErrors((prev) => ({ ...prev, description: "Description is required" }));
           }
-          else{
-            setErrors((prev) => ({ ...prev, hsn: "" }));
+          else {
+            setErrors((prev) => ({ ...prev, description: "" }));
           }
-          break;
+        }
+        break;
 
-        case "sac" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            setErrors((prev) => ({ ...prev, sac: "SAC is required"}));
+      case "taxRate":
+        if (formType === STRING_VALUES.REGISTRATION) {
+          if (value === "") {
+            setErrors((prev) => ({ ...prev, taxRate: "Tax Rate is required" }));
           }
-          else{
-            setErrors((prev) => ({ ...prev, sac: "" }));
-            }
-            break;
-        case "numberOfUsers" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            setErrors((prev) => ({ ...prev, companyUserCount: "minimum 1 user required"}));
+          else {
+            setErrors((prev) => ({ ...prev, taxRate: "" }));
           }
-          else{
-            setErrors((prev) => ({ ...prev, companyUserCount: "" }));
-          }
-          break;
+        }
+        break;
 
-        
-        case "monthsToPurchase" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            setErrors((prev) => ({ ...prev, monthsToPurchase: "minimum 1 month subscription is required"}));
-          }else{
-            setErrors((prev) => ({ ...prev, monthsToPurchase: "" }));
-          }
-          break;
+      case "validFrom":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, validFrom: "Valid From is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, validFrom: "" }));
+        }
+        break;
 
-          case "companyUserCountForUpdateSubscription" :
-          if(formType === STRING_VALUES.REGISTRATION && value === "") {
-            setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "minimum 1 user is required"}));
-          }else{
-            setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "" }));
-          }
-          break;
+      case "hsn":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, hsn: "HSN is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, hsn: "" }));
+        }
+        break;
+
+      case "sac":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, sac: "SAC is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, sac: "" }));
+        }
+        break;
+      case "numberOfUsers":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, companyUserCount: "minimum 1 user required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, companyUserCount: "" }));
+        }
+        break;
+
+
+      case "monthsToPurchase":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, monthsToPurchase: "minimum 1 month subscription is required" }));
+        } else {
+          setErrors((prev) => ({ ...prev, monthsToPurchase: "" }));
+        }
+        break;
+
+      case "companyUserCountForUpdateSubscription":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "minimum 1 user is required" }));
+        } else {
+          setErrors((prev) => ({ ...prev, companyUserCountForUpdateSubscription: "" }));
+        }
+        break;
+
+      case "purchaseDateString":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, purchaseDate: "Purchase Date is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, purchaseDate: "" }));
+        }
+        break;
+      case "quantity":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, quantity: "Quantity is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, quantity: "" }));
+        }
+        break;
+        case "deliveryDate":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, deliveryDate: "Delivery date is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, deliveryDate: "" }));
+        }
+        break;
+        case "installationDate":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, installationDate: "Installation date is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, installationDate: "" }));
+        }
+        break;
+        case "warrantyStartDate":
+        if (formType === STRING_VALUES.REGISTRATION && value === "") {
+          setErrors((prev) => ({ ...prev, warrantyStartDate: "Warranty start date is required" }));
+        }
+        else {
+          setErrors((prev) => ({ ...prev, warrantyStartDate: "" }));
+        }
+        break;
     }
   };
 
@@ -229,11 +275,11 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
       isValid = false;
     }
 
-    if(!formData.url){
-      if(!validateUrl(formData.url!.toString())){
-      newErrors.url = "Enter a valid url or leave it blank";
+    if (!formData.url) {
+      if (!validateUrl(formData.url!.toString())) {
+        newErrors.url = "Enter a valid url or leave it blank";
       }
-    }else{
+    } else {
       newErrors.url = "";
     }
 
@@ -244,7 +290,7 @@ export const useFormValidation = (formData: Record<string, string|number|boolean
 
     // SignUp specific validations
     if (formType === STRING_VALUES.REGISTRATION && formData.password) {
-      if (formData.password.toString().length <  8 || formData.password.toString().length > 20) {
+      if (formData.password.toString().length < 8 || formData.password.toString().length > 20) {
         newErrors.password = "Password must be between 8 to 20 characters";
         isValid = false;
       }

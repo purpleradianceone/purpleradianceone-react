@@ -12,6 +12,7 @@ import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagement
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
+import { Product } from "../../@types/products/ProductsManagementProps";
 
 function ProductsManagementGrid({
   products,
@@ -20,6 +21,8 @@ function ProductsManagementGrid({
   // isGridForProductUser,
   handleCompanyProductUserModalOpen,
   handleCompanyProductTeamModalOpen,
+  isGridForAccountProduct,
+  onRowSelect, //selected user for view lead details
 }: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProduct,
@@ -206,8 +209,31 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
       },
+      { 
+        headerName: "Actions",
+        hide : !isGridForAccountProduct,
+        sortable: false,
+        maxWidth: 100,
+        pinned: "right",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          cellRenderer: (params:  Product | any) => {
+          return (
+            <div className="flex items-center justify-center  ">
+              <span
+                className="lead-details cursor-pointer text-blue-600  "
+                onClick={() => {
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+              Select
+              </span>
+            </div>
+          );
+        },
+      },
       {
         headerName: "Actions",
+        hide : isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
@@ -403,6 +429,7 @@ function ProductsManagementGrid({
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
+         context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );

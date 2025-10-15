@@ -255,7 +255,9 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <ProductManagement />
+              <ProductManagement
+              isGridForAccountProduct={false}
+              />
             </Navbar>
           </div>
         </PrivateRoute>

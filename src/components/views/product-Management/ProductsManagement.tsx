@@ -15,7 +15,13 @@ import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/use
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 
-function ProductManagement() {
+function ProductManagement({
+  isGridForAccountProduct,
+  onRowSelect
+}: {
+  isGridForAccountProduct? : boolean;
+   onRowSelect? : (data : any ) =>void,
+}) {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -183,6 +189,8 @@ function ProductManagement() {
                   pageSize,
                 }}
                 products={productsData}
+                isGridForAccountProduct ={isGridForAccountProduct}
+                onRowSelect={onRowSelect}
                 // isListForProductUser={false}
               />
             </div>

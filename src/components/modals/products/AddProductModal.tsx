@@ -24,7 +24,7 @@ import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
 import RadioButtons from "../../ui/RadioButton";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { Product } from "../../../@types/products/ProductsManagementProps";
@@ -85,7 +85,9 @@ function AddProductModal({
 
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
-  const rangeOfNumber: Item[] = range(1, 365);
+  const rangeOfNumber: Item[] = useMemo(()=> {
+    return range(1, 365)
+  }, [] );
 
   const [intialAddProductFormData, setInitialAddProductFormData] =
     useState<Product>({
