@@ -16,8 +16,7 @@ import { Toaster } from "react-hot-toast";
 import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
 import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
-import { IndustryTypeDataProvider } from "./context/Account/IndustryTypeData";
-import { BusinessTypeDataProvider } from "./context/Account/BusinessTypeData";
+import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailDataContext";
 
 /**
  *
@@ -28,9 +27,8 @@ function App() {
     useAxiosForbiddenHandler();
   return (
     <LoggedInUserContextProvider>
+      <TutorailDataContextProvider>
       <AccessManagementContextProvider>
-        <BusinessTypeDataProvider>
-          <IndustryTypeDataProvider>
             <NotificationCountContextProvider>
               <UserPreferenceContextProvider>
                 <PanelProvider>
@@ -58,9 +56,8 @@ function App() {
                 </PanelProvider>
               </UserPreferenceContextProvider>
             </NotificationCountContextProvider>
-          </IndustryTypeDataProvider>
-        </BusinessTypeDataProvider>
       </AccessManagementContextProvider>
+      </TutorailDataContextProvider>
     </LoggedInUserContextProvider>
   );
 }

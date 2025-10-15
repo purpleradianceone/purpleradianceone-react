@@ -19,12 +19,18 @@ import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboa
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
-import { SIZE } from "../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
 import {
   CompanyUsersModuleSteps,
 } from "../../constants/AppTutorailsSteps";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../constants/Tutorail";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function GetCompanyUsersList({
   users,
@@ -54,6 +60,14 @@ function GetCompanyUsersList({
     useState<boolean>(false);
 
   const { userHasAccessToAddUser } = useUserAccessModules();
+  const {loginStatus} = useLoggedInUserContext();
+  const {tutorailData,setTutorailData} = useTutorailDataContext();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
+
+  useEffect(() => {
+    setTourFinished(tutorailData.isCompanyUserSeen)
+    setIsActionsTourEnded(tutorailData.isCompanyUserActionsSeen)
+  },[tutorailData])
 
   useEffect(() => {
     setTimeout(() => {
@@ -111,18 +125,113 @@ function GetCompanyUsersList({
   };
 
   const handleActionsTourEnd = () => {
-    setIsActionsTourEnded(true);
+    
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_ACTIONS_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setIsActionsTourEnded(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: true,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
   };
+
+  const handleTourEnd = async() => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: true,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  }
   return (
     <div
       className={`w-full  pt-1  ${
         userPreference.isLeftMenu ? "pl-5" : "pl-1"
       } pr-1 gap-1`}
     >
-      {isAnimationComplete && (
+      {tourFinished ? null : isAnimationComplete && (
         <AppTutorailManager
           steps={CompanyUsersModuleSteps}
-          handleTourEnd={() => {}}
+          handleTourEnd={handleTourEnd}
           isModalOpen={handleTourModalOpen}
           modalOpenTriggerIndices={[2, 3, 4]}
         />

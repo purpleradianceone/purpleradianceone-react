@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import CompanyUserDashboardProps from "../../../@types/company-users/CompanyUserDashboardProps";
@@ -147,7 +148,6 @@ function CompanyUserDashboardModal({
               // setCompanyUserDashboard(response.data);
             }
           })
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch(async (error: ApiError | any) => {
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenStatus = await RefreshToken({

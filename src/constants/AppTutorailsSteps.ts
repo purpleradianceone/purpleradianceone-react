@@ -41,6 +41,13 @@ export const NavbarSteps: Step[] = [
 
 export const DashboardTabsSteps: Step[] = [
   {
+    target: "#crmDashBoardCompanyUsersDropdown",
+    content: "Browse to other users dashboard and check there insights from here",
+    placement: "bottom",
+    disableBeacon: true,
+    disableOverlayClose: true,
+  },
+  {
     target: "#CRMDashboardTab",
     content: "Navigate to Crm related dashboard from here",
     placement: "bottom",
@@ -74,15 +81,9 @@ export const DashboardTabsSteps: Step[] = [
     placement: "bottom",
     disableBeacon: true,
     disableOverlayClose: true,
-  },
-  {
-    target: "#crmDashBoardCompanyUsersDropdown",
-    content: "Browse to other users dashboard and check there insights from here",
-    placement: "bottom",
-    disableBeacon: true,
-    disableOverlayClose: true,
     locale: { last: "Finish Tour" },
   },
+  
 ];
 
 export const DashboardCrmSteps: Step[] = [

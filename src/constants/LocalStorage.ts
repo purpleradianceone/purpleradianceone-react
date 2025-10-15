@@ -4,6 +4,7 @@ const LOCALSTORAGE_KEYS = {
     LOGIN_CREDENTIALS : "loginUserCredentials",
     LOGIN_STATUS : "loginStatus",
     ACCESS_MANAGEMENT : "AccessManagement",
+    TUTORAIL : "tutorail",
 
     GOOGLE_MEET_STATUS : "googleMeetStatus",
     ZOOM_MEETING_STATUS : "zoomMeetingStatus",

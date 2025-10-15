@@ -30,6 +30,8 @@ import Tasks from "./Tasks";
 import PieChart from "./PieChart";
 import AppTutorailManager from "../../tutorails/AppTutorailManager";
 import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -66,6 +68,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const [leadSummaryReportData, setLeadSummaryReportData] = useState<
     LeadSummaryReportType[]
   >([]);
+  const { tutorailData, setTutorailData } = useTutorailDataContext();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
   const [leadBySource, setLeadBySourcce] = useState<LeadSummaryReportType[]>(
     []
   );
@@ -81,6 +85,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
     AccessModuleType[]
   >([]);
+
+  useEffect(() => {
+    setTourFinished(tutorailData.isCrmDashboardSeen);
+  }, [tutorailData]);
+
   const getCrmModuleAccessOfCompanyUser = async () => {
     setAccessModuleCompanyUser([]);
     setIsTasksLoading(true);
@@ -404,7 +413,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       </div>
     ),
     "12 months performance": (
-      <div id="monthlyPerformance" key="12 months performance" className="min-h-[700px] col-span-1">
+      <div
+        id="monthlyPerformance"
+        key="12 months performance"
+        className="min-h-[700px] col-span-1"
+      >
         <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
@@ -474,7 +487,6 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const componentMapPieChart: { [key: string]: JSX.Element } = {
     "Leads by status": (
       <div
-
         key="Leads by status"
         className="grid grid-cols-1 xl:grid-cols-1 gap-8"
       >
@@ -537,6 +549,55 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     return renderedSections;
   };
 
+  const handleTourEnd = async () => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_CRM_DASHBOARD_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: true,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
@@ -547,7 +608,12 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         )}
         {!isTasksLoading && dashboardVisiblity.length !== 0 && (
           <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">
-            <AppTutorailManager steps={DashboardCrmSteps} handleTourEnd={()=>{}}/>
+            {!tourFinished && (
+              <AppTutorailManager
+                steps={DashboardCrmSteps}
+                handleTourEnd={handleTourEnd}
+              />
+            )}
             {renderDashboardSections()}
           </div>
         )}

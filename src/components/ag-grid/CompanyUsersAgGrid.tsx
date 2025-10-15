@@ -131,7 +131,7 @@ function CompanyUserAgGrid({
               if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target as Node) &&
-                isActionsTourEnded
+                !isActionsTourEnded
               ) {
                 setIsActionsDropDownOpen(false);
               }
@@ -165,7 +165,7 @@ function CompanyUserAgGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {!isActionsTourEnded && (
+                    {isActionsTourEnded && (
                       <AppTutorailManager
                         steps={CompanyUsersGridActionsButtonStep}
                         handleTourEnd={() => {

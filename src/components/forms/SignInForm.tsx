@@ -30,6 +30,8 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
 import toast from "react-hot-toast";
 import { KeySquare, Mail } from "lucide-react";
+import {TutorailDataType} from "../../@types/tutorail/TutorailDataType";
+import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
 
 function SignInForm() {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ function SignInForm() {
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
   const { setNotificationCount } = useNotificationCountContext();
+  const {setTutorailData} = useTutorailDataContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
@@ -117,6 +120,26 @@ function SignInForm() {
       startDateSubscription: "",
       endDateSubscription: "",
     });
+    setTutorailData({
+      id: 0,
+          companyUserId: 0,
+          isNavbarSeen: false,
+          isDashboardSeen: false,
+          isCrmDashboardSeen: false,
+          isCompanyUserSeen: false,
+          isCompanyUserActionsSeen : false,
+          isLeadSeen: false,
+          isAccountSeen: false,
+          isProductSeen: false,
+          isTeamSeen: false,
+          isSettingCompanySeen: false,
+          isSettingEmailTemplateSeen: false,
+          isSettingIntegrationSeen: false,
+          createdBy: "",
+          updatedBy: "",
+          createdOn: "",
+          updatedOn: "",
+    })
     setNotificationCount(0);
   };
 
@@ -277,6 +300,44 @@ function SignInForm() {
                       });
                     }
                   });
+                  const GetCompanyUserTutorailPostData = {
+      company_id: loginStatusRef.current.company_id,
+      company_user_id: loginStatusRef.current.id,
+      requestedby: loginStatusRef.current.id
+    };
+                  axios.post(
+        POST_API.GET_COMPANY_USER_TUTORAIL,
+        GetCompanyUserTutorailPostData,
+        {
+          withCredentials: true,
+        }
+      ).then((response) => {
+        if(response.status === STATUS_CODE.OK){
+          const formattedData: TutorailDataType =  {
+            id: response.data.id,
+            companyUserId: response.data.company_user_id,
+            isNavbarSeen: response.data.is_navbar_seen,
+            isDashboardSeen: response.data.is_dashboard_seen,
+            isCrmDashboardSeen: response.data.is_crm_dashboard_seen,
+            isCompanyUserSeen: response.data.is_company_user_seen,
+            isCompanyUserActionsSeen : response.data.is_company_user_actions_seen,
+            isLeadSeen: response.data.is_lead_seen,
+            isAccountSeen: response.data.is_account_seen,
+            isProductSeen: response.data.is_product_seen,
+            isTeamSeen: response.data.is_team_seen,
+            isSettingCompanySeen: response.data.is_setting_company_seen,
+            isSettingEmailTemplateSeen: response.data.is_setting_email_template_seen,
+            isSettingIntegrationSeen: response.data.is_setting_integration_seen,
+            createdBy: response.data.createdby,
+            updatedBy: response.data.updatedby,
+            createdOn: response.data.createdon,
+            updatedOn: response.data.updatedon,
+          };
+       
+        setTutorailData(formattedData);
+
+        }
+      })
                 setTimeout(() => {
                   navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
                 }, 1000);
@@ -320,6 +381,7 @@ function SignInForm() {
   useEffect(() => {
     resetLoginStatus();
     setAccessModules([]);
+    
     const remember = localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
     if (remember === "true") {
       setRememberMe(true);
@@ -518,6 +580,26 @@ function SignInForm() {
               startDateSubscription: "",
               endDateSubscription: "",
             });
+            setTutorailData({
+              id: 0,
+          companyUserId: 0,
+          isNavbarSeen: false,
+          isDashboardSeen: false,
+          isCrmDashboardSeen: false,
+          isCompanyUserSeen: false,
+          isCompanyUserActionsSeen : false,
+          isLeadSeen: false,
+          isAccountSeen: false,
+          isProductSeen: false,
+          isTeamSeen: false,
+          isSettingCompanySeen: false,
+          isSettingEmailTemplateSeen: false,
+          isSettingIntegrationSeen: false,
+          createdBy: "",
+          updatedBy: "",
+          createdOn: "",
+          updatedOn: "",
+            })
             navigate(ROUTES_URL.SIGN_IN);
             setSpinnerAnimation({
               status: "idle",
