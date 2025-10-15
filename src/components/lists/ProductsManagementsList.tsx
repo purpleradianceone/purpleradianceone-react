@@ -31,6 +31,8 @@ function ProductsManagementList({
   handleProductChangeOnAdd,
   handleEditProductChange,
   handleCreateCompanyProductTax,
+  isGridForAccountProduct,
+  onRowSelect
   // isListForProductUser,
 }: ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen } = useScreenSize();
@@ -168,7 +170,10 @@ function ProductsManagementList({
               </>
             )}
 
-              <div className="flex gap-1 mt-1">
+            {
+              !isGridForAccountProduct &&(
+                <>
+                  <div className="flex gap-1 mt-1">
                 {userHasAccessToAddProduct ? (
                   <Button type="submit" onClick={(e) => {
                     e.preventDefault();
@@ -196,6 +201,9 @@ function ProductsManagementList({
                   </Button>
                 )}
               </div>
+                </>
+              )
+            }
 
 
             <AddProductModal
@@ -240,6 +248,7 @@ function ProductsManagementList({
             }
           >
             <ProductsManagementGrid
+            isGridForAccountProduct={isGridForAccountProduct}
               products={products}
               // isGridForProductUser={isListForProductUsser}
               handleCompanyProductUserModalOpen={
@@ -252,6 +261,7 @@ function ProductsManagementList({
               handleCompanyProductTeamModalOpen={
                 handleCompanyProductTeamModalOpen
               }
+              onRowSelect={onRowSelect}
             />
           </div>
         </div>

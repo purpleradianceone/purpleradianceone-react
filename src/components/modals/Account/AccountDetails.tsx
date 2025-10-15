@@ -37,6 +37,7 @@ import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
 import AccountCompanyType from "./AccountCompanyType";
+import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 // Note this is the type
 interface AccountDetailsProps {
   company: Account;
@@ -992,6 +993,15 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <AccountCompanyType
             accountId={company.id}
           />
+        </div>
+        {/* Account company product */}
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Product Details
+          </h3> 
+            <AccountCompanyProduct
+              accountId={company.id}
+            /> 
         </div>
       </div>
       </div>
