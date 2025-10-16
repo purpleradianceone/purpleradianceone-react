@@ -70,6 +70,7 @@ jobs:
               --name react-app \
               --network host \
               -p 80:80 -p 443:443 \
+              -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
               -v ${{ secrets.LETSENCRYPT_PATH }}/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
               -v ${{ secrets.LETSENCRYPT_PATH }}/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
              -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
