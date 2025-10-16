@@ -72,8 +72,7 @@ jobs:
               -p 80:80 -p 443:443 \
               -v ${{ secrets.LETSENCRYPT_PATH }}/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
               -v ${{ secrets.LETSENCRYPT_PATH }}/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
-              -v /root/certbot-webroot/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:rw \
-              -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
+             -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
               --restart always \
               react-app:${{ github.ref_name }}
 
