@@ -10,6 +10,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout Source
@@ -67,8 +68,20 @@ jobs:
 
             docker run -d \
               --name react-app \
-              --network purple-net \
-              -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
+              --network host \
               -p 80:80 -p 443:443 \
+              -v ${{ secrets.LETSENCRYPT_PATH }}/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
+              -v ${{ secrets.LETSENCRYPT_PATH }}/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
+              -v /root/certbot-webroot/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:rw \
+              -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
               --restart always \
               react-app:${{ github.ref_name }}
+
+            echo "Cleaning up TAR file..."
+            rm -f /root/react-app.tar
+
+            echo "Deployment complete. Running container status:"
+            docker ps --filter "name=react-app"
+
+            echo "Recent logs from container:"
+            docker logs --tail=50 react-app

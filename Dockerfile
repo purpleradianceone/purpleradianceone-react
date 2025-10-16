@@ -9,7 +9,7 @@ RUN npm install && npm run build
 FROM nginx:alpine
 
 # Copy the CRA build output to nginx's html folder
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Optional: custom nginx config for SPA
 #COPY nginx.conf /etc/nginx/conf.d/default.conf
