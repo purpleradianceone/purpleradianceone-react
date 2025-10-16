@@ -8,7 +8,7 @@ const ROUTES_URL = {
     FORGOT_PASSWORD_REQUEST_PAGE : "/forgotpasswordrequestpage",
     CREATE_PASSWORD : "/createpassword",
     EMAIL_VERIFICATION : "/emailverfication/verify",
-    HOME : "/home",
+    HOME : "/home-dashboard",
     GET_COMPANY_USERS : "/home/manage-users/users",
     GET_LEAD_MANAGEMENT : "/home/manage-leads/leads",
     GET_LEAD_MANAGEMENT_DETAILS : "/home/manage-leads/leads",
@@ -18,7 +18,7 @@ const ROUTES_URL = {
     NOTIFICATION: "/home/notifications",
 
     TEAM_MANAGEMENT : "/home/manage-teams/teams",
-    PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
+    // PRODUCT_TEAM_MANAGEMENT : "/home/manage-products/teams",
     USER_PROFILE_SETTING : "/settings/userprofile",
     //for subscription
     CREATE_SUBSCRIPTION : "/create/subscription",
@@ -55,6 +55,15 @@ const ROUTES_URL = {
     CONTACT_US : "/#contactUs",
     FEATURES : "/#features",
     PRICING : "/pricing",
+    NOT_AUTHORIZED : "/not-authorized",
+    SETTINGS_ALREADY_EXISTS : "/meeting/settings/already-exists",
+
+    FACEBOOK_OAUTH : "/authenticate/facebook",
+    INTEGRATIONS_SETTINGS : "/settings/integrations",
+
+    ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
+    ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
+
 
 }
 export default ROUTES_URL;

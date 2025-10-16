@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
+import { Edit, Save, Trash2, X } from "lucide-react";
+import Button from "../../ui/Button";
+import FormInput from "../../ui/FormInput";
+import { SIZE } from "../../../constants/AppConstants";
 
 interface ButtonBlockProps {
   text: string;
@@ -37,10 +41,16 @@ export const ButtonBlock: React.FC = () => {
     props.align || "center"
   );
   const [tempBgColor, setTempBgColor] = useState(props.bgColor || "#007bff");
-  const [tempTextColor, setTempTextColor] = useState(props.textColor || "#ffffff");
+  const [tempTextColor, setTempTextColor] = useState(
+    props.textColor || "#ffffff"
+  );
   const [tempFontSize, setTempFontSize] = useState(props.fontSize || "16px");
-  const [tempFontWeight, setTempFontWeight] = useState(props.fontWeight || "normal");
-  const [tempFontFamily, setTempFontFamily] = useState(props.fontFamily || "inherit");
+  const [tempFontWeight, setTempFontWeight] = useState(
+    props.fontWeight || "normal"
+  );
+  const [tempFontFamily, setTempFontFamily] = useState(
+    props.fontFamily || "inherit"
+  );
   const [tempIcon, setTempIcon] = useState(props.icon || "");
 
   const handleSave = () => {
@@ -63,86 +73,169 @@ export const ButtonBlock: React.FC = () => {
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      // onMouseEnter={() => setHovered(true)}
+     
       style={{
         position: "relative",
+        width: "fit-content",
         border: "1px dashed #ccc",
         padding: "10px",
         cursor: "move",
         textAlign: props.align,
       }}
     >
-      {hovered && (
-        <>
-          <button onClick={() => actions.delete(id)} style={btnStyle("#ff5f5f", "right")}>
-            ×
-          </button>
-          {!editing && (
-            <button
-              onClick={() => setEditing(true)}
-              style={btnStyle("#007bff", "left")}
-              title="Edit Button"
+      {(hovered) && (
+        <div className="absolute w-full flex justify-between items-center -top-4 left-0 z-10"
+        onMouseLeave={() => setHovered(false)}
+      onMouseOver={() => setHovered(true)}
+        >
+          <div className="w-fit h-fit">
+            <Button type="submit" onClick={(e) => {
+              e.preventDefault();
+              setEditing(true);
+              }} title="Edit Button">
+              <div className="flex items-center justify-center gap-0.5">
+                <Edit size={SIZE.FOURTEEN} />
+                Edit
+              </div>
+            </Button>
+          </div>
+          <div className="w-fit h-fit">
+            <Button
+            type="button"
+              onClick={() => actions.delete(id)}
+              // style={btnStyle("#ff5f5f", "right")}
             >
-              ✎
-            </button>
-          )}
-        </>
-      )}
-
-      {editing && (
-        <div style={editPanelStyle}>
-          <input
-            placeholder="Button Text"
-            value={tempText}
-            onChange={(e) => setTempText(e.target.value)}
-          />
-          <input
-            placeholder="Button URL"
-            value={tempUrl}
-            onChange={(e) => setTempUrl(e.target.value)}
-          />
-          <select value={tempAlign} onChange={(e) => setTempAlign(e.target.value as any)}>
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
-          </select>
-          <label>
-            Background Color
-            <input type="color" value={tempBgColor} onChange={(e) => setTempBgColor(e.target.value)} />
-          </label>
-          <label>
-            Text Color
-            <input type="color" value={tempTextColor} onChange={(e) => setTempTextColor(e.target.value)} />
-          </label>
-          <input
-            placeholder="Font Family"
-            value={tempFontFamily}
-            onChange={(e) => setTempFontFamily(e.target.value)}
-          />
-          <input
-            placeholder="Font Size (e.g., 16px)"
-            value={tempFontSize}
-            onChange={(e) => setTempFontSize(e.target.value)}
-          />
-          <select value={tempFontWeight} onChange={(e) => setTempFontWeight(e.target.value)}>
-            <option value="normal">Normal</option>
-            <option value="bold">Bold</option>
-            <option value="lighter">Lighter</option>
-          </select>
-          <input
-            placeholder="FontAwesome Icon Class (e.g. fa fa-star)"
-            value={tempIcon}
-            onChange={(e) => setTempIcon(e.target.value)}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <button onClick={handleSave}>✅</button>
-            <button onClick={() => setEditing(false)}>❌</button>
+              <div className="flex items-center justify-center gap-1">
+                <Trash2 size={SIZE.FOURTEEN} />
+                Delete
+              </div>
+            </Button>
           </div>
         </div>
       )}
 
-      <ResizableBox
+      {editing && (
+        <div style={editPanelStyle}>
+          <FormInput
+            label="Button Text"
+            placeholder="Enter button text"
+            value={tempText}
+            defaultValue={tempText}
+            onChange={(e) => setTempText(e.target.value)}
+          />
+          <FormInput
+            label="Button URL"
+            placeholder="Enter button URL"
+            value={tempUrl}
+            defaultValue={tempUrl}
+            onChange={(e) => setTempUrl(e.target.value)}
+          />
+          <select
+            value={tempAlign}
+            onChange={(e) => setTempAlign(e.target.value as any)}
+            className="border-2"
+          >
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+          {/* <FormInput
+          type="color"
+          label="Background Color"
+          value={tempBgColor}
+          defaultValue={tempBgColor}
+          onChange={(e) => setTempBgColor(e.target.value)}
+
+          /> */}
+
+          <label className="flex items-center justify-between">
+            Background Color
+            <input
+              type="color"
+              value={tempBgColor}
+              onChange={(e) => setTempBgColor(e.target.value)}
+            />
+          </label>
+          <label className="flex items-center justify-between">
+            Text Color
+            <input
+              type="color"
+              value={tempTextColor}
+              onChange={(e) => setTempTextColor(e.target.value)}
+            />
+          </label>
+          {/* <input
+            placeholder="Font Family"
+            value={tempFontFamily}
+            onChange={(e) => setTempFontFamily(e.target.value)}
+          /> */}
+          <FormInput
+            label="Font Family"
+            placeholder=""
+            value={tempFontFamily}
+            defaultValue={tempFontFamily}
+            onChange={(e) => setTempFontFamily(e.target.value)}
+          />
+
+          <FormInput
+            label="Font Size"
+            value={tempFontSize}
+            defaultValue={tempFontSize}
+            placeholder="Font Size (e.g., 16px)"
+            onChange={(e) => setTempFontSize(e.target.value)}
+          />
+          <select
+            value={tempFontWeight}
+            onChange={(e) => setTempFontWeight(e.target.value)}
+            className="border-2"
+          >
+            <option value="normal">Normal</option>
+            <option value="bold">Bold</option>
+            <option value="lighter">Lighter</option>
+          </select>
+          {/* <input
+            placeholder="FontAwesome Icon Class (e.g. fa fa-star)"
+            value={tempIcon}
+            onChange={(e) => setTempIcon(e.target.value)}
+          /> */}
+          <FormInput
+            label="FontAwesome Icon"
+            placeholder="FontAwesome Icon Class (e.g. fa fa-star)"
+            value={tempIcon}
+            defaultValue={tempIcon}
+            onChange={(e) => setTempIcon(e.target.value)}
+          />
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div>
+              <Button type="button" onClick={() => setEditing(false)}>
+                 <div className="flex items-center justify-center gap-0.5">
+                                      <X size={SIZE.SIXTEEN} />
+                                      Cancel
+                                    </div>
+              </Button>
+            </div>
+
+            <div>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}>
+               <div className="flex items-center justify-center gap-1">
+                                     <Save size={SIZE.SIXTEEN} />
+                                     Save
+                                   </div>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div
+       onMouseLeave={() => setHovered(false)}
+      onMouseOver={() => setHovered(true)}
+      >
+        <ResizableBox
+      
         width={200}
         height={50}
         minConstraints={[100, 40]}
@@ -150,7 +243,7 @@ export const ButtonBlock: React.FC = () => {
         resizeHandles={["e", "s", "se"]}
       >
         <a
-          href={props.href} 
+          href={props.href}
           style={{
             display: "inline-block",
             padding: "10px 20px",
@@ -168,34 +261,27 @@ export const ButtonBlock: React.FC = () => {
             overflow: "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
-          }} target="_blank" rel="noreferrer"
+          }}
+          target="_blank"
+          rel="noreferrer"
         >
-          {props.icon && <i className={props.icon} style={{ marginRight: "6px" }}></i>}
+          {props.icon && (
+            <i className={props.icon} style={{ marginRight: "6px" }}></i>
+          )}
           {props.text}
         </a>
       </ResizableBox>
+      </div>
+      
     </div>
   );
 };
 
-const btnStyle = (bg: string, position: "left" | "right"): React.CSSProperties => ({
-  position: "absolute",
-  top: "-10px",
-  [position]: "-10px",
-  background: bg,
-  color: "#fff",
-  border: "none",
-  borderRadius: "50%",
-  width: "24px",
-  height: "24px",
-  cursor: "pointer",
-  zIndex: 1,
-});
-
 const editPanelStyle: React.CSSProperties = {
   position: "absolute",
-  top: "55px",
-  left: "50%",
+  top: "10%",
+  left: "5%",
+  width: "fit-content",
   transform: "translateX(-50%)",
   background: "#fff",
   padding: "10px",
@@ -221,5 +307,3 @@ const editPanelStyle: React.CSSProperties = {
     icon: "",
   },
 };
-
-

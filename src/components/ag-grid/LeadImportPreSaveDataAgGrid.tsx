@@ -25,6 +25,7 @@ const gridRef = useRef<AgGridReact>(null);
             <div>
               <input 
               type="checkbox"
+               className="checkbox  mt-1"
               checked={isChecked}
               onChange={
                 (e)=>params.context.onSelectedRow(rowId, e.target.checked)
@@ -38,7 +39,12 @@ const gridRef = useRef<AgGridReact>(null);
        },
       { headerName: "Name", field: "name" },
       
-     
+      { headerName: "Product", field: "company_product_name" },
+      { headerName: "Interest", field: "lead_interest" },
+      { headerName: "Description", field: "description" },
+      { headerName: "Lead Created On", field: "lead_created_on" },
+
+
       { headerName: "Email", field: "email" },
       { headerName: "Mobile Number", field: "mobilenumber" },
       { headerName: "Address", field: "address" },
@@ -54,6 +60,7 @@ const gridRef = useRef<AgGridReact>(null);
       { headerName: "Lead Status", field: "lead_status" },
        { headerName: "Lead Source", field: "lead_source" },
        { headerName: "Lead Owner", field: "lead_owner" },
+       {headerName : "Products" , field:"company_product_name" , hide:true},
       { headerName: "Owner ID", field: "ownerid" , hide:true },
      
       { headerName: "Lead Source ID", field: "lead_source_id"  , hide:true},
@@ -75,7 +82,7 @@ const gridRef = useRef<AgGridReact>(null);
       { headerName: "Created On", field: "createdon" },
       { headerName: "Created By", field: "createdby_name" },
       { headerName: "Updated On", field: "updatedon" },
-      { headerName: "Updated By", field: "updatedby_name" },
+      { headerName: "Updated By", field: "updatedby_name" , hide : false },
     ],
     [selectedIds]
   );

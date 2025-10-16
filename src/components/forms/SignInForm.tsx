@@ -8,38 +8,42 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../ui/Button";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import MessageSnackBar from "../ui/MessageSnackbar";
 import useRecaptcha from "../../config/hooks/useRecaptcha";
 import { useAccessManagementContext } from "../../context/user/AccessManagementContext";
 import POST_API from "../../constants/PostApi";
 import ROUTES_URL from "../../constants/Routes";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
+import CryptoJS from "crypto-js";
 import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import SignInFormDataType from "../../@types/auth/forms/SignInFormDataType";
 import {
-  NUMBER_VALUES,
   SITE_KEY,
   STATUS_CODE,
   STRING_VALUES,
+  VALIDATIONS,
 } from "../../constants/AppConstants";
 import PasswordVisibilityToggle from "../ui/PasswordVisibilityToggle";
 import MESSAGE from "../../constants/Messages";
 import SubscriptionDialogueBox from "../views/card/SubscriptionDialogueBox";
 import { useUserPreference } from "../../context/user/UserPreference";
+import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
+import toast from "react-hot-toast";
+import { KeySquare, Mail } from "lucide-react";
+import {TutorailDataType} from "../../@types/tutorail/TutorailDataType";
+import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
 
 function SignInForm() {
   const navigate = useNavigate();
   const { setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
+  const { setNotificationCount } = useNotificationCountContext();
+  const {setTutorailData} = useTutorailDataContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const initialSignInFormState: SignInFormDataType = {
     email: "",
@@ -51,11 +55,22 @@ function SignInForm() {
   const {
     formData: loginUserCredentials,
     handleChange: handleSignInFormDatachange,
+    setFormData: setInitialSignInFormState,
   } = useFormChange(initialSignInFormState);
   const { errors, handleBlur } = useFormValidation(
     loginUserCredentials,
     "registered"
   );
+
+  const secretKey = "S7qXRmjdLZhGv3Kunc1tlBbZiFkymrIt";
+  const encryptData = (data: string) => {
+    return CryptoJS.AES.encrypt(data, secretKey).toString();
+  };
+
+  const decryptData = (encryptedData: string) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
 
   //NOTE : NEED TO HANDLE THIS FUNCTIONALITY
   const [showSubscriptionOrInActivePopUp, setShowSubscriptionOrInActivePopUp] =
@@ -69,68 +84,93 @@ function SignInForm() {
     message: "",
   });
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   // const isActiveSubscriptionUseRef =useRef<boolean>(false);
 
   const resetLoginStatus = () => {
     setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isActiveSubscription: false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
-          });
-  }
+      companyId: 0,
+      companyName: "",
+      createdOn: "",
+      email: "",
+      fullName: "",
+      id: 0,
+      message: "",
+      mobileNumber: "",
+      status: false,
+      token: "",
+      isSuperUser: false,
+      isActiveSubscription: false,
+      subscriptionAllowedUsers: 0,
+      activeUsersInCompany: 0,
+      subscriptionId: 0,
+      startDateSubscription: "",
+      endDateSubscription: "",
+    });
+    setTutorailData({
+      id: 0,
+          companyUserId: 0,
+          isNavbarSeen: false,
+          isDashboardSeen: false,
+          isCrmDashboardSeen: false,
+          isCompanyUserSeen: false,
+          isCompanyUserActionsSeen : false,
+          isLeadSeen: false,
+          isAccountSeen: false,
+          isProductSeen: false,
+          isTeamSeen: false,
+          isSettingCompanySeen: false,
+          isSettingEmailTemplateSeen: false,
+          isSettingIntegrationSeen: false,
+          createdBy: "",
+          updatedBy: "",
+          createdOn: "",
+          updatedOn: "",
+    })
+    setNotificationCount(0);
+  };
 
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
       if (!loginUserCredentials.email) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.EMAIL_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.EMAIL_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.EMAIL_REQUIRED);
         return;
       }
       if (!loginUserCredentials.password) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.PASSWORD_REQUIRED,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: MESSAGE.ERROR.PASSWORD_REQUIRED,
+        //   type: "error",
+        // });
+        toast.error(MESSAGE.ERROR.PASSWORD_REQUIRED);
         return;
       }
     }
 
     if (!captchaToken) {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
+      //   type: "error",
+      // });
+      toast.error(MESSAGE.ERROR.COMPLETE_CAPTCHA);
       return;
     }
 
@@ -147,6 +187,15 @@ function SignInForm() {
     axios
       .post(POST_API.SIGN_IN, user, { withCredentials: true })
       .then((response) => {
+        if (response.status === STATUS_CODE.ACCEPTED) {
+          toast.error(response.data.message);
+          recaptchaRef.current!.reset();
+          setSpinnerAnimation({
+            status: "idle",
+            message: "",
+          });
+          return;
+        }
         if (response.data.status) {
           loginStatusRef.current = response.data;
           setLoginStatus({
@@ -160,6 +209,7 @@ function SignInForm() {
             token: response.data.token,
             status: response.data.status,
             createdOn: response.data.createdon,
+            isSuperUser: response.data.is_super_user,
             isActiveSubscription: response.data.isactive_subscription,
             subscriptionAllowedUsers: response.data.subscription_allowed_users,
             activeUsersInCompany: response.data.active_users_in_company,
@@ -170,16 +220,16 @@ function SignInForm() {
 
           // note: is status false , then it will navigate to create subscription page
           if (!response.data.isactive_subscription) {
-            
             setTimeout(() => {
-              showMessageSnackbar({
-                message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
-                type: "error",
-              });
-              
+              // showMessageSnackbar({
+              //   message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
+              //   type: "error",
+              // });
+              toast.error(MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR);
+
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
             }, 1500);
-            return; // ⬅️ Stops further execution
+            return; //  Stops further execution
           }
 
           const getCrmModuleAccessData = {
@@ -198,21 +248,21 @@ function SignInForm() {
                 status: "success",
                 message: MESSAGE.SUCCESS.LOGGED_IN,
               });
-              showMessageSnackbar({
-                message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-                type: "success",
-              });
+              // showMessageSnackbar({
+              //   message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
+              //   type: "success",
+              // });
+              toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
 
               if (
                 loginStatusRef.current.active_users_in_company >
                 loginStatusRef.current.subscription_allowed_users
               ) {
                 setShowSubscriptionOrInActivePopUp(true);
-                
+
                 return;
               }
               if (!loginStatusRef.current.isactive_subscription) {
-                
                 navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
                 return;
               } else if (
@@ -250,6 +300,44 @@ function SignInForm() {
                       });
                     }
                   });
+                  const GetCompanyUserTutorailPostData = {
+      company_id: loginStatusRef.current.company_id,
+      company_user_id: loginStatusRef.current.id,
+      requestedby: loginStatusRef.current.id
+    };
+                  axios.post(
+        POST_API.GET_COMPANY_USER_TUTORAIL,
+        GetCompanyUserTutorailPostData,
+        {
+          withCredentials: true,
+        }
+      ).then((response) => {
+        if(response.status === STATUS_CODE.OK){
+          const formattedData: TutorailDataType =  {
+            id: response.data.id,
+            companyUserId: response.data.company_user_id,
+            isNavbarSeen: response.data.is_navbar_seen,
+            isDashboardSeen: response.data.is_dashboard_seen,
+            isCrmDashboardSeen: response.data.is_crm_dashboard_seen,
+            isCompanyUserSeen: response.data.is_company_user_seen,
+            isCompanyUserActionsSeen : response.data.is_company_user_actions_seen,
+            isLeadSeen: response.data.is_lead_seen,
+            isAccountSeen: response.data.is_account_seen,
+            isProductSeen: response.data.is_product_seen,
+            isTeamSeen: response.data.is_team_seen,
+            isSettingCompanySeen: response.data.is_setting_company_seen,
+            isSettingEmailTemplateSeen: response.data.is_setting_email_template_seen,
+            isSettingIntegrationSeen: response.data.is_setting_integration_seen,
+            createdBy: response.data.createdby,
+            updatedBy: response.data.updatedby,
+            createdOn: response.data.createdon,
+            updatedOn: response.data.updatedon,
+          };
+       
+        setTutorailData(formattedData);
+
+        }
+      })
                 setTimeout(() => {
                   navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
                 }, 1000);
@@ -264,10 +352,11 @@ function SignInForm() {
               });
             });
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "error",
+          // });
+          toast.error(response.data.message);
           setSpinnerAnimation({
             status: "idle",
             message: "",
@@ -276,10 +365,11 @@ function SignInForm() {
       })
       .catch((error) => {
         recaptchaRef.current!.reset();
-        showMessageSnackbar({
-          message: error.response.data.message,
-          type: "error",
-        });
+        // showMessageSnackbar({
+        //   message: error.response.data.message,
+        //   type: "error",
+        // });
+        toast.error(error.response.data.message);
         setSpinnerAnimation({
           status: "idle",
           message: "",
@@ -291,7 +381,35 @@ function SignInForm() {
   useEffect(() => {
     resetLoginStatus();
     setAccessModules([]);
-    localStorage.clear();
+    
+    const remember = localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
+    if (remember === "true") {
+      setRememberMe(true);
+      const storedEmail = localStorage.getItem(
+        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS
+      );
+      const storedPass = localStorage.getItem(
+        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS
+      );
+      if (storedEmail) {
+        setInitialSignInFormState((prev) => ({
+          ...prev,
+          email: storedEmail,
+        }));
+      }
+      if (storedPass) {
+        setInitialSignInFormState((prev) => ({
+          ...prev,
+          password: decryptData(storedPass),
+        }));
+      }
+    }
+    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+    localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
   }, []);
 
   useEffect(() => {
@@ -314,34 +432,72 @@ function SignInForm() {
   ) => {
     if (event.target.checked) {
       localStorage.setItem(LOCALSTORAGE_KEYS.REMEMBER_ME, STRING_VALUES.TRUE);
+      setRememberMe(true);
+      localStorage.setItem(
+        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
+        loginUserCredentials.email
+      );
+      localStorage.setItem(
+        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
+        encryptData(loginUserCredentials.password)
+      );
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
+      setRememberMe(false);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
     }
   };
 
   return (
     <>
       <div>
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleLoginSubmit}>
           <FormInput
+            logo={Mail}
             label="Email"
             type="email"
             name="email"
             required={true}
             placeholder="Enter your email"
             value={loginUserCredentials.email}
-            onChange={handleSignInFormDatachange}
+            defaultValue={loginUserCredentials.email}
+            minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
+            maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+            onChange={(e) => {
+              if (rememberMe) {
+                localStorage.setItem(
+                  LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
+                  e.target.value
+                );
+              } else {
+                localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS);
+              }
+              handleSignInFormDatachange(e);
+            }}
             onBlur={handleBlur}
             error={errors.email}
           />
           <FormInput
+            logo={KeySquare}
             label="Password"
             type={showPassword ? "text" : "password"}
             name="password"
             required={true}
             placeholder="Enter your password"
             value={loginUserCredentials.password}
-            onChange={handleSignInFormDatachange}
+            defaultValue={loginUserCredentials.password}
+            onChange={(e) => {
+              if (rememberMe) {
+                localStorage.setItem(
+                  LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
+                  encryptData(e.target.value)
+                );
+              } else {
+                localStorage.removeItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
+              }
+              handleSignInFormDatachange(e);
+            }}
             onBlur={handleBlur}
             error={errors.password}
             rightElement={
@@ -357,12 +513,13 @@ function SignInForm() {
               label="Remember me"
               name="remember"
               onChange={handleRememberMeCheckBoxChange}
+              checked={rememberMe}
             />
             <button
               type="button"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              <Link to={ROUTES_URL.FORGOT_PASSWORD}>Forgot Password?</Link>
+              <Link to={ROUTES_URL.FORGOT_PASSWORD} className="table-header-custom-blue">Forgot Password?</Link>
             </button>
           </div>
 
@@ -374,18 +531,18 @@ function SignInForm() {
 
           <Button
             type="submit"
-            onClick={handleLoginSubmit}
+            // onClick={}
             spinner={spinnerAnimation}
           >
             Log In
           </Button>
 
           <div className="text-center">
-            <span className="text-gray-600 text-sm">
+            <span className="caption-custom">
               Don't have an account yet?{" "}
               <button
                 type="button"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="caption-custom-blue hover:text-blue-700"
               >
                 <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>
@@ -398,25 +555,51 @@ function SignInForm() {
           message="Get the Subscription / Inactive Some users."
           onClose={() => {
             setShowSubscriptionOrInActivePopUp(false);
-            localStorage.clear();
+            localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+            localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
             setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isActiveSubscription: false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
-          });
+              companyId: 0,
+              companyName: "",
+              createdOn: "",
+              email: "",
+              fullName: "",
+              id: 0,
+              message: "",
+              mobileNumber: "",
+              status: false,
+              token: "",
+              isActiveSubscription: false,
+              isSuperUser: false,
+              subscriptionAllowedUsers: 0,
+              activeUsersInCompany: 0,
+              subscriptionId: 0,
+              startDateSubscription: "",
+              endDateSubscription: "",
+            });
+            setTutorailData({
+              id: 0,
+          companyUserId: 0,
+          isNavbarSeen: false,
+          isDashboardSeen: false,
+          isCrmDashboardSeen: false,
+          isCompanyUserSeen: false,
+          isCompanyUserActionsSeen : false,
+          isLeadSeen: false,
+          isAccountSeen: false,
+          isProductSeen: false,
+          isTeamSeen: false,
+          isSettingCompanySeen: false,
+          isSettingEmailTemplateSeen: false,
+          isSettingIntegrationSeen: false,
+          createdBy: "",
+          updatedBy: "",
+          createdOn: "",
+          updatedOn: "",
+            })
             navigate(ROUTES_URL.SIGN_IN);
             setSpinnerAnimation({
               status: "idle",
@@ -426,13 +609,13 @@ function SignInForm() {
         />
       </div>
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </>
   );
 }

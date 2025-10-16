@@ -1,25 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Settings, X } from "lucide-react";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { Settings } from "lucide-react";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import { createPortal } from "react-dom";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useEffect, useState } from "react";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import ToggleButton from "../../../ui/ToggleButton";
 
 function LeadSettingForLead({
   isOpen,
@@ -33,20 +28,6 @@ function LeadSettingForLead({
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   const getLeadSetting = async () => {
     setIsLoading(true);
@@ -124,12 +105,14 @@ function LeadSettingForLead({
           if (response.data.status) {
             setLeadSetting((prev) =>
               prev.map((setting) =>
-                setting.id === id ? { ...setting, isActive: isChecked } : setting
+                setting.id === id
+                  ? { ...setting, isActive: isChecked }
+                  : setting
               )
             );
-            showMessageSnackbar({ message: response.data.message, type: "success" });
+            toast.success(response.data.message);
           } else {
-            showMessageSnackbar({ message: response.data.message, type: "error" });
+            toast.error(response.data.message);
           }
         }
       })
@@ -153,16 +136,17 @@ function LeadSettingForLead({
 
   if (!isOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 p-5 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-20 p-4 flex items-center justify-center bg-black bg-opacity-5  animate-fadeIn">
       <div
-        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
+        className="relative w-full p-4 max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
         [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between z-10">
+        {/* <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
             <Settings className="text-blue-600" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-xl font-bold text-gray-800">
-              Manage Settings for <span className="text-blue-600">{lead.name}</span>
+              Manage Settings for{" "}
+              <span className="text-blue-600">{lead.name}</span>
             </h2>
           </div>
           <button
@@ -172,45 +156,58 @@ function LeadSettingForLead({
           >
             <X size={SIZE.TWENTY_FOUR} />
           </button>
-        </div>
+        </div> */}
+        <FormHeader
+          icon={Settings}
+          onClose={onClose}
+          userName={lead.name || lead.email || "unnamed lead"}
+          preText="Manage lead settings - "
+          description="Update and manage the settings associated with this lead."
+        />
 
-        <div className="p-6">
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="flex justify-between items-center mb-4 text-gray-600 font-semibold text-sm border-b pb-2">
+        <div className="p-1">
+          <div className="bg-gray-50 rounded-lg p-2 mb-1">
+            <div className="flex justify-between items-center mb-4 table-header-custom border-b pb-2">
               <span className="ml-2">Setting Name</span>
               <span className="mr-2">Status</span>
             </div>
             {isLoading ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              <div className="flex justify-center items-center h-32">
+                <LoadingSpinner/>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {leadSetting.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No settings available for this lead.</p>
+                  <p className="text-center input-label-custom py-8">
+                    No settings available for this lead.
+                  </p>
                 ) : (
                   leadSetting.map((per) => (
                     <div
                       key={per.id}
-                      className={`
-                        relative flex items-center justify-between p-3 rounded-lg border
-                        ${per.isActive
-                          ? "bg-green-50 border-green-200 shadow-sm"
-                          : "bg-red-50 border-red-200 shadow-sm"
-                        }
-                        hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
-                      `}
+                      // className={`
+                      //   relative flex items-center justify-between p-2 rounded-lg border
+                      //   ${
+                      //     per.isActive
+                      //       ? "bg-green-50 border-green-200 shadow-sm"
+                      //       : "bg-red-50 border-red-200 shadow-sm"
+                      //   }
+                      //   hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
+                      // `}
+                      className="relative flex items-center justify-between p-2 rounded-lg border hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
                     >
-                      <div className="text-gray-800 font-medium text-sm flex items-center gap-2">
-                        {per.isActive ? (
+                      <div className="table-data-custom flex items-center gap-2">
+                        {/* {per.isActive ? (
                           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                         ) : (
                           <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                        )}
+                        )} */}
                         {per.name}
                       </div>
 
-                      <label className="inline-flex items-center cursor-pointer relative">
+                     
+                        {/* toggel button */}
+                      {/* <label className="inline-flex items-center cursor-pointer relative self-end">
                         <input
                           type="checkbox"
                           className="sr-only peer"
@@ -218,13 +215,14 @@ function LeadSettingForLead({
                           id={per.id.toString()}
                           onChange={handleLeadSettingCheckBoxChange}
                         />
-                        <div
-                          className="w-10 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-400 rounded-full
-                          peer-checked:bg-blue-500 transition-all duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                          after:bg-white after:border after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all after:duration-300
-                          peer-checked:after:translate-x-full peer-checked:after:border-white"
-                        ></div>
-                      </label>
+                        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                      </label> */}
+                      <ToggleButton
+                      checked={per.isActive}
+                      name={per.id.toString()}
+                      onToggle={handleLeadSettingCheckBoxChange}
+                      />
                     </div>
                   ))
                 )}
@@ -232,14 +230,6 @@ function LeadSettingForLead({
             )}
           </div>
         </div>
-
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
       </div>
     </div>,
     document.body

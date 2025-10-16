@@ -1,20 +1,16 @@
-import { EditIcon, X } from "lucide-react";
+import { EditIcon, Save, X } from "lucide-react";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
-  TAX_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useEffect, useState } from "react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
+// import {
+//   MessageSnackbarState,
+//   ShowMessageSnackbarProps,
+// } from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -24,9 +20,9 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import CreateCompanyProductTaxModalProps from "../../../@types/modal/CreateCompanyProductTaxModalProps";
 import RadioButtons from "../../ui/RadioButton";
-import { ProductsRadioButtonOptions } from "../../../constants/TestData";
 import DatePickerInput from "../../ui/DatePickerInput";
-import useScreenSize from "../../../config/hooks/useScreenSize";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
 
 function CreateCompanyProductTaxModal({
   isOpen,
@@ -43,15 +39,32 @@ function CreateCompanyProductTaxModal({
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
-  const { isSmallScreen } = useScreenSize();
 
-  const [selectedTaxCode, setSelectedTaxCode] = useState<string>("");
+  const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
+
+  const ProductsRadioButtonOptions = [
+  {
+    label : "HSN",
+    value : "hsn",
+    id : "hsn",
+    name : "taxCode",
+    checked : selectedTaxCode === "hsn" ? true : false,
+  },
+  {
+    label : "SAC",
+    value : "sac",
+    id : "sac",
+    name : "taxCode",
+    checked : selectedTaxCode === "sac" ? true : false,
+  },
+
+]
 
   const {
     formData: createCompanyProductTaxFormData,
@@ -63,18 +76,26 @@ function CreateCompanyProductTaxModal({
     "registration"
   );
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    setSelectedTaxCode(event.target.value);
+    if(event.target.value === "hsn"){
+      
+      setSelectedTaxCode("hsn");
+    }
+    else if(event.target.value === "sac") {
+
+        setSelectedTaxCode("sac");
+    }
+    
   }
 
   const hanldeUpdateCompanyProductFormSubmit = async (
@@ -91,8 +112,8 @@ function CreateCompanyProductTaxModal({
         const updateProductPostData = {
           company_id: loginStatus.companyId,
           company_product_id: product.id,
-          hsn: createCompanyProductTaxFormData.hsn,
-          sac: createCompanyProductTaxFormData.sac,
+          hsn: selectedTaxCode === "hsn" ? createCompanyProductTaxFormData.hsn : null,
+          sac: selectedTaxCode === "sac" ? createCompanyProductTaxFormData.sac : null,
           tax_rate: createCompanyProductTaxFormData.taxRate,
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
@@ -106,12 +127,8 @@ function CreateCompanyProductTaxModal({
               response.data.status === true &&
               response.status === STATUS_CODE.OK
             ) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
-              handleCreateCompanyProductTax(product);
-
+              toast.success(response.data.message);
+              handleCreateCompanyProductTax();
               setTimeout(() => {
                 onClose();
               }, 2000);
@@ -119,10 +136,7 @@ function CreateCompanyProductTaxModal({
               response.status === STATUS_CODE.OK &&
               !response.data.status
             ) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "error",
-              });
+              toast.error(response.data.message);
             }
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,10 +152,7 @@ function CreateCompanyProductTaxModal({
           });
       }
     } else {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.REQUIRED_FIELDS,
-        type: "error",
-      });
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
     }
   };
 
@@ -153,24 +164,26 @@ function CreateCompanyProductTaxModal({
         taxRate: "",
         validFrom: "",
       });
-      handleCloseSnackbar();
+      // handleCloseSnackbar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="flex justify-center items-center w-full">
+    <div
+      className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"
+      
+    >
+      <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
-          className={
-            isSmallScreen
-              ? "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn "
-              : "bg-slate-50 rounded-lg shadow-xl w-full relative animate-fadeIn px-3 "
-          }
+          className="relative w-full max-w-xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-300
+  [&::-webkit-scrollbar-thumb]:bg-gray-400
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
+            {/* <div className="flex items-center gap-3 mb-6">
               <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
                 Create Tax For : {product.name}
@@ -181,7 +194,14 @@ function CreateCompanyProductTaxModal({
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+            icon={EditIcon}
+            onClose={onClose}
+            preText="Create Tax For "
+            userName={product.name}
+            description="Easily manage your product taxation by adding all tax details in one place"
+            />
 
             <form
               className="space-y-2"
@@ -191,25 +211,26 @@ function CreateCompanyProductTaxModal({
                 options={ProductsRadioButtonOptions}
                 onChange={handleTaxRadioButtonChange}
               />
-
-              {(selectedTaxCode === TAX_CODE.HSN || selectedTaxCode === "") && (
+              {(selectedTaxCode === "hsn") && (
                 <FormInput
-                  label="HSN : "
+                  label="HSN "
                   type="text"
                   name="hsn"
                   value={createCompanyProductTaxFormData.hsn}
                   placeholder="Enter HSN Code"
                   onChange={handleCreateCompanyProductTaxChange}
                   onBlur={handleBlur}
+                  required={true}
                   error={errors.hsn}
                 />
               )}
 
-              {selectedTaxCode === TAX_CODE.SAC && (
+              {selectedTaxCode === "sac" && (
                 <FormInput
-                  label="SAC : "
+                  label="SAC "
                   type="text"
                   name="sac"
+                  required={true}
                   value={createCompanyProductTaxFormData.sac}
                   placeholder="Enter SAC Code"
                   onChange={handleCreateCompanyProductTaxChange}
@@ -219,9 +240,10 @@ function CreateCompanyProductTaxModal({
               )}
 
               <FormInput
-                label="Tax Rate : "
-                type="text"
+                label="Tax Rate "
+                type="decimal"
                 name="taxRate"
+                required={true}
                 placeholder="Enter Product Cost"
                 value={createCompanyProductTaxFormData.taxRate.toString()}
                 onChange={handleCreateCompanyProductTaxChange}
@@ -230,31 +252,43 @@ function CreateCompanyProductTaxModal({
               />
 
               <DatePickerInput
-                label="Valid From :"
+                label="Valid From"
                 name="validFrom"
+                required={true}
                 value={createCompanyProductTaxFormData.validFrom}
                 placeholder="Select Date"
                 onChange={handleCreateCompanyProductTaxChange}
                 onBlur={handleBlur}
                 error={errors.validFrom}
               />
-              <div className="flex justify-center">
-                <div className="max-w-80 min-w-72">
-                  <Button type="submit">Create Product Tax</Button>
+              <div className="flex justify-end gap-2">
+                <div >
+                  <Button
+                  type="button"
+                  onClick={onClose}
+                  >
+                  
+                  <div className="flex items-center justify-center gap-1">
+                    <X size={16} />
+                    Close
+                  </div>
+                  </Button>
+                </div>
+                <div >
+                  <Button type="submit">
+                    
+                  <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                  </Button>
                 </div>
               </div>
             </form>
           </div>
         </div>
       </div>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-    </>
+    </div>
   );
 }
 

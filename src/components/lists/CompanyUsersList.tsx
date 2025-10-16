@@ -1,6 +1,6 @@
-import { Users, UserPlus, Calendar, Filter, X } from "lucide-react";
+import { Users, UserPlus, Calendar } from "lucide-react";
 import Button from "../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "../ag-grid/Pagination";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
@@ -9,16 +9,28 @@ import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
 import CompanyUser from "../../@types/company-users/CompanyUser";
 import SearchInput from "../ui/SearchInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import useScreenSize from "../../config/hooks/useScreenSize";
 import CompanyUserAgGrid from "../ag-grid/CompanyUsersAgGrid";
-import {
-  JSX_CHILDREN_NAME,
-  SIZE,
-} from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
+
+import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
+import { useUserPreference } from "../../context/user/UserPreference";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
+import AppTutorailManager from "../views/tutorails/AppTutorailManager";
+import {
+  CompanyUsersModuleSteps,
+} from "../../constants/AppTutorailsSteps";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axios from "axios";
+import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../constants/Tutorail";
+import RefreshToken from "../../config/validations/RefreshToken";
 
 function GetCompanyUsersList({
   users,
@@ -28,31 +40,40 @@ function GetCompanyUsersList({
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
 }: GetCompanyUsersListProps) {
-  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(
-    false
-  );
-  const [isEditCompanyUserModalOpen, setIsEditModalOpen] = useState<boolean>(
-    false
-  );
+  const { userPreference } = useUserPreference();
+  const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
+
+  const [isActionsTourEnded,setIsActionsTourEnded] = useState<boolean>(false);
+
+  const [isDashboardModalOpen, setIsDashboardModalOpen] =
+    useState<boolean>(false);
+
+  const [isEditCompanyUserModalOpen, setIsEditModalOpen] =
+    useState<boolean>(false);
   const [isAddCompanyUserModalOpen, setIsAddCompanyUserModalOpen] =
     useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    false
-  );
-
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const [isAnimationComplete, setIsAnimationComplete] =
+    useState<boolean>(false);
 
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { userHasAccessToAddUser } = useUserAccessModules();
+  const {loginStatus} = useLoggedInUserContext();
+  const {tutorailData,setTutorailData} = useTutorailDataContext();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
 
-  const {
-    userHasAccessToAddUser,
-    userHasAccessToViewUser,
-  } = useUserAccessModules();
+  useEffect(() => {
+    setTourFinished(tutorailData.isCompanyUserSeen)
+    setIsActionsTourEnded(tutorailData.isCompanyUserActionsSeen)
+  },[tutorailData])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsAnimationComplete(true);
+    }, 500);
+  }, []);
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -88,278 +109,280 @@ function GetCompanyUsersList({
     setIsAccessModalOpen(status);
   };
 
+  const handleIsDashboardModalOpen = (status: boolean) => {
+    setIsDashboardModalOpen(status);
+  };
+
+  const handleTourModalOpen = (index: number) => {
+    if (index === 2) {
+      setIsAddCompanyUserModalOpen(true);
+
+      return;
+    } else if (index === 4) {
+      setIsAddCompanyUserModalOpen(false);
+      return;
+    }
+  };
+
+  const handleActionsTourEnd = () => {
+    
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_ACTIONS_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setIsActionsTourEnded(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: true,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  };
+
+  const handleTourEnd = async() => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_COMPANY_USER_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: true,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  }
   return (
-    userHasAccessToViewUser && (
-      <div className="w-full h-screen pt-1 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-9 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex  gap-2">
-            {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
+    <div
+      className={`w-full  pt-1  ${
+        userPreference.isLeftMenu ? "pl-5" : "pl-1"
+      } pr-1 gap-1`}
+    >
+      {tourFinished ? null : isAnimationComplete && (
+        <AppTutorailManager
+          steps={CompanyUsersModuleSteps}
+          handleTourEnd={handleTourEnd}
+          isModalOpen={handleTourModalOpen}
+          modalOpenTriggerIndices={[2, 3, 4]}
+        />
+      )}
 
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl font-bold">Company Members</span>
-            )}
-          </div>
-
-          {isLargeScreen && (
-            <>
-              <div className="flex gap-1">
-                {/* search box flex div */}
-                <div className="relative flex items-start w-80 ">
-                  <SearchInput
-                    onChange={(e) => {
-                      
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
-
-                {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar className="mt-2" />
-                    </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                </div>
-              </div>
-
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                />
-              </div>
-            </>
-          )}
-
-          {isMediumScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative  gap-2  ">
-                <div className="mt-1 flex ">
-                  <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                    <Calendar />
-                  </div>
-
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-              {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFilterOpenInTabletView(!isFilterOpenInTabletView);
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.TWENTY} />
-                    </button>
-
-                    <div className="my-10 justify-items-center mb-5">
-                      <div className="mb-5">
-                        <DateRangePicker
-                          onStartDateChange={onStartDateChange}
-                          onEndDateChange={onEndDateChange}
-                        />
-                      </div>
-                      <div className="w-full justify-items-center">
-                        <div className="w-24">
-                          <Button>Done</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {isSmallScreen && (
-            <>
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              <div className="flex relative gap-2">
-                <Button
-                  onClick={() => {
-                    setIsFiltersOpenInMobileView(!isFiltersOpenInMobileView);
-                  }}
-                >
-                  <Filter size={SIZE.EIGHT} />
-                </Button>
-              </div>
-              {isFiltersOpenInMobileView && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                    <button
-                      onClick={() => {
-                        setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
-                        );
-                      }}
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={SIZE.EIGHT} />
-                    </button>
-                    {/* Date FIlters Dropdown */}
-
-                    <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                      <div className="mt-1 flex ">
-                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                          <Calendar size={SIZE.TWENTY} />
-                        </div>
-
-                        <DateRangeFilterDropdown
-                          dropdownOptions={dateRangeDropdownOptions}
-                          handleDateIdChange={handleDateRangeIdChange}
-                        ></DateRangeFilterDropdown>
-                      </div>
-                    </div>
-
-                    {/* Custom Date Picker Div Flex Box*/}
-                    <div
-                      className="mb-10 justify-items-center"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-
-                    {
-                      <div className="flex w-full justify-center items-center mb-5">
-                        <div className="w-28">
-                          <Button
-                            onClick={() => {
-                              setIsFiltersOpenInMobileView(
-                                !isFiltersOpenInMobileView
-                              );
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* new end */}
-
-          {userHasAccessToAddUser ? (
-            <>
-              <div className="flex gap-1">
-                <Button
-                  onClick={() =>
-                    setIsAddCompanyUserModalOpen(true)
-                  }
-                >
-                  {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-                </Button>
-              </div>
-              <AddCompanyUserModal
-                isOpen={isAddCompanyUserModalOpen}
-                onClose={() =>
-                  setIsAddCompanyUserModalOpen(false)
-                }
-              />
-              <EditCompanyUserModal
-                handleCompanyUserChange={handleCompanyUserChangeOnEdit}
-                isOpen={isEditCompanyUserModalOpen}
-                onClose={() => {
-                  setIsEditModalOpen(false);
-                }}
-                user={selectedCompanyUser}
-              />
-            </>
-          ) : (
-            <div className="flex gap-1">
-              <Button disabled={true}>
-                {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER}
-              </Button>
-            </div>
-          )}
+      <div
+        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+      >
+        <div className="flex  gap-2">
+          <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+          <span className="section-header-custom">Company Users</span>
         </div>
 
+        <div className="flex gap-1">
+          {/* search box flex div */}
 
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+          <div className="relative flex items-start w-80">
+            <SearchInput
+              id="company-user-module-search-box"
+              onChange={(e) => {
+                handleSearchOption.handleSearchParameterChange(e.target.value);
+              }}
+            ></SearchInput>
+          </div>
+
+          {/* Date FIlters Dropdown */}
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "80%", width: "100%" }}
+            id="company-users-module-date-range-filter"
+            className="flex mx-3"
           >
+            <div className="flex">
+              <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                <Calendar className="input-label-custom mt-1" />
+              </div>
 
-            <CompanyUserAgGrid
-              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-              users={users}
-              handleIdIsEditModalOpen={handleIdIsEditModalOpen}
-              handleIsAccessModalOpen={handleIsAccessModalOpen}
-            />
+              <DateRangeFilterDropdown
+                dropdownOptions={dateRangeDropdownOptions}
+                handleDateIdChange={handleDateRangeIdChange}
+              ></DateRangeFilterDropdown>
+            </div>
           </div>
-          <CompanyUserAccessManagementModal
-            isOpen={isAccessModalOpen}
-            onClose={() => setIsAccessModalOpen(false)}
-            users={selectedCompanyUser}
-          />
         </div>
-        {/* pagination component */}
-        <div className="flex items-center justify-end ">
 
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
-            pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+        {/* Custom Date Picker Div Flex Box*/}
+        <div
+          style={
+            isCustomDateOptionSelected
+              ? { visibility: "visible" }
+              : { visibility: "hidden" }
+          }
+        >
+          <DateRangePicker
+            onStartDateChange={onStartDateChange}
+            onEndDateChange={onEndDateChange}
           />
         </div>
+
+        {/* new end */}
+
+        <>
+          {/* {userHasAccessToAddUser ? ( */}
+          {/* <> */}
+          <div id="company-users-module-add-button" className="flex gap-1">
+            <Button
+              type="submit"
+              disabled={!userHasAccessToAddUser}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!userHasAccessToAddUser) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.COMPANY_USER
+                      .DENIED_ADD_ACCESS_COMPANY_USER
+                  );
+                  return;
+                } else {
+                  setIsAddCompanyUserModalOpen(true);
+                }
+              }}
+              // onClick={() => setIsAddCompanyUserModalOpen(true)}
+            >
+              {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
+                {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
+                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
+              <div className="flex items-center gap-1">
+                <UserPlus size={SIZE.SIXTEEN} />
+                Add
+              </div>
+            </Button>
+          </div>
+          <AddCompanyUserModal
+            isOpen={isAddCompanyUserModalOpen}
+            onClose={() => setIsAddCompanyUserModalOpen(false)}
+          />
+
+         
+        </>
       </div>
-    )
+
+      <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+        
+        <div
+          className={
+            userPreference.isLeftMenu
+              ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-130px)]"
+          }
+        >
+           
+          <CompanyUserAgGrid
+            handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+            users={users}
+            handleIdIsEditModalOpen={handleIdIsEditModalOpen}
+            handleIsAccessModalOpen={handleIsAccessModalOpen}
+            handleIsDashboardModalOpen={handleIsDashboardModalOpen}
+            isActionsTourEnded={isActionsTourEnded}
+            handleActionsTourEnd={handleActionsTourEnd}
+          />
+        </div>
+          <CompanyUserAccessManagementModal
+          isOpen={isAccessModalOpen}
+          onClose={() => setIsAccessModalOpen(false)}
+          users={selectedCompanyUser}
+        />
+        <EditCompanyUserModal
+            handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+            isOpen={isEditCompanyUserModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+            }}
+            user={selectedCompanyUser}
+          />
+        
+        <CompanyUserDashboardModal
+          isOpen={isDashboardModalOpen}
+          onClose={() => {
+            setIsDashboardModalOpen(false);
+          }}
+          users={selectedCompanyUser}
+        />
+      </div>
+      {/* pagination component */}
+      <div className="flex items-center justify-end ">
+        <Pagination
+          totalPages={paginationData.totalPages}
+          currentPage={paginationData.currentPage}
+          pageSize={paginationData.pageSize}
+          onPageChange={paginationData.handlePageChange}
+          onPageSizeChange={paginationData.selectedPageSize}
+        />
+      </div>
+    </div>
   );
 }
 

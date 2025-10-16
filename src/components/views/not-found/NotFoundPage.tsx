@@ -1,5 +1,6 @@
 import { ArrowLeft, Ghost, HomeIcon } from "lucide-react";
 import Button from "../../ui/Button";
+import ROUTES_URL from "../../../constants/Routes";
 
 
 function NotFoundPage() {
@@ -10,27 +11,35 @@ function NotFoundPage() {
           <Ghost size={120} className="mx-auto text-blue-600 opacity-80" />
         </div>
         
-        <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-4 animate-fade-in">
+        <h1 className="main-title-custom mb-4 animate-fade-in">
           404
         </h1>
-        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
+        <h2 className="section-header-custom mb-4">
           Oops! Page not found
         </h2>
-        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+        <p className="input-label-custom mb-8 max-w-md mx-auto">
           The page you're looking for seems to have vanished into thin air. 
           Don't worry, even ghosts get lost sometimes!
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
-            onClick={() => window.history.back()}
+          type="button"
+            onClick={(e) =>{
+              e.preventDefault();
+              window.history.back();
+            } }
             
             >
             <ArrowLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform duration-200" />
             Go Back
           </Button>
           <Button 
-            onClick={() => window.location.href = '/home'}>
+          type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = ROUTES_URL.HOME;
+            }}>
             <HomeIcon className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
             Home Page
           </Button>

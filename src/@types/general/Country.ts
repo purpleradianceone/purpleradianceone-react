@@ -1,7 +1,7 @@
 type Country = {
     id : number |null,
     name : string | null,
-    dailcode : string | null,
+    dialcode : string | null,
     description : string | null ,
     isactive : boolean
 }

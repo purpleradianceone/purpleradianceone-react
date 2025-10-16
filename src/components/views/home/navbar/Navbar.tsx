@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import {
+  Aperture,
   Bell,
-  BoxesIcon,
   Building2,
   Calendar,
+  CreditCard,
   Handshake,
   Home,
+  Layers,
   LayoutPanelLeft,
   LogOut,
   LucideSettings,
@@ -15,6 +18,8 @@ import {
   Settings,
   SettingsIcon,
   Store,
+  User2,
+  UserCogIcon,
   X,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -33,21 +38,32 @@ import NotificationPopup from "../../notification/NotificationManagement";
 import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import { alphabets, backgroundColors } from "../../../../constants/Colors";
+import MESSAGE from "../../../../constants/Messages";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+    const [isDashboardRendered,setIsDashboardRendered] = useState<boolean>(false);
+    const {tutorailData,setTutorailData} = useTutorailDataContext();
+      const [istourFinished,setIsTourFinished] = useState<boolean>(false);
 
   const {
     userHasAccessToViewLead,
+    userHasAccessToViewAccount,
     userHasAccessToViewProduct,
-    userHasAccessToViewProductTeam,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
+    userHasAccessToUpdateSettingGeneral,
+    
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -83,47 +99,66 @@ function Navbar({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-
   const location = useLocation();
 
   useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
-        
-        element.scrollIntoView({ behavior: 'instant' });
+        element.scrollIntoView({ behavior: "instant" });
       }
     }
   }, [location]);
 
-  const handleLogout = async() => {
-    await axios.post(POST_API.LOGOUT,{} , {withCredentials: true} )
-    .then((response ) =>{
-      if(response.status === 200){
-        toast.success(response.data)
-        Navigate(ROUTES_URL.SIGN_IN);
-         setLoginStatus({
-      id: 0,
-      companyId: 0,
-      message: "",
-      token: "",
-      status: false,
-      email: "",
-      fullName: "",
-      companyName: "",
-      createdOn: "",
-      mobileNumber: "",
-      activeUsersInCompany: 0,
-      isActiveSubscription: false,
-      subscriptionAllowedUsers: 0,
-      endDateSubscription: "",
-      startDateSubscription: "",
-      subscriptionId: 0,
-    });
-      }
-    })
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   .catch(async (error: ApiError | any) => {
+
+
+  useEffect(() => {
+
+    
+    const element =location.pathname;
+    if(element === ROUTES_URL.HOME){
+      setIsDashboardRendered(true);
+      setIsTourFinished(tutorailData.isNavbarSeen);
+    }
+    else{
+      setIsDashboardRendered(false);
+      setIsTourFinished(tutorailData.isNavbarSeen);
+    }
+  },[location])
+ 
+
+  const handleLogout = async () => {
+    await axios
+      .post(POST_API.LOGOUT, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.status === 200) {
+          toast.success(response.data);
+          Navigate(ROUTES_URL.SIGN_IN);
+          setLoginStatus({
+            id: 0,
+            companyId: 0,
+            message: "",
+            token: "",
+            status: false,
+            email: "",
+            fullName: "",
+            companyName: "",
+            createdOn: "",
+            mobileNumber: "",
+            activeUsersInCompany: 0,
+            isActiveSubscription: false,
+            subscriptionAllowedUsers: 0,
+            endDateSubscription: "",
+            startDateSubscription: "",
+            subscriptionId: 0,
+            isSuperUser: false,
+          });
+
+          setNotificationCount(0);
+        }
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
         //if exception occurs then rollback to previous state
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
@@ -134,10 +169,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
           }
         }
       });
-
-  }
-
-
+  };
 
   //WRITE SUBSCRIPTION LOGIC HERE
   const handleSubscription = () => {
@@ -148,9 +180,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
     Navigate(ROUTES_URL.USER_PROFILE_SETTING);
   };
 
+  const handleClickOnSettings = () => {
+    Navigate(ROUTES_URL.COMPANY_SETTING)
+  }
+
   // const notifications = useNotifications();
 
-  const {notificationCount,setNotificationCount} = useNotificationCountContext();
+  const { notificationCount, setNotificationCount } =
+    useNotificationCountContext();
 
   // useEffect(() => {
   //   console.log("something happened");
@@ -163,8 +200,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
   // }, [notifications]);
 
   const resetNotificationCount = () => {
-
-
     setNotificationCount(0);
   };
 
@@ -173,16 +208,72 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
-    // useEffect(() => {
-    //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
-    //   console.log("loginstatus : " + loginStatus.status);
-    //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
-    //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
-    //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
-    //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
-    // },[loginStatus])
+    const handleNavbarTutorailFinish = async() => {
+      console.log(tutorailData);
+      const updateTutorailPostData = {
+        company_id : loginStatus.companyId,
+        id : tutorailData.id,
+        column_name : TutorailColumnName.IS_NAVBAR_SEEN,
+        status : true,
+        updatedby_id : loginStatus.id
+      }
+      axios.post(POST_API.UPDATE_COMPANY_USER_TUTORAIL,updateTutorailPostData,{
+        withCredentials:true,
+      }).then((response) => {
+        if(response.data.status){
+            setIsTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+          companyUserId: tutorailData.companyUserId,
+          isNavbarSeen: true,
+          isDashboardSeen: tutorailData.isDashboardSeen,
+          isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+          isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+          isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+          isLeadSeen: tutorailData.isLeadSeen,
+          isAccountSeen: tutorailData.isAccountSeen,
+          isProductSeen: tutorailData.isProductSeen,
+          isTeamSeen: tutorailData.isTeamSeen,
+          isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+          isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+          isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+          createdBy: tutorailData.createdOn,
+          updatedBy: tutorailData.updatedBy,
+          createdOn: tutorailData.createdOn,
+          updatedOn: tutorailData.updatedOn,
+          });
+        }
+      }).catch(async(error) => {
+        if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenResponse = await RefreshToken({callFunction:handleNavbarTutorailFinish})
+          if(refreshTokenResponse){
+            handleNavbarTutorailFinish();
+          }
+        }
+      })
+      
+    }
 
-  if (!loginStatus.status || ((loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers))) {
+  // useEffect(() => {
+  //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+  //   console.log("loginstatus : " + loginStatus.status);
+  //   console.log("Active subscription: " + !loginStatus.isActiveSubscription);
+  //   console.log("Active users in company: " + loginStatus.activeUsersInCompany);
+  //   console.log("Subscription allowed users: " + loginStatus.subscriptionAllowedUsers);
+  //   console.log("users consdition  : " + (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
+  // },[loginStatus])
+
+  const getColor = (email: string) => {
+    if (!email) return backgroundColors[0];
+    const emailChar = email.charAt(0);
+    const index = alphabets.indexOf(emailChar.toLowerCase());
+    return backgroundColors[index];
+  };
+
+  if (
+    !loginStatus.status ||
+    loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers
+  ) {
     return (
       <div>
         <header className="fixed bg-white w-full shadow-sm z-50 py-5">
@@ -190,7 +281,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
-                  <div className="w-32 h-auto">
+                  <div className="w-12 h-12 justify-self-start">
                     <img src={IMAGE_SOURCE.PR_LOGO} alt="Logo" />
                   </div>
                 </div>
@@ -226,7 +317,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Careers
                   </a>
-                  
+
                   <Link to={ROUTES_URL.SIGN_UP}>
                     <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
                       Get Started
@@ -287,25 +378,35 @@ function Navbar({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </header>
-        <main className="min-h-screen overflow-y-scroll border border-gray-400
+        <main
+          className="min-h-screen overflow-y-scroll border border-gray-400
             [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:bg-transparent
-            [&::-webkit-scrollbar-thumb]:bg-transparent">{children}</main>
+            [&::-webkit-scrollbar-thumb]:bg-transparent"
+        >
+          {children}
+        </main>
       </div>
     );
   } else {
     return (
       <div>
+        {istourFinished ? null : isDashboardRendered  && <AppTutorailManager steps={NavbarSteps} handleTourEnd={handleNavbarTutorailFinish}/>}
+        
         <header>
-          <nav className="z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 h-12">
+          <nav
+            className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${
+              position === "left" ? "h-12" : "h-14"
+            }`}
+          >
             <div className="px-4 lg:px-6">
               <div
                 className={`flex ${
-                  position === "left" ? "ml-10" : ""
+                  position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-lg   font-bold text-blue-700 cursor-pointer">
+                <div id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className="font-sora ">{loginStatus.companyName}</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -314,9 +415,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       <SideNavBar
                         isOpen={sidebarOpen}
                         onToggle={() => setSidebarOpen(!sidebarOpen)}
-                        onNextTab={() => {
-                          setSidebarOpen(false);
-                        }}
                       />
                     </div>
                   </>
@@ -332,69 +430,108 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<Home size={SIZE.TWENTY} />}
                           label="Home"
                         />
-                        {userHasAccessToViewUser && (
+                        {/* {userHasAccessToViewUser && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewUser}
                             to={ROUTES_URL.GET_COMPANY_USERS}
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        )}
-                        {!userHasAccessToViewUser && (
+                        {/* )} */}
+                        {/* {!userHasAccessToViewUser && (
                           <NavItem
-                            to={ROUTES_URL.GET_COMPANY_USERS}
+                          disable ={true}
+                            // to={ROUTES_URL.GET_COMPANY_USERS}
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        )}
+                        )} */}
 
-                        {userHasAccessToViewLead && (
+                        {/* {userHasAccessToViewLead && ( */}
+                          <NavItem
+                          disable={!userHasAccessToViewLead}
+                            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
+                            icon={<Handshake size={SIZE.TWENTY} />}
+                            label="Lead"
+                          />
+                        {/* )} */}
+                        {/* {!userHasAccessToViewLead && (
                           <NavItem
                             to={ROUTES_URL.GET_LEAD_MANAGEMENT}
                             icon={<Handshake size={SIZE.TWENTY} />}
                             label="Lead"
                           />
-                        )}
-                        {userHasAccessToViewProduct && (
+                        )} */}
+
+                       {/* {userHasAccessToViewAccount && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewAccount}
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                        {/* )} */}
+                        {/* {!userHasAccessToViewAccount && (
+                          <NavItem
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                        )} */}
+                        {/* {userHasAccessToViewProduct && ( */}
+                          <NavItem
+                          disable={!userHasAccessToViewProduct}
                             to={ROUTES_URL.PRODUCT_MANAGEMENT}
                             icon={<Store size={SIZE.TWENTY} />}
                             label="Products"
                           />
-                        )}
-                        {userHasAccessToViewTeamManagement && (
+                        {/* )} */}
+                        {/* {userHasAccessToViewTeamManagement && ( */}
                           <NavItem
+                          disable={!userHasAccessToViewTeamManagement}
                             to={ROUTES_URL.TEAM_MANAGEMENT}
                             icon={<Network size={SIZE.TWENTY} />}
                             label="Team"
                           />
-                        )}
-                        {userHasAccessToViewProductTeam && (
-                          <NavItem
+                        {/* )} */}
+                        {/* {userHasAccessToViewProductTeam && ( */}
+                          {/* <NavItem
+                          disable={!userHasAccessToViewProductTeam}
                             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                             icon={<BoxesIcon size={SIZE.TWENTY} />}
                             label="Prd Team/users"
+                          /> */}
+                        {/* )} */}
+
+                        {/* {userHasAccessToViewMeeting && ( */}
+                          <NavItem
+                          disable={!userHasAccessToViewMeeting}
+                            to={ROUTES_URL.MEETINGS}
+                            icon={<Calendar size={SIZE.TWENTY} />}
+                            label="Meetings"
+                            onClick={() => setIsDropdownOpen(false)}
                           />
-                        )}
+                        {/* )} */}
 
                         <NavItem
                           icon={<Settings />}
                           label="Crm Settings"
                           dropdownItems={[
                             {
-                              icon: <Handshake size={SIZE.TWENTY} />,
-                              to: ROUTES_URL.LEAD_SETTINGS,
-                              label: "Lead",
+                              icon: <Settings size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.COMPANY_SETTING,
+                              label: "Settings",
                             },
                             {
-                              icon: <MessageCircle size={SIZE.TWENTY} />,
+                              icon: <Aperture size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
-                              label: "Email Template",
+                              label: "Email Template", 
                             },
                             {
-                              icon: <LucideSettings size={SIZE.TWENTY} />,
-                              to: ROUTES_URL.EMAIL_SETTING,
-                              label: "Email Setting",
-                            },
+                              icon : <Layers size={SIZE.TWENTY}/>,
+                              to :ROUTES_URL.INTEGRATIONS_SETTINGS,
+                              label : "Integrations"
+                            }
                           ]}
                         />
                       </div>
@@ -430,6 +567,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
+
+                          {userHasAccessToViewAccount && (
+                          <NavItem
+                          disable={!userHasAccessToViewAccount}
+                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                            icon={<UserCogIcon size={SIZE.TWENTY} />}
+                            label="Accounts"
+                          />
+                         )}
                           {userHasAccessToViewProduct && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_MANAGEMENT}
@@ -446,14 +592,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
-                          {userHasAccessToViewProductTeam && (
+                          {/* {userHasAccessToViewProductTeam && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                               icon={<BoxesIcon size={SIZE.TWENTY} />}
                               label=""
                               onClick={() => setIsDropdownOpen(false)}
                             />
-                          )}
+                          )} */}
 
                           {userHasAccessToViewMeeting && (
                             <NavItem
@@ -512,6 +658,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link> */}
                       <div className="relative">
                         <button
+                          id="notifications-navbar"
+                          title="Show Notification"
                           onClick={() => {
                             resetNotificationCount();
                             setIsOpenPopUpOfNotification(
@@ -521,9 +669,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           }}
                           className="p-2 rounded-lg hover:bg-gray-100"
                         >
-                          <Bell className="h-5 w-5" />
+                          <Bell className=" table-header-custom" />
                           {notificationCount > 0 && (
-                            <span className="absolute -top-0.5 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                            <span className="absolute -top-0.5 -right-1 bg-red-500 caption-custom white-text px-1.5 py-0.5 rounded-full">
                               {notificationCount > 9 ? "9+" : notificationCount}
                             </span>
                           )}
@@ -537,31 +685,54 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         )}
                       </div>
 
-                      <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
-                        <button className="p-2 rounded-lg hover:bg-gray-100">
-                          <LayoutPanelLeft className="h-5 w-5" />
+                      {userHasAccessToUpdateSettingGeneral ? (
+                        <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
+                          <button
+                            id="panel-layout-navbar"
+                            title="Panel Layout"
+                            className="p-2 rounded-lg hover:bg-gray-100"
+                          >
+                            <LayoutPanelLeft className="table-header-custom" />
+                          </button>
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS
+                            );
+                          }}
+                          id="panel-layout-navbar"
+                          title="Panel Layout"
+                          className="p-2 rounded-lg opacity-50 cursor-not-allowed hover:bg-gray-100"
+                        >
+                          <LayoutPanelLeft className="table-header-custom" />
                         </button>
-                      </Link>
+                      )}
                     </>
                   )}
-                  {/* paste code here */}
                   <div
                     className="flex items-center cursor-pointer relative"
                     onClick={toggleCard}
+                    id="profile-actions-navbar"
                   >
-                    {/* Profile Image */}
-                    <img
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt="Profile"
-                      className="h-9 w-9 rounded-full border border-gray-300"
-                    />
+                    <div
+                      className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
+                        loginStatus.email
+                      )}`}
+                    >
+                      {loginStatus.fullName
+                        ? loginStatus.fullName.charAt(0)
+                        : ""}
+                    </div>
 
                     {/* Name & Email */}
                     <div className="ml-3 min-w-0">
-                      <span className="text-sm font-semibold text-gray-800 block truncate w-40">
+                      <span className="table-header-custom block truncate w-40">
                         {loginStatus?.fullName || "User Name"}
                       </span>
-                      <span className="text-xs text-gray-500 block truncate w-40">
+                      <span className="caption-custom block truncate w-40">
                         {loginStatus?.email || "user@example.com"}
                       </span>
                     </div>
@@ -574,32 +745,40 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       >
                         {/* Profile Section */}
                         <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
-                          <img
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt="User"
-                            className="rounded-full w-12 h-12 border border-gray-300"
-                          />
+                          <div
+                            className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
+                              loginStatus.email
+                            )}`}
+                          >
+                            {loginStatus.fullName
+                              ? loginStatus.fullName.charAt(0)
+                              : ""}
+                          </div>
                           <div className="min-w-0">
-                            <span className="text-sm font-semibold text-gray-800 block truncate w-40">
+                            <span className="table-header-custom  block truncate w-40">
                               {loginStatus?.fullName || "User Name"}
                             </span>
-                            <span className="text-xs text-gray-500 block truncate w-40">
-                              {loginStatus?.email || "user@example.com"}
+                            <span title={loginStatus?.email || "User email"} className="caption-custom block truncate w-40">
+                              {loginStatus?.email || "User email"}
                             </span>
                           </div>
                         </div>
 
                         {/* Menu Options */}
                         <div className="flex flex-col">
-                          {userHasAccessToViewUser ? (
+                          {/* {userHasAccessToViewUser ? ( */}
                             <button
                               onClick={handleClickOnUserProfile}
-                              className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
-                              👤 Profile
+                              <div className="flex gap-2">
+                              <User2 className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Profile</span>
+                              </div>
+                              {/* 👤 Profile */}
                             </button>
-                          ) : (
-                            <button
+                          {/* ) : ( */}
+                            {/* <button
                               onClick={() => {
                                 setAccessDeniedPopUpView(true);
                               }}
@@ -607,24 +786,37 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             >
                               👤 Profile
                             </button>
-                          )}
-                          <button className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                            ⚙️ Account Setting
-                          </button>
+                          )} */}
+                            <button 
+                            onClick={handleClickOnSettings}
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
+                              {/* ⚙️ Settings */}
+                              <div className="flex gap-2">
+                              <Settings className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Settings</span>
+                              </div>
+                            </button>
 
                           {userHasAccessToViewSubscription ? (
                             <button
                               onClick={handleSubscription}
-                              className="px-4 py-2 text-left flex items-center gap-2 transition hover:bg-gray-200 rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
-                              💳 Subscription
+                              <div className="flex gap-2">
+                              <CreditCard className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Subscription</span>
+                              </div>
+                              {/* 💳 Subscription */}
                             </button>
                           ) : (
                             <button
                               onClick={() => setAccessDeniedPopUpView(true)}
-                              className="px-4 py-2 text-left flex items-center gap-2 transition bg-gray-50 text-gray-400 cursor-not-allowed hover:bg-gray-100 rounded-md mx-2 my-1"
+                              className="px-4 py-2 input-label-custom text-left flex items-center gap-2 transition bg-gray-50 cursor-not-allowed hover:bg-gray-100 rounded-md mx-2 my-1"
                             >
-                              💳 Subscription
+                              <div className="flex gap-2">
+                              <CreditCard className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Subscription</span>
+                              </div>
                             </button>
                           )}
 
@@ -633,10 +825,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                           <button
                             onClick={handleLogout}
-                            className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-3"
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                           >
-                            <LogOut className="w-4 h-4 text-gray-500" />
-                            Sign Out
+                            {/* <LogOut className="input-label-custom" />
+                            Sign Out */}
+                            <div className="flex gap-2">
+                              <LogOut className="input-label-custom"/>
+                              <span className="input-label-custom mt-1">Sign Out</span>
+                              </div>
                           </button>
                         </div>
                       </div>
@@ -650,13 +846,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
         <main
           className={
             position === "left"
-              ? sidebarOpen && !isSmallScreen
-                ? "mt-16 ml-60 flex justify-center items-center"
+              ? sidebarOpen
+                ? "mt-12 ml-60 flex justify-center items-center"
                 : "mt-12 ml-10 flex justify-center items-center"
-              : "mt-12 ml-0 flex justify-center items-center"
+              : "mt-14 ml-0 flex justify-center items-center"
           }
         >
-          {children}
+
+          {istourFinished && children}
         </main>
         {accessDeniedPopUpView && (
           <AccessDeniedPopup
@@ -667,7 +864,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
             }}
           />
         )}
-        <Toaster position="top-center" />
       </div>
     );
   }

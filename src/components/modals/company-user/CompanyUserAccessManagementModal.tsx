@@ -1,27 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { Save, ShieldCheck, X } from "lucide-react";
 import Button from "../../ui/Button";
 import AccessRightsModalProps from "../../../@types/company-users/AccessRightsModalProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import POST_API from "../../../constants/PostApi";
 import { AccessManagementType } from "../../../@types/company-users/AccessManagementContextType";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import {
-  NUMBER_VALUES,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function CompanyUserAccessManagementModal({
   isOpen,
@@ -29,15 +24,12 @@ function CompanyUserAccessManagementModal({
   users,
 }: AccessRightsModalProps) {
   const [dataStatus, setDataStatus] = useState(false);
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
 
   const { userHasAccessToUpdateAccess } = useUserAccessModules();
 
-  const [changedAccessModules, setChangedAccessModules] = useState<AccessManagementType[]>([]);
+  const [changedAccessModules, setChangedAccessModules] = useState<
+    AccessManagementType[]
+  >([]);
   const initialModulesRef = useRef<AccessManagementType[]>([]);
   const [spinnerAnimation, setSpinnerAnimation] = useState<{
     status: "idle" | "loading" | "success" | "error";
@@ -88,16 +80,17 @@ function CompanyUserAccessManagementModal({
         })
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenStatus = await RefreshToken({ callFunction: fetchUserAccessModules });
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: fetchUserAccessModules,
+            });
             if (refreshTokenStatus) {
               fetchUserAccessModules();
             }
-          } 
+          }
         });
     } else {
       setModules([]);
       setChangedAccessModules([]);
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
     }
   };
 
@@ -107,13 +100,18 @@ function CompanyUserAccessManagementModal({
 
   if (!isOpen) return null;
 
-  const handleCheckboxChange = (moduleId: number, field: "add" | "view" | "update") => {
+  const handleCheckboxChange = (
+    moduleId: number,
+    field: "add" | "view" | "update"
+  ) => {
     setModules((prevModules) => {
       const updatedModules = prevModules.map((module) =>
         module.id === moduleId ? { ...module, [field]: !module[field] } : module
       );
 
-      const initialModule = initialModulesRef.current.find((m) => m.id === moduleId);
+      const initialModule = initialModulesRef.current.find(
+        (m) => m.id === moduleId
+      );
       const updatedModule = updatedModules.find((m) => m.id === moduleId);
 
       if (!updatedModule || !initialModule) return updatedModules;
@@ -125,7 +123,9 @@ function CompanyUserAccessManagementModal({
 
       setChangedAccessModules((prevChanges) => {
         const filteredChanges = prevChanges.filter((m) => m.id !== moduleId);
-        return hasChanged ? [...filteredChanges, updatedModule] : filteredChanges;
+        return hasChanged
+          ? [...filteredChanges, updatedModule]
+          : filteredChanges;
       });
 
       return updatedModules;
@@ -159,17 +159,9 @@ function CompanyUserAccessManagementModal({
     });
   };
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
   const handleSaveAccessModule = async () => {
     if (changedAccessModules.length === 0) {
-      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      toast.error(MESSAGE.ERROR.NO_CHANGES);
       return;
     }
 
@@ -192,10 +184,7 @@ function CompanyUserAccessManagementModal({
         withCredentials: true,
       })
       .then((response) => {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        toast.success(response.data.message);
 
         setSpinnerAnimation({
           status: "success",
@@ -218,38 +207,35 @@ function CompanyUserAccessManagementModal({
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenStatus = await RefreshToken({ callFunction: handleSaveAccessModule });
+          const refreshTokenStatus = await RefreshToken({
+            callFunction: handleSaveAccessModule,
+          });
           if (refreshTokenStatus) {
             handleSaveAccessModule();
           }
         } else {
-          showMessageSnackbar({
-            message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-            type: "error",
-          });
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
         }
       });
   };
-
 
   const isColumnSelected = (field: "add" | "view" | "update") =>
     modules.every((module) => module[field]);
 
   const columnClasses = {
-    srNo: "w-[10%]",
-    moduleName: "w-[40%]",
-    checkbox: "w-[16.67%]",
+    srNo: "w-[10%] table-header-custom",
+    moduleName: "w-[40%] table-header-custom",
+    checkbox: "w-[16.67%] table-header-custom",
   };
 
-  return (
-    <>
-      <div className="fixed inset-0 z-10 p-4 overflow-hidden bg-black bg-opacity-45">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="relative w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-lg font-medium text-gray-700">
-                Update Access rights of {users.fullname}
+  return createPortal(
+    <div  className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
+      <div className="flex min-h-screen items-center justify-center">
+        <div  className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
+          {/* Header */}
+          {/* <div className="flex justify-between items-center p-3 border-b">
+              <h2 className="text-xl flex items-center gap-2 font-medium text-gray-900">
+               <ShieldCheck size={20}/> Update Access rights of <span className="text-blue-600">{users.fullname}</span>
               </h2>
               <button
                 onClick={onClose}
@@ -257,152 +243,194 @@ function CompanyUserAccessManagementModal({
               >
                 <X size={20} />
               </button>
-            </div>
+            </div> */}
+          <FormHeader
+            icon={ShieldCheck}
+            preText="Update Access rights of User - "
+            userName={users.fullname}
+            onClose={onClose}
+            description="Manage who can view, edit, or control modules by updating access rights to align with user responsibilities."
+          />
 
-            {/* Content Area */}
-            <div className="flex-1 overflow-hidden">
-              {dataStatus ? (
-                <div className="flex w-full h-full justify-center items-center">
-                  <LoadingSpinner />
-                </div>
-              ) : (
-                <div className="flex flex-col h-full">
-                  {/* Fixed Header */}
-                  <div className="bg-white border-b">
-                    <table className="w-full table-fixed">
-                      <colgroup>
-                        <col className={columnClasses.srNo} />
-                        <col className={columnClasses.moduleName} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                      </colgroup>
-                      <thead>
-                        <tr className="text-left">
-                          <th className="p-4">Sr. No.</th>
-                          <th className="p-4">Module Name</th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>Add</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("add")}
-                                onChange={() => handleColumnSelectAll("add")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>View</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("view")}
-                                onChange={() => handleColumnSelectAll("view")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                          <th className="p-4">
-                            <div className="flex flex-col items-center">
-                              <span>Update</span>
-                              <input
-                                type="checkbox"
-                                checked={isColumnSelected("update")}
-                                onChange={() => handleColumnSelectAll("update")}
-                                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
-
-                  {/* Scrollable Body */}
-                  <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-                    <table className="w-full table-fixed">
-                      <colgroup>
-                        <col className={columnClasses.srNo} />
-                        <col className={columnClasses.moduleName} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                        <col className={columnClasses.checkbox} />
-                      </colgroup>
-                      <tbody>
-                        {modules
-                          .sort((a, b) => a.id - b.id)
-                          .map((module) => (
-                            <tr key={module.id} className="border-t hover:bg-gray-50">
-                              <td className="p-4">{module.crm_module_id}</td>
-                              <td className="p-4">{module.module_name}</td>
-                              <td className="p-4">
-                                <div className="flex flex-col ml-2 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.add}
-                                    onChange={() => handleCheckboxChange(module.id, "add")}
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex flex-col ml-2 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.view}
-                                    onChange={() => handleCheckboxChange(module.id, "view")}
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex flex-col ml-3 items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={module.update}
-                                    onChange={() => handleCheckboxChange(module.id, "update")}
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-6 border-t bg-white">
-              <div className="flex justify-self-end min-w-36 max-w-44">
-                {userHasAccessToUpdateAccess ? (
-                  users.id === loginStatus.id ? (
-                    <Button disabled={true}>Save</Button>
-                  ) : (
-                    <Button onClick={handleSaveAccessModule} spinner={spinnerAnimation}>
-                      Save
-                    </Button>
-                  )
-                ) : (
-                  <Button disabled={true}>Save</Button>
-                )}
+          {/* Content Area */}
+          <div  className="flex-1 overflow-hidden">
+            {dataStatus ? (
+              <div className="flex w-full h-full justify-center items-center">
+                <LoadingSpinner />
               </div>
-            </div>
+            ) : (
+              <div  className="flex flex-col h-full">
+                {/* Fixed Header */}
+                <div className="bg-white border-b">
+                  <table className="w-full table-fixed">
+                    <colgroup>
+                      <col className={columnClasses.srNo} />
+                      <col className={columnClasses.moduleName} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                    </colgroup>
+                    <thead>
+                      <tr className="text-left">
+                        <th className="p-2">Sr. No.</th>
+                        <th className="p-2">Module Name</th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>Add</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("add")}
+                              onChange={() => handleColumnSelectAll("add")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>View</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("view")}
+                              onChange={() => handleColumnSelectAll("view")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                        <th className="p-2">
+                          <div className="flex flex-col items-center">
+                            <span>Update</span>
+                            <input
+                              type="checkbox"
+                              checked={isColumnSelected("update")}
+                              onChange={() => handleColumnSelectAll("update")}
+                              className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+
+                {/* Scrollable Body */}
+                <div id="company-user-access-management-modal" className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                  <table className="w-full table-fixed">
+                    <colgroup>
+                      <col className={columnClasses.srNo} />
+                      <col className={columnClasses.moduleName} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                      <col className={columnClasses.checkbox} />
+                    </colgroup>
+                    <tbody>
+                      {modules
+                        .sort((a, b) => a.id - b.id)
+                        .map((module) => (
+                          <tr
+                            key={module.id}
+                            className="border-t  hover:bg-gray-50"
+                          >
+                            <td className="p-2 table-data-custom">
+                              {module.crm_module_id}
+                            </td>
+                            <td className=" table-data-custom">
+                              {module.module_name}
+                            </td>
+                            <td className=" table-data-custom">
+                              <div className="flex flex-col ml-2 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.add}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "add")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex flex-col ml-2 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.view}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "view")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex flex-col ml-3 items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={module.update}
+                                  onChange={() =>
+                                    handleCheckboxChange(module.id, "update")
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
 
-          <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
+          {/* Footer */}
+          <div className="p-1 border-t  bg-white">
+            <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
+              <Button type="button" onClick={onClose}>
+                <div className="flex gap-0.5 items-center">
+                  <X size={SIZE.SIXTEEN} />
+                  Cancel
+                </div>
+              </Button>
+              <Button
+                type="submit"
+                onClick={
+                  userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                    ? (e) => {
+                        e.preventDefault();
+                        handleSaveAccessModule();
+                      }
+                    : (e) => {
+                        e.preventDefault();
+                        if (users.id === loginStatus.id) {
+                          toast.error(
+                            "For security reasons, users are unable to update their own Access Module."
+                          );
+                        } else if (!userHasAccessToUpdateAccess) {
+                          toast.error(
+                            "You do not have permission to Update the access modules of Another user."
+                          );
+                        }
+                      }
+                }
+                disabled={
+                  !userHasAccessToUpdateAccess || users.id === loginStatus.id
+                }
+                spinner={
+                  userHasAccessToUpdateAccess && users.id !== loginStatus.id
+                    ? spinnerAnimation
+                    : undefined
+                }
+              >
+                <div className="flex gap-1 items-center">
+                  <Save size={SIZE.SIXTEEN} />
+                  Save
+                </div>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>,
+    document.body
   );
 }
 

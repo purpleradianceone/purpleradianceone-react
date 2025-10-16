@@ -1,4 +1,4 @@
-import { Users, Calendar, Filter, X } from "lucide-react";
+import { Calendar, Filter, X } from "lucide-react";
 import { useState } from "react";
 import { useComapanySpecificSearchDateRange } from "../../../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../../../config/hooks/useDateRangeIdChange";
@@ -17,7 +17,6 @@ import PaginationDataProps from "../../../../@types/ag-grid/PaginationDataProps"
 import HandleSearchOptionProps from "../../../../@types/company-users/HandleSearchOptionProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 
-
 type GetCompanyUsersListForLeadProps = {
   users: CompanyUsersSearchProps[];
   paginationData: PaginationDataProps;
@@ -25,10 +24,12 @@ type GetCompanyUsersListForLeadProps = {
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
-  handleSelectedCompanyUserChange: (params: CompanyUser |null)  => void;
+  handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
+  isUsedForSettings: boolean;
   //added
-  selectedUserId : number | null;
-}
+  selectedUserId: number | null;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean ;
+};
 
 function GetCompanyUserListForLeadAssignment({
   users,
@@ -37,44 +38,31 @@ function GetCompanyUserListForLeadAssignment({
   onStartDateChange,
   onEndDateChange,
   selectedUserId,
-  handleSelectedCompanyUserChange
+  handleSelectedCompanyUserChange,
+  isUsedForSettings,
+  handleUpdateLeadUser,
 }: GetCompanyUsersListForLeadProps) {
-  
-
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
     useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    false
-  );
+  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] =
+    useState(false);
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
-  const {
-    userHasAccessToViewUser,
-  } = useUserAccessModules();
-
-
+  const { userHasAccessToViewUser } = useUserAccessModules();
 
   return (
     userHasAccessToViewUser && (
-      <div className="w-full  pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-10  mb-2 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.8w-full">
-          <div className=" w-56  flex items-center justify-evenly  gap-5 ">
-            {!isSmallScreen && <Users className="w-6 h-6 text-blue-600" />}
-
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="text-1xl  font-bold whitespace-nowrap text-ellipsis">Company Users</span>
-            )}
-          </div>
-
+      <div className="w-full">
+        <div className=" z-10  mt-1  mb-2 flex items-center justify-between p-0.5  bg-gray-50 rounded-lg shadow-sm   w-full">
           {isLargeScreen && (
             <>
-              <div className="flex items-center gap-1">
+              <div className="flex  justify-between items-center gap-1">
                 {/* search box flex div */}
                 <div className="relative flex items-start w-80 ">
                   <SearchInput
@@ -122,7 +110,6 @@ function GetCompanyUserListForLeadAssignment({
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
-                    
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value
                     );
@@ -142,7 +129,7 @@ function GetCompanyUserListForLeadAssignment({
                 </div>
               </div>
               {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-5 flex place-items-start mt-16 justify-center p-4">
                   <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
                     <button
                       onClick={() => {
@@ -193,7 +180,7 @@ function GetCompanyUserListForLeadAssignment({
                 </Button>
               </div>
               {isFiltersOpenInMobileView && (
-                <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-5 flex place-items-start mt-16 justify-center p-4">
                   <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
                     <button
                       onClick={() => {
@@ -257,8 +244,6 @@ function GetCompanyUserListForLeadAssignment({
           )}
 
           {/* new end */}
-
-          
         </div>
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
@@ -266,13 +251,13 @@ function GetCompanyUserListForLeadAssignment({
             className="ag-theme-balhal w-full"
             style={{ height: "460px", width: "100%" }}
           >
-
             {/* NOTE : STATE MANAGEMENT NEED TO DO */}
             <CompanyUserAgGridForLead
-            selectedUserId={selectedUserId}
+              selectedUserId={selectedUserId}
               handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
               users={users}
-              // selectedUserId={selectedUser?.id ?? null}
+              isUsedForSettings={isUsedForSettings}
+              handleUpdateLeadUser={handleUpdateLeadUser}
             />
           </div>
           {/* <CompanyUserAccessManagementModal

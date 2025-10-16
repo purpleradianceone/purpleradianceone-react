@@ -1,28 +1,28 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import LeadCompanyTeam from "../../../@types/lead-management/LeadCompanyTeam";
-import { Plus, X, XIcon } from "lucide-react";
+import { X } from "lucide-react";
 import CompanyTeamsNotAssignedToLead from "./company-team-selection-modal/CompanyTeamsNotAssignedToLead";
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import ApiError from "../../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import MESSAGE from "../../../constants/Messages";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
-// import { MODULE_ACCESS_MESSAGE } from "../../../constants/Messages";
+import toast from "react-hot-toast";
+import COLORS from "../../../constants/Colors";
+import StatusChip from "../../ui/StatusChip";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
+import Button from "../../ui/Button";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedLeadData: any;
 };
 
@@ -47,23 +47,6 @@ const LeadAssignedTeams = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
     useState<boolean>(true);
-  function handleXIconClick() {
-    setOpenCreateLeadCompanyTeam(false);
-  }
-
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   //   Note : Get Lead assigned company team
   const getLeadAssignedCompanyteam = async () => {
@@ -92,7 +75,6 @@ const LeadAssignedTeams = ({
         if (response.status === STATUS_CODE.OK) {
           const responseData = response.data;
           const companyTeam: LeadCompanyTeam[] = responseData.map(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (item: any) => ({
               count: item.count,
               id: item.id,
@@ -105,6 +87,7 @@ const LeadAssignedTeams = ({
               teamName: item.team_name,
               createdBy: item.createdby,
               createdOn: item.createdon,
+              teamDescription: item.team_description,
             })
           );
           setLeadCompnayTeam(companyTeam);
@@ -127,7 +110,6 @@ const LeadAssignedTeams = ({
   };
 
   // Note : Get Company team company User
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getComapnyTeamUsers = async (companyTeam: any) => {
     const postDataToGetCompanyTeamUsers = {
       company_id: loginStatus.companyId,
@@ -151,7 +133,6 @@ const LeadAssignedTeams = ({
           setIsLoadingCompanyTeamCompanyUser(false);
           const res = response.data;
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const signleData: CompanyTeamUsers[] = res.map((item: any) => ({
             count: item.count,
             id: item.id,
@@ -200,19 +181,13 @@ const LeadAssignedTeams = ({
       })
       .then((response) => {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          toast.success(response.data.message);
           getLeadAssignedCompanyteam();
         } else {
           setIsActive(prevStatus);
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
-      }) // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
@@ -252,25 +227,29 @@ const LeadAssignedTeams = ({
       {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
-            <button
+            <Button
               disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (userHasAccessToUpdateLead) {
                   setOpenCreateLeadCompanyTeam(true);
                 } else {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  // showMessageSnackbar({
+                  //   message:
+                  //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                  //       .UPDATE_LEAD_ACCESS_DENIED_message,
+                  //   type: "error",
+                  // });
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 }
               }}
-              className="border rounded-md text-white px-1 py-0.5 bg-blue-600 "
+              className={COLORS.ADD_BUTTON}
             >
               +Add
-            </button>
-            <span className="text-gray-400">
+            </Button>
+            <span className="caption-custom italic">
               Company Team is Not assigned to lead.
             </span>
           </div>
@@ -280,25 +259,22 @@ const LeadAssignedTeams = ({
         <div className="w-full  px-1 mb-1">
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <span>Add</span>
-            <button
+            <Button
               disabled={!userHasAccessToUpdateLead}
               onClick={() => {
                 if (!userHasAccessToUpdateLead) {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                      .UPDATE_LEAD_ACCESS_DENIED_message
+                  );
                 } else {
                   setOpenCreateLeadCompanyTeam(!openCreateLeadCompanyTeam);
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1"
+              className={COLORS.ADD_BUTTON}
             >
-              <Plus size={10} />
-            </button>
+              +Add
+            </Button>
           </div>
           {/* Company team List */}
           <div className="space-y-2">
@@ -306,213 +282,327 @@ const LeadAssignedTeams = ({
               leadCompanyTeam.map((companyTeam, index) => (
                 <div
                   key={index}
-                  className="bg-blue-50 border border-blue-100 px-3 py-2 rounded shadow-sm flex justify-between items-center hover:shadow-md"
+                  onClick={() => {
+                    setSelectedCompanyTeamCard(companyTeam);
+                    getComapnyTeamUsers(companyTeam);
+                    setIsLoadingCompanyTeamCompanyUser(true);
+                  }}
+                  className={COLORS.CONTACT_CARD}
                 >
-                  {/* User Name */}
-                  <div>
-                    <p
-                      onClick={() => {
-                        setSelectedCompanyTeamCard(companyTeam);
-                        getComapnyTeamUsers(companyTeam);
-                        setIsLoadingCompanyTeamCompanyUser(true);
-                      }}
-                      className="text-xs font-medium text-gray-800 hover:text-blue-500 cursor-pointer"
-                    >
-                      {companyTeam.teamName}
-                    </p>
-                  </div>
-                  {/* isactive */}
-                  <div className="flex text-[10px] font-semibold items-center gap-1">
-                    <span
-                      className={` px-2 py-1 rounded-full ${
-                        companyTeam.isActive
-                          ? "bg-green-100 text-green-900 border border-green-400"
-                          : "bg-red-50 text-red-700 border border-red-200"
-                      }`}
-                    >
-                      {companyTeam.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-                  {/* <div className="flex items-center gap-1">
+                  {/* Left: Avatar + Team Info */}
+                  <div className="flex items-center gap-3">
+                    {/* Avatar */}
                     <div
-                      className={`rounded-full h-2.5 w-2.5 ${
-                        companyTeam.isActive ? "bg-green-600" : "bg-red-600"
+                      className={`flex items-center justify-center w-9 h-9 rounded-full font-semibold shadow-sm text-white ${
+                        companyTeam.isActive ? "bg-blue-500" : "bg-red-500"
                       }`}
-                    ></div>
-                    <span className={`text-xs font-medium text-gray-700 `}>
-                      {companyTeam.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div> */}
+                    >
+                      {companyTeam.teamName
+                        ? companyTeam.teamName.charAt(0).toUpperCase()
+                        : "?"}
+                    </div>
+
+                    {/* Team Name */}
+                    <div>
+                      <>
+                        <p className="table-data-custom">
+                          {companyTeam.teamName || "Unnamed Team"}
+                        </p>
+                        <p
+                          title={
+                            companyTeam.teamDescription ??
+                            "Team description is not given"
+                          }
+                          className="caption-custom"
+                        >
+                          {" "}
+                          {companyTeam.teamDescription ? (
+                            companyTeam.teamDescription.length <= 70 ? (
+                              companyTeam.teamDescription
+                            ) : (
+                              companyTeam.teamDescription.substring(0, 69) +
+                              "..."
+                            )
+                          ) : (
+                            <>
+                              <span className="caption-custom italic">
+                                team description is not given
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </>
+                    </div>
+                  </div>
+
+                  {/* Right: Status Badge */}
+                  <div className="flex items-center">
+                  <StatusChip
+                  isActive={companyTeam.isActive}
+                  />
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center">
+              <p className="input-label-custom text-center">
                 No teams are assigned available
               </p>
             )}
           </div>
-          {/* view in pop up card  */}
-          {selectedCompanyTeamCard && (
-            <div
-              className={` fixed z-10  inset-0  bg-opacity-0 flex justify-center items-center `}
-            >
-              <div
-                className={` ${
-                  isActive ? "bg-green-50" : "bg-red-50"
-                }  rounded-xl shadow-2xl w-full max-w-3xl p-7 relative`}
-              >
+        </div>
+      )}
+      {/* view in pop up card  */}
+          {selectedCompanyTeamCard && createPortal(
+            <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
+              {/* Overlay */}
+              {/* <div
+                className="fixed inset-0 bg-black bg-opacity-5 "
+                onClick={() => {
+                  setSelectedCompanyTeamCard(null);
+                  setCompanyTeamCompanyUser([]);
+                  setIsLoadingCompanyTeamCompanyUser(false);
+                }}
+              ></div> */}
+
+              {/* Modal */}
+              <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden z-10 animate-[fadeInScale_0.3s_ease]">
+                {/* Close button */}
                 <button
                   onClick={() => {
                     setSelectedCompanyTeamCard(null);
                     setCompanyTeamCompanyUser([]);
                     setIsLoadingCompanyTeamCompanyUser(false);
                   }}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+                  className="absolute top-1 right-4 p-2 caption-custom hover:text-gray-600 transition-all duration-200 z-20"
                 >
-                  <X size={22} />
+                  <X size={20} />
                 </button>
 
-                {/* Header Section */}
-                <div
-                  className={`flex items-center justify-between   rounded-md gap-6 mb-6 `}
-                >
-                  {/* Team Logo */}
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={` ${
-                        isActive ? "bg-green-300" : "bg-red-300"
-                      } w-20 h-20 rounded-full  flex items-center justify-center text-2xl font-bold text-white bg-gray-300`}
-                    >
-                      {selectedCompanyTeamCard.teamName.charAt(0).toUpperCase()}
-                    </div>
-                    {/* Team Name */}
-                    <div className="">
-                      <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
-                        {selectedCompanyTeamCard.teamName}
-                      </h2>
-                    </div>
-                  </div>
-                  {/* Team Status */}
-                  <div className="flex justify-center items-center gap-4 ">
-                    <span className="text-sm font-medium text-gray-700">
-                      Status:
-                    </span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        disabled={!userHasAccessToUpdateLead}
-                        checked={isActive}
-                        onChange={() => {
-                          if (userHasAccessToUpdateLead) {
-                            updateLeadCompanyTeam(selectedCompanyTeamCard);
-                          } else {
-                            showMessageSnackbar({
-                              message:
-                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                  .UPDATE_LEAD_ACCESS_DENIED_message,
-                              type: "error",
-                            });
-                          }
-                        }}
-                        className="sr-only peer"
-                      />
+                <div className="p-8">
+                  {/* Header */}
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
+                    {/* Left Section - Team Info */}
+                    <div className="flex items-center gap-6 flex-1">
+                      {/* Team logo */}
                       <div
-                        className="w-11 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
-                 after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                 after:bg-white after:border-gray-300 after:border after:rounded-full
-                 after:h-5 after:w-5 after:transition-all
-                 peer-checked:after:translate-x-full peer-checked:after:border-white"
-                      ></div>
-                      <span className="ml-3 text-sm font-medium text-gray-900">
-                        {isActive ? "Active" : "Inactive"}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Details Grid */}
-                <div className="grid grid-cols-1  md:grid-cols-2 gap-4 overflow-y-auto max-h-64 p-4 bg-white rounded-xl shadow-sm text-sm">
-                  <div className="text-lg font-semibold text-gray-800 col-span-2">
-                    Team Members
-                  </div>
-                  {isLoadingCompanyTeamCompanyUser && (
-                    <div className="w-full h-full col-span-2   flex justify-center items-center">
-                      <LoadingSpinner />
-                    </div>
-                  )}
-                  {isLoadingCompanyTeamCompanyUser === false &&
-                    Array.isArray(companyTeamCompanyUsers) &&
-                    companyTeamCompanyUsers.map((userData, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
+                        className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg
+                      ${
+                        isActive
+                          ? "bg-gradient-to-br from-green-500 to-green-600"
+                          : "bg-gradient-to-br from-red-500 to-red-600"
+                      }`}
                       >
-                        <div className="mb-1 sm:mb-0">
-                          <span className="text-gray-600 font-medium text-sm">
-                            Name:{" "}
-                          </span>
-                          <span className="text-gray-800 font-semibold">
-                            {userData.userName}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div
-                            className={`rounded-full h-2.5 w-2.5 ${
-                              userData.isActive ? "bg-green-600" : "bg-red-600"
-                            }`}
-                          ></div>
-                          <span
-                            className={`text-xs font-medium text-gray-700 `}
-                          >
-                            {userData.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </div>
+                        {selectedCompanyTeamCard.teamName
+                          .charAt(0)
+                          .toUpperCase()}
                       </div>
-                    ))}
+
+                      {/* Team details */}
+                      <div className="flex-1 min-w-0">
+                        <h2 className="section-header-custom">
+                          {selectedCompanyTeamCard.teamName}
+                        </h2>
+                        <p
+                          title={
+                            selectedCompanyTeamCard.teamDescription
+                              ? "Team Description: " +
+                                selectedCompanyTeamCard.teamDescription
+                              : "Team description is not given"
+                          }
+                          className="table-data-custom leading-relaxed"
+                        >
+                          {selectedCompanyTeamCard.teamDescription ? (
+                            selectedCompanyTeamCard.teamDescription.length <=
+                            200 ? (
+                              selectedCompanyTeamCard.teamDescription
+                            ) : (
+                              selectedCompanyTeamCard.teamDescription.substring(
+                                0,
+                                199
+                              ) + "..."
+                            )
+                          ) : (
+                            <span className="italic table-data-custom">
+                              Team description is not available
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right Section - Status Controls */}
+                    <div className="flex flex-col items-end gap-1 lg:min-w-[200px]">
+                      {/* Status Badge */}
+                      <div className="flex items-center gap-3">
+                        {/* <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm
+                        ${
+                          isActive
+                            ? "bg-green-100 input-label-custom-active border border-green-200"
+                            : "bg-red-100 input-label-custom-inactive border border-red-200"
+                        }`}
+                        >
+                          <span
+                            className={`inline-block w-2 h-2 rounded-full mr-2
+                          ${isActive ? "bg-green-600" : "bg-red-600"}`}
+                          ></span>
+                          {isActive ? "Active" : "Inactive"}
+                        </span> */}
+                        <StatusChip
+                        isActive={isActive}
+                        />
+                      </div>
+
+                      {/* Toggle Switch */}
+                      <div className="flex items-center gap-3">
+                        <span className="input-label-custom">Status:</span>
+                        {/* <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={isActive}
+                            onChange={() => {
+                              if (userHasAccessToUpdateLead) {
+                                updateLeadCompanyTeam(selectedCompanyTeamCard);
+                              } else {
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                    .UPDATE_LEAD_ACCESS_DENIED_message
+                                );
+                              }
+                            }}
+                            className="sr-only peer"
+                          />
+                          <div className="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all duration-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-6 shadow-inner"></div>
+                        </label> */}
+                        <ToggleButton
+                        checked={isActive}
+                        name="isActive"
+                        onToggle={() => {
+                              if (userHasAccessToUpdateLead) {
+                                updateLeadCompanyTeam(selectedCompanyTeamCard);
+                              } else {
+                                toast.error(
+                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                    .UPDATE_LEAD_ACCESS_DENIED_message
+                                );
+                              }
+                            }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 mb-4"></div>
+
+                  {/* Team Members Section */}
+                  <div>
+                    <h3 className="table-header-custom mb-1 flex items-center gap-2">
+                      Team Members
+                      <span className="bg-gray-100 input-label-custom px-2 py-1 rounded-full">
+                        {Array.isArray(companyTeamCompanyUsers)
+                          ? companyTeamCompanyUsers.length
+                          : 0}
+                      </span>
+                    </h3>
+
+                    {/* Members Grid */}
+                    <div className="bg-gray-50 rounded-xl p-6 max-h-80 overflow-y-auto">
+                      {isLoadingCompanyTeamCompanyUser ? (
+                        <div className="flex justify-center items-center py-12">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : Array.isArray(companyTeamCompanyUsers) &&
+                        companyTeamCompanyUsers.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {companyTeamCompanyUsers.map((userData, index) => (
+                            <div
+                              key={index}
+                              className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200"
+                            >
+                              <div className="flex items-center justify-between">
+                                {/* User Info */}
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-semibold text-lg shadow-sm">
+                                    {userData.userName
+                                      ? userData.userName
+                                          .charAt(0)
+                                          .toUpperCase()
+                                      : "?"}
+                                  </div>
+                                  <div>
+                                    <p className="input-label-custom">
+                                      {userData.userName || "Unnamed User"}
+                                    </p>
+                                    <p className="caption-custom">
+                                      Team Member
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Status Indicator */}
+                                <div
+                                  
+                                >
+                                  <StatusChip 
+                                  isActive={userData.isActive}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-2">
+                          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg
+                              className="w-8 h-8 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                              />
+                            </svg>
+                          </div>
+                          <p className="text-gray-500 font-medium">
+                            No team members found
+                          </p>
+                          <p className="text-sm text-gray-400 mt-1">
+                            This team doesn't have any members assigned yet.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
-        </div>
-      )}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+
       {/* Add Company Team Form */}
-      {openCreateLeadCompanyTeam && (
-        <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center p-2 sm-p-6 ">
-          <div className="bg-white mt-14 rounded-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-2xl sm:px-4 sm:py-4">
-            {/* header */}
-            <div className="border-b pb-1 mb-4 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-800">
-                Assign team to lead
-              </h2>
-              <XIcon
-                onClick={() => {
-                  handleXIconClick();
+      {openCreateLeadCompanyTeam && createPortal(
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-5 flex justify-center items-center p-2 sm-p-6 ">
+          <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
+            <div>
+              {/* note : need to make changes in the isopen and onclose */}
+              <CompanyTeamsNotAssignedToLead
+                getLeadAssignedCompanyteam={getLeadAssignedCompanyteam}
+                isOpen={openCreateLeadCompanyTeam}
+                onClose={() => {
+                  setOpenCreateLeadCompanyTeam(false);
                 }}
-                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                selectedLeadData={selectedLeadData}
               />
             </div>
-            <div className="grid grid-cols-1 sm-grid-cols-2 gap-4 text-sm">
-              <div>
-                {/* note : need to make changes in the isopen and onclose */}
-                <CompanyTeamsNotAssignedToLead
-                  getLeadAssignedCompanyteam={getLeadAssignedCompanyteam}
-                  isOpen={openCreateLeadCompanyTeam}
-                  onClose={() => {
-                    setOpenCreateLeadCompanyTeam(false);
-                  }}
-                  selectedLeadData={selectedLeadData}
-                />
-              </div>
-            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

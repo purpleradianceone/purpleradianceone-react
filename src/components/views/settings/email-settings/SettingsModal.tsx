@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
@@ -5,7 +6,14 @@ import Button from "../../../ui/Button";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { ShowMessageSnackbarProps } from "../../../../@types/ui/MessageSnackbarProps";
+import toast from "react-hot-toast";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import ApiError from "../../../../@types/error/ApiError";
+import FormHeader from "../../../ui/FormHeader";
+import { Edit, KeySquareIcon, LucideIcon, LucideMailPlus, NetworkIcon, Save, ServerCog, Shield, User, X } from "lucide-react";
+import FormInput from "../../../ui/FormInput";
+import { createPortal } from "react-dom";
 
 type SettingType = "company" | "user";
 
@@ -13,24 +21,23 @@ const Dialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-}> = ({ open, onOpenChange, children }) =>
-  !open ? null : (
-    <div
-      className="fixed pt-32 w-full inset-0 bg-black bg-opacity-70 flex justify-center items-center overflow-y-auto"
-      onClick={() => onOpenChange(false)}
-    >
-      <div className="h-10 min-w-[40%] max-w-xl min-h-fit max-h-fit z-50" onClick={(e) => e.stopPropagation()}>{children}</div>
-    </div>
+}> = ({ open, children }) =>
+  !open ? null : createPortal(
+    <div className="fixed pt-14 z-50  inset-0 bg-black bg-opacity-5  flex justify-center items-center overflow-y-auto ">
+      <div
+        className="h-10 min-w-[50%] max-w-xl min-h-fit max-h-fit"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>,
+    document.body
   );
 
 const DialogContent: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="bg-white px-4 py-1 rounded shadow ">{children}</div>;
-const DialogHeader: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => <div className="mb-2">{children}</div>;
-const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="text-lg font-bold">{children}</h2>
+}) => (
+  <div className="bg-white px-3 py-3 rounded min-w-xl shadow ">{children}</div>
 );
 
 interface BaseEmailSettings {
@@ -60,7 +67,6 @@ interface SettingsModalProps {
   settingType: SettingType;
   initialData?: EmailSettings; // initialData will be present in edit mode
   onSubmit: (data: EmailSettings) => void;
-  handleResponseMessage: ({ message, type }: ShowMessageSnackbarProps) => void;
 }
 
 const getDefaultSettings = (type: SettingType): EmailSettings =>
@@ -75,10 +81,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new company settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       }
     : {
         id: 0,
@@ -91,10 +97,10 @@ const getDefaultSettings = (type: SettingType): EmailSettings =>
         email_security_type_id: 1,
         authentication_required: false,
         isactive: true, // Default to true for new user settings
-        createdby: "Owner",
-        updatedby: "Owner",
-        createdon: "1 May 2025",
-        updatedon: "1 May 2025",
+        createdby: "",
+        updatedby: "",
+        createdon: "",
+        updatedon: "",
       };
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -103,7 +109,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settingType,
   initialData, // This prop indicates if it's an edit operation
   onSubmit,
-  handleResponseMessage,
 }) => {
   const [formData, setFormData] = useState<EmailSettings>(
     getDefaultSettings(settingType)
@@ -159,59 +164,84 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     };
 
     // Correct the typo for authentication_required if your API expects it correctly spelled
-    if ('authatication_required' in payload) {
-        payload.authentication_required = payload.authatication_required;
-        delete payload.authatication_required;
+    if ("authatication_required" in payload) {
+      payload.authentication_required = payload.authatication_required;
+      delete payload.authatication_required;
     }
-
 
     if (!isCompany) payload.company_user_id = loginStatus.id;
 
     try {
       setLoading(true);
-      const response = await axios.post(apiEndpoint, payload, {
-        withCredentials: true,
-      });
-      handleResponseMessage({message:response.data.message,type:response.data.status?'success':"error"});
-    } catch (error: any) { // Catching 'any' for error to access properties
+      await axios
+        .post(apiEndpoint, payload, {
+          withCredentials: true,
+        })
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            if (result.data.status) {
+              toast.success(result.data.message);
+            } else {
+              toast.error(result.data.message);
+            }
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: handleApiCall,
+            });
+            if (refreshTokenStatus) {
+              handleApiCall();
+            }
+          }
+        });
+    } catch (error: any) {
+      // Catching 'any' for error to access properties
       console.error("Email settings error:", error);
-      handleResponseMessage({message:`Something went wrong. Please try again. ${error.response?.data?.message || ''}`,type:"error"});
+      toast.error(
+        `Something went wrong. Please try again. ${
+          error.response?.data?.message || ""
+        }`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    
     await handleApiCall();
     onClose();
     onSubmit(formData); // Call onSubmit with current form data
-    
   };
 
   const renderField = (
     label: string,
     name: keyof EmailSettings,
     type: "text" | "email" | "password" | "number" | "checkbox" | "select",
-    options?: { value: number; label: string }[]
+    logo?: LucideIcon,
+    options?: { value: number; label: string }[],
   ) => (
     <div className="mb-2">
-      {type !== "checkbox" && (
-        <label className="block text-sm font-medium">{label}</label>
-      )}
+      {/* {type !== "checkbox" && (
+        <label className="block input-label-custom">{label}</label>
+      )} */}
       {type === "select" ? (
-        <select
-          name={name}
-          value={formData[name] as number}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        >
-          {options?.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <>
+          <label className="block input-label-custom"> <Shield size={16} className="inline mr-1 text-blue-500"/>{label}</label>
+          <select
+            name={name}
+            value={formData[name] as number}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded"
+          >
+            {options?.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </>
       ) : type === "checkbox" ? (
         <label className="inline-flex items-center mt-2">
           <input
@@ -221,15 +251,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             onChange={handleChange}
             className="mr-2"
           />
-          {label}
+           {label}
         </label>
       ) : (
-        <input
+        <FormInput
+        label={label}
+          logo={logo}
           type={type}
           name={name}
+          defaultValue={formData[name] as string | number}
           value={formData[name] as string | number}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          // className="w-full px-3 py-2 border rounded"
         />
       )}
     </div>
@@ -237,58 +270,85 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Edit" : "Create"} {settingType} Email Setting
-          </DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {renderField(
-            `${settingType === "company" ? "Company" : "User"} Email`,
-            "email",
-            "email"
-          )}
-          {renderField("Email Password", "email_password", "password")}
-          {renderField("SMTP Host", "smtp_host", "text")}
-          {renderField("SMTP Port", "smtp_port", "number")}
-          {renderField("Security Type", "email_security_type_id", "select", [
-            { value: 1, label: "SSL" },
-            { value: 2, label: "TLS" },
-          ])}
-          {renderField(
-            "Authentication Required",
-            "authentication_required",
-            "checkbox"
-          )}
-          {/* Conditional rendering for isactive checkbox */}
-          {isEdit && (
+      <div className="w-full ">
+        <DialogContent>
+          <FormHeader
+            icon={isEdit ? Edit : LucideMailPlus}
+            preText={`${isEdit ? "Edit" : "Create"}  ${
+              settingType === "company" ? "Company" : "User"
+            } Email Setting`}
+            description={` ${
+              settingType === "company"
+                ? "Manage and edit your company’s email configuration as required."
+                : "Manage and edit the user’s email configuration as required."
+            }`}
+            onClose={onClose}
+          />
+          <div className="grid grid-cols-2 p-2 gap-4">
+            {renderField(
+              `${settingType === "company" ? "Company" : "User"} Email`,
+              "email",
+              "email",
+              User
+            )}
+            {renderField("Email Password", "email_password", "password" , KeySquareIcon)}
+            {renderField("SMTP Host", "smtp_host", "text" ,  ServerCog)}
+            {renderField("SMTP Port", "smtp_port", "number"  , NetworkIcon )}
+            {renderField("Security Type", "email_security_type_id", "select", Shield, [
+              { value: 1, label: "SSL" },
+              { value: 2, label: "TLS" },
+            ] )}
+            <div className="mt-4">
+              {renderField(
+                "Authentication Required",
+                "authentication_required",
+                "checkbox"
+              )}
+            </div>
+            {/* Conditional rendering for isactive checkbox */}
+            {/* {isEdit &&
             renderField(
               "Active", // Label for the checkbox
               "isactive",
               "checkbox"
-            )
-          )}
-        </div>
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>{isEdit ? "Updating..." : "Creating..."}</span>
-              </div>
-            ) : (
-              <span>{isEdit ? "Update" : "Create"}</span>
-            )}
-          </Button>
-        </div>
-      </DialogContent>
+            )} */}
+          </div>
+          <div className="flex justify-end  space-x-1 ">
+            <div>
+              <Button type="button" onClick={onClose} disabled={loading}>
+                <div className="flex items-center justify-center gap-0.5">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+            </div>
+            <div>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }} disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>{isEdit ? "Updating..." : "Creating..."}</span>
+                  </div>
+                ) : (
+                  <span>
+                    {
+                      <div className="flex items-center justify-center gap-0.5">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    }
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </div>
     </Dialog>
   );
 };
-
 
 export default SettingsModal;

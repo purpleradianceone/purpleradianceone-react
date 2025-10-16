@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, X } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import SearchInput from "../../ui/SearchInput";
 
 import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
@@ -14,11 +14,11 @@ import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import ApiError from "../../../@types/error/ApiError";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
-import MessageSnackBar from "../../ui/MessageSnackbar";
-import { MessageSnackbarState, ShowMessageSnackbarProps } from "../../../@types/ui/MessageSnackbarProps";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
+import LOCALSTORAGE_KEYS from "../../../constants/LocalStorage";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -67,23 +67,10 @@ function EditSubscriptionUsersModal({
   const companyUserSearchParameterRef = useRef<string>("");
 
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-      open: false,
-      message: "",
-      type: "success",
-    });
-  
-    const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-      setMessageSnackbar({ open: true, message, type });
-    };
-  
-    const handleMessageSnackbarClose = () => {
-      setMessageSnackbar((prev) => ({ ...prev, open: false }));
-    };
-
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
-   
-    if (isCompanyUsersLoading ||(!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
+    if (
+      isCompanyUsersLoading ||
+      (!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
       companyUsersFetchingRef.current
     )
       return;
@@ -175,9 +162,11 @@ function EditSubscriptionUsersModal({
         }
       }
     } catch (error: ApiError | any) {
-      if(error.status === STATUS_CODE.UNATHORISED){
-        const refreshTokenResponse = await RefreshToken({callFunctionWithParamsNotEvent :fetchCompanyUsers});
-        if(refreshTokenResponse){
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithParamsNotEvent: fetchCompanyUsers,
+        });
+        if (refreshTokenResponse) {
           fetchCompanyUsers(comapnyUserSearchParameter);
         }
       }
@@ -245,12 +234,13 @@ function EditSubscriptionUsersModal({
     }
   };
 
-  const handleCompanyUserToggleChange =(message :string, status : boolean)=>{
-    showMessageSnackbar({
-      message: message,
-      type : status ? 'success' : 'error',
-    })
-  }
+  const handleCompanyUserToggleChange = (message: string, status: boolean) => {
+    if (status) {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -325,7 +315,20 @@ function EditSubscriptionUsersModal({
                     loginStatus.activeUsersInCompany >=
                     statusChangeOfCompanyUserCountFromAggrid
                   ) {
-                    localStorage.clear();
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS
+                    );
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS
+                    );
+                    localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+                    localStorage.removeItem(
+                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT
+                    );
                     onRedirectToLoginPage();
                     navigate(ROUTES_URL.SIGN_IN);
                   } else {
@@ -339,7 +342,7 @@ function EditSubscriptionUsersModal({
             </div>
 
             <div
-              className="ag-theme-alpine"
+              className="ag-theme-balham"
               style={{ height: "300px", width: "100%" }}
             >
               <div className="flex gap-2 mb-2 justify-between">
@@ -365,13 +368,13 @@ function EditSubscriptionUsersModal({
           </div>
         </div>
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 }

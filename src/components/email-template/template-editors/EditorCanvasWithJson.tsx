@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { Editor, } from "@craftjs/core";
+import { Editor } from "@craftjs/core";
 import { ImageBlock } from "../template-blocks/ImageBlock";
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { DividerBlock } from "../template-blocks/DividerBlock";
@@ -15,36 +15,40 @@ import {
   DynamicFieldsContext,
 } from "../DynamicFieldsContext";
 import { TableBlock } from "../template-blocks/TableBlock";
-import { LucideCode, LucideMail } from "lucide-react";
+import {
+  ClipboardCopy,
+  Eye,
+  LucideDatabase,
+  LucideMail,
+  Save,
+  Settings,
+} from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DynamicFieldBlock } from "../template-blocks/DynamicFieldBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
-import { TemplateSettingsPanelCreateTemplateUpdate } from "../template-panel/TemplateSettingsPanelCreateTemplateUpdate";
 import { GenericBlock } from "../template-blocks/GenericBlock";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { ExportPanel } from "../template-panel/ExportPanel";
 import { Sidebar } from "../sidebar/Sidebar";
 import { TemplateSettingsPanelInsertTemplateUpdate } from "../template-panel/TemplateSettingsPanelInsertTemplateUpdate";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import {
   convertPlaceholdersToFields,
   convertPlaceholdersToObject,
   PlaceholderItem,
 } from "../template-util/PlaceHolderDataToPlaceHolderRecord";
 import { CanvasWrapperWithJson } from "../canvas-wrapper/CanvasWrapperWithJson";
-
+import toast from "react-hot-toast";
+import { ExportPanelUpdate } from "../template-panel/ExportPanelUpdate";
+import Button from "../../ui/Button";
+import FormInput from "../../ui/FormInput";
+import FormHeader from "../../ui/FormHeader";
 
 export const EditorCanvasWithJson = () => {
-  const canvasBgColor="#f9f9f9";
+  const canvasBgColor = "#f9f9f9";
   const [previewHtml, setPreviewHtml] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showDynamicEditor, setShowDynamicEditor] = useState(true);
@@ -95,6 +99,16 @@ export const EditorCanvasWithJson = () => {
             }
           }
         }
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithParamsNotEvent: getPlaceHolderDataFromDatabase,
+          });
+          if (refreshTokenResponse) {
+            getPlaceHolderDataFromDatabase({ templateTypeId });
+          }
+        }
       });
   };
 
@@ -142,7 +156,7 @@ export const EditorCanvasWithJson = () => {
           });
           if (refreshTokenResponse) {
             getTemplateToUpdate({ emailTemplateId, templateTypeId });
-          } 
+          }
         }
       })
       .finally(() => {
@@ -164,22 +178,25 @@ export const EditorCanvasWithJson = () => {
     }
   }, []);
 
-  const parsedPlaceHolders: Record<string, string> = convertPlaceholdersToObject(placeHolderData);
-  const [dynamicVars, setDynamicVars] = useState<Record<string, string>>(parsedPlaceHolders);
+  const parsedPlaceHolders: Record<string, string> =
+    convertPlaceholdersToObject(placeHolderData);
+  const [dynamicVars, setDynamicVars] =
+    useState<Record<string, string>>(parsedPlaceHolders);
 
   const handlePreview = (html: string) => {
     let replacedHtml = html;
     Object.entries(dynamicVars).forEach(([key, value]) => {
-      const regex = new RegExp(`${key}`, "g");
-      replacedHtml = replacedHtml.replace(regex, value);
+      if (value !== null && value !== "") {
+        const regex = new RegExp(`${key}`, "g");
+        replacedHtml = replacedHtml.replace(regex, value);
+      }
     });
     setPreviewHtml(replacedHtml);
     setIsPreviewOpen(true);
   };
 
-  
-
-  const parsedFields: DynamicFieldOption[] = convertPlaceholdersToFields(placeHolderData);
+  const parsedFields: DynamicFieldOption[] =
+    convertPlaceholdersToFields(placeHolderData);
 
   //FOR HANDALING INSERT HTML TEMPLATES
   const handleHtmlInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -207,261 +224,206 @@ export const EditorCanvasWithJson = () => {
     setPreviewHtml(updatedHtml);
   };
 
-  //message snakbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  //for instruction
-
   return isLoading ? (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex justify-center items-center h-screen w-full">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
-    <>
-      <div className="fixed z-10 top-12 left-14 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm mb-1.5 w-fit p-2">
+    <div className="w-screen h-screen">
+      <div className="sticky z-10 top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-1 px-3">
         <div className="flex gap-1">
-          <LucideMail className="w-6 h-6 text-blue-600" />
-          <LucideCode className="w-4 h-4 text-blue-600" />
-          <span className="text-1xl font-bold">Email Template Update</span>
+          <LucideMail className="w-7 h-7 text-blue-600" />
+          <span className="section-header-custom">Email Template Update</span>
           {templateTypeId && (
-            <span className="text-1xl font-bold">
-              : : : {emailTemplateName}
-            </span>
+            <span className="section-header-custom">: {emailTemplateName}</span>
           )}
         </div>
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
       </div>
-
-      <button
-        onClick={() => setShowDynamicEditor(!showDynamicEditor)}
+      <div
         style={{
           position: "fixed",
-          top: 50,
-          right: 130,
+          top: 100,
+          right: 0,
           zIndex: 10,
-          color: "white",
-          background: "#007bff",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "6px 10px",
           cursor: "pointer",
           fontSize: "12px",
         }}
       >
-        ⚙️ {showDynamicEditor ? "Hide Fields" : "Show Fields"}
-      </button>
+        <Button type="submit" onClick={(e) => {
+          e.preventDefault();
+          setShowDynamicEditor(!showDynamicEditor);
+        }}>
+          <div className="flex justify-center gap-1">
+            <Settings size={SIZE.SIXTEEN} className="mt-0.5" />
+            <span>{showDynamicEditor ? "Hide Fields" : "Show Fields"}</span>
+          </div>
+        </Button>
 
-      {showDynamicEditor && (
-        <div
-          style={{
-            position: "fixed",
-            top: 80, // Adjusted to appear below the toggle button
-            right: 130,
-            width: "260px",
-            maxHeight: "600px",
-            background: "white",
-            padding: "10px",
-            borderRadius: "8px",
-            boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-            zIndex: 11,
-            overflowY: "auto",
-          }}
-        >
+        {showDynamicEditor && (
           <div
             style={{
-              position: "sticky",
-              display: "flex",
-              top: 0,
-              justifyContent: "space-between",
+              position: "absolute",
+              top: 0, // Adjusted to appear below the toggle button
+              right: 0,
+              width: "260px",
               background: "white",
-              alignItems: "center",
-              marginBottom: "10px",
-              paddingBottom: "8px",
-              borderBottom: "1px solid #eee",
+              padding: "10px",
+              borderRadius: "8px",
+              boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+              zIndex: 11,
             }}
           >
-            <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 600 }}>
-              Dynamic Fields
-            </h4>
-            <button
-              onClick={() => setShowDynamicEditor(false)}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "16px",
-                lineHeight: 1,
-                color: "#666",
-                padding: "4px",
-              }}
-            >
-              ✖
-            </button>
-          </div>
+            <FormHeader
+              icon={LucideDatabase}
+              onClose={() => setShowDynamicEditor(false)}
+              preText="Dynamic Fields"
+            />
 
-          {parsedFields.length === 0 ? (
-            <div
-              style={{
-                padding: "16px",
-                textAlign: "center",
-                color: "#666",
-                fontSize: "12px",
-              }}
-            >
-              {isLoading
-                ? "Loading dynamic fields..."
-                : "No dynamic fields available"}
-            </div>
-          ) : (
-            parsedFields.map((field) => (
-              <div key={field.value} style={{ marginBottom: "12px" }}>
-                <label
-                  style={{
-                    fontSize: "12px",
-                    display: "block",
-                    marginBottom: "4px",
-                    fontWeight: 500,
-                    color: "#333",
-                  }}
-                >
-                  {field.label}
-                </label>
-                <input
-                  style={{
-                    width: "100%",
-                    padding: "6px 8px",
-                    fontSize: "12px",
-                    borderRadius: "4px",
-                    border: "1px solid #ddd",
-                    backgroundColor: "#fff",
-                    boxSizing: "border-box",
-                  }}
-                  value={dynamicVars[field.value] || ""}
-                  onChange={(e) =>
-                    setDynamicVars((prev) => ({
-                      ...prev,
-                      [field.value]: e.target.value,
-                    }))
-                  }
-                  placeholder={`Enter value for ${field.label}`}
-                />
+            <div className="overflow-y-auto max-h-[400px]">
+              {parsedFields.length === 0 ? (
                 <div
                   style={{
-                    fontSize: "10px",
-                    color: "#999",
-                    marginTop: "4px",
-                    fontFamily: "monospace",
+                    padding: "16px",
+                    textAlign: "center",
+                    color: "#666",
+                    fontSize: "12px",
                   }}
                 >
-                  {field.value}
+                  {isLoading
+                    ? "Loading dynamic fields..."
+                    : "No dynamic fields available"}
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+              ) : (
+                parsedFields.map((field) => (
+                  <div key={field.value} style={{ marginBottom: "12px" }}>
+                    {/* <label
+                   className="mb-2 input-label-custom"
+                  >
+                    {field.label}
+                  </label> */}
+                    <FormInput
+                      label={field.label}
+                      value={dynamicVars[field.value] || ""}
+                      onChange={(e) =>
+                        setDynamicVars((prev) => ({
+                          ...prev,
+                          [field.value]: e.target.value,
+                        }))
+                      }
+                      placeholder={`Enter value for ${field.label}`}
+                    />
+                    <div className="caption-custom">{field.value}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       <DynamicFieldsContext.Provider value={parsedFields}>
         {currentJson == null || currentJson === "" ? (
-          <div style={{ marginTop: "60px", padding: "40px" }}>
-            <div>
-              <textarea
-                placeholder="Paste your HTML template here"
-                value={htmlInput}
-                onChange={handleHtmlInputChange}
-                style={{
-                  width: "100%",
-                  minWidth: "400px",
-                  height: "200px",
-                  padding: "10px",
-                  resize: "both",
-                  overflow: "auto",
-                  whiteSpace: "pre",
-                }}
-              />
-            </div>
+          <div className="flex justify-center items-center">
+            <div style={{ marginTop: "60px", padding: "40px" }}>
+              <div>
+                <textarea
+                  placeholder="Paste your HTML template here"
+                  value={htmlInput}
+                  onChange={handleHtmlInputChange}
+                  style={{
+                    width: "100%",
+                    minWidth: "400px",
+                    height: "200px",
+                    padding: "10px",
+                    resize: "both",
+                    overflow: "auto",
+                    whiteSpace: "pre",
+                  }}
+                />
+              </div>
 
-            <div style={{ marginTop: "20px" }}>
-              <input
-                type="file"
-                accept=".html"
-                onChange={handleHtmlFileUpload}
-                style={{
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  transition: "background-color 0.3s ease",
-                }}
-              />
-            </div>
+              <div style={{ marginTop: "20px" }}>
+                <input
+                  type="file"
+                  accept=".html"
+                  onChange={handleHtmlFileUpload}
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    transition: "background-color 0.3s ease",
+                  }}
+                />
+              </div>
 
-            <button
-              onClick={insertHtmlTemplate}
-              style={{ padding: "8px 14px", marginTop: "20px" }}
-            >
-              ⏭️ Preview HTML Template
-            </button>
+              <div className="mt-2 flex gap-4">
+                <div>
+                  <Button type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    insertHtmlTemplate();
+                  }}>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Eye size={SIZE.SIXTEEN} />
+                      View HTML Template
+                    </div>
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                  type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const beautified = htmlInput;
+                      navigator.clipboard.writeText(beautified);
+                      toast.success("Html copied to clipboard!");
+                      // showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <ClipboardCopy size={SIZE.SIXTEEN} />
+                      Copy HTML Email
+                    </div>
+                  </Button>
+                </div>
 
-            <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-              <button
-                onClick={() => {
-                  const beautified = htmlInput;
-                  navigator.clipboard.writeText(beautified);
-                  showMessageSnackbar({message:"Html copied to clipboard!", type:"success"})
-                }}
-                style={{ padding: "8px 14px" }}
-              >
-                📋 Copy HTML Email
-              </button>
+                <div>
+                  <Button
+                  type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const beautified = htmlInput;
+                      const blob = new Blob([beautified], {
+                        type: "text/html",
+                      });
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(blob);
+                      link.download = "sanitized-template.html";
+                      link.click();
+                      URL.revokeObjectURL(link.href);
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Save size={SIZE.SIXTEEN} />
+                      Export HTML Email
+                    </div>
+                  </Button>
+                </div>
+              </div>
 
-              <button
-                onClick={() => {
-                  const beautified = htmlInput;
-                  const blob = new Blob([beautified], { type: "text/html" });
-                  const link = document.createElement("a");
-                  link.href = URL.createObjectURL(blob);
-                  link.download = "sanitized-template.html";
-                  link.click();
-                  URL.revokeObjectURL(link.href);
-                }}
-                style={{ padding: "8px 14px" }}
-              >
-                💾 Export HTML Email
-              </button>
-            </div>
+              <div style={{ marginTop: "20px", zIndex: 2000 }}>
+                <HtmlPreviewModal
+                  isOpen={isPreviewOpen}
+                  onClose={() => setIsPreviewOpen(false)}
+                  html={previewHtml}
+                  onHtmlChange={setHtmlContent}
+                  editable={false}
+                />
+              </div>
 
-            <div style={{ marginTop: "20px", zIndex: 2000 }}>
-              <HtmlPreviewModal
-                isOpen={isPreviewOpen}
-                onClose={() => setIsPreviewOpen(false)}
-                html={previewHtml}
-                onHtmlChange={setHtmlContent}
-                editable={false}
-              />
-            </div>
-            <>
               {/* Settings panel */}
               <TemplateSettingsPanelInsertTemplateUpdate
                 htmlBody={htmlInput}
@@ -471,7 +433,7 @@ export const EditorCanvasWithJson = () => {
                 emailTemplateSubject={emailTemplateSubject}
                 emailTemplateIsDefault={emailTemplateDefault}
               />
-            </>
+            </div>
           </div>
         ) : (
           <Editor
@@ -486,7 +448,7 @@ export const EditorCanvasWithJson = () => {
               TableBlock,
               HeadingBlock,
               DynamicFieldBlock,
-              GenericBlock, 
+              GenericBlock,
             }}
             enabled={true}
           >
@@ -495,7 +457,7 @@ export const EditorCanvasWithJson = () => {
                 style={{
                   position: "sticky",
                   top: "0px",
-                  height: "3000px",
+                  height: "10000px",
                   backgroundColor: "blue",
                 }}
               >
@@ -529,14 +491,21 @@ export const EditorCanvasWithJson = () => {
                 </div> */}
 
                 <div
-                  className="fixed inset-0 justify-self-end top-12"
-                  style={{ 
-                    zIndex: 10, 
-                    height: "fit-content" }}
+                  className="fixed inset-0 justify-self-end top-14"
+                  style={{
+                    zIndex: 11,
+                    height: "fit-content",
+                  }}
                 >
-                  <ExportPanel
+                  <ExportPanelUpdate
                     onPreview={handlePreview}
-                    //   onSave={handleSave}
+                    templateSettingsPanelUpdateProps={{
+                      id: parseInt(emailTemplateId!),
+                      templateTypeId: parseInt(templateTypeId!),
+                      emailTemplateName: emailTemplateName,
+                      emailTemplateSubject: emailTemplateSubject,
+                      emailTemplateIsDefault: emailTemplateDefault,
+                    }}
                   />
                 </div>
 
@@ -550,24 +519,13 @@ export const EditorCanvasWithJson = () => {
                   />
                 </div>
                 <div id="CANVAS" style={{ top: 55 }}>
-                  <CanvasWrapperWithJson
-                  data={currentJson}/>
+                  <CanvasWrapperWithJson data={currentJson} />
                 </div>
               </div>
             </div>
-            {templateTypeId && (
-              <TemplateSettingsPanelCreateTemplateUpdate
-                id={parseInt(emailTemplateId!)}
-                templateTypeId={parseInt(templateTypeId!)}
-                emailTemplateName={emailTemplateName}
-                emailTemplateSubject={emailTemplateSubject}
-                emailTemplateIsDefault={emailTemplateDefault}
-              />
-            )}
           </Editor>
         )}
       </DynamicFieldsContext.Provider>
-
-    </>
+    </div>
   );
 };

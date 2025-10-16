@@ -6,17 +6,16 @@ import { useFormChange } from "../../config/hooks/useFormChange";
 import { useFormValidation } from "../../config/hooks/useFormValidation";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
-import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import PaymentSubscription from "./PaymentSubscription";
 import POST_API from "../../constants/PostApi";
+import toast from "react-hot-toast";
+import ApiError from "../../@types/error/ApiError";
+import RefreshToken from "../../config/validations/RefreshToken";
+import { ArrowRight, CalendarDays, Loader, Users2, X } from "lucide-react";
 
 function CreateSubscription({
   isSubscrptionFromLoginPage,
@@ -45,7 +44,7 @@ function CreateSubscription({
     initialCreateSubscriptionFormData
   );
 
-  const {setLoginStatus} = useLoggedInUserContext();
+  const { setLoginStatus } = useLoggedInUserContext();
   const [isPaymentSubscriptionOpen, setIsPaymentSubscriptionOpen] =
     useState(false);
 
@@ -56,20 +55,6 @@ function CreateSubscription({
     handleBlur: handleCreateSubscrptioFormFieldOnBlur,
     setErrors: setCreateSubscriptionErrors,
   } = useFormValidation(createSubscriptionFormData, "registration");
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   const handleOnCancelPaymentPage = () => {
     setIsPaymentSubscriptionOpen(false);
@@ -87,10 +72,7 @@ function CreateSubscription({
         createSubscriptionFormData.monthsToPurchase <= 0 &&
         createSubscriptionFormData.numberOfUsers <= 0
       ) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.REQUIRED_FIELDS,
-          type: "error",
-        });
+        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
         setCreateSubscriptionErrors({
           monthsToPurchase: "fill this field",
           companyUserCount: "fill this field",
@@ -98,17 +80,14 @@ function CreateSubscription({
         return;
       }
       if (createSubscriptionFormData.numberOfUsers <= 0) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED,
-          type: "error",
-        });
+        toast.error(MESSAGE.ERROR.SUBSCRIPTION_MIN_ONE_USER_REQUIRED);
         return;
       }
-      if (createSubscriptionFormData.monthsToPurchase <= 0 || createSubscriptionFormData.monthsToPurchase >48) {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.SUBSCRIPTION_MONTH,
-          type: "error",
-        });
+      if (
+        createSubscriptionFormData.monthsToPurchase <= 0 ||
+        createSubscriptionFormData.monthsToPurchase > 48
+      ) {
+        toast.error(MESSAGE.ERROR.SUBSCRIPTION_MONTH);
         return;
       }
     }
@@ -124,48 +103,63 @@ function CreateSubscription({
       subscription_id: null,
     };
 
-    try {
-      const response = await axios.post(
-        POST_API.GET_SUBSCRIPTION_AMOUNT,
-        requestData,
-        {
-          withCredentials: true,
+    await axios
+      .post(POST_API.GET_SUBSCRIPTION_AMOUNT, requestData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          setReponseState({
+            amount: response.data.subscription_amount,
+            orderId: response.data.order_id,
+          });
+          setIsPaymentSubscriptionOpen(true);
         }
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        setReponseState({
-          amount: response.data.subscription_amount,
-          orderId: response.data.order_id,
-        });
-        setIsPaymentSubscriptionOpen(true);
-      }
-    } catch (error: any) {
-      showMessageSnackbar({
-        message: MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
-        type: "error",
+      })
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithEvent: handleCreateSubscription,
+          });
+          if (refreshTokenResponse) {
+            handleCreateSubscription(event);
+          } else {
+            toast.error(
+              MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message
+            );
+            setLoginStatus({
+              companyId: 0,
+              companyName: "",
+              createdOn: "",
+              email: "",
+              fullName: "",
+              id: 0,
+              message: "",
+              mobileNumber: "",
+              status: false,
+              token: "",
+              isActiveSubscription: false,
+              subscriptionAllowedUsers: 0,
+              activeUsersInCompany: 0,
+              subscriptionId: 0,
+              startDateSubscription: "",
+              endDateSubscription: "",
+              isSuperUser: false,
+            });
+          }
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-      setLoginStatus({
-            companyId: 0,
-            companyName: "",
-            createdOn: "",
-            email: "",
-            fullName: "",
-            id: 0,
-            message: "",
-            mobileNumber: "",
-            status: false,
-            token: "",
-            isActiveSubscription: false,
-            subscriptionAllowedUsers: 0,
-            activeUsersInCompany: 0,
-            subscriptionId: 0,
-            startDateSubscription: "",
-            endDateSubscription: "",
-          }); 
-    } finally {
-      setIsLoading(false);
-    }
+
+    // if (response.status === STATUS_CODE.OK) {
+    //   setReponseState({
+    //     amount: response.data.subscription_amount,
+    //     orderId: response.data.order_id,
+    //   });
+    //   setIsPaymentSubscriptionOpen(true);
+    // }
   };
 
   useEffect(() => {
@@ -180,17 +174,19 @@ function CreateSubscription({
   if (!isOpen) return null;
   return (
     <>
-    <div className="border-t border-gray-300 "></div>
-      <h2 className="font-semibold text-sm sm:text-base flex flex-wrap">
+      <div className="  "></div>
+      <h2 className="table-header-custom flex flex-wrap">
         <span>Active Users in the Company:</span>
-        <span className="text-red-600 font-bold ml-1">
+        <span className="input-label-custom-inactive ml-1">
           {loginStatus.activeUsersInCompany}
         </span>
       </h2>
 
-      <form className="space-y-7" onSubmit={handleCreateSubscription}>
+      <form className="space-y-5" onSubmit={handleCreateSubscription}>
         <FormInput
-          label="Company users count: *"
+          logo={Users2}
+          required
+          label="Company users count:"
           placeholder="Count of users (min 1)"
           type="number"
           value={createSubscriptionFormData.numberOfUsers.toString()}
@@ -201,7 +197,9 @@ function CreateSubscription({
           error={createSubscriptionErrors.companyUserCount}
         />
         <FormInput
-          label="Months to purchase: *"
+          logo={CalendarDays}
+          required
+          label="Months to purchase:"
           placeholder="Number of months (min: 1 to max: 48 months)"
           type="number"
           value={createSubscriptionFormData.monthsToPurchase.toString()}
@@ -212,20 +210,26 @@ function CreateSubscription({
           max={48}
           error={createSubscriptionErrors.monthsToPurchase}
         />
-        <Button type="submit">
-          {isLoading ? "Generating Order Id..." : "Continue Payment"}
-        </Button>
+        <div className="flex items-center justify-end">
+          <div className="flex items-center gap-1 text-nowrap">
+            <Button type="button" onClick={onClose}>
+              <div className=" flex items-center">
+                <X size={16} /> Cancel
+              </div>
+            </Button>
+          <Button type="submit">
+              <div className=" flex items-center">
+
+             {isLoading ?  <Loader size={16}/> :               <ArrowRight size={16}/>}
+            {isLoading ? "Generating Order Id..." : "Continue Payment"}
+              </div>
+          </Button>
+          </div>
+        </div>
       </form>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
       {isPaymentSubscriptionOpen && (
-        <PaymentSubscription 
-        isSubscriptionForUpdate={false}
+        <PaymentSubscription
+          isSubscriptionForUpdate={false}
           descriptionInformation="Confirm & Pay for Subscription"
           amount={responseState.amount}
           orderId={responseState.orderId}

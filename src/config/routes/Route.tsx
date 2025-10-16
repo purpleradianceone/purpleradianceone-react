@@ -20,8 +20,6 @@ import ContactUs from "../../components/views/home/landing-page/ContactUs";
 import LeadManagement from "../../components/views/lead-management/LeadManagement";
 import ProductManagement from "../../components/views/product-Management/ProductsManagement";
 import TeamManagement from "../../components/views/team-management/TeamManagement";
-import ProductTeamManagement from "../../components/views/product-team-management/ProductTeamManagement";
-import Dashboard from "../../components/views/home/dashboard/Dashboard";
 import CreateSubscription from "../../components/subscription-module/CreateSubscription";
 import SubscriptionManagement from "../../components/subscription-module/Subscription";
 import PanelCustomizer from "../../components/views/panel/PanelCustomizer";
@@ -54,6 +52,13 @@ import AboutUs from "../../components/views/home/landing-page/AboutUs";
 import Pricing from "../../components/views/home/landing-page/Pricing";
 import CareersPage from "../../components/views/home/landing-page/Carrers";
 import LoginRequiredRouteNoContent from "./LoginRequiredRouteNoContent";
+import NotAuthorized from "../../components/views/not-authorized/NotAuthorized";
+import SettingsAlreadyExists from "../../components/views/not-authorized/SettingsAlreadyExists";
+import Home from "../../components/views/home/Home";
+import GetAccounts from "../../components/views/account/AccountManagement";
+import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
+import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
+import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
 
 export const router = createBrowserRouter([
   {
@@ -65,18 +70,26 @@ export const router = createBrowserRouter([
     element: <DownloadAppPage></DownloadAppPage>,
   },
   {
+    path: ROUTES_URL.NOT_AUTHORIZED,
+    element: <NotAuthorized></NotAuthorized>,
+  },
+  {
+    path: ROUTES_URL.SETTINGS_ALREADY_EXISTS,
+    element: <SettingsAlreadyExists></SettingsAlreadyExists>,
+  },
+  {
     path: ROUTES_URL.LANDING_PAGE,
     element: (
       <LoggedInRoute>
         <div className="min-h-screen">
           <Navbar>
             <Hero />
-            <AboutUs/>
+            <AboutUs />
             <Features />
             <Testimonials />
             <ContactUs />
             <CallToAction />
-            <Footer/>
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -88,8 +101,8 @@ export const router = createBrowserRouter([
       <LoggedInRoute>
         <div className="min-h-screen">
           <Navbar>
-            <CareersPage/>
-            <Footer/>
+            <CareersPage />
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -101,8 +114,8 @@ export const router = createBrowserRouter([
       <LoggedInRoute>
         <div className="min-h-screen">
           <Navbar>
-            <Pricing/>
-            <Footer/>
+            <Pricing />
+            <Footer />
           </Navbar>
         </div>
       </LoggedInRoute>
@@ -194,7 +207,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div className="min-h-95vh">
             <Navbar>
-              <Dashboard></Dashboard>
+              <Home />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -209,6 +222,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
+              
               <GetCompanyUsers />
             </Navbar>
           </div>
@@ -224,7 +238,9 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <LeadManagement />
+              <LeadManagement
+              isUsedInLeadModule={true}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -239,7 +255,9 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <ProductManagement />
+              <ProductManagement
+              isGridForAccountProduct={false}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -274,26 +292,25 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-  {
-    path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
-    element: (
-      <MobileRedirectWrapper>
-        <PrivateRoute>
-          <div>
-            <Navbar>
-              <ProductTeamManagement />
-            </Navbar>
-          </div>
-        </PrivateRoute>
-      </MobileRedirectWrapper>
-    ),
-  },
+  // {
+  //   path: ROUTES_URL.PRODUCT_TEAM_MANAGEMENT,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <ProductTeamManagement />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
   {
     path: ROUTES_URL.CREATE_SUBSCRIPTION,
     element: (
       <MobileRedirectWrapper>
         <LoginRequiredRouteNoContent>
-
           <div>
             <AuthLayout
               title="Activate Subscription!"
@@ -305,8 +322,7 @@ export const router = createBrowserRouter([
               />
             </AuthLayout>
           </div>
-          </LoginRequiredRouteNoContent>
-       
+        </LoginRequiredRouteNoContent>
       </MobileRedirectWrapper>
     ),
   },
@@ -343,9 +359,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <ViewLeadManagement />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -355,9 +373,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <MeetingScheduler></MeetingScheduler>
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -367,9 +387,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <TemplatesPage />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -379,9 +401,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EditorCanvas />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -391,9 +415,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EditorCanvasWithJson />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -403,9 +429,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <EmailSetting />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -415,9 +443,11 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <UserPrerefenceManagement />
           </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -453,23 +483,41 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <Meetings></Meetings>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
-  {
+{
     path: ROUTES_URL.LEAD_IMPORT_CSV,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <Navbar>
-          {/* <LeadImportCsv/> */}
-          <LeadImportCsvManagement />
-        </Navbar>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+          <Navbar>
+            {/* <LeadImportCsv/> */}
+            <LeadImportCsvManagement />
+          </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.ACCOUNT_IMPORT_CSV,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountImportCsvManagement />
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -478,6 +526,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <CreateLeadModal
             isOpen={true}
@@ -486,6 +535,7 @@ export const router = createBrowserRouter([
             }}
           ></CreateLeadModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -495,6 +545,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddCompanyUserModal
             isOpen={true}
@@ -503,6 +554,7 @@ export const router = createBrowserRouter([
             }}
           ></AddCompanyUserModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -512,6 +564,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddProductModal
             isOpen={true}
@@ -521,6 +574,7 @@ export const router = createBrowserRouter([
             handleProductChangeOnAdd={() => {}}
           ></AddProductModal>
         </Navbar>
+        </div>
       </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -530,6 +584,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
       <PrivateRoute>
+        <div>
         <Navbar>
           <AddTeamModal
             isOpen={true}
@@ -539,7 +594,46 @@ export const router = createBrowserRouter([
             handleCompanyTeamChangeOnAdd={() => {}}
           ></AddTeamModal>
         </Navbar>
+        </div>
       </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.ACCOUNT_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+      <PrivateRoute>
+        <div>
+        <Navbar>
+          <GetAccounts isUsedForAccountLead={false}/>
+        </Navbar>
+        </div>
+      </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.FACEBOOK_OAUTH,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <FacebookOAuthConsent></FacebookOAuthConsent>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.INTEGRATIONS_SETTINGS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+          <Navbar>
+        <IntegrationsPage/>
+        </Navbar>
+        </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },

@@ -1,299 +1,315 @@
+/* --- Font Imports --- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap");
+
 /* --- General Calendar Reset & Font --- */
 /* Apply a more modern font, similar to Google's Roboto or Arial */
 .rbc-calendar {
-  font-family: 'Roboto', 'Arial', sans-serif; /* Prefer Roboto if available */
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15); /* Subtle shadow like Google apps */
-  border-radius: 8px; /* Rounded corners for the entire calendar */
-  overflow: scroll; /* Ensures shadow/border-radius are applied nicely */
-  color: #3c4043;
-  min-height: 525px; /* Dark gray text, typical for Google */
+ box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15); /* Subtle shadow like Google apps */
+ border-radius: 8px; /* Rounded corners for the entire calendar */
+ overflow: scroll; /* Ensures shadow/border-radius are applied nicely */
+ color: #3c4043;
+ min-height: 525px; /* Dark gray text, typical for Google */
+ font-family: 'Roboto', sans-serif;
 }
 
 /* Remove default strong borders for a cleaner look */
 .rbc-day-bg + .rbc-day-bg {
-  border-left: none;
+ border-left: none;
 }
 
 /* --- Toolbar (Header) Styling --- */
 .rbc-toolbar {
-  background-color: #ffffff; /* White toolbar background */
-  border-bottom: 1px solid #dadce0; /* Light gray subtle bottom border */
-  padding: 10px 15px; /* Adjust padding */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+ background-color: #ffffff; /* White toolbar background */
+ border-bottom: 1px solid #dadce0; /* Light gray subtle bottom border */
+ padding: 10px 15px; /* Adjust padding */
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
 }
 
 .rbc-toolbar button {
-  background-color: transparent;
-  color: #3c4043; /* Dark gray button text */
-  border: 1px solid #dadce0; /* Light gray border */
-  border-radius: 4px;
-  padding: 8px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+ background-color: transparent;
+ color: #3c4043; /* Dark gray button text */
+ border: 1px solid #dadce0; /* Light gray border */
+ border-radius: 4px;
+ padding: 8px 15px;
+ font-size: 14px;
+ cursor: pointer;
+ transition: background-color 0.2s, border-color 0.2s;
+ font-family: "Inter", sans-serif;
+ font-weight: 600;
 }
 
 .rbc-toolbar button:hover {
-  background-color: #f1f3f4; /* Light hover background */
-  border-color: #c5c7c8; /* Slightly darker border on hover */
+ background-color: #f1f3f4; /* Light hover background */
+ border-color: #c5c7c8; /* Slightly darker border on hover */
 }
 
 .rbc-toolbar button.rbc-active {
-  background-color: #e8f0fe; /* Light blue background for active button */
-  color: #1a73e8; /* Google blue text for active button */
-  border-color: #a8dafa; /* Lighter blue border for active button */
+ background-color: #e8f0fe; /* Light blue background for active button */
+ color: #1a73e8; /* Google blue text for active button */
+ border-color: #a8dafa; /* Lighter blue border for active button */
 }
 
 .rbc-toolbar span.rbc-btn-group {
-  margin-right: 10px; /* Space between groups */
+ margin-right: 10px; /* Space between groups */
 }
 
 .rbc-toolbar .rbc-toolbar-label {
-  font-size: 22px; /* Larger font for current month/week/day */
-  font-weight: 500; /* Medium bold */
-  color: #202124; /* Even darker text for label */
-  flex-grow: 1; /* Allows label to take up space */
-  text-align: center; /* Center the label */
+ font-size: 22px; /* Larger font for current month/week/day */
+ font-weight: 500; /* Medium bold */
+ color: #202124; /* Even darker text for label */
+ flex-grow: 1; /* Allows label to take up space */
+ text-align: center; /* Center the label */
+ font-family: 'Roboto', sans-serif;
 }
 
 /* Make navigation buttons circular */
 .rbc-btn-group button {
-  min-width: 40px; /* Ensure circular shape */
+ min-width: 40px; /* Ensure circular shape */
 }
 
 
 /* --- Month View Specifics --- */
 .rbc-month-view {
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  border-top: 1px solid #dadce0; /* Match toolbar border */
+ display: flex;
+ flex-direction: column;
+ background-color: #ffffff;
+ border-top: 1px solid #dadce0; /* Match toolbar border */
 }
 
 .rbc-month-row {
-  flex: 1 1 0%; /* Ensures rows expand evenly */
-  min-height: 105px; /* Increase this to make day cells taller */
-  border-bottom: 1px solid #dadce0; /* Light border between rows */
-  overflow: visible; /* Hide overflow by default, let +X more handle it */
+ flex: 1 1 0%; /* Ensures rows expand evenly */
+ min-height: 105px; /* Increase this to make day cells taller */
+ border-bottom: 1px solid #dadce0; /* Light border between rows */
+ overflow: visible; /* Hide overflow by default, let +X more handle it */
 }
 .rbc-month-row:last-child {
-    border-bottom: none; /* No border for the last row */
+  border-bottom: none; /* No border for the last row */
 }
 
 
 /* Day of week headers (Sun, Mon, Tue...) */
 .rbc-header {
-  padding: 8px 6px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #70757a; /* Muted gray for headers */
-  border-bottom: 1px solid #dadce0;
-  background-color: #f8f9fa; /* Very light background for headers */
+ padding: 8px 6px;
+ text-align: center;
+ font-size: 12px;
+ color: #70757a; /* Muted gray for headers */
+ border-bottom: 1px solid #dadce0;
+ background-color: #f8f9fa; /* Very light background for headers */
+ font-family: "Roboto", sans-serif;
+ font-weight: 700;
 }
 .rbc-header + .rbc-header {
-  border-left: 1px solid #dadce0; /* Vertical borders between days in header */
+ border-left: 1px solid #dadce0; /* Vertical borders between days in header */
 }
 
 /* Individual Day Cells */
 .rbc-day-bg {
-  background-color: #ffffff; /* Default background for day cells */
-  border-left: 1px solid #dadce0; /* Vertical borders between days */
+ background-color: #ffffff; /* Default background for day cells */
+ border-left: 1px solid #dadce0; /* Vertical borders between days */
 }
 .rbc-day-bg:first-child {
-  border-left: none; /* No left border for the first day */
+ border-left: none; /* No left border for the first day */
 }
 
 
 /* Current Day in Month View */
 .rbc-day-bg.rbc-today {
-  background-color: #dfe6f3; /* Light blue background for today's day */
+ background-color: #dfe6f3; /* Light blue background for today's day */
 }
 
 /* Dates from prev/next month in current view */
 .rbc-off-range-bg {
-  background-color: #f1f3f4; /* Subtle gray for off-range days */
+ background-color: #f1f3f4; /* Subtle gray for off-range days */
 }
 
 /* Date numbers (1, 2, 3...) */
 .rbc-date-cell {
-  padding: 6px 8px; /* Adjust padding for date number */
-  text-align: right; /* Date number aligned to top-right */
-  font-size: 12px;
-  font-weight: 500;
-  color: #70757a; /* Muted gray for date numbers */
+ padding: 6px 8px; /* Adjust padding for date number */
+ text-align: right; /* Date number aligned to top-right */
+ font-size: 12px;
+ color: #70757a; /* Muted gray for date numbers */
+ font-family: "Roboto", sans-serif;
+ font-weight: 400;
 }
 .rbc-date-cell.rbc-current {
-  color: #1a73e8; /* Google blue for current date number */
+ color: #1a73e8; /* Google blue for current date number */
 }
 .rbc-off-range .rbc-date-cell {
-  color: #a0a0a0; /* Lighter gray for off-range date numbers */
+ color: #a0a0a0; /* Lighter gray for off-range date numbers */
 }
 
 /* --- Events Styling (Month, Week, Day Views) --- */
 .rbc-event {
-  background-color: #3367d6; /* Google blue for events, can be customized per event */
-  color: #ffffff; /* White text on events */
-  border-radius: 4px; /* Rounded corners for events */
-  padding: 2px 5px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  line-height: 1.3; /* Adjust line height for better text flow */
-  border: none; /* Remove default border */
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Subtle shadow for events */
+ background-color: #3367d6; /* Google blue for events, can be customized per event */
+ color: #ffffff; /* White text on events */
+ border-radius: 4px; /* Rounded corners for events */
+ padding: 2px 5px;
+ font-size: 13px;
+ cursor: pointer;
+ line-height: 1.3; /* Adjust line height for better text flow */
+ border: none; /* Remove default border */
+ box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Subtle shadow for events */
+ font-family: "Roboto", sans-serif;
+ font-weight: 400;
 }
 
 .rbc-event-content {
-  white-space: normal; /* Allow event text to wrap */
-  overflow: hidden;
-  text-overflow: ellipsis; /* Add ellipsis for truncated text */
+ white-space: normal; /* Allow event text to wrap */
+ overflow: hidden;
+ text-overflow: ellipsis; /* Add ellipsis for truncated text */
 }
 
 /* All-day events in month view */
 .rbc-allday-cell {
-    background-color: #f1f3f4; /* Light gray background for all-day row */
-    border-bottom: 1px solid #dadce0;
+  background-color: #f1f3f4; /* Light gray background for all-day row */
+  border-bottom: 1px solid #dadce0;
 }
 
 /* +X More link */
 .rbc-row-segment .rbc-event-content {
-    /* Ensures text is visible within the event block */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  /* Ensures text is visible within the event block */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .rbc-show-more {
-  background-color: transparent;
-  color: #1a73e8; /* Google blue for "+X more" link */
-  font-size: 13px;
-  padding: 0 5px;
-  text-align: left;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  width: 100%;
+ background-color: transparent;
+ color: #1a73e8; /* Google blue for "+X more" link */
+ font-size: 13px;
+ padding: 0 5px;
+ text-align: left;
+ border: none;
+ cursor: pointer;
+ text-decoration: underline;
+ width: 100%;
+ font-family: "Inter", sans-serif;
+ font-weight: 600;
 }
 .rbc-show-more:hover {
-  text-decoration: none;
+ text-decoration: none;
 }
 
 
 /* --- Week/Day View Specifics --- */
 .rbc-time-header {
-  border-bottom: 1px solid #dadce0;
-  background-color: #f8f9fa; /* Match day of week headers */
+ border-bottom: 1px solid #dadce0;
+ background-color: #f8f9fa; /* Match day of week headers */
 }
 
 .rbc-time-header-content {
-  border-left: 1px solid #dadce0; /* Vertical border for header */
+ border-left: 1px solid #dadce0; /* Vertical border for header */
 }
 .rbc-time-header-content > .rbc-row > div {
-  border-right: 1px solid #dadce0 !important; /* Vertical border between header days */
-  border-bottom: 1px solid #dadce0 !important; /* Horizontal border below header days */
-  padding: 8px 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #70757a;
+ border-right: 1px solid #dadce0 !important; /* Vertical border between header days */
+ border-bottom: 1px solid #dadce0 !important; /* Horizontal border below header days */
+ padding: 8px 6px;
+ font-size: 12px;
+ color: #70757a;
+ font-family: "Roboto", sans-serif;
+ font-weight: 700;
 }
 .rbc-time-header-content > .rbc-row > div:first-child {
-    border-left: none !important; /* Remove initial border if it appears */
+  border-left: none !important; /* Remove initial border if it appears */
 }
 
 
 .rbc-label { /* Time gutter labels (e.g., 9 AM, 10 AM) */
-  padding: 0 8px;
-  font-size: 12px;
-  color: #70757a;
-  text-align: right; /* Aligned right in Google Calendar */
+ padding: 0 8px;
+ font-size: 12px;
+ color: #70757a;
+ text-align: right; /* Aligned right in Google Calendar */
+ font-family: "Roboto", sans-serif;
+ font-weight: 400;
 }
 
 .rbc-time-gutter {
-  background-color: #ffffff; /* White background for the time gutter */
-  border-right: 1px solid #dadce0; /* Border separating gutter from grid */
+ background-color: #ffffff; /* White background for the time gutter */
+ border-right: 1px solid #dadce0; /* Border separating gutter from grid */
 }
 
 .rbc-day-slot {
-  border-right: 1px solid #dadce0 !important; /* Vertical borders between days in grid */
-  background-color: #ffffff; /* Default background for day columns */
+ border-right: 1px solid #dadce0 !important; /* Vertical borders between days in grid */
+ background-color: #ffffff; /* Default background for day columns */
 }
 .rbc-day-slot:last-child {
-  border-right: none !important; /* No border for the last day column */
+ border-right: none !important; /* No border for the last day column */
 }
 
 
 /* Time slot borders */
 .rbc-time-view .rbc-timeslot-group {
-  border-bottom: 1px solid #dadce0 !important; /* Lighter horizontal borders for every hour/slot group */
+ border-bottom: 1px solid #dadce0 !important; /* Lighter horizontal borders for every hour/slot group */
 }
 .rbc-time-view .rbc-time-slot {
-  border-bottom: 1px dashed #e8eaed !important; /* Even lighter dashed borders for sub-slots */
-  background-color: transparent; /* Keep slot background transparent */
+ border-bottom: 1px dashed #e8eaed !important; /* Even lighter dashed borders for sub-slots */
+ background-color: transparent; /* Keep slot background transparent */
 }
 
 /* Current Day in Week/Day View */
 .rbc-time-view .rbc-day-bg.rbc-today {
-  background-color: #dfe6f3; /* Light blue background for today's column */
+ background-color: #dfe6f3; /* Light blue background for today's column */
 }
 
 /* Current Time Indicator */
 .rbc-current-time-indicator {
-  background-color: #1a73e8 !important; /* Google blue for current time line */
-  height: 2px !important; /* Thicker line */
-  border: none !important;
+ background-color: #1a73e8 !important; /* Google blue for current time line */
+ height: 2px !important; /* Thicker line */
+ border: none !important;
 }
 .rbc-current-time-indicator::before {
-  background-color: #1a73e8 !important;
-  border-radius: 50% !important;
-  width: 10px !important;
-  height: 10px !important;
-  left: -5px !important;
-  top: -4px !important;
+ background-color: #1a73e8 !important;
+ border-radius: 50% !important;
+ width: 10px !important;
+ height: 10px !important;
+ left: -5px !important;
+ top: -4px !important;
 }
 
 /* Override default cell background for today's time slots (more specific) */
 /* This ensures the light blue today background extends through timeslots */
 .rbc-time-view .rbc-day-bg.rbc-today .rbc-time-slot {
-    background-color: #dfe6f3 !important; /* Let the parent .rbc-today handle background */
+  background-color: #dfe6f3 !important; /* Let the parent .rbc-today handle background */
 }
 .rbc-time-view .rbc-today .rbc-timeslot-group {
-    background-color: #dfe6f3 !important; /* Ensure transparent for group, unless you want a block color */
+  background-color: #dfe6f3 !important; /* Ensure transparent for group, unless you want a block color */
 }
 
 
 /* --- Agenda View Styling (Simplified) --- */
 .rbc-agenda-view table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #dadce0;
+ width: 100%;
+ border-collapse: collapse;
+ border: 1px solid #dadce0;
 }
 .rbc-agenda-view th, .rbc-agenda-view td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #dadce0;
+ padding: 10px;
+ text-align: left;
+ border-bottom: 1px solid #dadce0;
+ font-family: "Roboto", sans-serif;
 }
 .rbc-agenda-view th {
-  background-color: #f8f9fa;
-  font-weight: 500;
-  color: #70757a;
+ background-color: #f8f9fa;
+ font-weight: 700;
+ color: #70757a;
 }
 .rbc-agenda-view td.rbc-agenda-time {
-  color: #3c4043;
+ color: #3c4043;
+ font-weight: 400;
 }
 .rbc-agenda-view td.rbc-agenda-events {
-  font-weight: normal;
+ font-weight: 400;
 }
 .rbc-agenda-view .rbc-agenda-date-cell {
-    font-weight: 500;
-    color: #202124;
+  font-weight: 700;
+  color: #202124;
 }
 
 /* Selection highlight (when dragging to select) */
 .rbc-addons-dnd .rbc-selected-slot {
-    background-color: rgba(66, 133, 244, 0.2) !important; /* Light Google blue overlay */
-    border: 1px solid #4285f4 !important; /* Google blue border */
+  background-color: rgba(66, 133, 244, 0.2) !important; /* Light Google blue overlay */
+  border: 1px solid #4285f4 !important; /* Google blue border */
 }
 
 /* Focus outline for accessibility */
@@ -301,6 +317,6 @@
 .rbc-slot-selection:focus,
 .rbc-day-slot .rbc-events-container:focus,
 .rbc-toolbar button:focus {
-    outline: 2px solid #4285f4; /* Google blue outline */
-    outline-offset: 1px;
+  outline: 2px solid #4285f4; /* Google blue outline */
+  outline-offset: 1px;
 }

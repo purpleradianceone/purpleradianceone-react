@@ -1,0 +1,26 @@
+export type PendingTaskList = {
+id: number;
+  leadId : number;
+  leadActivityId : number;
+  leadTaskPriorityId : number;
+  leadTaskStageId : number;
+  subject : string,
+  description: string;
+  colorCode : string;
+  assignedToId : number[];
+  assignedToName : string[];
+  dueDateTime : string;
+  completedAtDateTime? : string;
+  leadActivityDetails : never;
+  isActive : boolean;
+  createdOn : string;
+  createdBy : string;
+  updatedOn : string;
+  updatedBy : string;
+  resultOutcome : string;
+  leadTaskActivityName : string;
+  leadTaskPriorityName : string;
+  leadTaskStageName : string;
+  overdueStatus? : string;
+  completedAt? : string;
+};

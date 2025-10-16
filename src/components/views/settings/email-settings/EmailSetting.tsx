@@ -10,22 +10,23 @@ import {
   Plus,
   CheckCircle,
   XCircle,
+  Edit,
 } from "lucide-react";
 import SettingsModal from "./SettingsModal";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import Button from "../../../ui/Button";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
+
 import MESSAGE from "../../../../constants/Messages";
 import EmailTypeSettings from "./EmailTypeSettings";
 import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
+import toast from "react-hot-toast";
+import ApiError from "../../../../@types/error/ApiError";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import ToggleButton from "../../../ui/ToggleButton";
 
 interface CompanyEmailSetting {
   id: number;
@@ -77,258 +78,254 @@ export default function EmailSettingsTabs() {
   const [modalType, setModalType] = useState<"company" | "user">("company");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { userHasAccessToAddEmailSetting, 
-          userHasAccessToUpdateEmailSetting,
-          userHasAccessToViewEmailSetting,
-          userHasAccessToViewEmailSettingCompany,
-          userHasAccessToViewEmailTypeSetting
-   } =
-    useUserAccessModules();
+  const {
+    userHasAccessToAddEmailSetting,
+    userHasAccessToUpdateEmailSetting,
+    userHasAccessToViewEmailSetting,
+    userHasAccessToViewEmailSettingCompany,
+    userHasAccessToViewEmailTypeSetting,
+  } = useUserAccessModules();
+  const { loginStatus } = useLoggedInUserContext();
 
   const handleModalSubmit = async (data: any) => {
     console.log("Submitted data:", data);
-    await getEmailSettings();
-    // TODO: Update state or send to backend here
+    if (activeTab === "company") {
+      getEmailSettingsCompany();
+    }
+    if (activeTab === "user") {
+      getEmailSettingsUser();
+    }
   };
 
-  const { loginStatus } = useLoggedInUserContext();
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  const getEmailSettings = async () => {
+  const getEmailSettingsCompany = async () => {
     setIsLoading(true); // Start loading
     setCompanySettings([]);
+    try {
+      await axios
+        .post(
+          POST_API.GET_EMAIL_SETTING_COMPANY,
+          {
+            company_id: loginStatus.companyId,
+            requestedby_id: loginStatus.id,
+          },
+          { withCredentials: true }
+        )
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            const companyEmailSetting = result.data;
+            setCompanySettings(
+              companyEmailSetting.length > 0 ? companyEmailSetting : []
+            );
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: getEmailSettingsCompany,
+            });
+            if (refreshTokenStatus) {
+              getEmailSettingsCompany();
+            }
+          }
+        });
+    } catch (error) {
+      console.error("Error fetching  company email settings:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
+  };
+
+  const getEmailSettingsUser = async () => {
+    setIsLoading(true); // Start loading
     setUserSettings([]);
     try {
-      const responseCompanyEmailSettings = await axios.post(
-        POST_API.GET_EMAIL_SETTING_COMPANY,
-        {
-          company_id: loginStatus.companyId,
-          requestedby_id: loginStatus.id,
-        },
-        { withCredentials: true }
-      );
-
-      if (responseCompanyEmailSettings.status === STATUS_CODE.OK) {
-        const companyEmailSetting = responseCompanyEmailSettings.data;
-        setCompanySettings(
-          companyEmailSetting.length > 0 ? companyEmailSetting : []
-        );
-      }
-
-      const responseCompanyUserEmailSettings = await axios.post(
-        POST_API.GET_EMAIL_SETTING_COMPANY_USER,
-        {
-          company_id: loginStatus.companyId,
-          company_user_id: loginStatus.id,
-          requestedby_id: loginStatus.id,
-        },
-        { withCredentials: true }
-      );
-
-      if (responseCompanyUserEmailSettings.status === STATUS_CODE.OK) {
-        const companyUserEmailSetting = responseCompanyUserEmailSettings.data;
-        setUserSettings(
-          companyUserEmailSetting.length > 0 ? companyUserEmailSetting : []
-        );
-      }
+      await axios
+        .post(
+          POST_API.GET_EMAIL_SETTING_COMPANY_USER,
+          {
+            company_id: loginStatus.companyId,
+            company_user_id: loginStatus.id,
+            requestedby_id: loginStatus.id,
+          },
+          { withCredentials: true }
+        )
+        .then((result) => {
+          if (result.status === STATUS_CODE.OK) {
+            const companyUserEmailSetting = result.data;
+            setUserSettings(
+              companyUserEmailSetting.length > 0 ? companyUserEmailSetting : []
+            );
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunction: getEmailSettingsUser,
+            });
+            if (refreshTokenStatus) {
+              getEmailSettingsUser();
+            }
+          }
+        });
     } catch (error) {
-      console.error("Error fetching template types:", error);
+      console.error("Error fetching user email setting:", error);
     } finally {
       setIsLoading(false); // Stop loading
     }
   };
 
   useEffect(() => {
-    getEmailSettings();
-  }, []);
+    if (activeTab === "company") {
+      getEmailSettingsCompany();
+    }
+    if (activeTab === "user") {
+      getEmailSettingsUser();
+    }
+  }, [activeTab]);
+
+  const onEmailSettingToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setting: CompanyUserEmailSetting | CompanyEmailSetting,
+    isForCompany: boolean
+  ) => {
+    const { checked } = event.target;
+
+    if (userHasAccessToUpdateEmailSetting) {
+      const updateEmailSettingPostData = {
+        company_id: loginStatus.companyId,
+        id: setting.id,
+        email: setting.email,
+        email_password: setting.email_password,
+        smtp_host: setting.smtp_host,
+        smtp_port: setting.smtp_port,
+        email_security_type_id: setting.email_security_type_id,
+        authentication_required: setting.authentication_required,
+        isactive: checked,
+        updatedby_id: loginStatus.id,
+      };
+
+      await axios
+        .post(
+          isForCompany
+            ? POST_API.UPDATE_EMAIL_SETTING_COMPANY
+            : POST_API.UPDATE_EMAIL_SETTING_COMPANY_USER,
+          updateEmailSettingPostData,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            if (response.data.status) {
+              if (isForCompany) {
+                setCompanySettings((prev) =>
+                  prev.map((item) =>
+                    item.id === setting.id
+                      ? { ...item, isactive: checked }
+                      : item
+                  )
+                );
+              } else {
+                setUserSettings((prev) =>
+                  prev.map((item) =>
+                    item.id === setting.id
+                      ? { ...item, isactive: checked }
+                      : item
+                  )
+                );
+              }
+            }
+
+            toast.success(response.data.message);
+          } else {
+            toast.error(response.data.message);
+          }
+        })
+        .catch(async (error: ApiError | any) => {
+          if (error.status === STATUS_CODE.UNATHORISED) {
+            const refreshTokenStatus = await RefreshToken({
+              callFunctionWithTwoParamsAndEvent: onEmailSettingToggle,
+            });
+
+            if (refreshTokenStatus) {
+              onEmailSettingToggle(event, setting, isForCompany);
+            }
+          }
+        });
+    }
+  };
 
   const renderCompanyEmailCard = (
     setting: CompanyEmailSetting,
     index: number
   ) => (
-        <><div className="flex justify-between">
-          <div
-            key={index}
-            className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
-          >
+    <>
+      <div className="flex justify-between">
+        <div
+          key={index}
+          className="flex-col w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
+        >
+          <div className="absolute right-3">
             <Button
+              type="submit"
               disabled={!userHasAccessToUpdateEmailSetting}
-              className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 if (userHasAccessToUpdateEmailSetting) {
                   setModalType("company");
                   setEditData(setting);
                   setIsModalOpen(true);
                 } else {
-                  showMessageSnackbar({
-                    message: MESSAGE.ERROR.NOT_ATHORISED,
-                    type: "error",
-                  });
+                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
                 }
-              } }
+              }}
             >
-              Edit
+              <div className="flex items-center justify-center gap-0.5">
+                <Edit size={16} />
+                Edit
+              </div>
             </Button>
-
-            <div className="flex items-center space-x-2 mb-2">
-              <Mail className="text-blue-600 w-5 h-5" />
-              <p className="text-gray-700 text-sm">
-                <strong>Company Email:</strong> {setting.email}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <KeyRound className="text-gray-500 w-5 h-5" />
-              <p className="text-gray-700 text-sm">
-                <strong>Email Password:</strong> ********
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Server className="text-green-600 w-5 h-5" />
-              <p className="text-gray-700 text-sm">
-                <strong>SMTP Host:</strong> {setting.smtp_host}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Server className="text-purple-600 w-5 h-5" />
-              <p className="text-gray-700 text-sm">
-                <strong>SMTP Port:</strong> {setting.smtp_port}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Lock className="text-orange-500 w-5 h-5" />
-              <p className="text-gray-700 text-sm">
-                <strong>Security Type:</strong>{" "}
-                {setting.email_security_type_id === 1
-                  ? "SSL"
-                  : setting.email_security_type_id === 2
-                    ? "TLS"
-                    : "Unknown"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <ShieldCheck
-                className={`w-5 h-5 ${setting.authentication_required
-                    ? "text-emerald-600"
-                    : "text-gray-400"}`} />
-              <p className="text-gray-700 text-sm">
-                <strong>Authentication Required:</strong>{" "}
-                {setting.authentication_required ? "Yes" : "No"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 mb-4">
-              {setting.isactive ? (
-                <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
-              ) : (
-                <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
-              )}
-              <p className="text-gray-700 text-sm">
-                <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <p className="text-gray-700 text-sm">
-                <strong>Created By:</strong> {setting.createdby}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <p className="text-gray-700 text-sm">
-                <strong>Created On:</strong> {setting.createdon}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <p className="text-gray-700 text-sm">
-                <strong>Updated By:</strong> {setting.updatedby}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <p className="text-gray-700 text-sm">
-                <strong>Updated On:</strong> {setting.updatedon}
-              </p>
-            </div>
           </div>
-        </div><MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleMessageSnackbarClose}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION} /></>
-  );
 
-  const renderUserEmailCard = (
-    setting: CompanyUserEmailSetting,
-    index: number
-  ) => (
-    <>
-    {userHasAccessToViewEmailSetting ? (
-      <>
-      <div className="flex justify-between">
-        <div
-          key={index}
-          className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
-        >
-          <Button
-            disabled={!userHasAccessToUpdateEmailSetting}
-            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm shadow-sm"
-            onClick={() => {
-              if (userHasAccessToUpdateEmailSetting) {
-                setModalType("user");
-                setEditData(setting);
-                setIsModalOpen(true);
-              } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.NOT_ATHORISED,
-                  type: "error",
-                });
-              }
-            }}
-          >
-            Edit
-          </Button>
           <div className="flex items-center space-x-2 mb-2">
             <Mail className="text-blue-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>User Email:</strong> {setting.email}
+              <strong className="input-label-custom">Company Email:</strong>{" "}
+              <span className="caption-custom">{setting.email}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <KeyRound className="text-gray-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>Email Password:</strong> ********
+              <strong className="input-label-custom">Email Password:</strong>{" "}
+              <span className="caption-custom">********</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-green-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>SMTP Host:</strong> {setting.smtp_host}
+              <strong className="input-label-custom">SMTP Host:</strong>{" "}
+              <span className="caption-custom">{setting.smtp_host}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Server className="text-purple-600 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>SMTP Port:</strong> {setting.smtp_port}
+              <strong className="input-label-custom">SMTP Port:</strong>{" "}
+              <span className="caption-custom">{setting.smtp_port}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <Lock className="text-orange-500 w-5 h-5" />
             <p className="text-gray-700 text-sm">
-              <strong>Security Type:</strong>{" "}
-              {setting.email_security_type_id === 1
-                ? "SSL"
-                : setting.email_security_type_id === 2
-                ? "TLS"
-                : "Unknown"}
+              <strong className="input-label-custom">Security Type:</strong>{" "}
+              <span className="caption-custom">
+                {setting.email_security_type_id === 1
+                  ? "SSL"
+                  : setting.email_security_type_id === 2
+                  ? "TLS"
+                  : "Unknown"}
+              </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
@@ -340,8 +337,12 @@ export default function EmailSettingsTabs() {
               }`}
             />
             <p className="text-gray-700 text-sm">
-              <strong>Authentication Required:</strong>{" "}
-              {setting.authentication_required ? "Yes" : "No"}
+              <strong className="input-label-custom">
+                Authentication Required:
+              </strong>{" "}
+              <span className="caption-custom">
+                {setting.authentication_required ? "Yes" : "No"}
+              </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-4">
@@ -351,124 +352,225 @@ export default function EmailSettingsTabs() {
               <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
             )}
             <p className="text-gray-700 text-sm">
-              <strong>Active:</strong> {setting.isactive ? "Yes" : "No"}
+              <strong className="input-label-custom">Active:</strong>
             </p>
+            {/* <label className="inline-flex items-center cursor-pointer relative self-end">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={setting.isactive}
+                id={setting.id.toString()}
+                onChange={(e) => {
+                  onEmailSettingToggle(e, setting, true);
+                }}
+              />
+              <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+              <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+            </label> */}
+            <ToggleButton
+              checked={setting.isactive}
+              name={setting.id.toString()}
+              onToggle={(e) => {
+                onEmailSettingToggle(e, setting, true);
+              }}
+            />
           </div>
-
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Created By:</strong> {setting.createdby}
+              <strong className="input-label-custom">Created By:</strong>{" "}
+              <span className="caption-custom">{setting.createdby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Created On:</strong> {setting.createdon}
+              <strong className="input-label-custom">Created On:</strong>{" "}
+              <span className="caption-custom">{setting.createdon}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Updated By:</strong> {setting.updatedby}
+              <strong className="input-label-custom">Updated By:</strong>{" "}
+              <span className="caption-custom">{setting.updatedby}</span>
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-gray-700 text-sm">
-              <strong>Updated On:</strong> {setting.updatedon}
+              <strong className="input-label-custom">Updated On:</strong>{" "}
+              <span className="caption-custom">{setting.updatedon}</span>
             </p>
           </div>
         </div>
       </div>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      </>
-    ) : (
-      <AccessDeniedMessagePage></AccessDeniedMessagePage>
-    )}
-      
     </>
   );
 
-  //message snakbar
+  const renderUserEmailCard = (
+    setting: CompanyUserEmailSetting,
+    index: number
+  ) => (
+    <>
+      {userHasAccessToViewEmailSetting ? (
+        <>
+          <div className="flex justify-between">
+            <div
+              key={index}
+              className="w-[40vw] min-w-80 relative rounded-xl border border-gray-200 bg-white shadow-md p-6 hover:shadow-lg transition duration-300"
+            >
+              <div className="absolute w-fit right-3">
+                <Button
+                  type="submit"
+                  disabled={!userHasAccessToUpdateEmailSetting}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (userHasAccessToUpdateEmailSetting) {
+                      setModalType("user");
+                      setEditData(setting);
+                      setIsModalOpen(true);
+                    } else {
+                      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                    }
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-0.5">
+                    <Edit size={16} />
+                    Edit
+                  </div>
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-2 mb-2">
+                <Mail className="text-blue-600 w-5 h-5" />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">User Email:</strong>{" "}
+                  <span className="caption-custom">{setting.email}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <KeyRound className="text-gray-500 w-5 h-5" />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">
+                    Email Password:
+                  </strong>{" "}
+                  <span className="caption-custom">********</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <Server className="text-green-600 w-5 h-5" />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">SMTP Host:</strong>{" "}
+                  <span className="caption-custom">{setting.smtp_host}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <Server className="text-purple-600 w-5 h-5" />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">SMTP Port:</strong>{" "}
+                  <span className="caption-custom">{setting.smtp_port}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <Lock className="text-orange-500 w-5 h-5" />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Security Type:</strong>{" "}
+                  <span className="caption-custom">
+                    {setting.email_security_type_id === 1
+                      ? "SSL"
+                      : setting.email_security_type_id === 2
+                      ? "TLS"
+                      : "Unknown"}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <ShieldCheck
+                  className={`w-5 h-5 ${
+                    setting.authentication_required
+                      ? "text-emerald-600"
+                      : "text-gray-400"
+                  }`}
+                />
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">
+                    Authentication Required:
+                  </strong>{" "}
+                  <span className="caption-custom">
+                    {setting.authentication_required ? "Yes" : "No"}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 mb-4">
+                {setting.isactive ? (
+                  <CheckCircle className={`w-5 h-5 ${"text-emerald-600"}`} />
+                ) : (
+                  <XCircle className={`w-5 h-5 ${"text-red-600"}`} />
+                )}
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Active:</strong>
+                </p>
+                {/* <label className="inline-flex items-center cursor-pointer relative self-end">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={setting.isactive}
+                    id={setting.id.toString()}
+                    onChange={(e) => {
+                      onEmailSettingToggle(e, setting, false);
+                    }}
+                  />
+                  <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                </label> */}
+                <ToggleButton
+                  checked={setting.isactive}
+                  name={setting.id.toString()}
+                  onToggle={(e) => {
+                    onEmailSettingToggle(e, setting, false);
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Created By:</strong>{" "}
+                  <span className="caption-custom">{setting.createdby}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Created On:</strong>{" "}
+                  <span className="caption-custom">{setting.createdon}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Updated By:</strong>{" "}
+                  <span className="caption-custom">{setting.updatedby}</span>
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-gray-700 text-sm">
+                  <strong className="input-label-custom">Updated On:</strong>{" "}
+                  <span className="caption-custom">{setting.updatedon}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <AccessDeniedMessagePage></AccessDeniedMessagePage>
+      )}
+    </>
+  );
 
   return (
     <div className="w-full">
-      <div className="sticky z-5 top-0 flex items-center justify-between bg-gray-50 rounded-lg shadow-sm w-full min-w-full ">
-        <div className="flex justify-between w-full items-center">
-          {/* <div className="flex gap-1">
-            {<LucideMail className="w-6 h-6 text-blue-600" />}
-            {<LucideSettings className="w-4 h-4 text-blue-600" />}
-            <span className="text-xl font-bold ">Email Settings</span>
-          </div> */}
-          {/* {activeTab !== "email type" && (
-<div className="flex float-end ">
-            {activeTab === "company" ? (
-              <div className="flex justify-end ">
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  className=" top-20 right-4 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("company");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex justify-end ">
-                <Button
-                  disabled={!userHasAccessToAddEmailSetting}
-                  className=" top-20 right-4 flex items-center bg-blue-600 text-white px-2 py-2 rounded hover:bg-blue-700 text-sm"
-                  onClick={() => {
-                    if (userHasAccessToAddEmailSetting) {
-                      setModalType("user");
-                      setEditData(null);
-                      setIsModalOpen(true);
-                    } else {
-                      showMessageSnackbar({
-                        message: MESSAGE.ERROR.NOT_ATHORISED,
-                        type: "error",
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-white " />{" "}
-                  <span className=" font-bold ">Create</span>{" "}
-                </Button>
-              </div>
-            )}
-            <MessageSnackBar
-              isOpen={messageSnackbar.open}
-              message={messageSnackbar.message}
-              type={messageSnackbar.type}
-              onClose={handleMessageSnackbarClose}
-              duration={NUMBER_VALUES.SNACKBAR_DURATION}
-            />
-          </div>
-          )}
-           */}
-        </div>
-      </div>
       <div className="mb-2 flex border-b border-gray-300">
         <button
           onClick={() => setActiveTab("company")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "company"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Company Email Settings
@@ -477,8 +579,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("user")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "user"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Company User Email Settings
@@ -487,8 +589,8 @@ export default function EmailSettingsTabs() {
           onClick={() => setActiveTab("email type")}
           className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
             activeTab === "email type"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-blue-600"
+              ? "border-teal-600 table-header-custom active"
+              : "border-transparent table-header-custom"
           }`}
         >
           Email Type
@@ -499,85 +601,91 @@ export default function EmailSettingsTabs() {
       <div>
         {activeTab === "company" ? (
           <div className="w-full">
-            {userHasAccessToViewEmailSettingCompany ? 
-            (isLoading ? (
-              <div className="flex justify-center items-center h-[40vh]">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-              </div>
-            ) : (
-              <div>
-                {companySettings.length > 0 ? (
-                  companySettings.map(renderCompanyEmailCard)
-                ) : (
-                  <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                    <span>No Email Settings For company </span>
-                    <div className="max-w-36">
-                      <Button
-                        disabled={!userHasAccessToAddEmailSetting}
-                        onClick={() => {
-                          if (userHasAccessToAddEmailSetting) {
-                            setModalType("company");
-                            setEditData(null);
-                            setIsModalOpen(true);
-                          } else {
-                            showMessageSnackbar({
-                              message: MESSAGE.ERROR.NOT_ATHORISED,
-                              type: "error",
-                            });
-                          }
-                        }}
-                      >
-                        <Plus className="w-5 h-5 text-white " />{" "}
-                        <span className=" font-bold ">Create</span>{" "}
-                      </Button>
+            {userHasAccessToViewEmailSettingCompany ? (
+              isLoading ? (
+                <div className="flex justify-center items-center h-[40vh]">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <div>
+                  {companySettings.length > 0 ? (
+                    companySettings.map(renderCompanyEmailCard)
+                  ) : (
+                    <div className="flex col-span-2 w-full items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
+                      <div>
+                        <span>No Email Settings For company </span>
+                      </div>
+
+                      <div>
+                        <Button
+                          type="submit"
+                          disabled={!userHasAccessToAddEmailSetting}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (userHasAccessToAddEmailSetting) {
+                              setModalType("company");
+                              setEditData(null);
+                              setIsModalOpen(true);
+                            } else {
+                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Plus size={16} />
+                            Create
+                          </div>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )) : 
-            (
+                  )}
+                </div>
+              )
+            ) : (
               <AccessDeniedMessagePage></AccessDeniedMessagePage>
             )}
-            
           </div>
         ) : activeTab === "user" ? (
           <div className="w-full">
             {userHasAccessToViewEmailSetting ? (
               isLoading ? (
-              <div className="flex justify-center items-center h-[40vh]">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-              </div>
-            ) : (
-              <div>
-                {userSettings.length > 0 ? (
-                  userSettings.map(renderUserEmailCard)
-                ) : (
-                  <div className="text-center w-full justify-items-center text-gray-500 mt-10 p-4  rounded-md bg-white shadow-sm">
-                    <span>No Email Settings For company </span>
-                    <div className="flex justify-center  items-center max-w-36">
-                      <Button
-                        disabled={!userHasAccessToAddEmailSetting}
-                        onClick={() => {
-                          if (userHasAccessToAddEmailSetting) {
-                            setModalType("user");
-                            setEditData(null);
-                            setIsModalOpen(true);
-                          } else {
-                            showMessageSnackbar({
-                              message: MESSAGE.ERROR.NOT_ATHORISED,
-                              type: "error",
-                            });
-                          }
-                        }}
-                      >
-                        <Plus className="w-5 h-5 text-white " />{" "}
-                        <span className=" font-bold ">Create</span>{" "}
-                      </Button>
+                <div className="flex justify-center items-center h-[40vh]">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <div>
+                  {userSettings.length > 0 ? (
+                    userSettings.map(renderUserEmailCard)
+                  ) : (
+                    <div className="flex col-span-2 w-full justify-items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
+                      <div>
+                        <span>No Email Settings For User </span>
+                      </div>
+                      <div>
+                        <Button
+                          type="submit"
+                          disabled={!userHasAccessToAddEmailSetting}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (userHasAccessToAddEmailSetting) {
+                              setModalType("user");
+                              setEditData(null);
+                              setIsModalOpen(true);
+                            } else {
+                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-0.5">
+                            <Plus size={16} />
+                            Create
+                          </div>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )
+                  )}
+                </div>
+              )
             ) : (
               <AccessDeniedMessagePage></AccessDeniedMessagePage>
             )}
@@ -585,7 +693,7 @@ export default function EmailSettingsTabs() {
         ) : (
           <div>
             {userHasAccessToViewEmailTypeSetting ? (
-                <EmailTypeSettings></EmailTypeSettings>
+              <EmailTypeSettings></EmailTypeSettings>
             ) : (
               <AccessDeniedMessagePage></AccessDeniedMessagePage>
             )}
@@ -601,12 +709,6 @@ export default function EmailSettingsTabs() {
           settingType={modalType}
           initialData={editData}
           onSubmit={handleModalSubmit}
-          handleResponseMessage={({
-            message,
-            type,
-          }: ShowMessageSnackbarProps) => {
-            showMessageSnackbar({ message: message, type: type });
-          }}
         />
       </div>
     </div>

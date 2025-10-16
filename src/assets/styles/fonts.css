@@ -1,0 +1,301 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;700&display=swap");
+
+/* Main Page Title */
+.main-title-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.main-title-custom-green {
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2bc610;
+}
+
+.main-title-custom-blue {
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+
+/* Section Headers */
+.section-header-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+}
+.section-header-custom-blue {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.section-header-custom-white {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Main Navigation Links */
+.main-nav-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #757575;
+  text-decoration: none;
+  border-bottom: 1px solid #757575;
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+  text-wrap: nowrap;
+}
+
+.main-nav-custom.active-header {
+  color: #2563eb;
+  /* color: #f01db8; */
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+  border-bottom: 3px solid #2563eb;
+  /* border-bottom: 3px solid #f01db8; */
+  border-radius: 0px;
+  box-shadow: none;
+  border-radius: 2px;
+  white-space: nowrap;
+  overflow-x: auto;
+   transition: border-bottom 0.01s ease-in; 
+}
+
+.main-nav-custom.active-tab {
+  /* color: #f01db8; */
+  color : #2563eb;
+  border : none;
+}
+
+
+/* Table Header */
+.table-header-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.table-header-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.table-header-custom-white {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.table-header-custom.active {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0D9488;
+}
+
+.table-header-custom-green {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+/* Table Data */
+.table-data-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333333;
+}
+
+
+
+
+/* Action Buttons */
+.action-btn-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.action-btn-custom.disabled-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.action-btn.primary {
+  background-color: #f01db8;
+}
+
+/* .action-btn.accent {
+} */
+
+/* Small Captions (dates, status) */
+.caption-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #757575;
+}
+
+.caption-custom.white-text {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: white;
+}
+
+.caption-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #2563eb;
+}
+
+.caption-custom-teal {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #0D9488;
+}
+.caption-custom-yellow {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ebeb25;
+}
+
+.caption-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.caption-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
+}
+
+.caption-custom-black {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: black;
+}
+
+.caption-custom-orange {
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  font-weight: 400; /* Maps to Regular */
+  color: #eb9225;
+}
+
+/* Input Labels */
+.input-label-custom {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #333333;
+}
+
+.input-label-custom-white {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #fff;
+}
+
+.input-label-custom-active-tab {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #0D9488;
+}
+
+.input-label-custom-active {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #22c55e;
+}
+
+.input-label-custom-inactive {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef4444;
+}
+
+.input-label-custom-blue {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #445bef;
+}
+
+.input-label-custom-purple {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #ef44ad;
+}
+
+.input-label-custom-orange {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Maps to Regular */
+  color: #eb9225;
+}
+
+.custom-height-scrollbar {
+  overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */
+}
+
+/* Scrollbar styling for WebKit browsers */
+.custom-height-scrollbar::-webkit-scrollbar {
+  width: 3px; /* Thinner scrollbar */
+  height: 3px;
+}
+
+/* Scrollbar track */
+.custom-height-scrollbar::-webkit-scrollbar-track {
+  background: #ededf3; /* Lighter background for the track */
+  border-radius: 10px;
+}
+
+/* Scrollbar thumb */
+.custom-height-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ededf3; /* Darker, neutral color for the thumb */
+  border-radius: 10px;
+  border: 3px solid #b5b5c4; /* Adds a clean border and gives a "floating" effect */
+}
+
+/* Scrollbar thumb on hover */
+.custom-height-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #ededf3; /* A darker shade on hover for interactivity */
+}

@@ -1,5 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contact2Icon, UserPlus, Users, X } from "lucide-react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import {
+  Calendar,
+  ClipboardList,
+  Clock,
+  Contact,
+  Contact2,
+  FileText,
+  FileTextIcon,
+  Globe,
+  Save,
+  TargetIcon,
+  Text,
+  User,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
@@ -13,23 +30,17 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
+import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
+import { createPortal } from "react-dom";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -39,14 +50,16 @@ function CreateLeadTaskModal({
   leadActivity,
   leadId,
   handleLeadTaskCreate,
+  ownerId,
 }: {
   isOpen: boolean;
   handleClose: () => void;
-  leadId? : number;
+  leadId?: number;
   leadTaskStage: LeadTaskStageType[];
   leadTaskPriority: LeadTaskPriorityType[];
   leadActivity: LeadActivityType[];
   handleLeadTaskCreate: () => void;
+  ownerId: number;
 }) {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -61,7 +74,7 @@ function CreateLeadTaskModal({
   const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [leadData, setLeadData] = useState<Lead>();
-  const [assignedTo, setAssignedTo] = useState<number[]>([loginStatus.id]);
+  const [assignedTo, setAssignedTo] = useState<number[]>([ownerId]);
   const [selectedCompanyUsers, setSelectedCompanyUsers] = useState<
     CompanyUsersSearchProps[]
   >([]);
@@ -79,25 +92,10 @@ function CreateLeadTaskModal({
   const [leadContactDataSelectedArray, setLeadContactDataSelectedArray] =
     useState<LeadContactType[]>([]);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
   useEffect(() => {
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
   }, [leadActivityId]);
-
   const resetStates = () => {
     setSubject("");
     setDescription("");
@@ -106,12 +104,12 @@ function CreateLeadTaskModal({
     setLeadActivityId(0);
     setLeadTaskPriorityId(0);
     setLeadTaskStageId(0);
-    setAssignedTo([loginStatus.id]);
+    setAssignedTo([ownerId]);
     setIsAssignUsersModalOpen(false);
     setSelectedCompanyUsers([]);
     setLeadContactDataSelectedArray([]);
     setAddCompanyLeadContactIdArray([]);
-    handleCloseSnackbar();
+    // handleCloseSnackbar();
   };
 
   const generateTimeOptions = () => {
@@ -161,7 +159,7 @@ function CreateLeadTaskModal({
   };
 
   const generateTaskDetailsJson = () => {
-    if (leadActivityId !== 3) {
+    if (leadActivityId !== 3 && leadActivityId !== 8) {
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -177,42 +175,25 @@ function CreateLeadTaskModal({
 
   const createLeadTask = async (event: React.FormEvent) => {
     if (leadActivityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Activity",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Activity");
       return;
     } else if (leadTaskPriorityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Priority",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Priority");
       return;
     } else if (leadTaskStageId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Stage",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Stage");
       return;
     } else if (subject === "") {
-      showMessageSnackbar({
-        message: "Please provide Subject To Task",
-        type: "error",
-      });
+      toast.error("Please provide Subject To Task");
       return;
-    }
-    else if(dueDate === ""){
-       showMessageSnackbar({
-        message: "Please select Due Date for Task",
-        type: "error",
-      });
+    } else if (dueDate === "") {
+      toast.error("Please select Due Date for Task");
       return;
-    }
-    else if(dueTime === ""){
-       showMessageSnackbar({
-        message: "Please select Due Time for Task",
-        type: "error",
-      });
+    } else if (dueTime === "") {
+      toast.error("Please select Due Time for Task");
+      return;
+    } else if (assignedTo.length === 0) {
+      toast.error("You haven't assigned a task yet, please assign it first");
       return;
     }
 
@@ -240,19 +221,13 @@ function CreateLeadTaskModal({
       })
       .then((response) => {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          toast.success(response.data.message);
           handleLeadTaskCreate();
           setTimeout(() => {
             handleClose();
           }, 2000);
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
       })
       .catch(async (error) => {
@@ -267,38 +242,36 @@ function CreateLeadTaskModal({
       });
   };
 
-   const getComapnyUsers = async () => {
+  const getComapnyUsers = async () => {
     setSelectedCompanyUsers([]);
-      const getCompanyUserPostData = {
-        company_id: loginStatus.companyId,
-        id: loginStatus.id,
-        search_company_specific_date_range_id: 0,
-        requestedby: loginStatus.id,
-      };
+    const getCompanyUserPostData = {
+      company_id: loginStatus.companyId,
+      id: ownerId,
+      search_company_specific_date_range_id: 0,
+      requestedby: loginStatus.id,
+    };
 
-      await axios
-        .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            response.data.map((res : any) => {
-                    setSelectedCompanyUsers((prev) => [...prev, res]);
-            })
-            
+    await axios
+      .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          response.data.map((res: any) => {
+            setSelectedCompanyUsers((prev) => [...prev, res]);
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.ststus === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: getComapnyUsers,
+          });
+          if (refreshTokenResponse) {
+            getComapnyUsers();
           }
-        })
-        .catch(async (error) => {
-          if (error.ststus === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({
-              callFunction: getComapnyUsers,
-            });
-            if (refreshTokenResponse) {
-              getComapnyUsers();
-            }
-          }
-        });
-    
+        }
+      });
   };
 
   const timeOptions = generateTimeOptions();
@@ -308,7 +281,6 @@ function CreateLeadTaskModal({
       getComapnyUsers();
       const leadSearchParam = JSON.parse(searchParams.get("leadData") || "{}");
       setLeadData(leadSearchParam);
-
     }
     if (!isOpen) {
       resetStates();
@@ -316,33 +288,31 @@ function CreateLeadTaskModal({
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+  return createPortal(
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
+      <div className="bg-white mt-12 min-h-[60vh]  rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
-        <div className="border-b pb-1 mb-4 flex justify-between items-center">
-          <h2 className="text-base font-semibold text-gray-800">Create Task</h2>
-
-          <X
-            onClick={() => {
-              handleClose();
-            }}
-            className="text-gray-400 hover:text-gray-600 cursor-pointer"
-          />
-        </div>
+        <FormHeader
+          icon={ClipboardList}
+          onClose={handleClose}
+          preText="Create task for timely action"
+          description="Plan and create a task to schedule follow-ups and ensure timely action."
+        />
 
         {/* Form Grid */}
-        <form className="space-y-2">
+        <form className="space-y-2 mt-2">
           <div className="grid grid-cols-3 gap-3">
+            {/* type */}
             <CustomDropdown
-              labelName="Type"
+              requiredRedDot
+              logo={Text}
+              labelName="Type:"
               onSelect={(e) => {
                 if (e !== 4) {
                   if (e) {
                     setLeadActivityId(e);
-                  }
-                  else{
-                     setLeadActivityId(0);
+                  } else {
+                    setLeadActivityId(0);
                   }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
@@ -351,49 +321,58 @@ function CreateLeadTaskModal({
               }}
               options={leadActivity}
             ></CustomDropdown>
+            {/* priority */}
             <CustomDropdown
-              labelName="Priority"
+              requiredRedDot
+              logo={Text}
+              labelName="Priority :"
+              preselectedOption={2} // id of medium
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
-                }
-                else{
-                   setLeadTaskPriorityId(0);
+                } else {
+                  setLeadTaskPriorityId(0);
                 }
               }}
               options={leadTaskPriority}
             ></CustomDropdown>
+
+            {/* Stage */}
             <CustomDropdown
+              requiredRedDot
+              logo={Text}
               labelName="Stage"
+              preselectedOption={2}
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
-                }
-                else{
+                } else {
                   setLeadTaskStageId(0);
                 }
               }}
               options={leadTaskStage}
             ></CustomDropdown>
-            {leadActivityId !== 3
-            && (
-              <div className="flex justify-between col-span-3 mb-0">
-                <label
-                  htmlFor="phoneCallBtn"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Select Lead Contact
+
+            {leadActivityId !== 3 && leadActivityId !== 8 && leadActivityId !== 0 && (
+              <div className="flex items-center gap-4  mb-0">
+                <label htmlFor="phoneCallBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <Contact2 className="text-blue-600 mt-0.5" size={16} />
+                    <span>Select Lead Contact :</span>
+                  </div>
                 </label>
-                <div id="phoneCallBtn" className="max-w-20 m-0">
+                <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
-                    <span className="flex gap-2">
-                      <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
-                      <span>Select</span>
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
                     </span>
                   </Button>
                 </div>
@@ -402,6 +381,7 @@ function CreateLeadTaskModal({
             {leadActivityId === 3 && (
               <div className="col-span-3">
                 <FormInput
+                  logo={Globe}
                   value={physicalMeetingAddress}
                   label="Address"
                   onChange={(e) => {
@@ -413,7 +393,7 @@ function CreateLeadTaskModal({
           </div>
 
           {leadContactDataSelectedArray.length != 0 && (
-            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
+            <div className="grid grid-cols-3 input-label-custom">
               Selected Lead Contacts
             </div>
           )}
@@ -426,9 +406,9 @@ function CreateLeadTaskModal({
                 >
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
-                        {contact.name}
+                      <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
+                      <span className="caption-custom">
+                        {contact.name || contact.email || "Unnamed contact"}
                       </span>
                     </span>
                     <Button
@@ -441,7 +421,7 @@ function CreateLeadTaskModal({
                           prev.filter((item) => item.id !== contact.id)
                         );
                       }}
-                      className="text-gray-600 hover:text-red-500"
+                      className="caption-custom hover:text-red-500"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -452,9 +432,12 @@ function CreateLeadTaskModal({
           )}
 
           <div className="grid grid-cols-2 gap-3">
+            {/* Subject */}
             <div className="mt-2">
               <FormInput
-                label="Subject"
+                required
+                logo={FileTextIcon}
+                label="Subject :"
                 type="text"
                 className="test-base"
                 onChange={(e) => {
@@ -463,17 +446,21 @@ function CreateLeadTaskModal({
               ></FormInput>
             </div>
 
+            {/* Outcome */}
             <div className="row-span-2">
               <TextAreaInput
+                logo={TargetIcon}
                 cols={5}
                 rows={5}
                 label="Outcome"
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
                 }}
+                 maxLength={500}
               ></TextAreaInput>
             </div>
 
+            {/* End date */}
             <div className="grid grid-cols-4 gap-2">
               <div className="col-span-2">
                 <DatePickerInput
@@ -481,15 +468,16 @@ function CreateLeadTaskModal({
                   onChange={(e) => {
                     setDueDate(e.target.value);
                   }}
+                  logo={Calendar}
                 />
               </div>
 
               <div className="mt-2 col-span-2">
-                <label
-                  htmlFor="endTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  End Time
+                <label htmlFor="endTime" className="block input-label-custom">
+                  <div className="flex gap-2 text-center">
+                    <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                    <span>End Time</span>
+                  </div>
                 </label>
                 <select
                   id="endTime"
@@ -507,78 +495,152 @@ function CreateLeadTaskModal({
                 </select>
               </div>
             </div>
+
+            {/* Description */}
             <div className="col-span-2">
               <TextAreaInput
+                logo={FileText}
                 cols={5}
-                rows={5}
+                rows={4}
                 label="Description"
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
           </div>
 
-          {selectedCompanyUsers.length != 0 && (
-            <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-              Assigned Users
-            </div>
-          )}
+         
+            {/* <div className="relative grid grid-cols-3 justify-center input-label-custom">
+              <div className="flex gap-2 mt-2">
+                <User className="text-blue-600  w-3 h-3 mt-1" />
+                <span>Assign Users : </span>
+              </div>
+
+              <div className="absolute left-28 max-w-32">
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
+                >
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center text-nowrap"
+                  >
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
+                  </span>
+                </Button>
+              </div>
+            </div> */}
+
+            <div className="flex items-center gap-4  mb-0">
+                <label htmlFor="assignUsersBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <User className="text-blue-600 mt-0.5" size={16} />
+                    <span>Assign Users : </span>
+                  </div>
+                </label>
+                <div id="assignUsersBtn" className=" max-w-32 m-0">
+                  {/* <Button
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
+                    </span>
+                  </Button> */}
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
+                >
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center text-nowrap"
+                  >
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
+                  </span>
+                </Button>
+                </div>
+              </div>
+          
 
           {selectedCompanyUsers.length != 0 && (
-            <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-              {selectedCompanyUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
-                >
-                  <div className="flex justify-between">
-                    <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
-                        {user.fullname}
+            <div className="p-1">
+              <span className="caption-custom">Currently assigned users:</span>
+              <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+                {selectedCompanyUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
+                  >
+                    <div className="flex justify-between">
+                      <span className="flex items-center gap-2">
+                        <Users className="h-3 w-3caption-custom rounded-full bg-white" />
+                        <span className="caption-custom">
+                          {user.fullname
+                            ? user.fullname
+                            : user.email || "Unnamed contact"}
+                        </span>
                       </span>
-                    </span>
-                    <Button
-                      size="sm"
-                      type="button"
-                      onClick={() => {
-                        setAssignedTo((prev) =>
-                          prev.filter((id) => id !== user.id)
-                        );
-                        setSelectedCompanyUsers((prev) =>
-                          prev.filter((item) => item.id !== user.id)
-                        );
-                      }}
-                      className="text-gray-600 hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                      <Button
+                        size="sm"
+                        type="button"
+                        onClick={() => {
+                          setAssignedTo((prev) =>
+                            prev.filter((id) => id !== user.id)
+                          );
+                          setSelectedCompanyUsers((prev) =>
+                            prev.filter((item) => item.id !== user.id)
+                          );
+                        }}
+                        className="caption-custom hover:text-red-500"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </form>
 
         {/* Footer Buttons */}
-        <div className="flex justify-center gap-4 mt-6">
-          <div className="max-w-28">
-            <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
-            >
-              <span className="flex gap-2">
-                <UserPlus size={SIZE.TWENTY}></UserPlus>
-                <span>Assign</span>
-              </span>
-            </Button>
-          </div>
-
-          <div className="max-w-28">
-            <Button type="submit" onClick={createLeadTask}>
-              Create Task
-            </Button>
+        <div className="flex w-full justify-center gap-4 mt-6">
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button onClick={handleClose} type="button">
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button type="submit" onClick={createLeadTask}>
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -605,17 +667,11 @@ function CreateLeadTaskModal({
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={false}
         />
       )}
-
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-    </div>
+    </div>,
+    document.body
   );
 }
 

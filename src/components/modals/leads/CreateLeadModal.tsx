@@ -1,10 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Handshake, UserRoundPlus, X } from "lucide-react";
+import {
+  Clock,
+  Handshake,
+  Link,
+  Mail,
+  Phone,
+  Save,
+  User,
+  UserRoundPlus,
+  X,
+} from "lucide-react";
 import {
   MOBILE_NUMBER_VALIDATION,
   NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
@@ -12,11 +21,6 @@ import Button from "../../ui/Button";
 import React, { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
@@ -29,6 +33,10 @@ import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CreateLeadModalProps from "../../../@types/lead-management/CreateLeadModalProps";
 import ApiError from "../../../@types/error/ApiError";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import FormInput from "../../ui/FormInput";
+import { createPortal } from "react-dom";
 
 function CreateLeadModal({
   isOpen,
@@ -40,9 +48,8 @@ function CreateLeadModal({
     email: "",
     mobileNumber: "",
   };
-  const createLeadLabelCss = "text-xs font-medium text-gray-700 block mb-1";
   const createLeadInputTagCss =
-    "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
+    "w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500";
   const { loginStatus } = useLoggedInUserContext();
   const { errors } = useFormValidation(
     initialCreatLeadFormData,
@@ -86,20 +93,6 @@ function CreateLeadModal({
 
   const handleCompanyUserPopUp = () => {
     setOpenPopUpOfCompanyUserModal(true);
-  };
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   //note : these 3 functions that handles changed values from dropdown
@@ -272,17 +265,19 @@ function CreateLeadModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (error.mobileNumber !== "") {
-      showMessageSnackbar({
-        message: "Please enter a valid mobile number.",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please enter a valid mobile number.",
+      //   type: "error",
+      // });
+      toast.error("Please enter a valid mobile number.");
       return;
     }
     if (error.email !== "") {
-      showMessageSnackbar({
-        message: "Please enter a valid email address.",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "Please enter a valid email address.",
+      //   type: "error",
+      // });
+      toast.error("Please enter a valid email address.");
       return;
     }
     const isEmailFilled = createLeadModalFormData.email !== "";
@@ -301,10 +296,11 @@ function CreateLeadModal({
       return;
     }
     if (selectedSource === undefined || selectedStatus === undefined) {
-      showMessageSnackbar({
-        message: "please select source and status",
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: "please select source and status",
+      //   type: "error",
+      // });
+      toast.error("Please select source and status");
       return;
     }
     if (
@@ -342,20 +338,14 @@ function CreateLeadModal({
         })
         .then((response) => {
           if (response.data.status === true) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             // note : this callback will run to refresh the list of aggrid
             onCreateLeadRefreshLeadData!();
             setTimeout(() => {
               onClose!();
             }, NUMBER_VALUES.SNACKBAR_DURATION);
           } else if (response.data.status == false) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "warning",
-            });
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -393,7 +383,6 @@ function CreateLeadModal({
         mobileNumber: "",
       });
 
-      handleCloseSnackbar();
       setShowErrorAtLeadStatus(false);
       setshowErrorAtLeadSource(false);
       //resetting the form data
@@ -407,10 +396,10 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-45 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn px-6 py-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn p-5 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-1">
+        {/* <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <Handshake className="text-blue-500" size={SIZE.TWENTY_FOUR} />
             <h2 className="text-lg font-semibold text-gray-800">
@@ -423,16 +412,32 @@ function CreateLeadModal({
           >
             <X size={SIZE.TWENTY} />
           </button>
-        </div>
+        </div> */}
+        <FormHeader
+          icon={Handshake}
+          onClose={onClose}
+          preText="Create new "
+          userName="Opportunity"
+          description="Fill in the details below to create a new lead."
+        />
 
         {/* Divider */}
-        <div className="border-t border-gray-300"></div>
+        {/* <div className="border-t border-gray-300"></div> */}
 
         {/* Form */}
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
-          <div className="flex flex-col space-y-3">
-            <div className="">
-              <label className={createLeadLabelCss} htmlFor="name">
+          <div className="flex flex-col space-y-1">
+            {/* <div className=""> */}
+            <FormInput
+              label="Name:"
+              logo={User}
+              type="text"
+              name="name"
+              placeholder="Enter Name: "
+              value={createLeadModalFormData.name}
+              onChange={handleCreateLeadModalFormDataChange}
+            />
+            {/* <label className={createLeadLabelCss} htmlFor="name">
                 Name:
               </label>
               <input
@@ -442,24 +447,13 @@ function CreateLeadModal({
                 placeholder="Enter Name: "
                 value={createLeadModalFormData.name}
                 onChange={handleCreateLeadModalFormDataChange}
-              />
-            </div>
-            {/* <FormInput
-              label="Name : "
-              type="text"
-              name="name"
-              placeholder="Enter Name"
-              value={createLeadModalFormData.name}
-              onChange={handleCreateLeadModalFormDataChange}
-            /> */}
-
+              /> */}
+            {/* </div> */}
             {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
             <div className="">
-              <label className={createLeadLabelCss} htmlFor="email">
-                Email:
-              </label>
-              <input
-                className={createLeadInputTagCss}
+              <FormInput
+                label="Email:"
+                logo={Mail}
                 type="email"
                 name="email"
                 placeholder="Enter Email: "
@@ -483,12 +477,10 @@ function CreateLeadModal({
               onBlur={handleBlur}
             /> */}
             <div className="">
-              <label className={createLeadLabelCss} htmlFor="mobileNumber">
-                Mobile Number:
-              </label>
-              <input
+              <FormInput
                 type="text"
-                // pattern="[0-9]{10}"
+                label="Mobile Number:"
+                logo={Phone}
                 className={createLeadInputTagCss}
                 name="mobileNumber"
                 placeholder="Enter Mobile Number: "
@@ -496,47 +488,53 @@ function CreateLeadModal({
                 onBlur={handleBlur}
                 onChange={handleCreateLeadModalFormDataChange}
               />
+              {/* <label className={createLeadLabelCss} htmlFor="mobileNumber">
+                Mobile Number:
+              </label>
+              <input */}
+
+              {/* /> */}
               {error.mobileNumber && (
-                <div className="text-red-500 text-xs">{error.mobileNumber}</div>
+                <div className="caption-custom-inactive">
+                  {error.mobileNumber}
+                </div>
               )}
             </div>
-            {/* <FormInput
-              label="Mobile Number : "
-              type="tel"
-              name="mobileNumber"
-              pattern="[0-9]{10}"
-              placeholder="Enter Phone Number"
-              value={createLeadModalFormData.mobileNumber}
-              onChange={handleCreateLeadModalFormDataChange}
-              onBlur={handleBlur}
-              error={errors.mobileNumber}
-            /> */}
+
             <div>
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
-                <Button onClick={handleCompanyUserPopUp} type="button">
-                  <div className="flex gap-2 items-center whitespace-nowrap">
-                    <UserRoundPlus size={18} />
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCompanyUserPopUp();
+                  }}
+                  type="submit"
+                >
+                  <div className="flex gap-1 items-center whitespace-nowrap">
+                    <UserRoundPlus size={16} />
                     <span>Assign Lead Owner</span>
                   </div>
                 </Button>
 
-                <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
-                  <span className="text-xs font-normal ">Lead Owner :</span>{" "}
+                <span className="caption-custom whitespace-nowrap">
+                  <span className="input-label-custom">Lead Owner :</span>{" "}
                   {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
                   {selectedCompanyUser.fullname || loginStatus.fullName}
                 </span>
               </div>
 
-              <span className=" text-xs text-gray-700 ">
-                <span className="font-medium">Note :</span> If a lead owner is
-                not selected, then lead will be assigned to the lead
-                <span className="font-medium"> Creator</span> by default.
+              <span className="caption-custom">
+                <span className="">Note :</span> If a lead owner is not
+                selected, then lead will be assigned to the lead
+                <span className=""> Creator</span> by default.
               </span>
             </div>
 
             {/* Lead Status */}
             <div className="space-y-1">
               <CustomDropdown
+                logo={Clock}
+                requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
@@ -551,6 +549,8 @@ function CreateLeadModal({
             {/* Lead Source */}
             <div className="space-y-1">
               <CustomDropdown
+                logo={Link}
+                requiredRedDot
                 labelName="Lead Source :"
                 options={leadSource!}
                 onSelect={handleLeadSelectedSource}
@@ -563,27 +563,31 @@ function CreateLeadModal({
             </div>
           </div>
 
-          <div className="flex justify-center px-36 ">
-            <Button type="submit">
-              <span>Create Lead</span>
-            </Button>
+          <div className="flex justify-end ">
+            <div className="flex gap-2">
+              <Button onClick={onClose} type="button">
+                <div className="flex items-center gap-0.5">
+                  <X size={16} />
+                  <span>Cancel</span>
+                </div>
+              </Button>
+              <Button type="submit">
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  <span>Save</span>
+                </div>
+              </Button>
+            </div>
           </div>
         </form>
       </div>
 
-      {/* Snackbar */}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      {openPopUpOfCompanyUserModal && (
-        <div className="fixed inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-            {/* Header with Close Button */}
-            <div className="flex justify-between items-center p-3 border-b border-gray-200">
+      {openPopUpOfCompanyUserModal &&
+        createPortal(
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+              {/* Header with Close Button */}
+              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">
                 Select Company User
               </h3>
@@ -593,19 +597,28 @@ function CreateLeadModal({
               >
                 <X size={20} />
               </button>
-            </div>
-            {/* NOTE : CALL TO THE MODAL COMPONENT */}
-            <div className="p-1">
-              <GetCompanyUsersForLead
-                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
-                }
+            </div> */}
+
+              <FormHeader
+                icon={UserRoundPlus}
+                onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+                preText="Select Company User"
+                description="Select the user to assign him/her as lead owner"
               />
+              {/* NOTE : CALL TO THE MODAL COMPONENT */}
+              <div className="p-1">
+                <GetCompanyUsersForLead
+                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                  handleSelectedCompanyUserChange={
+                    handleSelectedCompanyUserChange
+                  }
+                  isUsedForSettings={false}
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

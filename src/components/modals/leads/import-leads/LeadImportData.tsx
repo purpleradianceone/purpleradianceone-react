@@ -15,16 +15,20 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../../constants/AppConstants";
+import { NUMBER_VALUES, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
+import { LucideImport, Search, X } from "lucide-react";
+import Button from "../../../ui/Button";
 
 const LeadImportData = ({ 
     selectedLeadTag, 
-    getLeadImportTags
+    getLeadImportTags,
+    CancelSelectedLeadTag
  }: { 
     selectedLeadTag: string
     getLeadImportTags : () => Promise<void>
+    CancelSelectedLeadTag : ()=> void
  }) => {
   const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
@@ -212,6 +216,7 @@ const LeadImportData = ({
           setOpenFinalPopup(false);
         // making aggrid table null
           setLeadImportData([])
+          CancelSelectedLeadTag()
         } else {
           showMessageSnackbar({
             message: reposne.data.message,
@@ -246,102 +251,127 @@ const LeadImportData = ({
     setSelectedIds([]);
   }, [selectedLeadTag]);
 
+
   return (
-    <div>
-      <span className="text-sm text-gray-600 block bg-white mb-2">
-        These are the leads from selected tag.
+  <div className="p-4 bg-gray-300 border border-gray-200 rounded-xl shadow-sm">
+    {/* Header */}
+    <div className="flex items-center justify-between mb-4  px-2 py-1 ">
+      <span className="flex items-center gap-2 table-header-custom">
+        These are the leads from selected tag :
+        <span className=" flex gap-1 items-center justify-center input-label-custom-blue bg-blue-0  -blue-00 px-1 py-0.5 rounded-md">
+          {selectedLeadTag}
+         <div className="">
+            <Button className="h-fit w-fit flex items-center justify-center text-gray-700 hover:text-black rounded-sm p-0.5  " onClick={CancelSelectedLeadTag} >
+            <X size={16}/>
+          </Button>
+           
+         </div>
+        </span>
       </span>
 
-      <div className="flex flex-col  mt-2">
-        <div className="flex items-center gap-3 justify-between">
-          <div className="flex items-center gap-3">
-            <button
-
-              disabled={!userHasAccessToUpdateLead }
-              onClick={() => {
-                if (userHasAccessToUpdateLead) {
-                  if (selectedIds.length !== 0) {
-                    updateLeadImport();
-                  }else{
-                    showMessageSnackbar({
-                        message : "Please select at least one lead to delete.",
-                        type : "error"
-                    })
-                  }
-                }
-              }}
-              className="bg-red-600 text-white rounded-md px-2 text-sm p-1"
-            >
-              Delete Record
-            </button>
-
-            <div className="flex items-center justify-center">
-              <input
-                type="text"
-                placeholder="Search by Name, Email, Mobilenumber..."
-                value={searchInput}
-                onChange={handleSearchChange}
-                className="border px-2 py-1 text-sm rounded-md w-80"
-              />
-
-              {responseCame && (
-                <div className=" flex items-center justify-center ">
-                  <LoadingSpinner />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center">
-            <button
-            title="by clicking all Leads From Selected Tag will be moved to the LEADS Table."
-              onClick={() => {
-                setOpenFinalPopup(true);
-              }}
-              className="bg-blue-700 px-3 md:text-sm sm:text-xs  py-1 rounded-md text-white"
-            >
-              Move all leads to lead table
-            </button>
-          </div>
-        </div>
-
-        <div className="h-[80svh] w-svh mt-2">
-          <LeadImportPreSaveDataAgGrid
-            leadImportData={leadImportData}
-            onSelectedRow={handleSelectRow}
-            selectedIds={selectedIds}
-          />
-        </div>
-        <div className="flex justify-end ">
-          <Pagination
-            currentPage={pageNumber}
-            onPageChange={handleOnPageChange}
-            onPageSizeChange={handleOnPageSizeChange}
-            pageSize={pageSize}
-            totalPages={Math.ceil(totalCount / pageSize)}
-          />
-        </div>
-      </div>
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      <FinalConfirmationModal
-      showLoadingSpinner ={showLoadingSpinner}
-        importTag={selectedLeadTag}
-        isOpen={openFinalPopup}
-        message={`This is the final confirmation. All lead data from the selected import tag will be PERMANANTLY moved to the Lead table and this action cannot be undone.`}
-        onCancel={() => {
-          setOpenFinalPopup(false);
+      {/* Move All Button */}
+      <div>
+ <Button
+        type="submit"
+        title="By clicking, all leads from this tag will be moved to the Leads Table."
+        onClick={(e) => {
+          e.preventDefault();
+          setOpenFinalPopup(true);
         }}
-        onSave={handleCreateMoveLeadsToLeadTable}
-      />
-      
+        className="flex items-center  gap-1 bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-white text-sm font-medium shadow-md transition-all"
+      >
+        <LucideImport size={SIZE.SIXTEEN} />
+        Move all Leads To lead data
+      </Button>
+      </div>
+     
     </div>
-  );
+
+    {/* Actions Row */}
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-3">
+        {/* Delete Button */}
+        <Button
+          type="button"
+          disabled={!userHasAccessToUpdateLead}
+          onClick={() => {
+            if (userHasAccessToUpdateLead) {
+              if (selectedIds.length !== 0) {
+                updateLeadImport();
+              } else {
+                showMessageSnackbar({
+                  message: "Please select at least one lead to delete.",
+                  type: "error",
+                });
+              }
+            }
+          }}
+        >
+          Delete Selected
+        </Button>
+
+        {/* Search */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by Name, Email, or Mobile..."
+            value={searchInput}
+            onChange={handleSearchChange}
+            className="border border-gray-300 pl-9 pr-3 py-1.5 caption-custom rounded-lg w-80 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <span className="absolute left-2 top-2.5 text-gray-400">
+            <Search size={16} />
+          </span>
+        </div>
+        {responseCame && (
+          <div className="flex items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* Table */}
+    <div className="h-[75vh] mt-2 border rounded-lg overflow-hidden bg-white shadow">
+      <LeadImportPreSaveDataAgGrid
+        leadImportData={leadImportData}
+        onSelectedRow={handleSelectRow}
+        selectedIds={selectedIds}
+      />
+    </div>
+
+    {/* Pagination */}
+    <div className="flex justify-end mt-3">
+      <Pagination
+        currentPage={pageNumber}
+        onPageChange={handleOnPageChange}
+        onPageSizeChange={handleOnPageSizeChange}
+        pageSize={pageSize}
+        totalPages={Math.ceil(totalCount / pageSize)}
+      />
+    </div>
+
+    {/* Snackbar */}
+    <MessageSnackBar
+      isOpen={messageSnackbar.open}
+      message={messageSnackbar.message}
+      type={messageSnackbar.type}
+      onClose={handleCloseSnackbar}
+      duration={NUMBER_VALUES.SNACKBAR_DURATION}
+    />
+
+    {/* Confirmation Modal */}
+    <FinalConfirmationModal
+      showLoadingSpinner={showLoadingSpinner}
+      importTag={selectedLeadTag}
+      isOpen={openFinalPopup}
+      message={`⚠️ This is the final confirmation. All leads from "${selectedLeadTag}" will be PERMANENTLY moved to the Lead table. This action cannot be undone.`}
+      onCancel={() => setOpenFinalPopup(false)}
+      onSave={handleCreateMoveLeadsToLeadTable}
+    />
+  </div>
+);
+
 };
 
 export default LeadImportData;

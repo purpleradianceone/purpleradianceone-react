@@ -14,8 +14,16 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
-function LeadManagement() {
+function LeadManagement({
+  isUsedInLeadModule,
+  handleRowSelectedForShowAccountLead,
+
+} :{isUsedInLeadModule : boolean;
+    handleRowSelectedForShowAccountLead? : (rowData: LeadDataProps | any) => void;
+}) {
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [leadData, setLeadData] = useState<LeadDataProps[]>([]);
@@ -37,6 +45,7 @@ function LeadManagement() {
     null
   );
 
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const {
     currentPage,
@@ -72,7 +81,7 @@ function LeadManagement() {
 
   const getLeadsData = async () => {
     const offset = (currentPage - 1) * pageSize;
-    
+
     const effectiveDateRangeId = dateRangeId;
 
     //NOTE : need to work on this
@@ -116,8 +125,8 @@ function LeadManagement() {
             leadSourceId: item.lead_source_id,
             leadStatus: item["Lead Status"],
             leadStatusId: item.lead_status_id,
-            updatedBy : item.updatedby,
-            updatedOn : item.updatedon,
+            updatedBy: item.updatedby,
+            updatedOn: item.updatedon,
           })
         );
         setLeadData(formattedData);
@@ -271,45 +280,55 @@ function LeadManagement() {
   }, [userHasAccessToViewLead]);
 
   return (
-    <div className="w-full">
-      {userHasAccessToViewLead ? (
-        <LeadManagementList
-          handleAddLead={handleAddLead}
-          handleSearchOption={{
-            handleSearchParameterChange,
-            handleDateRangeIdChange: handleDatePageIdChange,
-          }}
-          leadData={leadData}
-          onEndDateChange={handleEndDateChange}
-          onStartDateChange={handleStartDateChange}
-          paginationData={{
-            selectedPageSize: handlePageSizeChange,
-            currentPage,
-            handlePageChange,
-            totalPages,
-            pageSize,
-          }}
-          handleSelectedCompanyUserCheckBoxChange={
-            handleSelectedCompanyUserCheckBoxChange
-          }
-          persistedSelectedUserId={persistedSelectedUserId}
-          selectedLeadOwner={selectedCompanyUser}
-          leadStatus={leadStatus!}
-          handleLeadSelectedStatus={handleLeadSelectedStatus}
-          leadSource={leadSource!}
-          handleLeadSelectedSource={handleLeadSelectedSource}
-        />
-      ) : (
-        <div className="flex-none mx-96 mt-14">
-          <AccessDeniedPopup
-            isOpen={accessDeniedPopUpOpen}
-            onClose={() => {
-              setAccessDeniedPopUpOpen(false);
-              window.history.back();
+    <div className="w-full ">
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {userHasAccessToViewLead ? (
+          <LeadManagementList
+          // Note : differentaition done because this module is used in account-lead and for lead module also
+          isUsedInLeadModule={isUsedInLeadModule}
+          handleRowSelectedForShowAccountLead={handleRowSelectedForShowAccountLead}
+            handleAddLead={handleAddLead}
+            handleSearchOption={{
+              handleSearchParameterChange,
+              handleDateRangeIdChange: handleDatePageIdChange,
             }}
+            leadData={leadData}
+            onEndDateChange={handleEndDateChange}
+            onStartDateChange={handleStartDateChange}
+            paginationData={{
+              selectedPageSize: handlePageSizeChange,
+              currentPage,
+              handlePageChange,
+              totalPages,
+              pageSize,
+            }}
+            handleSelectedCompanyUserCheckBoxChange={
+              handleSelectedCompanyUserCheckBoxChange
+            }
+            persistedSelectedUserId={persistedSelectedUserId}
+            selectedLeadOwner={selectedCompanyUser}
+            leadStatus={leadStatus!}
+            handleLeadSelectedStatus={handleLeadSelectedStatus}
+            leadSource={leadSource!}
+            handleLeadSelectedSource={handleLeadSelectedSource}
           />
-        </div>
-      )}
+        ) : (
+          <div className="flex-none mx-96 mt-14">
+            <AccessDeniedPopup
+              isOpen={accessDeniedPopUpOpen}
+              onClose={() => {
+                setAccessDeniedPopUpOpen(false);
+                window.history.back();
+              }}
+            />
+          </div>
+        )}
+      </motion.section>
     </div>
   );
 }

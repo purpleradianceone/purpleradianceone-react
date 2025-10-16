@@ -33,17 +33,18 @@ function Pagination({
   const sizeArray=rowsInGridDropdownOptions
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <label htmlFor="pageSize" className="text-sm">Page Size</label>
+      <label htmlFor="pageSize" className="input-label-custom">Page Size</label>
       <select
         id="pageSize"
         value={pageSize}
         onChange={handlePageSizeChange}
         style={{
-          padding: "3px 6px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "4px",
-          fontSize: "0.85rem",
+          // fontSize: "0.80rem",
         }}
+        className="input-label-custom"
       >
         {sizeArray.map((data) => (
           <option key={data.id} value={data.rowsInGrid}>
@@ -55,32 +56,35 @@ function Pagination({
         onClick={handlePreviousPage}
         disabled={currentPage === 1}
         style={{
-          padding: "2px 2px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "6px",
           backgroundColor: currentPage === 1 ? COLORS.WHITE_SMOKE : COLORS.WHITE,
           cursor: currentPage === 1 ? "not-allowed" : "pointer",
-          fontSize: "0.85rem",
+          // fontSize: "0.85rem",
         }}
+        className="input-label-custom"
       >
-        <ChevronLeft />
+        <ChevronLeft size={20} />
       </button>
-      <span style={{ fontSize: "0.85rem" }}>
+      <span className="input-label-custom">
         Page{" "}
         <input
           type="number"
+   
           value={currentPage}
           onChange={(e) => {
             onPageChange(Number(e.target.value));
           }}
           style={{
-            width: "40px",
+            width: "50px",
             textAlign: "center",
-            padding: "3px",
+            padding: "1px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            fontSize: "0.85rem",
+            // fontSize: "0.85rem",
           }}
+          className="input-label-custom"
         />{" "}
         of {Number(totalPages)}
       </span>
@@ -88,15 +92,16 @@ function Pagination({
         onClick={handleNextPage}
         disabled={currentPage === totalPages}
         style={{
-          padding: "2px 2px",
+          padding: "1px 1px",
           border: "1px solid #ccc",
           borderRadius: "6px",
           backgroundColor: currentPage === totalPages ? COLORS.WHITE_SMOKE : COLORS.WHITE,
           cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-          fontSize: "0.85rem",
+          // fontSize: "0.85rem",
         }}
+        className="input-label-custom"
       >
-        <ChevronRight />
+        <ChevronRight size={20}/>
       </button>
     </div>
   );

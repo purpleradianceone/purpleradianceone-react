@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 type TextAreaInputProps = {
     label : string,
     id? : string,
@@ -15,6 +17,7 @@ type TextAreaInputProps = {
     maxLength? : number,
     error? : string;
     required? : boolean;
+    logo? : LucideIcon;
 }
 
 export default TextAreaInputProps;

@@ -1,6 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contact2Icon, UserPlus, Users, X } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Contact,
+  Contact2,
+  Edit,
+  FileText,
+  FileTextIcon,
+  Save,
+  TargetIcon,
+  Text,
+  User,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Button from "../../../ui/Button";
 import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
@@ -14,26 +29,20 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../../ui/MessageSnackbar";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import { format, parse } from "date-fns";
 import { createPortal } from "react-dom";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
+import toast from "react-hot-toast";
+import FormHeader from "../../../ui/FormHeader";
+import ToggleButton from "../../../ui/ToggleButton";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -78,7 +87,9 @@ function UpdateLeadTaskModal({
     leadTask.leadTaskStageId
   );
   const [leadData, setLeadData] = useState<Lead>();
-  const [assignedTo, setAssignedTo] = useState<number[]>(leadTask.assignedToId);
+  const [assignedTo, setAssignedTo] = useState<number[]>(
+    leadTask.assignedToId!
+  );
   const [physicalMeetingAddress, setPhysicalMeetingAddress] =
     useState<string>("");
   const [resultOutcome, setResultOutcome] = useState<string>(
@@ -98,25 +109,12 @@ function UpdateLeadTaskModal({
   const [selectedCompanyUsers, setSelectedCompanyUsers] = useState<
     CompanyUsersSearchProps[]
   >([]);
-  const [isActive , setIsActive] = useState<boolean>(leadTask.isActive);
-
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  const [isActive, setIsActive] = useState<boolean>(leadTask.isActive);
 
   useEffect(() => {
     const leadDetailsJsonData = JSON.parse(leadTask.leadActivityDetails);
-    if (leadDetailsJsonData.leadContact) {
+    if(leadDetailsJsonData){
+        if (leadDetailsJsonData.leadContact) {
       const leadContacts = leadDetailsJsonData.leadContact;
 
       if (leadContacts.length !== 0) {
@@ -132,6 +130,8 @@ function UpdateLeadTaskModal({
       const leadAddress = leadDetailsJsonData.address;
       setPhysicalMeetingAddress(leadAddress);
     }
+    }
+    
 
     if (parsedDate instanceof Date && !isNaN(parsedDate.getTime())) {
       setDueDate(format(parsedDate, "yyyy-MM-dd"));
@@ -198,7 +198,7 @@ function UpdateLeadTaskModal({
   };
 
   const generateTaskDetailsJson = () => {
-    if (leadActivityId !== 3) {
+    if (leadActivityId !== 3 && leadActivityId !== 4) {
       const taskDetailsWithContact = {
         leadContact: leadContactDataSelectedArray,
       };
@@ -212,72 +212,66 @@ function UpdateLeadTaskModal({
     }
   };
 
+  useEffect(()=> {
+    console.log("intial values of json");
+    console.log(leadTask.leadActivityDetails)
+  },[])
+
   const UpdateLeadTask = async (event: React.FormEvent) => {
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();
+    console.log(jsonData);
+    
+
+    
 
     const originalLeadActivityDetailsString = leadTask.leadActivityDetails;
 
-// If leadTask.leadActivityDetails is an object (after parsing in useEffect):
-// This is safer if you've already parsed it and use the parsed object
-const originalLeadDetailsObject = JSON.parse(originalLeadActivityDetailsString);
-const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+    // // If leadTask.leadActivityDetails is an object (after parsing in useEffect):
+    // // This is safer if you've already parsed it and use the parsed object
+    const originalLeadDetailsObject = JSON.parse(
+      originalLeadActivityDetailsString
+    );
+    const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
+    console.log("second stringfy")
+    console.log(stringifiedOriginalData);
 
     if (leadActivityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Activity",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Activity");
       return;
     } else if (leadTaskPriorityId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Priority",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Priority");
       return;
     } else if (leadTaskStageId === 0) {
-      showMessageSnackbar({
-        message: "Please Select Lead Task Stage",
-        type: "error",
-      });
+      toast.error("Please Select Lead Task Priority");
       return;
     } else if (subject === "") {
-      showMessageSnackbar({
-        message: "Please provide Subject To Task",
-        type: "error",
-      });
+      toast.error("Please provide Subject To Task");
+      return;
+    } else if (dueDate === "") {
+      toast.error("Please select Due Date for Task");
+      return;
+    } else if (dueTime === "") {
+      toast.error("Please select Due Time for Task");
+      return;
+    } else if (
+      subject === leadTask.subject &&
+      description === leadTask.description &&
+      leadTaskStageId === leadTask.leadTaskStageId &&
+      leadTaskPriorityId === leadTask.leadTaskPriorityId &&
+      dueDate === dueDateValue &&
+      dueTime === dueTimeValue &&
+      resultOutcome === leadTask.resultOutcome &&
+      assignedTo === leadTask.assignedToId &&
+      jsonData === stringifiedOriginalData
+    ) {
+      toast.error("Not made changes to task");
       return;
     }
-    else if (dueDate === "") {
-      showMessageSnackbar({
-        message: "Please select Due Date for Task",
-        type: "error",
-      });
+    else if (assignedTo.length === 0) {
+      toast.error("You haven't assigned a task yet, please assign it first");
       return;
     }
-    else if(dueTime === ""){
-       showMessageSnackbar({
-        message: "Please select Due Time for Task",
-        type: "error",
-      });
-      return;
-    }
-    else if(
-      (subject === leadTask.subject) && 
-      (description === leadTask.description) &&
-      (leadTaskStageId === leadTask.leadTaskStageId) &&
-      (leadTaskPriorityId === leadTask.leadTaskPriorityId) &&
-      (dueDate === dueDateValue) &&
-      (dueTime === dueTimeValue) &&
-      (resultOutcome === leadTask.resultOutcome) &&
-      (assignedTo === leadTask.assignedToId) &&
-      (jsonData === stringifiedOriginalData)
-    ){
-      showMessageSnackbar({message : "Not made changes to task", type : "error"});
-      return;
-    }
-
-    
 
     const updateLeadTaskPostData = {
       company_id: loginStatus.companyId,
@@ -289,7 +283,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
       result_outcome: resultOutcome,
       assignedto: assignedTo,
       due_date_time: `${dueDate} ${dueTime}:00`,
-      lead_activity_details: jsonData,
+      lead_activity_details: leadActivityId !== 4 ? jsonData : leadTask.leadActivityDetails,
       isactive: isActive,
       updatedby_id: loginStatus.id,
     };
@@ -301,19 +295,13 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             handleLeadTaskUpdate();
             setTimeout(() => {
               handleClose(false);
             }, 2000);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            toast.error(response.data.message);
           }
         }
       })
@@ -331,10 +319,10 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
 
   const getComapnyUsers = async () => {
     setSelectedCompanyUsers([]);
-    for (let i = 0; i < leadTask.assignedToId.length; i++) {
+    for (let i = 0; i < leadTask.assignedToId!.length; i++) {
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
-        id: leadTask.assignedToId[i],
+        id: leadTask.assignedToId![i],
         search_company_specific_date_range_id: 0,
         requestedby: loginStatus.id,
       };
@@ -345,10 +333,9 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
         })
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-            response.data.map((res : any) => {
-                    setSelectedCompanyUsers((prev) => [...prev, res]);
-            })
-            
+            response.data.map((res: any) => {
+              setSelectedCompanyUsers((prev) => [...prev, res]);
+            });
           }
         })
         .catch(async (error) => {
@@ -365,7 +352,9 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
   };
   const timeOptions = generateTimeOptions();
 
-  const handleIsActiveCheckboxChange = async(event : React.ChangeEvent<HTMLInputElement> ) => {
+  const handleIsActiveCheckboxChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { checked } = event.target;
 
     const jsonData = generateTaskDetailsJson();
@@ -392,20 +381,11 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             setIsActive(checked);
             handleLeadTaskUpdate();
-            // setTimeout(() => {
-            //   handleClose(false);
-            // }, 2000);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            toast.error(response.data.message);
           }
         }
       })
@@ -419,8 +399,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
           }
         }
       });
-
-  }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -434,12 +413,11 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return (
-    createPortal(
-      <div className="fixed inset-0 z-10 bg-black bg-opacity-20 flex justify-center items-center  p-2 sm:p-6">
-      <div className="bg-white mt-14 min-h-[50vh] rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
+  return createPortal(
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex justify-center items-center  p-11  ">
+      <div className="bg-white mt-14 min-h-[60vh] rounded-lg w-full max-w-5xl max-h-[85vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
         {/* Header */}
-        <div className="border-b pb-1 mb-4 flex justify-between items-center">
+        {/* <div className="border-b pb-1 mb-4 flex justify-between items-center">
           <h2 className="text-base font-semibold text-gray-800">Update Task</h2>
 
           <X
@@ -448,21 +426,70 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
             }}
             className="text-gray-400 hover:text-gray-600 cursor-pointer"
           />
-        </div>
-
+        </div> */}
+        {/* Form header */}
+        <FormHeader
+          icon={Edit}
+          onClose={() => {
+            handleClose(false);
+          }}
+          preText="Update task"
+          description="Modify task details to keep information accurate and up to date."
+        />
         {/* Form Grid */}
         <form className="space-y-2">
           <div className="grid grid-cols-3 gap-3">
+            <div className="flex items-center col-span-3 justify-end gap-3 py-1  border-blue-00">
+              {/* <label
+                htmlFor="isActive"
+                className="text-lg text-gray-700 cursor-pointer"
+              >
+                Active
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={isActive}
+                  onChange={handleIsActiveCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
+              </label> */}
+
+              {/* new */}
+              <span className="input-label-custom">Status :</span>
+              {/* <label className="inline-flex items-center cursor-pointer relative self-end">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={isActive}
+                  onChange={handleIsActiveCheckboxChange}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+              </label> */}
+              <ToggleButton
+                name="isActive"
+                checked={isActive}
+                onToggle={handleIsActiveCheckboxChange}
+              />
+            </div>
+            {/* type */}
             <CustomDropdown
+              requiredRedDot
+              logo={Text}
               readOnly={true}
-              labelName="Type"
+              labelName="Type: "
               onSelect={(e) => {
                 if (e !== 4) {
                   if (e) {
                     setLeadActivityId(e);
-                  }
-                  else{
-                     setLeadActivityId(0);
+                  } else {
+                    setLeadActivityId(0);
                   }
                 } else {
                   sessionStorage.setItem("leadData", JSON.stringify(leadData));
@@ -472,50 +499,83 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               selectedValue={leadTask.leadActivityId}
               options={leadActivity}
             ></CustomDropdown>
+
+            {/* Priority */}
             <CustomDropdown
-              labelName="Priority"
+              requiredRedDot
+              logo={Text}
+              labelName="Priority: "
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskPriorityId(e);
-                }
-                else{
-                   setLeadTaskPriorityId(0);
+                } else {
+                  setLeadTaskPriorityId(0);
                 }
               }}
               options={leadTaskPriority}
               selectedValue={leadTask.leadTaskPriorityId}
             ></CustomDropdown>
+
+            {/* Stage */}
             <CustomDropdown
-              labelName="Stage"
+              requiredRedDot
+              logo={Text}
+              labelName="Stage: "
               onSelect={(e) => {
                 if (e) {
                   setLeadTaskStageId(e);
-                }
-                else{
+                } else {
                   setLeadTaskStageId(0);
                 }
               }}
               options={leadTaskStage}
               selectedValue={leadTask.leadTaskStageId}
             ></CustomDropdown>
-            {leadActivityId !== 3 && (
-              <div className="flex justify-between col-span-3 mb-0">
+            {leadActivityId !== 3 && leadActivityId !== 8 && (
+              // <div className="flex justify-between col-span-3 mb-0">
+              //   <label
+              //     htmlFor="phoneCallBtn"
+              //     className="block text-sm font-medium text-gray-700"
+              //   >
+              //     Select Lead Contact
+              //   </label>
+              //   <div id="phoneCallBtn" className="max-w-20 m-0">
+              //     <Button
+              //       type="button"
+              //       onClick={() => {
+              //         setIsAddCompanyLeadContactModalOpen(true);
+              //       }}
+              //     >
+              //       <span className="flex gap-2">
+              //         <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
+              //         <span>Select</span>
+              //       </span>
+              //     </Button>
+              //   </div>
+              // </div>
+
+              // Select lead contact
+              <div className="flex items-center gap-4  mb-0">
                 <label
                   htmlFor="phoneCallBtn"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block input-label-custom"
                 >
-                  Select Lead Contact
+                  <div className="flex gap-2">
+                    <Contact2 className="text-blue-600 mt-0.5" size={16} />
+                    <span>Select Lead Contact :</span>
+                  </div>
                 </label>
-                <div id="phoneCallBtn" className="max-w-20 m-0">
+                <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-                    type="button"
-                    onClick={() => {
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
-                    <span className="flex gap-2">
-                      <Contact2Icon size={SIZE.TWENTY}></Contact2Icon>
-                      <span>Select</span>
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
                     </span>
                   </Button>
                 </div>
@@ -534,11 +594,11 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               </div>
             )}
           </div>
-            {leadContactDataSelectedArray.length != 0 && (
-          <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-                Selected Lead Contacts
-              </div>
-            )}
+          {leadContactDataSelectedArray.length != 0 && (
+            <div className="grid grid-cols-3 input-label-custom">
+              Selected Lead Contacts
+            </div>
+          )}
           {leadContactDataSelectedArray.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
               {leadContactDataSelectedArray.map((contact) => (
@@ -549,8 +609,8 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
-                        {contact.name}
+                      <span className="caption-custom">
+                        {contact.name || contact.email || contact.mobileNumber}
                       </span>
                     </span>
                     <Button
@@ -563,7 +623,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
                           prev.filter((item) => item.id !== contact.id)
                         );
                       }}
-                      className="text-gray-600 hover:text-red-500"
+                      className="caption-custom hover:text-red-500"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -574,9 +634,12 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
           )}
 
           <div className="grid grid-cols-2 gap-3">
+            {/* Subject */}
             <div className="mt-2">
               <FormInput
-                label="Subject"
+                label="Subject: "
+                required
+                logo={FileTextIcon}
                 type="text"
                 value={subject}
                 defaultValue={leadTask.subject}
@@ -587,35 +650,44 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
               ></FormInput>
             </div>
 
+            {/* outcome */}
             <div className="row-span-2">
               <TextAreaInput
+                logo={TargetIcon}
                 cols={5}
                 rows={5}
-                label="Outcome"
+                label="Outcome: "
                 defaultValue={resultOutcome}
                 onChange={(e) => {
                   setResultOutcome(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
 
             <div className="grid grid-cols-4 gap-2">
+              {/* end date */}
               <div className="col-span-2">
                 <DatePickerInput
-                  label="End Date"
+                  label="End Date: "
                   defaultValue={dueDate}
                   onChange={(e) => {
                     setDueDate(e.target.value);
                   }}
+                  logo={Calendar}
                 />
               </div>
 
+              {/* edn time */}
               <div className="mt-2 col-span-2">
                 <label
                   htmlFor="endTime"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  End Time
+                  <div className="flex gap-2 text-center">
+                    <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
+                    <span>End Time</span>
+                  </div>
                 </label>
                 <select
                   id="endTime"
@@ -636,46 +708,88 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
             </div>
 
             <div className="col-span-2">
+              {/* description */}
               <TextAreaInput
+                logo={FileText}
                 cols={5}
-                rows={5}
-                label="Description"
+                rows={4}
+                label="Description: "
                 defaultValue={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
                 }}
+                maxLength={500}
               ></TextAreaInput>
             </div>
-            <div className="flex items-center col-span-2 justify-between py-1 border-b border-blue-100">
-              <label
-                htmlFor="isActive"
-                className="text-lg text-gray-700 cursor-pointer"
-              >
-                Active
-              </label>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  name="isActive"
-                  checked={isActive}
-                  onChange={handleIsActiveCheckboxChange}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-200 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-300 peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
+            {/* status  */}
           </div>
-            
-            {selectedCompanyUsers.length != 0 && (
-          <div className="grid grid-cols-3 text-sm font-medium text-gray-700">
-                Assigned Users
+          {/* <div className=" flex w-28 items-center text-nowrap gap-6">
+            <div className="flex gap-2 text-center">
+              <User className="text-blue-600 w-3 h-3 justify-center mt-1" />
+              <span>Assign Users : </span>
+            </div>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsAssignUsersModalOpen(true);
+              }}
+            >
+              <span className="flex gap-2">
+                <UserPlus size={14}></UserPlus>
+                <span>Assign Users</span>
+              </span>
+            </Button>
+          </div> */}
+          
+            <div className="flex items-center gap-4  mb-0">
+                <label htmlFor="assignUsersBtn" className="input-label-custom">
+                  <div className="flex gap-2">
+                    <User className="text-blue-600 mt-0.5" size={16} />
+                    <span>Assign Users : </span>
+                  </div>
+                </label>
+                <div id="assignUsersBtn" className=" max-w-32 m-0">
+                  {/* <Button
+
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="flex gap-1 text-nowrap ">
+                      <Contact size={SIZE.TWENTY}></Contact>
+                      <span>lead contact</span>
+                    </span>
+                  </Button> */}
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAssignUsersModalOpen(true);
+                  }}
+                >
+                  <span
+                    title="Assign user to this task"
+                    className="flex  text-center text-nowrap"
+                  >
+                    <span className="flex gap-0.5 justify-center">
+                      <UserPlus size={16} className="mt-0.5"></UserPlus>
+                      <span>Assign Users</span>
+                    </span>
+                  </span>
+                </Button>
+                </div>
               </div>
-            )}
+
           {selectedCompanyUsers.length != 0 && (
-            
+            <div className="grid grid-cols-3 input-label-custom">
+              Assigned Users
+            </div>
+          )}
+          {selectedCompanyUsers.length != 0 && (
             <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-              
               {selectedCompanyUsers.map((user) => (
                 <div
                   key={user.id}
@@ -683,10 +797,8 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
                 >
                   <div className="flex justify-between">
                     <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-gray-600 rounded-full bg-white" />
-                      <span className="text-xs text-gray-600">
-                        {user.fullname}
-                      </span>
+                      <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
+                      <span className="caption-custom">{user.fullname}</span>
                     </span>
                     <Button
                       size="sm"
@@ -699,7 +811,7 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
                           prev.filter((item) => item.id !== user.id)
                         );
                       }}
-                      className="text-gray-600 hover:text-red-500"
+                      className="caption-custom hover:text-red-500"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -712,21 +824,28 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
 
         {/* Footer Buttons */}
         <div className="flex justify-center gap-4 mt-6">
-          <div className="max-w-28">
-            <Button
-              type="button"
-              onClick={() => setIsAssignUsersModalOpen(true)}
-            >
-              <span className="flex gap-2">
-                <UserPlus size={SIZE.TWENTY}></UserPlus>
-                <span>Assign</span>
-              </span>
-            </Button>
-          </div>
-          <div className="max-w-28">
-            <Button type="submit" onClick={UpdateLeadTask}>
-              Update Task
-            </Button>
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button
+                onClick={() => {
+                  handleClose(false);
+                }}
+                type="button"
+              >
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button type="submit" onClick={UpdateLeadTask}>
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -753,19 +872,19 @@ const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
           handleCompanyLeadContactCheckBoxChange={
             handleCompanyLeadContactCheckBoxChange
           }
+          isUsedForMeetings={false}
         />
       )}
 
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>,
     document.body
-    )
   );
 }
 

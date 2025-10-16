@@ -2,7 +2,7 @@ import ProductTax from "../products/ProductTaxManagementProps"
 
 type ProductTaxManagementAgGridProps = {
     productTax: ProductTax[]
-    handleCompanyProductTaxChange : (status : boolean) => void,
+    handleCompanyProductTaxChange : () => void,
 }
 
 export default ProductTaxManagementAgGridProps

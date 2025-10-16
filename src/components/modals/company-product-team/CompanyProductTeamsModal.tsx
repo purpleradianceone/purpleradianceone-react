@@ -1,12 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditIcon, Network, X } from "lucide-react";
+import { EditIcon, Network } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
-import {
-  NUMBER_VALUES,
-  SIZE,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import CompanyProductTeamsAgGrid from "../../ag-grid/CompanyProductTeamsAgGrid";
 import TeamManagementAgGrid from "../../ag-grid/TeamManagementAgGrid";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -19,15 +15,12 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyTeamSearchProps from "../../../@types/team-management/CompanyTeamListProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import Button from "../../ui/Button";
-import { CLASS_NAMES } from "../../../constants/ClassNames";
 import CompanyProductTeamsModalProps from "../../../@types/modal/CompanyProductTeamsModalProps";
 import SearchInput from "../../ui/SearchInput";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
@@ -90,21 +83,22 @@ function CompanyProductTeamsModal({
   const [companyProductTeamAddCount, setCompanyProductTeamAddCount] =
     useState<number>(0);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleMessageSnackbarClose = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
   const handleCompanyProductTeamUpdate = (message: string) => {
-    showMessageSnackbar({ message: message, type: "success" });
+    // showMessageSnackbar({ message: message, type: "success" });
+    toast.success(message);
   };
 
   const handleAddCompanyProductTeamChange = () => {
@@ -147,10 +141,11 @@ function CompanyProductTeamsModal({
         )
         .then((response) => {
           if (response.data.status && response.data) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "success",
+            // });
+            toast.success(response.data.message);
             const updatedCompanyTeams = companyTeamsNotAssignedList.filter(
               (team) => !addCompanyProductTeamArray.includes(team.id)
             );
@@ -161,10 +156,11 @@ function CompanyProductTeamsModal({
             setIsCompanyProductTeamsLoading(false);
             setAddCompanyProductTeamArray([]);
           } else if (!response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            // showMessageSnackbar({
+            //   message: response.data.message,
+            //   type: "error",
+            // });
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -245,7 +241,7 @@ function CompanyProductTeamsModal({
         if (newCompanyProductTeams.length === 0) {
           setCompanyProductTeamsHasMore(false);
         }
-        if(companyProductTeamsSearchParameter.length === 0){
+        if (companyProductTeamsSearchParameter.length === 0) {
           newCompanyProductTeams.map((res: any) => {
             setCompanyProductsTeamsList((prev) => [
               ...prev,
@@ -263,23 +259,21 @@ function CompanyProductTeamsModal({
               },
             ]);
           });
-        }
-        else if(companyProductTeamsSearchParameter.length > 0){
+        } else if (companyProductTeamsSearchParameter.length > 0) {
           const transformedData = newCompanyProductTeams.map((res: any) => ({
             count: res.count,
-                id: res.id,
-                companyProductId: res.company_product_id,
-                productName: res["Product Name"],
-                productCode: res["Product Code"],
-                companyTeamId: res.company_team_id,
-                teamName: res["Team Name"],
-                isActive: res.isactive,
-                createdBy: res.createdby,
-                createdOn: res.createdon,
+            id: res.id,
+            companyProductId: res.company_product_id,
+            productName: res["Product Name"],
+            productCode: res["Product Code"],
+            companyTeamId: res.company_team_id,
+            teamName: res["Team Name"],
+            isActive: res.isactive,
+            createdBy: res.createdby,
+            createdOn: res.createdon,
           }));
           setCompanyProductsTeamsList(transformedData);
         }
-        
 
         if (
           companyProductTeamsGridApiRef.current &&
@@ -328,8 +322,10 @@ function CompanyProductTeamsModal({
       }
     }
   };
-  
-  const fetchCompanyTeamsNotAssigned = async (companyTeamsNotAssignedSearchParameter : string) => {
+
+  const fetchCompanyTeamsNotAssigned = async (
+    companyTeamsNotAssignedSearchParameter: string
+  ) => {
     if (
       !userHasAccessToViewTeamManagement ||
       isCompanyTeamsNotAssignedLoading ||
@@ -339,7 +335,8 @@ function CompanyProductTeamsModal({
       return;
 
     try {
-      companyTeamsNotassignedSearchParameterRef.current = companyTeamsNotAssignedSearchParameter;
+      companyTeamsNotassignedSearchParameterRef.current =
+        companyTeamsNotAssignedSearchParameter;
       companyTeamsNotAssignedFetchingRef.current = true;
       setIsCompanyTeamsNotAssignedLoading(true);
 
@@ -356,9 +353,12 @@ function CompanyProductTeamsModal({
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
         company_product_id: companyProduct.id,
-        isactive: null,
+        isactive: true,
         limit: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40,
-        offset: companyTeamsNotAssignedSearchParameter.length > 0 ? 0 : 40 * companyTeamsNotAssignedFetchedCount,
+        offset:
+          companyTeamsNotAssignedSearchParameter.length > 0
+            ? 0
+            : 40 * companyTeamsNotAssignedFetchedCount,
         searcsearch_company_specific_date_range_id: 0,
         search_parameter: companyTeamsNotAssignedSearchParameter,
         search_parameter_date: "",
@@ -371,19 +371,19 @@ function CompanyProductTeamsModal({
         }
       );
       if (response.data) {
-        if(companyTeamsNotAssignedSearchParameter.length === 0){
+        if (companyTeamsNotAssignedSearchParameter.length === 0) {
           setCompanyTeamsNotAssignedFetchedCount(
             companyTeamsNotAssignedFetchedCount + 1
           );
         }
-        
+
         const newcompanyTeams = response.data;
 
         if (newcompanyTeams.length === 0) {
           setCompanyTeamsNotAssignedHasMore(false);
           return;
         }
-        if(companyTeamsNotAssignedSearchParameter.length === 0){
+        if (companyTeamsNotAssignedSearchParameter.length === 0) {
           newcompanyTeams.map((team: any) => {
             setCompanyTeamsNotAssignedList((prev) => [
               ...prev,
@@ -399,30 +399,22 @@ function CompanyProductTeamsModal({
               },
             ]);
           });
-        }
-        else if(companyTeamsNotAssignedSearchParameter.length > 0){
-          const transformedData : CompanyTeamSearchProps[]  = newcompanyTeams.map((team: any) => ({
-                count: team.count,
-                id: team.id,
-                companyId: team.company_id,
-                name: team.name,
-                description: team.description,
-                isActive: team.isactive,
-                createdBy: team.createdby,
-                createdOn: team.createdon,
-          }));
+        } else if (companyTeamsNotAssignedSearchParameter.length > 0) {
+          const transformedData: CompanyTeamSearchProps[] = newcompanyTeams.map(
+            (team: any) => ({
+              count: team.count,
+              id: team.id,
+              companyId: team.company_id,
+              name: team.name,
+              description: team.description,
+              isActive: team.isactive,
+              createdBy: team.createdby,
+              createdOn: team.createdon,
+            })
+          );
 
           setCompanyTeamsNotAssignedList(transformedData);
         }
-        
-        // "count": 25,
-        // "id": 36,
-        // "company_id": 1,
-        // "name": "Thirty Seven",
-        // "description": "This IS thirty seven team",
-        // "isactive": true,
-        // "createdby": "PurpleRadiance Pvt LTD",
-        // "createdon": "Mar 17, 2025"
 
         // Restore scroll position after data update
         if (
@@ -457,21 +449,19 @@ function CompanyProductTeamsModal({
         }
       }
     } finally {
-      if(companyTeamsNotAssignedSearchParameter.length > 0){
+      if (companyTeamsNotAssignedSearchParameter.length > 0) {
         setIsCompanyTeamsNotAssignedLoading(false);
         companyTeamsNotAssignedFetchingRef.current = false;
         setCompanyTeamsNotAssignedHasMore(true);
-        if(companyTeamsNotassignedSearchParameterRef.current.length === 1){
+        if (companyTeamsNotassignedSearchParameterRef.current.length === 1) {
           setCompanyTeamsNotAssignedFetchedCount(0);
           companyProductTeamsGridApiRef.current = null;
-      companyProductTeamsLastScrollPositionRef.current = 0;
+          companyProductTeamsLastScrollPositionRef.current = 0;
         }
-      }
-      else if(companyTeamsNotAssignedSearchParameter.length === 0){
+      } else if (companyTeamsNotAssignedSearchParameter.length === 0) {
         setIsCompanyTeamsNotAssignedLoading(false);
         companyTeamsNotAssignedFetchingRef.current = false;
       }
-      
     }
   };
 
@@ -491,7 +481,7 @@ function CompanyProductTeamsModal({
 
     if (
       totalRowCount &&
-      lastVisibleRow >= companyTeamsNotAssignedList.length - 1 && 
+      lastVisibleRow >= companyTeamsNotAssignedList.length - 1 &&
       companyTeamsNotassignedSearchParameterRef.current.length === 0
     ) {
       fetchCompanyTeamsNotAssigned("");
@@ -586,18 +576,18 @@ function CompanyProductTeamsModal({
       setCompanyProductTeamsFetchedCount(0);
       setIsCompanyProductTeamsFetchedForFirstTime(true);
       setIsCompanyTeamsNotAssignedReadyToFetch(false);
-      handleMessageSnackbarClose();
+      // handleMessageSnackbarClose();
       // setIsCompanyTeamsNotAssignedLoading(false);
     }
   }, [isCompanyTeamsNotAssignedReadyToFetch, isOpen]);
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-5"
       }
     >
       <div className="flex min-h-screen items-center justify-center">
@@ -607,29 +597,36 @@ function CompanyProductTeamsModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white py-2">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-4">
+            {/* <div className="flex border-b items-center gap-2 mb-6  sticky bg-white py-1">
+              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
+              <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Teams
               </h2>
               <button
                 onClick={() => {
                   onClose();
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="absolute right-1 top-4 text-gray-400 hover:text-gray-600"
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+              icon={EditIcon}
+              onClose={onClose}
+              description="Manage the Teams assigned to product"
+              preText="Edit product team of"
+              userName={companyProduct.name}
+            />
             {/*Aggrid logic here */}
             <div className="flex justify-around gap-3 mb-16 pb-4">
               <div
-                className="ag-theme-alpine"
+                // className="ag-theme-balham"
                 style={{ height: "300px", width: "45%" }}
               >
-                <div className="flex gap-2 mb-1 mt-2 justify-between">
-                  <div>
+                <div className="flex w-full gap-2 mb-1 mt-2 justify-between">
+                  <div className="w-[60%]">
                     <SearchInput
                       // readonly = {isCompanyProductTeamsLoading}
                       // inputMode="numeric"
@@ -641,7 +638,7 @@ function CompanyProductTeamsModal({
                       }}
                     ></SearchInput>
                   </div>
-                  <div className="text-lg font-semibold text-gray-700">
+                  <div className="table-header-custom mt-3">
                     Assigned Teams
                   </div>
                 </div>
@@ -658,11 +655,11 @@ function CompanyProductTeamsModal({
               </div>
 
               <div
-                className="ag-theme-alpine"
+                // className="ag-theme-balham"
                 style={{ height: "300px", width: "45%" }}
               >
                 <div className="flex gap-2 mb-1 mt-2 justify-between">
-                  <div>
+                  <div className="w-[60%]">
                     <SearchInput
                       // readonly = {isCompanyProductTeamsLoading}
                       // inputMode="numeric"
@@ -676,40 +673,46 @@ function CompanyProductTeamsModal({
                   </div>
                   <div>
                     {" "}
-                    <Button onClick={handleAddCompanyProductTeam}>
+                    <Button type="submit" onClick={(e) => {
+                      e.preventDefault();
+                      handleAddCompanyProductTeam();
+                    }}>
                       <Network
-                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        size={SIZE.SIXTEEN}
                       ></Network>
-                      Assign Teams
+                      Add
                     </Button>
                   </div>
                 </div>
 
-                <TeamManagementAgGrid
-                  companyTeamList={companyTeamsNotAssignedList}
-                  isGridForProductTeam={true}
-                  handleCompanyTeamCheckboxChange={
-                    handleCompanyTeamCheckboxChange
-                  }
-                  addCompanyProductTeamArray={addCompanyProductTeamArray}
-                  handleViewPortChanged={
-                    handleCompanyTeamsNotAssignedViewPortChanged
-                  }
-                  onGridReady={companyTeamsNotAssignedOnGridReady}
-                />
+               
+                  <TeamManagementAgGrid
+                    companyTeamList={companyTeamsNotAssignedList}
+                    isGridForProductTeam={true}
+                    handleCompanyTeamCheckboxChange={
+                      handleCompanyTeamCheckboxChange
+                    }
+                    addCompanyProductTeamArray={addCompanyProductTeamArray}
+                    handleViewPortChanged={
+                      handleCompanyTeamsNotAssignedViewPortChanged
+                    }
+                    onGridReady={companyTeamsNotAssignedOnGridReady}
+                  />
+                
               </div>
             </div>
           </div>
         </div>
       </div>
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleMessageSnackbarClose}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-    </div>
+      /> */}
+    </div>,
+    document.body
   );
 }
 

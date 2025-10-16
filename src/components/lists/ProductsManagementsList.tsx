@@ -1,11 +1,8 @@
-import { BoxesIcon, Calendar, Filter, Plus, Store, X } from "lucide-react";
+import { Calendar, Plus, Store } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import SearchInput from "../ui/SearchInput";
 import Button from "../ui/Button";
-import {
-  JSX_CHILDREN_NAME,
-  SIZE,
-} from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import ProductsManagementGrid from "../ag-grid/ProductsManagementAgGrid";
 import AddProductModal from "../modals/products/AddProductModal";
@@ -20,6 +17,10 @@ import EditCompanyProductModal from "../modals/products/EditProductModal";
 import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
 import ProductsManagementListProps from "../../@types/List/ProductsManagementListProps";
+import { useUserPreference } from "../../context/user/UserPreference";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import COLORS from "../../constants/Colors";
 
 function ProductsManagementList({
   products,
@@ -30,43 +31,53 @@ function ProductsManagementList({
   handleProductChangeOnAdd,
   handleEditProductChange,
   handleCreateCompanyProductTax,
-  isListForProductUser,
-} : ProductsManagementListProps) {
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
-  const [isEditComapanyProductModalOpen,setIsEditCompanyProductModalOpen] = useState<boolean>(false); 
-  const [isCompanyProductUserModalOpen,setIsCompanyProductUserModalOpen] = useState<boolean>(false);
-  const [isCompanyProductTeamModalOpen,setIsCompanyProductTeamModalOpen] = useState<boolean>(false);
+  isGridForAccountProduct,
+  onRowSelect
+  // isListForProductUser,
+}: ProductsManagementListProps) {
+  const { isLargeScreen, isMediumScreen } = useScreenSize();
+  const { userPreference } = useUserPreference();
+  const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
+    useState<boolean>(false);
+  const [isCompanyProductUserModalOpen, setIsCompanyProductUserModalOpen] =
+    useState<boolean>(false);
+  const [isCompanyProductTeamModalOpen, setIsCompanyProductTeamModalOpen] =
+    useState<boolean>(false);
 
-  
   const { userHasAccessToAddProduct, userHasAccessToViewProduct } =
     useUserAccessModules();
-  const [isFiltersOpenInMobileView, setIsFiltersOpenInMobileView] =
-    useState<boolean>(false);
-  const [isFilterOpenInTabletView, setIsFilterOpenInTabletView] = useState(
-    false
-  );
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const [selectedProduct,setSelectedProduct] = useState<Product>({
-    name : "",
-    code : "",
-    description : "",
-    companyId : 0,
-    cost : 0,
-    count : 0,
-    createdBy : "",
-    createdOn : "",
-    hsn : "",
-    id : 0,
-    isActive : false,
-    sac : "",
-    taxRate : 0,
-    validFrom : ""
+  const [selectedProduct, setSelectedProduct] = useState<Product>({
+    count: 0,
+    id: 0,
+    companyId: 0,
+    productTypeId: 0,
+    productTypeName: "",
+    defaultWarrantyIntervalTypeId: 0,
+    defaultWarranty: 0,
+    defaultWarrantyName: "",
+    defaultAmcCycleIntervalTypeId: 0,
+    defaultAmcCycle: 0,
+    defaultAmcCycleName: "",
+    name: "",
+    code: "",
+    cost: 0,
+    description: "",
+    version: "",
+    url: "",
+    isActive: false,
+    hsn: "",
+    sac: "",
+    taxRate: 0,
+    validFrom: "",
+    createdBy: "",
+    createdOn: "",
   });
 
-  const handleSelectedProductChange = (product:Product) => {
+  const handleSelectedProductChange = (product: Product) => {
     setSelectedProduct(product);
-  }
+  };
 
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
@@ -82,292 +93,179 @@ function ProductsManagementList({
 
   const handleCompanyProductUserModalOpen = (status: boolean) => {
     setIsCompanyProductUserModalOpen(status);
-  }
+  };
 
-  const handleCompanyProductTeamModalOpen = (status : boolean) =>{
+  const handleCompanyProductTeamModalOpen = (status: boolean) => {
     setIsCompanyProductTeamModalOpen(status);
-  }
+  };
 
   if (userHasAccessToViewProduct) {
     return (
-      <div className="w-full pt-1 pl-5 pr-1 gap-1">
-        <div className="sticky z-10 top-9  flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1 w-full">
+      <div
+        className={`w-full  ${
+          userPreference.isLeftMenu ? "pl-5" : "pl-1"
+        } pr-1 gap-1`}
+      >
+        <div className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
           <div className="flex justify-between w-full ">
-              <div className="flex  gap-2">
-                {!isSmallScreen && isListForProductUser ? <BoxesIcon className="w-6 h-6 text-blue-600 mt-2" /> :<Store className="w-6 h-6 text-blue-600 mt-2" />}
+            <div className="flex  gap-2">
+              
+                <Store className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-2`} />
 
-                {(isMediumScreen || isLargeScreen) && 
+
+              {(isMediumScreen || isLargeScreen) && (
                 <>
-                  {!isListForProductUser && 
-                    <span className="text-1xl font-bold mt-2">Product Management</span>
-                  }
-                  {isListForProductUser &&
-                  <span className="text-1xl font-bold mt-2">Product Team/Users Management</span>
-                  }
-                  </>
-                  
-                }
-              </div>
 
-              {isLargeScreen && (
-                <>
-                  <div className="flex gap-1">
-                    {/* search box flex div */}
-                    <div className="relative flex items-start w-80 ">
-                      <SearchInput
-                        onChange={(e) => {
-                          handleSearchOption.handleSearchParameterChange(
-                            e.target.value
-                          );
-                        }}
-                      ></SearchInput>
-                    </div>
+                    <span className="section-header-custom mt-2">
+                      Products
+                    </span>
 
-                    {/* Date FIlters Dropdown */}
-                    <div className="flex mx-3">
-                      <div className="flex">
-                        <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                          <Calendar className="mt-2" />
-                        </div>
-
-                        <DateRangeFilterDropdown
-                          dropdownOptions={dateRangeDropdownOptions}
-                          handleDateIdChange={handleDateRangeIdChange}
-                        ></DateRangeFilterDropdown>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Custom Date Picker Div Flex Box*/}
-                  <div
-                    style={
-                      isCustomDateOptionSelected
-                        ? { visibility: "visible" }
-                        : { visibility: "hidden" }
-                    }
-                  >
-                    <DateRangePicker
-                      onStartDateChange={onStartDateChange}
-                      onEndDateChange={onEndDateChange}
-                    />
-                  </div>
                 </>
-              )}
-
-              {isMediumScreen && (
-                <>
-                  <div className="relative flex items-start w-80 ">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
-                  <div className="flex relative  gap-2  ">
-                    <div className="mt-1 flex ">
-                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                        <Calendar />
-                      </div>
-
-                      <DateRangeFilterDropdown
-                        dropdownOptions={dateRangeDropdownOptions}
-                        handleDateIdChange={handleDateRangeIdChange}
-                      ></DateRangeFilterDropdown>
-                    </div>
-                  </div>
-                  {isFilterOpenInTabletView && isCustomDateOptionSelected && (
-                    <div className="fixed inset-0 bg-black bg-opacity-45 flex place-items-start mt-16 justify-center p-4">
-                      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                        <button
-                          onClick={() => {
-                            setIsFilterOpenInTabletView(
-                              !isFilterOpenInTabletView
-                            );
-                          }}
-                          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                        >
-                          <X size={SIZE.TWENTY} />
-                        </button>
-
-                        <div className="my-10 justify-items-center mb-5">
-                          <div className="mb-5">
-                            <DateRangePicker
-                              onStartDateChange={onStartDateChange}
-                              onEndDateChange={onEndDateChange}
-                            />
-                          </div>
-                          <div className="w-full justify-items-center">
-                            <div className="w-24">
-                              <Button>Done</Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {isSmallScreen && (
-                <>
-                  <div className="relative flex items-start w-80 ">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
-                  <div className="flex relative gap-2">
-                    <Button
-                      onClick={() => {
-                        setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
-                        );
-                      }}
-                    >
-                      <Filter size={SIZE.EIGHT} />
-                    </Button>
-                  </div>
-                  {isFiltersOpenInMobileView && (
-                    <div className="fixed inset-0 bg-black bg-opacity-10 flex place-items-start mt-16 justify-center p-4">
-                      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative animate-fadeIn">
-                        <button
-                          onClick={() => {
-                            setIsFiltersOpenInMobileView(
-                              !isFiltersOpenInMobileView
-                            );
-                          }}
-                          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                        >
-                          <X size={SIZE.EIGHT} />
-                        </button>
-                        {/* Date FIlters Dropdown */}
-
-                        <div className="flex relative gap-2 items-center justify-center mt-10 mb-3">
-                          <div className="mt-1 flex ">
-                            <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                              <Calendar size={SIZE.TWENTY} />
-                            </div>
-
-                            <DateRangeFilterDropdown
-                              dropdownOptions={dateRangeDropdownOptions}
-                              handleDateIdChange={handleDateRangeIdChange}
-                            ></DateRangeFilterDropdown>
-                          </div>
-                        </div>
-
-                        {/* Custom Date Picker Div Flex Box*/}
-                        <div
-                          className="mb-10 justify-items-center"
-                          style={
-                            isCustomDateOptionSelected
-                              ? { visibility: "visible" }
-                              : { visibility: "hidden" }
-                          }
-                        >
-                          <DateRangePicker
-                            onStartDateChange={onStartDateChange}
-                            onEndDateChange={onEndDateChange}
-                          />
-                        </div>
-
-                        {
-                          <div className="flex w-full justify-center items-center mb-5">
-                            <div className="w-28">
-                              <Button
-                                onClick={() => {
-                                  setIsFiltersOpenInMobileView(
-                                    !isFiltersOpenInMobileView
-                                  );
-                                }}
-                              >
-                                Done
-                              </Button>
-                            </div>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {!isListForProductUser &&
-              <div className="flex gap-1 ">
-              {userHasAccessToAddProduct ? (
-                <Button
-                  onClick={() =>
-                    setIsAddProductModalOpen(true)
-                  }
-                >
-                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
-                </Button>
-              ) : (
-                <Button disabled>
-                  {!isSmallScreen && <Plus size={SIZE.TWENTY} />}
-                  {isSmallScreen && <Plus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.ADD_PRODUCTS}
-                </Button>
               )}
             </div>
-              }
-              
 
-              <AddProductModal
-                isOpen={isAddProductModalOpen}
-                onClose={handleAddProductModalClose}
-                handleProductChangeOnAdd={handleProductChangeOnAdd!}
-              />
+            {isLargeScreen && (
+              <>
+                <div className="flex gap-1 justify-center">
+                {/* search box flex div */}
+                <div className="relative flex items-start w-80 mt-1">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value
+                      );
+                    }}
+                  ></SearchInput>
+                </div>
+
+                {/* Date FIlters Dropdown */}
+                <div className="flex mx-3 mt-1">
+                  <div className="flex">
+                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                      <Calendar className="input-label-custom mt-1" />
+                    </div>
+
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
+                    ></DateRangeFilterDropdown>
+                  </div>
+                </div>
+              </div>
+
+                {/* Custom Date Picker Div Flex Box*/}
+                <div
+                  className="flex"
+                  style={
+                    isCustomDateOptionSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
+                >
+                  <DateRangePicker
+                    onStartDateChange={onStartDateChange}
+                    onEndDateChange={onEndDateChange}
+                  />
+                </div>
+              </>
+            )}
+
+            {
+              !isGridForAccountProduct &&(
+                <>
+                  <div className="flex gap-1 mt-1">
+                {userHasAccessToAddProduct ? (
+                  <Button type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    setIsAddProductModalOpen(true);
+                  }}>
+                    
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
+        
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                          .DENIED_ADD_ACCESS
+                      );
+                    }}
+                  >
+                    <div className="flex items-center gap-0.5">
+            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
+                  </Button>
+                )}
+              </div>
+                </>
+              )
+            }
 
 
-              <EditCompanyProductModal
-              handleCreateCompanyProductTaxAdd = {handleCreateCompanyProductTax!}
+            <AddProductModal
+              isOpen={isAddProductModalOpen}
+              onClose={handleAddProductModalClose}
+              handleProductChangeOnAdd={handleProductChangeOnAdd!}
+            />
+
+            <EditCompanyProductModal
+              handleCreateCompanyProductTaxAdd={handleCreateCompanyProductTax!}
               handleCompanyProductChange={handleEditProductChange!}
-              isOpen= {isEditComapanyProductModalOpen}
-              onClose={ ()=> {
-                setIsEditCompanyProductModalOpen(false)
+              isOpen={isEditComapanyProductModalOpen}
+              onClose={() => {
+                setIsEditCompanyProductModalOpen(false);
               }}
               product={selectedProduct}
-              />
+            />
 
-              <CompanyProductUsersModal
-               isOpen= {isCompanyProductUserModalOpen}
-               onClose={()=>{
+            <CompanyProductUsersModal
+              isOpen={isCompanyProductUserModalOpen}
+              onClose={() => {
                 setIsCompanyProductUserModalOpen(false);
-               }}
-               companyProduct={selectedProduct}
-              ></CompanyProductUsersModal>
+              }}
+              companyProduct={selectedProduct}
+            ></CompanyProductUsersModal>
 
-              <CompanyProductTeamsModal
+            <CompanyProductTeamsModal
               isOpen={isCompanyProductTeamModalOpen}
-              onClose={()=> {
+              onClose={() => {
                 setIsCompanyProductTeamModalOpen(false);
               }}
               companyProduct={selectedProduct}
-              />
+            />
           </div>
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
-            className="ag-theme-alpine w-full"
-            style={{ height: "90vh", width: "100%" }}
+            className={
+              userPreference.isLeftMenu
+                ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+            }
           >
-            <ProductsManagementGrid 
-            products={products}
-            isGridForProductUser = {isListForProductUser}
-            handleCompanyProductUserModalOpen={handleCompanyProductUserModalOpen}
-            handleSelectedProductChange={handleSelectedProductChange}
-            handleEditCompanyProductModalOpen={handleEditCompanyProductModalOpen}
-            handleCompanyProductTeamModalOpen={handleCompanyProductTeamModalOpen} />
+            <ProductsManagementGrid
+            isGridForAccountProduct={isGridForAccountProduct}
+              products={products}
+              // isGridForProductUser={isListForProductUsser}
+              handleCompanyProductUserModalOpen={
+                handleCompanyProductUserModalOpen
+              }
+              handleSelectedProductChange={handleSelectedProductChange}
+              handleEditCompanyProductModalOpen={
+                handleEditCompanyProductModalOpen
+              }
+              handleCompanyProductTeamModalOpen={
+                handleCompanyProductTeamModalOpen
+              }
+              onRowSelect={onRowSelect}
+            />
           </div>
         </div>
-        <div className="flex items-center justify-end mt-1">
+        <div className="flex items-center justify-end ">
           <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}

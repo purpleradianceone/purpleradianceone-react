@@ -6,22 +6,29 @@ import POST_API from "../../constants/PostApi";
 import axios from "axios";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
-import { NUMBER_VALUES, STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE, VALIDATIONS } from "../../constants/AppConstants";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { useUserPreference } from "../../context/user/UserPreference";
 import CustomTimezoneDropdown from "./custom-dropdown-timezonedata/CustomTimezoneDropdown";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../ui/MessageSnackbar";
+
 import REGEX from "../../constants/Regex";
 import { useMasterRowsInGrid } from "../../config/hooks/useMasterRowsInGrid";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { alphabets, backgroundColors } from "../../constants/Colors";
+import toast from "react-hot-toast";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import MESSAGE from "../../constants/Messages";
 
 const UserPreference = () => {
+  const classnameForParagragh = "table-data-custom  block truncate w-full";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
+
+  const navigate = useNavigate();
+  const { userHasAccessToUpdateUser, userHasAccessToUpdateSettingGeneral , userHasAccessToViewSettingGeneral } =
+    useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid
@@ -60,19 +67,19 @@ const UserPreference = () => {
   );
 
   //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
+  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
+  //   open: false,
+  //   message: "",
+  //   type: "success" as "success" | "error",
+  // });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
+  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
+  //   setMessageSnackbar({ open: true, message, type });
+  // };
 
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  // const handleCloseSnackbar = () => {
+  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
+  // };
 
   // timezone states
   const limitForGrid = userPreference.rowsInGrid;
@@ -110,18 +117,28 @@ const UserPreference = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message);
 
           setUserPreference({
             ...userPreference,
-            timezoneId: selectedTimezoneId ,
-            timezoneUTCOffset: selectedTimeZoneData.utc_offset === "" ? userPreference.timezoneUTCOffset : selectedTimeZoneData.utc_offset,
-            timezoneName: selectedTimeZoneData.name === "" ? userPreference.timezoneName : selectedTimeZoneData.name,
-            timezone: selectedTimeZoneData.timezone===  "" ? userPreference.timezone : selectedTimeZoneData.timezone,
-            rowsInGrid :parseInt(selectedMasterRowInGrid!.rowsInGrid)
+            timezoneId: selectedTimezoneId,
+            timezoneUTCOffset:
+              selectedTimeZoneData.utc_offset === ""
+                ? userPreference.timezoneUTCOffset
+                : selectedTimeZoneData.utc_offset,
+            timezoneName:
+              selectedTimeZoneData.name === ""
+                ? userPreference.timezoneName
+                : selectedTimeZoneData.name,
+            timezone:
+              selectedTimeZoneData.timezone === ""
+                ? userPreference.timezone
+                : selectedTimeZoneData.timezone,
+            rowsInGrid: parseInt(selectedMasterRowInGrid!.rowsInGrid),
           });
           setShowTimeZoneData(false);
         }
@@ -180,14 +197,14 @@ const UserPreference = () => {
     } else {
       if (name === "email") {
         const emailRegex = REGEX.EMAIL;
-        if (!emailRegex.test(value)) {
+        if (!emailRegex.test(value.trim())) {
           errorMsg = "Invalid email format";
         }
       }
 
       if (name === "mobileNumber") {
         const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
-        if (!mobileRegex.test(value)) {
+        if (!mobileRegex.test(value.trim())) {
           errorMsg = "Mobile number must be 10 digits and start with 6–9";
         }
       }
@@ -199,16 +216,18 @@ const UserPreference = () => {
     }));
 
     const hasChanged =
-      formData.fullName !== initialData.fullName ||
+      formData.fullName.trim() !== initialData.fullName ||
       formData.email !== initialData.email ||
-      formData.mobileNumber !== initialData.mobileNumber;
+      formData.mobileNumber.trim() !== initialData.mobileNumber;
 
     // Include current error for updated field
     const currentErrors = {
       ...formErrors,
       [name]: errorMsg,
     };
-
+    // if (!hasChanged) {
+    //   toast.error("No new changes to save.");
+    // }
     const hasErrors = Object.values(currentErrors).some((e) => e !== "");
 
     setIsSaveEnabled(hasChanged && !hasErrors);
@@ -228,17 +247,25 @@ const UserPreference = () => {
       const response = await axios.put(POST_API.UPDATE_COMPANY_USER, postData, {
         withCredentials: true,
       });
-
+      const res = response.data;
       if (response.status === STATUS_CODE.OK) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
-        setLoginStatus({
-          ...loginStatus,
-          fullName: formData.fullName.trim(),
-          mobileNumber: formData.mobileNumber.trim(),
-        });
+        // showMessageSnackbar({
+        //   message: response.data.message,
+        //   type: "success",
+        // });
+        if (res.status) {
+          toast.success(response.data.message);
+          setLoginStatus({
+            ...loginStatus,
+            fullName: formData.fullName.trim(),
+            mobileNumber: formData.mobileNumber.trim(),
+          });
+        } else {
+          formData.fullName = loginStatus.fullName!;
+          formData.mobileNumber = loginStatus.mobileNumber;
+
+          toast.error(res.message);
+        }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -350,6 +377,13 @@ const UserPreference = () => {
     }
   };
 
+  const getColor = (email: string) => {
+    if (!email) return backgroundColors[0];
+    const emailChar = email.charAt(0);
+    const index = alphabets.indexOf(emailChar.toLowerCase());
+    return backgroundColors[index];
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
@@ -357,18 +391,20 @@ const UserPreference = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <img
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt="Profile picture"
-            className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
-          />
+          <div
+            className={`w-32 h-32 rounded-full grid place-content-center text-white text-8xl font-semibold pb-3 border-2 border-gray-300 ${getColor(
+              loginStatus.email
+            )}`}
+          >
+            {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
+          </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
-            <h2 className="text-3xl font-bold text-gray-900">
-              {formData.fullName}
+            <h2  title={formData.fullName ?? "Not Provided"} className="section-header-custom block truncate w-full  ">
+              {loginStatus.fullName}
             </h2>
-            <p className="text-gray-600">{loginStatus.companyName || ""}</p>
+            <p  className="table-header-custom">{loginStatus.companyName || ""}</p>
             <button
-              className={`mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition
+              className={`mt-2 px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition
                   ${
                     isEditing
                       ? isSaveEnabled
@@ -377,7 +413,15 @@ const UserPreference = () => {
                       : "bg-blue-600 hover:bg-blue-700"
                   }}
                 `}
-              onClick={handleEditClick}
+              onClick={() => {
+                if (userHasAccessToUpdateUser) {
+                  handleEditClick();
+                } else {
+                  toast.error(
+                    "you do not have access to update user information."
+                  );
+                }
+              }}
               disabled={isEditing && !isSaveEnabled}
             >
               {isEditing ? "Save" : "Edit Profile"}
@@ -387,8 +431,8 @@ const UserPreference = () => {
 
         {/* Basic Info Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <h4 className="text-sm font-semibold text-gray-500">Name</h4>
+          <div className="">
+            <h4 className="table-header-custom">Name</h4>
             {isEditing ? (
               <>
                 <input
@@ -397,6 +441,8 @@ const UserPreference = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.fullName && (
@@ -406,24 +452,26 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p className="text-gray-800">
+              <p title={formData.fullName ?? "Not Provided"} className="table-data-custom block truncate w-full ">
                 {formData.fullName || "Not Provided"}
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Email</h4>
-            <p className="text-gray-800">{formData.email || "Not Provided"}</p>
+            <h4 className="table-header-custom">Email</h4>
+            <p className={classnameForParagragh}>
+              {formData.email || "Not Provided"}
+            </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Company</h4>
-            <p className="text-gray-800">{loginStatus.companyName}</p>
+            <h4 className="table-header-custom">Company</h4>
+            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">
+            <h4 className="table-header-custom">
               Contact Number
             </h4>
             {isEditing ? (
@@ -434,6 +482,8 @@ const UserPreference = () => {
                   value={formData.mobileNumber}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                  minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                   className="w-full p-2 border rounded"
                 />
                 {formErrors.mobileNumber && (
@@ -443,48 +493,55 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p className="text-gray-800">
+              <p className={classnameForParagragh}>
                 {formData.mobileNumber || "Not Provided"}
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">
+            <h4 className="table-header-custom">
               Profile Status
             </h4>
-            <p className="text-gray-800">
+            <p className={classnameForParagragh}>
               {loginStatus.status === true ? "Active" : "Inactive"}
             </p>
           </div>
         </div>
       </div>
       {/* PREFERENCE CARD */}
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
+      <div  className={` ${!userHasAccessToViewSettingGeneral ? "hidden" : ""} max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4`}>
         {/* button */}
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">Preferences</h3>
-          <button
-            onClick={() => {
-              if (prevTimezoneId.current !== selectedTimezoneId) {
-                handleTimezonePreferenceChange();
-                prevTimezoneId.current = selectedTimezoneId;
-              } else if (userPreference.rowsInGrid !== selectedRowsPerPage) {
-                handleTimezonePreferenceChange();
-              }
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-          >
-            {showTimeZoneData ||
-            userPreference.rowsInGrid != selectedRowsPerPage
-              ? "Save"
-              : "Change"}
-          </button>
+          <h3 className="section-header-custom">
+            Preferences <span className="caption-custom">(Click to change)</span>
+          </h3>
+          {(prevTimezoneId.current !== selectedTimezoneId ||
+            userPreference.rowsInGrid != selectedRowsPerPage) && (
+            <button
+              onClick={() => {
+                if(userHasAccessToUpdateSettingGeneral){
+
+                  if (prevTimezoneId.current !== selectedTimezoneId) {
+                    handleTimezonePreferenceChange();
+                    prevTimezoneId.current = selectedTimezoneId;
+                  } else if (userPreference.rowsInGrid !== selectedRowsPerPage) {
+                    handleTimezonePreferenceChange();
+                  }
+                }else{
+                  toast.error(MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS)
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
+            >
+              Save
+            </button>
+          )}
         </div>
         {/* time zone */}
         <div className="flex items-center space-x-4 border-b pb-1">
           {/* Label for the Time Zone setting */}
-          <h4 className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          <h4 className="input-label-custom whitespace-nowrap">
             Time Zone:
           </h4>
 
@@ -511,9 +568,15 @@ const UserPreference = () => {
             // When the display text should be visible (showTimeZoneData is false)
             <p
               onClick={() => {
-                setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+                if (userHasAccessToUpdateSettingGeneral) {
+                  setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                  );
+                }
               }}
-              className="text-sm  font-semibold text-blue-600 cursor-pointer hover:text-blue-700
+              className="input-label-custom text-blue-600 cursor-pointer hover:text-blue-700
                  rounded-md py-1.5 px-3  // Adds padding to match select height
                  focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
               tabIndex={0} // Makes the paragraph focusable for keyboard navigation
@@ -529,35 +592,48 @@ const UserPreference = () => {
           {/* Label for accessibility and clear identification */}
           <label
             htmlFor="records-per-page-select"
-            className="text-sm font-medium text-gray-700 whitespace-nowrap"
+            className="input-label-custom whitespace-nowrap"
           >
             Records per page:
           </label>
 
           {/* Display current preference, visually distinct */}
           <div className="flex items-center space-x-1">
-            <span className="text-sm text-gray-500">Current:</span>
-            <span className="text-sm font-semibold text-blue-600">
+            <span className="caption-custom">Current:</span>
+            <span className="caption-custom-blue">
               {userPreference.rowsInGrid}
             </span>
           </div>
 
           {/* The styled select dropdown */}
           <select
-            onChange={handleSelectRowInGridOptionChange}
+            // disabled={!userHasAccessToUpdateSettingGeneral}
+            onClick={() => {
+              if (!userHasAccessToUpdateSettingGeneral) {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                );
+                return;
+              }
+            }}
+            onChange={(e) => {
+              if (userHasAccessToUpdateSettingGeneral) {
+                handleSelectRowInGridOptionChange(e);
+              }
+            }}
             value={selectedRowsPerPage}
             id="records-per-page-select" // Link with label's htmlFor
-            className="block w-auto rounded-md border-gray-300 shadow-sm
+            className="block caption-custom w-auto rounded-md border-gray-300 shadow-sm
                focus:border-indigo-500 focus:ring-indigo-500
-               sm:text-sm  pl-3 pr-8 // Added padding for better appearance
+               sm:pl-3 pr-8 // Added padding for better appearance
                text-gray-900" // Default text color
             aria-label="Select number of records per page" // Good for accessibility
             // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
           >
-            <option value="">Select</option>
+            <option className="caption-custom" value="">Select</option>
             {rowsInGridDropdownOptions &&
               rowsInGridDropdownOptions.map((data) => (
-                <option key={data.id} value={data.rowsInGrid}>
+                <option  key={data.id} value={data.rowsInGrid}>
                   {data.rowsInGrid}
                 </option>
               ))}
@@ -567,31 +643,39 @@ const UserPreference = () => {
       {/* Subscription Card */}
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-semibold text-gray-800">Subscription</h3>
+          <h3 className="section-header-custom">Subscription</h3>
+          <button
+            onClick={() => {
+              navigate(ROUTES_URL.GET_SUBSCRIPTION);
+            }}
+            className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
+          >
+            Update Subscription
+          </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Started On</h4>
-            <p className="text-gray-800">
+            <h4 className="table-header-custom">Started On</h4>
+            <p className={classnameForParagragh}>
               {loginStatus.startDateSubscription || "-"}
             </p>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-500">Ending On</h4>
-            <p className="text-gray-800">
+            <h4 className="table-header-custom">Ending On</h4>
+            <p className={classnameForParagragh}>
               {loginStatus.endDateSubscription || "Not Provided"}
             </p>
           </div>
         </div>
       </div>
       {/* Snackbar */}
-      <MessageSnackBar
+      {/* <MessageSnackBar
         isOpen={messageSnackbar.open}
         message={messageSnackbar.message}
         type={messageSnackbar.type}
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+      /> */}
     </div>
   );
 };

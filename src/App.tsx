@@ -16,43 +16,49 @@ import { Toaster } from "react-hot-toast";
 import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
 import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
+import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailDataContext";
 
 /**
  *
  * @returns JSX.Element of all html elements to be rendered as child element of root element in index.html
  */
 function App() {
-
-  const {confirmHandler,dialogMessage,isDialogOpen} = useAxiosForbiddenHandler()
+  const { confirmHandler, dialogMessage, isDialogOpen } =
+    useAxiosForbiddenHandler();
   return (
-   <NotificationCountContextProvider>
-    
-      <UserPreferenceContextProvider>
-        <PanelProvider>
-          <ZoomMeetingContextProvider>
-            <GoogleMeetContextProvider>
-              <AccessManagementContextProvider>
-                <LoggedInUserContextProvider>
-                   <NotificationProvider>
-                     <Toaster position="top-center" reverseOrder={false} />
-                     <DialogueBox
-        isOpen={isDialogOpen}
-        // onClose={closeDialog}
-        onConfirm={confirmHandler}
-        title="Session Expired !"
-        message={dialogMessage}
-      />
-                  <RouterProvider router={router} />
-                   </NotificationProvider>
-                </LoggedInUserContextProvider>
-              </AccessManagementContextProvider>
-            </GoogleMeetContextProvider>
-          </ZoomMeetingContextProvider>
-        </PanelProvider>
-      </UserPreferenceContextProvider>
-      
-      </NotificationCountContextProvider>
-    
+    <LoggedInUserContextProvider>
+      <TutorailDataContextProvider>
+      <AccessManagementContextProvider>
+            <NotificationCountContextProvider>
+              <UserPreferenceContextProvider>
+                <PanelProvider>
+                  <ZoomMeetingContextProvider>
+                    <GoogleMeetContextProvider>
+                      <NotificationProvider>
+                        <Toaster
+                          position="top-center"
+                          toastOptions={{
+                            style: { zIndex: 2147483647 }, // max safe z-index
+                          }}
+                        />
+
+                        <DialogueBox
+                          isOpen={isDialogOpen}
+                          // onClose={closeDialog}
+                          onConfirm={confirmHandler}
+                          title="Session Expired !"
+                          message={dialogMessage}
+                        />
+                        <RouterProvider router={router} />
+                      </NotificationProvider>
+                    </GoogleMeetContextProvider>
+                  </ZoomMeetingContextProvider>
+                </PanelProvider>
+              </UserPreferenceContextProvider>
+            </NotificationCountContextProvider>
+      </AccessManagementContextProvider>
+      </TutorailDataContextProvider>
+    </LoggedInUserContextProvider>
   );
 }
 

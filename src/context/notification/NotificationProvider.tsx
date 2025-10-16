@@ -3,13 +3,13 @@ import React, { createContext, useEffect, useState, useContext, useRef } from "r
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { WEB_SOCKET_CONNECTION_URL } from "../../constants/PostApi";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { Toast } from "react-hot-toast";
 import { useLoggedInUserContext } from "../user/LoggedInUserContext";
 import { useNotificationCountContext } from "./NotificationCountContext";
 
 type Notification = {
   notificationSubject: string;
-  notitficationBody: string;
+  notificationBody: string;
 };
 
 const NotificationContext = createContext<Notification[] >([]);
@@ -89,7 +89,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Use useRef to hold the client instance across renders without triggering re-renders
   const clientRef = useRef<Client | null>(null);
-  const {notificationCount,setNotificationCount} = useNotificationCountContext();
+  const {setNotificationCount} = useNotificationCountContext();
 
   useEffect(() => {
     // Only connect if authenticated AND no existing client is active
@@ -104,7 +104,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log("WebSocket connected");
 
           const showToast = (body: Notification) => {
-            toast.custom((t) => (
+            toast.custom((t : Toast) => (
               <div
                 className={`${
                   t.visible ? "animate-enter" : "animate-leave"
@@ -117,14 +117,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
                         {body.notificationSubject}
                       </p>
                       <p className="mt-1 text-sm text-gray-500">
-                        {body.notitficationBody}
+                        {body.notificationBody}
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="flex border-l border-gray-200">
                   <button
-                    onClick={() => toast.dismiss(t.id)}
+                    onClick={() => toast.dismiss(t.id!)}
                     className="w-full border-none rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none"
                   >
                     Close
@@ -144,10 +144,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
           newClient.subscribe("/user/queue/notifications", (message) => {
             const body: Notification = JSON.parse(message.body);
+            console.log("this is the body");
+            
+            console.log(body);
+            
             setNotifications((prev) => [body, ...prev]);
 
-            console.log("inside User queue");
-            console.log(notificationCount);
+          
             setNotificationCount((prev) => prev+1);
             showToast(body);
           });
@@ -178,13 +181,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         clientRef.current = null; // Clear the ref on cleanup
       }
     };
-  }, [loginStatus.id]); // Dependency array includes isAuthenticated
+  }, [loginStatus.id ]); // Dependency array includes isAuthenticated
 
 
   return (
     <NotificationContext.Provider value={notifications}>
       {children}
-      <Toaster position="top-center" reverseOrder={false} />
+      {/* <Toaster position="top-center" reverseOrder={false} /> */}
     </NotificationContext.Provider>
   );
 };

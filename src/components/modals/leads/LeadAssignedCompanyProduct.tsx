@@ -4,21 +4,22 @@ import InterestType from "../../../@types/lead-management/InterestType";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { NUMBER_VALUES, STATUS_CODE } from "../../../constants/AppConstants";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
+import toast from "react-hot-toast";
+import { Save } from "lucide-react";
+import COLORS from "../../../constants/Colors";
+import Button from "../../ui/Button";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
   interestTypeData: InterestType[];
   handleLeadProductStatusUpdate: (product: LeadAssignedCompanyProduct) => void;
   handleLeadProductUpdate: (product: LeadAssignedCompanyProduct) => void;
+  setIsAddProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
@@ -26,6 +27,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   handleLeadProductStatusUpdate,
   interestTypeData,
   handleLeadProductUpdate,
+  setIsAddProductModalOpen,
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -46,21 +48,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { userHasAccessToUpdateLead } = useUserAccessModules();
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
 
   const handleUpdateLeadCompanyProductStatus = async (
     product: LeadAssignedCompanyProduct
@@ -88,16 +75,10 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       if (response) {
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             handleLeadProductStatusUpdate(product);
           } else {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "error",
-            });
+            toast.error(response.data.message);
           }
         }
       }
@@ -163,18 +144,12 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       const parsedCost = parseFloat(editedValues.costExpected);
 
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-        showMessageSnackbar({
-          message: "Quantity Required must be greater than 0.",
-          type: "error",
-        });
+        toast.error("Quantity Required must be greater than 0.");
         return;
       }
 
       if (isNaN(parsedCost)) {
-        showMessageSnackbar({
-          message: "Expected Cost must be a valid number.",
-          type: "error",
-        });
+        toast.error("Expected Cost must be a valid number.");
         return;
       }
 
@@ -206,10 +181,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         );
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             handleLeadProductUpdate(updatedProduct);
           }
         }
@@ -229,167 +201,260 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     }
   };
 
+  const handleShowToasterAboutProductIsInactive = () => {
+    toast.error("Inactive products cannot be updated.");
+  };
+  const handleAddProductToLeadButtonClick = () => {
+    setIsAddProductModalOpen(true);
+  };
   return (
     <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
       {/* Header row */}
-      <div className=" sm:text-xs md:text-[12px] md:grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 font-semibold h-5 bg-gray-200 text-gray-900 text-sm mb-2  px-2">
-        <div>Product Name</div>
-        <div className="text-center">Req. Quantity</div>
-        <div className="text-center">Exp. Cost</div>
-        <div>Interest</div>
-        <div className="text-center">Status</div>
+      <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.7fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
+        <div className="table-header-custom">Product Name</div>
+        <div className="table-header-custom">Req. Quantity</div>
+        <div className="table-header-custom">Exp. Cost</div>
+        <div className="table-header-custom">Interest</div>
+        <div className="table-header-custom">Status</div>
       </div>
       {data.length == 0 && (
-        <div className="flex w-full h-28 bg-green50 text-xs text-gray-400 justify-center items-center ">
-          Product is not assigned to lead.
+        <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
+          <Button
+            disabled={!userHasAccessToUpdateLead}
+            onClick={() =>{
+              if(userHasAccessToUpdateLead){
+                handleAddProductToLeadButtonClick()
+              }else{
+                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+              }
+            }}
+            className={COLORS.ADD_BUTTON}
+          >
+            +Add
+          </Button>
+          <span className="italic">Product is not assigned to lead.</span>
         </div>
       )}
       {/* Data rows */}
-      {data.map(
-        (
-          product,
-          index // Added 'index' to the map function
-        ) => (
-          <form key={product.id} className="px-1">
-            <div
-              key={index}
-              ref={editingProductId === product.id ? wrapperRef : null}
-              title={product.companyProductName}
-              className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-slate-50  border shadow-sm  border-gray-100 rounded-md p-1 mb-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
-            >
-              <div className="text-[13px] font-medium text-gray-800 truncate">
-                {product.companyProductName}
-              </div>
-
-              {product.isActive &&
-              editingProductId === product.id &&
-              userHasAccessToUpdateLead ? (
-                <>
-                  <input
-                    type="text"
-                    disabled={!userHasAccessToUpdateLead}
-                    value={editedValues.quantityRequired}
-                    onChange={(e) => handleQuantityChange(e.target.value)}
-                    className="border py-0.5 px-1 rounded w-16 "
-                  />
-                  <input
-                    type="text"
-                    disabled={!userHasAccessToUpdateLead}
-                    value={editedValues.costExpected}
-                    onChange={(e) => handleCostChange(e.target.value)}
-                    className="border px-1 rounded w-16 "
-                  />
-                  <select
-                    disabled={!userHasAccessToUpdateLead}
-                    value={editedValues.leadInterestId ?? ""}
-                    onChange={(e) =>
-                      setEditedValues((prev) => ({
-                        ...prev,
-                        leadInterestId:
-                          e.target.value === ""
-                            ? null
-                            : parseInt(e.target.value),
-                        interestName: e.target.selectedOptions[0].text,
-                      }))
-                    }
-                    className="border rounded w-16"
-                  >
-                    <option value="">Select</option>
-                    {interestTypeData.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="flex items-center justify-center">
-                    <button
-                      type="button"
-                      className="bg-blue-500 text-white px-2 py-0.5 rounded text-xs"
-                      onClick={() => {
-                        if (userHasAccessToUpdateLead) {
-                          handleSaveClick(product);
-                        } else {
-                          showMessageSnackbar({
-                            message:
-                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                .UPDATE_LEAD_ACCESS_DENIED_message,
-                            type: "error",
-                          });
-                        }
-                      }}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div
-                    className="cursor-pointer text-center"
-                    onClick={() => product.isActive && handleEditClick(product)}
-                  >
-                    {product.quantityRequired}
-                  </div>
-                  <div
-                    className="cursor-pointer text-center"
-                    onClick={() => product.isActive && handleEditClick(product)}
-                  >
-                    ₹{product.costExpected}
-                  </div>
-                  <div
-                    className="truncate cursor-pointer"
-                    onClick={() => product.isActive && handleEditClick(product)}
-                  >
-                    {/* {interestTypeData.map((value) => {
-                if (value.id === product.leadInterestId) {
-                  return value.name;
-                }
-              })} */}
-                    {product.leadInterestName}
-                  </div>
-                  <div className="flex items-center justify-start sm:justify-center">
-                    <button
-                      type="submit"
-                      id={product.companyProductName}
-                      title={product.isActive ? "Active" : "Inactive"}
-                      className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
-                        product.isActive ? "bg-green-500" : "bg-red-500"
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (userHasAccessToUpdateLead) {
-                          handleUpdateLeadCompanyProductStatus(product);
-                        } else {
-                          showMessageSnackbar({
-                            message:
-                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                .UPDATE_LEAD_ACCESS_DENIED_message,
-                            type: "error",
-                          });
-                        }
-                      }}
-                    >
-                      <div
-                        className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
-                          product.isActive ? "translate-x-4" : "translate-x-0"
-                        }`}
-                      ></div>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </form>
-        )
+      {data.length > 0 && (
+        <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
+          {/* <span>Add</span> */}
+          {/* <button
+            onClick={() => {
+              if (userHasAccessToUpdateLead) {
+                handleAddProductToLeadButtonClick();
+              } else {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                    .UPDATE_LEAD_ACCESS_DENIED_message
+                );
+              }
+            }}
+            className={COLORS.ADD_BUTTON}
+          >
+           +Add
+          </button> */}
+           <Button
+            disabled={!userHasAccessToUpdateLead}
+            onClick={() =>{
+              if(userHasAccessToUpdateLead){
+                handleAddProductToLeadButtonClick()
+              }else{
+                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+              }
+            }}
+            className={COLORS.ADD_BUTTON}
+          >
+            +Add
+          </Button>
+        </div>
       )}
+      {data.length > 0 &&
+        data.map(
+          (
+            product,
+            index // Added 'index' to the map function
+          ) => (
+            <>
+              <form key={product.id} className="px-1">
+                <div
+                  key={index}
+                  ref={editingProductId === product.id ? wrapperRef : null}
+                  title={product.companyProductName}
+                  className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-slate-50  border shadow-sm  border-gray-100 rounded-md p-1 mb-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
+                >
+                  <div
+                    // className="text-[13px] font-medium text-gray-800 truncate "
+                    className={`  input-label-custom rounded-lg ${
+                      !product.isActive ? "opacity-50 " : ""
+                    }`}
+                    onClick={() => {
+                      if (!product.isActive) {
+                        handleShowToasterAboutProductIsInactive();
+                        return;
+                      }
+                    }}
+                  >
+                    {product.companyProductName}
+                  </div>
 
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
+                  {product.isActive &&
+                  editingProductId === product.id &&
+                  userHasAccessToUpdateLead ? (
+                    <>
+                      <input
+                        type="text"
+                        disabled={!userHasAccessToUpdateLead}
+                        value={editedValues.quantityRequired}
+                        onChange={(e) => handleQuantityChange(e.target.value)}
+                        className="border py-0.5 px-1 rounded w-16 input-label-custom "
+                      />
+                      <input
+                        type="text"
+                        disabled={!userHasAccessToUpdateLead}
+                        value={editedValues.costExpected}
+                        onChange={(e) => handleCostChange(e.target.value)}
+                        className="border px-1 rounded w-16 input-label-custom"
+                      />
+                      <select
+                        disabled={!userHasAccessToUpdateLead}
+                        value={editedValues.leadInterestId ?? ""}
+                        onChange={(e) =>
+                          setEditedValues((prev) => ({
+                            ...prev,
+                            leadInterestId:
+                              e.target.value === ""
+                                ? null
+                                : parseInt(e.target.value),
+                            interestName: e.target.selectedOptions[0].text,
+                          }))
+                        }
+                        className="border rounded w-20 input-label-custom"
+                      >
+                        <option value="">Select</option>
+                        {interestTypeData.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex items-center justify-center">
+                        <button
+                          type="button"
+                          className="bg-blue-600 caption-custom white-text px-2 py-0.5 rounded"
+                          onClick={() => {
+                            if (userHasAccessToUpdateLead) {
+                              handleSaveClick(product);
+                            } else {
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                  .UPDATE_LEAD_ACCESS_DENIED_message
+                              );
+                            }
+                          }}
+                        >
+                        <div className="flex items-center gap-0.5">
+                           <Save size={12}/> Save
+                        </div>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                          !product.isActive
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          if (!product.isActive) {
+                            handleShowToasterAboutProductIsInactive();
+                            return;
+                          }
+                          handleEditClick(product);
+                        }}
+                      >
+                        {product.quantityRequired}
+                      </div>
+
+                      {/* <div
+                        className="cursor-pointer text-center border rounded-lg "
+                        onClick={() =>
+                          product.isActive && handleEditClick(product)
+                        }
+                      > */}
+                      <div
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                          !product.isActive
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          if (!product.isActive) {
+                            handleShowToasterAboutProductIsInactive();
+                            return;
+                          }
+                          handleEditClick(product);
+                        }}
+                      >
+                        ₹{product.costExpected}
+                      </div>
+                      <div
+                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                          !product.isActive
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          if (!product.isActive) {
+                            handleShowToasterAboutProductIsInactive();
+                            return;
+                          }
+                          handleEditClick(product);
+                        }}
+                      >
+                        {product.leadInterestName}
+                      </div>
+                      <div className="flex items-center justify-start sm:justify-center">
+                        <button
+                          type="submit"
+                          id={product.companyProductName}
+                          title={product.isActive ? "Active" : "Inactive"}
+                          className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
+                            product.isActive ? "bg-green-500" : "bg-gray-400"
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (userHasAccessToUpdateLead) {
+                              handleUpdateLeadCompanyProductStatus(product);
+                            } else {
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                  .UPDATE_LEAD_ACCESS_DENIED_message
+                              );
+                            }
+                          }}
+                        >
+                          <div
+                            className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
+                              product.isActive
+                                ? "translate-x-4"
+                                : "translate-x-0"
+                            }`}
+                          ></div>
+                        </button>
+
+
+                        
+                      </div>
+                    </>
+                  )}
+                </div>
+              </form>
+            </>
+          )
+        )}
     </div>
   );
 };

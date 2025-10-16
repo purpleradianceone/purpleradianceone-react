@@ -54,27 +54,27 @@ function SubscriptionListAggrid({
           if (params.value === "Ongoing") {
             return (
               <div className="flex items-center gap-1 mt-1">
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                <span className="text-xs text-green-600">
-                  Ongoing <span className="text-xs">✅</span>
+                <CheckCircle2 className="w-4 h-4 -mt-1 caption-custom-active" />
+                <span className="caption-custom-active">
+                  Ongoing <span className="caption-custom-active">✅</span>
                 </span>
               </div>
             );
           } else if (params.value === "Upcoming") {
             return (
               <div className="flex items-center gap-1 mt-1">
-                <XCircle className="w-4 h-4 text-yellow-500" />
-                <span className="text-xs text-yellow-600">
-                  Upcoming <span className="text-xs">⏳</span>
+                <XCircle className="w-4 h-4 -mt-1 caption-custom-orange" />
+                <span className="caption-custom-orange">
+                  Upcoming <span className="caption-custom-orange">⏳</span>
                 </span>
               </div>
             );
           } else {
             return (
               <div className="flex items-center gap-1 mt-1">
-                <XCircle className="w-4 h-4 text-red-500" />
-                <span className="text-xs text-red-600">
-                  Expired <span className="text-xs">❌</span>
+                <XCircle className="w-4 h-4 -mt-1 caption-custom-inactive" />
+                <span className="caption-custom-inactive">
+                  Expired <span className="caption-custom-inactive">❌</span>
                 </span>
               </div>
             );
@@ -239,7 +239,7 @@ function SubscriptionListAggrid({
                 createPortal(
                   <div
                     ref={dropdownRef}
-                    className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 mr-4 z-50"
+                    className="absolute bg-white border rounded-md shadow-lg w-28 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
                     {userHasAccessToUpdateSubscription && (
@@ -253,10 +253,11 @@ function SubscriptionListAggrid({
                           // handleSelectedProductChange(params.data);
                         }}
                       >
-                        <FilePen
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />
-                        {JSX_CHILDREN_NAME.UPDATE}
+                        
+                       <FilePen
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      />{" "}
+                      {JSX_CHILDREN_NAME.UPDATE}
                       </ActionsDropdownButton>
                     )}
                     {!userHasAccessToUpdateSubscription && (
@@ -271,10 +272,11 @@ function SubscriptionListAggrid({
                           // handleSelectedProductChange(params.data);
                         }}
                       >
-                        <FilePen
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />
-                        {JSX_CHILDREN_NAME.UPDATE}
+                       <FilePen
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      />{" "}
+                      {JSX_CHILDREN_NAME.UPDATE}
+                       
                       </ActionsDropdownButton>
                     )}
                   </div>,
@@ -300,8 +302,8 @@ function SubscriptionListAggrid({
   return (
     <>
       <div
-        className="ag-theme-alpine w-full"
-        style={{ height: 505, width: "100%" }}
+        className="ag-theme-balham w-full"
+        style={{ height: "100%", width: "100%" }}
       >
         <AgGridReact
           rowData={subscriptionList}

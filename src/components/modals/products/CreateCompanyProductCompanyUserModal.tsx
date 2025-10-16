@@ -13,6 +13,7 @@ import axios from "axios";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import Button from "../../ui/Button";
+import { createPortal } from "react-dom";
 
 function CreateCompanyProductCompanyUserModal({
   isOpen,
@@ -98,8 +99,8 @@ function CreateCompanyProductCompanyUserModal({
 
   if (!isOpen) return null;
 
-  return (
-    <div className={isSmallScreen ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"}>
+  return createPortal(
+    <div className={isSmallScreen ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5" : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"}>
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div className="relative w-full max-w-3xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
           {/* Header */}
@@ -166,7 +167,10 @@ function CreateCompanyProductCompanyUserModal({
           {/* Footer with Button */}
           <div className="p-6 border-t bg-white">
             <div className="flex justify-end">
-              <Button onClick={handleCreateCompanyProductCompanyUserSubmit}>
+              <Button type="submit" onClick={(e) => {
+                e.preventDefault();
+                handleCreateCompanyProductCompanyUserSubmit();
+              }}>
                 Update Users
               </Button>
             </div>
@@ -181,7 +185,8 @@ function CreateCompanyProductCompanyUserModal({
           duration={NUMBER_VALUES.SNACKBAR_DURATION}
         />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

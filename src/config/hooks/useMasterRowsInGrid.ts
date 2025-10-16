@@ -5,6 +5,7 @@ import axios from "axios"
 import ApiError from "../../@types/error/ApiError"
 import { STATUS_CODE } from "../../constants/AppConstants"
 import RefreshToken from "../validations/RefreshToken"
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext"
 
 interface rowsInGridDropdownOptionsResponse {
     id: number,
@@ -12,9 +13,11 @@ interface rowsInGridDropdownOptionsResponse {
 }
 export const useMasterRowsInGrid = () => {
     const [rowsInGridDropdownOptions, setRowsInGridDropdownOptions] = useState<RowsInGridDropdownOptions[]>([])
+    const {loginStatus} = useLoggedInUserContext();
 
     const fetchMasterRowsInGridDropdownOptions = async () => {
-        const postData = {
+        if(loginStatus.status){
+                const postData = {
             id: null,
         };
         setRowsInGridDropdownOptions([]);
@@ -38,12 +41,17 @@ export const useMasterRowsInGrid = () => {
                 }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: ApiError | any) => {
+            .catch(async(error: ApiError | any) => {
                 if (error.status === STATUS_CODE.UNATHORISED) {
 
-                    RefreshToken({ callFunction: fetchMasterRowsInGridDropdownOptions })
+                   const refreshTOkenResponse = await RefreshToken({ callFunction: fetchMasterRowsInGridDropdownOptions });
+                   if(refreshTOkenResponse){
+                    fetchMasterRowsInGridDropdownOptions();
+                   }
                 }
             });
+        }
+        
     }
 
     useEffect(() => {

@@ -98,18 +98,18 @@ const CustomTimezoneDropdown: React.FC<Props> = ({
                 setDropdownOpen(false);
                 onSelect(zone);
               }}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-3 py-2 caption-custom hover:bg-gray-100 cursor-pointer"
             >
               {zone.timezone}
             </div>
           ))}
           {hasMore && timezoneData.length > 0 && (
-            <div className="text-center text-sm text-gray-500 py-2">
+            <div className="text-center caption-custom py-2">
               Loading more...
             </div>
           )}
           {timezoneData.length === 0 && searchText !== "" && (
-            <div className="text-center text-sm text-gray-500 py-2">
+            <div className="text-center caption-custom py-2">
               No timezones found.
             </div>
           )}

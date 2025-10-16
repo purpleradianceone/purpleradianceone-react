@@ -1,40 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import {  useMemo, useRef } from "react";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { useMemo, useRef } from "react";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGridProps";
 import LeadDataProps from "../../@types/lead-management/LeadProps";
-
-
 
 function LeadManagementAgGrid({
   leads,
   onRowSelect, //selected user for view lead details
-  handleRowClick
+  handleRowClick,
+  isUsedInLeadModule,
 }: LeadManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        hide: false,
-        field:"id",
-        headerName : "leadid"
-      },
-      {
-        field: "leadOwner",
-        headerName: "Lead Owner",
-        sortable: true,
-        filter: "agTextColumnFilter",
-        flex: 1,
-        minWidth: 180,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
-
+        hide: true,
+        field: "id",
+        headerName: "leadid",
       },
       {
         field: "name",
-        headerName: "Lead Name",
+        headerName: "Name",
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
@@ -51,42 +40,51 @@ function LeadManagementAgGrid({
       },
       {
         field: "mobileNumber",
-        headerName: "Mobile Number",
+        headerName: "Mobile number",
         sortable: true,
         filter: true,
       },
       {
+        field: "leadOwner",
+        headerName: "Owner",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 180,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+      {
         field: "leadStatus",
-        headerName: "Lead Status",
+        headerName: "Status",
         sortable: true,
         filter: true,
       },
       {
         field: "leadSource",
-        headerName: "Lead Source",
+        headerName: "Source",
         sortable: true,
         filter: true,
       },
-      { 
+      {
         field: "createdBy",
-        headerName: "Created By",
-        filter: true
+        headerName: "Created by",
+        filter: true,
       },
       {
         field: "createdOn",
-        headerName: "Created On",
+        headerName: "Created on",
         sortable: true,
         filter: true,
       },
-       {
+      {
         field: "updatedBy",
-        headerName: "Updated By",
+        headerName: "Updated by",
         sortable: true,
         filter: true,
       },
-       {
+      {
         field: "updatedOn",
-        headerName: "Updated On",
+        headerName: "Updated on",
         sortable: true,
         filter: true,
       },
@@ -98,37 +96,40 @@ function LeadManagementAgGrid({
         sortable: false,
         maxWidth: 110,
         pinned: "right",
-         cellStyle: {
-          color: '#2563eb', // Tailwind's blue-600
-          textDecoration: 'none',
-          cursor: 'pointer',
-          fontWeight: '400'
-        }
+        cellStyle: {
+          color: "#2563eb", // Tailwind's blue-600
+          textDecoration: "none",
+          cursor: "pointer",
+          fontWeight: "400",
+        },
       },
       {
-        headerName :"Actions",
+        headerName: "Actions",
+        // hide: !isUsedInLeadModule,
         field: "view",
-        pinned : "right",
-        maxWidth : 110,
-        // cellRenderer : ()=> "View",
-        cellRenderer : (params :LeadDataProps| any ) => {
+        pinned: "right",
+        maxWidth: 80,
+        // minWidth:80,
+        // autoHeight: true,
+        // suppressSizeToFit: true,
+        cellRenderer: (params: LeadDataProps | any) => {
           return (
-            <span
-            style={{
-              color: '#2563eb',
-              textDecoration: 'none',
-              cursor: 'pointer',
-              fontWeight: '400',
-              fontSize : 13
-            }}
-            onClick={() =>{
-              params.context.handleRowSelect(params.data)
-            }}>
-              Lead Details
-            </span>
-          )
+            <div className="flex items-center justify-center  ">
+              <span
+                className="lead-details cursor-pointer text-blue-600  "
+                onClick={() => {
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+                
+                {
+                  isUsedInLeadModule ? "Details": "Select"
+                }
+              </span>
+            </div>
+          );
         },
-      }
+      },
     ],
     []
   );
@@ -156,7 +157,8 @@ function LeadManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        context={{ handleRowSelect : onRowSelect}}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />
     </div>

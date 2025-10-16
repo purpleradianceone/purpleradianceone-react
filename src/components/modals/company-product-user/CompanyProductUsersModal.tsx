@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditIcon, X } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
+import { EditIcon } from "lucide-react";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import CompanyProductUsersModalProps from "../../../@types/modal/CompanyProductUsersModalProps";
@@ -15,6 +15,9 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import axios from "axios";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 function CompanyProductUsersModal({
   isOpen,
   onClose,
@@ -109,8 +112,12 @@ function CompanyProductUsersModal({
             companyProductUsersGridApiRef.current = null;
             companyProductUsersLastScrollPositionRef.current = 0;
             setIsCompanyProductUsersFetchedCount(0);
-            setAddCompanyProductUserArray([]);
+            
+            toast.success(response.data.message)
+          }else{
+            toast.error(response.data.message)
           }
+          setAddCompanyProductUserArray([]);
         })
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -344,36 +351,43 @@ function CompanyProductUsersModal({
   }, [isOpen, companyProductUserUpdateCount]);
 
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 justify-content-center pl-28 p-16 pt-2 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 justify-content-center pl-28 p-9  overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-full items-center justify-center">
         <div
-          className="relative w-full max-w-6xl min-w-full max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl min-w-full max-h-[95vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6 sticky bg-white py-2">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-3">
+            {/* <div className="flex items-center gap-2  border-b sticky bg-white ">
+              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
+              <h2 className="text-lg font-semibold text-gray-800">
                 Edit product {companyProduct.name} Users
               </h2>
               <button
                 onClick={() => {
                   onClose();
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="absolute right-1 top-2 text-gray-500 hover:text-gray-700"
               >
                 <X size={SIZE.TWENTY} />
               </button>
-            </div>
+            </div> */}
+            <FormHeader
+            icon={EditIcon}
+            onClose={onClose}
+            description="Manage the users assigned to product"
+            preText="Edit product users of"
+            userName={companyProduct.name}
+            />
             {/*Aggrid logic here */}
             <CompanyTeamUsersAgGrid
               companyProduct={companyProduct}
@@ -399,7 +413,8 @@ function CompanyProductUsersModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

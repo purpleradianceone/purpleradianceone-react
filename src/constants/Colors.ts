@@ -1,11 +1,72 @@
 const COLORS={
     BG_BLUE_600_COLOR:"bg-blue-600",
     HOVER_BG_BLUE_700_COLOR_HOVER:"hover:bg-blue-700",
+    BG_GRAY_500_COLOR:"bg-gray-500",
+    CANCEL_BUTTON_TEXT_COLOR: "text-gray-500",
+    HOVER_BG_GRAY_600_COLOR_HOVER:"hover:bg-gray-600",
     PRIMARY_SNACKBAR_TEXT_GREEN_COLOR:"text-green-800",
     PRIMARY_SNACKBAR_TEXT_RED_COLOR:"text-red-800",
     WHITE_SMOKE : "#f5f5f5",
     WHITE : "white",
+    GRID_HEADER_ICONS_COLOR_AND_SIZE : "w-6 h-6 text-blue-600",
+    GRID_HEADER_SECTION_BG_COLOR : "bg-gray-50",
+    FORM_HEADER_ICONS_COLOR : "text-blue-500 mt-1",
+    INPUT_LABEL_ICONS_COLOR : "inline mr-1 text-blue-500",
+    INPUT_READONLY_BG_COLOR : "bg-gray-100",
+    INPUT_FOCUS_COLOR : "focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+    INPUT_BORDER_COLOR : "border-gray-300",
+    CHIP_ACTIVE : "bg-white px-2  border-green-400 border rounded-full caption-custom-active",
+    CHIP_INACTIVE : "bg-white px-2  border-red-400 border rounded-full caption-custom-inactive",
+    CHIP_SECONDARY : "bg-white px-2  border-blue-400 border rounded-full caption-custom-blue",
+    CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
+    ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700"
 }
 
+export const chartColors = [
+  "#1976d2", // blue
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff8042",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042"
+];
+
+ export const backgroundColors = [
+    "bg-red-500",//a
+    "bg-blue-500",//b
+    "bg-green-500",//c
+    "bg-purple-500",//d
+    "bg-yellow-500",//e
+    "bg-emerald-500",//f
+    "bg-teal-500",//g
+    "bg-orange-500",//h
+    "bg-cyan-500",//i
+    "bg-fuchsia-500",//j
+    "bg-pink-500",//k
+    "bg-violet-500",//l
+    "bg-indigo-500",//m
+    "bg-lime-500",//n
+    "bg-rose-500",//o
+    "bg-amber-500",//p
+    "bg-sky-500",//q
+    "bg-sky-400",//r
+    "bg-fuchsia-400",//s
+    "bg-green-400",//t
+    "bg-cyan-400",//u
+    "bg-teal-400",//v
+    "bg-red-400",//w
+    "bg-amber-400",//x
+    "bg-emerald-400",//y
+    "bg-pink-400",//z
+  ];
+
+  export const alphabets = ["a","b","c","d","e",
+    "f","g","h","i","j",
+    "k","l","m","n","o",
+    "p","q","r","s","t",
+    "u","v","w","x","y","z"
+  ]
 export default COLORS;
 

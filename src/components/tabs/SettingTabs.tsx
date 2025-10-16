@@ -6,13 +6,14 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import LeadFormEmbed from "./LeadFormEmbed";
 import LeadSetting from "../views/settings/lead-settings/LeadSetting";
 import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
 import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
 import CompanyPreferenceSetting from "../views/settings/company-preferences/CompanyPreferenceSetting";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
+import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
+import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -22,6 +23,7 @@ function SettingsTabs() {
     userHasAccessToViewCompanyPreferences,
     userHasAccessToViewMeetingSetting,
     userHasAccessToViewSettingGeneral,
+    userHasAccessToViewCompanyAccountType
   } = useUserAccessModules();
 
   const data = [
@@ -31,13 +33,10 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewSettingLeady ? (
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-1">
+            activeTab === "onlineLead" &&
+            <div className="grid grid-cols-1 gap-2">
+              <div className="col-span-1 min-h-full">
                 <LeadSetting />
-              </div>
-
-              <div className="col-span-1">
-                <LeadFormEmbed></LeadFormEmbed>
               </div>
             </div>
           ) : (
@@ -49,15 +48,28 @@ function SettingsTabs() {
     {
       label: "Email",
       value: "emailSettings",
-      desc: <EmailSetting />,
+      desc:  activeTab === "emailSettings" && <EmailSetting />,
     },
-    {
+     {
       label: "Meetings",
       value: "meeting",
       desc: (
         <>
           {userHasAccessToViewMeetingSetting ? (
-            <MeetingSettings></MeetingSettings>
+            activeTab === "meeting" && <MeetingSettings></MeetingSettings>
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Account Type",
+      value: "accounttype",
+      desc: (
+        <>
+          {userHasAccessToViewCompanyAccountType ? (
+            activeTab === "accounttype" && <AccountTypeSetting/>
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -70,7 +82,7 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewCompanyPreferences ? (
-            <CompanyPreferenceSetting></CompanyPreferenceSetting>
+           activeTab === "companyPreference" && <CompanyPreferenceSetting></CompanyPreferenceSetting>
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -83,11 +95,7 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewSettingGeneral ? (
-            <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                General Settings
-              </h2>
-            </div>
+            activeTab === "general" && <UserPrerefenceManagement />
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -99,27 +107,32 @@ function SettingsTabs() {
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white pb-2">
+        <div className="sticky top-0  bg-white pb-2">
           <TabsHeader
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
+            onResize={undefined}
+            onResizeCapture={undefined}
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                "main-nav-custom active-header shadow-none focus:outline-none",
             }}
+            className="shadow-none focus:outline-none"
+            
           >
             {data.map(({ label, value }) => (
               <Tab
                 placeholder="Online Lead"
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+            onResizeCapture={undefined}
                 key={value}
                 value={value}
                 onClick={() => setActiveTab(value)}
                 className={
-                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  activeTab === value ? "main-nav-custom active-tab mt-0.5" : "main-nav-custom"
                 }
               >
                 {label}
@@ -134,6 +147,8 @@ function SettingsTabs() {
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {data.map(({ value, desc }) => (
               <TabPanel key={value} value={value}>

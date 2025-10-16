@@ -2,25 +2,34 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, Edit, UserCheck, XCircle } from "lucide-react";
+import { Edit, LucideLayoutDashboard, UserCheck } from "lucide-react";
 import { createPortal } from "react-dom";
-import {
-  INNERHTML,
-  JSX_CHILDREN_NAME,
-} from "../../constants/AppConstants";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import StatusIndicator from "../ui/StatusIndicator";
+import AppTutorailManager from "../views/tutorails/AppTutorailManager";
+import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsSteps";
 // import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
   handleSelectedCompanyUserChange,
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
+  handleIsDashboardModalOpen,
+  handleActionsTourEnd,
+  isActionsTourEnded,
 }: CompanyUserAgGridProps) {
-  const { userHasAccessToViewAccess, userHasAccessToUpdateUser } =
-    useUserAccessModules();
+  const {
+    userHasAccessToViewAccess,
+    userHasAccessToUpdateUser,
+    userHasAccessToViewDashboard,
+  } = useUserAccessModules();
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -46,7 +55,7 @@ function CompanyUserAgGrid({
       {
         field: "mobilenumber",
         headerName: "Mobile Number",
-        
+
         sortable: true,
         filter: true,
       },
@@ -71,17 +80,7 @@ function CompanyUserAgGrid({
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              {params.value ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-green-600">Active</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-xs text-red-600">Inactive</span>
-                </>
-              )}
+              <StatusIndicator isActive={params.value} />
             </div>
           );
         },
@@ -91,46 +90,48 @@ function CompanyUserAgGrid({
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        headerClass: "company-users-actions-column",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
-          const [isActionsDropDownOpen, setIsActionsDropDownOpen] = useState(
-            false
-          );
+          const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
+            useState(false);
+
           const [position, setPosition] = useState({
             top: 0,
             left: 0,
-            isUpward : false,
+            isUpward: false,
           });
 
-          
           const dropdownRef = useRef<HTMLDivElement | null>(null);
 
           const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
+
             setIsActionsDropDownOpen((prev) => !prev);
 
-            const rect = (event.currentTarget as HTMLButtonElement).getBoundingClientRect();
+            const rect = (
+              event.currentTarget as HTMLButtonElement
+            ).getBoundingClientRect();
             const dropdownHeight = 80; // Approximate height of dropdown
             const windowHeight = window.innerHeight;
             const spaceBelow = windowHeight - rect.bottom;
             const isUpward = spaceBelow < dropdownHeight;
-        
+
             setPosition({
-              top: isUpward 
+              top: isUpward
                 ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
                 : rect.bottom + window.scrollY - 10, // Position below button
-              left: rect.left + window.scrollX - 25,
-              isUpward
+              left: rect.left + window.scrollX - 50,
+              isUpward,
             });
-
-           
           };
 
           useEffect(() => {
             const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
               if (
                 dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
+                !dropdownRef.current.contains(event.target as Node) &&
+                !isActionsTourEnded
               ) {
                 setIsActionsDropDownOpen(false);
               }
@@ -150,6 +151,7 @@ function CompanyUserAgGrid({
           return (
             <>
               <button
+                id="actions-button"
                 className="text-blue-600"
                 onClick={handleActionsButtonClick}
               >
@@ -160,51 +162,122 @@ function CompanyUserAgGrid({
                 createPortal(
                   <div
                     ref={dropdownRef}
-                    className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
+                    className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
-                    {userHasAccessToViewAccess && (
-                      <ActionsDropdownButton
-                        onClick={() => {
+                    {isActionsTourEnded && (
+                      <AppTutorailManager
+                        steps={CompanyUsersGridActionsButtonStep}
+                        handleTourEnd={() => {
+                          setIsActionsDropDownOpen(false);
+                          handleActionsTourEnd!();
+                          handleIsAccessModalOpen(false);
+                           handleIdIsEditModalOpen(false);
+                            handleIsDashboardModalOpen(false);
+                        }}
+                        modalOpenTriggerIndices={[0, 2, 4, 5]}
+                        isModalOpen={(index) => {
+                          if (index === 0) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(true);
+                            
+                          }
+                          if (index === 2) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(false);
+                            handleIdIsEditModalOpen(true);
+                          }
+                           if (index === 4) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(false);
+                            handleIdIsEditModalOpen(false);
+                            handleIsDashboardModalOpen(true);
+                          }
+                          
+                        }}
+                      />
+                    )}
+                    <ActionsDropdownButton
+                      id="company-user-access-management-action-btn"
+                      disabled={!userHasAccessToViewAccess}
+                      onClick={() => {
+                        if (userHasAccessToViewAccess) {
                           handleSelectedCompanyUserChange(params.data);
                           handleIsAccessModalOpen(true);
                           setIsActionsDropDownOpen(false);
-                        }}
-                      >
-                        <UserCheck
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />{" "}
-                        {JSX_CHILDREN_NAME.ACCESS}
-                      </ActionsDropdownButton>
-                    )}
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.MODULE_ACCESS
+                              .DENIED_VIEW_ACCESS_MODULE_ACCESS
+                          );
+                        }
+                      }}
+                    >
+                      <UserCheck
+                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                      />{" "}
+                      {JSX_CHILDREN_NAME.ACCESS}
+                    </ActionsDropdownButton>
 
-                    {userHasAccessToUpdateUser && (
-                      <ActionsDropdownButton
-                        onClick={() => {
+                    <ActionsDropdownButton
+                      id="company-user-edit-action-btn"
+                      disabled={!userHasAccessToUpdateUser}
+                      onClick={() => {
+                        if (userHasAccessToUpdateUser) {
                           handleSelectedCompanyUserChange(params.data);
                           handleIdIsEditModalOpen(true);
                           setIsActionsDropDownOpen(false);
-                        }}
-                      >
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
-                      </ActionsDropdownButton>
-                    )}
-                    {!userHasAccessToViewAccess && (
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.COMPANY_USER
+                              .DENIED_UPDATE_ACCESS_COMPANY_USER
+                          );
+                        }
+                      }}
+                    >
+                      <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                      {JSX_CHILDREN_NAME.EDIT}
+                    </ActionsDropdownButton>
+
+                    <ActionsDropdownButton
+                      id="company-user-dashboard-action-btn"
+                      disabled={!userHasAccessToViewDashboard}
+                      onClick={() => {
+                        if (userHasAccessToViewDashboard) {
+                          handleSelectedCompanyUserChange(params.data);
+                          handleIsDashboardModalOpen(true);
+                          setIsActionsDropDownOpen(false);
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.DASHBOARD
+                              .DENIED_VIEW_ACCESS_DASHBOARD
+                          );
+                        }
+                      }}
+                    >
+                      <span className="flex gap-1">
+                        <LucideLayoutDashboard
+                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        />{" "}
+                        {JSX_CHILDREN_NAME.DASHBOARD}
+                      </span>
+                    </ActionsDropdownButton>
+
+                    {/* {!userHasAccessToViewAccess && (
                       <ActionsDropdownButton disabled>
                         <UserCheck
                           className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                         />{" "}
                         {JSX_CHILDREN_NAME.ACCESS}
                       </ActionsDropdownButton>
-                    )}
+                    )} */}
 
-                    {!userHasAccessToUpdateUser && (
+                    {/* {!userHasAccessToUpdateUser && (
                       <ActionsDropdownButton disabled>
                         <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
                         {JSX_CHILDREN_NAME.EDIT}
                       </ActionsDropdownButton>
-                    )}
+                    )} */}
                   </div>,
                   document.body // Render dropdown in body to avoid clipping
                 )}
@@ -228,10 +301,9 @@ function CompanyUserAgGrid({
   }, []);
 
   return (
-
     <div
-      // className="ag-theme-balham w-full "
-      style={{ height: "100vh", width: "100%" }}
+      className="ag-theme-balham w-full "
+      style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         rowData={users}
@@ -241,7 +313,7 @@ function CompanyUserAgGrid({
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
       />
-     </div>
+    </div>
   );
 }
 

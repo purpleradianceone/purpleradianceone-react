@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit, X } from "lucide-react";
+import { CheckCircle2, Edit, Save, Text, Users, X, XCircle } from "lucide-react";
 import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
-  NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
 } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
@@ -11,15 +9,9 @@ import { useFormChange } from "../../../config/hooks/useFormChange";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import Button from "../../ui/Button";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import { useEffect, useRef, useState } from "react";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
-import RadioButtons from "../../ui/RadioButton";
 import MESSAGE from "../../../constants/Messages";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -30,6 +22,10 @@ import EditCompanyTeamModalProps from "../../../@types/modal/EditCompanyTeamModa
 import CompanyTeamUsers from "../../../@types/team-management/CompanyTeamUsers";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -45,25 +41,8 @@ function EditCompanyTeamModal({
   const intialUpdateCompanyTeamFormData = {
     name: companyTeam.name,
     description: companyTeam.description,
-    isActive: companyTeam.isActive,
   };
 
-  const CompanyTeamIsActiveRadioButtonOptions = [
-    {
-      label: "Active",
-      value: "true",
-      id: "active",
-      name: "isActive",
-      checked: companyTeam.isActive,
-    },
-    {
-      label: "Inactive",
-      value: "false",
-      id: "inActive",
-      name: "isActive",
-      checked: !companyTeam.isActive,
-    },
-  ];
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -77,19 +56,7 @@ function EditCompanyTeamModal({
     "registration"
   );
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success",
-  });
-
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleMessageSnackbarClose = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  const [isTeamActive,setIsTeamActive] = useState<boolean>(companyTeam.isActive) 
   const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
     CompanyTeamUsers[]
   >([]);
@@ -185,10 +152,7 @@ function EditCompanyTeamModal({
         )
         .then((response) => {
           if (response.data.status) {
-            showMessageSnackbar({
-              message: response.data.message,
-              type: "success",
-            });
+            toast.success(response.data.message);
             setIsCompanyTeamUsersAddCompleted(true);
             handleCompanyTeamUsersUpdateChange();
             setCompanyTeamUsersList([]);
@@ -199,6 +163,8 @@ function EditCompanyTeamModal({
             companyTeamUsersLastScrollPositionRef.current = 0;
             setIsCompanyTeamUsersFetchedCount(0);
             setAddCompanyTeamUserArray([]);
+          }else{
+            toast.error(response.data.message);
           }
         })
         .catch(async (error: ApiError | any) => {
@@ -244,7 +210,7 @@ function EditCompanyTeamModal({
         company_id: loginStatus.companyId,
         company_team_id: companyTeam!.id,
         company_user_id: 0,
-        isactive: true,
+        // isactive: true,
         search_company_specific_date_range_id: 0,
         search_parameter: companyTeamsUserSearchParameter,
         search_parameter_date: "",
@@ -380,7 +346,47 @@ function EditCompanyTeamModal({
     }
   };
 
+  const handleComapnyTeamToggle = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    const {checked} = event.target;
+    if(userHasAccessToUpdateTeamManagement){
+      const updateCompanyTeamPostData = {
+          id: companyTeam.id,
+          company_id: loginStatus.companyId,
+          name: updateCompanyTeamFormData.name,
+          description: updateCompanyTeamFormData.description,
+          isactive: checked,
+          updatedby: loginStatus.id,
+        };
+        axios
+          .post(POST_API.UPDATE_COMPANY_TEAM, updateCompanyTeamPostData, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data.status) {
+              toast.success(response.data.message);
+              handleCompanyTeamChangeOnUpdate(companyTeam.id);
+              setIsTeamActive(checked);
+            }else{
+              toast.error(response.data.message);
+            }
+          })
+          .catch(async (error: ApiError | any) => {
+            if (error.status === STATUS_CODE.UNATHORISED) {
+              const refreshTokenResponse = await RefreshToken({
+                callFunctionWithEvent: handleComapnyTeamToggle,
+              });
+              if (refreshTokenResponse) {
+                handleComapnyTeamToggle(event);
+              }
+            }
+          });
+    }else{
+      toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+    }
+  }
   const { isSmallScreen } = useScreenSize();
+
+
   const handleUpdateCompanyTeam = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -390,16 +396,14 @@ function EditCompanyTeamModal({
         intialUpdateCompanyTeamFormData.description !==
           updateCompanyTeamFormData.description ||
         intialUpdateCompanyTeamFormData.name !==
-          updateCompanyTeamFormData.name ||
-        updateCompanyTeamFormData.isActive !==
-          intialUpdateCompanyTeamFormData.isActive
+          updateCompanyTeamFormData.name
       ) {
         const updateCompanyTeamPostData = {
           id: companyTeam.id,
           company_id: loginStatus.companyId,
           name: updateCompanyTeamFormData.name,
           description: updateCompanyTeamFormData.description,
-          isactive: updateCompanyTeamFormData.isActive,
+          isactive: isTeamActive,
           updatedby: loginStatus.id,
         };
         axios
@@ -408,14 +412,13 @@ function EditCompanyTeamModal({
           })
           .then((response) => {
             if (response.data.status) {
-              showMessageSnackbar({
-                message: response.data.message,
-                type: "success",
-              });
+              toast.success(response.data.message);
               handleCompanyTeamChangeOnUpdate(companyTeam.id);
               setTimeout(() => {
                 onClose();
               }, 3000);
+            }else{
+              toast.error(response.data.message);
             }
           })
           .catch(async (error: ApiError | any) => {
@@ -429,10 +432,7 @@ function EditCompanyTeamModal({
             }
           });
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.NO_CHANGES,
-          type: "error",
-        });
+        toast.error(MESSAGE.ERROR.NO_CHANGES)
       }
     }
   };
@@ -443,7 +443,7 @@ function EditCompanyTeamModal({
         name: "",
         description: "",
       });
-      handleMessageSnackbarClose();
+
       setCompanyTeamUsersList([]);
       setAddCompanyTeamUserArray([]);
       setssCompanyTeamUsersFetchedForFirstTime(true);
@@ -462,79 +462,130 @@ function EditCompanyTeamModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, companyTeamUsersUpdateCount]);
 
+  useEffect(() => {
+    setIsTeamActive(companyTeam.isActive);
+  },[companyTeam])
+
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       className={
         isSmallScreen
-          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-45"
-          : "fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-45"
+          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
+          : "fixed inset-0 z-50 p-7 overflow-hidden bg-black bg-opacity-5"
       }
     >
-      <div className="flex min-h-screen mb-5 items-center justify-center">
+      <div className="flex min-h-screen  items-center justify-center">
         <div
-          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Edit className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Edit Team {companyTeam.name}
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div>
+          <div className="p-4">
+            <FormHeader
+            icon={Edit}
+            onClose={onClose}
+            preText="Edit team  - "
+            userName={companyTeam.name}
+            description="Modify the details of an existing company team."
+            />
 
-            <form className="space-y-1" onSubmit={handleUpdateCompanyTeam}>
+            <form className="space-y-2" onSubmit={handleUpdateCompanyTeam}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-stretch">
                 <FormInput
+                logo={Users}
                   label="Team Name : "
                   type="text"
                   name="name"
                   defaultValue={intialUpdateCompanyTeamFormData.name}
-                  placeholder="Product Name"
+                  placeholder="Team Name"
                   onBlur={handleBlur}
-                  required={true}
+                  // required={true}
                   error={errors.name}
                   onChange={handleUpdateCompanyFormDataChange}
                 />
 
-                <RadioButtons
-                  label="IsActive : "
-                  onChange={handleUpdateCompanyFormDataChange}
-                  options={CompanyTeamIsActiveRadioButtonOptions}
-                />
+                 <div className="flex items-center mt-6 gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    {isTeamActive ? (
+                      <div>
+                        <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
+                        <span className="input-label-custom">Active</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
+                        <span className="input-label-custom">Inactive</span>
+                      </div>
+                    )}
+                  </label>
+                  {/* <label className="inline-flex items-center cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isTeamActive}
+                      id="isActive"
+                      name="isActive"
+                      onChange={handleComapnyTeamToggle}
+                    />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
+                  </label> */}
+                  <ToggleButton
+                  checked={isTeamActive}
+                  name="isActive"
+                  onToggle={handleComapnyTeamToggle}
+                  />
+                </div>
               </div>
 
               <TextAreaInput
+              logo={Text}
                 label="Description : "
                 name="description"
-                placeholder="Product Description"
+                placeholder="Team Description"
                 defaultValue={intialUpdateCompanyTeamFormData.description}
                 cols={5}
                 rows={3}
                 maxLength={256}
                 required={true}
-                onBlur={handleBlur}
-                error={errors.description}
+               
                 onChange={handleUpdateCompanyFormDataChange}
               />
 
               {userHasAccessToUpdateTeamManagement ? (
-                <div className="flex justify-self-center max-w-60 m-3 pb-14">
-                  <Button type="submit">Update Team</Button>
-                </div>
+                <div className="flex justify-self-end m-2 min-w-70 gap-2">
+                <Button type="button" onClick={onClose}>
+                  <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button type="submit">
+                  <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+              </div>
               ) : (
-                <div className="flex justify-self-end max-w-36 m-3">
-                  <Button type="submit" onClick={() => {}} disabled>
-                    Edit Team
+
+                <div className="flex justify-self-end max-w-70 m-2 gap-2">
+                  <Button type="button" onClick={onClose}>
+                  <div className="flex items-center justify-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                  <Button type="submit" onClick={(e) => {e.preventDefault()}} disabled>
+                    <div className="flex items-center justify-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
                   </Button>
                 </div>
               )}
@@ -560,15 +611,9 @@ function EditCompanyTeamModal({
             ></CompanyTeamUsersAgGrid>
           </div>
         </div>
-        <MessageSnackBar
-          isOpen={messageSnackbar.open}
-          message={messageSnackbar.message}
-          type={messageSnackbar.type}
-          onClose={handleMessageSnackbarClose}
-          duration={NUMBER_VALUES.SNACKBAR_DURATION}
-        />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 export default EditCompanyTeamModal;

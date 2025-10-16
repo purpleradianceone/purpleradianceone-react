@@ -6,6 +6,7 @@ import UpdateSubscription from "../../subscription-module/UpdateSubscription";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
+import LOCALSTORAGE_KEYS from "../../../constants/LocalStorage";
 
 function SubscriptionDialogueBox({
   isOpen,
@@ -26,7 +27,12 @@ function SubscriptionDialogueBox({
     useState<boolean>(false);
   useEffect(() => {
     if (!isOpen) {
-      localStorage.clear();
+      localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+      localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
     }
   }, [isOpen]);
 
@@ -48,20 +54,20 @@ function SubscriptionDialogueBox({
   if (!isOpen) return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-      />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
 
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-2 animate-in fade-in zoom-in duration-200">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 ">{cardTitle}</h2>
-          <p className="text-gray-600 text-sm">{message}</p>
+          <h2 className="section-header-custom ">{cardTitle}</h2>
+          <p className="input-label-custom">{message}</p>
         </div>
 
         <div className="flex justify-end gap-3">
           <div className="flex">
             <Button
-              onClick={() => {
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 setIsEditSubscriptionUserModalOpen(true);
               }}
             >
@@ -71,7 +77,9 @@ function SubscriptionDialogueBox({
 
           <div className="flex">
             <Button
-              onClick={() => {
+            type="submit"
+              onClick={(e) => {
+                e.preventDefault();
                 setIsUpgradeSubscriptionModalOpen(true);
               }}
             >

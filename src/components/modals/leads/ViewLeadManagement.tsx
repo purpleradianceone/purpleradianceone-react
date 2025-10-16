@@ -1,16 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronLeft, History, Plus, Settings, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit3,
+  Handshake,
+  History,
+  Plus,
+  Save,
+  Settings,
+  User2,
+  X,
+} from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { usePanel } from "../../../context/panel/usePanel";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
-  NUMBER_VALUES,
   STATUS_CODE,
+  VALIDATIONS,
 } from "../../../constants/AppConstants";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
@@ -19,11 +28,6 @@ import LeadStatusHistory from "./LeadStatusHistory";
 import LeadDetails from "./LeadDetails";
 import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
 import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
@@ -38,18 +42,28 @@ import LeadContactType from "../../../@types/lead-management/LeadContact";
 import LeadAssignedTeams from "./LeadAssignedTeams";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
-import Button from "../../ui/Button";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
+import toast from "react-hot-toast";
+import { useUserPreference } from "../../../context/user/UserPreference";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
+import Button from "../../ui/Button";
+import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
+import StatusUpdateModal from "./lead-status/StatusUpdateModal";
+import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead, userHasAccessToViewLead } = useUserAccessModules();
+  const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
+    useUserAccessModules();
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
     useState<boolean>(false);
-  const { position } = usePanel();
+  const { userPreference } = useUserPreference();
   const [searchParams] = useSearchParams();
   const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState<boolean>(false);
   const [reasonInputBoxOpenForLeadOwner, setReasonInputBoxOpenForLeadOwner] =
@@ -91,22 +105,6 @@ const ViewLeadManagement = () => {
   const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
     useState<boolean>(false);
 
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
-
-  // const UPDATE_LEAD_ACCESS_DENIED_message = "oamd;slm"
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-  
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -161,6 +159,7 @@ const ViewLeadManagement = () => {
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
+        
           const updatedStatusName = leadStatus?.find(
             (item) => item.id === selectedStatusId
           )?.name;
@@ -179,18 +178,13 @@ const ViewLeadManagement = () => {
           setReasonInputBoxOpen(false);
           setReasonText("");
           setSelectedStatusId(null);
-          
+
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+
+          toast.success(response.data.message);
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
       }
     } catch (error: any) {
@@ -222,6 +216,7 @@ const ViewLeadManagement = () => {
   const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
     number | null
   >(selectedLeadData.companyUserId);
+
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
@@ -263,10 +258,7 @@ const ViewLeadManagement = () => {
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
-      showMessageSnackbar({
-        message: "Select new lead owner before procedding.",
-        type: "error",
-      });
+      toast.error("Select new lead owner before procedding.");
       return;
     }
     const PostDataLeadOwnerChange = {
@@ -285,11 +277,7 @@ const ViewLeadManagement = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
-
+          toast.success(response.data.message);
           const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
           parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
           const newQueryString = qs.stringify({
@@ -305,18 +293,13 @@ const ViewLeadManagement = () => {
           setSelectedLeadData((prev: any) => ({
             ...prev,
             leadOwner: selectedCompanyUser.fullname,
+            companyUserId: selectedCompanyUser.id,
           }));
         } else {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "error",
-          });
+          toast.error(response.data.message);
         }
       } else {
-        showMessageSnackbar({
-          message: response.data.status,
-          type: "error",
-        });
+        toast.error(response.data.message);
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -590,6 +573,17 @@ const ViewLeadManagement = () => {
   }, []);
 
   const handleLeadInfoSave = async () => {
+    const trimmedName = selectedLeadData.name?.trim() ?? "";
+
+    // case 1: only spaces → not allowed
+    if (selectedLeadData.name !== "" && trimmedName === "") {
+      setSelectedLeadData((prev: any) => ({
+        ...prev,
+        name: null,
+      }));
+    }
+    console.log(trimmedName);
+
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id, //NOTE : LEAD ID FOR EDIT
@@ -598,6 +592,8 @@ const ViewLeadManagement = () => {
       mobilenumber: selectedLeadData.mobileNumber,
       updatedby_id: loginStatus.id,
     };
+    console.log(PostDataForLeadUpdate);
+
     try {
       const response = await axios.post(
         POST_API.UPDATE_LEAD,
@@ -611,12 +607,12 @@ const ViewLeadManagement = () => {
         const leadDataStr = urlParams.get("leadData");
 
         const parsedQuery = JSON.parse(leadDataStr || "{}");
-        parsedQuery.name = !selectedLeadData.name ? "-" : selectedLeadData.name;
+        parsedQuery.name = !selectedLeadData.name ? "" : selectedLeadData.name;
         parsedQuery.email = !selectedLeadData.email
-          ? "-"
+          ? ""
           : selectedLeadData.email;
         parsedQuery.mobileNumber = !selectedLeadData.mobileNumber
-          ? "-"
+          ? ""
           : selectedLeadData.mobileNumber;
 
         const newQueryString = qs.stringify({
@@ -626,16 +622,10 @@ const ViewLeadManagement = () => {
         const newPath = `${window.location.pathname}?${newQueryString}`;
         navigate(newPath, { replace: true });
 
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "success",
-        });
+        toast.success(response.data.message);
         fetchLeadContact();
       } else if (response.data.status === false) {
-        showMessageSnackbar({
-          message: response.data.message,
-          type: "error",
-        });
+        toast.error(response.data.message);
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -647,6 +637,8 @@ const ViewLeadManagement = () => {
         if (refreshTokenStatus) {
           handleLeadInfoSave();
         }
+      } else if (error.status === 400) {
+        toast.error(error.response.data);
       }
     }
   };
@@ -680,580 +672,648 @@ const ViewLeadManagement = () => {
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const [isLeadSettingModalOpen,setIsLeadSettingModalOpen] = useState<boolean>(false);
+  const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
+    useState<boolean>(false);
+
+  // Note : Clears the states when user clicks on lead owner change button
+  function handleLeadOwnerChangeStateClear() {
+    setReasonTextForLeadOwnerChange("");
+    setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
+    setPersistedSelectedUserId(selectedLeadData.companyUserId);
+  }
   return (
     <div
-      className={`${
-        position === "left" ? " ml-14" : "ml-1"
-      } fixed top-8 inset-0 z-10 bg-white mt-4   overflow-auto`}
+      className={` fixed top-8 inset-0 z-10 bg-white ${
+        userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
+      } overflow-auto`}
     >
-      {/* Header */}
-      <div className="flex bg-slate-100 rounded-lg items-center justify-between border-b  m-1 ">
-        <div className="flex gap-6">
-          <button
-            className="flex items-center pr-1 text-sm text-gray-600 hover:text-blue-600 transition"
-            onClick={() => {
-              navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
-            }}
-          >
-            <ChevronLeft size={18} />
-            <span>Leads</span>
-          </button>
-          <div className="py-1">
-            <div
-              title={
-                userHasAccessToUpdateLead
-                  ? ""
-                  : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
-              }
-              className="text-lg font-semibold"
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {/* Header */}
+        <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
+          <div className="flex w-[30%] gap-6">
+            <button
+              className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
-                if (!userHasAccessToUpdateLead) {
-                  showMessageSnackbar({
-                    message:
+                navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
+              }}
+            >
+              <ArrowLeft size={14} />
+              <span>Leads</span>
+            </button>
+          </div>
+
+          {/**Add Setting in lead details page here  */}
+          <div className=" flex items-center min-w-20 justify-end mr-2  w-full">
+            {/* new code  */}
+            <div className="relative inline-block">
+              <button
+                onClick={() => {
+                  if (userHasAccessToUpdateLead) {
+                    setIsLeadSettingModalOpen(true);
+                  } else {
+                    toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
-                }
-              }}
-            >
-              <Detail
-                label="Name"
-                type={userHasAccessToUpdateLead ? "text" : "none"}
-                value={selectedLeadData?.name}
-                onChange={(e) => {
-                  setSelectedLeadData({
-                    ...selectedLeadData,
-                    name: e.target.value,
-                  });
-                }}
-                handleLeadInfoSave={handleLeadInfoSave}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/**Add Setting in lead details page here  */}
-        <div className="flex items-center min-w-20 justify-end gap-3 w-full">
-          {/* new code  */}
-          <div className="relative inline-block">
-            <button
-              disabled={!userHasAccessToUpdateLead}
-              onClick={()=>{
-                    if(userHasAccessToViewLead){
-                        setIsLeadSettingModalOpen(true);
-                    }
-                    else{
-                      showMessageSnackbar({message : "Your are not authorized",type : "error"})
-                    }
-                    
-              }}
-              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
-            >
-              <Settings size={12} />
-              <span>Settings</span>
-            </button>
-            {isLeadSettingModalOpen && (
-              <LeadSettingForLead
-              isOpen = {isLeadSettingModalOpen}
-              onClose={()=> {
-                setIsLeadSettingModalOpen(false);
-              }}
-              lead={selectedLeadData}
-              />
-            )}
-        </div>
-        </div>
-
-        <div className="flex items-center justify-evenly w-48">
-          {/* new code  */}
-          <div className="relative inline-block">
-            <button
-              disabled={!userHasAccessToViewLead}
-              onClick={() => {
-                if (userHasAccessToViewLead) {
-                  setIsAddProductModalOpen(true);
-                } else {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.ERROR.NOT_ATHORISED,
-                    type: "error",
-                  });
-                }
-              }}
-              className="px-1 py-1 text-xs flex gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
-            >
-              <Plus size={8} />
-              <span>Product</span>
-            </button>
-            <AssignProductToLead
-              selectedLeadData={selectedLeadData}
-              isOpen={isAddProductModalOpen}
-              onClose={() => {
-                setIsAddProductModalOpen(false);
-              }}
-              leadAssignedComponyProduct={leadAssignedCompanyProduct}
-              fetchLeadCompanyProduct={fetchLeadCompanyProduct}
-              interestTypeData={interestTypeData}
-            />
-          </div>
-          
-          <button
-            className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
-            onClick={() => {
-              setIsUpdateLeadFormOpen(true);
-            }}
-          >
-            Edit
-          </button>
-
-          <Detail
-            type="none"
-            label="Created On"
-            value={selectedLeadData?.createdOn}
-          />
-        </div>
-      </div>
-
-      {/* Lead Basic Info */}
-      <div className="w-full flex ">
-        <div className="ml-4 flex justify-between w-3/4   whitespace-nowrap overflow-auto">
-          <div
-            onClick={() => {
-              if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
-              }
-            }}
-            title={
-              userHasAccessToUpdateLead
-                ? ""
-                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-            }
-          >
-            <Detail
-              label="Email"
-              type={userHasAccessToUpdateLead ? "text" : "none"}
-              value={selectedLeadData?.email}
-              onChange={(e) => {
-                setSelectedLeadData({
-                  ...selectedLeadData,
-                  email: e.target.value.trim(),
-                });
-              }}
-              handleLeadInfoSave={handleLeadInfoSave}
-            />
-          </div>
-          <div
-            onClick={() => {
-              if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
-              }
-            }}
-            title={
-              userHasAccessToUpdateLead
-                ? ""
-                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-            }
-          >
-            <Detail
-              label="Mobile Number"
-              type={userHasAccessToUpdateLead ? "text" : "none"}
-              value={selectedLeadData?.mobileNumber}
-              onChange={(e) => {
-                setSelectedLeadData({
-                  ...selectedLeadData,
-                  mobileNumber: e.target.value,
-                });
-              }}
-              handleLeadInfoSave={handleLeadInfoSave}
-            />
-          </div>
-          <Detail
-            type="none"
-            label="Lead Source"
-            value={selectedLeadData?.leadSource}
-          />
-          <Detail
-            type="none"
-            label="Created By"
-            value={selectedLeadData?.createdBy}
-          />
-          <div
-            className="flex"
-            title={
-              userHasAccessToUpdateLead
-                ? ""
-                : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-            }
-            onClick={() => {
-              if (!userHasAccessToUpdateLead) {
-                showMessageSnackbar({
-                  message:
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message,
-                  type: "error",
-                });
-              }
-            }}
-          >
-            <Detail
-              label="Lead Owner"
-              type={userHasAccessToUpdateLead ? "text" : "none"}
-              value={selectedLeadData?.leadOwner}
-              handleClickLeadOwnerChange={handleClickLeadOwnerChange}
-            />
-            <button
-              onClick={() => {
-                setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
-              }}
-            >
-              <History size={13} className="mt-0" />
-            </button>
-          </div>
-        </div>
-        {reasonInputBoxOpenForLeadOwner && (
-          // <div className="w-1/4 ">
-          // <div className="fixed w-full h-full bg-green-100  ">
-          //   <div className="  flex  items-center justify-center ml-2  gap-1 ">
-          //     <label className="text-xs text-gray-600 font-medium">
-          //       Reason(Optional)
-          //     </label>
-          //     <input
-          //       type="text"
-          //       placeholder="Enter reason for Owner Update"
-          //       className=" border rounded px-3   text-xs "
-          //       value={reasonTextForLeadOwnerChange}
-          //       onChange={(e) =>
-          //         setReasonTextForLeadOwnerChange(e.target.value)
-          //       }
-          //     />
-          //     <button
-          //       className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded w-fit"
-          //       onClick={() => {
-          //         handleLeadOwnerChange();
-          //       }}
-          //     >
-          //       Save
-          //     </button>
-          //   </div>
-          // </div>
-          <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm text-gray-700 font-medium">
-                  Reason (Optional)
-                </label>
-                <textarea
-                  rows={7}
-                  placeholder="Enter reason for lead owner update"
-                  className="border rounded  p-1 text-sm"
-                  value={reasonTextForLeadOwnerChange}
-                  onChange={(e) =>
-                    setReasonTextForLeadOwnerChange(e.target.value)
+                        .UPDATE_LEAD_ACCESS_DENIED_message
+                    );
                   }
+                }}
+                className="px-1 py-0.5 caption-custom flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
+              >
+                <Settings size={12} />
+                <span>Lead setting</span>
+              </button>
+              {isLeadSettingModalOpen && (
+                <LeadSettingForLead
+                  isOpen={isLeadSettingModalOpen}
+                  onClose={() => {
+                    setIsLeadSettingModalOpen(false);
+                  }}
+                  lead={selectedLeadData}
                 />
-                <div className="flex justify-end">
-                  <button
-                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded self-end"
-                    onClick={() => {
-                      handleLeadOwnerChange();
-                    }}
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Lead Status Section */}
-      <div className="m-3 mt-2 pl-1 flex h- bg-slate-100 flex-col shadow-md rounded-md">
-        <div className="flex justify-between text-xs  mb-1 px-2">
-          <span className="font-semibold ">Lead Status</span>
-          <button
-            onClick={() => {
-              setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
-            }}
-          >
-            <span className="border-b text-gray-500 hover:text-gray-950 hover:border-b-black">
-              Status history
-            </span>
-          </button>
-        </div>
-        <div className="flex border rounded-r-full mb-0.5  bg-white">
-          {leadStatus!.map((item: any) => (
+          <div className="hidden items-center justify-evenly w-48">
+            {/* new code  */}
+            <div className="relative inline-block">
+              <button
+                disabled={!userHasAccessToViewLead}
+                onClick={() => {
+                  if (userHasAccessToUpdateLead) {
+                    setIsAddProductModalOpen(true);
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message
+                    );
+                  }
+                }}
+                className="hidden px-1 py-1 text-xs  gap-1 items-center justify-center text-gray-500 bg-transparent border rounded  transition"
+              >
+                <Plus size={8} />
+                <span>Product</span>
+              </button>
+            </div>
+
             <button
-              title={item.name}
-              disabled={!userHasAccessToUpdateLead}
-              key={item.id}
-              className={`flex-1 text-xs text-ellipsis  overflow-hidden ${
-                selectedLeadData.leadStatus === item.name
-                  ? "bg-blue-700 text-white hover:bg-blue-900"
-                  : "hover:bg-blue-700 hover:text-white"
-              } text-gray-800 font-medium text-center`}
+              className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
+              onClick={() => {
+                setIsUpdateLeadFormOpen(true);
+              }}
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+
+        {/* Lead Status Section */}
+        <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
+          <div className="flex w-full">
+            <div
+              className="flex w-[100%] border bg-white"
               style={{
                 clipPath:
-                  "polygon(0 0, calc(100% - 17px) 0, 100% 50%, calc(100% - 17px) 100%, 0 100%)",
-              }}
-              onClick={() => {
-                if (userHasAccessToUpdateLead) {
-                  setReasonInputBoxOpen(true);
-                  setSelectedStatusId(item.id);
-                } else {
-                  showMessageSnackbar({
-                    message:
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message,
-                    type: "error",
-                  });
-                }
+                  "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
               }}
             >
-              {item.name}
-            </button>
-          ))}
-        </div>
-
-        {reasonInputBoxOpen && (
-          <div className="  flex m-1  gap-1">
-            <label className="text-xs text-gray-600 font-medium">
-              Reason (Optional)
-            </label>
-            <input
-              type="text"
-              placeholder="Enter reason for status update"
-              className="border rounded px-3  text-sm"
-              value={reasonText}
-              onChange={(e) => setReasonText(e.target.value)}
-            />
-            <button
-              className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-0.5 rounded w-fit"
-              onClick={handleSaveStatusUpdate}
-            >
-              Save
-            </button>
+              {leadStatus!.map((item: any) => (
+                <button
+                  title={item.name}
+                  key={item.id}
+                  className={`flex-1 overflow-hidden ${
+                    selectedLeadData.leadStatus === item.name
+                      ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                      : "hover:bg-blue-700 table-header-custom hover:text-white"
+                  }
+              ${
+                selectedStatusId === item.id &&
+                "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
+              } text-center p-1`}
+                  style={{
+                    clipPath:
+                      "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                  }}
+                  onClick={() => {
+                    if (userHasAccessToUpdateLead) {
+                      setReasonInputBoxOpen(true);
+                      setSelectedStatusId(item.id);
+                    } else {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+            {/* status history */}
+            <div className="flex justify-end caption-custom  mb-1 px-2">
+              {/* <span className="font-semibold ">Lead Status</span> */}
+              <button
+                onClick={() => {
+                  setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+                }}
+              >
+                <span
+                  title="Status history"
+                  className="flex items-center justify-center hover:text-blue-600 "
+                >
+                  <History size={12} className="mt-0" />
+                  History
+                </span>
+              </button>
+            </div>
           </div>
+        </div>
+        {reasonInputBoxOpen && selectedStatusId !== 9 && (
+          <StatusUpdateModal
+            handleCancel={() => {
+              setReasonInputBoxOpen(!reasonInputBoxOpen);
+              setSelectedStatusId(null);
+            }}
+            handleSaveStatusUpdate={handleSaveStatusUpdate}
+            onReasonChange={(e) => setReasonText(e.target.value)}
+            reasonText={reasonText}
+          />
         )}
-      </div>
 
-      {/* Sections  */}
-      <div className="w-full flex flex-col md:flex-row gap-1 p-2">
-        {/* Column 1 */}
-        <div className="w-full md:w-1/2 flex flex-col gap-4">
-          {/* Lead Details */}
-          <div className="shadow-md rounded-sm">
-            <LeadDetails
-              handleSaveEditLeadDetailsCallback={
-                handleSaveEditLeadDetailsCallback
-              }
-              leadDetailsData={leadDetailsData}
-              setLeadDetailsData={setLeadDetailsData}
-              selectedLeadData={selectedLeadData}
-              getLeadDetails={getLeadDetails}
+        {reasonInputBoxOpen && selectedStatusId === 9 && (
+          <ConvertLeadModal
+            isOpen={reasonInputBoxOpen}
+            onClose={() => {
+              setReasonInputBoxOpen(!reasonInputBoxOpen);
+              setSelectedStatusId(null);
+              setReasonText("");
+            }}
+            leadData={selectedLeadData}
+            handleLeadConversion={handleSaveStatusUpdate}
+            onReasonChange={(e) => setReasonText(e.target.value)}
+              reasonText={reasonText}
+              handleLeadMappedToAccount={()=>{
+               const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadStatusId = "9";
+          parsedQuery.leadStatus = "Converted";
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
+
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadStatus: "Converted",
+          }));
+          setReasonInputBoxOpen(false);
+          setReasonText("");
+          setSelectedStatusId(null);
+
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
+              }}
             />
+          )}
+
+        {/* Sections  */}
+        <div className="w-full flex flex-col md:flex-row gap-1 p-2">
+          {/* Column 1 */}
+          <div className="w-full md:w-1/2 flex flex-col gap-2">
+            {/* Lead Basic Info */}
+            <div className=" flex   shadow-sm border rounded-sm p-1  ">
+              <div className="mx-1 grid md:grid-cols-3 bg-pink-00 sm:grid-cols-1  gap-2  ">
+                <div className=" flex items-center gap-3 col-span-3  ">
+                  <div className="bg-blue-600  p-2 rounded text-white">
+                    <Handshake size={30} />
+                  </div>
+                  <div
+                    title={
+                      userHasAccessToUpdateLead
+                        ? ""
+                        : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message
+                    }
+                    className="table-header-custom"
+                    onClick={() => {
+                      if (!userHasAccessToUpdateLead) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message
+                        );
+                      }
+                    }}
+                  >
+                    <Detail
+                      label="Name"
+                      // hasBorder={true}
+                      type={userHasAccessToUpdateLead ? "text" : "none"}
+                      value={selectedLeadData?.name}
+                      onChange={(e) => {
+                        setSelectedLeadData({
+                          ...selectedLeadData,
+                          name: e.target.value,
+                        });
+                        // }
+                      }}
+                      handleLeadInfoSave={handleLeadInfoSave}
+                    />
+                  </div>
+                </div>
+                <div
+                
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                >
+                  <Detail
+                    // hasBorder={true}
+                    label="Email"
+                    type={userHasAccessToUpdateLead ? "text" : "none"}
+                    value={selectedLeadData?.email}
+                    onChange={(e) => {
+                      setSelectedLeadData({
+                        ...selectedLeadData,
+                        email: e.target.value.trim(),
+                      });
+                    }}
+                    handleLeadInfoSave={handleLeadInfoSave}
+                  />
+                </div>
+
+                <div
+                className="ml-4"
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                >
+                  <Detail
+                    label="Mobile number"
+                    // hasBorder={true}
+                    type={userHasAccessToUpdateLead ? "text" : "none"}
+                    value={selectedLeadData?.mobileNumber}
+                    onChange={(e) => {
+                      setSelectedLeadData({
+                        ...selectedLeadData,
+                        mobileNumber: e.target.value,
+                      });
+                    }}
+                    handleLeadInfoSave={handleLeadInfoSave}
+                  />
+                </div>
+                <Detail
+                  type="none"
+                  label="Lead source"
+                  value={selectedLeadData?.leadSource}
+                />
+                <Detail
+                  type="none"
+                  label="Created on"
+                  value={selectedLeadData?.createdOn}
+                />
+                <div className="ml-4">
+
+                <Detail
+                  type="none"
+                  label="Created by"
+                  value={selectedLeadData?.createdBy}
+                  />
+                  </div>
+                <div
+                  className="flex"
+                  title={
+                    userHasAccessToUpdateLead
+                      ? ""
+                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                  }
+                  onClick={() => {
+                    if (!userHasAccessToUpdateLead) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                          .UPDATE_LEAD_ACCESS_DENIED_message
+                      );
+                    }
+                  }}
+                >
+                  <div className="flex relative ">
+                    <Detail
+                      label="Lead owner"
+                      hasBorder={true}
+                      type={userHasAccessToUpdateLead ? "select" : "none"}
+                      value={selectedLeadData?.leadOwner}
+                      handleClickLeadOwnerChange={handleClickLeadOwnerChange}
+                    />
+                    <button
+                      title="Lead owner history"
+                      className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
+                      onClick={() => {
+                        setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+                      }}
+                    >
+                      <History size={12} className="mt-0" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {reasonInputBoxOpenForLeadOwner && (
+                <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="table-header-custom">
+                        Reason (Optional)
+                      </label>
+                      <textarea
+                        rows={7}
+                        placeholder="Enter reason for lead owner update"
+                        className="border rounded  p-1 input-label-custom"
+                        value={reasonTextForLeadOwnerChange}
+                        onChange={(e) =>
+                          setReasonTextForLeadOwnerChange(e.target.value)
+                        }
+                      />
+                      <div className="flex justify-end ">
+                        <div className="flex gap-1">
+                          <Button
+                            type="submit"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleLeadOwnerChange();
+                            }}
+                          >
+                            <div className="flex items-center gap-1">
+                              <Save size={16} />
+                              Save
+                            </div>
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleLeadOwnerChangeStateClear}
+                          >
+                            <div className="flex items-center ">
+                              <X size={18} />
+                              Cancel
+                            </div>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Lead Details */}
+            <div className="shadow-md rounded-sm">
+              <LeadDetails
+                handleSaveEditLeadDetailsCallback={
+                  handleSaveEditLeadDetailsCallback
+                }
+                leadDetailsData={leadDetailsData}
+                setLeadDetailsData={setLeadDetailsData}
+                selectedLeadData={selectedLeadData}
+                getLeadDetails={getLeadDetails}
+              />
+            </div>
+
+            {/* Assigned Company Product */}
+            <div className=" shadow-md rounded">
+              <LeadAssignedComponyProducts
+                setIsAddProductModalOpen={setIsAddProductModalOpen}
+                data={leadAssignedCompanyProduct}
+                interestTypeData={interestTypeData}
+                handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
+                handleLeadProductUpdate={handleLeadProductUpdate}
+              />
+            </div>
           </div>
 
-          {/* Assigned Company Product */}
-          <div className=" shadow-md rounded">
-            <LeadAssignedComponyProducts
-              data={leadAssignedCompanyProduct}
-              interestTypeData={interestTypeData}
-              handleLeadProductStatusUpdate={handleLeadProductStatusUpdate}
-              handleLeadProductUpdate={handleLeadProductUpdate}
-            />
-          </div>
-        </div>
+          {/* Column 2 */}
+          <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-sm">
+            {/* Meeting / Contact / Span Tabs */}
+            <div className="bg-slate-200 pl-1  flex caption-custom gap-4">
+              <span
+                id="contact"
+                className={`cursor-pointer ${
+                  activeTab === "contact"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Contacts
+              </span>
+              <span
+                id="meeting"
+                className={`cursor-pointer ${
+                  activeTab === "meeting"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Meeting
+              </span>
 
-        {/* Column 2 */}
-        <div className="w-full md:w-1/2 flex flex-col gap-0">
-          {/* Meeting / Contact / Span Tabs */}
-          <div className="bg-slate-200 pl-1  flex text-xs font-semibold text-gray-800 gap-4">
-            <span
-              id="contact"
-              className={`cursor-pointer ${
-                activeTab === "contact"
-                  ? "border-b-2 border-blue-500 text-blue-600"
-                  : "hover:text-blue-500"
-              }`}
-              onClick={handleClickCards}
-            >
-              Contacts
-            </span>
-            <span
-              id="meeting"
-              className={`cursor-pointer ${
-                activeTab === "meeting"
-                  ? "border-b-2 border-blue-500 text-blue-600"
-                  : "hover:text-blue-500"
-              }`}
-              onClick={handleClickCards}
-            >
-              Meeting
-            </span>
-
-            <span
-              id="LeadTeams"
-              className={`cursor-pointer ${
-                activeTab === "LeadTeams"
-                  ? "border-b-2 border-blue-500 text-blue-600"
-                  : "hover:text-blue-500"
-              }`}
-              onClick={handleClickCards}
-            >
-              Lead Teams
-            </span>
-          </div>
-          <div className="flex flex-col min-h-32 gap-2">
-            <div
-              className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
+              <span
+                id="LeadTeams"
+                className={`cursor-pointer ${
+                  activeTab === "LeadTeams"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Lead Teams
+              </span>
+            </div>
+            <div className="flex flex-col min-h-72 gap-2">
+              <div
+                className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-gray-50
              [&::-webkit-scrollbar-thumb]:bg-gray-50
               [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
-            >
-              {isOpenMeetingsModal && (
-                <div className="flec max-w-48">
-                  <Button
-                    onClick={() => {
-                      const leadDataSearchParams = JSON.parse(
-                        searchParams.get("leadData") || "{}"
-                      );
-                      sessionStorage.setItem(
-                        "leadData",
-                        JSON.stringify(leadDataSearchParams!)
-                      );
-                      navigate(ROUTES_URL.SCHEDULE_MEETING);
-                    }}
-                  >
-                    Schedule Meeting
-                  </Button>
-                </div>
-              )}
-              {isOpenProductCard && (
-                <LeadContact
-                  selectedLeadData={selectedLeadData}
-                  leadContact={leadContact}
-                  fetchLeadContact={fetchLeadContact}
-                />
-              )}
-              {isOpenLeadTeamsCard && (
-                <LeadAssignedTeams
-                  selectedLeadData={selectedLeadData}
-                  isOpen={isOpenLeadTeamsCard}
-                />
-              )}
-            </div>
-          </div>
-          {/* Activity */}
-          {/* <div className="border p-4 bg-white shadow-sm rounded">
-            <div className=" top-0 bg-slate-100 font-sans text-sm font-semibold">
-              Activity
-            </div>
-            <div className="pl-1 space-y-1">
-              {activityData.map((item: activity, index: number) => (
-                <div key={index}>
-                  <span className="text-sm font-semibold">
-                    <ArrowBigRightDash
-                      size={12}
-                      className="inline-block mr-1"
-                    />
-                    {item.person}
-                  </span>{" "}
-                  <span>➡️</span> <span className="text-xs">{item.work}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
-          {}
-          <LeadTasksModal></LeadTasksModal>
-          {/* End Activity */}
-        </div>
-      </div>
-
-      {/* end  */}
-      <UpdateLeadForm
-        isOpen={isUpdateLeadFormOpen}
-        onClose={() => {
-          setIsUpdateLeadFormOpen(false);
-        }}
-        selectedLeadForEdit={selectedLeadData}
-      />
-
-      <LeadStatusHistory
-        selectedLeadData={selectedLeadData}
-        isOpen={isOpenLeadStatusHistory}
-        onClose={() => {
-          setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
-        }}
-      />
-      <LeadOwnerHistory
-        selectedLeadData={selectedLeadData}
-        isOpen={isOpenLeadOwnerHistory}
-        onClose={() => {
-          setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
-        }}
-      />
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
-      {isLeadOwnerPopUpOpen && (
-        <div className="fixed top-12 inset-0 z-30 bg-black bg-opacity-40 flex items-center justify-center p-4 ">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-5xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
-            {/* Header with Close Button */}
-            <div className="flex justify-between items-center p-2 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-800">
-                Select Company User
-              </h3>
-              <button
-                onClick={() => {
-                  setIsLeadOwnerPopUpOpen(false);
-              
-
-                  if (
-                    selectedCompanyUser.id !== 0 &&
-                    selectedCompanyUser.id !== null &&
-                    selectedCompanyUser.id === persistedSelectedUserId
-                  ) {
-                    setReasonInputBoxOpenForLeadOwner(true);
-                  }
-                }}
-                className="text-gray-500 hover:text-gray-700"
               >
-                <X size={20} />
-              </button>
+                {isOpenMeetingsModal && (
+                  <div className="flex  items-center justify-center   min-h-72">
+                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
+                      <h2 className="table-header-custom">
+                        Schedule a Meeting
+                      </h2>
+                      <p className="input-label-custom">
+                        Plan your next discussion with ease. Use this option to
+                        select a convenient time, invite participants, and share
+                        meeting details — all in one place.
+                      </p>
+                      <p className="input-label-custom max-w-md">
+                        Once scheduled, participants will receive notifications
+                        with the meeting link and reminders before it begins.
+                      </p>
+                      <div>
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const leadDataSearchParams = JSON.parse(
+                              searchParams.get("leadData") || "{}"
+                            );
+                            sessionStorage.setItem(
+                              "leadData",
+                              JSON.stringify(leadDataSearchParams!)
+                            );
+                            navigate(ROUTES_URL.SCHEDULE_MEETING);
+                          }}
+                        >
+                          + Schedule Meeting
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {isOpenProductCard && (
+                  <LeadContact
+                    selectedLeadData={selectedLeadData}
+                    leadContact={leadContact}
+                    fetchLeadContact={fetchLeadContact}
+                  />
+                )}
+                {isOpenLeadTeamsCard && (
+                  <LeadAssignedTeams
+                    selectedLeadData={selectedLeadData}
+                    isOpen={isOpenLeadTeamsCard}
+                  />
+                )}
+              </div>
             </div>
-            {/* NOTE : CALL TO THE MODAL COMPONENT */}
-            <div className="p-1">
-              <GetCompanyUsersForLead
-                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
-                }
-              />
-            </div>
+            {/* Activity */}
+            <LeadTasksModal
+              ownerId={selectedLeadData.companyUserId}
+            ></LeadTasksModal>
+            {/* End Activity */}
           </div>
         </div>
-      )}
+
+        {/* end  */}
+
+        {/* update lead form */}
+        <UpdateLeadForm
+          isOpen={isUpdateLeadFormOpen}
+          onClose={() => {
+            setIsUpdateLeadFormOpen(false);
+          }}
+          selectedLeadForEdit={selectedLeadData}
+        />
+
+        {/* lead status history */}
+        <LeadStatusHistory
+          selectedLeadData={selectedLeadData}
+          isOpen={isOpenLeadStatusHistory}
+          onClose={() => {
+            setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+          }}
+        />
+        {/* lead owner history */}
+        <LeadOwnerHistory
+          selectedLeadData={selectedLeadData}
+          isOpen={isOpenLeadOwnerHistory}
+          onClose={() => {
+            setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+          }}
+        />
+
+        {/* lead owner pop up open */}
+        {isLeadOwnerPopUpOpen &&
+          createPortal(
+            <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
+              <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+                {/* Header with Close Button */}
+                {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800">
+                  Select Company User
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsLeadOwnerPopUpOpen(false);
+
+                    if (
+                      selectedCompanyUser.id !== 0 &&
+                      selectedCompanyUser.id !== null &&
+                      selectedCompanyUser.id === persistedSelectedUserId
+                    ) {
+                      setReasonInputBoxOpenForLeadOwner(true);
+                    }
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div> */}
+                <FormHeader
+                  preText="Assign new lead owner."
+                  description="Select and assign a new owner to manage this lead."
+                  onClose={() => {
+                    setIsLeadOwnerPopUpOpen(false);
+
+                    if (
+                      selectedCompanyUser.id !== 0 &&
+                      selectedCompanyUser.id !== null &&
+                      selectedCompanyUser.id === persistedSelectedUserId
+                    ) {
+                      setReasonInputBoxOpenForLeadOwner(true);
+                    }
+                  }}
+                  icon={User2}
+                />
+                {/* NOTE : CALL TO THE MODAL COMPONENT */}
+                <div className="">
+                  <GetCompanyUsersForLead
+                  isUsedForSettings={false}
+                    selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                    handleSelectedCompanyUserChange={
+                      handleSelectedCompanyUserChange
+                    }
+                  />
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+        <AssignProductToLead
+          selectedLeadData={selectedLeadData}
+          isOpen={isAddProductModalOpen}
+          onClose={() => {
+            setIsAddProductModalOpen(false);
+          }}
+          leadAssignedComponyProduct={leadAssignedCompanyProduct}
+          fetchLeadCompanyProduct={fetchLeadCompanyProduct}
+          interestTypeData={interestTypeData}
+        />
+      </motion.section>
     </div>
   );
 };
@@ -1269,6 +1329,7 @@ type DetailProps = {
   ) => void;
   handleLeadInfoSave?: () => Promise<void>;
   handleClickLeadOwnerChange?: () => void;
+  hasBorder?: boolean;
 };
 
 const Detail: React.FC<DetailProps> = ({
@@ -1279,22 +1340,10 @@ const Detail: React.FC<DetailProps> = ({
   onChange,
   handleLeadInfoSave,
   handleClickLeadOwnerChange,
+  hasBorder,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  //note : Message Snackbar
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
 
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
   const prevValueRef = useRef(value);
 
   const handleClick = () => {
@@ -1305,10 +1354,18 @@ const Detail: React.FC<DetailProps> = ({
   const handleBlur = () => {
     setIsEditing(false);
 
-    if (label === "Mobile Number") {
-      const isValid = value.match(
-        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
-      );
+    const trimmedValue = value.trim();
+    // Step 1: Check if value changed
+    if (trimmedValue === prevValueRef.current) {
+      // toast.error(MESSAGE.ERROR.NO_CHANGES);
+      return; // No changes made, do nothing
+    }
+
+    if (label === "Mobile number") {
+      const isValid = value
+        .trim()
+        .match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN);
+
       if (!isValid) {
         //revert to previous value
         const syntheticEvent = {
@@ -1316,12 +1373,33 @@ const Detail: React.FC<DetailProps> = ({
         } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 
         onChange?.(syntheticEvent);
-        showMessageSnackbar({
-          message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
-          type: "error",
-        });
+
+        toast.error(
+          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+        );
         return;
       }
+    } else if (label === "Email") {
+      const isValid = value.trim().match(VALIDATIONS.EMAIL);
+      if (!isValid) {
+        //revert to previous value
+        const syntheticEvent = {
+          target: { value: prevValueRef.current },
+        } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+        onChange?.(syntheticEvent);
+
+        toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
+        return;
+      }
+    }
+    //  Apply trimmed value before saving
+    if (trimmedValue !== value) {
+      const syntheticEvent = {
+        target: { value: trimmedValue },
+      } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+      onChange?.(syntheticEvent); // update UI with trimmed value
     }
     if (value !== prevValueRef.current) {
       handleLeadInfoSave!();
@@ -1329,13 +1407,13 @@ const Detail: React.FC<DetailProps> = ({
   };
   return (
     <div className="">
-      <label className="text-xs text-gray-700 block  whitespace-nowrap overflow-hidden  ">
+      <label className="caption-custom block  whitespace-nowrap overflow-hidden  ">
         {label}
       </label>
       {isEditing ? (
         type === "select" ? (
           <select
-            className="text-sm text-gray-700 "
+            className="input-label-custom"
             value={value}
             onChange={onChange}
             onBlur={handleBlur}
@@ -1351,51 +1429,117 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className="text-sm text-gray-700 p-0 m-0 border-none focus:outline-none focus:ring-0 w-auto"
+              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${label==="Name" ? "w-fit" : "w-48"} focus:outline-none focus:ring-0 `}
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
               autoFocus
+              maxLength={60}
+              size={value ? value.length : 10}
             />
           )
         )
       ) : type === "none" ? (
         <div>
           <p
-            // title={value}
-            className="font-medium text-sm text-gray-800 whitespace-nowrap overflow-x-auto text-clip"
+            className={`input-label-custom  text-gray-800 whitespace-nowrap overflow-x-hidden text-clip`}
           >
-            {value || "-"}
+            {value ? (
+              <span
+                className={`${
+                  label === "Lead source" ||
+                  label === "Created by" ||
+                  label === "Created on"
+                    ? ""
+                    : "border border-gray-200 rounded-md px-1"
+                } `}
+              >
+                {value}
+              </span>
+            ) : (
+              <span
+                className={`${
+                  label === "Lead source" ||
+                  label === "Created by" ||
+                  label === "Created on"
+                    ? ""
+                    : "border border-gray-200 rounded-md "
+                }caption-custom px-1`}
+              >
+                {label === "Lead source" ||
+                label === "Created by" ||
+                label === "Created on"
+                  ? "Data not found"
+                  : "Add here..."}
+              </span>
+            )}
           </p>
         </div>
-      ) : label === "Lead Owner" ? (
+      ) : label === "Lead owner" ? (
         <div
           title={value}
-          className={`font-medium text-sm text-gray-900   whitespace-nowrap overflow-x-auto text-clip  cursor-pointer`}
+          className={`input-label-custom hover:bg-slate-100      cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
-          {value || "-"}
+          {
+          value?
+          <>
+          
+         {value} {/* Icon never gets truncated */}
+            <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" /> 
+          </>
+            :<span className="input-label-custom">Add here...</span>}
         </div>
       ) : (
         <div
-          title={value}
-          className={`font-medium ${
-            label === "Name"
-              ? "text-sm text-black"
-              : "text-sm md:whitespace-nowrap md:overflow-hidden text-gray-900"
-          }   whitespace-nowrap overflow-hidden   cursor-pointer`}
+          title={value ?? "Enter value "}
+          className={`table-header-custom flex items-center min-w-48 
+    ${label === "Name" ? "table-header-custom" : "input-label-custom"}
+    ${hasBorder ? "border rounded-md px-1 border-gray-200" : ""}
+    cursor-pointer`}
           onClick={handleClick}
         >
-          {value || "-"}
+          <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
+            {/* Only the text truncates */}
+            <span className={`truncate ${label==="Name" ? "" : " max-w-[205px]"} `}>
+              {value ? (
+                value
+              ) : (
+                <span className="p-1 caption-custom italic">Add here...</span>
+              )}
+            </span>
+
+            {/* Icon never gets truncated */}
+            <Edit3 className="ml-1 h-3 w-3 text-slate-400 flex-shrink-0" />
+          </div>
         </div>
+
+        // <div
+        //   title={value ?? "Enter value "}
+        //   className={`table-header-custom flex items-center min-w-48 max-w-fit gap-3 justify-between ${
+        //     label === "Name"
+        //       ? "table-header-custom p-0  border-gray-200 "
+        //       : "input-label-custom"
+        //   }   truncate overflow-hidden ${
+        //     hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
+        //   }   cursor-pointer`}
+        //   onClick={handleClick}
+        // >
+        //   {value ? (
+
+        //     <>
+        //     {value}
+        //     </>
+        //   ) : (
+        //     <>
+        //       <span className=" p-1 caption-custom flex items-center justify-between italic">
+        //         Add here...
+        //       </span>
+        //     </>
+        //   )}
+        //   <Pen size={12} className="caption-custom "/>
+        // </div>
       )}
-      <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      />
     </div>
   );
 };

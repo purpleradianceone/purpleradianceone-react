@@ -53,11 +53,11 @@ const LiveTimezoneClock: React.FC<LiveTimezoneClockProps> = ({
         padding : '0 8px' ,
     }}>
       {label && <div style={{ fontSize: '0.6em', color: '#555' }}>{label}</div>}
-      <div style={{ fontSize: '0.9em', fontWeight: 'bolder', color: '#0056b3' }}>
-        {formattedTime}
+      <div className='input-label-custom-blue'>
+        {formattedTime}{' '}
       </div>
-      <div style={{ fontSize: '0.6em', color: '#888' }}>
-        {" : " + timeZone}
+      <div className='caption-custom'>
+        { timeZone}
       </div>
     </div>
   );

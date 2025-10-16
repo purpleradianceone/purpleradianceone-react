@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { EditIcon, X } from "lucide-react";
+import { EditIcon, Mail, Phone, Save, User, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import MessageSnackBar from "../../ui/MessageSnackbar";
 import POST_API from "../../../constants/PostApi";
 import EditUserPopupProps from "../../../@types/modal/EditCompanyUserProps";
-import {
-  MessageSnackbarState,
-  ShowMessageSnackbarProps,
-} from "../../../@types/ui/MessageSnackbarProps";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {
-  NUMBER_VALUES,
-  SIZE,
   STATUS_CODE,
+  VALIDATIONS,
 } from "../../../constants/AppConstants";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
+import REGEX from "../../../constants/Regex";
+import toast from "react-hot-toast";
+import FormHeader from "../../ui/FormHeader";
+import ToggleButton from "../../ui/ToggleButton";
+import { createPortal } from "react-dom";
 
 function EditCompanyUserModal({
   isOpen,
@@ -33,7 +32,6 @@ function EditCompanyUserModal({
     mobileNumber: user.mobilenumber,
   };
 
-  
   const {
     formData: updateUserformData,
     handleChange: handleEditUserFormChange,
@@ -45,11 +43,6 @@ function EditCompanyUserModal({
 
   const [userIsActive, setUserIsActive] = useState<boolean>(user.isactive);
 
-  const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-    open: false,
-    message: "",
-    type: "success" as "success" | "error",
-  });
   const { loginStatus } = useLoggedInUserContext();
 
   useEffect(() => {
@@ -57,13 +50,31 @@ function EditCompanyUserModal({
       setErrors({
         name: "",
       });
-     setUserIsActive(user.isactive);
+      setUserIsActive(user.isactive);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleEditUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
+    if (
+      updateUserformData.mobileNumber &&
+      updateUserformData.mobileNumber!.trim() !== ""
+    ) {
+      if (!mobileRegex.test(updateUserformData.mobileNumber!.trim())) {
+        toast.error("Invalid mobile number");
+        return;
+      }
+    }
+    if (
+      updateUserformData.name.trim() !== "" &&
+      !REGEX.NAME_SPACE_DOT_ALLOWED_ONLY.test(updateUserformData.name)
+    ) {
+      toast.error(MESSAGE.ERROR.NAME_SPACE_AND_DOT_ERROR);
+      return;
+    }
 
     if (
       initialUpdateUserformData.name !== updateUserformData.name ||
@@ -91,15 +102,9 @@ function EditCompanyUserModal({
             })
             .then((response) => {
               if (response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
+                toast.success(response.data.message);
               } else if (!response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "error",
-                });
+                toast.error(response.data.message);
               }
               handleCompanyUserChange(user);
               setTimeout(() => {
@@ -116,131 +121,111 @@ function EditCompanyUserModal({
                   handleEditUserSubmit(event);
                 }
               } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-                  type: "error",
-                });
+                toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
               }
             });
         } else {
-          showMessageSnackbar({
-            message: MESSAGE.ERROR.NO_CHANGES,
-            type: "error",
-          });
+          toast.error(MESSAGE.ERROR.NO_CHANGES);
         }
       } else {
-        showMessageSnackbar({
-          message: MESSAGE.ERROR.NAME_REQUIRED,
-          type: "error",
-        });
+        toast.error(MESSAGE.ERROR.NAME_REQUIRED);
         setErrors({
           name: MESSAGE.ERROR.NAME_REQUIRED,
         });
       }
     } else {
-      showMessageSnackbar({ message: MESSAGE.ERROR.NO_CHANGES, type: "error" });
+      toast.error(MESSAGE.ERROR.NO_CHANGES);
     }
   };
 
-  const handleCompanyUserToggle = async(event: React.ChangeEvent<HTMLInputElement>) => {
-    handleCloseSnackbar();
-    const {  checked } = event.target;
+  const handleCompanyUserToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // handleCloseSnackbar();
+    const { checked } = event.target;
 
-    if(user.id === loginStatus.id){
-        setUserIsActive(checked);
-        showMessageSnackbar({message : "Can't change your own status", type : "error"});
-        setTimeout(() => {
-          setUserIsActive(user.isactive);
-        },200);
-        return;
+    if (user.id === loginStatus.id) {
+      setUserIsActive(checked);
+      toast.error("Can't change your own status");
+      setTimeout(() => {
+        setUserIsActive(user.isactive);
+      }, 200);
+      return;
     }
 
     const postUpdateUserData = {
-            id: user.id,
-            updatedby: loginStatus.id,
-            company_id: loginStatus.companyId,
-            fullname: updateUserformData.name,
-            mobilenumber: updateUserformData.mobileNumber,
-            isactive: checked ,
-          };
-          await axios
-            .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
-              withCredentials: true,
-            })
-            .then((response) => {
-              if (response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "success",
-                });
-              } else if (!response.data.status) {
-                showMessageSnackbar({
-                  message: response.data.message,
-                  type: "error",
-                });
-              }
-              handleCompanyUserChange(user);
-              setUserIsActive(checked);
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch(async (error: ApiError | any) => {
-              if (error.status === STATUS_CODE.UNATHORISED) {
-                const refreshTokenStatus = await RefreshToken({
-                  callFunctionWithEvent: handleCompanyUserToggle,
-                });
-                if (refreshTokenStatus) {
-                  handleCompanyUserToggle(event);
-                }
-              } else {
-                showMessageSnackbar({
-                  message: MESSAGE.ERROR.SOMETHING_WENT_WRONG,
-                  type: "error",
-                });
-              }
-            });
-
-
-  }
-  const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-    setMessageSnackbar({ open: true, message, type });
+      id: user.id,
+      updatedby: loginStatus.id,
+      company_id: loginStatus.companyId,
+      fullname: updateUserformData.name,
+      mobilenumber: updateUserformData.mobileNumber,
+      isactive: checked,
+    };
+    await axios
+      .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+          setUserIsActive(checked);
+        } else if (!response.data.status) {
+          toast.error(response.data.message);
+        }
+        handleCompanyUserChange(user);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenStatus = await RefreshToken({
+            callFunctionWithEvent: handleCompanyUserToggle,
+          });
+          if (refreshTokenStatus) {
+            handleCompanyUserToggle(event);
+          }
+        } else {
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
+        }
+      });
   };
-
-  const handleCloseSnackbar = () => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  useEffect(() => {
-    setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  }, [isOpen]);
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-45">
+      <div  className="fixed inset-0 z-50 p-9 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+            className=" w-full max-w-lg max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-            >
-              <X size={SIZE.TWENTY} />
-            </button>
+            <div  className="p-5">
+              {/* <div className="flex justify-between items-center  mb-3 border-b ">
+                <div className="flex gap-2">
+                  <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Edit <span className="text-blue-700">{user.fullname}</span>
+                  </h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className=" right-4 top-4 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={SIZE.TWENTY} />
+                </button>
+              </div> */}
+              <FormHeader
+                icon={EditIcon}
+                onClose={onClose}
+                preText="Update user : "
+                userName={user.fullname}
+                description="Modify and manage user details, including contact information, as needed."
+              />
 
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Edit {user.fullname}
-                </h2>
-              </div>
-
-              <form className="space-y-8" onSubmit={handleEditUserSubmit}>
+              <form id="company-user-edit-modal" className="space-y-5" onSubmit={handleEditUserSubmit}>
                 <FormInput
+                  logo={User}
                   label="Name"
                   type="text"
                   name="name"
@@ -248,67 +233,85 @@ function EditCompanyUserModal({
                   value={updateUserformData.name}
                   placeholder="Enter User Name"
                   defaultValue={initialUpdateUserformData.name}
-                  maxLength={256}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
                   onChange={handleEditUserFormChange}
                   error={errors.name}
                   onBlur={handleBlur}
                 />
                 <FormInput
+                  logo={Phone}
                   label="Mobile Number"
                   type="tel"
                   name="mobileNumber"
                   placeholder="Enter Mobile Number"
+                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                   defaultValue={initialUpdateUserformData.mobileNumber}
                   onChange={handleEditUserFormChange}
                   onBlur={handleBlur}
                   error={errors.mobileNumber}
                 />
 
-                <div className="flex items-center justify-between">
-      <label htmlFor="isActive" className="block text-sm font-medium text-gray-700">
-        Status
-      </label>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          id="isActive"
-          name="isActive"
-          checked={userIsActive}
-          onChange={handleCompanyUserToggle}
-          className="sr-only peer"
-        />
-        <div
-          className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-gray-300
-                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                     peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white"
-        ></div>
-      </label>
-    </div>
+                <div className="flex items-center gap-4 justify-start">
+                  <label
+                    htmlFor="isActive"
+                    className="block input-label-custom"
+                  >
+                    Status :
+                  </label>
+
+                  {/* <label className="inline-flex items-center cursor-pointer relative self-end">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      name="isActive"
+                      checked={userIsActive}
+                      onChange={handleCompanyUserToggle}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
+                  </label> */}
+                  <ToggleButton
+                  checked={userIsActive}
+                  name="isActive"
+                  onToggle={handleCompanyUserToggle}
+                  />
+                </div>
                 <FormInput
+                  logo={Mail}
                   label="Email"
                   type="email"
                   name="email"
                   required={true}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
                   placeholder="Enter Email Address"
                   defaultValue={user.email}
                   readonly={true}
                 />
-                <div className="flex justify-self-center m-2 min-w-60 pb-10">
-                  <Button type="submit">Update Company User</Button>
+                <div className="flex justify-end  ">
+                  <div className="flex gap-1">
+                    <Button onClick={onClose} type="button">
+                      <div className="flex items-center">
+                        <X size={16} /> Cancel
+                      </div>
+                    </Button>
+                    <Button type="submit">
+                      <div className="flex items-center gap-1">
+                        <Save size={16} />
+                        Save
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>
           </div>
-          <MessageSnackBar
-            isOpen={messageSnackbar.open}
-            message={messageSnackbar.message}
-            type={messageSnackbar.type}
-            onClose={handleCloseSnackbar}
-            duration={NUMBER_VALUES.SNACKBAR_DURATION}
-          />
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

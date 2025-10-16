@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
@@ -9,7 +10,15 @@ import React, {
   useRef,
   forwardRef,
 } from "react";
-import { FileUp, XCircle, ArrowRight, Search, Info, ArrowLeft } from "lucide-react";
+import {
+  XCircle,
+  ArrowRight,
+  Search,
+  Info,
+  ArrowLeft,
+  LucideFolderInput,
+} from "lucide-react";
+// import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -28,6 +37,12 @@ import {
   ShowMessageSnackbarProps,
 } from "../../../../@types/ui/MessageSnackbarProps";
 import MessageSnackBar from "../../../ui/MessageSnackbar";
+import Button from "../../../ui/Button";
+import InterestType from "../../../../@types/lead-management/InterestType";
+import ApiError from "../../../../@types/error/ApiError";
+import { Product } from "../../../../@types/products/ProductsManagementProps";
+import COLORS from "../../../../constants/Colors";
+import toast from "react-hot-toast";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -57,6 +72,8 @@ const ItemTypes = {
   CSV_STATUS_VALUE: "csv_status_value",
   CSV_SOURCE_VALUE: "csv_source_value",
   CSV_OWNER_VALUE: "csv_owner_value",
+  CSV_INTEREST_VALUE: "csv_interest_value",
+  CSV_PRODUCT_VALUE: "csv_product_value",
 };
 
 interface DragItem {
@@ -75,7 +92,7 @@ const DraggableCsvColumn: React.FC<{ header: string }> = ({ header }) => {
   return (
     <li
       ref={drag}
-      className={`bg-gray-100 text-gray-800 px-3 py-1.5 rounded text-sm border border-gray-200 shadow-sm cursor-grab ${
+      className={`bg-gray-100  px-3 py-1.5 rounded input-label-custom border border-gray-200 shadow-sm cursor-grab ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -123,13 +140,13 @@ const DroppableCrmField: React.FC<{
   }));
 
   return (
-    <div key={field.id} className="flex items-start gap-1">
+    <div key={field.id} className="flex items-start justify-evenly">
       <label
         htmlFor={`map-${field.id}`}
-        className="w-1/3 text-sm font-medium text-gray-700 pt-2"
+        className="w-1/2 input-label-custom  pt-2"
       >
-        {field.label} :
-        {field.required && <span className="text-red-500 ml-1">*</span>}
+        {field.label }
+        {field.required && <span className="text-red-500 ">*</span> } :
       </label>
       <div
         ref={drop}
@@ -143,59 +160,20 @@ const DroppableCrmField: React.FC<{
           mappedHeaders.map((header) => (
             <span
               key={header}
-              className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium"
+              className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 caption-custom-blue"
             >
               {header}
               <XCircle
-                className="ml-1 w-4 h-4 cursor-pointer"
+                className={`ml-1 w-4 h-4 ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
                 onClick={() => onRemoveMapping(field.id, header)}
               />
             </span>
           ))
         ) : (
-          <span className="text-gray-500 text-sm italic">Drag column here</span>
+          <span className="text-gray-500 text-sm  italic">Drag column here</span>
         )}
       </div>
     </div>
-    // <div key={field.id} className="grid grid-cols-2 gap-2 items-start ">
-    //     <label
-    //       htmlFor={`map-${field.id}`}
-    //       className="text-sm font-medium text-gray-700 pt-2"
-    //     >
-    //       {field.label}
-    //       {field.required && <span className="text-red-500 ml-1">*</span>}
-    //     </label>
-
-    //     <div
-    //       ref={drop}
-    //       className={`min-h-[40px] border rounded-md p-2 flex flex-wrap gap-2 items-center transition-all
-    //   ${
-    //     isOver && canDrop
-    //       ? "border-blue-500 bg-blue-50 ring-2"
-    //       : "border-gray-300 bg-gray-50"
-    //   }
-    //   ${canDrop ? "border-dashed" : ""}`}
-    //     >
-    //       {mappedHeaders.length > 0 ? (
-    //         mappedHeaders.map((header) => (
-    //           <span
-    //             key={header}
-    //             className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium"
-    //           >
-    //             {header}
-    //             <XCircle
-    //               className="ml-1 w-4 h-4 cursor-pointer"
-    //               onClick={() => onRemoveMapping(field.id, header)}
-    //             />
-    //           </span>
-    //         ))
-    //       ) : (
-    //         <span className="text-gray-500 text-sm italic">
-    //           Drag column here
-    //         </span>
-    //       )}
-    //     </div>
-    //   </div>
   );
 };
 
@@ -203,7 +181,11 @@ const DroppableCrmField: React.FC<{
 interface ValueMappingCardProps<T extends MappableItem> {
   title: string;
   csvValues: string[];
-  crmData: T[] | PostDataTypeForLeadSourceAndStatusAndStates[] | null;
+  crmData:
+    | T[]
+    | PostDataTypeForLeadSourceAndStatusAndStates[]
+    | Product[]
+    | null;
   mapping: ValueMapping;
   onDrop: (crmItem: T, csvValue: string) => void;
   onRemove: (crmItem: T) => void;
@@ -280,19 +262,19 @@ const GenericValueMappingCard = forwardRef(
             } ${mappedValue ? "bg-green-100" : "bg-white"}`}
           >
             {mappedValue ? (
-              <div className="flex justify-between items-center w-full text-sm font-medium text-green-800">
+              <div className="flex justify-between items-center w-full input-label-custom-active">
                 <span>{mappedValue}</span>
                 <XCircle
-                  className="w-4 h-4 text-red-500 cursor-pointer"
+                  className={`w-4 h-4  ${COLORS.CANCEL_BUTTON_TEXT_COLOR} cursor-pointer`}
                   onClick={() => onRemove(crmItem)}
                 />
               </div>
             ) : (
-              <span className="text-gray-400 text-sm italic">Drop here</span>
+              <span className="caption-custom">Drop here</span>
             )}
           </div>
           <ArrowRight className="text-gray-400 flex-shrink-0" />
-          <div className="flex-1 p-2 bg-blue-100 text-blue-800 rounded-md text-sm font-medium h-10 flex items-center justify-center">
+          <div className="flex-1 p-2 bg-blue-100 input-label-custom-blue rounded-md h-10 flex items-center justify-center">
             {crmItem.name!}
           </div>
         </div>
@@ -317,13 +299,13 @@ const GenericValueMappingCard = forwardRef(
 
     return (
       <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm">
-        <h3 className="text-md font-semibold text-gray-800 mb-3">{title}</h3>
+        <h3 className="table-header-custom mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="font-medium text-sm text-center mb-2 text-gray-600">
+            <h4 className="input-label-custom text-center mb-2">
               Your CSV Values (Drag)
             </h4>
-            <div className="space-y-2 p-2 bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
+            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
               {unmappedCsvValues.map((s) => (
                 <DraggableCsvValue key={s} value={s} type={itemType} />
               ))}
@@ -358,7 +340,7 @@ const GenericValueMappingCard = forwardRef(
               </button> */}
               </div>
             )}
-            <h4 className="font-medium text-sm text-center mb-2 text-gray-600">
+            <h4 className="input-label-custom  text-center mb-2">
               To CRM Values (Drop)
             </h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -372,17 +354,17 @@ const GenericValueMappingCard = forwardRef(
                 <button
                   onClick={() => handleInternalPageChange(currentPage - 1)}
                   disabled={currentPage === 0}
-                  className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200 input-label-custom  disabled:opacity-50"
                 >
                   Previous
                 </button>
-                <span className="text-sm">
+                <span className="input-label-custom ">
                   Page {currentPage + 1} of {totalPages}
                 </span>
                 <button
                   onClick={() => handleInternalPageChange(currentPage + 1)}
                   disabled={currentPage === totalPages - 1}
-                  className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200input-label-custom  disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -398,10 +380,10 @@ const GenericValueMappingCard = forwardRef(
 // --- MAIN COMPONENT ---
 const LeadImportCsv = ({
   // isSelectCsvButtonClicked
-  handleButtonClicked 
-}:{
+  handleButtonClicked,
+}: {
   // isSelectCsvButtonClicked:boolean
-  handleButtonClicked: (value: boolean) => void; 
+  handleButtonClicked: (value: boolean) => void;
 }) => {
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
@@ -415,13 +397,19 @@ const LeadImportCsv = ({
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
-  
 
+  const [isLoadingLeadInterestData, setIsLoadingLeadInterestData] =
+    useState<boolean>(true);
+    const [isLoadingLeadSourceAndStatusData, setIsLoadingLeadSourceAndSourceData] =
+    useState<boolean>(true);
 
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
   const leadSourceMappingRef = useRef<HTMLDivElement>(null);
   const leadOwnerMappingRef = useRef<HTMLDivElement>(null);
+  const productDataMappingRef = useRef<HTMLDivElement>(null);
+
+  const leadInterestTypeMappingRef = useRef<HTMLDivElement>(null);
 
   // Mappings
   const [fieldMappings, setFieldMappings] = useState<FieldMapping>({});
@@ -432,11 +420,23 @@ const LeadImportCsv = ({
     {}
   );
   const [ownerValueMapping, setOwnerValueMapping] = useState<ValueMapping>({});
+  const [productDataValueMapping, setProductDataValueMapping] =
+    useState<ValueMapping>({});
+
+  const [InterestTypeValueMapping, setInterestTypeValueMapping] =
+    useState<ValueMapping>({});
 
   // Unique values from CSV
   const [csvUniqueStatuses, setCsvUniqueStatuses] = useState<string[]>([]);
   const [csvUniqueSources, setCsvUniqueSources] = useState<string[]>([]);
   const [csvUniqueOwners, setCsvUniqueOwners] = useState<string[]>([]);
+  const [csvUniqueProductData, setCsvUniqueProductData] = useState<string[]>(
+    []
+  );
+
+  const [csvUniqueInterestType, setCsvUniqueInterestType] = useState<string[]>(
+    []
+  );
 
   // Data from API
   const [leadStatus, setLeadStatus] = useState<
@@ -446,20 +446,30 @@ const LeadImportCsv = ({
     PostDataTypeForLeadSourceAndStatusAndStates[] | null
   >(null);
   const [companyUsers, setCompanyUsers] = useState<CompanyUser[]>([]);
+  // Note : For getting the product data
+  const [productsData, setProductsData] = useState<Product[]>([]);
+  const [totalProductData, setTotalProductData] = useState<number>(0); // Total count for pagination
+  const [productDataCurrentPage, setProductDataCurrentPage] =
+    useState<number>(0);
+
   const [totalCompanyUsers, setTotalCompanyUsers] = useState<number>(0); // Total count for pagination
   const [companyUsersCurrentPage, setCompanyUsersCurrentPage] =
     useState<number>(0);
-  const [csvImportButtonClicked , setCsvImportButtonClicked] = useState<boolean>(false);
+  const [csvImportButtonClicked, setCsvImportButtonClicked] =
+    useState<boolean>(false);
   const [isLoadingSpinnerAfterSubmission, setIsLoadingSpinnerAfterSubmission] =
     useState<boolean>(false);
   const [showLeadImportResultPopUp, setShowLeadImportResultPopUp] =
     useState<boolean>(false);
-  const [LeadImportReponse, setLeadImportResponse] =
+  const [LeadImportResponse, setLeadImportResponse] =
     useState<LeadImportResponse>({
-    
       message: "",
-      status : false,
+      status: false,
     });
+
+  const [interestTypeData, setInterestTypeData] = React.useState<
+    InterestType[]
+  >([]);
 
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
@@ -498,10 +508,11 @@ const LeadImportCsv = ({
   // --- STATIC DATA ---
   const crmLeadFields: CrmField[] = useMemo(
     () => [
-      { id: "name", label: "Full Name", required: false },
+      { id: "name", label: "Full Name", required: true },
       { id: "email", label: "Email", required: false },
       { id: "mobilenumber", label: "Mobile Number", required: false },
-
+      { id: "description", label: "Description", required: false },
+      { id: "lead_interest_id", label: "Interest Type", required: false },
       { id: "job_title", label: "Job Title", required: false },
       { id: "industry_name", label: "Industry", required: false },
       { id: "country", label: "Country", required: false },
@@ -516,6 +527,8 @@ const LeadImportCsv = ({
       },
       { id: "leadSource", label: "Lead Source", required: false },
       { id: "address", label: "Address", required: false },
+      { id: "lead_created_on_string", label: "Created On", required: false },
+      { id: "company_product_id", label: "Product", required: false },
 
       { id: "leadOwner", label: "Lead Owner", required: false },
     ],
@@ -547,15 +560,103 @@ const LeadImportCsv = ({
           const refreshTokenStatus = await RefreshToken({
             callFunction: callFn,
           });
-          if(refreshTokenStatus){
+          if (refreshTokenStatus) {
             callFn();
           }
-        } 
+        }
       }
     };
     await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
     await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
+    await function(){
+    setIsLoadingLeadSourceAndSourceData(false);
+    }()
   }, []);
+
+  // API call to get lead interest data
+  async function getLeadInterestData() {
+    try {
+      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
+        params: {
+          id: null,
+          name: null,
+          isActive: true,
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === STATUS_CODE.OK) {
+        setIsLoadingLeadInterestData(false);
+        setInterestTypeData(response.data);
+      }
+    } catch (error: any) {
+      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: getLeadInterestData,
+        });
+        if (refreshTokenStatus) {
+          getLeadInterestData();
+        }
+      }
+    }
+  }
+  // Note : called the above function , will get the data once the component renders
+  useEffect(() => {
+    getLeadInterestData();
+  }, []);
+
+  // Note : api call to get company product
+  const fetchCompanyProducts = async (
+    searchParameter: string,
+    offset: number,
+    limit: number
+  ) => {
+    const getProductPostData = {
+      company_id: loginStatus.companyId,
+      id: null,
+      limit: limit,
+      offset: offset,
+      search_company_specific_date_range_id: null,
+      search_parameter: searchParameter,
+      search_parameter_date: null,
+      requestedby_id: loginStatus.id,
+    };
+
+    try {
+      const response = await axios.post(
+        POST_API.GET_PRODUCTS,
+        getProductPostData,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const normalizedProductData = response.data.map((product: any) => ({
+        ...product,
+        name: `${product.name}`.trim(),
+      }));
+      setProductsData(normalizedProductData);
+
+      // Assuming the API response includes a total count in a 'count' field
+      if (response.data.length > 0 && response.data[0].count !== undefined) {
+        setTotalProductData(response.data[0].count);
+      } else {
+        setTotalProductData(normalizedProductData.length); // Fallback if count is not provided
+      }
+    } catch (error: ApiError | any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunction: () =>
+            fetchCompanyProducts(searchParameter, offset, limit),
+        });
+
+        if (refreshTokenStatus) {
+          fetchCompanyProducts(searchParameter, offset, limit);
+        }
+      }
+    }
+  };
 
   // Note : Api call to get the data Company User with offset and limit
   const fetchCompanyUsers = async (
@@ -604,6 +705,7 @@ const LeadImportCsv = ({
 
   useEffect(() => {
     fetchApiData();
+    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 40);
     fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
@@ -622,8 +724,14 @@ const LeadImportCsv = ({
     }
   }, [originalCsvHeaders, crmLeadFields]);
 
+  // Note : extract the unique values
   const extractUniqueValues = (
-    fieldId: "leadStatus" | "leadSource" | "leadOwner",
+    fieldId:
+      | "leadStatus"
+      | "leadSource"
+      | "leadOwner"
+      | "lead_interest_id"
+      | "company_product_id",
     setUniqueValues: (v: string[]) => void
   ) => {
     const mappedHeaders = fieldMappings[fieldId];
@@ -643,6 +751,53 @@ const LeadImportCsv = ({
     setUniqueValues(Array.from(unique));
   };
 
+  const extractUniqueValuesForMultipleMapping = (
+    fieldId: "company_product_id",
+    setUniqueValues: (v: string[]) => void
+  ) => {
+    const mappedHeaders = fieldMappings[fieldId];
+    if (!csvData || !mappedHeaders?.length) {
+      setUniqueValues([]);
+      return;
+    }
+
+    const indices = mappedHeaders
+      .map((h) => originalCsvHeaders.indexOf(h))
+      .filter((i) => i !== -1);
+
+    const unique = new Set<string>();
+
+    csvData.slice(1).forEach((row) => {
+      indices.forEach((index: number) => {
+        const cellValue = row[index];
+
+        if (cellValue?.trim().includes(`"`)) {
+          const values = cellValue
+            .replace(/"/g, "")
+            .split(":")
+            .map((v) => v.trim())
+            .filter((v) => v.length > 0);
+
+          values.forEach((v) => {
+            unique.add(v);
+          });
+        } else {
+          const values = cellValue
+            .split(",")
+            .map((v) => v.trim())
+            .filter((v) => v.length > 0);
+
+          values.forEach((v) => {
+            unique.add(v);
+          });
+        }
+      });
+    });
+
+    setUniqueValues(Array.from(unique));
+  };
+
+  // Note
   useEffect(() => {
     extractUniqueValues("leadStatus", setCsvUniqueStatuses);
     setStatusValueMapping({});
@@ -655,13 +810,26 @@ const LeadImportCsv = ({
     extractUniqueValues("leadOwner", setCsvUniqueOwners);
     setOwnerValueMapping({});
   }, [csvData, fieldMappings.leadOwner]);
+  // for Product Data
+  useEffect(() => {
+    extractUniqueValuesForMultipleMapping(
+      "company_product_id",
+      setCsvUniqueProductData
+    );
+    setProductDataValueMapping({});
+  }, [csvData, fieldMappings.company_product_id]);
+  // for interest type
+  useEffect(() => {
+    extractUniqueValues("lead_interest_id", setCsvUniqueInterestType);
+    setInterestTypeValueMapping({});
+  }, [csvData, fieldMappings.lead_interest_id]);
 
   // --- HANDLERS ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // true if button is clicked 
+    // true if button is clicked
     // setIsSelectCsvButtonClicked(true);
     setCsvImportButtonClicked(true);
-    handleButtonClicked(true)
+    handleButtonClicked(true);
     setCsvFile(null);
     setCsvData(null);
     setOriginalCsvHeaders([]);
@@ -670,10 +838,14 @@ const LeadImportCsv = ({
     setFieldMappings({});
     setStatusValueMapping({});
     setSourceValueMapping({});
+    setInterestTypeValueMapping({});
+    setProductDataValueMapping({});
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
+    setCsvUniqueProductData([]);
+    setCsvUniqueInterestType([]);
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
 
@@ -692,9 +864,9 @@ const LeadImportCsv = ({
     }
   };
 
-  const resetState= ()=>{
+  const resetState = () => {
     setCsvImportButtonClicked(false);
-     handleButtonClicked(false)
+    handleButtonClicked(false);
     setCsvFile(null);
     setCsvData(null);
     setOriginalCsvHeaders([]);
@@ -703,13 +875,17 @@ const LeadImportCsv = ({
     setFieldMappings({});
     setStatusValueMapping({});
     setSourceValueMapping({});
+    setInterestTypeValueMapping({});
+    setProductDataValueMapping({});
     setOwnerValueMapping({});
     setCsvUniqueStatuses([]);
     setCsvUniqueSources([]);
     setCsvUniqueOwners([]);
+    setCsvUniqueInterestType([]);
+    setCsvUniqueProductData([]);
     setProcessedLeads([]); // Clear processed leads on new file
     setShowPreImportReview(false); // Hide review on new file
-  }
+  };
   const readCsv = (file: File) => {
     setIsParsing(true);
     const reader = new FileReader();
@@ -721,9 +897,26 @@ const LeadImportCsv = ({
           .map((l) => l.trim())
           .filter(Boolean);
         if (lines.length < 1) throw new Error("CSV file is empty.");
-        const parsedData = lines.map((line) =>
-          line.split(",").map((cell) => cell.trim().replace(/^"|"$/g, ""))
-        );
+
+        const parsedData = lines.map((line) => {
+          const newLine = line.replace(/"(.*?)"/g, (content) => {
+            // match: The entire quoted string (e.g., '"cdc,csc"')
+            // content: The content inside the quotes (e.g., 'cdc,csc')
+
+            // 1. Replace all commas inside the content with colons (:)
+            const newContent = content.replace(/,/g, ":");
+
+            // 2. Re-wrap the modified content with double quotes
+            return `"${newContent}"`;
+          });
+
+          return newLine.split(",").map((cell) => cell.trim());
+        });
+
+        // console.log(
+        //   "_____________________________ line ______________________________"
+        // );
+        // console.log(parsedData);
         setCsvData(parsedData);
         setOriginalCsvHeaders(parsedData[0]);
         // setError(null);
@@ -741,21 +934,24 @@ const LeadImportCsv = ({
     reader.readAsText(file);
   };
 
-  // const handleDropField = useCallback(
-  //   (crmFieldId: string, csvHeader: string) => {
-  //     const singleMapFields = ["leadStatus", "leadSource", "leadOwner"];
-  //     if (singleMapFields.includes(crmFieldId)) {
-  //       setFieldMappings((prev) => ({ ...prev, [crmFieldId]: [csvHeader] }));
-  //     } else {
-  //       setFieldMappings((prev) => ({
-  //         ...prev,
-  //         [crmFieldId]: [...(prev[crmFieldId] || []), csvHeader],
-  //       }));
-  //     }
-  //   },
-  //   []
-  // );
-
+  //   const readCsv = (file: File) => {
+  //   setIsParsing(true);
+  //   Papa.parse(file, {
+  //     complete: (result :any) => {
+  //       setCsvData(result.data);
+  //       setOriginalCsvHeaders(result.data[0]);
+  //       handleCloseSnackbar();
+  //       setIsParsing(false);
+  //     },
+  //     error: (err :any) => {
+  //       showMessageSnackbar({
+  //         message: err.message || "Failed to parse CSV.",
+  //         type: "error",
+  //       });
+  //       setIsParsing(false);
+  //     },
+  //   });
+  // };
   const handleDropField = useCallback(
     (crmFieldId: string, csvHeader: string) => {
       setFieldMappings((prev) => {
@@ -790,6 +986,26 @@ const LeadImportCsv = ({
                 block: "start",
               });
             }
+            // product data
+            else if (
+              crmFieldId === "company_product_id" &&
+              productDataMappingRef.current
+            ) {
+              productDataMappingRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+            // for lead interest type
+            else if (
+              crmFieldId === "lead_interest_id" &&
+              leadInterestTypeMappingRef.current
+            ) {
+              leadInterestTypeMappingRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
           }, 100); // Small delay, adjust if needed
 
           return { ...prev, [crmFieldId]: newMappings };
@@ -797,7 +1013,14 @@ const LeadImportCsv = ({
         return prev; // If header already mapped, return previous state
       });
     },
-    [leadStatusMappingRef, leadSourceMappingRef, leadOwnerMappingRef] // Add refs to dependency array
+    [
+      leadStatusMappingRef,
+      leadSourceMappingRef,
+      leadOwnerMappingRef,
+      productDataMappingRef,
+      leadInterestTypeMappingRef,
+      leadOwnerMappingRef,
+    ] // Add refs to dependency array
   );
   const handleRemoveFieldMapping = useCallback(
     (crmFieldId: string, csvHeader: string) => {
@@ -821,6 +1044,8 @@ const LeadImportCsv = ({
       if (newMapping[key] === csvValue) delete newMapping[key];
     });
     newMapping[String(crmItem.id)] = csvValue;
+    // console.log("new Mapping : ");
+    // console.log(newMapping);
     setMapping(newMapping);
   };
 
@@ -856,7 +1081,14 @@ const LeadImportCsv = ({
       const values = mappedHeaders
         .map((header) => {
           const index = originalCsvHeaders.indexOf(header);
-          return index !== -1 ? row[index]?.trim() : null;
+
+          if (row[index].replace(/"/g, "").split(":").length === 1) {
+            return index !== -1 ? row[index]?.trim() : null;
+          } else {
+            return index !== -1
+              ? row[index].replace(/"/g, "").split(":")
+              : null;
+          }
         })
         .filter(Boolean); // Filter out null, undefined, empty strings
 
@@ -869,6 +1101,11 @@ const LeadImportCsv = ({
       // Get email and mobile for duplicate checking using the new helper
       const email = getConcatenatedCsvValue(row, "email");
       const mobile = getConcatenatedCsvValue(row, "mobileNumber");
+      const product = getConcatenatedCsvValue(row, "company_product_id");
+      // console.log("valuse");
+      // console.log(row)
+      // console.log(product);
+      // console.log("valuse");
 
       let isDuplicate = false;
       if (email && emailSet.has(email)) {
@@ -885,10 +1122,15 @@ const LeadImportCsv = ({
         mobileSet.add(mobile);
       }
 
-      const mappedData: { [key: string]: string | number | null } = {};
-      const displayData: { [key: string]: string | null | undefined } = {};
+      const mappedData: {
+        [key: string]: string | number | null | undefined | number[] | string[];
+      } = {};
+      const displayData: {
+        [key: string]: string | null | undefined | number[] | string[];
+      } = {};
 
       // Iterate through all CRM fields to process them
+
       crmLeadFields.forEach((field) => {
         const csvValue = getConcatenatedCsvValue(row, field.id); // Use helper for any field
 
@@ -897,19 +1139,98 @@ const LeadImportCsv = ({
             (status) => statusValueMapping[String(status.id)] === csvValue
           );
           mappedData[field.id] = crmStatus ? crmStatus.id : null; // Store ID
-          displayData[field.id] = crmStatus ? crmStatus.name : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmStatus ? crmStatus.name : ""; // Display Name or original CSV
         } else if (field.id === "leadSource" && csvValue) {
           const crmSource = leadSource?.find(
             (source) => sourceValueMapping[String(source.id)] === csvValue
           );
           mappedData[field.id] = crmSource ? crmSource.id : null; // Store ID
-          displayData[field.id] = crmSource ? crmSource.name : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmSource ? crmSource.name : ""; // Display Name or original CSV
         } else if (field.id === "leadOwner" && csvValue) {
           const crmOwner = companyUsers?.find(
             (owner) => ownerValueMapping[String(owner.id)] === csvValue
           );
           mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
-          displayData[field.id] = crmOwner ? crmOwner.fullname : csvValue; // Display Name or original CSV
+          displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
+        }
+        // Note : product data
+        else if (field.id === "company_product_id") {
+          // console.log("inside product cond");
+          // console.log(csvValue);
+          //  console.log("inside product cond");
+          const prodArr = product?.split(",").map((item) => item.trim());
+          // const crmProduct = productsData.filter((p) => {
+          //   console.log(
+          //     " ___________________________________________ data ___________________________________________"
+          //   );
+          //   console.log(p);
+
+          //   const idArr : number[] = [];
+          //    prodArr?.map((x) => {
+
+          //     console.log(
+          //   );
+          //   console.log(x);
+          //   console.log(productDataValueMapping[String(p.id)]);
+          //   console.log(
+          //   );
+
+          //     if (productDataValueMapping[String(p.id)] === x){
+          //           idArr.push(p.id!)
+          //     }
+          //   });
+
+          //    console.log(
+          //     " ___________________________________________ data ___________________________________________"
+          //   );
+          //    console.log(
+          //     " ___________________________________________ IDARR ___________________________________________"
+          //   );
+
+          //   console.log(idArr);
+
+          //   console.log(
+          //     " ___________________________________________ IDARR ___________________________________________"
+          //   );
+          //   return idArr;
+          // });
+
+          const crmProduct = productsData.filter((p) => {
+            // Check for valid ID and if the mapped value is included in prodArr
+            // console.log(
+            //   " ___________________________________________ IDARR ___________________________________________"
+            // );
+            // console.log(prodArr);
+
+            const mappedValue = productDataValueMapping[String(p.id)];
+
+            // console.log(mappedValue);
+            // console.log(
+            //   " ___________________________________________ IDARR ___________________________________________"
+            // );
+            return (
+              p.id !== undefined &&
+              p.id !== null &&
+              prodArr?.includes(mappedValue)
+            );
+          });
+
+          // 2. Use map() on the filtered array to extract only the 'id' property.
+          const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
+
+          mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
+          displayData[field.id] = crmProduct
+            ? crmProduct.map((item) => item.name).join(",")
+            : null; // Display Name or original CSV
+        }
+        // NOte : lead interest type leadInterestType
+        else if (field.id === "lead_interest_id" && csvValue) {
+          const crmInterestType = interestTypeData?.find(
+            (interest) =>
+              InterestTypeValueMapping[String(interest.id)] === csvValue
+          );
+          mappedData[field.id] = crmInterestType ? crmInterestType.id : null; // Store ID
+          displayData[field.id] = crmInterestType ? crmInterestType.name : ""; // Display Name or original CSV
         } else {
           // For other fields (including 'name', 'email', etc.), store the concatenated CSV value
           mappedData[field.id] = csvValue;
@@ -947,6 +1268,10 @@ const LeadImportCsv = ({
     statusValueMapping,
     sourceValueMapping,
     ownerValueMapping,
+    productDataValueMapping,
+    InterestTypeValueMapping,
+    productsData,
+    interestTypeData,
     leadStatus,
     leadSource,
     companyUsers,
@@ -991,15 +1316,16 @@ const LeadImportCsv = ({
     }
 
     const isContactMapped =
-      fieldMappings.email?.length > 0 || fieldMappings.mobileNumber?.length > 0;
+      fieldMappings.email?.length > 0 || fieldMappings.mobilenumber?.length > 0;
     // const isNameMapped = fieldMappings.name?.length > 0;
     // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
     if (!isContactMapped) {
       // setError('Please map "Name" and either "Email" or "Mobile Number".');
-      showMessageSnackbar({
-        message: 'Please map "Name" and either "Email" or "Mobile Number.',
-        type: "error",
-      });
+      // showMessageSnackbar({
+      //   message: 'Please map "Name" and either of "Email" or "Mobile Number".',
+      //   type: "error",
+      // });
+      toast.error('Please map "Name" and either of "Email" or "Mobile Number".')
       return;
     }
     setError(null);
@@ -1039,8 +1365,7 @@ const LeadImportCsv = ({
         },
       })), // Sending only necessary data
     };
-    console.log("Submitting payload:", payload);
-
+    // console.log("Submitting payload:", payload);
     try {
       // const formData = new FormData();
       // formData.append("csvFile", csvFile);
@@ -1080,6 +1405,7 @@ const LeadImportCsv = ({
       }
     } finally {
       setIsLoadingSpinnerAfterSubmission(false);
+      handleFileChange({ target: { files: null } } as any);
     }
   };
 
@@ -1088,47 +1414,75 @@ const LeadImportCsv = ({
     fieldMappings.leadStatus?.length > 0 && csvUniqueStatuses.length > 0;
   const showSourceMapping =
     fieldMappings.leadSource?.length > 0 && csvUniqueSources.length > 0;
-  const showOwnerMapping = 
+  const showOwnerMapping =
     fieldMappings.leadOwner?.length > 0 && csvUniqueOwners.length > 0;
+
+  // NOte : product data
+  const showProductDataMapping =
+    fieldMappings.company_product_id?.length > 0 &&
+    csvUniqueProductData.length > 0;
+  const showLeadInterestTypeMapping =
+    fieldMappings.lead_interest_id?.length > 0 &&
+    csvUniqueInterestType.length > 0;
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full h-full bg-gray-100 rounded-md overflow-auto flex flex-col p-1  space-y-2">
+      <div className="w-full h-full   overflow-auto flex flex-col   space-y-2">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-1 border-b-2 bg-white rounded-lg z-10">
-         {
-          csvImportButtonClicked &&(
-             <button onClick={
-            resetState
-            }>
-            <ArrowLeft/>
-          </button>
-          )
-         }
-          <h2 className="text-base font-semibold text-gray-800">
-            Import Leads from CSV file.
-          </h2>
-          <label
-            htmlFor="csv-upload"
-            className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer shadow-sm"
-          >
-            <FileUp className="w-5 h-5" />
-            <span>{csvFile ? "Change File" : "Select CSV"}</span>
-            <input
-              id="csv-upload"
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
+        <div className="flex-shrink-0 flex items-center justify-between p-2 border-b-2 bg-white rounded-lg z-10">
+          {csvImportButtonClicked && (
+            <button
+              className="flex items-center gap-2 table-header-custom hover:text-blue-600 transition-colors"
+              onClick={resetState}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to File Selection / Imported Tags</span>
+            </button>
+          )}
+
+          {!csvImportButtonClicked && (
+            <div className="flex items-center justify-between w-full">
+              <h2 className="table-header-custom hover:text-blue-500   px-1 ">
+                Import leads via CSV file
+                {/* Import leads via CSV */}
+              </h2>
+
+             
+                {!isLoadingLeadInterestData && !isLoadingLeadSourceAndStatusData ? (
+                  <>
+                   <label
+                htmlFor="csv-upload"
+                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
+              >
+
+                    <LucideFolderInput className="w-5 h-5" />
+                    <span>{csvFile ? "Change File" : "Browse CSV"}</span>
+                    <input
+                      id="csv-upload"
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      />
+                      </label>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center w-24 ">
+                    <LoadingSpinner />
+                  </div>
+                )}
+              
+            </div>
+          )}
         </div>
 
         {isParsing && (
-          <div className="p-3 bg-blue-100 rounded-md">Parsing CSV...</div>
+          <div className="p-3 input-label-custom bg-blue-100 rounded-md">
+            Parsing CSV...
+          </div>
         )}
         {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md font-bold">
+          <div className="p-3 bg-red-100 input-label-inactive rounded-md ">
             {error}
           </div>
         )}
@@ -1137,12 +1491,10 @@ const LeadImportCsv = ({
         {csvData && (
           <div className="flex-shrink-0 p-2 border rounded-lg bg-white shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-md font-semibold text-gray-700">
-                Preview (First 5 Rows)
-              </h4>
+              <h4 className="table-header-custom">Preview (First 5 Rows)</h4>
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-sm text-blue-600 hover:underline"
+                className="input-label-custom-blue text-blue-600 hover:underline"
               >
                 {showPreview ? "Hide" : "Show"}
               </button>
@@ -1153,7 +1505,10 @@ const LeadImportCsv = ({
                   <thead className="bg-gray-50">
                     <tr>
                       {originalCsvHeaders.map((h, i) => (
-                        <th key={i} className="px-3 py-2 text-left font-medium">
+                        <th
+                          key={i}
+                          className="px-3 py-2 text-left table-header-custom"
+                        >
                           {h}
                         </th>
                       ))}
@@ -1161,7 +1516,7 @@ const LeadImportCsv = ({
                   </thead>
                   <tbody>
                     {csvData.slice(1, 6).map((row, i) => (
-                      <tr key={i} className="border-t">
+                      <tr key={i} className="border-t table-data-custom">
                         {row.map((cell, j) => (
                           <td key={j} className="px-3 py-2">
                             {cell}
@@ -1173,7 +1528,7 @@ const LeadImportCsv = ({
                 </table>
               </div>
             )}
-            <div className="text-xs text-gray-500">
+            <div className="caption-custom">
               Total records in csv file : {csvData.length - 1}
             </div>
           </div>
@@ -1185,7 +1540,7 @@ const LeadImportCsv = ({
             <div className="flex-grow flex flex-col lg:flex-row w-full gap-6">
               <div className="w-full lg:w-5/12 xl:w-4/12 flex flex-col gap-4">
                 <div className="border rounded-lg p-3 bg-white shadow-sm">
-                  <h3 className=" flex items-center gap-1 text-md font-semibold text-gray-800 mb-3">
+                  <h3 className=" flex items-center gap-1 table-header-custom mb-3">
                     <span>1. CSV Columns</span>
                     <span
                       className="cursor-pointer"
@@ -1204,7 +1559,7 @@ const LeadImportCsv = ({
               </div>
               <div className="w-full  lg:w-7/12 xl:w-8/12 flex flex-col">
                 <div className="border rounded-lg p-4 bg-white flex-grow shadow-sm">
-                  <h3 className=" flex items-center gap-2 text-md font-semibold text-gray-800 mb-4">
+                  <h3 className=" flex items-center gap-2 table-header-custom mb-4">
                     <span>2. Map Columns to CRM Fields </span>
                     <span
                       className="cursor-pointer"
@@ -1213,7 +1568,7 @@ const LeadImportCsv = ({
                       <Info size={12} />
                     </span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  text-xs">
                     {crmLeadFields.map((field) => (
                       <DroppableCrmField
                         key={field.id}
@@ -1303,7 +1658,7 @@ const LeadImportCsv = ({
                   }
                   itemType={ItemTypes.CSV_OWNER_VALUE}
                   onSearch={fetchCompanyUsers} // This is already good
-                  searchPlaceholder="Search users by Name, Email ,Mobile number."
+                  searchPlaceholder="Search user..."
                   totalCrmItems={totalCompanyUsers}
                   currentPage={companyUsersCurrentPage}
                   itemsPerPage={userPreference.rowsInGrid || 40}
@@ -1316,17 +1671,89 @@ const LeadImportCsv = ({
                     );
                   }}
                 />
-                )} 
+              )}
+              {/* for product mapping */}
+
+              {showProductDataMapping && (
+                <GenericValueMappingCard
+                  ref={productDataMappingRef}
+                  title="Map Product assigned to lead"
+                  csvValues={csvUniqueProductData}
+                  crmData={productsData}
+                  mapping={productDataValueMapping}
+                  onDrop={(c, v) =>
+                    handleValueMap(
+                      c,
+                      v,
+                      productDataValueMapping,
+                      setProductDataValueMapping
+                    )
+                  }
+                  onRemove={(c) =>
+                    handleRemoveValueMap(
+                      c,
+                      productDataValueMapping,
+                      setProductDataValueMapping
+                    )
+                  }
+                  itemType={ItemTypes.CSV_PRODUCT_VALUE}
+                  onSearch={fetchCompanyProducts} // This is already good
+                  searchPlaceholder="Search product..."
+                  totalCrmItems={totalProductData}
+                  currentPage={productDataCurrentPage}
+                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  onPageChange={(newPage) => {
+                    setProductDataCurrentPage(newPage);
+                    fetchCompanyProducts(
+                      "",
+                      newPage * (userPreference.rowsInGrid || 40),
+                      userPreference.rowsInGrid || 40
+                    );
+                  }}
+                />
+              )}
+              {/* For lead interest type data  */}
+              {showLeadInterestTypeMapping && (
+                <GenericValueMappingCard
+                  ref={leadInterestTypeMappingRef}
+                  title=" Map Interest Type"
+                  csvValues={csvUniqueInterestType}
+                  crmData={interestTypeData}
+                  mapping={InterestTypeValueMapping}
+                  onDrop={(c, v) =>
+                    handleValueMap(
+                      c,
+                      v,
+                      InterestTypeValueMapping,
+                      setInterestTypeValueMapping
+                    )
+                  }
+                  onRemove={(c) =>
+                    handleRemoveValueMap(
+                      c,
+                      InterestTypeValueMapping,
+                      setInterestTypeValueMapping
+                    )
+                  }
+                  itemType={ItemTypes.CSV_INTEREST_VALUE}
+                />
+              )}
             </div>
 
             <div className="mt-6 flex justify-end">
-              <button
-                onClick={processCsvForReview} // Changed to trigger review first
-                disabled={isParsing || !csvFile}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
-              >
-                Review and Finalize Import
-              </button>
+              <div>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    processCsvForReview();
+                  }} // Changed to trigger review first
+                  disabled={isParsing || !csvFile}
+                  // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                >
+                  Review and Finalize Import
+                </Button>
+              </div>
             </div>
           </>
         )}
@@ -1334,22 +1761,22 @@ const LeadImportCsv = ({
         {/* Pre-Import Review Section */}
         {showPreImportReview && (
           <div className="mt-6 p-4 border rounded-lg bg-white shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="section-header-custom mb-4">
               6. Review Leads Before Import
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="input-label-custom mb-4">
               Review the mapped data below. Leads highlighted in{" "}
               <span className="font-bold text-red-600">red</span> indicate
               potential duplicates (based on Email or Mobile Number). Check the
               box for each record you wish to import.
             </p>
-            <div className="w-full overflow-x-auto border rounded-md">
+            <div className="w-full overflow-x-auto overflow-y-auto max-h-96  border rounded-md">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6  text-left table-header-custom uppercase tracking-wider"
                     >
                       Import
                     </th>
@@ -1357,7 +1784,7 @@ const LeadImportCsv = ({
                       <th
                         key={field.id}
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-6  text-left table-header-custom uppercase tracking-wider"
                       >
                         {field.label}
                       </th>
@@ -1372,20 +1799,20 @@ const LeadImportCsv = ({
                         lead.isDuplicate ? "bg-red-100" : "bg-green-50" // Apply red background for duplicates, green for unique
                       }
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6  whitespace-nowrap">
                         <input
                           type="checkbox"
                           checked={lead.isSelectedForImport}
                           onChange={() => handleToggleLeadSelection(index)}
-                          className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          className="focus:ring-blue-500 h-3 w-3 text-blue-600 border-gray-300 rounded"
                         />
                       </td>
                       {crmLeadFields.map((field) => (
                         <td
                           key={field.id}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                          className="px-6 py-1 whitespace-nowrap table-data-custom"
                         >
-                          {lead.mappedData[field.id]}
+                          {lead.displayData[field.id]}
                         </td>
                       ))}
                     </tr>
@@ -1394,24 +1821,34 @@ const LeadImportCsv = ({
               </table>
             </div>
             <div className="mt-6 flex justify-between">
-              <button
-                onClick={() => setShowPreImportReview(false)}
-                className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
-              >
-                Back to Mapping
-              </button>
-              <button
-                onClick={handleSubmitImport}
-                disabled={
-                  isParsing ||
-                  !csvFile ||
-                  processedLeads.filter((l) => l.isSelectedForImport).length ===
-                    0
-                }
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
-              >
-                Confirm and Import Selected Leads
-              </button>
+              <div>
+                <Button
+                  type="button"
+                  onClick={() => setShowPreImportReview(false)}
+                  // className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-md shadow-sm"
+                >
+                  Back to Mapping
+                </Button>
+              </div>
+
+              <div>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmitImport();
+                  }}
+                  disabled={
+                    isParsing ||
+                    !csvFile ||
+                    processedLeads.filter((l) => l.isSelectedForImport)
+                      .length === 0
+                  }
+                  // className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
+                >
+                  Confirm and Import Selected Leads
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -1419,7 +1856,7 @@ const LeadImportCsv = ({
       {isLoadingSpinnerAfterSubmission && <LoadingSpinner />}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
-          data={LeadImportReponse}
+          data={LeadImportResponse}
           onClose={() => {
             setShowLeadImportResultPopUp(false);
             handleFileChange({ target: { files: null } } as any);

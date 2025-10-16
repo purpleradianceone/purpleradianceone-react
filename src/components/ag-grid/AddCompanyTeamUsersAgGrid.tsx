@@ -126,7 +126,7 @@ function AddCompanyTeamUsersAgGrid({
               : false;
 
             return (
-              <div className="flex flex-col ml-2 items-center">
+              <div className="flex flex-col ml-2 mt-3 items-center">
                 <input
                   type="checkbox"
                   checked={isChecked}
@@ -147,7 +147,6 @@ function AddCompanyTeamUsersAgGrid({
             );
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
-
 
             const handleCompanyUserUpdateToggle = async (
               event: React.FormEvent<HTMLButtonElement>
@@ -193,9 +192,8 @@ function AddCompanyTeamUsersAgGrid({
                   });
                   if (refreshTokenStatus) {
                     handleCompanyUserUpdateToggle(event);
-                  } 
+                  }
                 }
-
               }
             };
 
@@ -251,15 +249,18 @@ function AddCompanyTeamUsersAgGrid({
   return (
     <>
       {/* Optional: display the global change count */}
-      <div className="mb-2">
-        {isGridForSubscription && (
-          <>
+
+      {isGridForSubscription && (
+        <>
+          <div className="mb-2 ag-theme-balham ">
             <span className="font-semibold">Net Status Change Count: </span>
             <span>{statusChangeCount}</span>
-          </>
-        )}
-      </div>
-      <AgGridReact
+          </div>
+        </>
+      )}
+
+<div className="ag-theme-balham w-full h-full">
+        <AgGridReact
         rowData={companyUsers}
         columnDefs={companyUserColDefs}
         defaultColDef={defaultColDef}
@@ -269,6 +270,8 @@ function AddCompanyTeamUsersAgGrid({
         onViewportChanged={handleViewPortChanged}
         onGridReady={onGridReady}
       />
+</div>
+      
     </>
   );
 }

@@ -4,13 +4,15 @@ const LOCALSTORAGE_KEYS = {
     LOGIN_CREDENTIALS : "loginUserCredentials",
     LOGIN_STATUS : "loginStatus",
     ACCESS_MANAGEMENT : "AccessManagement",
+    TUTORAIL : "tutorail",
 
     GOOGLE_MEET_STATUS : "googleMeetStatus",
     ZOOM_MEETING_STATUS : "zoomMeetingStatus",
     USER_PREFERENCE : "userpreference",
     REDIRECT_PLATFORM : "redirectPlatform",
     MASTER_ROWS_IN_GRID : "masterrowsingrid",
-    NOTIFICATION_COUNT : "notificationCount"
+    NOTIFICATION_COUNT : "notificationCount",
+    LOGINCREDENTAILSPASS : "app_cache_ref"
 
 }
 export default LOCALSTORAGE_KEYS;

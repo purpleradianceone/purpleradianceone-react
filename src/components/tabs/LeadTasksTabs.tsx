@@ -11,6 +11,7 @@ import LeadTaskPriorityType from "../../@types/lead-management/LeadTaskPriorityT
 import LeadActivityType from "../../@types/lead-management/LeadActivityType";
 import LeadTaskStageType from "../../@types/lead-management/LeadTaskStageType";
 import LeadTaskType from "../../@types/lead-management/LeadTaskType";
+import { useMeetingPlatform } from "../../config/hooks/useMeetingPlatforms";
 
 function LeadTaskTabs({
   leadTaskStage,
@@ -35,6 +36,7 @@ function LeadTaskTabs({
 }) {
 
    const [activeTab, setActiveTab] = useState("allTasks");
+   const {meetingPlatform} = useMeetingPlatform();
 
   const data = [
     {
@@ -50,6 +52,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
        handleLeadTaskUpdate={handleLeadTaskUpdate}
+       meetingPlatform={meetingPlatform}
        />
       ),
       taskId : 0
@@ -67,6 +70,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
        taskId : leadTaskStage[0]?.id,
@@ -84,6 +88,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
       taskId : leadTaskStage[1]?.id,
@@ -101,6 +106,7 @@ function LeadTaskTabs({
        handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
        handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
         handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
        />
       ),
       taskId : leadTaskStage[2]?.id,
@@ -110,7 +116,7 @@ function LeadTaskTabs({
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white pb-2">
+        <div className="sticky top-0 bg-white">
           <TabsHeader
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}
@@ -118,14 +124,18 @@ function LeadTaskTabs({
             className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
             indicatorProps={{
               className:
-                "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                "bg-transparent border-b-2 border-teal-600 shadow-none rounded-none",
             }}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {data.map(({ label, value , taskId}) => (
               <Tab
                 placeholder="All Tasks"
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+            onResizeCapture={undefined}
                 key={value}
                 value={value}
                 onClick={() => {
@@ -134,7 +144,7 @@ function LeadTaskTabs({
                 
                 }}
                 className={
-                  activeTab === value ? "text-gray-900 text-sm" : "text-sm"
+                  activeTab === value ? "input-label-custom-active-tab" : "input-label-custom"
                 }
               >
                 {label}
@@ -149,6 +159,8 @@ function LeadTaskTabs({
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {data.map(({ value, desc }) => (
               <TabPanel key={value} value={value}>

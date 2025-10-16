@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import {
@@ -13,10 +14,13 @@ import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { Product } from "../../../@types/products/ProductsManagementProps";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 function ProductTeamManagement() {
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
@@ -54,7 +58,7 @@ function ProductTeamManagement() {
       setAccessDeniedPopUpOpen(false);
       const getProductPostData = {
         company_id: loginStatus.companyId,
-        requestedby: loginStatus.id,
+        requestedby_id: loginStatus.id,
         limit: pageSize,
         offset: offset,
         search_company_specific_date_range_id: effectiveDateRangeId,
@@ -72,14 +76,12 @@ function ProductTeamManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          response.data.map((res : any) => {
-            setProductsData((prev) => [
-              ...prev,
-              {
+ const formattedData: Product[] = response.data.map(
+          (res: any) => ({
                 code: res.code,
                 companyId: res.company_id,
                 cost: res.cost,
+                productTypeName:res.product_type_name,
                 count: res.count,
                 createdBy: res.createdby,
                 createdOn: res.createdon,
@@ -91,17 +93,15 @@ function ProductTeamManagement() {
                 sac: res.sac,
                 taxRate: res.tax_rate,
                 validFrom: res.valid_from,
-              },
-            ]);
-          });
-
+            })
+        );
+          setProductsData(formattedData)
           if (response.data[0]?.count) {
             setTotalPages(
               Math.ceil(response.data[0].count / pageSize)
             );
           }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: ApiError | any) {
         console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -139,6 +139,12 @@ function ProductTeamManagement() {
 
   return (
     <div className="w-full">
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
       {userHasAccessToViewProduct ? (
         <>
           <div>
@@ -157,7 +163,7 @@ function ProductTeamManagement() {
                 pageSize,
               }}
               products={productsData}
-              isListForProductUser={true}
+              // isListForProductUser={true}
 
             /> 
           </div>
@@ -173,6 +179,7 @@ function ProductTeamManagement() {
           />
         </div>
       )}
+      </motion.section>
     </div>
   );
 }
