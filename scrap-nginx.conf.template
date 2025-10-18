@@ -1,17 +1,14 @@
-
 # Redirect HTTP to HTTPS
 server {
     listen 80;
-    server_name ${MAIN_DOMAIN} *.${MAIN_DOMAIN};
+    server_name cdranalysis.com *.cdranalysis.com;
     return 301 https://$host$request_uri;
 }
-
-
 
 # HTTPS server with reverse proxy and static React app
 server {
     listen 443 ssl;
-    server_name ${MAIN_DOMAIN} *.${MAIN_DOMAIN};
+    server_name cdranalysis.com *.cdranalysis.com;
 
     ssl_certificate     /etc/nginx/certs/fullchain.pem;
     ssl_certificate_key /etc/nginx/certs/privkey.pem;
@@ -25,20 +22,28 @@ server {
     add_header X-Content-Type-Options nosniff;                 # Disable MIME sniffing
     add_header X-XSS-Protection "1; mode=block";               # Basic XSS protection
     add_header Referrer-Policy no-referrer-when-downgrade;     # Privacy improvement
-   
     # 🔒 CONTENT SECURITY POLICY — ADD THIS BELOW THE OTHERS
-    #add_header Content-Security-Policy "default-src 'self'; \
-    #script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.recaptcha.net; \
-    #style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
-    #frame-src https://www.google.com https://www.recaptcha.net; \
-    #img-src 'self' data: https://www.google.com https://www.gstatic.com https://www.recaptcha.net; \
-    #font-src 'self' https://fonts.gstatic.com; \
-    #manifest-src 'self'; \
-    #child-src 'self' https://www.google.com https://www.recaptcha.net; \
-    #form-action 'self'; \
-    #media-src 'self'; \
-    #worker-src 'self'; \
-    #object-src 'none';";
+  
+
+
+       add_header Content-Security-Policy "
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://checkout.razorpay.com https://cdn.razorpay.com https://checkout-static-next.razorpay.com https://lumberjack.razorpay.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://checkout.razorpay.com https://lumberjack.razorpay.com;
+        frame-src https://www.google.com https://www.recaptcha.net https://checkout.razorpay.com https://cdn.razorpay.com https://checkout-static-next.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://web-lead.netlify.app;
+        img-src 'self' data: https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://checkout.razorpay.com https://cdn.razorpay.com https://checkout-static-next.razorpay.com https://lumberjack.razorpay.com;
+        connect-src 'self' https://lumberjack.razorpay.com https://api.razorpay.com https://o515678.ingest.sentry.io https://cdn.razorpay.com https://checkout-static-next.razorpay.com;
+        font-src 'self' https://fonts.gstatic.com https://checkout-static-next.razorpay.com https://lumberjack.razorpay.com;
+        manifest-src 'self';
+        child-src 'self' https://www.google.com https://www.recaptcha.net https://checkout.razorpay.com https://cdn.razorpay.com https://checkout-static-next.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com;
+        form-action 'self' https://checkout.razorpay.com;
+        media-src 'self';
+        worker-src 'self';
+        object-src 'none';"
+    
+
+   
+        always;
 
     # Serve React frontend (static files)
     root /usr/share/nginx/html;
@@ -49,7 +54,7 @@ server {
         try_files $uri /index.html;
     }
 
- # === Reverse Proxy for WebSocket ===
+     # === Reverse Proxy for WebSocket ===
     location /api/notification/ws/ {
         proxy_pass http://purple-crm-notification-service:8182;
         proxy_http_version 1.1;
@@ -90,6 +95,5 @@ server {
         deny all;
         proxy_pass http://rabbitmq:15672/;
         proxy_set_header Host $host;
-    }    
-    
+    }
 }
