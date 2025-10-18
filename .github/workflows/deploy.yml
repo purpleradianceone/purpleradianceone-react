@@ -10,7 +10,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout Source
@@ -37,7 +36,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-deploy
-    environment: ${{ github.ref_name }}   # ✅ Add this line
+
     steps:
       - name: Download Docker Image Artifact
         uses: actions/download-artifact@v4
@@ -68,20 +67,8 @@ jobs:
 
             docker run -d \
               --name react-app \
-              --network host \
+              --network purple-net \
+              -v ${{ secrets.LETSENCRYPT_PATH }}:/etc/nginx/certs:ro \
               -p 80:80 -p 443:443 \
-              -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
-              -v ${{ secrets.LETSENCRYPT_PATH }}/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
-              -v ${{ secrets.LETSENCRYPT_PATH }}/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
-             -e MAIN_DOMAIN=${{ secrets.MAIN_DOMAIN }} \
               --restart always \
               react-app:${{ github.ref_name }}
-
-            echo "Cleaning up TAR file..."
-            rm -f /root/react-app.tar
-
-            echo "Deployment complete. Running container status:"
-            docker ps --filter "name=react-app"
-
-            echo "Recent logs from container:"
-            docker logs --tail=50 react-app
