@@ -11,6 +11,7 @@ function TextAreaInput(props: TextAreaInputProps) {
         {props.label}{props.required && <span className="text-red-500 align-top">*</span>}
       </label>
       <textarea
+        autoFocus={props.autoFocus}
         name={props.name}
         id={props.id}
         disabled={props.disabled}

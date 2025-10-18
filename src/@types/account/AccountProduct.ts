@@ -1,5 +1,4 @@
 type AccountProduct ={
-    companyId : number,
 	accountId : number ,
 	companyProductId : number,
 	quantity : number,
@@ -18,7 +17,17 @@ type AccountProduct ={
 	amcCycle : number,
 	amcCycleStartDate : string,
 	amcCycleEndDate : string,
-	createdby : number
+
+	id: number,
+	accountName : string,
+	companyProductName : string,
+	installedByName:  string,
+	warrantyIntervalName : string,
+	amcIntervalName : string,
+	updatedBy : string,
+	createdOn : string,
+	updatedOn : string
+	createdBy : string
 }
 
 export default AccountProduct;

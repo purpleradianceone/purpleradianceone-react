@@ -995,7 +995,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           />
         </div>
         {/* Account company product */}
-        <div className="bg-white rounded-xl border p-1 border-slate-200">
+        <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Product Details
           </h3> 

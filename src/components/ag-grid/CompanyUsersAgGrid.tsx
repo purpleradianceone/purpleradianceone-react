@@ -23,6 +23,8 @@ function CompanyUserAgGrid({
   handleIsDashboardModalOpen,
   handleActionsTourEnd,
   isActionsTourEnded,
+  isUsedInAccountProductForAssingingInstalledBy,
+  onRowSelect
 }: CompanyUserAgGridProps) {
   const {
     userHasAccessToViewAccess,
@@ -85,7 +87,36 @@ function CompanyUserAgGrid({
           );
         },
       },
+       {
+        hide: !isUsedInAccountProductForAssingingInstalledBy,
+        headerName: "Actions",
+        // hide: !isUsedInLeadModule,
+        field: "view",
+        pinned: "right",
+        maxWidth: 80,
+        // minWidth:80,
+        // autoHeight: true,
+        // suppressSizeToFit: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params:   any) => {
+          return (
+            <div className="flex items-center justify-center  ">
+              <span
+                className="lead-details cursor-pointer text-blue-600  "
+                onClick={(e) => {
+                    e.preventDefault();
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+                
+                Select
+              </span>
+            </div>
+          );
+        },
+      },
       {
+        hide: isUsedInAccountProductForAssingingInstalledBy,
         headerName: "Actions",
         sortable: false,
         maxWidth: 100,
@@ -312,6 +343,7 @@ function CompanyUserAgGrid({
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
+        context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );
