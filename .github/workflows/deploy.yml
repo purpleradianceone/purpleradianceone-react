@@ -10,6 +10,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}   # ✅ Add this line
 
     steps:
       - name: Checkout Source
@@ -36,6 +37,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-deploy
+    environment: ${{ github.ref_name }}   # ✅ Add this line
 
     steps:
       - name: Download Docker Image Artifact
