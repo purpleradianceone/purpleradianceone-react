@@ -18,6 +18,7 @@ type TextAreaInputProps = {
     error? : string;
     required? : boolean;
     logo? : LucideIcon;
+    autoFocus? : boolean 
 }
 
 export default TextAreaInputProps;
