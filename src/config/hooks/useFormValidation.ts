@@ -231,6 +231,9 @@ export const useFormValidation = (formData: Record<string, string | number | boo
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, quantity: "Quantity is required" }));
         }
+         else if (formType === STRING_VALUES.REGISTRATION && value === "0") {
+          setErrors((prev) => ({ ...prev, quantity: "Quantity is required" }));
+        }
         else {
           setErrors((prev) => ({ ...prev, quantity: "" }));
         }

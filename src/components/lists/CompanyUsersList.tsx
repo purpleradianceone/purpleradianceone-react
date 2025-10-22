@@ -39,6 +39,8 @@ function GetCompanyUsersList({
   onStartDateChange,
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
+  isUsedInAccountProductForAssingingInstalledBy,
+   onRowSelect 
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
@@ -294,7 +296,11 @@ function GetCompanyUsersList({
         <>
           {/* {userHasAccessToAddUser ? ( */}
           {/* <> */}
-          <div id="company-users-module-add-button" className="flex gap-1">
+          {
+            !isUsedInAccountProductForAssingingInstalledBy &&
+            <>
+
+            <div id="company-users-module-add-button" className="flex gap-1">
             <Button
               type="submit"
               disabled={!userHasAccessToAddUser}
@@ -321,10 +327,13 @@ function GetCompanyUsersList({
               </div>
             </Button>
           </div>
+          
           <AddCompanyUserModal
-            isOpen={isAddCompanyUserModalOpen}
-            onClose={() => setIsAddCompanyUserModalOpen(false)}
+          isOpen={isAddCompanyUserModalOpen}
+          onClose={() => setIsAddCompanyUserModalOpen(false)}
           />
+          </>
+        }
 
          
         </>
@@ -341,6 +350,8 @@ function GetCompanyUsersList({
         >
            
           <CompanyUserAgGrid
+          onRowSelect={onRowSelect}
+            isUsedInAccountProductForAssingingInstalledBy={isUsedInAccountProductForAssingingInstalledBy}
             handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
             users={users}
             handleIdIsEditModalOpen={handleIdIsEditModalOpen}

@@ -1,10 +1,15 @@
 import {
   ArrowLeft,
-  Edit2,
+  BoxSelectIcon,
   LucideCalendar,
   LucideClock,
   LucideIndianRupee,
   LucideTimer,
+  MapPin,
+  Save,
+  ShieldCheck,
+  User,
+  X,
 } from "lucide-react";
 import FormHeader from "../../../ui/FormHeader";
 import FormInput from "../../../ui/FormInput";
@@ -14,7 +19,6 @@ import ProductManagement from "../../../views/product-Management/ProductsManagem
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
-import AccountProduct from "../../../../@types/account/AccountProduct";
 import { useFormChange } from "../../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../../config/hooks/useFormValidation";
 import { useIntervalType } from "../../../../config/hooks/useIntervalType";
@@ -25,21 +29,25 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
+import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersManagement";
+import CompanyUser from "../../../../@types/company-users/CompanyUser";
 
 const CreateAccountCompanyProduct = ({
   onClose,
   accountId,
+  getAccountCompanyProduct
 }: {
   onClose: () => void;
   accountId: number;
+  getAccountCompanyProduct: () => void
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onRowSelectForAssingingToAccount = (data: Product | any) => {
+  const onRowSelectProductForAssingingToAccount = (data: Product | any) => {
     console.log(data);
     setSelectedProduct(null);
     if (data !== null && data !== undefined) {
@@ -47,37 +55,76 @@ const CreateAccountCompanyProduct = ({
       setShowGrid(!showGrid);
     }
   };
+  const [selectedInstalledBy, setSelectedInstalledBy] = useState<CompanyUser>();
+  const [showCompanyUserModule, setShowCompanyUserModule] =
+    useState<boolean>(false);
+  const intialAddProductToAccountFormData = {
+    accountId: 0,
+    amcCycle: 0,
+    amcCycleEndDate: "",
+    amcCycleIntervalTypeId: 0,
+    amcCycleStartDate: "",
+    billingAddress: "",
+    companyId: 0,
+    companyProductId: 0,
+    deliveryAddress: "",
+    deliveryDate: "",
+    installationDate: "",
+    installedBy: 0,
+    purchaseDate: "",
+    quantity: 0,
+    warranty: 0,
+    warrantyEndDate: "",
+    warrantyIntervalTypeId: 0,
+    warrantyStartDate: "",
+    warrantyTerms: "",
+  };
+
+  const {
+    handleChange: handleAddProductToAccountFormDataChange,
+    formData: addProductToAccountFormData,
+    resetForm: resetAccountCreateForm,
+  } = useFormChange(intialAddProductToAccountFormData);
+
+  const { errors, handleBlur, setErrors } = useFormValidation(
+    addProductToAccountFormData,
+    "registration"
+  );
 
   const handleGoBackToProductSelection = () => {
+    // alert()
     setSelectedProduct(null);
+
+    // // resets the form
+    // resetAccountCreateForm();
+
+    // setWarrantyIntervalTypeId(0);
+    // setAmcIntervalTypeId(0);
+    // setSelectedWarranty(0);
+    // setSelectedAmc(0);
+    // setErrors({
+    //   quantity: "",
+    //   purchaseDate: "",
+    //   installationDate: "",
+    //   deliveryDate: "",
+    //   warrantyStartDate: "",
+    // });
+    // setErrorsData({
+    //   AmcIntervalTypeId: false,
+    //   SelectedAmc: false,
+    //   Warranty: false,
+    //   WarrantyIntervalTypeId: false,
+    // });
     setShowGrid(!showGrid);
   };
 
   // reset add the states before closing the form
   const handleCloseForm = () => {
     setSelectedProduct(null);
-    setInitialAddProductToAccountFormData({
-      accountId: 0,
-      amcCycle: 0,
-      amcCycleEndDate: "",
-      amcCycleIntervalTypeId: 0,
-      amcCycleStartDate: "",
-      billingAddress: "",
-      companyId: 0,
-      companyProductId: 0,
-      createdby: 0,
-      deliveryAddress: "",
-      deliveryDate: "",
-      installationDate: "",
-      installedBy: 0,
-      purchaseDate: "",
-      quantity: 0,
-      warranty: 0,
-      warrantyEndDate: "",
-      warrantyIntervalTypeId: 0,
-      warrantyStartDate: "",
-      warrantyTerms: "",
-    });
+
+    // resets the states for form
+    resetAccountCreateForm();
+
     setWarrantyIntervalTypeId(0);
     setAmcIntervalTypeId(0);
     setSelectedWarranty(0);
@@ -102,53 +149,13 @@ const CreateAccountCompanyProduct = ({
   const rangeOfNumber: Item[] = useMemo(() => {
     return range(1, 365);
   }, []);
-  const [
-    intialAddProductToAccountFormData,
-    setInitialAddProductToAccountFormData,
-  ] = useState<AccountProduct>({
-    accountId: 0,
-    amcCycle: 0,
-    amcCycleEndDate: "",
-    amcCycleIntervalTypeId: 0,
-    amcCycleStartDate: "",
-    billingAddress: "",
-    companyId: 0,
-    companyProductId: 0,
-    createdby: 0,
-    deliveryAddress: "",
-    deliveryDate: "",
-    installationDate: "",
-    installedBy: 0,
-    purchaseDate: "",
-    quantity: 0,
-    warranty: 0,
-    warrantyEndDate: "",
-    warrantyIntervalTypeId: 0,
-    warrantyStartDate: "",
-    warrantyTerms: "",
-  });
 
-  const {
-    handleChange: handleAddProductToAccountFormDataChange,
-    formData: addProductToAccountFormData,
-  } = useFormChange(intialAddProductToAccountFormData);
+  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+    useState<number>(0);
 
-  const { errors, handleBlur, setErrors } = useFormValidation(
-    addProductToAccountFormData,
-    "registration"
-  );
-
-  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] = useState<
-    number | undefined
-  >(0);
-
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<
-    number | undefined
-  >(0);
-  const [SelectedWarranty, setSelectedWarranty] = useState<number | undefined>(
-    0
-  );
-  const [selectedAmc, setSelectedAmc] = useState<number | undefined>(0);
+  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  const [SelectedWarranty, setSelectedWarranty] = useState<number>(0);
+  const [selectedAmc, setSelectedAmc] = useState<number>(0);
   const [errorsData, setErrorsData] = useState<{
     WarrantyIntervalTypeId: boolean;
     Warranty: boolean;
@@ -161,69 +168,165 @@ const CreateAccountCompanyProduct = ({
     SelectedAmc: false,
   });
 
-  const validateFormData = () => {
-    if (
-      selectedProduct?.id === null ||
-      selectedProduct?.id === undefined ||
-      selectedProduct?.id === 0
-    ) {
-      toast.error("Product is required.");
-      return;
-    }
-    if (
-      addProductToAccountFormData.quantity === 0 ||
-      addProductToAccountFormData.quantity === null ||
-      addProductToAccountFormData.quantity === undefined
-    ) {
-      toast.error("Quantity is required.");
-      return;
-    }
-    if (
-      selectedWarrantyIntervalTypeId === 0 ||
-      selectedWarrantyIntervalTypeId === null ||
-      selectedWarrantyIntervalTypeId === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        WarrantyIntervalTypeId: true,
-      }));
-      return;
-    }
-    if (
-      SelectedWarranty === 0 ||
-      SelectedWarranty === null ||
-      SelectedWarranty === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        Warranty: true,
-      }));
-      return;
-    }
-    if (
-      selectedAmcIntervalTypeId === 0 ||
-      selectedAmcIntervalTypeId === null ||
-      selectedAmcIntervalTypeId === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        AmcIntervalTypeId: true,
-      }));
-      return;
-    }
-    if (
-      selectedAmc === 0 ||
-      selectedAmc === null ||
-      selectedAmc === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        SelectedAmc: true,
-      }));
-      return;
+  // const validateFormData = () => {
+  //   if (
+  //     selectedInstalledBy?.id === 0 ||
+  //     selectedInstalledBy?.id === null ||
+  //     selectedInstalledBy?.id === undefined
+  //   ) {
+  //     toast.error("Installed By user is required.");
+  //     return;
+  //   }
+  //   if (
+  //     selectedProduct?.id === null ||
+  //     selectedProduct?.id === undefined ||
+  //     selectedProduct?.id === 0
+  //   ) {
+  //     toast.error("Product is required.");
+  //     return;
+  //   }
+  //   if (
+  //     addProductToAccountFormData.quantity === 0 ||
+  //     addProductToAccountFormData.quantity === null ||
+  //     addProductToAccountFormData.quantity === undefined
+  //   ) {
+  //     toast.error("Quantity is required.");
+  //     return;
+  //   }
+  //   if (
+  //     selectedWarrantyIntervalTypeId === 0 ||
+  //     selectedWarrantyIntervalTypeId === null ||
+  //     selectedWarrantyIntervalTypeId === undefined
+  //   ) {
+  //     setErrorsData((prev) => ({
+  //       ...prev,
+  //       WarrantyIntervalTypeId: true,
+  //     }));
+  //     return;
+  //   }
+  //   if (
+  //     SelectedWarranty === 0 ||
+  //     SelectedWarranty === null ||
+  //     SelectedWarranty === undefined
+  //   ) {
+  //     setErrorsData((prev) => ({
+  //       ...prev,
+  //       Warranty: true,
+  //     }));
+  //     return;
+  //   }
+  //   if (
+  //     selectedAmcIntervalTypeId === 0 ||
+  //     selectedAmcIntervalTypeId === null ||
+  //     selectedAmcIntervalTypeId === undefined
+  //   ) {
+  //     setErrorsData((prev) => ({
+  //       ...prev,
+  //       AmcIntervalTypeId: true,
+  //     }));
+  //     return;
+  //   }
+  //   if (
+  //     selectedAmc === 0 ||
+  //     selectedAmc === null ||
+  //     selectedAmc === undefined
+  //   ) {
+  //     setErrorsData((prev) => ({
+  //       ...prev,
+  //       SelectedAmc: true,
+  //     }));
+  //     return;
+  //   }
+  // };
+
+  const validateFormData = (): boolean => {
+  if (
+    selectedInstalledBy?.id === 0 ||
+    selectedInstalledBy?.id === null ||
+    selectedInstalledBy?.id === undefined
+  ) {
+    toast.error("Installed By user is required.");
+    return false;
+  }
+
+  if (
+    selectedProduct?.id === null ||
+    selectedProduct?.id === undefined ||
+    selectedProduct?.id === 0
+  ) {
+    toast.error("Product is required.");
+    return false;
+  }
+
+  if (
+    addProductToAccountFormData.quantity === 0 ||
+    addProductToAccountFormData.quantity === null ||
+    addProductToAccountFormData.quantity === undefined
+  ) {
+    toast.error("Quantity is required.");
+    return false;
+  }
+   if (
+    selectedAmc === 0 ||
+    selectedAmc === null ||
+    selectedAmc === undefined
+  ) {
+    setErrorsData((prev) => ({
+      ...prev,
+      SelectedAmc: true,
+    }));
+    return false;
+  }
+
+   if (
+    selectedAmcIntervalTypeId === 0 ||
+    selectedAmcIntervalTypeId === null ||
+    selectedAmcIntervalTypeId === undefined
+  ) {
+    setErrorsData((prev) => ({
+      ...prev,
+      AmcIntervalTypeId: true,
+    }));
+    return false;
+  }
+
+  if (
+    SelectedWarranty === 0 ||
+    SelectedWarranty === null ||
+    SelectedWarranty === undefined
+  ) {
+    setErrorsData((prev) => ({
+      ...prev,
+      Warranty: true,
+    }));
+    return false;
+  }
+  
+  if (
+    selectedWarrantyIntervalTypeId === 0 ||
+    selectedWarrantyIntervalTypeId === null ||
+    selectedWarrantyIntervalTypeId === undefined
+  ) {
+    setErrorsData((prev) => ({
+      ...prev,
+      WarrantyIntervalTypeId: true,
+    }));
+    return false;
+  }
+
+  // All good
+  return true;
+};
+
+  const handleSelctedInstalledByUser = (data: CompanyUser) => {
+    console.log(data);
+
+    setSelectedInstalledBy(data);
+    if (data.id > 0) {
+      setShowCompanyUserModule(false);
+      setShowGrid(true);
     }
   };
-
   const formattedDate = (date: string) => {
     const dateObj = new Date(date);
     const day = dateObj.getDate();
@@ -240,7 +343,14 @@ const CreateAccountCompanyProduct = ({
   ) => {
     e.preventDefault();
 
-    validateFormData();
+   const isValid= validateFormData();
+
+   if(!isValid) {
+    toast.error("Please fill the required field.")
+    return;
+   };
+   
+   
     const purchaseDate = formattedDate(
       addProductToAccountFormData.purchaseDate
     );
@@ -249,7 +359,7 @@ const CreateAccountCompanyProduct = ({
     );
 
     const installationDate = formattedDate(
-     addProductToAccountFormData.installationDate
+      addProductToAccountFormData.installationDate
     );
 
     const warrentyStartDate = formattedDate(
@@ -264,7 +374,7 @@ const CreateAccountCompanyProduct = ({
       addProductToAccountFormData.amcCycleStartDate
     );
     const AmcCycleEndDate = formattedDate(
-       addProductToAccountFormData.amcCycleEndDate
+      addProductToAccountFormData.amcCycleEndDate
     );
 
     const postData = {
@@ -277,7 +387,7 @@ const CreateAccountCompanyProduct = ({
       delivery_address: addProductToAccountFormData.deliveryAddress,
       billing_address: addProductToAccountFormData.billingAddress,
       installation_date: installationDate,
-      installed_by: loginStatus.id,
+      installed_by: selectedInstalledBy?.id,
       warranty_interval_type_id: selectedWarrantyIntervalTypeId,
       warranty: SelectedWarranty,
       warranty_start_date: warrentyStartDate,
@@ -286,16 +396,24 @@ const CreateAccountCompanyProduct = ({
       amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
       amc_cycle: selectedAmc,
       amc_cycle_start_date: amcCycleStartDate,
-      amc_cycle_end_date:AmcCycleEndDate,
+      amc_cycle_end_date: AmcCycleEndDate,
       createdby_id: loginStatus.id,
     };
-    await axios.post(POST_API.CREATE_ACCOUNT_COMPANY_PRODUCT, postData, {withCredentials : true})
-    .then((response)=>{
-        console.log(response);
-        
-    })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .catch(async (error: ApiError | any) => {
+    await axios
+      .post(POST_API.CREATE_ACCOUNT_COMPANY_PRODUCT, postData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if(response.data.status){
+          toast.success(response.data.messge);
+          handleCloseForm();
+          getAccountCompanyProduct();
+        }else{
+          toast.error(response.data.message)
+        }
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
             callFunctionWithEvent: handleCreateAccountCompanyProduct,
@@ -303,70 +421,134 @@ const CreateAccountCompanyProduct = ({
           if (refreshTokenResponse) {
             handleCreateAccountCompanyProduct(e);
           }
-        }else{
-            toast.error(error.response.data)
+        } else {
+          toast.error(error.response.data);
         }
-      })
+      });
   };
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-5   flex justify-center items-center  p-2 sm:p-2">
-      <div className="bg-white w-full max-w-6xl h-full   rounded  p-2 relative overflow-auto">
+      <div className="bg-white w-full max-w-6xl h-[90vh]   rounded  p-2 relative overflow-auto">
         {/* Header */}
         <FormHeader
-          icon={Edit2}
+          icon={BoxSelectIcon}
           onClose={handleCloseForm}
           preText="Assign Product to account"
           description="Assign the new product to this Account."
         />
-        {!showGrid && (
+        {!showGrid && !showCompanyUserModule && (
           <>
             <ProductManagement
               isGridForAccountProduct={true}
-              onRowSelect={onRowSelectForAssingingToAccount}
+              onRowSelect={onRowSelectProductForAssingingToAccount}
             />
           </>
         )}
 
-        {showGrid && (
+        {showGrid && !showCompanyUserModule && (
           <>
-            <Button
-              className="bg-pink-00 flex gap-1 items-center table-header-custom"
-              onClick={handleGoBackToProductSelection}
-            >
-              <ArrowLeft size={16} />
-              Go Back to product selection
-            </Button>
-            {selectedProduct && (
-              <span className="table-header-custom">
-                <span>Product :</span> {selectedProduct.name}
-              </span>
-            )}
+            <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
+              <Button
+                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
+                onClick={handleGoBackToProductSelection}
+              >
+                <ArrowLeft size={14} />
+                Change Product
+              </Button>
+
+              {selectedProduct && (
+                <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
+                  <span className="text-gray-500">Product:</span>{" "}
+                  {selectedProduct.name}
+                </div>
+              )}
+            </div>
+
             <form
               onSubmit={handleCreateAccountCompanyProduct}
-              className="grid grid-cols-2 gap-2"
+              className="grid grid-cols-2 gap-2 px-2"
             >
-              {/* Quantity */}
-              <FormInput
-                label="Quantity: "
-                logo={LucideIndianRupee}
-                required
-                type="number"
-                name="quantity"
-                min={0}
-                placeholder="Enter quantity here"
-                value={addProductToAccountFormData.quantity}
-                onChange={handleAddProductToAccountFormDataChange}
-                onBlur={handleBlur}
-                error={errors.quantity}
-              />
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-3 ">
+                {/* Quantity */}
+                <div className="mt-1.5">
+                  <FormInput
+                  label="Quantity : "
+                  logo={LucideIndianRupee}
+                  required
+                  type="number"
+                  name="quantity"
+                  min={0}
+                  placeholder="Enter quantity here"
+                  // value={addProductToAccountFormData.quantity}
+                  defaultValue={
+                    addProductToAccountFormData.quantity === 0
+                      ? ""
+                      : addProductToAccountFormData.quantity
+                  }
+                  onChange={handleAddProductToAccountFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.quantity}
+                />
+                </div>
+                {/* installation date */}
+                <DatePickerInput
+                  label="Installation Date :"
+                  logo={LucideCalendar}
+                  name="installationDate"
+                  defaultValue={addProductToAccountFormData.installationDate}
+                  placeholder="Select Date"
+                  onChange={handleAddProductToAccountFormDataChange}
+                />
+              </div>
+              <div className="flex items-center justify-end mt-2">
+                <div className="w-full">
+                  <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
+                    <User className="text-blue-500" size={15}/>
+                    <div>
+
+                    Installed By :<span className="ml-0 text-red-400">*</span>
+                    </div>
+                  </label>
+
+                  <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1.5 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                    <span className="text-gray-800">
+                      { selectedInstalledBy ?  (
+
+                        <>
+                          {selectedInstalledBy?.fullname}{" "}
+                          <span className="text-sm">
+                            {` (${selectedInstalledBy?.email
+                              ? (selectedInstalledBy.email)
+                              : selectedInstalledBy?.mobilenumber})`}
+                            
+                            
+                          </span>
+                        </>
+                      ) : "No user selected"}
+                    </span>
+
+                    <Button
+                      type="button"
+                      className="text-blue-600 text-sm underline hover:text-blue-800"
+                      onClick={() => {
+                        setShowCompanyUserModule(true);
+                        setShowGrid(false);
+                      }}
+                    >
+                      {selectedInstalledBy ? "Change" : "Select"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 ">
                 {/* purchase date */}
                 <DatePickerInput
                   label="Purchase Date :"
                   required
                   logo={LucideCalendar}
                   name="purchaseDate"
-                  value={addProductToAccountFormData.purchaseDate}
+                  defaultValue={addProductToAccountFormData.purchaseDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
                   onBlur={handleBlur}
@@ -377,147 +559,20 @@ const CreateAccountCompanyProduct = ({
                   label="Delivery Date :"
                   logo={LucideCalendar}
                   name="deliveryDate"
-                  value={addProductToAccountFormData.deliveryDate}
-                  placeholder="Select Date"
-                  onChange={handleAddProductToAccountFormDataChange}
-                />
-              </div>
-              {/* installation date */}
-              <DatePickerInput
-                label="Installation Date :"
-                // required
-                logo={LucideCalendar}
-                name="installationDate"
-                value={addProductToAccountFormData.installationDate}
-                placeholder="Select Date"
-                onChange={handleAddProductToAccountFormDataChange}
-              />
-              {/* Delivery address */}
-              <TextAreaInput
-                cols={4}
-                label="Delivery Address"
-                name="deliveryAddress"
-                value={addProductToAccountFormData.deliveryAddress}
-                onChange={handleAddProductToAccountFormDataChange}
-                // onBlur={handleBlur}
-                rows={3}
-              />
-              {/* Billing address */}
-              <TextAreaInput
-                cols={4}
-                label="Billing Address"
-                rows={3}
-                name="billingAddress"
-                value={addProductToAccountFormData.billingAddress}
-                onChange={handleAddProductToAccountFormDataChange}
-                // onBlur={handleBlur}
-              />
-              {/* Warranty terms */}
-              <TextAreaInput
-                cols={4}
-                label="Warranty terms"
-                name="warrantyTerms"
-                rows={3}
-                value={addProductToAccountFormData.warrantyTerms}
-                onChange={handleAddProductToAccountFormDataChange}
-                // onBlur={handleBlur}
-              />
-              {/* Warranty & warranty time unit */}
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                {/* Warranty time unit */}
-                <div>
-                  <CustomDropdown
-                    labelName="Warranty Time Unit"
-                    logo={LucideTimer}
-                    preselectedOption={0}
-                    onSelect={(selectedValue) => {
-                      console.log(selectedValue);
-                      if (selectedValue) {
-                        setErrorsData((prev) => ({
-                          ...prev,
-                          WarrantyIntervalTypeId: false,
-                        }));
-                        setWarrantyIntervalTypeId(selectedValue);
-                      } else {
-                        setErrorsData((prev) => ({
-                          ...prev,
-                          WarrantyIntervalTypeId: true,
-                        }));
-                        setWarrantyIntervalTypeId(undefined);
-                      }
-                    }}
-                    options={intervalTypeData}
-                    requiredRedDot={true}
-                  />
-                  {errorsData.WarrantyIntervalTypeId && (
-                    <div className="caption-custom-inactive">
-                      Warranty Time Unit is required
-                    </div>
-                  )}
-                </div>
-
-                {/* Warranty */}
-                <div>
-                  <CustomDropdown
-                    labelName="Warranty :"
-                    logo={LucideClock}
-                    preselectedOption={0}
-                    onSelect={(data) => {
-                      if (data) {
-                        setErrorsData((prev) => ({
-                          ...prev,
-                          Warranty: false,
-                        }));
-                        setSelectedWarranty(data);
-                      } else {
-                        setErrorsData((prev) => ({
-                          ...prev,
-                          Warranty: true,
-                        }));
-                        setSelectedWarranty(undefined);
-                      }
-                    }}
-                    options={rangeOfNumber}
-                    requiredRedDot={true}
-                  />
-                  {errorsData.Warranty && (
-                    <div className="caption-custom-inactive">
-                      Warranty duration is required
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* Warranty start date  & Warranty end date*/}
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                {/* Warranty start date */}
-                <DatePickerInput
-                  label="Warranty Start Date :"
-                  logo={LucideCalendar}
-                  name="warrantyStartDate"
-                  value={addProductToAccountFormData.warrantyStartDate}
-                  placeholder="Select Date"
-                  onChange={handleAddProductToAccountFormDataChange}
-                />
-
-                {/* Warranty end date */}
-                <DatePickerInput
-                  label="Warranty End Date :"
-                  logo={LucideCalendar}
-                  name="warrantyEndDate"
-                  value={addProductToAccountFormData.warrantyEndDate}
+                  defaultValue={addProductToAccountFormData.deliveryDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
                 />
               </div>
 
               {/* amc cycle duration &&  Amc time unit */}
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-3 mt-5">
                 {/* amc cycle duration */}
                 <div>
                   <CustomDropdown
-                    labelName="AMC Cycle Duration"
+                    labelName="AMC Cycle Duration:"
                     logo={LucideClock}
-                    preselectedOption={0}
+                    preselectedOption={selectedAmc}
                     onSelect={(selectedValue) => {
                       if (selectedValue) {
                         setErrorsData((prev) => ({
@@ -530,7 +585,7 @@ const CreateAccountCompanyProduct = ({
                           ...prev,
                           SelectedAmc: true,
                         }));
-                        setSelectedAmc(undefined);
+                        setSelectedAmc(0);
                       }
                     }}
                     options={rangeOfNumber}
@@ -546,9 +601,9 @@ const CreateAccountCompanyProduct = ({
                 {/* Amc time unit */}
                 <div>
                   <CustomDropdown
-                    labelName="AMC Time Unit"
+                    labelName="AMC Time Unit: "
                     logo={LucideTimer}
-                    preselectedOption={0}
+                    preselectedOption={selectedAmcIntervalTypeId}
                     onSelect={(selectedValue) => {
                       console.log(selectedValue);
                       if (selectedValue) {
@@ -562,7 +617,7 @@ const CreateAccountCompanyProduct = ({
                           ...prev,
                           AmcIntervalTypeId: true,
                         }));
-                        setAmcIntervalTypeId(undefined);
+                        setAmcIntervalTypeId(0);
                       }
                     }}
                     options={intervalTypeData}
@@ -584,7 +639,7 @@ const CreateAccountCompanyProduct = ({
                   // required
                   logo={LucideCalendar}
                   name="amcCycleStartDate"
-                  value={addProductToAccountFormData.amcCycleStartDate}
+                  defaultValue={addProductToAccountFormData.amcCycleStartDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
                 />
@@ -593,23 +648,163 @@ const CreateAccountCompanyProduct = ({
                   label="Amc End Date :"
                   logo={LucideCalendar}
                   name="amcCycleEndDate"
-                  value={addProductToAccountFormData.amcCycleEndDate}
+                  defaultValue={addProductToAccountFormData.amcCycleEndDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
                 />
               </div>
 
+              {/* Warranty & warranty time unit */}
+              <div className="grid grid-cols-2 gap-3 mt-7">
+                {/* Warranty */}
+                <div>
+                  <CustomDropdown
+                    labelName="Warranty :"
+                    logo={LucideClock}
+                    preselectedOption={SelectedWarranty}
+                    onSelect={(data) => {
+                      if (data) {
+                        setErrorsData((prev) => ({
+                          ...prev,
+                          Warranty: false,
+                        }));
+                        setSelectedWarranty(data);
+                      } else {
+                        setErrorsData((prev) => ({
+                          ...prev,
+                          Warranty: true,
+                        }));
+                        setSelectedWarranty(0);
+                      }
+                    }}
+                    options={rangeOfNumber}
+                    requiredRedDot={true}
+                  />
+                  {errorsData.Warranty && (
+                    <div className="caption-custom-inactive">
+                      Warranty duration is required
+                    </div>
+                  )}
+                </div>
+                {/* Warranty time unit */}
+                <div>
+                  <CustomDropdown
+                    labelName="Warranty Time Unit :"
+                    logo={LucideTimer}
+                    preselectedOption={selectedWarrantyIntervalTypeId}
+                    onSelect={(selectedValue) => {
+                      console.log(selectedValue);
+                      if (selectedValue) {
+                        setErrorsData((prev) => ({
+                          ...prev,
+                          WarrantyIntervalTypeId: false,
+                        }));
+                        setWarrantyIntervalTypeId(selectedValue);
+                      } else {
+                        setErrorsData((prev) => ({
+                          ...prev,
+                          WarrantyIntervalTypeId: true,
+                        }));
+                        setWarrantyIntervalTypeId(0);
+                      }
+                    }}
+                    options={intervalTypeData}
+                    requiredRedDot={true}
+                  />
+                  {errorsData.WarrantyIntervalTypeId && (
+                    <div className="caption-custom-inactive">
+                      Warranty Time Unit is required
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Warranty start date  & Warranty end date*/}
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {/* Warranty start date */}
+                <DatePickerInput
+                  label="Warranty Start Date :"
+                  logo={LucideCalendar}
+                  name="warrantyStartDate"
+                  defaultValue={addProductToAccountFormData.warrantyStartDate}
+                  placeholder="Select Date"
+                  onChange={handleAddProductToAccountFormDataChange}
+                />
+
+                {/* Warranty end date */}
+                <DatePickerInput
+                  label="Warranty End Date :"
+                  logo={LucideCalendar}
+                  name="warrantyEndDate"
+                  defaultValue={addProductToAccountFormData.warrantyEndDate}
+                  placeholder="Select Date"
+                  onChange={handleAddProductToAccountFormDataChange}
+                />
+              </div>
+              <div className="col-span-2">
+                {/* Warranty terms */}
+                <TextAreaInput
+                logo={ShieldCheck}
+                  cols={4}
+                  label="Warranty Terms : "
+                  name="warrantyTerms"
+                  rows={3}
+                  defaultValue={addProductToAccountFormData.warrantyTerms}
+                  onChange={handleAddProductToAccountFormDataChange}
+                  // onBlur={handleBlur}
+                />
+                {/* Delivery address */}
+                <TextAreaInput
+                logo={MapPin}
+                  cols={4}
+                  label="Delivery Address :"
+                  name="deliveryAddress"
+                  defaultValue={addProductToAccountFormData.deliveryAddress}
+                  onChange={handleAddProductToAccountFormDataChange}
+                  // onBlur={handleBlur}
+                  rows={3}
+                />
+                {/* Billing address */}
+                <TextAreaInput
+                logo={MapPin}
+                  cols={4}
+                  label="Billing Address :"
+                  rows={3}
+                  name="billingAddress"
+                  defaultValue={addProductToAccountFormData.billingAddress}
+                  onChange={handleAddProductToAccountFormDataChange}
+                  // onBlur={handleBlur}
+                />
+              </div>
+
               <div className="flex items-center justify-end bg-pink-00 col-span-2">
                 <div className="flex gap-1">
-                  <Button onClick={handleCloseForm}  type="button">Cancel</Button>
-                  <Button type="submit">
-                    Save
+                  <Button onClick={handleCloseForm} type="button">
+                   <div className="flex items-center gap-0.5">
+                    <X size={SIZE.SIXTEEN} />
+                    Cancel
+                  </div>
                   </Button>
+                  <Button type="submit">
+                     <div className="flex items-center gap-1">
+                    <Save size={SIZE.SIXTEEN} />
+                    Save
+                  </div>
+                    </Button>
                 </div>
               </div>
             </form>
           </>
         )}
+        {
+          showCompanyUserModule && !showGrid && (
+            <GetCompanyUsers
+              onRowSelect={handleSelctedInstalledByUser}
+              isUsedInAccountProductForAssingingInstalledBy={true}
+            />
+          )
+         
+        }
       </div>
     </div>
   );

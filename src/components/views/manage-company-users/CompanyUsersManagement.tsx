@@ -15,7 +15,14 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 
-function GetCompanyUsers() {
+function GetCompanyUsers({
+  isUsedInAccountProductForAssingingInstalledBy,
+  onRowSelect
+}:{
+  isUsedInAccountProductForAssingingInstalledBy? : boolean
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   onRowSelect? : (data : any ) =>void,
+}) {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
@@ -143,6 +150,8 @@ function GetCompanyUsers() {
                   pageSize,
                 }}
                 users={companyUsers}
+                isUsedInAccountProductForAssingingInstalledBy={isUsedInAccountProductForAssingingInstalledBy}
+                onRowSelect={ onRowSelect}
               />
             </motion.section>
           </div>

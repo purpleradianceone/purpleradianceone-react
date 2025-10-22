@@ -222,8 +222,8 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              
-              <GetCompanyUsers />
+              <GetCompanyUsers
+              isUsedInAccountProductForAssingingInstalledBy={false} />
             </Navbar>
           </div>
         </PrivateRoute>
