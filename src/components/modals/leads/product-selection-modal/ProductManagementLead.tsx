@@ -107,7 +107,7 @@ function ProductManagementLead({
             defaultAmcCycle:res.default_amc_cycle,
             defaultAmcCycleName:res.default_amc_cycle_name,
             name: res.name,
-            code: res.code,
+            barcode: res.barcode,
             cost: res.cost,
             description: res.description,
             version:res.version,
