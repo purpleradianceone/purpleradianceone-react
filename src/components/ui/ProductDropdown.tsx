@@ -78,16 +78,16 @@ function ProductDropdownList(props: ProductDropdownList ) {
               </button>
               {props.product.map((option) => (
                 <button
-                  key={option.code}
+                  key={option.barcode}
                   id = {option.id?.toString()}
                   className={`
                     w-full px-4 py-2 text-left
-                    ${selectedOption === option.code
+                    ${selectedOption === option.barcode
                       ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-800 hover:bg-gray-50'}
                     focus:outline-none focus:bg-gray-50
                   `}
-                  onClick={() => handleOptionClick(option.code,option.name)}
+                  onClick={() => handleOptionClick(option.barcode,option.name)}
                 >
                   {option.name}
                 </button>
