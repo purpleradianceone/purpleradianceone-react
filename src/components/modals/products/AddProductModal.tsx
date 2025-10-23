@@ -15,11 +15,7 @@ import {
   Text,
   X,
 } from "lucide-react";
-import {
-  GAP,
-  OPACITY,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { GAP, OPACITY, STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -54,40 +50,38 @@ function AddProductModal({
   const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
 
   const ProductsRadioButtonOptions = [
-  {
-    label : "HSN",
-    value : "hsn",
-    id : "hsn",
-    name : "taxCode",
-    checked : selectedTaxCode === "hsn" ? true : false,
-  },
-  {
-    label : "SAC",
-    value : "sac",
-    id : "sac",
-    name : "taxCode",
-    checked : selectedTaxCode === "sac" ? true : false,
-  },
-
-]
+    {
+      label: "HSN",
+      value: "hsn",
+      id: "hsn",
+      name: "taxCode",
+      checked: selectedTaxCode === "hsn" ? true : false,
+    },
+    {
+      label: "SAC",
+      value: "sac",
+      id: "sac",
+      name: "taxCode",
+      checked: selectedTaxCode === "sac" ? true : false,
+    },
+  ];
 
   const { isSmallScreen } = useScreenSize();
   const handleTaxRadioButtonChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if(event.target.value === "hsn"){
+    if (event.target.value === "hsn") {
       setSelectedTaxCode("hsn");
-    }
-    else if(event.target.value === "sac"){
+    } else if (event.target.value === "sac") {
       setSelectedTaxCode("sac");
     }
-  }
+  };
 
   const { intervalTypeData } = useIntervalType();
   const { productTypeData } = useProductType();
-  const rangeOfNumber: Item[] = useMemo(()=> {
-    return range(1, 365)
-  }, [] );
+  const rangeOfNumber: Item[] = useMemo(() => {
+    return range(1, 365);
+  }, []);
 
   const [intialAddProductFormData, setInitialAddProductFormData] =
     useState<Product>({
@@ -103,7 +97,7 @@ function AddProductModal({
       defaultAmcCycle: 0,
       defaultAmcCycleName: "",
       name: "",
-      code: "",
+      barcode: "",
       cost: 0,
       description: "",
       version: "",
@@ -144,7 +138,7 @@ function AddProductModal({
     formData: addProductFormData,
   } = useFormChange(intialAddProductFormData);
 
-  const { errors, handleBlur ,setErrors} = useFormValidation(
+  const { errors, handleBlur, setErrors } = useFormValidation(
     addProductFormData,
     "registration"
   );
@@ -166,12 +160,12 @@ function AddProductModal({
     useState<boolean>(false);
 
   const validateDropdown = () => {
-      if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
-        setSelectedProductTypeIdError(true);
-        // toast.error("Please select 'Product Type'");
-      } else {
-        setSelectedProductTypeIdError(false);
-      }
+    if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
+      setSelectedProductTypeIdError(true);
+      // toast.error("Please select 'Product Type'");
+    } else {
+      setSelectedProductTypeIdError(false);
+    }
 
     if (
       selectedWarrantyIntervalTypeId === 0 ||
@@ -207,8 +201,7 @@ function AddProductModal({
     } else {
       setSelectedDefaultAmcError(false);
     }
-  }
-
+  };
 
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -216,7 +209,7 @@ function AddProductModal({
     event.preventDefault();
     validateDropdown();
     if (userHasAccessToAddProduct) {
-      if (addProductFormData.name !== "" || addProductFormData.code !== "") {
+      if (addProductFormData.name !== "" || addProductFormData.version !== "") {
         if (
           (addProductFormData.hsn !== "" || addProductFormData.sac !== "") &&
           (addProductFormData.taxRate === 0 ||
@@ -260,7 +253,7 @@ function AddProductModal({
               default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
               default_amc_cycle: selectedDefaultAmc,
               name: addProductFormData.name,
-              code: addProductFormData.code,
+              barcode: addProductFormData.barcode,
               cost: addProductFormData.cost,
               description: addProductFormData.description,
               version: addProductFormData.version,
@@ -298,8 +291,10 @@ function AddProductModal({
                   }
                 }
               });
-          } 
+          }
         }
+      } else {
+        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
       }
     } else {
       toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_ADD_ACCESS);
@@ -330,7 +325,7 @@ function AddProductModal({
       defaultAmcCycle: 0,
       defaultAmcCycleName: "",
       name: "",
-      code: "",
+      barcode: "",
       cost: 0,
       description: "",
       version: "",
@@ -345,14 +340,15 @@ function AddProductModal({
     });
 
     addProductFormData.description = "";
-  }
+  };
   useEffect(() => {
     // if (!isOpen) {
     clearCreateForm();
     setErrors({
-      code:"",
-      name : "",
-    })
+      barcode: "",
+      name: "",
+      version: "",
+    });
     // }
   }, [isOpen]);
 
@@ -390,7 +386,7 @@ function AddProductModal({
             >
               <div className="grid col-span-1 ">
                 <FormInput
-                  label="Product Name : "
+                  label="Product Name :"
                   logo={LucidePresentation}
                   maxLength={40}
                   type="text"
@@ -421,15 +417,16 @@ function AddProductModal({
                   type="text"
                   name="version"
                   max={20}
-                  required={false}
+                  required={true}
                   value={addProductFormData.version}
                   placeholder="Product Version"
                   onChange={handleAddProductFormDataChange}
                   onBlur={handleBlur}
+                  error={errors.version}
                 />
 
                 <TextAreaInput
-                  label="Description : "
+                  label="Description :"
                   logo={Text}
                   name="description"
                   placeholder="Product Description"
@@ -455,16 +452,16 @@ function AddProductModal({
                     error={errors.cost}
                   />
                   <FormInput
-                    label="Item Code : "
+                    label="Bar Code :"
                     logo={LucideAirplay}
                     type="text"
-                    name="code"
-                    value={addProductFormData.code}
-                    placeholder="Product Item Code"
+                    name="barcode"
+                    value={addProductFormData.barcode}
+                    placeholder="Product Bar Code"
                     onChange={handleAddProductFormDataChange}
                     onBlur={handleBlur}
-                    required={true}
-                    error={errors.code}
+                    // required={true}
+                    // error={errors.code}
                   />
                   <div className="mt-2">
                     <CustomDropdown
@@ -472,7 +469,7 @@ function AddProductModal({
                       logo={LucideGroup}
                       preselectedOption={0}
                       onSelect={(e) => {
-                        if(e){
+                        if (e) {
                           setSelectedProductTypeIdError(false);
                         }
                         setSelectedProductTypeId(e);
@@ -491,11 +488,11 @@ function AddProductModal({
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   <div>
                     <CustomDropdown
-                      labelName="Warranty Duration"
+                      labelName="Warranty Duration :"
                       logo={LucideClock}
                       preselectedOption={0}
                       onSelect={(e) => {
-                         if(e){
+                        if (e) {
                           setSelectedDefaultWarrantyError(false);
                         }
                         setDefaultWarranty(e);
@@ -511,11 +508,11 @@ function AddProductModal({
                   </div>
                   <div>
                     <CustomDropdown
-                      labelName="Warranty Time Unit"
+                      labelName="Warranty Time Unit :"
                       logo={LucideTimer}
                       preselectedOption={0}
                       onSelect={(e) => {
-                         if(e){
+                        if (e) {
                           setSelectedWarrantyIntervalTypeIdError(false);
                         }
                         setWarrantyIntervalTypeId(e);
@@ -534,11 +531,11 @@ function AddProductModal({
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   <div>
                     <CustomDropdown
-                      labelName="AMC Cycle Duration"
+                      labelName="AMC Cycle Duration :"
                       logo={LucideClock}
                       preselectedOption={0}
                       onSelect={(e) => {
-                        if(e){
+                        if (e) {
                           setSelectedDefaultAmcError(false);
                         }
                         setDefaultAmc(e);
@@ -555,11 +552,11 @@ function AddProductModal({
 
                   <div>
                     <CustomDropdown
-                      labelName="AMC Time Unit"
+                      labelName="AMC Time Unit :"
                       logo={LucideTimer}
                       preselectedOption={0}
                       onSelect={(e) => {
-                        if(e){
+                        if (e) {
                           setSelectedAmcIntervalTypeIdError(false);
                         }
                         setAmcIntervalTypeId(e);
@@ -583,7 +580,7 @@ function AddProductModal({
                 />
               </div>
 
-              {(selectedTaxCode === "hsn") && (
+              {selectedTaxCode === "hsn" && (
                 <FormInput
                   label="HSN : "
                   logo={LucideVerified}

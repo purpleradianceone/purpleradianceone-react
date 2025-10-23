@@ -13,7 +13,7 @@ export type ErrorType = {
   confirmPassword?: string;
   mobileNumber?: string;
   name?: string;
-  code?: string;
+  barcode?: string;
   description?: string;
   cost?: string;
   taxRate?: string;
@@ -29,6 +29,7 @@ export type ErrorType = {
   installationDate?: string;
   warrantyStartDate?: string;
   quantity?: string;
+  version?: string;
 
 };
 
@@ -68,6 +69,18 @@ export const useFormValidation = (formData: Record<string, string | number | boo
           } else {
             setErrors((prev) => ({ ...prev, url: "" }));
           }
+        }
+
+        break;
+      
+      case "version":
+        if (value === null || value.trim() === "") {
+          setErrors((prev) => ({ ...prev, version: "Version is required" }));
+        } else {
+            setErrors((prev) => ({
+              ...prev,
+              version: "",
+            }));
         }
 
         break;
@@ -135,13 +148,13 @@ export const useFormValidation = (formData: Record<string, string | number | boo
         }
         break;
 
-      case "code":
+      case "barcode":
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
-          console.log("inside code");
-          setErrors((prev) => ({ ...prev, code: "Item Code is required" }));
+          console.log("inside barcode");
+          setErrors((prev) => ({ ...prev, barcode: "Item Code is required" }));
         }
         else {
-          setErrors((prev) => ({ ...prev, code: "" }));
+          setErrors((prev) => ({ ...prev, barcode: "" }));
         }
         break;
 
@@ -284,6 +297,14 @@ export const useFormValidation = (formData: Record<string, string | number | boo
       }
     } else {
       newErrors.url = "";
+    }
+
+    if (!formData.version) {
+      if(formData.version?.toString().trim() === ""){
+        newErrors.version = "Version is required";
+      }
+    } else {
+      newErrors.version = "Version is required";
     }
 
     if (!formData.password) {
