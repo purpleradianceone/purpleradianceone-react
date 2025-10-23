@@ -532,7 +532,7 @@ function EditCompanyProductModal({
                       onChange={handleEditCompanyProductFormDataChange}
                     />
                     <FormInput
-                      label="Bar Code :"
+                      label="Barcode :"
                       logo={LucideAirplay}
                       type="text"
                       name="barcode"
