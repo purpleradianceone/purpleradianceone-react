@@ -66,7 +66,7 @@ function EditCompanyProductModal({
     default_amc_cycle: product.defaultAmcCycle,
     name: product.name,
     cost: product.cost,
-    code: product.code,
+    barcode: product.barcode,
     description: product.description,
     version: product.version,
     url: product.url,
@@ -258,9 +258,9 @@ function EditCompanyProductModal({
       updateCompanyProductFormData.name !== "" &&
       updateCompanyProductFormData.name !== null &&
       updateCompanyProductFormData.name !== undefined &&
-      updateCompanyProductFormData.code !== "" &&
-      updateCompanyProductFormData.code !== null &&
-      updateCompanyProductFormData.code !== undefined &&
+      updateCompanyProductFormData.version !== "" &&
+      updateCompanyProductFormData.version !== null &&
+      updateCompanyProductFormData.version !== undefined &&
       selectedProductTypeId !== 0 &&
       selectedProductTypeId !== undefined &&
       selectedWarrantyIntervalTypeId !== 0 &&
@@ -273,8 +273,8 @@ function EditCompanyProductModal({
       selectedDefaultAmc !== undefined
     ) {
       if (
-        updateCompanyProductFormData.code !==
-          intialEditCompanyProductFormData.code ||
+        updateCompanyProductFormData.barcode !==
+          intialEditCompanyProductFormData.barcode ||
         updateCompanyProductFormData.name !==
           intialEditCompanyProductFormData.name ||
         updateCompanyProductFormData.description !==
@@ -321,7 +321,7 @@ function EditCompanyProductModal({
                 ? selectedDefaultAmc
                 : updateCompanyProductFormData.default_amc_cycle,
             name: updateCompanyProductFormData.name,
-            code: updateCompanyProductFormData.code,
+            barcode: updateCompanyProductFormData.barcode,
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
@@ -422,9 +422,10 @@ function EditCompanyProductModal({
     console.log(intialEditCompanyProductFormData);
     if (isOpen) {
       setErrors({
-        code: "",
+        barcode: "",
         description: "",
         name: "",
+        version: "",
       });
       fetchCompanyroductTax();
     } else {
@@ -492,21 +493,22 @@ function EditCompanyProductModal({
                   />
 
                   <FormInput
-                    label="Version : "
+                    label="Version :"
                     logo={LucideVerified}
                     type="text"
                     name="version"
                     max={20}
-                    required={false}
                     defaultValue={intialEditCompanyProductFormData.version}
                     value={intialEditCompanyProductFormData.version}
                     placeholder="Product Version"
                     onChange={handleEditCompanyProductFormDataChange}
                     onBlur={handleBlur}
+                    required={true}
+                    error={errors.version}
                   />
                   <TextAreaInput
                     logo={Text}
-                    label="Description : "
+                    label="Description :"
                     cols={5}
                     rows={2}
                     name="description"
@@ -522,7 +524,7 @@ function EditCompanyProductModal({
                   <div className="grid col-span-1 gap-1">
                     <FormInput
                       logo={LucideIndianRupee}
-                      label="Cost : "
+                      label="Cost :"
                       type="text"
                       name="cost"
                       placeholder="Enter Product Cost"
@@ -530,16 +532,16 @@ function EditCompanyProductModal({
                       onChange={handleEditCompanyProductFormDataChange}
                     />
                     <FormInput
-                      label="Item Code : "
+                      label="Bar Code :"
                       logo={LucideAirplay}
                       type="text"
-                      name="code"
-                      required={true}
-                      placeholder="Enter Item Code"
+                      name="barcode"
+                      placeholder="Enter Bar Code"
                       onChange={handleEditCompanyProductFormDataChange}
-                      defaultValue={intialEditCompanyProductFormData.code}
+                      defaultValue={intialEditCompanyProductFormData.barcode}
                       onBlur={handleBlur}
-                      error={errors.code}
+                      // required={true}
+                      // error={errors.barcode}
                     />
                     <div className="mt-2">
                       <CustomDropdown
@@ -569,7 +571,7 @@ function EditCompanyProductModal({
                     <div>
                       <CustomDropdown
                         logo={LucideClock}
-                        labelName="Warranty Duration"
+                        labelName="Warranty Duration :"
                         preselectedOption={
                           intialEditCompanyProductFormData.default_warranty
                         }
@@ -592,7 +594,7 @@ function EditCompanyProductModal({
                     <div>
                       <CustomDropdown
                         logo={LucideTimer}
-                        labelName="Warranty Time Unit"
+                        labelName="Warranty Time Unit :"
                         preselectedOption={
                           intialEditCompanyProductFormData.default_warranty_interval_type_id
                         }
@@ -616,7 +618,7 @@ function EditCompanyProductModal({
                     <div>
                       <CustomDropdown
                         logo={LucideClock}
-                        labelName="AMC Cycle Duration"
+                        labelName="AMC Cycle Duration :"
                         preselectedOption={
                           intialEditCompanyProductFormData.default_amc_cycle
                         }
@@ -639,7 +641,7 @@ function EditCompanyProductModal({
                     <div>
                       <CustomDropdown
                         logo={LucideTimer}
-                        labelName="AMC Time Unit"
+                        labelName="AMC Time Unit :"
                         preselectedOption={
                           intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
                         }
