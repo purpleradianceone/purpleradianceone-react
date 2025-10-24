@@ -14,6 +14,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
 import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
 import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
+import SupportTicketCategorySetting from "../views/settings/support-ticket-category/SupportTicketCategorySetting";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -23,7 +24,7 @@ function SettingsTabs() {
     userHasAccessToViewCompanyPreferences,
     userHasAccessToViewMeetingSetting,
     userHasAccessToViewSettingGeneral,
-    userHasAccessToViewCompanyAccountType
+    userHasAccessToViewCompanyAccountType,
   } = useUserAccessModules();
 
   const data = [
@@ -33,12 +34,13 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewSettingLeady ? (
-            activeTab === "onlineLead" &&
-            <div className="grid grid-cols-1 gap-2">
-              <div className="col-span-1 min-h-full">
-                <LeadSetting />
+            activeTab === "onlineLead" && (
+              <div className="grid grid-cols-1 gap-2">
+                <div className="col-span-1 min-h-full">
+                  <LeadSetting />
+                </div>
               </div>
-            </div>
+            )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -48,9 +50,9 @@ function SettingsTabs() {
     {
       label: "Email",
       value: "emailSettings",
-      desc:  activeTab === "emailSettings" && <EmailSetting />,
+      desc: activeTab === "emailSettings" && <EmailSetting />,
     },
-     {
+    {
       label: "Meetings",
       value: "meeting",
       desc: (
@@ -69,7 +71,7 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewCompanyAccountType ? (
-            activeTab === "accounttype" && <AccountTypeSetting/>
+            activeTab === "accounttype" && <AccountTypeSetting />
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -82,7 +84,9 @@ function SettingsTabs() {
       desc: (
         <>
           {userHasAccessToViewCompanyPreferences ? (
-           activeTab === "companyPreference" && <CompanyPreferenceSetting></CompanyPreferenceSetting>
+            activeTab === "companyPreference" && (
+              <CompanyPreferenceSetting></CompanyPreferenceSetting>
+            )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -96,6 +100,27 @@ function SettingsTabs() {
         <>
           {userHasAccessToViewSettingGeneral ? (
             activeTab === "general" && <UserPrerefenceManagement />
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Setting",
+      value: "setting",
+      desc: (
+        <>
+          {userHasAccessToViewSettingGeneral ? (
+            activeTab == "setting" && <SupportTicketCategorySetting></SupportTicketCategorySetting>
+            // (
+            //   <div className="p-4">
+            //     <h2 className="text-xl font-semibold">Settings Content</h2>
+            //     <p className="text-gray-600">
+            //       This is the content of the Settings tab.
+            //     </p>
+            //   </div>
+            // )
           ) : (
             <AccessDeniedMessagePage></AccessDeniedMessagePage>
           )}
@@ -119,7 +144,6 @@ function SettingsTabs() {
                 "main-nav-custom active-header shadow-none focus:outline-none",
             }}
             className="shadow-none focus:outline-none"
-            
           >
             {data.map(({ label, value }) => (
               <Tab
@@ -127,12 +151,14 @@ function SettingsTabs() {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onResize={undefined}
-            onResizeCapture={undefined}
+                onResizeCapture={undefined}
                 key={value}
                 value={value}
                 onClick={() => setActiveTab(value)}
                 className={
-                  activeTab === value ? "main-nav-custom active-tab mt-0.5" : "main-nav-custom"
+                  activeTab === value
+                    ? "main-nav-custom active-tab mt-0.5"
+                    : "main-nav-custom"
                 }
               >
                 {label}
