@@ -51,7 +51,7 @@ function ProductsManagementGrid({
       },
       {
         field: "barcode",
-        headerName: "Bar Code",
+        headerName: "Barcode",
         sortable: true,
         maxWidth:130,
         filter: true,

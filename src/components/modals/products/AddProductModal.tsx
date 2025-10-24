@@ -452,7 +452,7 @@ function AddProductModal({
                     error={errors.cost}
                   />
                   <FormInput
-                    label="Bar Code :"
+                    label="Barcode :"
                     logo={LucideAirplay}
                     type="text"
                     name="barcode"
