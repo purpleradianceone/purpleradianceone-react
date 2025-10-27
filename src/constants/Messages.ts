@@ -65,6 +65,10 @@ const MESSAGE = {
             DENIED_UPDATE_ACCESS : "You do not have permission to update account.",
             DENIED_ADD_ACCOUNT_IMPORT_ACCESS : "You do not have permission to import accounts.",
 
+        },SUPPORT_TICKET_CATEGORY: {
+            DENIED_VIEW_ACCESS : "You do not have permission to view support ticket category.",
+            DENIED_ADD_ACCESS : "You do not have permission to add new support ticket category.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update support ticket category.",
         }
     }
 }

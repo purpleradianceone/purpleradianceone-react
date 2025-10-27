@@ -61,7 +61,7 @@ function ProductsManagementList({
     defaultAmcCycle: 0,
     defaultAmcCycleName: "",
     name: "",
-    code: "",
+    barcode: "",
     cost: 0,
     description: "",
     version: "",
