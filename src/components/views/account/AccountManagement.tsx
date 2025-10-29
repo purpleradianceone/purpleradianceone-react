@@ -121,8 +121,11 @@ function GetAccounts({
   };
 
   useEffect(() => {
+
+   
     fetchAccounts();
 
+   
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,

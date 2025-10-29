@@ -17,11 +17,11 @@ import { motion } from "framer-motion";
 
 function GetCompanyUsers({
   isUsedInAccountProductForAssingingInstalledBy,
-  onRowSelect
-}:{
-  isUsedInAccountProductForAssingingInstalledBy? : boolean
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   onRowSelect? : (data : any ) =>void,
+  onRowSelect,
+}: {
+  isUsedInAccountProductForAssingingInstalledBy?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowSelect?: (data: any) => void;
 }) {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
@@ -59,7 +59,7 @@ function GetCompanyUsers({
   };
 
   // Fetch data function
-  const fetchCompanyUsers = async () => {
+  const fetchCompanyUsers = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -78,6 +78,7 @@ function GetCompanyUsers({
 
     try {
       const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+        signal,
         withCredentials: true,
       });
 
@@ -90,23 +91,29 @@ function GetCompanyUsers({
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: fetchCompanyUsers,
+          callFunctionWithEvent: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-          fetchCompanyUsers();
+          fetchCompanyUsers(signal);
         }
       }
     }
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (loginStatus.status) {
-        fetchCompanyUsers();
-      }
-    }, 100); // Small delay to allow state updates to settle
+    const controller = new AbortController();
 
-    return () => clearTimeout(timeoutId);
+    const signal = controller.signal;
+    // const timeoutId = setTimeout(() => {
+    //   if (loginStatus.status) {
+        fetchCompanyUsers(signal);
+    //   }
+    // }, 100); // Small delay to allow state updates to settle
+
+    return () => {
+      controller.abort();
+    };
+    // return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,
@@ -150,8 +157,10 @@ function GetCompanyUsers({
                   pageSize,
                 }}
                 users={companyUsers}
-                isUsedInAccountProductForAssingingInstalledBy={isUsedInAccountProductForAssingingInstalledBy}
-                onRowSelect={ onRowSelect}
+                isUsedInAccountProductForAssingingInstalledBy={
+                  isUsedInAccountProductForAssingingInstalledBy
+                }
+                onRowSelect={onRowSelect}
               />
             </motion.section>
           </div>

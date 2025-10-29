@@ -20,9 +20,9 @@ import { motion } from "framer-motion";
 function LeadManagement({
   isUsedInLeadModule,
   handleRowSelectedForShowAccountLead,
-
-} :{isUsedInLeadModule : boolean;
-    handleRowSelectedForShowAccountLead? : (rowData: LeadDataProps | any) => void;
+}: {
+  isUsedInLeadModule: boolean;
+  handleRowSelectedForShowAccountLead?: (rowData: LeadDataProps | any) => void;
 }) {
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
@@ -79,7 +79,7 @@ function LeadManagement({
     }
   };
 
-  const getLeadsData = async () => {
+  const getLeadsData = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;
@@ -100,6 +100,7 @@ function LeadManagement({
     };
     try {
       const response = await axios.post(POST_API.GET_LEAD, postDataToGetLeads, {
+        signal,
         withCredentials: true,
       });
       if (response.status === STATUS_CODE.OK) {
@@ -135,12 +136,12 @@ function LeadManagement({
       //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: getLeadsData,
+          callFunctionWithEvent: getLeadsData,
         });
 
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
-          getLeadsData();
+          getLeadsData(signal);
         }
       }
     }
@@ -255,9 +256,15 @@ function LeadManagement({
   const handleAddLead = () => {
     setLeadsUpdateCount(leadsUpdateCount + 1);
   };
-  //NOTE : NEED TO ADD PAGINATION FUNCTIONALITY HERE
   useEffect(() => {
-    getLeadsData();
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    getLeadsData(signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [
     leadsUpdateCount,
     pageSize,
@@ -289,9 +296,11 @@ function LeadManagement({
       >
         {userHasAccessToViewLead ? (
           <LeadManagementList
-          // Note : differentaition done because this module is used in account-lead and for lead module also
-          isUsedInLeadModule={isUsedInLeadModule}
-          handleRowSelectedForShowAccountLead={handleRowSelectedForShowAccountLead}
+            // Note : differentaition done because this module is used in account-lead and for lead module also
+            isUsedInLeadModule={isUsedInLeadModule}
+            handleRowSelectedForShowAccountLead={
+              handleRowSelectedForShowAccountLead
+            }
             handleAddLead={handleAddLead}
             handleSearchOption={{
               handleSearchParameterChange,
