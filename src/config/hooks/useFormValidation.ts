@@ -5,6 +5,7 @@ import { STRING_VALUES } from '../../constants/AppConstants';
 import REGEX from '../../constants/Regex';
 import MESSAGE from '../../constants/Messages';
 import validateUrl from '../validations/ValidateUrl';
+import validateLocation from '../validations/ValidateLocation';
 
 
 export type ErrorType = {
@@ -30,6 +31,7 @@ export type ErrorType = {
   warrantyStartDate?: string;
   quantity?: string;
   version?: string;
+  location?: string;
 
 };
 
@@ -273,6 +275,15 @@ export const useFormValidation = (formData: Record<string, string | number | boo
         }
         else {
           setErrors((prev) => ({ ...prev, warrantyStartDate: "" }));
+        }
+        break;
+        case "location":
+        if (!validateLocation(value) && value.length) {
+          setErrors((prev) => ({ ...prev,
+            location: "Please enter a valid location (letters, numbers, spaces, and common punctuation allowed)",
+          }));
+        } else {
+          setErrors((prev) => ({ ...prev, location: "" }));
         }
         break;
     }
