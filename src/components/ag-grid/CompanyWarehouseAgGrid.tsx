@@ -1,50 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
-import { INNERHTML } from "../../constants/AppConstants";
 import { useMemo, useRef } from "react";
-import CompanyAccountType from "../../@types/settings/CompanyAccountType";
+import { AgGridReact } from "ag-grid-react";
+import { Warehouse } from "../../config/hooks/useCompanyWarehouse";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { INNERHTML } from "../../constants/AppConstants";
 
-const AccountCompanyAccountTypeAgGrid = ({
-  accountCompanyAccountTypeData,
-  onRowSelect, //selected user for view lead details
+const CompanyWarehouseAgGrid = ({
+  data,
+  onRowSelect,
 }: {
-  accountCompanyAccountTypeData: CompanyAccountType[];
-  onRowSelect: (data: CompanyAccountType | any) => void;
+  data: Warehouse[];
+  onRowSelect: (data: Warehouse | any) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
   const columnDefs = useMemo<ColDef[]>(
+    // id: number,
+    // companyId: number,
+    // warehouseTypeId: number,
+    // warehouseTypeName: string
+    // name: string,
+    // description: string,
+    // location: string,
+    // isactive: boolean
     () => [
       {
         hide: true,
 
-        field: "accountTypeId",
-        headerName: "accountTypeId",
+        field: "id",
+        headerName: "id",
       },
 
       {
-        field: "companyAccountTypeName",
-        headerName: "Company Account Type",
-        sortable: true,
-        filter: "agTextColumnFilter",
-        flex: 1,
-        minWidth: 160,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
-      },
-      {
-        field: "accountTypeName",
-        headerName: "Account Type",
-        sortable: true,
-        filter: "agTextColumnFilter",
-        flex: 1,
-        minWidth: 160,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
-      },
-      {
         hide: true,
-        field: "companyId",
-        headerName: "companyId",
+        field: "warehouseTypeId",
+        headerName: "warehouseTypeId",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 160,
+        // comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+      {
+        hide: false,
+        field: "name",
+        headerName: "name",
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
@@ -52,9 +52,39 @@ const AccountCompanyAccountTypeAgGrid = ({
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
       {
+        field: "warehouseTypeName",
+        headerName: "warehouseTypeName",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 160,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+      
+      {
+        hide: false,
+        field: "location",
+        headerName: "location",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 160,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+       {
+        hide: false,
+        field: "description",
+        headerName: "Description",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 160,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+       {
         hide: true,
-        field: "id",
-        headerName: "id",
+        field: "isactive",
+        headerName: "Active",
       },
       {
         headerName: "Actions",
@@ -65,7 +95,7 @@ const AccountCompanyAccountTypeAgGrid = ({
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
-        cellRenderer: (params: CompanyAccountType | any) => {
+        cellRenderer: (params: Warehouse | any) => {
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -98,7 +128,7 @@ const AccountCompanyAccountTypeAgGrid = ({
     <div className="ag-theme-balham " style={{ height: "100%", width: "100%" }}>
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={accountCompanyAccountTypeData}
+        rowData={data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
@@ -110,4 +140,4 @@ const AccountCompanyAccountTypeAgGrid = ({
   );
 };
 
-export default AccountCompanyAccountTypeAgGrid;
+export default CompanyWarehouseAgGrid;
