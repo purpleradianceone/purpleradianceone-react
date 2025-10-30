@@ -27,37 +27,33 @@ function CreateSupportTicketCategory({
   onClose: () => void;
   getSupportTicketCategory: () => void;
 }) {
-
-
   const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
 
   const [intialSupportTicketCategoryData, setIntialSupportTicketCategoryData] =
     useState<SupportTicketCategoryType>({
-    id : 0,
-    companyId : 0,
-    name : "",
-    description : "",
-    isActive : false,
-    requestedBy: 0,
-    createdById : 0,
-    updatedById : 0,
+      id: 0,
+      companyId: 0,
+      name: "",
+      description: "",
+      isActive: false,
+      requestedBy: 0,
+      createdById: 0,
+      updatedById: 0,
     });
 
-     const {
-        handleChange: handleAddSupportTicketCategoryFormDataChange,
-        formData: addSupportTicketCategoryFormData,
-      } = useFormChange(intialSupportTicketCategoryData);
-    
-      const { errors, handleBlur } = useFormValidation(
-        addSupportTicketCategoryFormData,
-        "registration"
-      );
+  const {
+    handleChange: handleAddSupportTicketCategoryFormDataChange,
+    formData: addSupportTicketCategoryFormData,
+  } = useFormChange(intialSupportTicketCategoryData);
+
+  const { errors, handleBlur } = useFormValidation(
+    addSupportTicketCategoryFormData,
+    "registration"
+  );
 
   const handleAddSupportTicketCategory = async () => {
-
-
     if (!userHasAccessToAddSettingGeneral) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY.DENIED_ADD_ACCESS
@@ -66,8 +62,7 @@ function CreateSupportTicketCategory({
       return;
     }
 
-     if(addSupportTicketCategoryFormData.name == "")
-    {
+    if (addSupportTicketCategoryFormData.name == "") {
       return;
     }
 
@@ -112,17 +107,15 @@ function CreateSupportTicketCategory({
   };
 
   function addFunctionStatesCleanup() {
-    
-
     setIntialSupportTicketCategoryData({
-       id : 0,
-    companyId : 0,
-    name : "",
-    description : "",
-    isActive : false,
-    requestedBy: 0,
-    createdById : 0,
-    updatedById : 0,
+      id: 0,
+      companyId: 0,
+      name: "",
+      description: "",
+      isActive: false,
+      requestedBy: 0,
+      createdById: 0,
+      updatedById: 0,
     });
   }
   return createPortal(
@@ -138,71 +131,60 @@ function CreateSupportTicketCategory({
           description="Create Support Ticket Category for user"
         />
 
-      <form onSubmit={handleAddSupportTicketCategory}>
-        <div className="space-y-3 p-2">
-      
-           <FormInput
-            label="Name :"
-            logo={User}
-            maxLength={70}
-            type="text"
-            name="name"
-            placeholder="Name: "
-            required={true}
-            value={addSupportTicketCategoryFormData.name}
-            onChange={handleAddSupportTicketCategoryFormDataChange}
-            onBlur={handleBlur}
-            error={errors.name}
-          />
+        <form onSubmit={handleAddSupportTicketCategory}>
+          <div className="space-y-3 p-2">
+            <FormInput
+              label="Name :"
+              logo={User}
+              maxLength={70}
+              type="text"
+              name="name"
+              placeholder="Name: "
+              required={true}
+              value={addSupportTicketCategoryFormData.name}
+              onChange={handleAddSupportTicketCategoryFormDataChange}
+              onBlur={handleBlur}
+              error={errors.name}
+            />
 
-          <FormInput
-            label="Description: "
-            logo={FileText}
-            maxLength={300}
-            type="text"
-            name="description"
-            placeholder="Description: "
-            value={addSupportTicketCategoryFormData.description}
-            onChange={handleAddSupportTicketCategoryFormDataChange}
-            onBlur={handleBlur}
-            // required={true}
-            // error={errors.description}
-          />
-        
-          <div className="flex items-center  justify-end gap-3 ">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                onClick={() => {
-                  onClose();
-                }}
-              >
-                <div className="flex items-center ">
-                  <X size={16} />
-                  Cancel
-                </div>
-              </Button>
+            <FormInput
+              label="Description: "
+              logo={FileText}
+              maxLength={300}
+              type="text"
+              name="description"
+              placeholder="Description: "
+              value={addSupportTicketCategoryFormData.description}
+              onChange={handleAddSupportTicketCategoryFormDataChange}
+              onBlur={handleBlur}
+              // required={true}
+              // error={errors.description}
+            />
 
-              <Button
-                type="submit"
-                onClick={() => {
-                  
-                  handleAddSupportTicketCategory();
-                }}
-                //   disabled={!newTypeName.trim() || newParentType === 0}
-                // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
-              >
-                <div className="flex items-center  gap-1">
-                  <Save size={16} />
-                  Save
-                </div>
-              </Button>
+            <div className="flex items-center  justify-end gap-3 ">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  <div className="flex items-center ">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+
+                <Button type="submit">
+                  <div className="flex items-center  gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
-
-
+        </form>
       </div>
     </div>,
     document.body

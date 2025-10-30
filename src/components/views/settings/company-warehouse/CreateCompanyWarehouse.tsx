@@ -12,7 +12,7 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import FormInput from "../../../ui/FormInput";
 import Button from "../../../ui/Button";
 import FormHeader from "../../../ui/FormHeader";
-import {  useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import CustomDropdown from "../../../modals/leads/CustomDropdown";
 import WarehouseType from "../../../../@types/warehouse/WarehouseType";
@@ -53,7 +53,6 @@ function CreateCompanyWarehouse({
     formData: addCompanyWarehouseFormData,
   } = useFormChange(intialAddCompanyWarehouseData);
 
-  
   const { errors, handleBlur } = useFormValidation(
     addCompanyWarehouseFormData,
     "registration"
@@ -90,15 +89,15 @@ function CreateCompanyWarehouse({
 
     validateDropdown();
 
-    if( selectedWarehouseType == 0 
-      || selectedWarehouseType == null 
-      || selectedWarehouseType == undefined ){
-
+    if (
+      selectedWarehouseType == 0 ||
+      selectedWarehouseType == null ||
+      selectedWarehouseType == undefined
+    ) {
       return;
     }
 
-    if(addCompanyWarehouseFormData.name == "")
-    {
+    if (addCompanyWarehouseFormData.name == "") {
       return;
     }
 
@@ -159,8 +158,6 @@ function CreateCompanyWarehouse({
     });
   }
 
- 
-
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5">
       <div className="bg-white w-full max-w-xl rounded-lg border border-blue-200 shadow-lg p-2 relative">
@@ -176,92 +173,85 @@ function CreateCompanyWarehouse({
 
         <form onSubmit={handleAddCompanyWarehouse}>
           <div className="space-y-3 p-2">
-          <FormInput
-            label="Name :"
-            logo={User}
-            maxLength={70}
-            type="text"
-            name="name"
-            placeholder="Name: "
-            required={true}
-            value={addCompanyWarehouseFormData.name}
-            onChange={handleAddCompanyWarehouseFormDataChange}
-            onBlur={handleBlur}
-            error={errors.name}
-          />
+            <FormInput
+              label="Name :"
+              logo={User}
+              maxLength={70}
+              type="text"
+              name="name"
+              placeholder="Name: "
+              required={true}
+              value={addCompanyWarehouseFormData.name}
+              onChange={handleAddCompanyWarehouseFormDataChange}
+              onBlur={handleBlur}
+              error={errors.name}
+            />
 
-          <FormInput
-            label="Description: "
-            logo={FileText}
-            maxLength={300}
-            type="text"
-            name="description"
-            placeholder="Description: "
-            value={addCompanyWarehouseFormData.description}
-            onChange={handleAddCompanyWarehouseFormDataChange}
-            onBlur={handleBlur}
-            // required={true}
-            // error={errors.description}
-          />
+            <FormInput
+              label="Description: "
+              logo={FileText}
+              maxLength={300}
+              type="text"
+              name="description"
+              placeholder="Description: "
+              value={addCompanyWarehouseFormData.description}
+              onChange={handleAddCompanyWarehouseFormDataChange}
+              onBlur={handleBlur}
+              // required={true}
+              // error={errors.description}
+            />
 
-          <FormInput
-            label="Location: "
-            logo={MapPin}
-            maxLength={300}
-            type="text"
-            name="Location: "
-            value={addCompanyWarehouseFormData.location}
-            placeholder="Enter Location: "
-            onChange={handleAddCompanyWarehouseFormDataChange}
-            onBlur={handleBlur}
-            error={errors.location}
-          />
+            <FormInput
+              label="Location: "
+              logo={MapPin}
+              maxLength={300}
+              type="text"
+              name="Location: "
+              value={addCompanyWarehouseFormData.location}
+              placeholder="Enter Location: "
+              onChange={handleAddCompanyWarehouseFormDataChange}
+              onBlur={handleBlur}
+              error={errors.location}
+            />
 
-          <div>
-            <CustomDropdown
-              requiredRedDot
-              logo={Text}
-              labelName="Warehouse Type :"
-              onSelect={handleLeadSelectedWarehouseType}
-              options={warehouseTypeData}
-            ></CustomDropdown>
+            <div>
+              <CustomDropdown
+                requiredRedDot
+                logo={Text}
+                labelName="Warehouse Type :"
+                onSelect={handleLeadSelectedWarehouseType}
+                options={warehouseTypeData}
+              ></CustomDropdown>
 
-            {selectedWarehouseTypeIdError && (
-              <div className="caption-custom-inactive">
-                Select WarehouseType
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center  justify-end gap-3 ">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                onClick={() => {
-                  onClose();
-                }}
-              >
-                <div className="flex items-center ">
-                  <X size={16} />
-                  Cancel
+              {selectedWarehouseTypeIdError && (
+                <div className="caption-custom-inactive">
+                  Select WarehouseType
                 </div>
-              </Button>
-
-              <Button
-                type="submit"
-                onClick={() => {
-                  handleAddCompanyWarehouse();
-                }}
-                //   disabled={!newTypeName.trim() || newParentType === 0}
-                // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
-              >
-                <div className="flex items-center  gap-1">
-                  <Save size={16} />
-                  Save
-                </div>
-              </Button>
+              )}
             </div>
-          </div>
+
+            <div className="flex items-center  justify-end gap-3 ">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  <div className="flex items-center ">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+
+                <Button type="submit">
+                  <div className="flex items-center  gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
