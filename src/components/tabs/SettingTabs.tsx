@@ -15,6 +15,7 @@ import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage"
 import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
 import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
 import SupportTicketCategorySetting from "../views/settings/support-ticket-category/SupportTicketCategorySetting";
+import CompanyWarehouseSetting from "../views/settings/company-warehouse/CompanyWarehouseSetting";
 
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -107,12 +108,34 @@ function SettingsTabs() {
       ),
     },
     {
-      label: "Setting",
+      label: "Support Ticket Category",
       value: "setting",
       desc: (
         <>
           {userHasAccessToViewSettingGeneral ? (
             activeTab == "setting" && <SupportTicketCategorySetting></SupportTicketCategorySetting>
+            // (
+            //   <div className="p-4">
+            //     <h2 className="text-xl font-semibold">Settings Content</h2>
+            //     <p className="text-gray-600">
+            //       This is the content of the Settings tab.
+            //     </p>
+            //   </div>
+            // )
+          ) : (
+            <AccessDeniedMessagePage></AccessDeniedMessagePage>
+          )}
+        </>
+      ),
+    },
+
+    {
+      label: "Company Warehouse",
+      value: "warehouse",
+      desc: (
+        <>
+          {userHasAccessToViewSettingGeneral ? (
+            activeTab == "warehouse" && <CompanyWarehouseSetting></CompanyWarehouseSetting>
             // (
             //   <div className="p-4">
             //     <h2 className="text-xl font-semibold">Settings Content</h2>
