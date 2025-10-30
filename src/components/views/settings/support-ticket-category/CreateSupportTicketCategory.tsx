@@ -53,7 +53,9 @@ function CreateSupportTicketCategory({
     "registration"
   );
 
-  const handleAddSupportTicketCategory = async () => {
+  const handleAddSupportTicketCategory = async (e?: React.FormEvent) => {
+    
+    e?.preventDefault();
     if (!userHasAccessToAddSettingGeneral) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY.DENIED_ADD_ACCESS
@@ -90,7 +92,6 @@ function CreateSupportTicketCategory({
         } else {
           toast.error(response.data.message);
         }
-        //  getComapnyAccountType();
       })
       .catch(async (error: any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
