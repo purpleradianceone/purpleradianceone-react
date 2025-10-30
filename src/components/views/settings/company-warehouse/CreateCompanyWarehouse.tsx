@@ -78,7 +78,9 @@ function CreateCompanyWarehouse({
     }
   };
 
-  const handleAddCompanyWarehouse = async () => {
+  const handleAddCompanyWarehouse = async (e?: React.FormEvent) => {
+
+    e?.preventDefault();
     if (!userHasAccessToAddSettingGeneral) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY.DENIED_ADD_ACCESS
@@ -88,6 +90,8 @@ function CreateCompanyWarehouse({
     }
 
     validateDropdown();
+
+    console.log("Call is gone 1");
 
     if (
       selectedWarehouseType == 0 ||
@@ -101,6 +105,8 @@ function CreateCompanyWarehouse({
       return;
     }
 
+    
+
     const postDataToAddNewCompanyWarehouse = {
       company_id: loginStatus.companyId,
       name: addCompanyWarehouseFormData.name,
@@ -109,6 +115,8 @@ function CreateCompanyWarehouse({
       warehouse_type_id: selectedWarehouseType,
       createdby_id: loginStatus.id,
     };
+
+    alert(JSON.stringify(postDataToAddNewCompanyWarehouse, null, 2));
 
     axios
       .post(
@@ -206,7 +214,7 @@ function CreateCompanyWarehouse({
               logo={MapPin}
               maxLength={300}
               type="text"
-              name="Location: "
+              name="location"
               value={addCompanyWarehouseFormData.location}
               placeholder="Enter Location: "
               onChange={handleAddCompanyWarehouseFormDataChange}
@@ -243,8 +251,8 @@ function CreateCompanyWarehouse({
                     Cancel
                   </div>
                 </Button>
-
-                <Button type="submit">
+                <Button 
+                type="submit">
                   <div className="flex items-center  gap-1">
                     <Save size={16} />
                     Save
