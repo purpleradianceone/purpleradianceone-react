@@ -174,7 +174,7 @@ export const useFormValidation = (formData: Record<string, string | number | boo
       case "taxRate":
         if (formType === STRING_VALUES.REGISTRATION) {
           if (value === "") {
-            setErrors((prev) => ({ ...prev, taxRate: "Tax Rate is required" }));
+            setErrors((prev) => ({ ...prev, taxRate: "if tax rate given , valid from is madatory." }));
           }
           else {
             setErrors((prev) => ({ ...prev, taxRate: "" }));
@@ -184,7 +184,7 @@ export const useFormValidation = (formData: Record<string, string | number | boo
 
       case "validFrom":
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
-          setErrors((prev) => ({ ...prev, validFrom: "Valid From is required" }));
+          setErrors((prev) => ({ ...prev, validFrom: "mandatory if tax rate is given." }));
         }
         else {
           setErrors((prev) => ({ ...prev, validFrom: "" }));

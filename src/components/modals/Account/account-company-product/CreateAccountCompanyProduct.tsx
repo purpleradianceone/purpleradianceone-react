@@ -14,7 +14,7 @@ import {
 import FormHeader from "../../../ui/FormHeader";
 import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductManagement from "../../../views/product-Management/ProductsManagement";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import Button from "../../../ui/Button";
@@ -92,29 +92,7 @@ const CreateAccountCompanyProduct = ({
   );
 
   const handleGoBackToProductSelection = () => {
-    // alert()
     setSelectedProduct(null);
-
-    // // resets the form
-    // resetAccountCreateForm();
-
-    // setWarrantyIntervalTypeId(0);
-    // setAmcIntervalTypeId(0);
-    // setSelectedWarranty(0);
-    // setSelectedAmc(0);
-    // setErrors({
-    //   quantity: "",
-    //   purchaseDate: "",
-    //   installationDate: "",
-    //   deliveryDate: "",
-    //   warrantyStartDate: "",
-    // });
-    // setErrorsData({
-    //   AmcIntervalTypeId: false,
-    //   SelectedAmc: false,
-    //   Warranty: false,
-    //   WarrantyIntervalTypeId: false,
-    // });
     setShowGrid(!showGrid);
   };
 
@@ -155,7 +133,15 @@ const CreateAccountCompanyProduct = ({
 
   const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
   const [SelectedWarranty, setSelectedWarranty] = useState<number>(0);
-  const [selectedAmc, setSelectedAmc] = useState<number>(0);
+  const [selectedAmc, setSelectedAmc] = useState<number | undefined>(0);
+  useEffect(()=>{
+    if(selectedProduct){
+      setSelectedAmc(selectedProduct?.defaultAmcCycle)
+      setAmcIntervalTypeId(selectedProduct.defaultAmcCycleIntervalTypeId)
+      setWarrantyIntervalTypeId(selectedProduct.defaultWarrantyIntervalTypeId);
+      setSelectedWarranty(selectedProduct.defaultWarranty)
+    }
+  },[selectedProduct])
   const [errorsData, setErrorsData] = useState<{
     WarrantyIntervalTypeId: boolean;
     Warranty: boolean;
@@ -167,77 +153,6 @@ const CreateAccountCompanyProduct = ({
     AmcIntervalTypeId: false,
     SelectedAmc: false,
   });
-
-  // const validateFormData = () => {
-  //   if (
-  //     selectedInstalledBy?.id === 0 ||
-  //     selectedInstalledBy?.id === null ||
-  //     selectedInstalledBy?.id === undefined
-  //   ) {
-  //     toast.error("Installed By user is required.");
-  //     return;
-  //   }
-  //   if (
-  //     selectedProduct?.id === null ||
-  //     selectedProduct?.id === undefined ||
-  //     selectedProduct?.id === 0
-  //   ) {
-  //     toast.error("Product is required.");
-  //     return;
-  //   }
-  //   if (
-  //     addProductToAccountFormData.quantity === 0 ||
-  //     addProductToAccountFormData.quantity === null ||
-  //     addProductToAccountFormData.quantity === undefined
-  //   ) {
-  //     toast.error("Quantity is required.");
-  //     return;
-  //   }
-  //   if (
-  //     selectedWarrantyIntervalTypeId === 0 ||
-  //     selectedWarrantyIntervalTypeId === null ||
-  //     selectedWarrantyIntervalTypeId === undefined
-  //   ) {
-  //     setErrorsData((prev) => ({
-  //       ...prev,
-  //       WarrantyIntervalTypeId: true,
-  //     }));
-  //     return;
-  //   }
-  //   if (
-  //     SelectedWarranty === 0 ||
-  //     SelectedWarranty === null ||
-  //     SelectedWarranty === undefined
-  //   ) {
-  //     setErrorsData((prev) => ({
-  //       ...prev,
-  //       Warranty: true,
-  //     }));
-  //     return;
-  //   }
-  //   if (
-  //     selectedAmcIntervalTypeId === 0 ||
-  //     selectedAmcIntervalTypeId === null ||
-  //     selectedAmcIntervalTypeId === undefined
-  //   ) {
-  //     setErrorsData((prev) => ({
-  //       ...prev,
-  //       AmcIntervalTypeId: true,
-  //     }));
-  //     return;
-  //   }
-  //   if (
-  //     selectedAmc === 0 ||
-  //     selectedAmc === null ||
-  //     selectedAmc === undefined
-  //   ) {
-  //     setErrorsData((prev) => ({
-  //       ...prev,
-  //       SelectedAmc: true,
-  //     }));
-  //     return;
-  //   }
-  // };
 
   const validateFormData = (): boolean => {
   if (
@@ -572,6 +487,7 @@ const CreateAccountCompanyProduct = ({
                   <CustomDropdown
                     labelName="AMC Cycle Duration:"
                     logo={LucideClock}
+
                     preselectedOption={selectedAmc}
                     onSelect={(selectedValue) => {
                       if (selectedValue) {

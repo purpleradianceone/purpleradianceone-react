@@ -32,9 +32,9 @@ function ProductsManagementList({
   handleEditProductChange,
   handleCreateCompanyProductTax,
   isGridForAccountProduct,
-  onRowSelect
-  // isListForProductUser,
-}: ProductsManagementListProps) {
+  onRowSelect,
+}: // isListForProductUser,
+ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen } = useScreenSize();
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
@@ -73,6 +73,9 @@ function ProductsManagementList({
     validFrom: "",
     createdBy: "",
     createdOn: "",
+    unitId : 0,
+    unitName : "",
+    unitNameInStock : ""
   });
 
   const handleSelectedProductChange = (product: Product) => {
@@ -106,20 +109,18 @@ function ProductsManagementList({
           userPreference.isLeftMenu ? "pl-5" : "pl-1"
         } pr-1 gap-1`}
       >
-        <div className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
+        <div
+          className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        >
           <div className="flex justify-between w-full ">
             <div className="flex  gap-2">
-              
-                <Store className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-2`} />
-
+              <Store
+                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-2`}
+              />
 
               {(isMediumScreen || isLargeScreen) && (
                 <>
-
-                    <span className="section-header-custom mt-2">
-                      Products
-                    </span>
-
+                  <span className="section-header-custom mt-2">Products</span>
                 </>
               )}
             </div>
@@ -127,31 +128,31 @@ function ProductsManagementList({
             {isLargeScreen && (
               <>
                 <div className="flex gap-1 justify-center">
-                {/* search box flex div */}
-                <div className="relative flex items-start w-80 mt-1">
-                  <SearchInput
-                    onChange={(e) => {
-                      handleSearchOption.handleSearchParameterChange(
-                        e.target.value
-                      );
-                    }}
-                  ></SearchInput>
-                </div>
+                  {/* search box flex div */}
+                  <div className="relative flex items-start w-80 mt-1">
+                    <SearchInput
+                      onChange={(e) => {
+                        handleSearchOption.handleSearchParameterChange(
+                          e.target.value
+                        );
+                      }}
+                    ></SearchInput>
+                  </div>
 
-                {/* Date FIlters Dropdown */}
-                <div className="flex mx-3 mt-1">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="input-label-custom mt-1" />
+                  {/* Date FIlters Dropdown */}
+                  <div className="flex mx-3 mt-1">
+                    <div className="flex">
+                      <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                        <Calendar className="input-label-custom mt-1" />
+                      </div>
+
+                      <DateRangeFilterDropdown
+                        dropdownOptions={dateRangeDropdownOptions}
+                        handleDateIdChange={handleDateRangeIdChange}
+                      ></DateRangeFilterDropdown>
                     </div>
-
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
                   </div>
                 </div>
-              </div>
 
                 {/* Custom Date Picker Div Flex Box*/}
                 <div
@@ -170,73 +171,85 @@ function ProductsManagementList({
               </>
             )}
 
-            {
-              !isGridForAccountProduct &&(
-                <>
-                  <div className="flex gap-1 mt-1">
-                {userHasAccessToAddProduct ? (
-                  <Button type="submit" onClick={(e) => {
-                    e.preventDefault();
-                    setIsAddProductModalOpen(true);
-                  }}>
-                    
-                    <div className="flex items-center gap-0.5">
-            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
-        
-                  </Button>
-                ) : (
-                  <Button
-                    disabled
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toast.error(
-                        MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                          .DENIED_ADD_ACCESS
-                      );
-                    }}
-                  >
-                    <div className="flex items-center gap-0.5">
-            <Plus size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_PRODUCTS}</div>
-                  </Button>
-                )}
-              </div>
-                </>
-              )
-            }
+            {!isGridForAccountProduct && (
+              <>
+                <div className="flex gap-1 mt-1">
+                  {userHasAccessToAddProduct ? (
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsAddProductModalOpen(true);
+                      }}
+                    >
+                      <div className="flex items-center gap-0.5">
+                        <Plus size={SIZE.SIXTEEN} />{" "}
+                        {JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                      </div>
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                            .DENIED_ADD_ACCESS
+                        );
+                      }}
+                    >
+                      <div className="flex items-center gap-0.5">
+                        <Plus size={SIZE.SIXTEEN} />{" "}
+                        {JSX_CHILDREN_NAME.ADD_PRODUCTS}
+                      </div>
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
 
+            {isAddProductModalOpen && (
+              <AddProductModal
+                isOpen={isAddProductModalOpen}
+                onClose={handleAddProductModalClose}
+                handleProductChangeOnAdd={handleProductChangeOnAdd!}
+              />
+            )}
 
-            <AddProductModal
-              isOpen={isAddProductModalOpen}
-              onClose={handleAddProductModalClose}
-              handleProductChangeOnAdd={handleProductChangeOnAdd!}
-            />
+            {isEditComapanyProductModalOpen && (
+              <EditCompanyProductModal
+                handleCreateCompanyProductTaxAdd={
+                  handleCreateCompanyProductTax!
+                }
+                handleCompanyProductChange={handleEditProductChange!}
+                isOpen={isEditComapanyProductModalOpen}
+                onClose={() => {
+                  setIsEditCompanyProductModalOpen(false);
+                }}
+                product={selectedProduct}
+              />
+            )}
 
-            <EditCompanyProductModal
-              handleCreateCompanyProductTaxAdd={handleCreateCompanyProductTax!}
-              handleCompanyProductChange={handleEditProductChange!}
-              isOpen={isEditComapanyProductModalOpen}
-              onClose={() => {
-                setIsEditCompanyProductModalOpen(false);
-              }}
-              product={selectedProduct}
-            />
+            {isCompanyProductUserModalOpen && (
+              <CompanyProductUsersModal
+                isOpen={isCompanyProductUserModalOpen}
+                onClose={() => {
+                  setIsCompanyProductUserModalOpen(false);
+                }}
+                companyProduct={selectedProduct}
+              />
+            )}
 
-            <CompanyProductUsersModal
-              isOpen={isCompanyProductUserModalOpen}
-              onClose={() => {
-                setIsCompanyProductUserModalOpen(false);
-              }}
-              companyProduct={selectedProduct}
-            ></CompanyProductUsersModal>
-
-            <CompanyProductTeamsModal
-              isOpen={isCompanyProductTeamModalOpen}
-              onClose={() => {
-                setIsCompanyProductTeamModalOpen(false);
-              }}
-              companyProduct={selectedProduct}
-            />
+            {isCompanyProductTeamModalOpen && (
+              <CompanyProductTeamsModal
+                isOpen={isCompanyProductTeamModalOpen}
+                onClose={() => {
+                  setIsCompanyProductTeamModalOpen(false);
+                }}
+                companyProduct={selectedProduct}
+              />
+            )}
           </div>
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
@@ -248,7 +261,7 @@ function ProductsManagementList({
             }
           >
             <ProductsManagementGrid
-            isGridForAccountProduct={isGridForAccountProduct}
+              isGridForAccountProduct={isGridForAccountProduct}
               products={products}
               // isGridForProductUser={isListForProductUsser}
               handleCompanyProductUserModalOpen={

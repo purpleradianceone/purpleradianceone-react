@@ -4,7 +4,7 @@ import FormInputProps from "../../@types/ui/FormInputProps";
 
 function DatePickerInput(props : FormInputProps){
     return (
-        <div className="mt-2">
+        <div className="mt-1">
       <label htmlFor={props.name} className={( props.center ? 'text-center ' : '') + 'block input-label-custom'}>
              {props.logo  && <props.logo size={14} className="inline mr-1 text-blue-500"/>}
 {props.label}{props.required && <span className="caption-custom-inactive align-top">*</span>}
@@ -22,9 +22,9 @@ function DatePickerInput(props : FormInputProps){
           onChange={props.onChange}
           onBlur={props.onBlur}
           className={props.readonly ? 
-            "input-label-custom appearance-none block w-full px-3 py-2 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            "input-label-custom appearance-none block w-full px-3 py-1.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             :
-            "input-label-custom appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            "input-label-custom appearance-none block w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
            }
           inputMode={props.inputMode}
           max={props.maxDate}

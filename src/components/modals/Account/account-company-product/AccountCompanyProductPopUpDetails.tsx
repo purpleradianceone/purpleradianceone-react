@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createPortal } from "react-dom";
 import AccountProduct from "../../../../@types/account/AccountProduct";
 import {
@@ -35,14 +37,10 @@ import { Item, range } from "../../../../constants/NumberList";
 const AccountCompanyProductPopUpDetails = ({
   selectedProductCard,
   onClose,
-  //   getAccountCompanyProduct,
-  //   triggerRefresh,
   refreshKey,
 }: {
   selectedProductCard: AccountProduct | null;
   onClose: () => void;
-  //   getAccountCompanyProduct: () => void;
-  //   triggerRefresh: () => void;
   refreshKey: number;
 }) => {
   const { intervalTypeData } = useIntervalType();
@@ -91,7 +89,6 @@ const AccountCompanyProductPopUpDetails = ({
   };
 
   function formatDate(dateStr: string): string {
-    // Convert "19-oct-2025" to a valid Date format
     const formattedInput = dateStr.replace(/-/g, " ");
     const date = new Date(formattedInput);
 
@@ -119,8 +116,7 @@ const AccountCompanyProductPopUpDetails = ({
     if (title === "intervalOption") {
       updateAccountCompanyProduct("warranty_interval_type_id", value);
     }
-    //  intervalName="amcInterval"
-    //                      intervalOptionName="amcIntervalOption"
+  
     if (title === "amcInterval") {
       updateAccountCompanyProduct("amc_cycle", value);
     }
@@ -176,100 +172,165 @@ const AccountCompanyProductPopUpDetails = ({
   const handleClose = () => {
     setOpenCompanyUserModuleForInstalledByChange(false);
   };
+  // const updateAccountCompanyProduct = async (
+  //   field: string,
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   value: any,
+  //   displayName?: string
+  // ) => {
+  //   const postData = {
+  //     id: productData?.id,
+  //     [field]: value,
+  //     company_id: loginStatus.companyId,
+  //     updatedby_id: loginStatus.id,
+  //   };
+
+  //   axios
+  //     .post(POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT, postData, {
+  //       withCredentials: true,
+  //     })
+  //     .then((response) => {
+  //       if (response.data.status) {
+  //         toast.success(response.data.message);
+
+  //         //  Update local popup state so UI refreshes instantly
+  //         if (field === "installed_by") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   installedBy: value,
+  //                   installedByName: displayName!,
+  //                 }
+  //               : prev
+  //           );
+  //         }
+  //         if (field === "billing_address") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   billingAddress: value,
+  //                 }
+  //               : prev
+  //           );
+  //         }
+  //         if (field === "delivery_address") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   deliveryAddress: value,
+  //                 }
+  //               : prev
+  //           );
+  //         }
+
+  //         if (field === "warranty_terms") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   warrantyTerms: value,
+  //                 }
+  //               : prev
+  //           );
+  //         }
+  //         if (field === "quantity") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   quantity: parseInt(value),
+  //                 }
+  //               : prev
+  //           );
+  //         }
+
+  //         if (field === "purchase_date") {
+  //           setProductData((prev) =>
+  //             prev
+  //               ? {
+  //                   ...prev,
+  //                   purchaseDate: formatDate(value),
+  //                 }
+  //               : prev
+  //           );
+  //         }
+
+  //         // wait for backend to update
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       toast.success(error.data.message);
+  //     });
+  // };
+
   const updateAccountCompanyProduct = async (
-    field: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    value: any,
-    displayName?: string
-  ) => {
+  field: string,
+  value: any,
+  displayName?: string
+) => {
+  // Keep previous state for rollback
+  const previousState = productData;
+
+  // Optimistically update (optional – to make UI feel fast)
+  setProductData((prev) => {
+    if (!prev) return prev;
+    const updated = { ...prev };
+
+    switch (field) {
+      case "installed_by":
+        updated.installedBy = value;
+        updated.installedByName = displayName!;
+        break;
+      case "billing_address":
+        updated.billingAddress = value;
+        break;
+      case "delivery_address":
+        updated.deliveryAddress = value;
+        break;
+      case "warranty_terms":
+        updated.warrantyTerms = value;
+        break;
+      case "quantity":
+        updated.quantity = parseInt(value);
+        break;
+      case "purchase_date":
+        updated.purchaseDate = formatDate(value);
+        break;
+      // add other cases if needed
+    }
+    return updated;
+  });
+
+  try {
     const postData = {
-      //   ...productData,
       id: productData?.id,
       [field]: value,
       company_id: loginStatus.companyId,
       updatedby_id: loginStatus.id,
     };
 
-    axios
-      .post(POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT, postData, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.data.status) {
-          toast.success(response.data.message);
+    const response = await axios.post(
+      POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT,
+      postData,
+      { withCredentials: true }
+    );
 
-          //  Update local popup state so UI refreshes instantly
-          if (field === "installed_by") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    installedBy: value,
-                    installedByName: displayName!,
-                  }
-                : prev
-            );
-          }
-          if (field === "billing_address") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    billingAddress: value,
-                  }
-                : prev
-            );
-          }
-          if (field === "delivery_address") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    deliveryAddress: value,
-                  }
-                : prev
-            );
-          }
-
-          if (field === "warranty_terms") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    warrantyTerms: value,
-                  }
-                : prev
-            );
-          }
-          if (field === "quantity") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    quantity: parseInt(value),
-                  }
-                : prev
-            );
-          }
-
-          if (field === "purchase_date") {
-            setProductData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    purchaseDate: formatDate(value),
-                  }
-                : prev
-            );
-          }
-
-          // wait for backend to update
-        }
-      })
-      .catch((error) => {
-        toast.success(error.data.message);
-      });
-  };
+    if (response.data.status) {
+      toast.success(response.data.message);
+    } else {
+      toast.error(response.data.message || "Update failed!");
+      // ❌ Rollback to previous data
+      setProductData(previousState);
+    }
+  } catch (error: any) {
+    toast.error("Network error: Unable to update.");
+    // ❌ Rollback to previous data
+    setProductData(previousState);
+  }
+};
 
   if (selectedProductCard === null) return null;
   return (
@@ -415,12 +476,6 @@ const AccountCompanyProductPopUpDetails = ({
 
                 <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
                   <div className="col-span-2">
-                    {/* <InfoRow
-                      icon={Layers}
-                      title="AMC Cycle"
-                      selectedIntervalOptionValue={}
-                    /> */}
-
                     <InfoRow
                       icon={Shield}
                       title="Amc"
@@ -454,13 +509,7 @@ const AccountCompanyProductPopUpDetails = ({
                     penLogo={true}
                   />
                 </div>
-                {/* <InfoRow
-                  icon={Clock}
-                  title="AMC Cycle Period"
-                  value={`${productData!.amcCycleStartDate || "?"} → ${
-                    productData!.amcCycleEndDate || "?"
-                  }`}
-                /> */}
+                
               </div>
             </div>
 
@@ -669,107 +718,6 @@ function InfoRow({
   );
 }
 
-// function InfoRow({
-//   icon: Logo,
-//   title,
-//   intervalName,
-//   intervalOptionName,
-//   displayValue,
-//   selectedIntervalTypevalue,
-//   selectedIntervalOptionValue,
-//   penLogo,
-//   intervalOption,
-//   interval,
-//   onValueChange
-// }: InfoRowProps) {
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [selectedValue, setSelectedValue] = useState(selectedIntervalTypevalue ?? "");
-//   const [selectedIntervalOption, setSelectedIntervalOption] = useState(selectedIntervalOptionValue ?? "");
-
-//     const [changedValue, setChangedValue] = useState<string | number>(displayValue);
-
-//   //  Memoize callback and ensure stable dependency
-//   const handleChange = React.useCallback(
-//     (event: React.ChangeEvent<HTMLSelectElement>) => {
-//       const newValue = event.target.value;
-//       setSelectedValue(newValue);
-//       // Avoid blocking console logs
-//       requestAnimationFrame(() => onValueChange(intervalName, newValue));
-//     },
-//     [intervalName, onValueChange]
-//   );
-
-//   const handleIntervalOptionChange = React.useCallback(
-//     (event: React.ChangeEvent<HTMLSelectElement>) => {
-//       const newValue = event.target.value;
-//       setSelectedIntervalOption(newValue);
-//       requestAnimationFrame(() => onValueChange(intervalOptionName, newValue));
-//     },
-//     [intervalOptionName, onValueChange]
-//   );
-
-//   //  Memoize dropdown options (no re-render cost)
-//   const intervalOptions = React.useMemo(
-//     () =>
-//       interval?.map(item => (
-//         <option key={item.id} value={item.id}>
-//           {item.name}
-//         </option>
-//       )),
-//     [interval]
-//   );
-
-//   const intervalOptionOptions = React.useMemo(
-//     () =>
-//       intervalOption?.map(item => (
-//         <option key={item.id} value={item.id!}>
-//           {item.name}
-//         </option>
-//       )),
-//     [intervalOption]
-//   );
-
-//   return (
-//     <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-//       <Logo className="text-blue-500" size={20} />
-//       <div>
-//         <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
-
-//         {!isEditing ? (
-//           <div
-//             className="flex items-center gap-2 hover:bg-gray-200 rounded px-2 cursor-pointer"
-//             onClick={() => setIsEditing(true)}
-//           >
-//             <p className="text-gray-700">
-//               {changedValue ? changedValue : <span className="text-sm italic">Not provided</span>}
-//             </p>
-//             {penLogo && <Pen className="text-blue-600" size={12} />}
-//           </div>
-//         ) : (
-//           <div className="flex flex-row gap-2">
-//             <select
-//               className="border rounded px-2 py-1"
-//               value={selectedValue}
-//               onChange={handleChange}
-//             >
-//               {intervalOptions}
-//             </select>
-
-//             <select
-//               className="border rounded px-2 py-1"
-//               value={selectedIntervalOption}
-//               onChange={handleIntervalOptionChange}
-//             >
-//               <option value="">Select Option</option>
-//               {intervalOptionOptions}
-//             </select>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
 // this function is only used in the warranty and amc
 
 interface InfoBlockProps {
@@ -826,20 +774,15 @@ function InfoBlock({
   const [changedValue, setChangedValue] = useState<string | number>(value);
   const prevValueRef = useRef(value);
 
-  //   this function is used to format the data as the date picker wants
-  //  function convertToInputDateFormat(dateStr?: string  ): string {
-  //   if (!dateStr) return "";
-  //   const date = new Date(dateStr);
-  //   return isNaN(date.getTime()) ? "" : date.toISOString().split("T")[0];
-  // }
+  
 
-  // ✅ Safely handle both string and number date values
+  //  Safely handle both string and number date values
   function convertToInputDateFormat(dateValue?: string | number): string {
     if (!dateValue) return "";
     const date = new Date(dateValue);
     if (isNaN(date.getTime())) return "";
 
-    // ✅ Format based on local time (not UTC)
+    //  Format based on local time (not UTC)
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -949,7 +892,6 @@ function InfoBlock({
               defaultValue={convertToInputDateFormat(value)}
               placeholder="Select Date"
               onBlur={handleBlur}
-              //   value={value}
             />
           </div>
         ) : type === "interval" ? (

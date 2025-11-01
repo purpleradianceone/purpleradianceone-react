@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AddStockModalProps from "../../../@types/stock/AddStockModalProps";
 import FormHeader from "../../ui/FormHeader";
 import {
   ArrowLeft,
+  ClipboardPen,
+  ListOrdered,
   LucideIndianRupee,
   Plus,
   Save,
@@ -12,9 +15,9 @@ import {
 import FormLayout from "../../ui/FormLayout";
 import ProductManagement from "../../views/product-Management/ProductsManagement";
 import { Product } from "../../../@types/products/ProductsManagementProps";
-import {  useState } from "react";
+import { useState } from "react";
 import Button from "../../ui/Button";
-import { SIZE } from "../../../constants/AppConstants";
+import {  SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
@@ -26,16 +29,28 @@ import {
 } from "../../../config/hooks/useCompanyWarehouse";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import CompanyWarehouseAgGrid from "../../ag-grid/CompanyWarehouseAgGrid";
+import useAdjustmentReason from "../../../config/hooks/useAdjustmentReason";
+import axios from "axios";
+import POST_API from "../../../constants/PostApi";
+import toast from "react-hot-toast";
+import ApiError from "../../../@types/error/ApiError";
+import RefreshToken from "../../../config/validations/RefreshToken";
 
 const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
   const { loginStatus } = useLoggedInUserContext();
   const { companyWarehouse, loading: companyWarehouseLoading } =
     useCompanyWarehouse();
+
+  const { adjustmentReason, loading: adjustmentReasonLoading } =
+    useAdjustmentReason();
   const [selectedCompanyWarehouse, setSelectedCompanyWarehouse] =
-    useState<Warehouse>();
+    useState<Warehouse | null>(null);
   const [showWarehouseSelectionModule, setShowWarehouseSelectionModule] =
     useState<boolean>(false);
-  
+
+  const [selectedAdjustmentReasonId, setSelectedAdjustmentReasonId] = useState<
+    number | null
+  >(null);
   const intialAddStockFormData = {
     companyId: loginStatus.companyId,
     companyProductId: 0,
@@ -50,12 +65,10 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
   const {
     handleChange: handleAddStockFormDataChange,
     formData: addStockFormData,
-    // resetForm: resetStockCreateForm,
+    resetForm: resetStockCreateForm,
   } = useFormChange(intialAddStockFormData);
 
-  const { errors, handleBlur
-    // , setErrors 
-} = useFormValidation(
+  const { errors, handleBlur, setErrors } = useFormValidation(
     addStockFormData,
     "registration"
   );
@@ -64,7 +77,6 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
 
   const [showInputForm, setShowInputForm] = useState<boolean>(false);
   function onRowSelectProductForStock(product: Product) {
-    console.log(product);
     setSelectedProduct(null);
     if (product !== null && product !== undefined) {
       setSelectedProduct(product);
@@ -73,10 +85,8 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
   }
 
   function handleSelectedWarehouse(selectedWarehouse: Warehouse) {
-    console.log(selectedWarehouse);
-
-    setSelectedCompanyWarehouse(selectedWarehouse);
-    if (selectedWarehouse.id > 0) {
+      setSelectedCompanyWarehouse(selectedWarehouse);
+    if (selectedWarehouse.id > 0 && selectedCompanyWarehouse?.id !== null) {
       setShowWarehouseSelectionModule(false);
       setShowInputForm(true);
     }
@@ -85,12 +95,90 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
     setSelectedProduct(null);
     setShowInputForm(false);
   }
-  const handleCloseForm = () => {};
 
+  function handleAdjustmentReasonChange(option: number) {
+    setSelectedAdjustmentReasonId(option);
+  }
+  const handleCloseForm = () => {
+    resetStockCreateForm()
+
+    setErrors({
+        quantity : "",
+        description : ""
+    })
+    setSelectedAdjustmentReasonId(null);
+    setSelectedCompanyWarehouse(null);
+    setSelectedProduct(null);
+    onClose()
+  };
+
+  const  validateForm =() : boolean =>{
+    if(addStockFormData.quantity ===0) {
+        toast.error("Quantity is required")
+        return false;
+    }
+
+    if(selectedAdjustmentReasonId === 0 || selectedAdjustmentReasonId === null || selectedAdjustmentReasonId === undefined)
+    {
+        toast.error("Adjustment reason is required.")
+        return false;
+    }
+    if(selectedCompanyWarehouse?.id ===null ||selectedCompanyWarehouse?.id ===0 ||selectedCompanyWarehouse?.id ===undefined ){
+        toast.error("Warehouse is required.")
+        return false;
+    }
+    return true;
+  }
   // submit api call
-  const handleCreateStockAdjustment = () => {};
+  const handleCreateStockAdjustment =async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+   const isValid = validateForm();
+   if(!isValid){
+    return;
+   }
+
+    const postData ={
+        company_id : loginStatus.companyId,
+        company_product_id: selectedProduct?.id,
+        company_warehouse_id: selectedCompanyWarehouse?.id,
+        serial_number: addStockFormData.serial_number,
+        quantity : addStockFormData.quantity,
+        other_id : selectedAdjustmentReasonId,
+        description : addStockFormData.description,
+        createdby_id : loginStatus.id
+    }
+
+    await axios.post(POST_API.CREATE_ADJUSTMENT_STOCK, postData , {
+        withCredentials: true,
+    })
+    .then((response) =>{
+        console.log(response);
+        
+        if(response.data.status){
+            toast.success(response.data.message)
+            handleCloseForm()
+        }else{
+            toast.error(response.data.message)
+        }
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithEvent: handleCreateStockAdjustment,
+          });
+          if (refreshTokenResponse) {
+            handleCreateStockAdjustment(event);
+          }
+        } else {
+          toast.error(error.response.data);
+        }
+      });    
+  };
+
+  
   if (!isOpen) return null;
-  if (companyWarehouseLoading)
+  if (companyWarehouseLoading || adjustmentReasonLoading)
     return (
       <FormLayout>
         <LoadingSpinner />
@@ -101,7 +189,7 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
       <>
         <FormHeader
           icon={Plus}
-          onClose={onClose}
+          onClose={handleCloseForm}
           description="Add new stock details to the inventory."
           preText="Add stock"
         />
@@ -129,13 +217,19 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
                   {selectedProduct.name}
                 </div>
               )}
+              {selectedProduct && (
+                <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
+                  <span className="text-gray-500">Product Barcode:</span>{" "}
+                  {selectedProduct.barcode}
+                </div>
+              )}
             </div>
 
             <form
               onSubmit={handleCreateStockAdjustment}
               className="grid grid-cols-2 gap-2 px-2"
             >
-              <div className="grid grid-cols-2 gap-3 ">
+              <div className="col-span-2 grid grid-cols-2 gap-3 ">
                 {/* Quantity */}
                 <div className="mt-1.5">
                   <FormInput
@@ -156,7 +250,55 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
                     error={errors.quantity}
                   />
                 </div>
+                {/* serial number */}
+                <div className="mt-1.5">
+                  <FormInput
+                    label="Serial Number : "
+                    logo={ListOrdered}
+                    type="text"
+                    name="serial_number"
+                    placeholder="Enter serial number here"
+                    // value={addProductToAccountFormData.quantity}
+                    defaultValue={addStockFormData.serial_number}
+                    onChange={handleAddStockFormDataChange}
+                    // error={errors.serial_number}
+                  />
+                </div>
               </div>
+              {/* adjustment reason */}
+              <div className="mt-2">
+                <h1 className="input-label-custom  mb-1 gap-1 flex items-center ">
+                  <ClipboardPen className="text-blue-500" size={15} />{" "}
+                  Adjustment Reason :
+                </h1>
+                <div className="flex flex-wrap gap-3">
+                  {adjustmentReason.length > 0 &&
+                    adjustmentReason.map((option: any) => (
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-2 px-2 py-1.5 border rounded cursor-pointer transition ${
+                          selectedAdjustmentReasonId === option.id
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-gray-300 hover:bg-gray-100"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="adjustmentReason"
+                          value={option.id}
+                          checked={selectedAdjustmentReasonId === option.id}
+                          onChange={() =>
+                            handleAdjustmentReasonChange(option.id)
+                          }
+                          className="accent-blue-600 cursor-pointer"
+                        />
+
+                        <span className="caption-custom">{option.name}</span>
+                      </label>
+                    ))}
+                </div>
+              </div>
+              {/* warehouse */}
               <div className="flex items-center justify-end mt-2">
                 <div className="w-full">
                   <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
@@ -193,8 +335,9 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
                   </div>
                 </div>
               </div>
-              {/* Warranty terms */}
-              <div className="col-span-2">
+
+              {/* description */}
+              <div className="col-span-2 ">
                 <TextAreaInput
                   logo={ShieldCheck}
                   cols={4}
@@ -203,7 +346,6 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
                   rows={3}
                   defaultValue={addStockFormData.description}
                   onChange={handleAddStockFormDataChange}
-                  // onBlur={handleBlur}
                 />
               </div>
 
