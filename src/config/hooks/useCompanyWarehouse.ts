@@ -6,6 +6,7 @@ import RefreshToken from "../validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import POST_API from "../../constants/PostApi";
 
 export type Warehouse = {
     id: number,
@@ -33,7 +34,10 @@ export const useCompanyWarehouse = () => {
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/api/inventory/purple-crm-api/get/company-warehouse', PostData, {
+            const response = await axios.post(
+                POST_API.GET_COMPANY_WAREHOUSE
+                // 'http://localhost:8080/api/inventory/purple-crm-api/get/company-warehouse'
+                , PostData, {
                 withCredentials: true,
             });
             if (response.status == STATUS_CODE.OK) {
