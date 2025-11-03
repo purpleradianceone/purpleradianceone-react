@@ -60,7 +60,7 @@ function ProductManagement({
       setProductUpdateCount((prev) => prev + 1);
   };
 
-  const fetchCompanyProducts = async () => {
+  const fetchCompanyProducts = async (signal : AbortSignal) => {
     if (userHasAccessToViewProduct) {
       const offset = (currentPage - 1) * pageSize;
 
@@ -85,6 +85,7 @@ function ProductManagement({
           POST_API.GET_PRODUCTS,
           getProductPostData,
           {
+            signal,
             withCredentials: true,
           }
         );
@@ -96,6 +97,9 @@ function ProductManagement({
             companyId: res.company_id,
             productTypeId:res.product_type_id,
             productTypeName:res.product_type_name,
+            unitName: res.unit_name,
+            unitId : res.unit_id,
+            unitNameInStock : res.unit_name_in_stock,
             defaultWarrantyIntervalTypeId:res.default_warranty_interval_type_id,
             defaultWarranty:res.default_warranty,
             defaultWarrantyName:res.default_warranty_name,
@@ -126,11 +130,11 @@ function ProductManagement({
         console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
-            callFunction: fetchCompanyProducts,
+            callFunctionWithEvent: fetchCompanyProducts,
           });
 
           if (refreshTokenStatus) {
-            fetchCompanyProducts();
+            fetchCompanyProducts(signal);
           }
         }
       }
@@ -138,12 +142,20 @@ function ProductManagement({
   };
 
   useEffect(() => {
+
+    const controller = new AbortController();
+    const {signal} = controller;
     setTimeout(() => {
       setProductsData([]);
       // console.log("Product Data is cleared");
       // console.log(productsData);
-      fetchCompanyProducts();
+      fetchCompanyProducts(signal);
     }, 200);
+
+
+    return () =>{
+      controller.abort();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     productUpdateCount,

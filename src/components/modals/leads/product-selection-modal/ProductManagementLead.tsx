@@ -119,6 +119,9 @@ function ProductManagementLead({
             validFrom: res.valid_from,
             createdBy: res.createdby,
             createdOn: res.createdon,
+            unitId : res.unit_id,
+            unitName : res.unit_name,
+            unitNameInStock: res.unit_name_in_stock
               },
             ]);
           });

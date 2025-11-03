@@ -7,50 +7,54 @@ import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
-import IntervalType from "../../@types/interval/IntervalType";
 
-export const useIntervalType = () => {
-  const [intervalTypeData, setIntervalTypeData] = useState<
-    IntervalType[]
+import WarehouseType from "../../@types/warehouse/WarehouseType";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+
+export const useWarehouseType = () => {
+
+  const { loginStatus } = useLoggedInUserContext();
+  const [warehouseTypeData, setWarehouseTypeData] = useState<
+    WarehouseType[]
   >([]);
-  const [loading , setLoading]= useState<boolean>(true);
 
-  const getIntervalType = async () => {
-    setLoading(true)
-    const PostData: IntervalType = {
+
+  const getWarehouseType = async () => {
+    const PostData: WarehouseType = {
+      
+      company_id: loginStatus.companyId,
       id: null,
       name: null,
-      isactive: true,
+      isactive: null,
+      requestedby_id: loginStatus.id,
     };
 
     try {
-      const response = await axios.post(POST_API.GET_INTERVAL_TYPE, PostData, {
+      const response = await axios.post(
+        POST_API.GET_WAREHOUSE_TYPE, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
         console.log(response.data);
-        setLoading(false)
-        setIntervalTypeData(response.data);
+        setWarehouseTypeData(response.data);
       }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getIntervalType,
+          callFunctionWithEvent: getWarehouseType,
         });
         if (refreshTokenStatus) {
-          getIntervalType();
+          getWarehouseType();
         }
       }
     }
   };
   useEffect(() => {
-    getIntervalType();
-
+    getWarehouseType();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
-    intervalTypeData,
-    loading
+    warehouseTypeData,
   };
 };

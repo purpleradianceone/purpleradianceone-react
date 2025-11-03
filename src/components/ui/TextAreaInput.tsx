@@ -2,7 +2,7 @@ import TextAreaInputProps from "../../@types/ui/textAreaInputProps";
 
 function TextAreaInput(props: TextAreaInputProps) {
   return (
-    <div className="mt-4">
+    <div className="mt-1">
       <label
         htmlFor={props.name}
         className="block input-label-custom"

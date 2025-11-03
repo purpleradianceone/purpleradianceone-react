@@ -254,6 +254,7 @@ function SignInForm() {
               // });
               toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
 
+              // note : changes done here
               if (
                 loginStatusRef.current.active_users_in_company >
                 loginStatusRef.current.subscription_allowed_users
@@ -549,9 +550,10 @@ function SignInForm() {
             </span>
           </div>
         </form>
-        <SubscriptionDialogueBox
+        {
+          showSubscriptionOrInActivePopUp && <SubscriptionDialogueBox
           isOpen={showSubscriptionOrInActivePopUp}
-          cardTitle="Subscription Required"
+          cardTitle="User Management"
           message="Get the Subscription / Inactive Some users."
           onClose={() => {
             setShowSubscriptionOrInActivePopUp(false);
@@ -607,6 +609,8 @@ function SignInForm() {
             });
           }}
         />
+        }
+        
       </div>
 
       {/* <MessageSnackBar
