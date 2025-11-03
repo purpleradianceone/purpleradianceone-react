@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   BoxSelectIcon,
+  Info,
   LucideCalendar,
   LucideClock,
   LucideIndianRupee,
@@ -33,6 +34,7 @@ import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersManagement";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
+import useUnitForProduct from "../../../../config/hooks/useUnitForProduct";
 
 const CreateAccountCompanyProduct = ({
   onClose,
@@ -46,6 +48,12 @@ const CreateAccountCompanyProduct = ({
   const { loginStatus } = useLoggedInUserContext();
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const { unitForProduct: unitForProductData } = useUnitForProduct({
+    companyProductId: selectedProduct?.id,
+  });
+    const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(0);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onRowSelectProductForAssingingToAccount = (data: Product | any) => {
     console.log(data);
@@ -119,6 +127,7 @@ const CreateAccountCompanyProduct = ({
       SelectedAmc: false,
       Warranty: false,
       WarrantyIntervalTypeId: false,
+      unitIdError : false
     });
     onClose();
   };
@@ -147,12 +156,29 @@ const CreateAccountCompanyProduct = ({
     Warranty: boolean;
     AmcIntervalTypeId: boolean;
     SelectedAmc: boolean;
+    unitIdError : boolean
   }>({
     WarrantyIntervalTypeId: false,
     Warranty: false,
     AmcIntervalTypeId: false,
     SelectedAmc: false,
+    unitIdError : false
   });
+
+  const [productUnitConversionFactor, setProductUnitConversionFactor] =
+    useState<number>(0);
+  useEffect(() => {
+    const factor = unitForProductData.find(
+      (item) => item.id === selectedUnitId
+    );
+    if (factor?.conversionFactor) {
+      const productUnitConversionFactorCalculation =
+        factor?.conversionFactor * addProductToAccountFormData.quantity;
+      setProductUnitConversionFactor(productUnitConversionFactorCalculation);
+    } else {
+      setProductUnitConversionFactor(0);
+    }
+  }, [selectedUnitId, addProductToAccountFormData.quantity]);
 
   const validateFormData = (): boolean => {
   if (
@@ -172,6 +198,18 @@ const CreateAccountCompanyProduct = ({
     toast.error("Product is required.");
     return false;
   }
+  if (selectedUnitId === 0 || selectedUnitId === undefined) {
+      setErrorsData((prev) => ({
+        ...prev,
+        unitIdError: true,
+      }));
+      return false;
+    } else {
+      setErrorsData((prev) => ({
+        ...prev,
+        unitIdError: false,
+      }));
+    }
 
   if (
     addProductToAccountFormData.quantity === 0 ||
@@ -296,6 +334,7 @@ const CreateAccountCompanyProduct = ({
       company_id: loginStatus.companyId,
       account_id: accountId,
       company_product_id: selectedProduct?.id,
+      unit_id : selectedUnitId,
       quantity: addProductToAccountFormData.quantity,
       purchase_date: purchaseDate,
       delivery_date: deliveryDate,
@@ -320,7 +359,7 @@ const CreateAccountCompanyProduct = ({
       })
       .then((response) => {
         if(response.data.status){
-          toast.success(response.data.messge);
+          toast.success(response.data.message);
           handleCloseForm();
           getAccountCompanyProduct();
         }else{
@@ -341,6 +380,10 @@ const CreateAccountCompanyProduct = ({
         }
       });
   };
+
+  useEffect(() => {
+   setSelectedUnitId(undefined)
+  }, [selectedProduct]);
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-5   flex justify-center items-center  p-2 sm:p-2">
       <div className="bg-white w-full max-w-6xl h-[90vh]   rounded  p-2 relative overflow-auto">
@@ -383,7 +426,7 @@ const CreateAccountCompanyProduct = ({
               onSubmit={handleCreateAccountCompanyProduct}
               className="grid grid-cols-2 gap-2 px-2"
             >
-              <div className="grid grid-cols-2 gap-3 ">
+              {/* <div className=" gap-3 "> */}
                 {/* Quantity */}
                 <div className="mt-1.5">
                   <FormInput
@@ -404,7 +447,43 @@ const CreateAccountCompanyProduct = ({
                   onBlur={handleBlur}
                   error={errors.quantity}
                 />
+                {productUnitConversionFactor !== 0 && (
+                  <p
+                    title="Quantity is converted automatically based on the product’s default unit and current selected unit."
+                    className="caption-custom-active flex items-center cursor-pointer gap-1"
+                  >
+                    Converted Quantity: {productUnitConversionFactor}{" "}
+                    <Info size={12} className="" />
+                  </p>
+                )}
                 </div>
+                {/* Unit */}
+              <div className="mt-4">
+                <CustomDropdown
+                  labelName="Unit :"
+                  logo={LucideTimer}
+                  preselectedOption={
+                    selectedUnitId !== undefined ? selectedUnitId : 0
+                  }
+                  onSelect={(data) => {
+                    if (data) {
+                      // setSelectedUnitError(false);
+                      setErrorsData((prev) => ({
+                        ...prev,
+                        unitIdError: false,
+                      }));
+                    }
+                    setSelectedUnitId(data);
+                  }}
+                  options={unitForProductData}
+                  requiredRedDot={true}
+                />
+                {errorsData.unitIdError && (
+                  <div className="caption-custom-inactive">
+                    Product Unit is required
+                  </div>
+                )}
+              </div>
                 {/* installation date */}
                 <DatePickerInput
                   label="Installation Date :"
@@ -414,7 +493,7 @@ const CreateAccountCompanyProduct = ({
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
                 />
-              </div>
+             
               <div className="flex items-center justify-end mt-2">
                 <div className="w-full">
                   <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">

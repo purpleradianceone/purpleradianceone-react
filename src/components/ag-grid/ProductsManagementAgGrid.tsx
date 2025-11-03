@@ -74,6 +74,13 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
       },
+       {
+        field: "unitName",
+        headerName: "Unit Name",
+        sortable: true,
+        filter: true,
+        flex: 1,
+      },
 
       {
         field: "isActive",
@@ -193,6 +200,24 @@ function ProductsManagementGrid({
         tooltipValueGetter(params) {
           return params.data.description;
         },
+      },
+     
+      {
+        hide:true,
+        field: "unitId",
+        headerName: "Unit Id",
+        sortable: true,
+        filter: true,
+        flex: 1,
+
+      },
+      {
+        hide : true,
+        field: "unitNameInStock",
+        headerName: "Base Unit in Stock",
+        sortable: true,
+        filter: true,
+        flex: 1,
       },
 
       {
