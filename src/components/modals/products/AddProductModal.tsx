@@ -619,36 +619,13 @@ function AddProductModal({
                 </div>
               </div>
               {/* </div> */}
-              <div className="grid grid-cols-2 gap-3 ">
-                {/* tax rate */}
-                <FormInput
-                  label="Tax Rate"
-                  logo={LucidePercent}
-                  type="text"
-                  name="taxRate"
-                  value={addProductFormData.taxRate?.toString()}
-                  placeholder="Enter Tax Rate"
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.taxRate}
-                />
-                {/* valid from */}
-                <DatePickerInput
-                  label="Valid From :"
-                  logo={LucideCalendar}
-                  name="validFrom"
-                  value={addProductFormData.validFrom}
-                  placeholder="Select Date"
-                  onChange={handleAddProductFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.validFrom}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <RadioButtons
+               <div className="flex items-center justify-between">
+               <div className="flex items-center  h-full">
+                 <RadioButtons
                   options={ProductsRadioButtonOptions}
                   onChange={handleTaxRadioButtonChange}
                 />
+               </div>
                 <div className="w-full">
                   {selectedTaxCode === "hsn" && (
                     <FormInput
@@ -675,6 +652,32 @@ function AddProductModal({
                   )}
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3 ">
+                {/* tax rate */}
+                <FormInput
+                  label="Tax Rate"
+                  logo={LucidePercent}
+                  type="text"
+                  name="taxRate"
+                  value={addProductFormData.taxRate?.toString()}
+                  placeholder="Enter Tax Rate"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.taxRate}
+                />
+                {/* valid from */}
+                <DatePickerInput
+                  label="Valid From :"
+                  logo={LucideCalendar}
+                  name="validFrom"
+                  value={addProductFormData.validFrom}
+                  placeholder="Select Date"
+                  onChange={handleAddProductFormDataChange}
+                  onBlur={handleBlur}
+                  error={errors.validFrom}
+                />
+              </div>
+             
 
               {/* description */}
               <div className="col-span-2">
