@@ -18,7 +18,7 @@ import {
   ArrowLeft,
   LucideFolderInput,
 } from "lucide-react";
-// import Papa from "papaparse";
+import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -43,6 +43,7 @@ import ApiError from "../../../../@types/error/ApiError";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -887,52 +888,43 @@ const LeadImportCsv = ({
     setShowPreImportReview(false); // Hide review on new file
   };
   const readCsv = (file: File) => {
-    setIsParsing(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
+  setIsParsing(true);
+
+  Papa.parse(file, {
+    header: false, // since you're manually managing headers
+    skipEmptyLines: true,
+    complete: (results) => {
       try {
-        const content = e.target?.result as string;
-        const lines = content
-          .split(/[\r\n]+/)
-          .map((l) => l.trim())
-          .filter(Boolean);
-        if (lines.length < 1) throw new Error("CSV file is empty.");
+        const parsedData = results.data as string[][];
 
-        const parsedData = lines.map((line) => {
-          const newLine = line.replace(/"(.*?)"/g, (content) => {
-            // match: The entire quoted string (e.g., '"cdc,csc"')
-            // content: The content inside the quotes (e.g., 'cdc,csc')
+        if (!parsedData || parsedData.length === 0) {
+          throw new Error("CSV file is empty.");
+        }
 
-            // 1. Replace all commas inside the content with colons (:)
-            const newContent = content.replace(/,/g, ":");
-
-            // 2. Re-wrap the modified content with double quotes
-            return `"${newContent}"`;
-          });
-
-          return newLine.split(",").map((cell) => cell.trim());
-        });
-
-        // console.log(
-        //   "_____________________________ line ______________________________"
-        // );
-        // console.log(parsedData);
+        // Set parsed data and headers
         setCsvData(parsedData);
         setOriginalCsvHeaders(parsedData[0]);
-        // setError(null);
+
+        // Clear any existing error message
         handleCloseSnackbar();
       } catch (err: any) {
         showMessageSnackbar({
           message: err.message || "Failed to parse CSV.",
           type: "error",
         });
-        // setError(err.message || "Failed to parse CSV.");
       } finally {
         setIsParsing(false);
       }
-    };
-    reader.readAsText(file);
-  };
+    },
+    error: (err) => {
+      showMessageSnackbar({
+        message: err.message || "Error reading CSV file.",
+        type: "error",
+      });
+      setIsParsing(false);
+    },
+  });
+};
 
   //   const readCsv = (file: File) => {
   //   setIsParsing(true);
@@ -1365,6 +1357,7 @@ const LeadImportCsv = ({
         },
       })), // Sending only necessary data
     };
+     setIsLoadingSpinnerAfterSubmission(true);
     // console.log("Submitting payload:", payload);
     try {
       // const formData = new FormData();
@@ -1376,7 +1369,7 @@ const LeadImportCsv = ({
       });
 
       // alert("Import simulated successfully! Check console for payload.");
-      setIsLoadingSpinnerAfterSubmission(true);
+     
       if (response.status === STATUS_CODE.OK) {
         setIsLoadingSpinnerAfterSubmission(false);
         // console.log("API Response:", response.data); // Log actual API response
@@ -1853,7 +1846,10 @@ const LeadImportCsv = ({
           </div>
         )}
       </div>
-      {isLoadingSpinnerAfterSubmission && <LoadingSpinner />}
+      {isLoadingSpinnerAfterSubmission &&<LoadingPopUpAnimation
+        show={isLoadingSpinnerAfterSubmission}
+        text="Loading please wait..."
+      />}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
           data={LeadImportResponse}
@@ -1870,6 +1866,7 @@ const LeadImportCsv = ({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
+      
     </DndProvider>
   );
 };

@@ -322,12 +322,12 @@ const AccountCompanyProductPopUpDetails = ({
       toast.success(response.data.message);
     } else {
       toast.error(response.data.message || "Update failed!");
-      // ❌ Rollback to previous data
+      //  Rollback to previous data
       setProductData(previousState);
     }
   } catch (error: any) {
     toast.error("Network error: Unable to update.");
-    // ❌ Rollback to previous data
+    //  Rollback to previous data
     setProductData(previousState);
   }
 };
@@ -336,10 +336,10 @@ const AccountCompanyProductPopUpDetails = ({
   return (
     productData &&
     createPortal(
-      <div className="fixed inset-0 bg-black bg-opacity-5 flex justify-center items-center z-50 p-4">
-        <div className="bg-white border rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+      <div className="fixed inset-0  bg-black bg-opacity-5 flex justify-center items-center z-50 p-4">
+        <div className="bg-gray-50  border rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
           {/* Header */}
-          <div className="relative px-8 pt-5 pb-4">
+          <div className="relative px-6 pt-4 pb-3">
             <button
               onClick={() => {
                 onClose();
@@ -380,19 +380,36 @@ const AccountCompanyProductPopUpDetails = ({
           </div>
 
           {/* Content */}
-          <div className="px-8 pb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <div className="px-8 pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
               {/* Left Section */}
-              <div className="space-y-3">
-                <InfoBlock
+              <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5 ">
+               {/* <div className="flex items-center justify-between w-full "> */}
+                 <div className="col-span-2">
+                  <DisplayComponent
+                  icon={Package}
+                  title="Quantity"
+                  value={productData.quantity.toLocaleString().concat(" "+productData.unitName)}
+                  penLogo={false}
+                />
+                 </div>
+                {/* <DisplayComponent
+                  icon={PencilRuler}
+                  title="Unit"
+                  value={productData.unitName.toLocaleString()}
+                  penLogo={false}
+                /> */}
+               {/* </div> */}
+
+                {/* <InfoBlock
                   icon={Package}
                   title="Quantity"
                   type="number"
                   value={productData!.quantity}
                   onValueChange={handleDescriptionChange}
                   penLogo={true}
-                />
-                <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
+                /> */}
+                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5"> */}
                   <InfoBlock
                     icon={Calendar}
                     title="Purchase Date"
@@ -410,9 +427,9 @@ const AccountCompanyProductPopUpDetails = ({
                     onValueChange={handleDescriptionChange}
                     penLogo={true}
                   />
-                </div>
+                {/* </div> */}
 
-                <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
+                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5"> */}
                   <InfoBlock
                     icon={Calendar}
                     title="Installation Date"
@@ -432,7 +449,7 @@ const AccountCompanyProductPopUpDetails = ({
                       penLogo={true}
                     />
                   </div>
-                </div>
+                {/* </div> */}
               </div>
 
               {/* Right Section */}
@@ -555,7 +572,7 @@ const AccountCompanyProductPopUpDetails = ({
                   <FormHeader
                     icon={User}
                     onClose={handleClose}
-                    description="slect the user for changing"
+                    description="select the new installed by user"
                     preText="Select the new user "
                   />
                   <GetCompanyUsers
@@ -675,8 +692,12 @@ function InfoRow({
   );
 
   return (
-    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-      <Logo className="text-blue-500" size={20} />
+    // <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+    //   <Logo className="text-blue-500" size={20} />
+     <div className="flex w-full items-start gap-3 p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
+    </div>
       <div>
         <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
 
@@ -742,23 +763,30 @@ function DisplayComponent({
   title: string;
   icon: LucideIcon;
 }) {
-  return (
-    <div className="flex items-start gap-3 p-2  bg-gray-50 rounded-lg">
-      <Logo className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
-      <div className="w-full">
-        <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
+ return (
+  <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
+    </div>
 
-        <div className="flex items-center gap-2 hover:cursor-pointer hover:bg-gray-200 rounded px-2">
-          <p className="text-gray-700">
-            { value||  (
-              <span className="text-sm italic">Not provided</span>
-            )}
-          </p>
-          {penLogo && <Pen className="text-blue-600" size={12} />}
-        </div>
+    <div className="flex flex-col w-full">
+      <h4 className="font-semibold text-gray-900 mb-1 text-base">{title}</h4>
+
+      <div className="flex items-center justify-between group px-2 py-1 rounded-md transition-colors duration-200 hover:bg-gray-100 cursor-pointer">
+        <p className="text-gray-700 text-sm">
+          {value.length >30 ? value.substring(0,29).concat("...") : value || <span className="text-gray-400 italic">Not provided</span>}
+        </p>
+        {penLogo && (
+          <Pen
+            className="text-blue-500 "
+            size={14}
+          />
+        )}
       </div>
     </div>
-  );
+  </div>
+);
+
 }
 function InfoBlock({
   icon: Logo,
@@ -843,8 +871,12 @@ function InfoBlock({
   };
 
   return (
-    <div className="flex items-start gap-3 p-2  bg-gray-50 rounded-lg">
-      <Logo className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
+    // <div className="flex items-start gap-3 p-2  bg-gray-50 rounded-lg">
+    //   <Logo className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
+    <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
+    </div>
       <div className="w-full">
         <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
 
