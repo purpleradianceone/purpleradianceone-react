@@ -71,7 +71,7 @@ function AuthLayout(props: AuthLayoutProps) {
             }}
           >
             <div className="logo flex justify-center">
-              <img src={IMAGE_SOURCE.PR_LOGO} alt="" className="w-72 h-72" />
+              <img src={IMAGE_SOURCE.PR_ONE_LOGO} alt="" className="w-72 h-72" />
             </div>
             <div className="flex justify-center">
               <AuthSideSvg></AuthSideSvg>

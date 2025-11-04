@@ -17,7 +17,8 @@ type AccountProduct ={
 	amcCycle : number,
 	amcCycleStartDate : string,
 	amcCycleEndDate : string,
-
+	unitName : string ,
+	unitNameInStock : string ,
 	id: number,
 	accountName : string,
 	companyProductName : string,

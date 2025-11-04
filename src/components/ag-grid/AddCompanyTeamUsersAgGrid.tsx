@@ -11,7 +11,7 @@ import {
   themeAlpine,
   ViewportChangedEvent,
 } from "ag-grid-community";
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef } from "react";
 import { INNERHTML, STATUS_CODE } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
@@ -146,13 +146,7 @@ function AddCompanyTeamUsersAgGrid({
             const [isActive, setIsActive] = useState<boolean>(
               params.data.isactive
             );
-            useEffect(()=>{
-              console.log("THis is the isactive");
-              console.log( params.data.isactive);
-              
-              console.log(isActive);
-              
-            }, [isActive,  params.data.isactive])
+            
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
 

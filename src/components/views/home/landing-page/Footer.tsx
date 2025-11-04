@@ -18,10 +18,10 @@ function Footer() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Activity className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-xl font-bold">Purple Crm</h3>
+              <h3 className="text-xl font-bold">PurpleRadianceOne</h3>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              The comprehensive customer relationship management platform trusted by businesses worldwide. Streamline your sales process and grow your business with Purple CRM
+              The comprehensive customer relationship management platform trusted by businesses worldwide. Streamline your sales process and grow your business with PurpleRadianceOne CRM
             </p>
             <div className="flex space-x-4">
               <a
@@ -85,7 +85,7 @@ function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0">
-              © 2025 Purple CRM. All rights reserved.
+              © 2025 PurpleRadianceOne.com All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a

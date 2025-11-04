@@ -206,10 +206,10 @@ const LeadImportData = ({
       .post(POST_API.CREATE_LEAD_IMPORT_FROM_IMPORT_TAG, postData, {
         withCredentials: true,
       })
-      .then((reposne) => {
-        if (reposne.data.status) {
+      .then((response) => {
+        if (response.data.status) {
           showMessageSnackbar({
-            message: reposne.data.message,
+            message: response.data.message,
             type: "success",
           });
           getLeadImportTags()
@@ -219,7 +219,7 @@ const LeadImportData = ({
           CancelSelectedLeadTag()
         } else {
           showMessageSnackbar({
-            message: reposne.data.message,
+            message: response.data.message,
             type: "error",
           });
         }

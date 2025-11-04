@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 type FinalConfirmationModalProps = {
   isOpen: boolean;
@@ -52,7 +52,10 @@ const FinalConfirmationModal: React.FC<FinalConfirmationModalProps> = ({
               </div>
               {showLoadingSpinner && (
                 <div className="flex h-full w-full bg-transparent opacity-100   justify-center items-center">
-                  <LoadingSpinner />
+                  {/* <LoadingSpinner /> */}
+                  <LoadingPopUpAnimation
+                    show={showLoadingSpinner}
+                  />
                 </div>
               )}
               <p className="text-sm text-black mb-6 px-1">

@@ -63,6 +63,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
     userHasAccessToUpdateSettingGeneral,
+    userHasAccessToViewStock,
     
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -281,8 +282,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 justify-self-start">
-                    <img src={IMAGE_SOURCE.PR_LOGO} alt="Logo" />
+                  <div className=" justify-self-start">
+                    <img height={28} width={100} src={IMAGE_SOURCE.PR_ONE_LOGO} alt="Logo" />
                   </div>
                 </div>
 
@@ -423,7 +424,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   <>
                     <div className="flex-1 max-w-6xl hidden lg:block">
                       {/* Navbar Icons */}
-                      <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-11  ">
+                      <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-1  ">
                         {/* note : NavItem id created component in navbar/Component folder */}
                         <NavItem
                           to={ROUTES_URL.HOME}
@@ -470,6 +471,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<UserCogIcon size={SIZE.TWENTY} />}
                             label="Accounts"
                           />
+                          
                         {/* )} */}
                         {/* {!userHasAccessToViewAccount && (
                           <NavItem
@@ -484,6 +486,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             to={ROUTES_URL.PRODUCT_MANAGEMENT}
                             icon={<Store size={SIZE.TWENTY} />}
                             label="Products"
+                          />
+                           <NavItem
+                          disable={!userHasAccessToViewStock}
+                            to={ROUTES_URL.STOCK_MANAGEMENT}
+                            icon={<Layers size={SIZE.TWENTY} />}
+                            label="Stock"
                           />
                         {/* )} */}
                         {/* {userHasAccessToViewTeamManagement && ( */}
