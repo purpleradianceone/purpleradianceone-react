@@ -37,9 +37,7 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
   const handleRowSelectAccountProduct =(data : AccountProduct)=>{
     if(data){
       setSelectedProductCard(data)
-    }
-    console.log(data);
-    
+    }    
   }
   const getAccountCompanyProduct = async () => {
     const postData = {
@@ -65,6 +63,8 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
             companyProductId: item.company_product_id,
             companyProductName: item.company_product_name,
             quantity: item.quantity,
+            unitName : item.unit_name,
+            unitNameInStock : item.unit_name_in_stock,
             purchaseDate: item.purchase_date,
             deliveryDate: item.delivery_date,
             deliveryAddress: item.delivery_address,
@@ -168,47 +168,6 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
             </Button>
           </div>
           <div className="md:col-span-2  w-full h-96">
-            {/* {accountCompanyProduct &&
-              accountCompanyProduct.map((item: AccountProduct, index) => (
-                <div
-                  key={index}
-                  className={COLORS.CONTACT_CARD}
-                  onClick={() => setSelectedProductCard(item)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`
-                        bg-blue-500
-                      text-white flex items-center justify-center w-9 h-9 rounded-full border    font-semibold shadow-sm`}
-                    >
-                      {item.companyProductName
-                        ? item.companyProductName.charAt(0).toUpperCase()
-                        : "?"}
-                    </div>
-
-                    <div className="flex flex-col">
-                      <p className="input-label-custom underline hover:decoration-blue-400 hover:text-blue-400 ">
-                        {item.companyProductName || "Unknown Contact"}
-                      </p>
-                      <p className="caption-custom flex flex-wrap items-center gap-x-1">
-                        {item.quantity && (
-                          <span className="flex gap-1 items-center">
-                            Quantity: {item.quantity}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex caption-custom bg-pink-00 items-end gap-1 text-[10px] font-semibold">
-                    <div className="grid ">
-                      <span>Installed By: {item.installedByName}</span>
-                      <span>Installation date:{item.installationDate}</span>
-                    </div>
-                  </div>
-                </div>
-              ))} */}
-
               <AccountCompanyProductAgGrid
                 accountProductData={accountCompanyProduct}
                 onRowSelect={handleRowSelectAccountProduct}
@@ -217,6 +176,8 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
         </div>
       )}
 
+     {
+      selectedProductCard &&  
       <AccountCompanyProductPopUpDetails
         selectedProductCard={selectedProductCard}
         onClose={() => {
@@ -225,6 +186,7 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
         }}
         refreshKey={refreshKey}
       />
+     }
 
       {/* Modal */}
       {showCreateAccountCompanyProduct &&

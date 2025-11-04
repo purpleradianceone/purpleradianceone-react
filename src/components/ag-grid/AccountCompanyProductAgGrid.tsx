@@ -43,6 +43,18 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+        field: "unitName",
+        headerName: "Unit",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "unitNameInStock",
+        headerName: "Unit In Stock",
+        sortable: true,
+        filter: true,
+      },
+      {
         field: "purchaseDate",
         headerName: "Purchase Date",
         sortable: true,
