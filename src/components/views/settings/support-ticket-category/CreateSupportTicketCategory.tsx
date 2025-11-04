@@ -27,7 +27,7 @@ function CreateSupportTicketCategory({
   onClose: () => void;
   getSupportTicketCategory: () => void;
 }) {
-  const { userHasAccessToAddSettingGeneral } = useUserAccessModules();
+  const { userHasAccessToAddSupportTicket } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
 
@@ -56,7 +56,7 @@ function CreateSupportTicketCategory({
   const handleAddSupportTicketCategory = async (e?: React.FormEvent) => {
     
     e?.preventDefault();
-    if (!userHasAccessToAddSettingGeneral) {
+    if (!userHasAccessToAddSupportTicket) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY.DENIED_ADD_ACCESS
       );
