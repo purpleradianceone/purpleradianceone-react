@@ -342,6 +342,22 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 21 && accessModule.update
   );
 
+  //Support Ticket 
+   const userHasAccessToAddSupportTicket = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 22 && accessModules.add
+  );
+
+   const userHasAccessToViewSupportTicket  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 22 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSupportTicket = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 22 && accessModule.update
+  );
+
   //stock
   const userHasAccessToAddStock = accessModules.some(
     (accessModules) => 
@@ -442,6 +458,10 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToAddIntegrationSetting,
     userHasAccessToViewIntegrationSetting,
     userHasAccessToUpdateIntegrationSetting,
+
+    userHasAccessToAddSupportTicket,
+    userHasAccessToViewSupportTicket,
+    userHasAccessToUpdateSupportTicket,
 
     userHasAccessToAddStock,
     userHasAccessToViewStock,

@@ -20,8 +20,8 @@ import validateDescription from "../../../../config/validations/ValidateDescript
 
 const SupportTicketCategorySetting: React.FC = () => {
   const {
-    userHasAccessToAddSettingGeneral,
-    userHasAccessToUpdateSettingGeneral,
+    userHasAccessToAddSupportTicket,
+    userHasAccessToUpdateSupportTicket,
   } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -186,7 +186,7 @@ const SupportTicketCategorySetting: React.FC = () => {
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (userHasAccessToAddSettingGeneral) {
+                  if (userHasAccessToAddSupportTicket) {
                     setShowAddForm(true);
                   } else {
                     toast.error(
@@ -267,7 +267,7 @@ const SupportTicketCategorySetting: React.FC = () => {
                       title={item.name}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSupportTicket) {
                           setEditingTypeId(item.id);
                           setEditingTypeName(item.name);
                           setEditingField("name");
@@ -339,7 +339,7 @@ const SupportTicketCategorySetting: React.FC = () => {
                       title={item.description}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSupportTicket) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description);
                           setEditingField("description");
