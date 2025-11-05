@@ -44,7 +44,7 @@ import { Product } from "../../../../@types/products/ProductsManagementProps";
 import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
-import { convertPayloadToCsv } from "./SendLeadAsCsv";
+import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -147,8 +147,8 @@ const DroppableCrmField: React.FC<{
         htmlFor={`map-${field.id}`}
         className="w-1/2 input-label-custom  pt-2"
       >
-        {field.label }
-        {field.required && <span className="text-red-500 ">*</span> } :
+        {field.label}
+        {field.required && <span className="text-red-500 ">*</span>} :
       </label>
       <div
         ref={drop}
@@ -172,7 +172,9 @@ const DroppableCrmField: React.FC<{
             </span>
           ))
         ) : (
-          <span className="text-gray-500 text-sm  italic">Drag column here</span>
+          <span className="text-gray-500 text-sm  italic">
+            Drag column here
+          </span>
         )}
       </div>
     </div>
@@ -402,8 +404,10 @@ const LeadImportCsv = ({
 
   const [isLoadingLeadInterestData, setIsLoadingLeadInterestData] =
     useState<boolean>(true);
-    const [isLoadingLeadSourceAndStatusData, setIsLoadingLeadSourceAndSourceData] =
-    useState<boolean>(true);
+  const [
+    isLoadingLeadSourceAndStatusData,
+    setIsLoadingLeadSourceAndSourceData,
+  ] = useState<boolean>(true);
 
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
@@ -570,9 +574,9 @@ const LeadImportCsv = ({
     };
     await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
     await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
-    await function(){
-    setIsLoadingLeadSourceAndSourceData(false);
-    }()
+    await (function () {
+      setIsLoadingLeadSourceAndSourceData(false);
+    })();
   }, []);
 
   // API call to get lead interest data
@@ -889,43 +893,43 @@ const LeadImportCsv = ({
     setShowPreImportReview(false); // Hide review on new file
   };
   const readCsv = (file: File) => {
-  setIsParsing(true);
+    setIsParsing(true);
 
-  Papa.parse(file, {
-    header: false, // since you're manually managing headers
-    skipEmptyLines: true,
-    complete: (results) => {
-      try {
-        const parsedData = results.data as string[][];
+    Papa.parse(file, {
+      header: false, // since you're manually managing headers
+      skipEmptyLines: true,
+      complete: (results) => {
+        try {
+          const parsedData = results.data as string[][];
 
-        if (!parsedData || parsedData.length === 0) {
-          throw new Error("CSV file is empty.");
+          if (!parsedData || parsedData.length === 0) {
+            throw new Error("CSV file is empty.");
+          }
+
+          // Set parsed data and headers
+          setCsvData(parsedData);
+          setOriginalCsvHeaders(parsedData[0]);
+
+          // Clear any existing error message
+          handleCloseSnackbar();
+        } catch (err: any) {
+          showMessageSnackbar({
+            message: err.message || "Failed to parse CSV.",
+            type: "error",
+          });
+        } finally {
+          setIsParsing(false);
         }
-
-        // Set parsed data and headers
-        setCsvData(parsedData);
-        setOriginalCsvHeaders(parsedData[0]);
-
-        // Clear any existing error message
-        handleCloseSnackbar();
-      } catch (err: any) {
+      },
+      error: (err) => {
         showMessageSnackbar({
-          message: err.message || "Failed to parse CSV.",
+          message: err.message || "Error reading CSV file.",
           type: "error",
         });
-      } finally {
         setIsParsing(false);
-      }
-    },
-    error: (err) => {
-      showMessageSnackbar({
-        message: err.message || "Error reading CSV file.",
-        type: "error",
-      });
-      setIsParsing(false);
-    },
-  });
-};
+      },
+    });
+  };
 
   //   const readCsv = (file: File) => {
   //   setIsParsing(true);
@@ -1318,7 +1322,9 @@ const LeadImportCsv = ({
       //   message: 'Please map "Name" and either of "Email" or "Mobile Number".',
       //   type: "error",
       // });
-      toast.error('Please map "Name" and either of "Email" or "Mobile Number".')
+      toast.error(
+        'Please map "Name" and either of "Email" or "Mobile Number".'
+      );
       return;
     }
     setError(null);
@@ -1343,32 +1349,45 @@ const LeadImportCsv = ({
 
     // Note : this function will return the unique import tag.
     const importTag = generateUniqueTag();
-    const payload = {
-      // fieldMappings,
-      // statusValueMapping,
-      // sourceValueMapping,
-      // ownerValueMapping,
-      leadsToImport: leadsToImport.map((lead) => ({
-        // originalRow: lead.originalRow,
-        mappedData: {
-          ...lead.mappedData,
-          createdby: loginStatus.id,
+    // Note : This is the old payload working but the logic is changed.
+    // const payload = {
+    //   // fieldMappings,
+    //   // statusValueMapping,
+    //   // sourceValueMapping,
+    //   // ownerValueMapping,
+    //   leadsToImport: leadsToImport.map((lead) => ({
+    //     // originalRow: lead.originalRow,
+    //     mappedData: {
+    //       ...lead.mappedData,
+    //       createdby: loginStatus.id,
+    //       company_id: loginStatus.companyId,
+    //       import_tag: importTag,
+    //     },
+    //   })), // Sending only necessary data
+    // };
+
+    // const csvFileFormatted = convertPayloadToCsv(payload);
+    setIsLoadingSpinnerAfterSubmission(true);
+    const rowsData = leadsToImport.map((lead) => ({
+      ...lead.mappedData,
+       createdby: loginStatus.id,
           company_id: loginStatus.companyId,
           import_tag: importTag,
-        },
-      })), // Sending only necessary data
+        
+    }));
+    const leadImportCsvFile = convertToCsvFile(rowsData, "importLeadFile.csv");
+    const reader = new FileReader();
+    console.log("this is the row data");
+    
+    console.log(rowsData);
+
+    
+    reader.onload = (e) => {
+      console.log(e.target?.result);
     };
 
-    const csvFileFormatted = convertPayloadToCsv(payload);
-    const reader = new FileReader();
-    
-    reader.onload= (e) => {
-      console.log(e.target?.result);
-    }
-    
-    console.log("this is the data ");
-    reader.readAsText(csvFileFormatted);
-     setIsLoadingSpinnerAfterSubmission(true);
+    console.log("this is the csv file data ");
+    reader.readAsText(leadImportCsvFile);
     // console.log("Submitting payload:", payload);
     try {
       // const formData = new FormData();
@@ -1379,26 +1398,24 @@ const LeadImportCsv = ({
       //   withCredentials: true,
       // });
 
-
       // new code comment if needed above response os working but old code
       const formData = new FormData();
-      formData.append('file', csvFileFormatted , 'importLeadFile.csv')
-       formData.append("company_id", loginStatus.companyId.toString());
+      formData.append("file", leadImportCsvFile, leadImportCsvFile.name);
+      formData.append("company_id", loginStatus.companyId.toString());
       formData.append("createdby", loginStatus.id.toString());
-      const response = await axios.post('http://localhost:8080/api/main/purple-crm-api/upload/csv-for-import', formData, {
-        headers : {
-          "Content-Type": "multipart/form-data",
-        },
-        // params : {
-        //   company_id : loginStatus.companyId,
-        //   createdby : loginStatus.id
-        // },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        POST_API.UPLOAD_CSV_FOR_IMPORT,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
-      return;
       // alert("Import simulated successfully! Check console for payload.");
-     
+
       if (response.status === STATUS_CODE.OK) {
         setIsLoadingSpinnerAfterSubmission(false);
         const data: LeadImportResponse = response.data;
@@ -1468,14 +1485,13 @@ const LeadImportCsv = ({
                 {/* Import leads via CSV */}
               </h2>
 
-             
-                {!isLoadingLeadInterestData && !isLoadingLeadSourceAndStatusData ? (
-                  <>
-                   <label
-                htmlFor="csv-upload"
-                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
-              >
-
+              {!isLoadingLeadInterestData &&
+              !isLoadingLeadSourceAndStatusData ? (
+                <>
+                  <label
+                    htmlFor="csv-upload"
+                    className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
+                  >
                     <LucideFolderInput className="w-5 h-5" />
                     <span>{csvFile ? "Change File" : "Browse CSV"}</span>
                     <input
@@ -1484,15 +1500,14 @@ const LeadImportCsv = ({
                       accept=".csv"
                       onChange={handleFileChange}
                       className="hidden"
-                      />
-                      </label>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center w-24 ">
-                    <LoadingSpinner />
-                  </div>
-                )}
-              
+                    />
+                  </label>
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-24 ">
+                  <LoadingSpinner />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1874,10 +1889,12 @@ const LeadImportCsv = ({
           </div>
         )}
       </div>
-      {isLoadingSpinnerAfterSubmission &&<LoadingPopUpAnimation
-        show={isLoadingSpinnerAfterSubmission}
-        text="Loading please wait..."
-      />}
+      {isLoadingSpinnerAfterSubmission && (
+        <LoadingPopUpAnimation
+          show={isLoadingSpinnerAfterSubmission}
+          text="Loading please wait..."
+        />
+      )}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
           data={LeadImportResponse}
@@ -1894,7 +1911,6 @@ const LeadImportCsv = ({
         onClose={handleCloseSnackbar}
         duration={NUMBER_VALUES.SNACKBAR_DURATION}
       />
-      
     </DndProvider>
   );
 };
