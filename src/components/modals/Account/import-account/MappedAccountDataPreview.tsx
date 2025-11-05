@@ -11,7 +11,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
@@ -331,7 +331,7 @@ const MappedAccountDataPopup = ({
           }}
         />
       )}
-      {isLoading && LoadingSpinner()}
+      {isLoading && <LoadingPopUpAnimation show={isLoading} text="Account Importing..."/>}
     </div>
   );
 };
