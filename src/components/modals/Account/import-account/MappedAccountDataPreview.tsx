@@ -10,6 +10,7 @@ import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
+import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
@@ -21,12 +22,6 @@ interface MappedAccountDataPopupProps {
   businessTypes: MappableItem[];
   companyAccountTypes: MappableItem[];
   onImport?: (uniqueData: Account[]) => void; // callback to parent
-}
-
-interface postDataPropAccountImport {
-  company_id: number;
-  account_import_mapped_data_list: Account[];
-  createdby: number;
 }
 
 const MappedAccountDataPopup = ({
@@ -98,15 +93,22 @@ const MappedAccountDataPopup = ({
       !allMobileNumbersAreNotMapped &&
       !allEmailsAreNotMapped
     ) {
-      const postDataForAccountImport: postDataPropAccountImport = {
-        company_id: loginStatus.companyId,
-        account_import_mapped_data_list: uniqueData,
-        createdby: loginStatus.id,
-      };
-      // console.log("Post Data For import:", postDataForAccountImport); // for debugging
+      const accountImportCsvFile = convertToCsvFile(
+        uniqueData,
+        "account_import.csv"
+      );
+
+      const formData = new FormData();
+      formData.append("file", accountImportCsvFile);
+      formData.append("company_id", loginStatus.companyId.toString());
+      formData.append("createdby", loginStatus.id.toString());
+      console.log(accountImportCsvFile);
 
       await axios
-        .post(POST_API.IMPORT_ACCOUNT_VIA_CSV, postDataForAccountImport, {
+        .post(POST_API.UPLOAD_CSV_FOR_IMPORT, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         })
         .then((response) => {
