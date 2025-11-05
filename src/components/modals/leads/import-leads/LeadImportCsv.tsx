@@ -44,6 +44,7 @@ import { Product } from "../../../../@types/products/ProductsManagementProps";
 import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import { convertPayloadToCsv } from "./SendLeadAsCsv";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -1357,6 +1358,16 @@ const LeadImportCsv = ({
         },
       })), // Sending only necessary data
     };
+
+    const csvFileFormatted = convertPayloadToCsv(payload);
+    const reader = new FileReader();
+    
+    reader.onload= (e) => {
+      console.log(e.target?.result);
+    }
+    
+    console.log("this is the data ");
+    reader.readAsText(csvFileFormatted);
      setIsLoadingSpinnerAfterSubmission(true);
     // console.log("Submitting payload:", payload);
     try {
@@ -1364,15 +1375,32 @@ const LeadImportCsv = ({
       // formData.append("csvFile", csvFile);
       // formData.append("mappings", JSON.stringify(payload)); // Send the structured payload
       // formData.append("mappings",payload );
-      const response = await axios.post(POST_API.LEAD_IMPORT_VIA_CSV, payload, {
+      // const response = await axios.post(POST_API.LEAD_IMPORT_VIA_CSV, payload, {
+      //   withCredentials: true,
+      // });
+
+
+      // new code comment if needed above response os working but old code
+      const formData = new FormData();
+      formData.append('file', csvFileFormatted , 'importLeadFile.csv')
+       formData.append("company_id", loginStatus.companyId.toString());
+      formData.append("createdby", loginStatus.id.toString());
+      const response = await axios.post('http://localhost:8080/api/main/purple-crm-api/upload/csv-for-import', formData, {
+        headers : {
+          "Content-Type": "multipart/form-data",
+        },
+        // params : {
+        //   company_id : loginStatus.companyId,
+        //   createdby : loginStatus.id
+        // },
         withCredentials: true,
       });
 
+      return;
       // alert("Import simulated successfully! Check console for payload.");
      
       if (response.status === STATUS_CODE.OK) {
         setIsLoadingSpinnerAfterSubmission(false);
-        // console.log("API Response:", response.data); // Log actual API response
         const data: LeadImportResponse = response.data;
         setLeadImportResponse(data);
         setShowLeadImportResultPopUp(true);
