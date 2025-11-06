@@ -17,6 +17,7 @@ import { AccountImportDataType } from "../../../../@types/account/AccountImportD
 import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 const AccountImportData = ({
   onCloseOrUnselectTag,
@@ -43,6 +44,8 @@ const AccountImportData = ({
   const [responseCame, setResponeCame] = useState<boolean>(true);
   const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(false);
   const [openFinalPopup, setOpenFinalPopup] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
+
   //note : Message Snackbar
 
   const getAccountImportData = async () => {
@@ -167,6 +170,7 @@ const AccountImportData = ({
   };
 
   const handleCreateMoveAccountsToAccountTable = async () => {
+    // setIsLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
       import_tag: selectedAccountTag,
@@ -188,6 +192,7 @@ const AccountImportData = ({
         } else {
           toast.error(reposne.data.message);
         }
+        // setIsLoading(false);
       })
       .catch(async (error: any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -204,6 +209,9 @@ const AccountImportData = ({
       })
       .finally(() => {
         setShowLoadingSpinner(false);
+        // setIsLoading(false);
+        onCloseOrUnselectTag();
+
       });
   };
 
@@ -310,17 +318,21 @@ const AccountImportData = ({
         />
       </div>
 
+
       {/* Confirmation */}
       <ConfirmationDialog
         title="Final Confirmation!"
         description={`Import Tag: ${selectedAccountTag}`}
         message={`⚠️ This is the final confirmation. `}
         messageDescription={`All accounts from "${selectedAccountTag}" will be PERMANENTLY moved to the Account table. \nThis action cannot be undone.`}
-        open={openFinalPopup}
+        open={openFinalPopup || showLoadingSpinner}
         showLoadingSpinner={showLoadingSpinner}
         onConfirm={handleCreateMoveAccountsToAccountTable}
         onCancel={() => setOpenFinalPopup(false)}
       />
+      {
+        showLoadingSpinner&&<LoadingPopUpAnimation show={showLoadingSpinner} text="Final Account Importing..."/>
+      }
     </div>
   );
 };
