@@ -399,15 +399,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
               position === "left" ? "h-12" : "h-14"
             }`}
           >
-            <div className="px-4 lg:px-6">
+            <div className="px-2 lg:px-2">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
+                <div title={loginStatus.companyName} id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName.length>20  ? loginStatus.companyName.substring(0,19).concat("...") : loginStatus.companyName }</h2>
                   </Link>
                 </div>
                 {position === "left" && (

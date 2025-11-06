@@ -103,15 +103,6 @@ export default function CreateAccountType({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-5 ">
       <div className="bg-white w-full max-w-xl rounded-lg border border-blue-200 shadow-lg p-2 relative">
-        {/* Close button */}
-        {/* <h3 className="border-b p-1 table-header-custom">Add company account type</h3>
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-        >
-          <X size={20} />
-        </button> */}
-
         <FormHeader 
         icon={Edit}
         preText="Add company account type"
@@ -180,7 +171,6 @@ export default function CreateAccountType({
                 setNewParentType(0);
                 onClose();
               }}
-              // className="flex items-center gap-1 bg-gray-500 text-white px-2 py-1 rounded-md hover:bg-gray-600 transition-colors"
             >
               <div className="flex items-center ">
                 <X size={16} />
@@ -194,7 +184,6 @@ export default function CreateAccountType({
                 handleAddAccountType();
               }}
               disabled={!newTypeName.trim() || newParentType === 0}
-              // className="flex items-center  gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:bg-blue-200  disabled:cursor-not-allowed transition-colors"
             >
               <div className="flex items-center  gap-1">
                 <Save size={16} />

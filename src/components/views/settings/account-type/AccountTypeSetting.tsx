@@ -260,7 +260,7 @@ const AccountTypeSetting: React.FC = () => {
 
         {/* Available Account Types */}
 
-        <div className="space-y-6 border p-2  rounded-md hover:scale-[1.01] transition-all duration-200 ease-in-out bg-white">
+        <div className="space-y-6 border p-2  rounded-md  bg-white">
           {/* <h4 className="font-medium text-md text-gray-900  w-fit p-1  rounded-lg    flex items-center gap-2">
             
           </h4> */}
@@ -279,7 +279,7 @@ const AccountTypeSetting: React.FC = () => {
                   {/* Parent Header */}
                   <div className="grid ">
                     <div
-                      className="flex items-center justify-between p-1 cursor-pointer bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-colors"
+                      className="flex items-center justify-between p-1  bg-gradient-to-r from-blue-100 to-blue-200  "
                       onClick={() => toggleParentExpand(parentType)}
                     >
                       <h3 className="table-header-custom pl-3">{parentType}</h3>
@@ -299,7 +299,7 @@ const AccountTypeSetting: React.FC = () => {
                     {children.map((item) => (
                       <div
                         key={item.id}
-                        className="p-2  grid grid-col rounded-xl border border-gray-200 bg-white shadow-sm hover:bg-emerald-50 hover:shadow-md hover:scale-[1.01] transition-all duration-300"
+                        className="p-2 grid grid-col rounded-xl border border-gray-00 bg-white shadow-sm hover:bg-emerald-0 hover:shadow-md "
                       >
                         {/* Editable Name */}
                         {editingTypeId === item.id ? (
@@ -328,7 +328,7 @@ const AccountTypeSetting: React.FC = () => {
                                 }
                               }}
                               autoFocus
-                              className="w-full px-2  border border-blue-400 rounded-md focus:ring-1 focus:ring-blue-500"
+                              className="w-full px-2  border border-blue-400 bg-white rounded-md focus:ring-1 focus:ring-blue-500"
                             />
                           </>
                         ) : (
@@ -347,9 +347,9 @@ const AccountTypeSetting: React.FC = () => {
                               }
                             }}
                           >
-                            <div className="grid items-center pl-2  w-full">
+                            <div className="grid items-center   w-full">
                               {/* <span className="text-gray-600 text-xs">Name : </span> */}
-                              <div className="flex items-center justify-between  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50">
+                              <div className="flex items-center   w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-0">
                                 {item.companyAccountTypeName}
                                 <Pen size={10} className="text-blue-500 " />
                               </div>
