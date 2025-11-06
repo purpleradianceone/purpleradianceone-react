@@ -181,6 +181,7 @@ const POST_API = {
     CREATE_ADJUSTMENT_STOCK: `${BASE_URL}${import.meta.env.VITE_CREATE_ADJUSTMENT_STOCK}`,
     GET_UNIT: `${BASE_URL}${import.meta.env.VITE_GET_UNIT}`,
     GET_UNIT_FOR_COMPANY_PRODUCT: `${BASE_URL}${import.meta.env.VITE_GET_UNIT_FOR_COMPANY_PRODUCT}`,
+    UPLOAD_CSV_FOR_IMPORT: `${BASE_URL}${import.meta.env.VITE_UPLOAD_CSV_FOR_IMPORT}`,
 }
 
 export default POST_API;
