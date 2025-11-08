@@ -59,17 +59,17 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     [key: string]: string;
   }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState<"primary contact" | "legal" | "address" | "details">(
-    "details"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "primary contact" | "legal" | "address" | "details"
+  >("details");
   const { industryTypeData, loading: isIndustryTypeLoading } =
     useIndustryType();
   const { businessType, isLoading: isBusinessTypeLoading } = usebusinessType();
 
-  const {countries} = useCountries();
-  const {states} = useStates(formData.countryId);
-  const {districts} = useDistricts(formData.stateId);
- 
+  const { countries } = useCountries();
+  const { states } = useStates(formData.countryId);
+  const { districts } = useDistricts(formData.stateId);
+
   const validateField = (fieldName: string, value: string): string => {
     switch (fieldName) {
       case "name":
@@ -92,20 +92,24 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       case "pan":
         if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value))
           return "Please enter the valid pan.";
-        return ""
+        return "";
       case "tan":
         if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value))
           return "Please enter the valid tan.";
-        return ""
-       case "gst":
-        if (!/ ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value))
+        return "";
+      case "gst":
+        if (
+          !/ ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
+            value
+          )
+        )
           return "Please enter the valid gst.";
-        return ""
-      case "registration" : 
-        if(value.length > 100 ){
-          return "registration number length is greater that 100."
+        return "";
+      case "registration":
+        if (value.length > 100) {
+          return "registration number length is greater that 100.";
         }
-        return ""
+        return "";
       default:
         return "";
     }
@@ -137,9 +141,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       mobilenumber: formData.mobileNumber.trim(),
       industry_type_id: formData.industryTypeId,
       business_type_id: formData.businessTypeId,
-      country_id : formData.countryId,
-      state_id : formData.stateId,
-      district_id : formData.districtId,
+      country_id: formData.countryId,
+      state_id: formData.stateId,
+      district_id: formData.districtId,
       pan: formData.pan.trim(),
       gst: formData.gst.trim(),
       tan: formData.tan.trim(),
@@ -189,9 +193,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       });
   };
 
-  const handleAccountStatusToggle = async(event : React.ChangeEvent<HTMLInputElement>) => {
-    const {checked} = event.target;
-     const postData = {
+  const handleAccountStatusToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { checked } = event.target;
+    const postData = {
       id: formData.id,
       company_id: loginStatus.companyId,
       name: formData.name.trim(),
@@ -199,9 +205,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       mobilenumber: formData.mobileNumber.trim(),
       industry_type_id: formData.industryTypeId,
       business_type_id: formData.businessTypeId,
-      country_id : formData.countryId,
-      state_id : formData.stateId,
-      district_id : formData.districtId,
+      country_id: formData.countryId,
+      state_id: formData.stateId,
+      district_id: formData.districtId,
       pan: formData.pan.trim(),
       gst: formData.gst.trim(),
       tan: formData.tan.trim(),
@@ -222,7 +228,6 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           setFormData((prev) => ({ ...prev, isActive: checked }));
         } else {
           toast.error(response.data.message);
-          
         }
         fetchAccounts();
       })
@@ -236,10 +241,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           }
         } else {
           toast.error(error.response.data);
-         
         }
       });
-  }
+  };
 
   const handleFieldClick = (fieldName: string) => {
     if (!["createdOn", "createdBy"].includes(fieldName)) {
@@ -286,28 +290,25 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         industryTypeId: parseInt(selectedId),
         industryTypeName: selectedName,
       }));
-    }
-    else if (fieldName === "countryName") {
+    } else if (fieldName === "countryName") {
       setFormData((prev) => ({
         ...prev,
         countryId: parseInt(selectedId),
         countryName: selectedName,
-        stateId : 0,
-        stateName : "",
-        districtId : 0,
-        districtName : ""
+        stateId: 0,
+        stateName: "",
+        districtId: 0,
+        districtName: "",
       }));
-    }
-    else if (fieldName === "stateName") {
+    } else if (fieldName === "stateName") {
       setFormData((prev) => ({
         ...prev,
         stateId: parseInt(selectedId),
         stateName: selectedName,
-        districtId : 0,
-        districtName : ""
+        districtId: 0,
+        districtName: "",
       }));
-    }
-    else if (fieldName === "districtName") {
+    } else if (fieldName === "districtName") {
       setFormData((prev) => ({
         ...prev,
         districtId: parseInt(selectedId),
@@ -333,22 +334,22 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     const currentValue =
       fieldName === "businessTypeName"
         ? formData.businessTypeName
-        : fieldName === "industryTypeName" 
-        ? formData.industryTypeName 
-        : fieldName === "countryName" 
-        ? formData.countryName 
-        : fieldName === "stateName" 
-        ? formData.stateName 
+        : fieldName === "industryTypeName"
+        ? formData.industryTypeName
+        : fieldName === "countryName"
+        ? formData.countryName
+        : fieldName === "stateName"
+        ? formData.stateName
         : formData.districtName;
     const originalValue =
       fieldName === "businessTypeName"
         ? company.businessTypeName
-         : fieldName === "industryTypeName" 
-        ? company.industryTypeName 
-        : fieldName === "countryName" 
-        ? company.countryName 
-        : fieldName === "stateName" 
-        ? company.stateName 
+        : fieldName === "industryTypeName"
+        ? company.industryTypeName
+        : fieldName === "countryName"
+        ? company.countryName
+        : fieldName === "stateName"
+        ? company.stateName
         : company.districtName;
 
     // Only call API if value actually changed
@@ -391,11 +392,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 fieldName === "businessTypeName"
                   ? formData.businessTypeId || ""
                   : fieldName === "industryTypeName"
-                  ? formData.industryTypeId || "" 
-                  : fieldName === "countryName" 
+                  ? formData.industryTypeId || ""
+                  : fieldName === "countryName"
                   ? formData.countryId || ""
-                  : fieldName === "stateName" 
-                  ? formData.stateId 
+                  : fieldName === "stateName"
+                  ? formData.stateId
                   : formData.districtId
               }
               onChange={(e) => {
@@ -481,7 +482,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           <div
             title={value}
             onClick={() => handleFieldClick(fieldName)}
-            className={`h-full  flex items-center truncate ${
+            className={`h-full  flex items-center  ${
               !isReadOnly
                 ? `${
                     fieldName === "name"
@@ -523,44 +524,42 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     switch (activeTab) {
       case "details":
         return (
-          <div className="grid grid-cols-2 gap-2 p-1" >
+          <div className="grid grid-cols-2 gap-2 p-1">
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">Account Status</span>
               </h3>
-               <div className="text-sm text-slate-600 bg-white p-2 rounded-lg border border-green-100">
-              <div className="flex items-center gap-4">
-                {formData.isActive ? (
-                  <div className="flex items-center text-green-600">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    <span className="input-label-custom-active">Active</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center text-red-600">
-                    <XCircle className="h-4 w-4 mr-1" />
-                    <span className="input-label-custom-inactive">
-                      Inactive
-                    </span>
-                  </div>
-                )}
+              <div className="text-sm text-slate-600 bg-white p-2 rounded-lg border border-green-100">
+                <div className="flex items-center gap-4">
+                  {formData.isActive ? (
+                    <div className="flex items-center text-green-600">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      <span className="input-label-custom-active">Active</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-red-600">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      <span className="input-label-custom-inactive">
+                        Inactive
+                      </span>
+                    </div>
+                  )}
 
-                <ToggleButton
-                checked={formData.isActive}
-                name="isActive"
-                onToggle={handleAccountStatusToggle}
-
-                />
+                  <ToggleButton
+                    checked={formData.isActive}
+                    name="isActive"
+                    onToggle={handleAccountStatusToggle}
+                  />
+                </div>
               </div>
-            </div>
             </div>
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">Country</span>
               </h3>
-             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-
+              <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
                 <div className="ml-1 truncate">
                   {renderDropdownField(
                     "countryName",
@@ -576,8 +575,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">Industry Type</span>
               </h3>
-             <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-
+              <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
                 <div className="ml-1 truncate">
                   {renderDropdownField(
                     "industryTypeName",
@@ -593,8 +591,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">State</span>
               </h3>
-               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-
+              <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
                 <div className="ml-1 truncate">
                   {renderDropdownField(
                     "stateName",
@@ -610,42 +607,42 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">Business Type</span>
               </h3>
-               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-              <div className="grid items-center text-slate-700">
-                <div className="flex items-center">
-                  {/* <Factory className="h-4 w-4 mr-2" /> */}
-                  <div className="caption-custom truncate">
-                    {renderDropdownField(
-                      "businessTypeName",
-                      formData.businessTypeName,
-                      businessType || [],
-                      "Select business type"
-                    )}
+              <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+                <div className="grid items-center text-slate-700">
+                  <div className="flex items-center">
+                    {/* <Factory className="h-4 w-4 mr-2" /> */}
+                    <div className="caption-custom truncate">
+                      {renderDropdownField(
+                        "businessTypeName",
+                        formData.businessTypeName,
+                        businessType || [],
+                        "Select business type"
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
                 <span className="input-label-custom">District</span>
               </h3>
-               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
-              <div className="grid items-center text-slate-700">
-                <div className="flex items-center">
-                  {/* <Factory className="h-4 w-4 mr-2" /> */}
-                  <div className="caption-custom truncate">
-                    {renderDropdownField(
-                      "districtName",
-                      formData.districtName,
-                      districts,
-                      "Select District"
-                    )}
+              <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
+                <div className="grid items-center text-slate-700">
+                  <div className="flex items-center">
+                    {/* <Factory className="h-4 w-4 mr-2" /> */}
+                    <div className="caption-custom truncate">
+                      {renderDropdownField(
+                        "districtName",
+                        formData.districtName,
+                        districts,
+                        "Select District"
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
         );
@@ -710,7 +707,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   >
                     {formData.website ? (
                       <a
-                        href={formData.website}
+                        href={
+                          formData.website.startsWith("http")
+                            ? formData.website
+                            : "https://" + formData.website
+                        }
                         target="_blank"
                         title={formData.website}
                         rel="noopener noreferrer"
@@ -810,205 +811,164 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   if (isIndustryTypeLoading || isBusinessTypeLoading) {
     return (
-      <div className={` ${userPreference.isLeftMenu ? " ml-11 " :""}fixed mt-11  inset-0 z-10 bg-white p-8`}>
-        <Skeleton/>
+      <div
+        className={` ${
+          userPreference.isLeftMenu ? " ml-11 " : ""
+        }fixed mt-11  inset-0 z-10 bg-white p-8`}
+      >
+        <Skeleton />
       </div>
     );
   }
   return (
     <div
       className={`${
-        userPreference.isLeftMenu ? "ml-14" : ""
-      } mt-8  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-2 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
-
+        userPreference.isLeftMenu ? "ml-14  mt-5" : " mt-7"
+      }  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-1 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
     >
       <div className="pb-3">
         {/* Header Section */}
-      <div className="bg-white rounded-2xl  p-2 mb-2 border">
-        <button
-          className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1 pt-1 bg-blue-0 hover:bg-blue-00 hover:text-indigo-500 hover:border-blue-600"
-          onClick={onClose}
-        >
-          <ArrowLeft size={14} />{" "}
-          <span className="caption-custom hover:text-blue-700"> Accounts</span>
-        </button>
+        <div className="bg-white rounded-2xl  p-2 mb-1 border">
+          <button
+            className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1   hover:text-indigo-500 hover:border-blue-600"
+            onClick={onClose}
+          >
+            <ArrowLeft size={14} />{" "}
+            <span className="caption-custom hover:text-blue-700">
+              {" "}
+              Accounts
+            </span>
+          </button>
 
-        {/* Main header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className={`p-4 rounded-xl ${formData.isActive ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-red-500 to-amber-600' }`}>
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="section-header-custom truncate">
-                {renderEditableField(
-                  "name",
-                  formData.name,
-                  "Enter company name"
-                )}
-              </h1>
-              {/* <div className="text-slate-600 flex items-center">
-                <span className="input-label-custom">Industry type:</span>
-
-                <div className="ml-1 truncate">
-                  {renderDropdownField(
-                    "industryTypeName",
-                    formData.industryTypeName,
-                    industryTypeData,
-                    "Select industry type"
+          {/* Main header */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-3">
+              <div
+                className={`p-4 rounded-xl ${
+                  formData.isActive
+                    ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                    : "bg-gradient-to-br from-red-500 to-amber-600"
+                }`}
+              >
+                <Building2 className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="section-header-custom truncate">
+                  {renderEditableField(
+                    "name",
+                    formData.name,
+                    "Enter company name"
                   )}
-                </div>
+                </h1>
               </div>
-              <div className="flex items-center">
-                {formData.isActive ? (
-                  <div className="flex items-center text-green-600">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    <span className="input-label-custom-active">Active</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center text-red-600">
-                    <XCircle className="h-4 w-4 mr-1" />
-                    <span className="input-label-custom-inactive">
-                      Inactive
-                    </span>
-                  </div>
-                )}
-              </div> */}
-            </div>
-          </div>
-
-          {/* Right side */}
-          <div className="grid gap-2 font-semibold text-gray-700">
-            <div className="flex items-center justify-between gap-4">
-              <span className="grid">
-                <span className="input-label-custom">Created By</span>
-                <span className="caption-custom truncate">
-                  {formData.createdBy}
-                </span>
-              </span>
-              <span className="grid">
-                <span className="input-label-custom">Created On</span>
-                <span className="caption-custom truncate">
-                  {formData.createdOn}
-                </span>
-              </span>
             </div>
 
-            {/* Business type */}
-            {/* <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-1 rounded-lg">
-              <div className="grid items-center text-slate-700">
-                <div className="input-label-custom">Business type</div>
-                <div className="flex items-center">
-                  <Factory className="h-4 w-4 mr-2" />
-                  <div className="caption-custom truncate">
-                    {renderDropdownField(
-                      "businessTypeName",
-                      formData.businessTypeName,
-                      businessType || [],
-                      "Select business type"
-                    )}
-                  </div>
-                </div>
+            {/* Right side */}
+            <div className="grid gap-2 font-semibold text-gray-700">
+              <div className="flex items-center justify-between gap-4">
+                <span className="grid">
+                  <span className="input-label-custom">Created By</span>
+                  <span className="caption-custom truncate">
+                    {formData.createdBy}
+                  </span>
+                </span>
+                <span className="grid">
+                  <span className="input-label-custom">Created On</span>
+                  <span className="caption-custom truncate">
+                    {formData.createdOn}
+                  </span>
+                </span>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2    gap-1">
-        {/* Left Card with Tabs */}
-        <div className="bg-white rounded-xl p-1 border border-slate-200">
-          {/* Tab Navigation */}
-          <div className="flex border-b  border-gray-200 mb-2">
-            <button
-              onClick={() => setActiveTab("details")}
-              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
-                activeTab === "details"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
-              }`}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Details
-            </button>
-            <button
-              onClick={() => setActiveTab("primary contact")}
-              className={`flex items-center px-2 rounded-t-lg border-b-2 ${
-                activeTab === "primary contact"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
-              }`}
-            >
-              <Mail className="h-4 w-4 mr-2" />
-             Primary Contact
-            </button>
-            <button
-              onClick={() => setActiveTab("legal")}
-              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
-                activeTab === "legal"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
-              }`}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Legal
-            </button>
-            <button
-              onClick={() => setActiveTab("address")}
-              className={`flex items-center px-4 py-2 rounded-t-lg border-b-2 ${
-                activeTab === "address"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
-              }`}
-            >
-              <MapPin className="h-4 w-4 mr-2" />
-              Address
-            </button>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2    gap-1">
+          {/* Left Card with Tabs */}
+          <div className="bg-white rounded-xl p-1 border border-slate-200">
+            {/* Tab Navigation */}
+            <div className="flex border-b  border-gray-200 mb-1">
+              <button
+                onClick={() => setActiveTab("details")}
+                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                  activeTab === "details"
+                    ? "border-teal-600 table-header-custom active"
+                    : "border-transparent table-header-custom"
+                }`}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Details
+              </button>
+              <button
+                onClick={() => setActiveTab("primary contact")}
+                className={`flex items-center px-2 rounded-t-lg border-b-2 ${
+                  activeTab === "primary contact"
+                    ? "border-teal-600 table-header-custom active"
+                    : "border-transparent table-header-custom"
+                }`}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Primary Contact
+              </button>
+              <button
+                onClick={() => setActiveTab("legal")}
+                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                  activeTab === "legal"
+                    ? "border-teal-600 table-header-custom active"
+                    : "border-transparent table-header-custom"
+                }`}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Legal
+              </button>
+              <button
+                onClick={() => setActiveTab("address")}
+                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                  activeTab === "address"
+                    ? "border-teal-600 table-header-custom active"
+                    : "border-transparent table-header-custom"
+                }`}
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Address
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            {renderTabContent()}
           </div>
 
-          {/* Tab Content */}
-          {renderTabContent()}
+          {/* Right Card - Empty for future use */}
+          <div className="bg-white rounded-xl border p-1 border-slate-200">
+            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Account Contacts
+            </h3>
+            <AccountContact accountId={company.id} />
+          </div>
+          {/* Account Lead */}
+          <div>
+            <AccountLead account={company} />
+          </div>
+          {/* Account company type */}
+          <div className="bg-white rounded-xl border p-1 border-slate-200">
+            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Company Account Type
+            </h3>
+            <AccountCompanyType accountId={company.id} />
+          </div>
+          {/* Account company product */}
+          <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
+            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Product Details
+            </h3>
+            <AccountCompanyProduct accountId={company.id} />
+          </div>
         </div>
-
-        {/* Right Card - Empty for future use */}
-        <div className="bg-white rounded-xl border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Contacts
-          </h3>
-          <AccountContact
-           accountId={company.id} />
-        </div>
-        {/* Account Lead */}
-        <div>
-          <AccountLead
-          account={company}
-          />
-        </div>
-        {/* Account company type */}
-        <div className="bg-white rounded-xl border p-1 border-slate-200">
-           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Company Account Type
-          </h3>
-          <AccountCompanyType
-            accountId={company.id}
-          />
-        </div>
-        {/* Account company product */}
-        <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Product Details
-          </h3> 
-            <AccountCompanyProduct
-              accountId={company.id}
-            /> 
-        </div>
-      </div>
       </div>
     </div>
   );
 };
-
 
 // Note : this is the form skeleton
 const Skeleton: React.FC = () => {
@@ -1026,7 +986,7 @@ const Skeleton: React.FC = () => {
           <div className="h-3 bg-gray-200 rounded w-24"></div>
         </div>
       </div>
-      
+
       {/* Tab and Content Section */}
       <div className="flex space-x-4 mb-6">
         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
@@ -1050,7 +1010,7 @@ const Skeleton: React.FC = () => {
             <div className="h-3 bg-gray-200 rounded w-full"></div>
           </div>
         </div>
-        
+
         {/* Right Side (Account Contact) */}
         <div className="p-4 bg-white rounded-md border border-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -1070,6 +1030,5 @@ const Skeleton: React.FC = () => {
     </div>
   );
 };
-
 
 export default AccountDetails;

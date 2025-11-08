@@ -242,7 +242,7 @@ function GetCompanyUsersList({
       <div
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex  gap-2">
+        <div className="flex  gap-1">
           <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
           <span className="section-header-custom">Company Users</span>
         </div>

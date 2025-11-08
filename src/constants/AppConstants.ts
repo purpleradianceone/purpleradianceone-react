@@ -14,6 +14,8 @@ export const  STRING_VALUES = {
     
 }
 
+export const DEBOUNCE_DELAY = 300;
+
 export const OPACITY = {
   POPUP_OPACITY_AND_BACKGROUNG_COLOR : "bg-black bg-opacity-5 ",
 }

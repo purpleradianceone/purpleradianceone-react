@@ -110,17 +110,17 @@ ProductsManagementListProps) {
         } pr-1 gap-1`}
       >
         <div
-          className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+          className={`sticky z-10 top-12 mt-1  flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1 w-full`}
         >
-          <div className="flex justify-between w-full ">
-            <div className="flex  gap-2">
+          <div className="flex  justify-between w-full ">
+            <div className="flex items-center gap-2">
               <Store
-                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-2`}
+                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
               />
 
               {(isMediumScreen || isLargeScreen) && (
                 <>
-                  <span className="section-header-custom mt-2">Products</span>
+                  <span className="section-header-custom ">Products</span>
                 </>
               )}
             </div>

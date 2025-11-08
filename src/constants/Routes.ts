@@ -64,7 +64,8 @@ const ROUTES_URL = {
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
     // Stock
-    STOCK_MANAGEMENT : "/home/manage-stock/stock"
+    STOCK_MANAGEMENT : "/home/manage-stock/stock",
+    STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/'
 
 }
 export default ROUTES_URL;

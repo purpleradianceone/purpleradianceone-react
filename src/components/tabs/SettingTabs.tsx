@@ -17,6 +17,184 @@ import AccountTypeSetting from "../views/settings/account-type/AccountTypeSettin
 import SupportTicketCategorySetting from "../views/settings/support-ticket-category/SupportTicketCategorySetting";
 import CompanyWarehouseSetting from "../views/settings/company-warehouse/CompanyWarehouseSetting";
 
+// function SettingsTabs() {
+//   const [activeTab, setActiveTab] = useState("onlineLead");
+
+//   const {
+//     userHasAccessToViewSettingLeady,
+//     userHasAccessToViewCompanyPreferences,
+//     userHasAccessToViewMeetingSetting,
+//     userHasAccessToViewSettingGeneral,
+//     userHasAccessToViewCompanyAccountType,
+//   } = useUserAccessModules();
+
+//   const data = [
+//     {
+//       label: "Lead",
+//       value: "onlineLead",
+//       desc: (
+//         <>
+//           {userHasAccessToViewSettingLeady ? (
+//             activeTab === "onlineLead" && (
+//               <div className="grid grid-cols-1 gap-2">
+//                 <div className="col-span-1 min-h-full">
+//                   <LeadSetting />
+//                 </div>
+//               </div>
+//             )
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//     {
+//       label: "Email",
+//       value: "emailSettings",
+//       desc: activeTab === "emailSettings" && <EmailSetting />,
+//     },
+//     {
+//       label: "Meetings",
+//       value: "meeting",
+//       desc: (
+//         <>
+//           {userHasAccessToViewMeetingSetting ? (
+//             activeTab === "meeting" && <MeetingSettings></MeetingSettings>
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//     {
+//       label: "Account Type",
+//       value: "accounttype",
+//       desc: (
+//         <>
+//           {userHasAccessToViewCompanyAccountType ? (
+//             activeTab === "accounttype" && <AccountTypeSetting />
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//     {
+//       label: "Company Preferences",
+//       value: "companyPreference",
+//       desc: (
+//         <>
+//           {userHasAccessToViewCompanyPreferences ? (
+//             activeTab === "companyPreference" && (
+//               <CompanyPreferenceSetting></CompanyPreferenceSetting>
+//             )
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//     {
+//       label: "General",
+//       value: "general",
+//       desc: (
+//         <>
+//           {userHasAccessToViewSettingGeneral ? (
+//             activeTab === "general" && <UserPrerefenceManagement />
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//     {
+//       label: "Support Ticket Category",
+//       value: "setting",
+//       desc: (
+//         <>
+//           {userHasAccessToViewSettingGeneral ? (
+//             activeTab == "setting" && <SupportTicketCategorySetting></SupportTicketCategorySetting>
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+
+//     {
+//       label: "Company Warehouse",
+//       value: "warehouse",
+//       desc: (
+//         <>
+//           {userHasAccessToViewSettingGeneral ? (
+//             activeTab == "warehouse" && <CompanyWarehouseSetting></CompanyWarehouseSetting>
+//           ) : (
+//             <AccessDeniedMessagePage></AccessDeniedMessagePage>
+//           )}
+//         </>
+//       ),
+//     },
+//   ];
+
+//   return (
+//     <div className="relative">
+//       <Tabs value={activeTab}>
+//         <div className="sticky top-0  bg-white pb-2">
+//           <TabsHeader
+//             placeholder="Online Lead"
+//             onPointerEnterCapture={undefined}
+//             onPointerLeaveCapture={undefined}
+//             onResize={undefined}
+//             onResizeCapture={undefined}
+//             indicatorProps={{
+//               className:
+//                 "main-nav-custom active-header shadow-none focus:outline-none",
+//             }}
+//             className="shadow-none focus:outline-none"
+//           >
+//             {data.map(({ label, value }) => (
+//               <Tab
+//                 placeholder="Online Lead"
+//                 onPointerEnterCapture={undefined}
+//                 onPointerLeaveCapture={undefined}
+//                 onResize={undefined}
+//                 onResizeCapture={undefined}
+//                 key={value}
+//                 value={value}
+//                 onClick={() => setActiveTab(value)}
+//                 className={
+//                   activeTab === value
+//                     ? "main-nav-custom active-tab mt-0.5"
+//                     : "main-nav-custom"
+//                 }
+//               >
+//                 {label}
+//               </Tab>
+//             ))}
+//           </TabsHeader>
+//         </div>
+
+//         {/* Scrollable content */}
+//         <div className="overflow-y-auto max-h-[calc(100vh-150px)]">
+//           <TabsBody
+//             placeholder="Online Lead"
+//             onPointerEnterCapture={undefined}
+//             onPointerLeaveCapture={undefined}
+//             onResize={undefined}
+//             onResizeCapture={undefined}
+//           >
+//             {data.map(({ value, desc }) => (
+//               <TabPanel key={value} value={value}>
+//                 { desc}
+//               </TabPanel>
+//             ))}
+//           </TabsBody>
+//         </div>
+//       </Tabs>
+//     </div>
+//   );
+// }
+
 function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
 
@@ -32,136 +210,90 @@ function SettingsTabs() {
     {
       label: "Lead",
       value: "onlineLead",
-      desc: (
-        <>
-          {userHasAccessToViewSettingLeady ? (
-            activeTab === "onlineLead" && (
-              <div className="grid grid-cols-1 gap-2">
-                <div className="col-span-1 min-h-full">
-                  <LeadSetting />
-                </div>
-              </div>
-            )
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewSettingLeady ? (
+          <LeadSetting />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
     {
       label: "Email",
       value: "emailSettings",
-      desc: activeTab === "emailSettings" && <EmailSetting />,
+      render: () => <EmailSetting />,
     },
     {
       label: "Meetings",
       value: "meeting",
-      desc: (
-        <>
-          {userHasAccessToViewMeetingSetting ? (
-            activeTab === "meeting" && <MeetingSettings></MeetingSettings>
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewMeetingSetting ? (
+          <MeetingSettings />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
     {
       label: "Account Type",
       value: "accounttype",
-      desc: (
-        <>
-          {userHasAccessToViewCompanyAccountType ? (
-            activeTab === "accounttype" && <AccountTypeSetting />
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewCompanyAccountType ? (
+          <AccountTypeSetting />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
     {
       label: "Company Preferences",
       value: "companyPreference",
-      desc: (
-        <>
-          {userHasAccessToViewCompanyPreferences ? (
-            activeTab === "companyPreference" && (
-              <CompanyPreferenceSetting></CompanyPreferenceSetting>
-            )
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewCompanyPreferences ? (
+          <CompanyPreferenceSetting />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
     {
       label: "General",
       value: "general",
-      desc: (
-        <>
-          {userHasAccessToViewSettingGeneral ? (
-            activeTab === "general" && <UserPrerefenceManagement />
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewSettingGeneral ? (
+          <UserPrerefenceManagement />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
     {
       label: "Support Ticket Category",
       value: "setting",
-      desc: (
-        <>
-          {userHasAccessToViewSettingGeneral ? (
-            activeTab == "setting" && <SupportTicketCategorySetting></SupportTicketCategorySetting>
-            // (
-            //   <div className="p-4">
-            //     <h2 className="text-xl font-semibold">Settings Content</h2>
-            //     <p className="text-gray-600">
-            //       This is the content of the Settings tab.
-            //     </p>
-            //   </div>
-            // )
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewSettingGeneral ? (
+          <SupportTicketCategorySetting />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
-
     {
       label: "Company Warehouse",
       value: "warehouse",
-      desc: (
-        <>
-          {userHasAccessToViewSettingGeneral ? (
-            activeTab == "warehouse" && <CompanyWarehouseSetting></CompanyWarehouseSetting>
-            // (
-            //   <div className="p-4">
-            //     <h2 className="text-xl font-semibold">Settings Content</h2>
-            //     <p className="text-gray-600">
-            //       This is the content of the Settings tab.
-            //     </p>
-            //   </div>
-            // )
-          ) : (
-            <AccessDeniedMessagePage></AccessDeniedMessagePage>
-          )}
-        </>
-      ),
+      render: () =>
+        userHasAccessToViewSettingGeneral ? (
+          <CompanyWarehouseSetting />
+        ) : (
+          <AccessDeniedMessagePage />
+        ),
     },
   ];
 
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0  bg-white pb-2">
+        <div className="sticky top-0 bg-white pb-2">
           <TabsHeader
             placeholder="Online Lead"
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
             onResize={undefined}
             onResizeCapture={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
             indicatorProps={{
               className:
                 "main-nav-custom active-header shadow-none focus:outline-none",
@@ -170,11 +302,6 @@ function SettingsTabs() {
           >
             {data.map(({ label, value }) => (
               <Tab
-                placeholder="Online Lead"
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
                 key={value}
                 value={value}
                 onClick={() => setActiveTab(value)}
@@ -183,6 +310,11 @@ function SettingsTabs() {
                     ? "main-nav-custom active-tab mt-0.5"
                     : "main-nav-custom"
                 }
+                placeholder="tab"
+                onResize={undefined}
+                onResizeCapture={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
               >
                 {label}
               </Tab>
@@ -190,18 +322,17 @@ function SettingsTabs() {
           </TabsHeader>
         </div>
 
-        {/* Scrollable content */}
-        <div className="overflow-y-auto max-h-[calc(100vh-150px)]">
+        <div className="overflow-y-auto max-h-[calc(100vh-150px)] p-4">
           <TabsBody
-            placeholder="Online Lead"
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
+            placeholder="body"
             onResize={undefined}
             onResizeCapture={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
           >
-            {data.map(({ value, desc }) => (
+            {data.map(({ value, render }) => (
               <TabPanel key={value} value={value}>
-                {desc}
+                {activeTab === value && render()}
               </TabPanel>
             ))}
           </TabsBody>

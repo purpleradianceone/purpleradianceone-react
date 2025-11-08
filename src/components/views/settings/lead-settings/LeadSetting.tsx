@@ -20,6 +20,7 @@ import { User2, } from "lucide-react";
 import FormHeader from "../../../ui/FormHeader";
 import GetCompanyUsersForLead from "../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
@@ -31,6 +32,7 @@ const LeadSetting: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
 
+  const {userHasAccessToViewUser, userHasAccessToUpdateUser} = useUserAccessModules();
   const getLeadSetting = async () => {
     setIsLoading(true);
     try {
@@ -232,8 +234,9 @@ if (
         </div>
       )}
       
-          {/* <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 "> */}
-            <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
+            {
+              userHasAccessToViewUser && userHasAccessToUpdateUser && (
+                <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
               <FormHeader
                 preText="Assign Users to whom all leads are visible"
                 description="Select and assign a user to whom all the lead's will be visible."
@@ -259,7 +262,8 @@ if (
                 </div>
               </div>
             </div>
-          {/* </div> */}
+              )
+            }
       
     </div>
   );
