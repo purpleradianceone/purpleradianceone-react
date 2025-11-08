@@ -119,7 +119,8 @@ function FormInput({
   maxLength,
   autoComplete,
   logo : Icon,
-  autoFocus
+  autoFocus,
+  step
   // onClick
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
@@ -187,6 +188,7 @@ function FormInput({
             defaultValue={defaultValue}
             name={name}
             id={name}
+            step={step}
             required={required}
             placeholder={placeholder}
             onChange={onChange}

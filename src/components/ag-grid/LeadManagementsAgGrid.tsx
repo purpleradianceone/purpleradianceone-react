@@ -11,6 +11,7 @@ function LeadManagementAgGrid({
   onRowSelect, //selected user for view lead details
   handleRowClick,
   isUsedInLeadModule,
+  
 }: LeadManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 

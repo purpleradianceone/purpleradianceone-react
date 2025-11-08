@@ -350,10 +350,10 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
                 )}
                 {productUnitConversionFactor !== 0 && (
                   <p
-                    title="Quantity is converted automatically based on the product’s default and selected stock units."
+                    title="Quantity is converted automatically based on the Product base unit and selected stock unit."
                     className="caption-custom-active flex items-center cursor-pointer gap-1"
                   >
-                    Converted Quantity: {productUnitConversionFactor}{" "}
+                    Quantity will be inserted into the stock : {productUnitConversionFactor}{selectedProduct?.unitNameInStock}
                     <Info size={12} className="" />
                   </p>
                 )}

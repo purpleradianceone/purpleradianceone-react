@@ -60,6 +60,7 @@ import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthCon
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
 import StockManagement from "../../components/views/stock-management/StockManagement";
+import StockLiveForCompanyProduct from "../../components/modals/stock/StockLiveForCompanyProduct";
 
 export const router = createBrowserRouter([
   {
@@ -642,6 +643,19 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <Navbar>
             <StockManagement />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: `${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}:companyProductId/:product_name/:q_live/:q_inward/:q_outward`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <StockLiveForCompanyProduct 
+            />
           </Navbar>
         </PrivateRoute>
       </MobileRedirectWrapper>

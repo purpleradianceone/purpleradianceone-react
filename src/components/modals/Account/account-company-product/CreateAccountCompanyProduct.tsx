@@ -432,6 +432,7 @@ const CreateAccountCompanyProduct = ({
                   <FormInput
                   label="Quantity : "
                   logo={LucideIndianRupee}
+                  step="any"
                   required
                   type="number"
                   name="quantity"
@@ -449,10 +450,10 @@ const CreateAccountCompanyProduct = ({
                 />
                 {productUnitConversionFactor !== 0 && (
                   <p
-                    title="Quantity is converted automatically based on the product’s default unit and current selected unit."
+                    title="Quantity is converted automatically based on the product base unit and current selected unit."
                     className="caption-custom-active flex items-center cursor-pointer gap-1"
                   >
-                    Converted Quantity: {productUnitConversionFactor}{" "}
+                    Quantity will be deducted from stock : {productUnitConversionFactor}{selectedProduct?.unitNameInStock}
                     <Info size={12} className="" />
                   </p>
                 )}

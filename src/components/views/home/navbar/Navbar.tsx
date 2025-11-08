@@ -399,7 +399,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
               position === "left" ? "h-12" : "h-14"
             }`}
           >
-            <div className="px-2 lg:px-2">
+            <div className="px-2 lg:px-6">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : "ml-0"

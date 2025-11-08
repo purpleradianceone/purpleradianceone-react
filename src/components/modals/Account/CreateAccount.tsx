@@ -45,6 +45,7 @@ import { createPortal } from "react-dom";
 import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
+import FormLayout from "../../ui/FormLayout";
 
 type CreateAccountType = {
   onClose: () => void;
@@ -426,16 +427,19 @@ if (name === "mobilenumber") {
   if (loadingState) {
     return createPortal(
       <div className="fixed top-8 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
-        <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+        <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[90vh]  max-w-7xl overflow-auto ">
           <FormSkeleton />
         </div>
       </div>,
       document.body
     );
   }
-  return createPortal(
-    <div className="fixed inset-0 z-50 border bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
-      <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[80vh]  max-w-6xl overflow-auto ">
+  return (
+    // <div className="fixed inset-0 z-50 border bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
+    //   <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[90vh]  max-w-7xl overflow-auto ">
+    <FormLayout>
+
+  
         <motion.section
           ref={ref}
           initial={{ opacity: 0, y: 40 }}
@@ -773,9 +777,9 @@ if (name === "mobilenumber") {
             </div>
           </form>
         </motion.section>
-      </div>
-    </div>,
-    document.body
+          </FormLayout>
+      
+     
   );
 };
 export default CreateAccount;

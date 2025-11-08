@@ -182,6 +182,9 @@ const POST_API = {
     GET_UNIT: `${BASE_URL}${import.meta.env.VITE_GET_UNIT}`,
     GET_UNIT_FOR_COMPANY_PRODUCT: `${BASE_URL}${import.meta.env.VITE_GET_UNIT_FOR_COMPANY_PRODUCT}`,
     UPLOAD_CSV_FOR_IMPORT: `${BASE_URL}${import.meta.env.VITE_UPLOAD_CSV_FOR_IMPORT}`,
+    GET_STOCK: `${BASE_URL}${import.meta.env.VITE_GET_STOCK}`,
+    GET_STOCK_LIVE_COMPANY_PRODUCT : `${BASE_URL}${import.meta.env.VITE_GET_STOCK_LIVE_COMPANY_PRODUCT}`,
+    GET_STOCK_LIVE: `${BASE_URL}${import.meta.env.VITE_GET_STOCK_LIVE}`,
 }
 
 export default POST_API;
