@@ -218,7 +218,7 @@ const GenericValueMappingCard = forwardRef(
       searchPlaceholder,
       totalCrmItems,
       currentPage = 0,
-      itemsPerPage = 40,
+      itemsPerPage = 10,
       onPageChange,
     }: ValueMappingCardProps<T>,
     ref: React.Ref<HTMLDivElement> // added this for component reference
@@ -712,7 +712,7 @@ const LeadImportCsv = ({
   useEffect(() => {
     fetchApiData();
     fetchCompanyProducts("", 0, userPreference.rowsInGrid || 40);
-    fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
+    fetchCompanyUsers("", 0, 10); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
   // --- EFFECTS ---
@@ -1029,32 +1029,90 @@ const LeadImportCsv = ({
     []
   );
 
+  // const handleValueMap = <T extends MappableItem>(
+  //   crmItem: T,
+  //   csvValue: string,
+  //   currentMapping: ValueMapping,
+  //   setMapping: (m: ValueMapping) => void
+  // ) => {
+  //   if (!crmItem.id) return;
+  //   const newMapping = { ...currentMapping };
+  //   Object.keys(newMapping).forEach((key) => {
+  //     if (newMapping[key] === csvValue) delete newMapping[key];
+  //   });
+  //   newMapping[String(crmItem.id)] = csvValue;
+
+  //   setMapping(newMapping);
+  // };
+
+  // const handleRemoveValueMap = <T extends MappableItem>(
+  //   crmItem: T,
+  //   currentMapping: ValueMapping,
+  //   setMapping: (m: ValueMapping) => void
+  // ) => {
+  //   if (!crmItem.id) return;
+  //   const newMapping = { ...currentMapping };
+  //   delete newMapping[String(crmItem.id)];
+  //   setMapping(newMapping);
+  // };
+
+  // Add this in parent component
+
+  const [ownerCache, setOwnerCache] = useState<Record<string, CompanyUser>>({});
+
+  useEffect(() => {
+    if (companyUsers?.length) {
+      setOwnerCache((prev) => {
+        const updated = { ...prev };
+        companyUsers.forEach((u) => (updated[String(u.id)] = u));
+        return updated;
+      });
+    }
+  }, [companyUsers]);
+
+  const [productCache, setProductCache] = useState<Record<string, any>>({});
+  useEffect(() => {
+    if (productsData?.length) {
+      setProductCache((prev) => {
+        const updated = { ...prev };
+        productsData.forEach((p) => (updated[String(p.id)] = p));
+        return updated;
+      });
+    }
+  }, [productsData]);
+
   const handleValueMap = <T extends MappableItem>(
     crmItem: T,
     csvValue: string,
-    currentMapping: ValueMapping,
-    setMapping: (m: ValueMapping) => void
+    setMapping: React.Dispatch<React.SetStateAction<ValueMapping>>
   ) => {
     if (!crmItem.id) return;
-    const newMapping = { ...currentMapping };
-    Object.keys(newMapping).forEach((key) => {
-      if (newMapping[key] === csvValue) delete newMapping[key];
+
+    setMapping((prev) => {
+      const newMapping = { ...prev };
+
+      // Remove existing entry for this CSV value (to prevent duplicates)
+      Object.keys(newMapping).forEach((key) => {
+        if (newMapping[key] === csvValue) delete newMapping[key];
+      });
+
+      // Map CRM ID → CSV value
+      newMapping[String(crmItem.id)] = csvValue;
+      return newMapping;
     });
-    newMapping[String(crmItem.id)] = csvValue;
-    // console.log("new Mapping : ");
-    // console.log(newMapping);
-    setMapping(newMapping);
   };
 
   const handleRemoveValueMap = <T extends MappableItem>(
     crmItem: T,
-    currentMapping: ValueMapping,
-    setMapping: (m: ValueMapping) => void
+    setMapping: React.Dispatch<React.SetStateAction<ValueMapping>>
   ) => {
     if (!crmItem.id) return;
-    const newMapping = { ...currentMapping };
-    delete newMapping[String(crmItem.id)];
-    setMapping(newMapping);
+
+    setMapping((prev) => {
+      const newMapping = { ...prev };
+      delete newMapping[String(crmItem.id)];
+      return newMapping;
+    });
   };
 
   const processCsvForReview = useCallback(() => {
@@ -1092,17 +1150,11 @@ const LeadImportCsv = ({
       return values.length > 0 ? values.join(" ").trim() : null;
     };
 
-    // Note : NEED TO FIX THIS ERROR ProcessedLeadData
-    // note : error do changes , type changed to any
     const processed: any[] = csvData.slice(1).map((row) => {
       // Get email and mobile for duplicate checking using the new helper
       const email = getConcatenatedCsvValue(row, "email");
       const mobile = getConcatenatedCsvValue(row, "mobileNumber");
       const product = getConcatenatedCsvValue(row, "company_product_id");
-      // console.log("valuse");
-      // console.log(row)
-      // console.log(product);
-      // console.log("valuse");
 
       let isDuplicate = false;
       if (email && emailSet.has(email)) {
@@ -1144,82 +1196,69 @@ const LeadImportCsv = ({
           mappedData[field.id] = crmSource ? crmSource.id : null; // Store ID
           displayData[field.id] = crmSource ? crmSource.name : ""; // Display Name or original CSV
         } else if (field.id === "leadOwner" && csvValue) {
-          const crmOwner = companyUsers?.find(
-            (owner) => ownerValueMapping[String(owner.id)] === csvValue
+          const matchedCrmIdEntry = Object.entries(ownerValueMapping).find(
+            ([_, mappedCsv]) => mappedCsv === csvValue
           );
-          mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
-          displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
+          if (matchedCrmIdEntry) {
+            const crmId = matchedCrmIdEntry[0];
+            const crmOwner = ownerCache[crmId];
+            mappedData[field.id] = crmId;
+            displayData[field.id] = crmOwner ? crmOwner.fullname : "null";
+          }
         }
+
+        // else if (field.id === "leadOwner" && csvValue) {
+        //   const crmOwner = companyUsers?.find(
+        //     (owner) => ownerValueMapping[String(owner.id)] === csvValue
+        //   );
+        //   mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
+        //   displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
+        // }
         // Note : product data
-        else if (field.id === "company_product_id") {
-          // console.log("inside product cond");
-          // console.log(csvValue);
-          //  console.log("inside product cond");
-          const prodArr = product?.split(",").map((item) => item.trim());
-          // const crmProduct = productsData.filter((p) => {
-          //   console.log(
-          //     " ___________________________________________ data ___________________________________________"
-          //   );
-          //   console.log(p);
+        // else if (field.id === "company_product_id") {
+        //   const prodArr = product?.split(",").map((item) => item.trim());
+        //   const crmProduct = productsData.filter((p) => {
+        //     const mappedValue = productDataValueMapping[String(p.id)];
+        //     return (
+        //       p.id !== undefined &&
+        //       p.id !== null &&
+        //       prodArr?.includes(mappedValue)
+        //     );
+        //   });
 
-          //   const idArr : number[] = [];
-          //    prodArr?.map((x) => {
+        //   // 2. Use map() on the filtered array to extract only the 'id' property.
+        //   const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
 
-          //     console.log(
-          //   );
-          //   console.log(x);
-          //   console.log(productDataValueMapping[String(p.id)]);
-          //   console.log(
-          //   );
+        //   mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
+        //   displayData[field.id] = crmProduct
+        //     ? crmProduct.map((item) => item.name).join(",")
+        //     : null; // Display Name or original CSV
+        // }
+        else if (field.id === "company_product_id" && product) {
+          const prodArr = product.split(",").map((item) => item.trim());
+          const crmProductIds: number[] = [];
+          const crmProductNames: string[] = [];
 
-          //     if (productDataValueMapping[String(p.id)] === x){
-          //           idArr.push(p.id!)
-          //     }
-          //   });
+          prodArr.forEach((csvValue) => {
+            const matchedCrmIdEntry = Object.entries(
+              productDataValueMapping
+            ).find(([, mappedCsv]) => mappedCsv === csvValue);
 
-          //    console.log(
-          //     " ___________________________________________ data ___________________________________________"
-          //   );
-          //    console.log(
-          //     " ___________________________________________ IDARR ___________________________________________"
-          //   );
+            if (matchedCrmIdEntry) {
+              const crmId = Number(matchedCrmIdEntry[0]);
+              const crmProduct = productCache[crmId];
 
-          //   console.log(idArr);
-
-          //   console.log(
-          //     " ___________________________________________ IDARR ___________________________________________"
-          //   );
-          //   return idArr;
-          // });
-
-          const crmProduct = productsData.filter((p) => {
-            // Check for valid ID and if the mapped value is included in prodArr
-            // console.log(
-            //   " ___________________________________________ IDARR ___________________________________________"
-            // );
-            // console.log(prodArr);
-
-            const mappedValue = productDataValueMapping[String(p.id)];
-
-            // console.log(mappedValue);
-            // console.log(
-            //   " ___________________________________________ IDARR ___________________________________________"
-            // );
-            return (
-              p.id !== undefined &&
-              p.id !== null &&
-              prodArr?.includes(mappedValue)
-            );
+              crmProductIds.push(crmId);
+              crmProductNames.push(crmProduct ? crmProduct.name : "null");
+            }
           });
 
-          // 2. Use map() on the filtered array to extract only the 'id' property.
-          const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
-
-          mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
-          displayData[field.id] = crmProduct
-            ? crmProduct.map((item) => item.name).join(",")
-            : null; // Display Name or original CSV
+          mappedData[field.id] =
+            crmProductIds.length > 0 ? crmProductIds : null;
+          displayData[field.id] =
+            crmProductNames.length > 0 ? crmProductNames.join(",") : null;
         }
+
         // NOte : lead interest type leadInterestType
         else if (field.id === "lead_interest_id" && csvValue) {
           const crmInterestType = interestTypeData?.find(
@@ -1370,18 +1409,16 @@ const LeadImportCsv = ({
     setIsLoadingSpinnerAfterSubmission(true);
     const rowsData = leadsToImport.map((lead) => ({
       ...lead.mappedData,
-       createdby: loginStatus.id,
-          company_id: loginStatus.companyId,
-          import_tag: importTag,
-        
+      createdby: loginStatus.id,
+      company_id: loginStatus.companyId,
+      import_tag: importTag,
     }));
     const leadImportCsvFile = convertToCsvFile(rowsData, "importLeadFile.csv");
     const reader = new FileReader();
     console.log("this is the row data");
-    
+
     console.log(rowsData);
 
-    
     reader.onload = (e) => {
       console.log(e.target?.result);
     };
@@ -1454,6 +1491,14 @@ const LeadImportCsv = ({
     fieldMappings.leadSource?.length > 0 && csvUniqueSources.length > 0;
   const showOwnerMapping =
     fieldMappings.leadOwner?.length > 0 && csvUniqueOwners.length > 0;
+
+  // lead owner changes
+  useEffect(() => {
+    console.log("🧭 Current owner mappings:", ownerValueMapping);
+  }, [ownerValueMapping]);
+  useEffect(() => {
+    console.log("Updated productDataValueMapping:", productDataValueMapping);
+  }, [productDataValueMapping]);
 
   // NOte : product data
   const showProductDataMapping =
@@ -1631,14 +1676,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      statusValueMapping,
+                      // statusValueMapping,
                       setStatusValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      statusValueMapping,
+                      // statusValueMapping,
                       setStatusValueMapping
                     )
                   }
@@ -1656,14 +1701,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      sourceValueMapping,
+                      // sourceValueMapping,
                       setSourceValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      sourceValueMapping,
+                      // sourceValueMapping,
                       setSourceValueMapping
                     )
                   }
@@ -1681,14 +1726,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      ownerValueMapping,
+                      // ownerValueMapping,
                       setOwnerValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      ownerValueMapping,
+                      // ownerValueMapping,
                       setOwnerValueMapping
                     )
                   }
@@ -1697,14 +1742,10 @@ const LeadImportCsv = ({
                   searchPlaceholder="Search user..."
                   totalCrmItems={totalCompanyUsers}
                   currentPage={companyUsersCurrentPage}
-                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  itemsPerPage={10}
                   onPageChange={(newPage) => {
                     setCompanyUsersCurrentPage(newPage);
-                    fetchCompanyUsers(
-                      "",
-                      newPage * (userPreference.rowsInGrid || 40),
-                      userPreference.rowsInGrid || 40
-                    );
+                    fetchCompanyUsers("", newPage * 10, 10);
                   }}
                 />
               )}
@@ -1718,35 +1759,55 @@ const LeadImportCsv = ({
                   crmData={productsData}
                   mapping={productDataValueMapping}
                   onDrop={(c, v) =>
-                    handleValueMap(
-                      c,
-                      v,
-                      productDataValueMapping,
-                      setProductDataValueMapping
-                    )
+                    handleValueMap(c, v, setProductDataValueMapping)
                   }
                   onRemove={(c) =>
-                    handleRemoveValueMap(
-                      c,
-                      productDataValueMapping,
-                      setProductDataValueMapping
-                    )
+                    handleRemoveValueMap(c, setProductDataValueMapping)
                   }
                   itemType={ItemTypes.CSV_PRODUCT_VALUE}
-                  onSearch={fetchCompanyProducts} // This is already good
+                  onSearch={fetchCompanyProducts}
                   searchPlaceholder="Search product..."
                   totalCrmItems={totalProductData}
                   currentPage={productDataCurrentPage}
-                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  itemsPerPage={40}
                   onPageChange={(newPage) => {
                     setProductDataCurrentPage(newPage);
-                    fetchCompanyProducts(
-                      "",
-                      newPage * (userPreference.rowsInGrid || 40),
-                      userPreference.rowsInGrid || 40
-                    );
+                    fetchCompanyProducts("", newPage * 40, 40);
                   }}
                 />
+
+                // <GenericValueMappingCard
+                //   ref={productDataMappingRef}
+                //   title="Map Product assigned to lead"
+                //   csvValues={csvUniqueProductData}
+                //   crmData={productsData}
+                //   mapping={productDataValueMapping}
+                //   onDrop={(c, v) =>
+                //     handleValueMap(
+                //       c,
+                //       v,
+                //       // productDataValueMapping,
+                //       setProductDataValueMapping
+                //     )
+                //   }
+                //   onRemove={(c) =>
+                //     handleRemoveValueMap(
+                //       c,
+                //       // productDataValueMapping,
+                //       setProductDataValueMapping
+                //     )
+                //   }
+                //   itemType={ItemTypes.CSV_PRODUCT_VALUE}
+                //   onSearch={fetchCompanyProducts} // This is already good
+                //   searchPlaceholder="Search product..."
+                //   totalCrmItems={totalProductData}
+                //   currentPage={productDataCurrentPage}
+                //   itemsPerPage={10}
+                //   onPageChange={(newPage) => {
+                //     setProductDataCurrentPage(newPage);
+                //     fetchCompanyProducts("", newPage * 10, 10);
+                //   }}
+                // />
               )}
               {/* For lead interest type data  */}
               {showLeadInterestTypeMapping && (
@@ -1760,14 +1821,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      InterestTypeValueMapping,
+                      // InterestTypeValueMapping,
                       setInterestTypeValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      InterestTypeValueMapping,
+                      // InterestTypeValueMapping,
                       setInterestTypeValueMapping
                     )
                   }
