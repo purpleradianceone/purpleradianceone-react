@@ -365,7 +365,7 @@ const LeadImportData = ({
       showLoadingSpinner={showLoadingSpinner}
       importTag={selectedLeadTag}
       isOpen={openFinalPopup}
-      message={`⚠️ This is the final confirmation. All leads from "${selectedLeadTag}" will be PERMANENTLY moved to the Lead table. This action cannot be undone.`}
+      message={`⚠️ This is the final confirmation message. All leads from "${selectedLeadTag}" will be PERMANENTLY moved to the Lead table. This action cannot be undone.`}
       onCancel={() => setOpenFinalPopup(false)}
       onSave={handleCreateMoveLeadsToLeadTable}
     />
