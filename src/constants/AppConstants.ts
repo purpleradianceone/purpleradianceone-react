@@ -14,6 +14,8 @@ export const  STRING_VALUES = {
     
 }
 
+export const DEBOUNCE_DELAY = 300;
+
 export const OPACITY = {
   POPUP_OPACITY_AND_BACKGROUNG_COLOR : "bg-black bg-opacity-5 ",
 }
@@ -83,7 +85,8 @@ export const notificationsDesription = {
 
 
 export const  SUBSCRIPTION = {
-    RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
+    // RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
+    RAZORPAY_KEY : import.meta.env.VITE_RAZORPAY_API_ID_KEY,
     COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",
     RAZORPAY_CURRENCY : "INR",
 }

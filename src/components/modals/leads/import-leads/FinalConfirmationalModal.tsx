@@ -74,7 +74,7 @@ const FinalConfirmationModal: React.FC<FinalConfirmationModalProps> = ({
                   disabled={showLoadingSpinner}
                   className="px-5 py-2 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition"
                 >
-                 {showLoadingSpinner ? 'Loading...' : 'Comfirm & Save'}
+                 {showLoadingSpinner ? 'Loading...' : 'Confirm & Save'}
                 </button>
               </div>
             </motion.div>

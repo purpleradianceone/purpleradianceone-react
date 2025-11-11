@@ -3,6 +3,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 COPY . .
+
+# Declare Razorpay key argument
+ARG VITE_RAZORPAY_API_ID_KEY
+ENV VITE_RAZORPAY_API_ID_KEY=$VITE_RAZORPAY_API_ID_KEY
+
 RUN npm install && npm run build
 
 # Stage 2: Serve with NGINX

@@ -122,7 +122,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
         email: "",
       });
     }
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

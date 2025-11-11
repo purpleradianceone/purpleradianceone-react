@@ -15,7 +15,7 @@ import {
   Text,
   X,
 } from "lucide-react";
-import { GAP, OPACITY, STATUS_CODE } from "../../../constants/AppConstants";
+import { GAP,  STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -33,14 +33,13 @@ import DatePickerInput from "../../ui/DatePickerInput";
 import AddProductModalProps from "../../../@types/modal/AddProductModalProps";
 import MESSAGE from "../../../constants/Messages";
 import ApiError from "../../../@types/error/ApiError";
-import useScreenSize from "../../../config/hooks/useScreenSize";
+// import useScreenSize from "../../../config/hooks/useScreenSize";
 import toast from "react-hot-toast";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useIntervalType } from "../../../config/hooks/useIntervalType";
 import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
-import { createPortal } from "react-dom";
 import useUnit from "../../../config/hooks/useUnit";
 import FormLayout from "../../ui/FormLayout";
 import FormSkeleton from "../Account/FormSkeleton";
@@ -54,7 +53,7 @@ function AddProductModal({
   const { loading: intervalTypeLoading, intervalTypeData } = useIntervalType();
   const { loading: productTypeLoading, productTypeData } = useProductType();
   const { userHasAccessToAddProduct } = useUserAccessModules();
-  const { isSmallScreen } = useScreenSize();
+  // const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
@@ -385,22 +384,24 @@ function AddProductModal({
       </FormLayout>
     );
   }
-  return createPortal(
-    <div
-      className={
-        isSmallScreen
-          ? `fixed inset-0 z-50 pt-10   pr-2 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
-          : `fixed inset-0 z-50 p-6 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
-      }
-    >
-      <div className="flex min-h-screen  items-center justify-center">
-        <div
-          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-gray-300
-  [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
-        >
-          <div className="p-4">
+  return (
+  //   <div
+  //     className={
+  //       isSmallScreen
+  //         ? `fixed inset-0 z-50 pt-10   pr-2 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
+  //         : `fixed inset-0 z-50 p-6 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
+  //     }
+  //   >
+  //     <div className="flex min-h-screen  items-center justify-center">
+  //       <div
+  //         className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+  // [&::-webkit-scrollbar-track]:bg-gray-300
+  // [&::-webkit-scrollbar-thumb]:bg-gray-400
+  //  [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+  //       >
+  <FormLayout>
+
+          <div className="">
             <FormHeader
               icon={Store}
               onClose={() => {
@@ -722,10 +723,13 @@ function AddProductModal({
               }
             </form>
           </div>
-        </div>
-      </div>
-    </div>,
-    document.body
+            </FormLayout>
+
+    //     </div>
+
+    //   </div>
+    // </div>,
+    // document.body
   );
 }
 
