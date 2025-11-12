@@ -63,7 +63,6 @@ const MappedAccountDataPopup = ({
 
     // select only non-duplicate rows
     setSelectedRows(mappedData.map((_, index) => !duplicates.has(index)));
-
     setDuplicateIndexes(duplicates);
   }, [mappedData]);
 
@@ -113,6 +112,8 @@ const MappedAccountDataPopup = ({
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
           withCredentials: true,
         })
         .then((response) => {
@@ -154,6 +155,8 @@ const MappedAccountDataPopup = ({
     }
   };
 
+  const allSelected = selectedRows.every((v) => v === true);
+
   return (
     <div
       className={`fixed inset-0 ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR} flex items-center justify-center z-50`}
@@ -161,12 +164,13 @@ const MappedAccountDataPopup = ({
       {!isLoading && (
         <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-6xl h-[80%] flex flex-col">
           {/* Header */}
-          <div className="p-3">
+          <div className="pt-3 pb-3 p-1 pr-5 flex-none w-auto h-auto ">
             <FormHeader
               icon={LucideScanEye}
               onClose={onClose}
               preText="Mapped Account Data Preview"
               description="This is previews of mapped account data, highlights duplicates, allows deselection, and imports only unique rows."
+              isModal = {true}
             />
           </div>
 
@@ -175,12 +179,25 @@ const MappedAccountDataPopup = ({
             {mappedData && mappedData.length > 0 ? (
               <table className="border-collapse border w-full text-xs min-w-[3000px]">
                 <thead className="sticky -top-2 bg-gray-100 z-100">
-                  <tr>
-                    <th className="border p-2 w-fit">Select</th>
+                  <tr className="text-center bg-gray-100">
+                    <th className="border p-2 align-middle w-32">
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        <span className="table-header-custom">Select All</span>
+                        <input
+                          type="checkbox"
+                          checked={allSelected}
+                          onChange={() =>
+                            setSelectedRows(mappedData.map(() => !allSelected))
+                          }
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                      </div>
+                    </th>
+
                     {fieldKeys.map((key) => (
                       <th
                         key={key}
-                        className="border p-2 text-left font-medium w-fit"
+                        className="border p-2 table-header-custom align-top"
                       >
                         {fieldVariables[key]}
                       </th>
@@ -203,6 +220,7 @@ const MappedAccountDataPopup = ({
                             type="checkbox"
                             checked={selectedRows[i]}
                             onChange={() => toggleRowSelection(i)}
+                            className="w-4 h-4 cursor-pointer"
                           />
                         </td>
 
@@ -221,7 +239,7 @@ const MappedAccountDataPopup = ({
                               : industryTypes.find((v) => v.id === value)
                                   ?.name ?? "";
                             return (
-                              <td key={key} className="border p-2 w-fit">
+                              <td key={key} className="border p-2 w-fit table-data-custom">
                                 {result}
                               </td>
                             );
@@ -241,7 +259,7 @@ const MappedAccountDataPopup = ({
                               : businessTypes.find((v) => v.id === value)
                                   ?.name ?? "";
                             return (
-                              <td key={key} className="border p-2 w-fit">
+                              <td key={key} className="border p-2 w-fit table-data-custom">
                                 {result}
                               </td>
                             );
@@ -262,7 +280,7 @@ const MappedAccountDataPopup = ({
                               : companyAccountTypes.find((v) => v.id === value)
                                   ?.name ?? "";
                             return (
-                              <td key={key} className="border p-2 w-fit">
+                              <td key={key} className="border p-2 w-fit table-data-custom">
                                 {result}
                               </td>
                             );
@@ -272,7 +290,7 @@ const MappedAccountDataPopup = ({
                           if (Array.isArray(value)) value = value.join(", ");
 
                           return (
-                            <td key={key} className="border p-2 w-fit">
+                            <td key={key} className="border p-2 w-fit table-data-custom">
                               {value}
                             </td>
                           );
@@ -331,7 +349,9 @@ const MappedAccountDataPopup = ({
           }}
         />
       )}
-      {isLoading && <LoadingPopUpAnimation show={isLoading} text="Account Importing..."/>}
+      {isLoading && (
+        <LoadingPopUpAnimation show={isLoading} text="Account Importing..." />
+      )}
     </div>
   );
 };
