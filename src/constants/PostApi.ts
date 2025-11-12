@@ -185,6 +185,7 @@ const POST_API = {
     GET_STOCK: `${BASE_URL}${import.meta.env.VITE_GET_STOCK}`,
     GET_STOCK_LIVE_COMPANY_PRODUCT : `${BASE_URL}${import.meta.env.VITE_GET_STOCK_LIVE_COMPANY_PRODUCT}`,
     GET_STOCK_LIVE: `${BASE_URL}${import.meta.env.VITE_GET_STOCK_LIVE}`,
+    GET_TRANSACTION_TYPE: `${BASE_URL}${import.meta.env.VITE_GET_TRANSACTION_TYPE}`,
 }
 
 export default POST_API;

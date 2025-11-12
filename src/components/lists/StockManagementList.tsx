@@ -17,8 +17,7 @@ import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
+import StockLiveForCompanyProduct from "../modals/stock/StockLiveForCompanyProduct";
 
 const StockManagementList = ({
   liveStockForCompanyProduct,
@@ -28,14 +27,20 @@ const StockManagementList = ({
   onEndDateChange,
   
 }: StockManagementListProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { userPreference } = useUserPreference();
   const { userHasAccessToAddStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
-  
+  const [openStockLivePage ,setOpenStockLivePage] = useState<boolean>(false); 
+  const [stockForCompanyProductLive , setStockLiveForCompanyProduct]= useState<LiveStockForCompanyProduct| null>(null);
   function handleSelectedStockLiveForCompanyProduct(data : LiveStockForCompanyProduct){
-    navigate(`${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}${data.companyProductId}/${data.companyProductName}/${data.quantityLive}/${data.quantityInward}/${data.quantityOutward}`);
+    if(data !== null && data!== undefined){
+      setStockLiveForCompanyProduct(data)
+      setOpenStockLivePage(true);
+
+    }
+    // navigate(`${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}${data.companyProductId}/${data.companyProductName}/${data.quantityLive}/${data.quantityInward}/${data.quantityOutward}`);
   }  
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
    const { handleDateRangeIdChange, isCustomDateOptionSelected } =
@@ -151,6 +156,16 @@ const StockManagementList = ({
           }}
         />
       )}
+      {
+        openStockLivePage && 
+      <StockLiveForCompanyProduct
+      companyStockLive={stockForCompanyProductLive!}
+        handleClose={()=>{
+          setOpenStockLivePage(false)
+          setStockLiveForCompanyProduct(null)
+        }}
+      />
+    }
     </div>
   );
 };
