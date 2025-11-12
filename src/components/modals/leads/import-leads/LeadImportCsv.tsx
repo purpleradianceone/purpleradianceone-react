@@ -45,6 +45,7 @@ import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
+import MESSAGE from "../../../../constants/Messages";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -218,7 +219,7 @@ const GenericValueMappingCard = forwardRef(
       searchPlaceholder,
       totalCrmItems,
       currentPage = 0,
-      itemsPerPage = 10,
+      itemsPerPage = 25,
       onPageChange,
     }: ValueMappingCardProps<T>,
     ref: React.Ref<HTMLDivElement> // added this for component reference
@@ -305,11 +306,11 @@ const GenericValueMappingCard = forwardRef(
       <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm">
         <h3 className="table-header-custom mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className={onSearch ? " mt-12 ": ""}>
             <h4 className="input-label-custom text-center mb-2">
               Your CSV Values (Drag)
             </h4>
-            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
+            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-80 overflow-y-auto">
               {unmappedCsvValues.map((s) => (
                 <DraggableCsvValue key={s} value={s} type={itemType} />
               ))}
@@ -347,7 +348,7 @@ const GenericValueMappingCard = forwardRef(
             <h4 className="input-label-custom  text-center mb-2">
               To CRM Values (Drop)
             </h4>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-2 max-h-80 overflow-y-auto">
               {crmValues.map(
                 (item) =>
                   item.id && <DroppableTarget key={item.id} crmItem={item} />
@@ -368,7 +369,7 @@ const GenericValueMappingCard = forwardRef(
                 <button
                   onClick={() => handleInternalPageChange(currentPage + 1)}
                   disabled={currentPage === totalPages - 1}
-                  className="px-3 py-1 rounded-md bg-gray-200input-label-custom  disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200 input-label-custom  disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -572,15 +573,19 @@ const LeadImportCsv = ({
         }
       }
     };
-    await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
-    await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
-    await (function () {
-      setIsLoadingLeadSourceAndSourceData(false);
-    })();
+
+    try{
+      await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
+      await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
+    }catch(err : any ){
+      toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
+    }finally{
+        setIsLoadingLeadSourceAndSourceData(false);
+    }
   }, []);
 
   // API call to get lead interest data
-  async function getLeadInterestData() {
+  const  getLeadInterestData = useCallback(async ()=> {
     try {
       const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
         params: {
@@ -592,7 +597,6 @@ const LeadImportCsv = ({
       });
 
       if (response.status === STATUS_CODE.OK) {
-        setIsLoadingLeadInterestData(false);
         setInterestTypeData(response.data);
       }
     } catch (error: any) {
@@ -604,12 +608,16 @@ const LeadImportCsv = ({
         if (refreshTokenStatus) {
           getLeadInterestData();
         }
+      }else{
+              toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
       }
-    }
-  }
+    }finally{
+        setIsLoadingLeadInterestData(false);
+      }
+  },[])
   // Note : called the above function , will get the data once the component renders
   useEffect(() => {
-    getLeadInterestData();
+      getLeadInterestData();
   }, []);
 
   // Note : api call to get company product
@@ -711,8 +719,8 @@ const LeadImportCsv = ({
 
   useEffect(() => {
     fetchApiData();
-    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 40);
-    fetchCompanyUsers("", 0, 10); // Initial fetch
+    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 25);
+    fetchCompanyUsers("", 0, userPreference.rowsInGrid || 25); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
   // --- EFFECTS ---
@@ -1323,6 +1331,57 @@ const LeadImportCsv = ({
     );
   };
 
+  //  const handleMarkAll = () => {
+  //   setProcessedLeads((prevLeads) =>
+  //     prevLeads.map((lead) => ({
+  //       ...lead,
+  //       isSelectedForImport: true,
+  //     }))
+  //   );
+  // };
+  // const handleMarkAll = () => {
+  //   setProcessedLeads((prevLeads) => {
+  //     // Check if all leads are currently selected
+  //     const allSelected = prevLeads.every((lead) => lead.isSelectedForImport);
+
+  //     // Toggle based on current state
+  //     return prevLeads.map((lead) => ({
+  //       ...lead,
+  //       isSelectedForImport: !allSelected, // mark or unmark all
+  //     }));
+  //   });
+  // };
+
+  const [previousSelections, setPreviousSelections] = useState<boolean[]>([]);
+
+  const handleMarkAll = () => {
+    setProcessedLeads((prevLeads) => {
+      // If no previous state saved → Mark all
+      if (previousSelections.length === 0) {
+        // Save the current selection state before marking all
+        setPreviousSelections(
+          prevLeads.map((lead) => lead.isSelectedForImport)
+        );
+
+        // Mark all leads (including duplicates)
+        return prevLeads.map((lead) => ({
+          ...lead,
+          isSelectedForImport: true,
+        }));
+      } else {
+        // Restore to previous selection state
+        const restoredLeads = prevLeads.map((lead, i) => ({
+          ...lead,
+          isSelectedForImport: previousSelections[i],
+        }));
+
+        // Clear the previous state
+        setPreviousSelections([]);
+        return restoredLeads;
+      }
+    });
+  };
+
   function generateUniqueTag() {
     const randomString = Math.random()
       .toString(36)
@@ -1356,11 +1415,6 @@ const LeadImportCsv = ({
     // const isNameMapped = fieldMappings.name?.length > 0;
     // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
     if (!isContactMapped) {
-      // setError('Please map "Name" and either "Email" or "Mobile Number".');
-      // showMessageSnackbar({
-      //   message: 'Please map "Name" and either of "Email" or "Mobile Number".',
-      //   type: "error",
-      // });
       toast.error(
         'Please map "Name" and either of "Email" or "Mobile Number".'
       );
@@ -1374,7 +1428,6 @@ const LeadImportCsv = ({
     );
 
     if (leadsToImport.length === 0) {
-      // setError("No leads selected for import.");
       showMessageSnackbar({
         message: "No leads selected for import.",
         type: "error",
@@ -1742,10 +1795,10 @@ const LeadImportCsv = ({
                   searchPlaceholder="Search user..."
                   totalCrmItems={totalCompanyUsers}
                   currentPage={companyUsersCurrentPage}
-                  itemsPerPage={10}
+                  itemsPerPage={25}
                   onPageChange={(newPage) => {
                     setCompanyUsersCurrentPage(newPage);
-                    fetchCompanyUsers("", newPage * 10, 10);
+                    fetchCompanyUsers("", newPage * 25, 25);
                   }}
                 />
               )}
@@ -1769,10 +1822,10 @@ const LeadImportCsv = ({
                   searchPlaceholder="Search product..."
                   totalCrmItems={totalProductData}
                   currentPage={productDataCurrentPage}
-                  itemsPerPage={40}
+                  itemsPerPage={25}
                   onPageChange={(newPage) => {
                     setProductDataCurrentPage(newPage);
-                    fetchCompanyProducts("", newPage * 40, 40);
+                    fetchCompanyProducts("", newPage * 25, 25);
                   }}
                 />
 
@@ -1867,6 +1920,14 @@ const LeadImportCsv = ({
               potential duplicates (based on Email or Mobile Number). Check the
               box for each record you wish to import.
             </p>
+            <div className="bg-pink-00 w-fit flex items-center justify-start pl-2">
+              <Button
+                // className="bg-blue-500 p-1 rounded-md"
+                onClick={handleMarkAll}
+              >
+                {previousSelections.length === 0 ? "Mark duplicate leads." : "Unmark duplicate leads."}
+              </Button>
+            </div>
             <div className="w-full overflow-x-auto overflow-y-auto max-h-96  border rounded-md">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">

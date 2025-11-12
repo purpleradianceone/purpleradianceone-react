@@ -1,37 +1,53 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import LiveStock from "../../@types/stock/LiveStock";
 
 const StockLiveAgGrid =({
     data
 }:{
-    data: any
+    data: LiveStock[]
 }) => {
+
+    // count : number,
+    // companyProductId: number,
+    // companyProductName : string,
+    // companyWarehouseId: number,
+    // companyWarehouseName : string,
+    // quantityInward: number,
+    // quantityOutward: number,
+    // quantityLive : number
 
      const columnDefs = useMemo<ColDef[]>(
         () => [
           {
-            field: "leadOwner",
-            headerName: "Changed Lead Owner",
+            hide: true,
+            field: "companyProductName",
+            headerName: " Product",
             cellStyle: {
               color: "black",
               fontWeight: "bold",
             },
           },
           {
-            field: "id",
-            headerName: "id",
-            hide: true,
+            field: "companyWarehouseName",
+            headerName: "Warehouse",
+            hide: false,
             
           },
-          {
-            field: "reason",
-            headerName: "Reason to change", 
+           {
+            field: "quantityLive",
+            headerName: "Current Quantity",
           },
           {
-            field: "createdOn",
-            headerName: "Change Date",
+            field: "quantityInward",
+            headerName: "Inward", 
           },
+          {
+            field: "quantityOutward",
+            headerName: "Outward",
+          },
+          
         ],
         []
       );
