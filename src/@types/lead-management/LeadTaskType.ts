@@ -2,27 +2,30 @@
 type LeadTaskType = {
   id: number;
   leadId : number;
+  leadName?: string;
+  leadStatusName?: string;
   leadActivityId : number;
+  leadTaskActivityName : string;
   leadTaskPriorityId : number;
+  leadTaskPriorityName : string;
   leadTaskStageId : number;
+  leadTaskStageName : string;
   subject : string,
   description: string;
+  resultOutcome : string;
+  dueDateTime : string;
+  overdueStatus? : string;
+  leadActivityDetails : any;
+  isActive : boolean;
   colorCode : string;
   assignedToId? : number[];
   assignedToName? : string[];
-  dueDateTime : string;
   completedAtDateTime? : string;
-  leadActivityDetails : any;
-  isActive : boolean;
+  
   createdOn? : string;
   createdBy? : string;
   updatedOn? : string;
   updatedBy? : string;
-  resultOutcome : string;
-  leadTaskActivityName : string;
-  leadTaskPriorityName : string;
-  leadTaskStageName : string;
-  overdueStatus? : string;
   completedAt? : string;
 }
 
