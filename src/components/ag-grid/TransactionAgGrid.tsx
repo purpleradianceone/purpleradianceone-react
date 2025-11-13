@@ -28,7 +28,7 @@ const TransactionAgGrid: React.FC<{
     () => [
       {
         field: "companyProductName",
-        headerName: "Changed Lead Owner",
+        headerName: "Product",
         cellStyle: {
           color: "black",
           fontWeight: "bold",
@@ -36,7 +36,7 @@ const TransactionAgGrid: React.FC<{
       },
       {
         field: "transactionTypeName",
-        headerName: "transactionTypeName",
+        headerName: "Transaction",
         hide: false,
         
       },
@@ -44,22 +44,23 @@ const TransactionAgGrid: React.FC<{
         field: "quantity",
         headerName: "quantity", 
       },
+       {
+        field: "transactionDate",
+        headerName: "Transaction Date",
+      },
       {
         field: "isInward",
         headerName: "isInward",
       },
        {
         field: "otherDetails",
-        headerName: "otherDetails",
+        headerName: "Other Details",
       },
        {
         field: "description",
         headerName: "description",
       },
-       {
-        field: "transactionDate",
-        headerName: "transactionDate",
-      },
+      
        {
         field: "createdBy",
         headerName: "createdBy",

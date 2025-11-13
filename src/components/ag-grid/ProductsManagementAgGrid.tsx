@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import { Edit, Network, UserPlus } from "lucide-react";
+import { Edit, Network,  UserPlus } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
 import toast from "react-hot-toast";
@@ -53,7 +53,7 @@ function ProductsManagementGrid({
         field: "barcode",
         headerName: "Barcode",
         sortable: true,
-        maxWidth:130,
+        maxWidth: 130,
         filter: true,
         flex: 1,
       },
@@ -74,7 +74,7 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
       },
-       {
+      {
         field: "unitName",
         headerName: "Unit Name",
         sortable: true,
@@ -87,12 +87,12 @@ function ProductsManagementGrid({
         headerName: "Active",
         sortable: true,
         filter: true,
-        maxWidth:100,
+        maxWidth: 100,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center gap-1">
-              <StatusIndicator isActive={params.value}/>
+              <StatusIndicator isActive={params.value} />
             </div>
           );
         },
@@ -105,7 +105,7 @@ function ProductsManagementGrid({
         maxWidth: 110,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct ,
+        hide: !userHasAccessToViewProduct,
       },
       {
         field: "defaultAmcCycleName",
@@ -114,7 +114,7 @@ function ProductsManagementGrid({
         maxWidth: 120,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct ,
+        hide: !userHasAccessToViewProduct,
       },
       {
         field: "version",
@@ -130,7 +130,7 @@ function ProductsManagementGrid({
         headerName: "URL",
         sortable: true,
         filter: true,
-        maxWidth:120,
+        maxWidth: 120,
         flex: 1,
         hide: !userHasAccessToViewProduct,
         tooltipValueGetter(params) {
@@ -201,18 +201,17 @@ function ProductsManagementGrid({
           return params.data.description;
         },
       },
-     
+
       {
-        hide:true,
+        hide: true,
         field: "unitId",
         headerName: "Unit Id",
         sortable: true,
         filter: true,
         flex: 1,
-
       },
       {
-        hide : true,
+        hide: true,
         field: "unitNameInStock",
         headerName: "Base Unit in Stock",
         sortable: true,
@@ -234,14 +233,14 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
       },
-      { 
+      {
         headerName: "Actions",
-        hide : !isGridForAccountProduct,
+        hide: !isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          cellRenderer: (params:  Product | any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: Product | any) => {
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -250,7 +249,7 @@ function ProductsManagementGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-              Select
+                Select
               </span>
             </div>
           );
@@ -258,7 +257,7 @@ function ProductsManagementGrid({
       },
       {
         headerName: "Actions",
-        hide : isGridForAccountProduct,
+        hide: isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
@@ -331,74 +330,96 @@ function ProductsManagementGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-24 ml-2 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
+                    <>
+                      <ActionsDropdownButton
+                        disabled={!userHasAccessToUpdateProduct}
+                        onClick={() => {
+                          if (userHasAccessToUpdateProduct) {
+                            setIsActionsDropDownOpen(false);
+                            handleEditCompanyProductModalOpen(true);
+                            handleSelectedProductChange(params.data);
+                          } else {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                                .DENIED_UPDATE_ACCESS
+                            );
+                          }
+                        }}
+                      >
+                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                        {JSX_CHILDREN_NAME.EDIT}
+                      </ActionsDropdownButton>
+                    </>
+
+                    {/* <>
+                      <ActionsDropdownButton
+                        disabled={!userHasAccessToUpdateProduct}
+                        onClick={() => {
+                          if (userHasAccessToUpdateProduct) {
+                            setIsActionsDropDownOpen(false);
+                            handleCreateStockModalOpen!(true);
+                            handleSelectedProductChange(params.data);
+                          } else {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                                .DENIED_UPDATE_ACCESS
+                            );
+                          }
+                        }}
+                      >
+                        <div className="flex text-nowrap">
+                          <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                          Stock
+                        </div>
+                      </ActionsDropdownButton>
+                    </> */}
+                    <>
+                      {/* {userHasAccessToUpdateProductTeam && ( */}
                       <>
                         <ActionsDropdownButton
-                          disabled={!userHasAccessToUpdateProduct}
+                          disabled={!userHasAccessToUpdateProductTeam}
                           onClick={() => {
-                            if (userHasAccessToUpdateProduct) {
+                            if (userHasAccessToUpdateProductTeam) {
                               setIsActionsDropDownOpen(false);
-                              handleEditCompanyProductModalOpen(true);
+                              handleCompanyProductUserModalOpen(true);
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
                                   .DENIED_UPDATE_ACCESS
                               );
                             }
                           }}
                         >
-                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                          {JSX_CHILDREN_NAME.EDIT}
+                          <UserPlus
+                            className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                          />
+                          {JSX_CHILDREN_NAME.USER}
+                        </ActionsDropdownButton>
+                        <ActionsDropdownButton
+                          disabled={!userHasAccessToUpdateProductTeam}
+                          onClick={() => {
+                            if (userHasAccessToUpdateProductTeam) {
+                              setIsActionsDropDownOpen(false);
+                              handleCompanyProductTeamModalOpen(true);
+                              handleSelectedProductChange(params.data);
+                            } else {
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
+                                  .DENIED_UPDATE_ACCESS
+                              );
+                            }
+                          }}
+                        >
+                          <Network
+                            className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                          />
+                          {JSX_CHILDREN_NAME.TEAM}
                         </ActionsDropdownButton>
                       </>
+                      {/* // )} */}
 
-                      <>
-                        {/* {userHasAccessToUpdateProductTeam && ( */}
-                        <>
-                          <ActionsDropdownButton
-                            disabled={!userHasAccessToUpdateProductTeam}
-                            onClick={() => {
-                              if (userHasAccessToUpdateProductTeam) {
-                                setIsActionsDropDownOpen(false);
-                                handleCompanyProductUserModalOpen(true);
-                                handleSelectedProductChange(params.data);
-                              } else {
-                                toast.error(
-                                  MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                    .DENIED_UPDATE_ACCESS
-                                );
-                              }
-                            }}
-                          >
-                            <UserPlus
-                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                            />
-                            {JSX_CHILDREN_NAME.USER}
-                          </ActionsDropdownButton>
-                          <ActionsDropdownButton
-                            disabled={!userHasAccessToUpdateProductTeam}
-                            onClick={() => {
-                              if (userHasAccessToUpdateProductTeam) {
-                                setIsActionsDropDownOpen(false);
-                                handleCompanyProductTeamModalOpen(true);
-                                handleSelectedProductChange(params.data);
-                              } else {
-                                toast.error(
-                                  MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                    .DENIED_UPDATE_ACCESS
-                                );
-                              }
-                            }}
-                          >
-                            <Network
-                              className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                            />
-                            {JSX_CHILDREN_NAME.TEAM}
-                          </ActionsDropdownButton>
-                        </>
-                        {/* // )} */}
-
-                        {/* {!userHasAccessToUpdateProductTeam && (
+                      {/* {!userHasAccessToUpdateProductTeam && (
                           <>
                             <Button
                              disabled
@@ -418,8 +439,7 @@ function ProductsManagementGrid({
                             </Button>
                           </>
                         )} */}
-                      </>
-
+                    </>
                   </div>,
                   document.body // Render dropdown in body to avoid clipping
                 )}
@@ -454,7 +474,7 @@ function ProductsManagementGrid({
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
-         context={{ handleRowSelect: onRowSelect }}
+        context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );

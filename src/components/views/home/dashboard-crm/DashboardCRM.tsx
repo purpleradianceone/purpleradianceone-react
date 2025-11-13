@@ -92,7 +92,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const getCrmModuleAccessOfCompanyUser = async () => {
     setAccessModuleCompanyUser([]);
-    setIsTasksLoading(true);
+   
     const getCrmModuleAccessData = {
       company_id: loginStatus.companyId,
       company_user_id: companyUserId,
@@ -108,7 +108,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
           setAccessModuleCompanyUser(accessModuleOfCompanyUser);
         }
-        getDashboardData();
+       
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -134,7 +134,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     setIsTasksLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      owner_id: companyUserId ?? loginStatus.id,
+      owner_id: companyUserId ?? null,
       requestedby_id: loginStatus.id,
     };
 
@@ -254,9 +254,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   };
 
   useEffect(() => {
-    if (loginStatus?.companyId && loginStatus?.id) {
+    if (loginStatus?.companyId && loginStatus?.id && companyUserId !== null) {
+       setIsTasksLoading(true);       
       getCrmModuleAccessOfCompanyUser();
     }
+     getDashboardData();
   }, [companyUserId]);
 
   useEffect(() => {

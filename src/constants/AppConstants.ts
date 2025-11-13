@@ -14,6 +14,11 @@ export const  STRING_VALUES = {
     
 }
 
+export enum ActionTypeForStockMOdule{
+  DETAILS = "DETAILS",
+  TRANSACTIONS = "TRANSACTIONS"
+}
+
 export const DEBOUNCE_DELAY = 300;
 
 export const OPACITY = {

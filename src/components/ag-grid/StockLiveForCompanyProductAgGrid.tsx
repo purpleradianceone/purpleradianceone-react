@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { INNERHTML } from "../../constants/AppConstants";
+import { ActionTypeForStockMOdule, INNERHTML } from "../../constants/AppConstants";
 import { useMemo, useRef } from "react";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 
 const StockLiveForCompanyProductAgGrid = ({
   data,
-  onRowSelect
+  onRowSelect,
 }: {
   data: LiveStockForCompanyProduct[];
-  onRowSelect : (data : LiveStockForCompanyProduct) => void;
+  onRowSelect: (data: LiveStockForCompanyProduct , action : ActionTypeForStockMOdule) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -52,28 +53,67 @@ const StockLiveForCompanyProductAgGrid = ({
         minWidth: 180,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
-
       {
         headerName: "Actions",
-        field: "view",
+        field: "actions",
         pinned: "right",
-        maxWidth: 80,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params:LiveStockForCompanyProduct| any) => {
+        cellRenderer: (params: LiveStockForCompanyProduct | any) => {
+          const handleClick = (action : ActionTypeForStockMOdule) => {
+            params.context.handleRowSelect(params.data , action);
+          };
+
           return (
-            <div className="flex items-center justify-center  ">
+            <div className="flex  items-center justify-center gap-1">
               <span
                 className="lead-details cursor-pointer text-blue-600  "
-                onClick={() => {
-                  params.context.handleRowSelect(params.data);
-                }}
+                onClick={() =>handleClick(ActionTypeForStockMOdule.DETAILS)}
               >
                 Details
+              </span>
+              <span
+                className="lead-details cursor-pointer text-blue-600  "
+                onClick={() => handleClick(ActionTypeForStockMOdule.TRANSACTIONS)}
+              >
+                Transactions
               </span>
             </div>
           );
         },
       },
+
+      // {
+      //   headerName: "Actions",
+      //   field: "view",
+      //   pinned: "right",
+
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   cellRenderer: (params:LiveStockForCompanyProduct| any) => {
+      //     return (
+      //       <>
+      //       <div className="flex items-center justify-center  ">
+      //         <span
+      //           className="lead-details cursor-pointer text-blue-600  "
+      //           onClick={() => {
+      //             params.context.handleRowSelect(params.data);
+      //           }}
+      //           >
+      //           Details
+      //         </span>
+      //       </div>
+      //       <div className="flex items-center justify-center  ">
+      //         <span
+      //           className="lead-details cursor-pointer text-blue-600  "
+      //           onClick={() => {
+      //             params.context.handleRowSelect(params.data);
+      //           }}
+      //           >
+      //           asdsd
+      //         </span>
+      //       </div>
+      //           </>
+      //     );
+      //   },
+      // },
     ],
     []
   );
@@ -81,7 +121,7 @@ const StockLiveForCompanyProductAgGrid = ({
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
-      minWidth: 150,
+      // minWidth: 150,
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,

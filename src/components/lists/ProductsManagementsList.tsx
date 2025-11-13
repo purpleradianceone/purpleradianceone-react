@@ -39,6 +39,7 @@ ProductsManagementListProps) {
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
     useState<boolean>(false);
+  // const [openCreateStockModal  , setOpenCreateStockModal] = useState<boolean>(false); 
   const [isCompanyProductUserModalOpen, setIsCompanyProductUserModalOpen] =
     useState<boolean>(false);
   const [isCompanyProductTeamModalOpen, setIsCompanyProductTeamModalOpen] =
@@ -93,6 +94,10 @@ ProductsManagementListProps) {
   const handleEditCompanyProductModalOpen = (status: boolean) => {
     setIsEditCompanyProductModalOpen(status);
   };
+
+  // const handleCreateStockModalOpen = (status: boolean) => {
+  //   setOpenCreateStockModal(status);
+  // };
 
   const handleCompanyProductUserModalOpen = (status: boolean) => {
     setIsCompanyProductUserModalOpen(status);
@@ -250,6 +255,16 @@ ProductsManagementListProps) {
                 companyProduct={selectedProduct}
               />
             )}
+            {/* {
+              openCreateStockModal && (
+                <AddStock
+                  isOpen={openCreateStockModal}
+                  onClose={() =>{
+                    setOpenCreateStockModal(false)
+                  }}
+                />
+              )
+            } */}
           </div>
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
@@ -274,6 +289,7 @@ ProductsManagementListProps) {
               handleCompanyProductTeamModalOpen={
                 handleCompanyProductTeamModalOpen
               }
+              // handleCreateStockModalOpen={handleCreateStockModalOpen}
               onRowSelect={onRowSelect}
             />
           </div>

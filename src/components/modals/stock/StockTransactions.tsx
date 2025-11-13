@@ -8,7 +8,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import DatePickerInput from "../../ui/DatePickerInput";
-import { ClipboardPen, LucideCalendar } from "lucide-react";
+import { ClipboardPen, LucideCalendar, Receipt } from "lucide-react";
 import { useFormattedForPostData } from "../../../config/hooks/useFormatDateForPostData";
 import useTransactionType from "../../../config/hooks/useTransactionType";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
@@ -17,8 +17,15 @@ import Pagination from "../../ag-grid/Pagination";
 import TransactionAgGrid from "../../ag-grid/TransactionAgGrid";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import FormHeader from "../../ui/FormHeader";
 
-const StockTransactions = ({ onClose }: { onClose: () => void }) => {
+const StockTransactions = ({
+  companyProductId,
+   onClose
+   }: {
+    companyProductId : number ;
+     onClose: () => void;
+     }) => {
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
   const { loading: transactionTypeDataLoading, transactionType } =
@@ -57,7 +64,7 @@ const StockTransactions = ({ onClose }: { onClose: () => void }) => {
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
-      company_product_id: null,
+      company_product_id: companyProductId,
       transaction_type_id: transactionId,
       transaction_date: formattedDate,
       offset: offset,
@@ -116,6 +123,9 @@ const StockTransactions = ({ onClose }: { onClose: () => void }) => {
     };
   }, [transactionDate , currentPage , pageSize , transactionId]);
 
+  function handleResetTransactionType (){
+
+  }
   if (transactionTypeDataLoading) {
     <FormLayout>
       <LoadingPopUpAnimation show={transactionTypeDataLoading} />
@@ -123,10 +133,17 @@ const StockTransactions = ({ onClose }: { onClose: () => void }) => {
   }
   return (
     <FormLayout>
-      <button onClick={onClose}>close </button>
-      <div>
+      <FormHeader
+        icon={Receipt}
+        onClose={onClose}
+        preText="Transaction history"
+        description="Check daily transaction history — select a date to view past records. "
+      />
+      <div className="flex items-center gap-2"> 
+
         <DatePickerInput
-          label="Transactions Date :"
+          label="Transactions Date "
+          required
           logo={LucideCalendar}
           name="validFrom"
           defaultValue={transactionDate}
@@ -134,17 +151,17 @@ const StockTransactions = ({ onClose }: { onClose: () => void }) => {
           onChange={handleDateChange}
         />
         {/* adjustment reason */}
-              <div className="mt-2 flex items-center ">
+              <div className="mt-2 p-1.5  items-center ">
                 <h1 className="input-label-custom  mb-1 gap-1 flex items-center ">
                   <ClipboardPen className="text-blue-500" size={15} />{" "}
-                  Adjustment Reason :<span className="text-red-400">*</span>
+                  Transaction Type 
                 </h1>
                 <div className="flex flex-wrap gap-3">
                   {transactionType.length > 0 &&
                     transactionType.map((option: any) => (
                       <label
                         key={option.id}
-                        className={`flex items-center gap-2 px-2 py-1.5 border rounded cursor-pointer transition ${
+                        className={`flex items-center gap-2 px-1 py-1 border rounded cursor-pointer transition ${
                           transactionId === option.id
                             ? "border-blue-500 bg-blue-50 text-blue-700"
                             : "border-gray-300 hover:bg-gray-100"
@@ -164,11 +181,14 @@ const StockTransactions = ({ onClose }: { onClose: () => void }) => {
                         <span className="caption-custom">{option.name}</span>
                       </label>
                     ))}
+                    <button className="h-1"
+                      onClick={handleResetTransactionType}
+                    >✖️</button>
                 </div>
                 
               </div>
       </div>
-        <h2>Stock transactions.</h2>
+        {/* <h2>Stock transactions.</h2> */}
 
       {/* Data Grid Section */}
       <div
