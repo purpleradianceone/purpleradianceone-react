@@ -188,6 +188,7 @@ const StockLiveForCompanyProduct = ({
       </div>
       {showTransactions && (
         <StockTransactions
+        companyProductId = {companyStockLive.companyProductId}
           onClose={() => {
             setShowTransactions(false);
           }}
