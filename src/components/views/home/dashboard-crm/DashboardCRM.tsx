@@ -7,7 +7,11 @@ import MetricCard from "./MetricCard";
 import PipelineChart from "./PipeLineChart";
 import QuickActions from "./QuickActions";
 import {
+  AlarmClock,
   AlertCircleIcon,
+  CalendarCheck,
+  CalendarClock,
+  ListTodo,
   ShieldAlert,
   Target,
   TrendingUp,
@@ -195,6 +199,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -219,6 +225,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -482,6 +490,89 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           companyUserId={companyUserId}
           moduleAccessCompanyUser={accessModuleCompanyUser}
         />
+      </div>
+    ),
+    "Total Pending Task": (
+      <div
+        key="Total Pending Task"
+        className="flex col-span-2 w-full gap-4 justify-around"
+      >
+        <div className="flex grid-cols-4 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <MetricCard
+            title="Total Pending Task"
+            id="totalPendingTaskMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK]?.[0]
+                ?.total_pending_task ?? 0
+            ).toString()}
+            icon={CalendarClock}
+            color="bg-gradient-to-r from-red-500 to-red-600"
+            gradient="bg-gradient-to-r from-red-500 to-red-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Pending Task - Today"
+            id="totalPendingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY]?.[0]
+                ?.total_pending_task_today ?? 0
+            ).toString()}
+            icon={AlarmClock}
+            color="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task - Today"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task"
+            id="totalUpcomingTaskMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK
+              ]?.[0]?.total_upcoming_task ?? 0
+            ).toString()}
+            icon={ListTodo}
+            color="bg-gradient-to-r from-blue-500 to-blue-600"
+            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task - Today"
+            id="totalUpcomingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK_TODAY
+              ]?.[0]?.total_upcoming_task_today ?? 0
+            ).toString()}
+            icon={CalendarCheck}
+            color="bg-gradient-to-r from-teal-500 to-teal-600"
+            gradient="bg-gradient-to-r from-teal-500 to-teal-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task - Today"
+                  )!.value
+                : false
+            }
+          />
+        </div>
       </div>
     ),
   };
