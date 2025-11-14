@@ -389,7 +389,7 @@ const AccountCompanyProductPopUpDetails = ({
                   <DisplayComponent
                   icon={Package}
                   title="Quantity"
-                  value={productData.quantity.toLocaleString().concat(" "+productData.unitName)}
+                  value={productData.quantity.toLocaleString().concat(" "+productData.unitNameInStock)}
                   penLogo={false}
                 />
                  </div>

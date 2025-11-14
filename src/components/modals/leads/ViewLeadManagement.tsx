@@ -139,9 +139,10 @@ const ViewLeadManagement = () => {
       }
     }
   };
-
+  const [isLeadStatusSaving, setIsLeadStatusSaving] = useState<boolean>(false);
   const handleSaveStatusUpdate = async () => {
     if (!selectedLeadData || selectedStatusId === null) return;
+    if(isLeadStatusSaving) return;
 
     const postDataForLeadStatusUpdate = {
       company_id: loginStatus.companyId,
@@ -152,6 +153,7 @@ const ViewLeadManagement = () => {
     };
 
     try {
+      setIsLeadStatusSaving(true)
       const response = await axios.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
@@ -196,6 +198,8 @@ const ViewLeadManagement = () => {
           handleSaveStatusUpdate();
         }
       }
+    }finally{
+      setIsLeadStatusSaving(false);
     }
   };
 
@@ -836,6 +840,7 @@ const ViewLeadManagement = () => {
         </div>
         {reasonInputBoxOpen && selectedStatusId !== 9 && (
           <StatusUpdateModal
+          isLeadStatusSaving={isLeadStatusSaving}
             handleCancel={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
@@ -848,6 +853,7 @@ const ViewLeadManagement = () => {
 
         {reasonInputBoxOpen && selectedStatusId === 9 && (
           <ConvertLeadModal
+          isLeadStatusSaving={isLeadStatusSaving}
             isOpen={reasonInputBoxOpen}
             onClose={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);

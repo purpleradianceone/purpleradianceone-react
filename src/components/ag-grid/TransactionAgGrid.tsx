@@ -3,6 +3,7 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo } from "react";
 import Transaction from "../../@types/stock/Transaction";
+import StatusIndicator from "../ui/StatusIndicator";
 
 const TransactionAgGrid: React.FC<{
   data : Transaction[]
@@ -50,7 +51,17 @@ const TransactionAgGrid: React.FC<{
       },
       {
         field: "isInward",
-        headerName: "isInward",
+        headerName: "Inward ",
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center gap-1">
+              <StatusIndicator isActive={params.value} 
+              activeLabel="Yes"
+              inactiveLabel="No"
+              />
+            </div>
+          );
+        },
       },
        {
         field: "otherDetails",

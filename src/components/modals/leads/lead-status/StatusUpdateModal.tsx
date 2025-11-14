@@ -1,17 +1,20 @@
 import React from 'react';
 import { Save, X } from 'lucide-react'; 
 import COLORS from '../../../../constants/Colors';
+import LoadingPopUpAnimation from '../../../views/card/LoadingPopUpAnimation';
 
 function StatusUpdateModal({
   reasonText,
   onReasonChange,
   handleSaveStatusUpdate,
   handleCancel,
+  isLeadStatusSaving
 } : {
      reasonText : string;
   onReasonChange : (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSaveStatusUpdate : () => Promise<void>;
   handleCancel : () => void;
+   isLeadStatusSaving: boolean
 }) {
   return (
     <div className="flex m-3 w-full pr-40 gap-1">
@@ -19,7 +22,8 @@ function StatusUpdateModal({
       <label className="input-label-custom">
         Reason (Optional)
       </label>
-      
+                      { isLeadStatusSaving && <LoadingPopUpAnimation show={isLeadStatusSaving} />}
+
       {/* Reason Text Input */}
       <input
         type="text"

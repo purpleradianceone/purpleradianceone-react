@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import { Edit, Network,  UserPlus } from "lucide-react";
+import { Edit, Network,  Plus,  UserPlus } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
 import toast from "react-hot-toast";
@@ -23,6 +23,7 @@ function ProductsManagementGrid({
   handleCompanyProductTeamModalOpen,
   isGridForAccountProduct,
   onRowSelect, //selected user for view lead details
+  handleCreateStockModalOpen
 }: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProduct,
@@ -351,7 +352,7 @@ function ProductsManagementGrid({
                       </ActionsDropdownButton>
                     </>
 
-                    {/* <>
+                    <>
                       <ActionsDropdownButton
                         disabled={!userHasAccessToUpdateProduct}
                         onClick={() => {
@@ -372,7 +373,7 @@ function ProductsManagementGrid({
                           Stock
                         </div>
                       </ActionsDropdownButton>
-                    </> */}
+                    </>
                     <>
                       {/* {userHasAccessToUpdateProductTeam && ( */}
                       <>

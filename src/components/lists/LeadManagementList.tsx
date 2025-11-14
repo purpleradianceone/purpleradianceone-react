@@ -163,12 +163,11 @@ function LeadManagementList({
          }
               
 
-          {isLargeScreen && (
+          {/* {isLargeScreen && ( */}
             <>
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-2  px-1 justify-center items-center">
                 {/* search box flex div */}
-                <div className="relative flex items-center justify-center w-auto">
-                  <div className="grid w-56">
+                  <div className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}>
                     <SearchInput
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
@@ -177,7 +176,6 @@ function LeadManagementList({
                       }}
                     ></SearchInput>
                   </div>
-                </div>
 
                 {/* Date FIlters Dropdown */}
                 <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
@@ -242,11 +240,6 @@ function LeadManagementList({
 
                     {selectedLeadOwner.id !== 0 && (
                       <div className="border rounded-md border-gray-400 p-0.5">
-                        {/* <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
-                          {" "}
-                          <User size={11} />
-                          Selected Owner:
-                        </span> */}
                         <div
                           title={selectedLeadOwner.fullname}
                           className={
@@ -279,7 +272,7 @@ function LeadManagementList({
                  )}
               </div>
             </>
-          )}
+          {/* )} */}
 
           {isUsedInLeadModule && (
             <div className="flex  gap-1">

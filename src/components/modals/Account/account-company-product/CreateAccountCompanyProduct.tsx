@@ -35,6 +35,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersManagement";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import useUnitForProduct from "../../../../config/hooks/useUnitForProduct";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 const CreateAccountCompanyProduct = ({
   onClose,
@@ -139,7 +140,7 @@ const CreateAccountCompanyProduct = ({
 
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
     useState<number>(0);
-
+  const [isSaving , setIsSaving] = useState<boolean>(false);
   const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
   const [SelectedWarranty, setSelectedWarranty] = useState<number>(0);
   const [selectedAmc, setSelectedAmc] = useState<number | undefined>(0);
@@ -295,7 +296,7 @@ const CreateAccountCompanyProduct = ({
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-
+    if(isSaving) return;
    const isValid= validateFormData();
 
    if(!isValid) {
@@ -330,6 +331,7 @@ const CreateAccountCompanyProduct = ({
       addProductToAccountFormData.amcCycleEndDate
     );
 
+    setIsSaving(true)
     const postData = {
       company_id: loginStatus.companyId,
       account_id: accountId,
@@ -378,6 +380,9 @@ const CreateAccountCompanyProduct = ({
         } else {
           toast.error(error.response.data);
         }
+      })
+      .finally(()=>{
+        setIsSaving(false)
       });
   };
 
@@ -388,6 +393,9 @@ const CreateAccountCompanyProduct = ({
     <div className="fixed inset-0 z-50 bg-black bg-opacity-5   flex justify-center items-center  p-2 sm:p-2">
       <div className="bg-white w-full max-w-6xl h-[90vh]   rounded  p-2 relative overflow-auto">
         {/* Header */}
+        {isSaving && <LoadingPopUpAnimation
+        show={isSaving}
+          />}
         <FormHeader
           icon={BoxSelectIcon}
           onClose={handleCloseForm}

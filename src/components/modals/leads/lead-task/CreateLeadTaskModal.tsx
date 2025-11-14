@@ -27,7 +27,7 @@ import ROUTES_URL from "../../../../constants/Routes";
 import LeadActivityType from "../../../../@types/lead-management/LeadActivityType";
 import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
 import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageType";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
@@ -41,6 +41,8 @@ import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import MESSAGE from "../../../../constants/Messages";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -64,6 +66,7 @@ function CreateLeadTaskModal({
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
+  const [isSaving, setIsSaving] = useState(false);
 
   const [subject, setSubject] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -174,6 +177,7 @@ function CreateLeadTaskModal({
   };
 
   const createLeadTask = async (event: React.FormEvent) => {
+    if(isSaving) return;
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
       return;
@@ -214,8 +218,8 @@ function CreateLeadTaskModal({
       lead_activity_details: jsonData,
       createdby_id: loginStatus.id,
     };
-
-    axios
+    setIsSaving(true)
+   await  axios
       .post(POST_API.CREATE_LEAD_TASK, createLeadTaskPostData, {
         withCredentials: true,
       })
@@ -223,9 +227,7 @@ function CreateLeadTaskModal({
         if (response.data.status) {
           toast.success(response.data.message);
           handleLeadTaskCreate();
-          setTimeout(() => {
             handleClose();
-          }, 2000);
         } else {
           toast.error(response.data.message);
         }
@@ -238,7 +240,11 @@ function CreateLeadTaskModal({
           if (refreshTokenResponse) {
             createLeadTask(event);
           }
+        }else{
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
+      }).finally(()=>{
+        setIsSaving(false)
       });
   };
 
@@ -298,6 +304,7 @@ function CreateLeadTaskModal({
           preText="Create task for timely action"
           description="Plan and create a task to schedule follow-ups and ensure timely action."
         />
+        {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
         {/* Form Grid */}
         <form className="space-y-2 mt-2">
@@ -634,10 +641,17 @@ function CreateLeadTaskModal({
                 </div>
               </Button>
               {/* Save */}
-              <Button type="submit" onClick={createLeadTask}>
+              <Button 
+              type="submit"
+              disabled={isSaving}
+              
+              onClick={(event : React.FormEvent<HTMLButtonElement>)=>{
+                if(isSaving) return;
+                createLeadTask(event)
+              }}>
                 <div className="flex items-center gap-1">
                   <Save size={16} />
-                  Save
+                  {isSaving ? "Saving..." : "Save"} 
                 </div>
               </Button>
             </div>
