@@ -33,10 +33,14 @@ const StockManagementList = ({
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
   const [openStockLivePage, setOpenStockLivePage] = useState<boolean>(false);
-  const [openTransactionsPage , setOpenTransactionsPage] = useState<boolean>(false);
+  const [openAllTransactionPage, setOpenAllTransactionPage] =
+    useState<boolean>(false);
+  const [openTransactionsPage, setOpenTransactionsPage] =
+    useState<boolean>(false);
   const [stockForCompanyProductLive, setStockLiveForCompanyProduct] =
     useState<LiveStockForCompanyProduct | null>(null);
-  const [selectedStockForTransaction, setSelectedStockForTransaction]  = useState<LiveStockForCompanyProduct | null >(null) 
+  const [selectedStockForTransaction, setSelectedStockForTransaction] =
+    useState<LiveStockForCompanyProduct | null>(null);
   function handleSelectedStockLiveForCompanyProduct(
     data: LiveStockForCompanyProduct,
     action: ActionTypeForStockMOdule
@@ -48,7 +52,7 @@ const StockManagementList = ({
           setOpenStockLivePage(true);
         }
         break;
-      case ActionTypeForStockMOdule.TRANSACTIONS: 
+      case ActionTypeForStockMOdule.TRANSACTIONS:
         if (data !== null && data !== undefined) {
           setSelectedStockForTransaction(data);
           setOpenTransactionsPage(true);
@@ -56,6 +60,10 @@ const StockManagementList = ({
     }
 
     // navigate(`${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}${data.companyProductId}/${data.companyProductName}/${data.quantityLive}/${data.quantityInward}/${data.quantityOutward}`);
+  }
+
+  function handleShowAllTransactionButtonClick() {
+    setOpenAllTransactionPage(true);
   }
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
@@ -75,10 +83,10 @@ const StockManagementList = ({
           <span className="section-header-custom">Stock Management</span>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex justify-center items-center  gap-1">
           {/* search box flex div */}
 
-          <div className="relative flex items-start w-80">
+          <div className="  flex items-start w-80">
             <SearchInput
               id="company-user-module-search-box"
               onChange={(e) => {
@@ -89,7 +97,7 @@ const StockManagementList = ({
 
           {/* Date FIlters Dropdown */}
           <div
-            className={`flex flex-wrap gap-0.5 ${
+            className={`flex flex-wrap items-center gap-0.5 ${
               isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
             }`}
           >
@@ -105,19 +113,31 @@ const StockManagementList = ({
               </div>
             </div>
             {/* Custom Date Picker Div Flex Box*/}
-            <div
-              style={
-                isCustomDateOptionSelected
-                  ? { visibility: "visible" }
-                  : { visibility: "hidden" }
-              }
-            >
-              <DateRangePicker
-                onStartDateChange={onStartDateChange}
-                onEndDateChange={onEndDateChange}
-              />
-            </div>
+            {isCustomDateOptionSelected && (
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
+            )}
           </div>
+          <Button
+            type="button"
+            onClick={handleShowAllTransactionButtonClick}
+            className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
+                      rounded-md bg-white  hover:bg-gray-50 
+                      focus:outline-none shadow-sm"
+          >
+            <span className="inline md:hidden">Transa...</span>
+           <span className="hidden md:inline"> Transactions</span>
+          </Button>
         </div>
 
         <div id="company-users-module-add-button" className="flex gap-1">
@@ -139,7 +159,7 @@ const StockManagementList = ({
           >
             <div className="flex items-center gap-1">
               <Plus size={SIZE.SIXTEEN} />
-              Add
+              <span className="hidden md:inline">Add</span>
             </div>
           </Button>
         </div>
@@ -184,16 +204,21 @@ const StockManagementList = ({
           }}
         />
       )}
-      {
-        openTransactionsPage && (
-          <StockTransactions
-            companyProductId={selectedStockForTransaction!.companyProductId}
-            onClose={() =>{
-              setOpenTransactionsPage(false)
-            }}
-          />
-        )
-      }
+      {openTransactionsPage && (
+        <StockTransactions
+          companyProductId={selectedStockForTransaction!.companyProductId}
+          onClose={() => {
+            setOpenTransactionsPage(false);
+          }}
+        />
+      )}
+      {openAllTransactionPage && (
+        <StockTransactions
+          onClose={() => {
+            setOpenAllTransactionPage(false);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -46,6 +46,7 @@ import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
 import FormLayout from "../../ui/FormLayout";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 type CreateAccountType = {
   onClose: () => void;
@@ -74,7 +75,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   handleCreateAccount,
 }) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-
+  const [isSaving, setIsSaving ] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
   const [createAccountFormData, setCreateAccountFormData] =
     useState<AccountFormType>({
@@ -261,6 +262,7 @@ if (name === "mobilenumber") {
   // create function call
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(isSaving) return;
     const { name, email, mobilenumber, business_type_id, industry_type_id } =
       createAccountFormData;
     let isValid = true;
@@ -328,7 +330,7 @@ if (name === "mobilenumber") {
 
     setErrors(newErrors);
     if (!isValid) return;
-
+    setIsSaving(true)
     //  Proceed with form submission logic here
     const postData = {
       name: createAccountFormData.name.trim(),
@@ -386,7 +388,9 @@ if (name === "mobilenumber") {
           toast.error(error.response.data);
         }
       })
-      .finally(() => {});
+      .finally(() => {
+        setIsSaving(false)
+      });
   };
 
   // note : to make the state clear
@@ -435,11 +439,9 @@ if (name === "mobilenumber") {
     );
   }
   return (
-    // <div className="fixed inset-0 z-50 border bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
-    //   <div className=" bg-white border rounded-2xl  shadow-lg w-full m-20 p-4 h-full max-h-[90vh]  max-w-7xl overflow-auto ">
-    <FormLayout>
+      <FormLayout>
+        {isSaving && <LoadingPopUpAnimation show={isSaving}/>}
 
-  
         <motion.section
           ref={ref}
           initial={{ opacity: 0, y: 40 }}

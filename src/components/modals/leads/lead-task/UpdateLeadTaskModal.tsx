@@ -43,6 +43,8 @@ import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import ToggleButton from "../../../ui/ToggleButton";
+import MESSAGE from "../../../../constants/Messages";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -64,6 +66,7 @@ function UpdateLeadTaskModal({
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const parsedDate = parse(
     leadTask.dueDateTime,
@@ -217,10 +220,12 @@ function UpdateLeadTaskModal({
     console.log(leadTask.leadActivityDetails)
   },[])
 
-  const UpdateLeadTask = async (event: React.FormEvent) => {
+  const UpdateLeadTask = async (event: React.FormEvent<HTMLButtonElement>) => {
+    if(isSaving) return;
+
     event.preventDefault();
     const jsonData = generateTaskDetailsJson();
-    console.log(jsonData);
+    // console.log(jsonData);
     
 
     
@@ -233,8 +238,8 @@ function UpdateLeadTaskModal({
       originalLeadActivityDetailsString
     );
     const stringifiedOriginalData = JSON.stringify(originalLeadDetailsObject);
-    console.log("second stringfy")
-    console.log(stringifiedOriginalData);
+    // console.log("second stringfy")
+    // console.log(stringifiedOriginalData);
 
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
@@ -288,7 +293,8 @@ function UpdateLeadTaskModal({
       updatedby_id: loginStatus.id,
     };
 
-    axios
+    setIsSaving(true)
+    await axios
       .post(POST_API.UPDATE_LEAD_TASK, updateLeadTaskPostData, {
         withCredentials: true,
       })
@@ -296,10 +302,10 @@ function UpdateLeadTaskModal({
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
             toast.success(response.data.message);
-            handleLeadTaskUpdate();
             setTimeout(() => {
               handleClose(false);
-            }, 2000);
+            }, 100);
+            handleLeadTaskUpdate();
           } else {
             toast.error(response.data.message);
           }
@@ -313,7 +319,11 @@ function UpdateLeadTaskModal({
           if (refreshTokenResponse) {
             UpdateLeadTask(event);
           }
+        }else{
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
+      }).finally(()=>{
+        setIsSaving(false)
       });
   };
 
@@ -436,6 +446,13 @@ function UpdateLeadTaskModal({
           preText="Update task"
           description="Modify task details to keep information accurate and up to date."
         />
+        {
+          isSaving && (
+             <LoadingPopUpAnimation
+      show={isSaving}
+      />
+          )
+        }
         {/* Form Grid */}
         <form className="space-y-2">
           <div className="grid grid-cols-3 gap-3">
@@ -839,7 +856,16 @@ function UpdateLeadTaskModal({
                 </div>
               </Button>
               {/* Save */}
-              <Button type="submit" onClick={UpdateLeadTask}>
+              <Button type="submit" 
+              
+              disabled = {isSaving}
+              onClick={(event : React.FormEvent<HTMLButtonElement>)=>{
+
+                if(isSaving) return;
+                UpdateLeadTask(event)
+              }
+              }
+                >
                 <div className="flex items-center gap-1">
                   <Save size={16} />
                   Save
@@ -875,14 +901,6 @@ function UpdateLeadTaskModal({
           isUsedForMeetings={false}
         />
       )}
-
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>,
     document.body
   );

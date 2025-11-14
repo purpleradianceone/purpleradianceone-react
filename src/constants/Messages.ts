@@ -11,6 +11,7 @@ const MESSAGE = {
         COMPLETE_CAPTCHA: "Please Complete The Captcha",
         WRONG_CREDENTIALS: "Wrong Credentials ! Please try again",
         SOMETHING_WENT_WRONG: "Something Went Wrong!",
+        SOMETHING_WENT_WRONG_TRY_AGAIN: "Something went wrong! Please try again.",
         INVALID_CAPTCHA: "Invalid Captcha",
         REQUIRED_FIELDS: "Fill required fields",
         NO_CHANGES: "No changes to save",

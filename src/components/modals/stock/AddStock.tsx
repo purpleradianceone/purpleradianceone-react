@@ -39,11 +39,20 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CustomDropdown from "../leads/CustomDropdown";
 import useUnitForProduct from "../../../config/hooks/useUnitForProduct";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
-const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
+const AddStock = ({
+  isUsedInProductModal = false,
+  isOpen,
+  onClose,
+  product ,
+  }: 
+   AddStockModalProps
+  ) => {
   const { loginStatus } = useLoggedInUserContext();
-  // const { loading: isUnitDataLoading, unit: unitData } = useUnit();
-  const { companyWarehouse, loading: companyWarehouseLoading } =
+  const [isSaving , setIsSaving] = useState<boolean>(false);
+
+  const { companyWarehouse, loading: companyWarehouseLoading } =  
     useCompanyWarehouse();
   const { adjustmentReason, loading: adjustmentReasonLoading } =
     useAdjustmentReason();
@@ -52,7 +61,6 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
   const [showWarehouseSelectionModule, setShowWarehouseSelectionModule] =
     useState<boolean>(false);
   const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(0);
-  // const [selectedUnitError, setSelectedUnitError] = useState<boolean>(false);
   const [selectedAdjustmentReasonId, setSelectedAdjustmentReasonId] = useState<
     number | null
   >(null);
@@ -62,6 +70,13 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
   const { unitForProduct: unitForProductData } = useUnitForProduct({
     companyProductId: selectedProduct?.id,
   });
+  // Note : new Changes 
+  useEffect(()=>{
+    if(product){
+      setSelectedProduct(product)
+      setShowInputForm(true)
+    }
+  }, [product])
 
   const [error, setError] = useState<{
     unitIdError: boolean;
@@ -225,7 +240,7 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
     if (!isValid) {
       return;
     }
-
+    if(isSaving) return;
     const postData = {
       company_id: loginStatus.companyId,
       company_product_id: selectedProduct?.id,
@@ -238,12 +253,13 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
       createdby_id: loginStatus.id,
     };
 
+
+    setIsSaving(true)
     await axios
       .post(POST_API.CREATE_ADJUSTMENT_STOCK, postData, {
         withCredentials: true,
       })
       .then((response) => {
-        console.log(response);
 
         if (response.data.status) {
           toast.success(response.data.message);
@@ -264,12 +280,15 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
         } else {
           toast.error(error.response.data);
         }
+      }).finally(()=>{
+        setIsSaving(false)
       });
   };
 
   useEffect(() => {
    setSelectedUnitId(undefined)
   }, [selectedProduct]);
+
 
   if (!isOpen) return null;
   if (companyWarehouseLoading || adjustmentReasonLoading)
@@ -286,10 +305,10 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
           icon={Plus}
           onClose={handleCloseForm}
           description="Add new stock details to the inventory."
-          preText="Add stock"
+          preText="Add Stock"
         />
 
-        {!showInputForm && !showWarehouseSelectionModule && (
+        {!product && !showInputForm && !showWarehouseSelectionModule  && (
           <ProductManagement
             isGridForAccountProduct={true}
             onRowSelect={onRowSelectProductForStock}
@@ -298,13 +317,17 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
         {showInputForm && !showWarehouseSelectionModule && (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
-              <Button
+             {
+              !isUsedInProductModal && (
+                 <Button
                 className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
                 onClick={handleGoBackToProductSelection}
               >
                 <ArrowLeft size={14} />
                 Change Product
               </Button>
+              )
+             }
 
               {selectedProduct && (
                 <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
@@ -524,6 +547,7 @@ const AddStock = ({ isOpen, onClose }: AddStockModalProps) => {
           </div>
         )}
       </>
+      {isSaving && <LoadingPopUpAnimation show={isSaving}/>}
     </FormLayout>
   );
 };

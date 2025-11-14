@@ -43,12 +43,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+        hide:true,
         field: "unitName",
         headerName: "Unit",
         sortable: true,
         filter: true,
       },
       {
+         hide:true,
         field: "unitNameInStock",
         headerName: "Unit In Stock",
         sortable: true,
@@ -99,13 +101,21 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+         hide:true,
         field: "warrantyIntervalTypeId",
         headerName: "Warranty Interval Type ID",
         sortable: true,
         filter: true,
       },
       {
+         hide:true,
         field: "warranty",
+        headerName: "Warranty",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "warrantyIntervalName",
         headerName: "Warranty",
         sortable: true,
         filter: true,
@@ -128,13 +138,22 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
+       
       {
+        field: "amcIntervalName",
+        headerName: "AMC",
+        sortable: true,
+        filter: true,
+      },
+      {
+         hide:true,
         field: "amcCycleIntervalTypeId",
         headerName: "AMC Cycle Interval Type ID",
         sortable: true,
         filter: true,
       },
       {
+         hide:true,
         field: "amcCycle",
         headerName: "AMC Cycle",
         sortable: true,
@@ -161,18 +180,7 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
      
-      {
-        field: "warrantyIntervalName",
-        headerName: "Warranty Interval Name",
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: "amcIntervalName",
-        headerName: "AMC Interval Name",
-        sortable: true,
-        filter: true,
-      },
+     
       {
         field: "updatedBy",
         headerName: "Updated By",
