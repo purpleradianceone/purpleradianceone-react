@@ -36,6 +36,7 @@ import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersMan
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import useUnitForProduct from "../../../../config/hooks/useUnitForProduct";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import { StockSerialNumber } from "../../stock/stock-available-serial-number/StockSerialNumber";
 
 const CreateAccountCompanyProduct = ({
   onClose,
@@ -67,6 +68,7 @@ const CreateAccountCompanyProduct = ({
   const [selectedInstalledBy, setSelectedInstalledBy] = useState<CompanyUser>();
   const [showCompanyUserModule, setShowCompanyUserModule] =
     useState<boolean>(false);
+  const [showSerialNumberModule , setShowSerialNumberModule] = useState<boolean>(false);
   const intialAddProductToAccountFormData = {
     accountId: 0,
     amcCycle: 0,
@@ -402,7 +404,7 @@ const CreateAccountCompanyProduct = ({
           preText="Assign Product to account"
           description="Assign the new product to this Account."
         />
-        {!showGrid && !showCompanyUserModule && (
+        {!showGrid && !showCompanyUserModule && !showSerialNumberModule && (
           <>
             <ProductManagement
               isGridForAccountProduct={true}
@@ -436,7 +438,7 @@ const CreateAccountCompanyProduct = ({
             >
               {/* <div className=" gap-3 "> */}
                 {/* Quantity */}
-                <div className="mt-1.5">
+                <div className=" grid grid-cols-2 gap-2">
                   <FormInput
                   label="Quantity : "
                   logo={LucideIndianRupee}
@@ -465,6 +467,48 @@ const CreateAccountCompanyProduct = ({
                     <Info size={12} className="" />
                   </p>
                 )}
+
+                <div className="flex items-center justify-end mt-2">
+                <div className="w-full">
+                  <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
+                    <User className="text-blue-500" size={15}/>
+                    <div>
+
+                    Serial Number :<span className="ml-0 text-red-400">*</span>
+                    </div>
+                  </label>
+
+                  <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1.5 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                    <span className="text-gray-800">
+                      { selectedInstalledBy ?  (
+
+                        <>
+                          {selectedInstalledBy?.fullname}{" "}
+                          <span className="text-sm">
+                            {` (${selectedInstalledBy?.email
+                              ? (selectedInstalledBy.email)
+                              : selectedInstalledBy?.mobilenumber})`}
+                            
+                            
+                          </span>
+                        </>
+                      ) : "No serial number selected"}
+                    </span>
+
+                    <Button
+                      type="button"
+                      className="text-blue-600 text-sm underline hover:text-blue-800"
+                      onClick={() => {
+                        setShowSerialNumberModule(true);
+                        setShowCompanyUserModule(false);
+                        setShowGrid(false);
+                      }}
+                    >
+                      {selectedInstalledBy ? "Change" : "Select"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
                 </div>
                 {/* Unit */}
               <div className="mt-4">
@@ -801,7 +845,7 @@ const CreateAccountCompanyProduct = ({
           </>
         )}
         {
-          showCompanyUserModule && !showGrid && (
+          showCompanyUserModule && !showGrid && !showSerialNumberModule && (
             <GetCompanyUsers
               onRowSelect={handleSelctedInstalledByUser}
               isUsedInAccountProductForAssingingInstalledBy={true}
@@ -809,6 +853,17 @@ const CreateAccountCompanyProduct = ({
           )
          
         }
+        {
+          showSerialNumberModule &&  !showGrid && !showCompanyUserModule &&(
+            <StockSerialNumber
+            companyProductId={selectedProduct?.id}
+            onClose={()=>{
+              setShowSerialNumberModule(false)
+              setShowGrid(true)
+            }}
+            />
+          )}
+        
       </div>
     </div>
   );

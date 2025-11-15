@@ -353,18 +353,20 @@ const AddStock = ({
                   label="Quantity : "
                   logo={LucideIndianRupee}
                   required
+                  readonly={product?.isSerialNumber || selectedProduct?.isSerialNumber}
                   type="number"
                   name="quantity"
                   placeholder="Enter quantity here"
                   // value={addProductToAccountFormData.quantity}
                   defaultValue={
+                    (product?.isSerialNumber || selectedProduct?.isSerialNumber) ? 1 : 
                     addStockFormData.quantity === 0
                       ? ""
                       : addStockFormData.quantity
                   }
                   onChange={handleAddStockFormDataChange}
                   onBlur={handleBlur}
-                  error={errors.quantity}
+                  // error={errors.quantity}
                 />
                 {errors.quantity && (
                   <div className="caption-custom-inactive">
@@ -414,6 +416,7 @@ const AddStock = ({
                   label="Serial Number : "
                   logo={ListOrdered}
                   type="text"
+                  required={product?.isSerialNumber || selectedProduct?.isSerialNumber}
                   name="serial_number"
                   placeholder="Enter serial number here"
                   // value={addProductToAccountFormData.quantity}

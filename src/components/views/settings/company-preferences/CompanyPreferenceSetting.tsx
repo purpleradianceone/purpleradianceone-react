@@ -171,10 +171,11 @@ function CompanyPreferenceSetting() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
+    <div className="w-full min-h-screen bg-white  lg:p-1">
       <div className="text-center mb-3">
         <p className="table-data-custom mt-2">
-          Manage your company's default settings and services.
+          {/* Manage your company's default settings and services. */}
+          Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
         </p>
       </div>
       {isLoading ? (

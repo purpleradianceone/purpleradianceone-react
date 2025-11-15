@@ -67,7 +67,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </div>
           </div>
           <div>
-            <p className="tabel-header-custom mb-1">{title}</p>
+            <p className="table-header-custom mb-1">{title}</p>
             <p className="main-title-custom">{value}</p>
           </div>
         </div>

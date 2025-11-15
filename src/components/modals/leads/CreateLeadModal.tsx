@@ -37,12 +37,17 @@ import FormHeader from "../../ui/FormHeader";
 import FormInput from "../../ui/FormInput";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../constants/Messages";
 
 function CreateLeadModal({
   isOpen,
   onClose,
   onCreateLeadRefreshLeadData,
 }: CreateLeadModalProps) {
+
+
+  const {userHasAccessToViewUser} = useUserAccessModules();
   const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
@@ -298,10 +303,6 @@ function CreateLeadModal({
       return;
     }
     if (selectedSource === undefined || selectedStatus === undefined) {
-      // showMessageSnackbar({
-      //   message: "please select source and status",
-      //   type: "error",
-      // });
       toast.error("Please select source and status");
       return;
     }
@@ -403,7 +404,6 @@ function CreateLeadModal({
     <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn p-5 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-
         <FormHeader
           icon={Handshake}
           onClose={onClose}
@@ -496,14 +496,20 @@ function CreateLeadModal({
               <div className="flex items-center justify-between pr-60 gap-1 w-full">
                 <Button
                   onClick={(e) => {
+
                     e.preventDefault();
-                    handleCompanyUserPopUp();
+                    if(userHasAccessToViewUser){
+
+                      handleCompanyUserPopUp();
+                    }else{
+                      toast.error(MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS)
+                    }
                   }}
                   type="submit"
                 >
                   <div className="flex gap-1 items-center whitespace-nowrap">
                     <UserRoundPlus size={16} />
-                    <span>Assign Lead Owner</span>
+                    <span>Assign</span>
                   </div>
                 </Button>
 

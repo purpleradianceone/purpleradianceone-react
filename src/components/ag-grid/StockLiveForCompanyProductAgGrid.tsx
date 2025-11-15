@@ -80,40 +80,6 @@ const StockLiveForCompanyProductAgGrid = ({
           );
         },
       },
-
-      // {
-      //   headerName: "Actions",
-      //   field: "view",
-      //   pinned: "right",
-
-      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   cellRenderer: (params:LiveStockForCompanyProduct| any) => {
-      //     return (
-      //       <>
-      //       <div className="flex items-center justify-center  ">
-      //         <span
-      //           className="lead-details cursor-pointer text-blue-600  "
-      //           onClick={() => {
-      //             params.context.handleRowSelect(params.data);
-      //           }}
-      //           >
-      //           Details
-      //         </span>
-      //       </div>
-      //       <div className="flex items-center justify-center  ">
-      //         <span
-      //           className="lead-details cursor-pointer text-blue-600  "
-      //           onClick={() => {
-      //             params.context.handleRowSelect(params.data);
-      //           }}
-      //           >
-      //           asdsd
-      //         </span>
-      //       </div>
-      //           </>
-      //     );
-      //   },
-      // },
     ],
     []
   );
@@ -121,7 +87,6 @@ const StockLiveForCompanyProductAgGrid = ({
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
-      // minWidth: 150,
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,

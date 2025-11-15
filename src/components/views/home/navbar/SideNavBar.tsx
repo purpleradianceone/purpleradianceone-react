@@ -25,6 +25,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewMeeting,
+    userHasAccessToViewStock
   } = useUserAccessModules();
 
   return (
@@ -112,7 +113,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               label="Stock"
               isOpen={isOpen}
               isActive={isActive}
-              disabled={false}
+              disabled={!userHasAccessToViewStock}
             />
           )}
         </NavLink>

@@ -44,6 +44,7 @@ const MESSAGE = {
             DENIED_ADD_LEAD_IMPORT_ACCESS : "You do not have permission to import leads.",
             UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update this lead."
         }, COMPANY_USER: {
+            DENIED_VIEW_ACCESS : "You do not have permission to view Company user.",
             DENIED_ADD_ACCESS_COMPANY_USER: "You do not have permission to Add user.",
             DENIED_UPDATE_ACCESS_COMPANY_USER: "You do not have permission to update user."
         }, DASHBOARD: {
@@ -74,8 +75,11 @@ const MESSAGE = {
         }, COMPANY_WAREHOUSE:{
             DENIED_VIEW_ACCESS : "You do not have permission to view Company Warehouse.",
             DENIED_ADD_ACCESS : "You do not have permission to add new Company Warehouse.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update Company Warehouse..",
-
+            DENIED_UPDATE_ACCESS : "You do not have permission to update Company Warehouse.",
+        }, STOCK : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view Stock.",
+            DENIED_ADD_ACCESS : "You do not have permission to add new Stock.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update Stock.",
         }
     }
 }
