@@ -44,6 +44,7 @@ import useUnit from "../../../config/hooks/useUnit";
 import FormLayout from "../../ui/FormLayout";
 import FormSkeleton from "../Account/FormSkeleton";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormCheckbox from "../../ui/FormCheckbox";
 
 function AddProductModal({
   isOpen,
@@ -124,6 +125,7 @@ function AddProductModal({
 
   const [selectedUnitId, setUnitId] = useState<number | undefined>(0);
 
+  const [isSerialNumberChecked , setIsSerialNumberChecked ] = useState<boolean >(false)
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
     number | undefined
   >(0);
@@ -169,6 +171,10 @@ function AddProductModal({
     useState<boolean>(false);
   const [selectedUnitError, setSelectedUnitError] = useState<boolean>(false);
 
+
+  function handleCheckboxChangeOfSerialNumber(event : React.ChangeEvent<HTMLInputElement>){
+    setIsSerialNumberChecked(event.target.checked)
+  }
   const validateDropdown = () => {
     if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
       setSelectedProductTypeIdError(true);
@@ -277,6 +283,7 @@ function AddProductModal({
               name: addProductFormData.name,
               unit_id : selectedUnitId,
               barcode: addProductFormData.barcode,
+              is_serial_number : isSerialNumberChecked,
               cost: addProductFormData.cost,
               description: addProductFormData.description,
               version: addProductFormData.version,
@@ -483,6 +490,8 @@ function AddProductModal({
                 error={errors.cost}
               />
               {/* barcode */}
+              <div className="grid grid-cols-2 gap-6">
+
               <FormInput
                 label="Barcode :"
                 logo={LucideAirplay}
@@ -492,9 +501,17 @@ function AddProductModal({
                 placeholder="Product Bar Code"
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
-                // required={true}
-                // error={errors.code}
-              />
+                />
+                
+               <div className="mt-10">
+                <FormCheckbox
+                label="Has Serial number"
+                name="is_serial_number"
+                onChange={handleCheckboxChangeOfSerialNumber}
+                checked={isSerialNumberChecked}
+               />
+               </div>
+                </div>
 
               {/* url */}
               <FormInput

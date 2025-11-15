@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
-import { Edit, Network,  Plus,  UserPlus } from "lucide-react";
+import { Edit, Network, Plus, UserPlus } from "lucide-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ProductsManagementGridProps from "../../@types/ag-grid/ProductsManagementGridProps";
 import toast from "react-hot-toast";
@@ -23,7 +23,7 @@ function ProductsManagementGrid({
   handleCompanyProductTeamModalOpen,
   isGridForAccountProduct,
   onRowSelect, //selected user for view lead details
-  handleCreateStockModalOpen
+  handleCreateStockModalOpen,
 }: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProduct,
@@ -94,6 +94,26 @@ function ProductsManagementGrid({
           return (
             <div className="flex items-center gap-1">
               <StatusIndicator isActive={params.value} />
+            </div>
+          );
+        },
+      },
+      {
+        field: "isSerialNumber",
+        headerName: "Serial Number",
+        sortable: true,
+        // filter: true,
+        minWidth: 140,
+        maxWidth: 160,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center gap-1">
+              <StatusIndicator
+                activeLabel="Yes"
+                inactiveLabel="No"
+                isActive={params.value}
+              />
             </div>
           );
         },

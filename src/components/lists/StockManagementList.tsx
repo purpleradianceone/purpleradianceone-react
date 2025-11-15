@@ -148,8 +148,7 @@ const StockManagementList = ({
               e.preventDefault();
               if (!userHasAccessToAddStock) {
                 toast.error(
-                  MESSAGE.MODULE_ACCESS.COMPANY_USER
-                    .DENIED_ADD_ACCESS_COMPANY_USER
+                  MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
                 );
                 return;
               } else {

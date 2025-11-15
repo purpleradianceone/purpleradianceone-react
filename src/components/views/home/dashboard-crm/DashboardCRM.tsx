@@ -36,6 +36,7 @@ import AppTutorailManager from "../../tutorails/AppTutorailManager";
 import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
 import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { DashboardComponentJsxKey } from "../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -285,7 +286,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const componentMapDefault: { [key: string]: JSX.Element } = {
     // Changed to ensure JSX.Element, not null
-    "Total Leads": (
+    [DashboardComponentJsxKey.TOTAL_LEADS] : (
       <div
         key="Total Leads"
         className="flex col-span-2 w-full gap-4 justify-around"
@@ -407,7 +408,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       </div>
     ),
 
-    "Leads by status": (
+    [DashboardComponentJsxKey.LEADS_BY_STATUS]: (
       <div
         key="Leads by status"
         className="grid grid-cols-1 col-span-1 xl:grid-cols-1 gap-8"
@@ -422,7 +423,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         </div>
       </div>
     ),
-    "12 months performance": (
+    [DashboardComponentJsxKey._12_MONTHS_PERFORMANCE]: (
       <div
         id="monthlyPerformance"
         key="12 months performance"
@@ -431,7 +432,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
-    "Pending tasks": (
+    [DashboardComponentJsxKey.PENDING_TASKS]: (
       <div
         id="pendingTasks"
         key="Pending tasks"
@@ -448,7 +449,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Upcoming tasks": (
+    [DashboardComponentJsxKey.UPCOMING_TASKS]: (
       <div
         id="upcomingTasks"
         key="Upcoming tasks"
@@ -465,7 +466,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Leads by source": (
+    [DashboardComponentJsxKey.LEADS_BY_SOURCE]: (
       <div
         id="leadBySource"
         key="Leads by source"
@@ -480,7 +481,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         ></PipelineChart>
       </div>
     ),
-    "Quick Actions": (
+    [DashboardComponentJsxKey.QUICK_ACTIONS]: (
       <div
         id="quickActions"
         key="Quick Actions"
@@ -492,7 +493,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Total Pending Task": (
+    [DashboardComponentJsxKey.TOTAL_PENDING_TASKS]: (
       <div
         key="Total Pending Task"
         className="flex col-span-2 w-full gap-4 justify-around"

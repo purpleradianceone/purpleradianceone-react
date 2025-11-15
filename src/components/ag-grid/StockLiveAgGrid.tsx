@@ -4,14 +4,6 @@ import { useMemo } from "react";
 import LiveStock from "../../@types/stock/LiveStock";
 
 const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
-  // count : number,
-  // companyProductId: number,
-  // companyProductName : string,
-  // companyWarehouseId: number,
-  // companyWarehouseName : string,
-  // quantityInward: number,
-  // quantityOutward: number,
-  // quantityLive : number
 
   const columnDefs = useMemo<ColDef[]>(
     () => [

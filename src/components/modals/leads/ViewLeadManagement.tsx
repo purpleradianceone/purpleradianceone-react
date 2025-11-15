@@ -703,11 +703,11 @@ const ViewLeadManagement = () => {
             <button
               className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
-                navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
+                navigate(-1);
               }}
             >
               <ArrowLeft size={14} />
-              <span>Leads</span>
+              <span>back</span>
             </button>
           </div>
 
