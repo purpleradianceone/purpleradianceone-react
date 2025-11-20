@@ -15,6 +15,7 @@ export type Product = {
   defaultAmcCycleName: string;
   name: string;
   barcode: string;
+  parentUnitId? : number,
   isSerialNumber? : boolean,
   cost?: number;
   description?: string;

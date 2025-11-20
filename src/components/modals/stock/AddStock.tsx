@@ -45,14 +45,12 @@ const AddStock = ({
   isUsedInProductModal = false,
   isOpen,
   onClose,
-  product ,
-  }: 
-   AddStockModalProps
-  ) => {
+  product,
+}: AddStockModalProps) => {
   const { loginStatus } = useLoggedInUserContext();
-  const [isSaving , setIsSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const { companyWarehouse, loading: companyWarehouseLoading } =  
+  const { companyWarehouse, loading: companyWarehouseLoading } =
     useCompanyWarehouse();
   const { adjustmentReason, loading: adjustmentReasonLoading } =
     useAdjustmentReason();
@@ -60,7 +58,7 @@ const AddStock = ({
     useState<Warehouse | null>(null);
   const [showWarehouseSelectionModule, setShowWarehouseSelectionModule] =
     useState<boolean>(false);
-  const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(0);
+ 
   const [selectedAdjustmentReasonId, setSelectedAdjustmentReasonId] = useState<
     number | null
   >(null);
@@ -70,13 +68,20 @@ const AddStock = ({
   const { unitForProduct: unitForProductData } = useUnitForProduct({
     companyProductId: selectedProduct?.id,
   });
-  // Note : new Changes 
-  useEffect(()=>{
-    if(product){
-      setSelectedProduct(product)
-      setShowInputForm(true)
-    }
-  }, [product])
+   const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(
+    product?.parentUnitId || selectedProduct?.parentUnitId
+  );
+  // Note : new Changes
+  useEffect(() => {
+    if (product) {
+      setSelectedUnitId(product?.parentUnitId || selectedProduct?.parentUnitId)
+      setSelectedProduct(product);
+      setShowInputForm(true);
+    }else if (selectedProduct) {
+    // Selected from table
+    setSelectedUnitId(selectedProduct.parentUnitId);
+  }
+  }, [product, selectedProduct]);
 
   const [error, setError] = useState<{
     unitIdError: boolean;
@@ -93,7 +98,7 @@ const AddStock = ({
     companyProductId: 0,
     companyWarehouseId: 0,
     serial_number: "",
-    quantity: 0,
+    quantity: 1,
     other_id: 0,
     description: "",
     createdby: loginStatus.id,
@@ -142,12 +147,12 @@ const AddStock = ({
     );
     if (factor?.conversionFactor) {
       const productUnitConversionFactorCalculation =
-        factor?.conversionFactor * addStockFormData.quantity;
+        factor?.conversionFactor * addStockFormData.quantity  ;
       setProductUnitConversionFactor(productUnitConversionFactorCalculation);
     } else {
       setProductUnitConversionFactor(0);
     }
-  }, [selectedUnitId, addStockFormData.quantity]);
+  }, [selectedUnitId, unitForProductData,addStockFormData.quantity , product?.parentUnitId, selectedProduct?.parentUnitId]);
 
   function handleAdjustmentReasonChange(option: number) {
     if (option !== 0) {
@@ -183,6 +188,7 @@ const AddStock = ({
       toast.error("Quantity is required");
       return false;
     }
+   
     if (selectedUnitId === 0 || selectedUnitId === undefined) {
       // setSelectedUnitError(true);
       setError((prev) => ({
@@ -240,7 +246,7 @@ const AddStock = ({
     if (!isValid) {
       return;
     }
-    if(isSaving) return;
+    if (isSaving) return;
     const postData = {
       company_id: loginStatus.companyId,
       company_product_id: selectedProduct?.id,
@@ -253,14 +259,12 @@ const AddStock = ({
       createdby_id: loginStatus.id,
     };
 
-
-    setIsSaving(true)
+    setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ADJUSTMENT_STOCK, postData, {
         withCredentials: true,
       })
       .then((response) => {
-
         if (response.data.status) {
           toast.success(response.data.message);
           handleCloseForm();
@@ -280,15 +284,15 @@ const AddStock = ({
         } else {
           toast.error(error.response.data);
         }
-      }).finally(()=>{
-        setIsSaving(false)
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
   };
 
-  useEffect(() => {
-   setSelectedUnitId(undefined)
-  }, [selectedProduct]);
-
+  // useEffect(() => {
+  //   setSelectedUnitId(undefined);
+  // }, [selectedProduct]);
 
   if (!isOpen) return null;
   if (companyWarehouseLoading || adjustmentReasonLoading)
@@ -308,7 +312,7 @@ const AddStock = ({
           preText="Add Stock"
         />
 
-        {!product && !showInputForm && !showWarehouseSelectionModule  && (
+        {!product && !showInputForm && !showWarehouseSelectionModule && (
           <ProductManagement
             isGridForAccountProduct={true}
             onRowSelect={onRowSelectProductForStock}
@@ -317,17 +321,15 @@ const AddStock = ({
         {showInputForm && !showWarehouseSelectionModule && (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
-             {
-              !isUsedInProductModal && (
-                 <Button
-                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
-                onClick={handleGoBackToProductSelection}
-              >
-                <ArrowLeft size={14} />
-                Change Product
-              </Button>
-              )
-             }
+              {!isUsedInProductModal && (
+                <Button
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
+                  onClick={handleGoBackToProductSelection}
+                >
+                  <ArrowLeft size={14} />
+                  Change Product
+                </Button>
+              )}
 
               {selectedProduct && (
                 <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
@@ -353,47 +355,72 @@ const AddStock = ({
                   label="Quantity : "
                   logo={LucideIndianRupee}
                   required
-                  readonly={product?.isSerialNumber || selectedProduct?.isSerialNumber}
+                  readonly={
+                    product?.isSerialNumber || selectedProduct?.isSerialNumber
+                  }
                   type="number"
                   name="quantity"
                   placeholder="Enter quantity here"
-                  // value={addProductToAccountFormData.quantity}
-                  defaultValue={
-                    (product?.isSerialNumber || selectedProduct?.isSerialNumber) ? 1 : 
-                    addStockFormData.quantity === 0
+                  defaultValue={(product?.isSerialNumber || selectedProduct?.isSerialNumber) ?   1 : !(
+                          product?.isSerialNumber ||
+                          selectedProduct?.isSerialNumber
+                        ) && addStockFormData.quantity === 0
+                      ? ""
+                      : addStockFormData.quantity }
+                  value={
+                    product?.isSerialNumber || selectedProduct?.isSerialNumber
+                      ? 1
+                      : !(
+                          product?.isSerialNumber ||
+                          selectedProduct?.isSerialNumber
+                        ) && addStockFormData.quantity === 0
                       ? ""
                       : addStockFormData.quantity
                   }
                   onChange={handleAddStockFormDataChange}
                   onBlur={handleBlur}
-                  // error={errors.quantity}
                 />
                 {errors.quantity && (
                   <div className="caption-custom-inactive">
                     Quantity is required
                   </div>
                 )}
-                {productUnitConversionFactor !== 0 && (
+                {/* {(product?.isSerialNumber ||
+                  selectedProduct?.isSerialNumber) && (
                   <p
                     title="Quantity is converted automatically based on the Product base unit and selected stock unit."
                     className="caption-custom-active flex items-center cursor-pointer gap-1"
                   >
-                    Quantity will be inserted into the stock : {productUnitConversionFactor}{selectedProduct?.unitNameInStock}
-                    <Info size={12} className="" />
+                    Quantity will be inserted into the stock : 1 irrespective of
+                    the unit.
                   </p>
-                )}
+                )} */}
+                {/* {
+                  (productUnitConversionFactor !== 0 && ( */}
+                    <p
+                      title="Quantity is converted automatically based on the Product base unit and selected stock unit."
+                      className="caption-custom-active flex items-center cursor-pointer gap-1"
+                    >
+                      Quantity will be inserted into the stock :{" "}
+                      {productUnitConversionFactor}
+                      {selectedProduct?.unitNameInStock}
+                      <Info size={12} className="" />
+                    </p>
+                  {/* // )
+                  // )} */}
               </div>
               {/* Unit */}
+
               <div className="mt-4">
                 <CustomDropdown
                   labelName="Unit :"
                   logo={LucideTimer}
                   preselectedOption={
-                    selectedUnitId !== undefined ? selectedUnitId : 0
+                    
+                    !selectedUnitId ? (selectedProduct?.parentUnitId || product?.parentUnitId) : selectedUnitId
                   }
                   onSelect={(data) => {
                     if (data) {
-                      // setSelectedUnitError(false);
                       setError((prev) => ({
                         ...prev,
                         unitIdError: false,
@@ -401,6 +428,7 @@ const AddStock = ({
                     }
                     setSelectedUnitId(data);
                   }}
+                  readOnly={selectedProduct?.isSerialNumber && ( selectedProduct?.parentUnitId || product?.parentUnitId) ? true : false}
                   options={unitForProductData}
                   requiredRedDot={true}
                 />
@@ -410,13 +438,16 @@ const AddStock = ({
                   </div>
                 )}
               </div>
+
               {/* serial number */}
               <div className="mt-1">
                 <FormInput
                   label="Serial Number : "
                   logo={ListOrdered}
                   type="text"
-                  required={product?.isSerialNumber || selectedProduct?.isSerialNumber}
+                  required={
+                    product?.isSerialNumber || selectedProduct?.isSerialNumber
+                  }
                   name="serial_number"
                   placeholder="Enter serial number here"
                   // value={addProductToAccountFormData.quantity}
@@ -550,7 +581,7 @@ const AddStock = ({
           </div>
         )}
       </>
-      {isSaving && <LoadingPopUpAnimation show={isSaving}/>}
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
     </FormLayout>
   );
 };

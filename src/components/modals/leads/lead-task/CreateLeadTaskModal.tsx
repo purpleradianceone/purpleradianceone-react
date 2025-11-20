@@ -379,7 +379,7 @@ function CreateLeadTaskModal({
                   >
                     <span className="flex gap-1 text-nowrap ">
                       <Contact size={SIZE.TWENTY}></Contact>
-                      <span>lead contact</span>
+                      {/* <span>lead contact</span> */}
                     </span>
                   </Button>
                 </div>
