@@ -109,7 +109,7 @@ function EditCompanyUserModal({
               handleCompanyUserChange(user);
               setTimeout(() => {
                 onClose();
-              }, 2000);
+              }, 100);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (error: ApiError | any) => {

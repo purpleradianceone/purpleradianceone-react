@@ -23,7 +23,7 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -44,6 +44,7 @@ import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import FormCheckbox from "../../ui/FormCheckbox";
 
 function EditCompanyProductModal({
   isOpen,
@@ -71,6 +72,7 @@ function EditCompanyProductModal({
     version: product.version,
     url: product.url,
     isActive: product.isActive,
+    isSerialNumber : product.isSerialNumber
   };
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
@@ -188,7 +190,7 @@ function EditCompanyProductModal({
 
   const [selectedDefaultWarrantyError, setSelectedDefaultWarrantyError] =
     useState<boolean>(false);
-
+  const [isSerialNumberChecked , setIsSerialNumberChecked ] = useState<boolean >(product.isSerialNumber!)
   const [selectedAmcIntervalTypeIdError, setSelectedAmcIntervalTypeIdError] =
     useState<boolean>(false);
   const [selectedDefaultAmcError, setSelectedDefaultAmcError] =
@@ -294,7 +296,8 @@ function EditCompanyProductModal({
         updateCompanyProductFormData.version !==
           intialEditCompanyProductFormData.version ||
         updateCompanyProductFormData.url !==
-          intialEditCompanyProductFormData.url
+          intialEditCompanyProductFormData.url ||
+          updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -322,6 +325,7 @@ function EditCompanyProductModal({
                 : updateCompanyProductFormData.default_amc_cycle,
             name: updateCompanyProductFormData.name,
             barcode: updateCompanyProductFormData.barcode,
+            is_serial_number : isSerialNumberChecked,
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
@@ -419,7 +423,6 @@ function EditCompanyProductModal({
   };
 
   useEffect(() => {
-    console.log(intialEditCompanyProductFormData);
     if (isOpen) {
       setErrors({
         barcode: "",
@@ -531,6 +534,8 @@ function EditCompanyProductModal({
                       defaultValue={intialEditCompanyProductFormData.cost}
                       onChange={handleEditCompanyProductFormDataChange}
                     />
+                     <div className="grid grid-cols-2 gap-6">
+
                     <FormInput
                       label="Barcode :"
                       logo={LucideAirplay}
@@ -540,9 +545,19 @@ function EditCompanyProductModal({
                       onChange={handleEditCompanyProductFormDataChange}
                       defaultValue={intialEditCompanyProductFormData.barcode}
                       onBlur={handleBlur}
-                      // required={true}
-                      // error={errors.barcode}
-                    />
+                      />
+                    <div className="mt-10">
+                <FormCheckbox
+                label="Has Serial number"
+                name="is_serial_number"
+                onChange={( event : React.ChangeEvent<HTMLInputElement>)=>{
+                  setIsSerialNumberChecked(event.target.checked
+                  )
+                }}
+                checked={isSerialNumberChecked}
+               />
+               </div>
+                      </div>
                     <div className="mt-2">
                       <CustomDropdown
                         labelName="Product Type"

@@ -51,7 +51,7 @@ const Home: React.FC = () => {
     if (tourFinished) {
       switch (activeTab) {
         case 1:
-          return <CRM companyUserId={(selectedUser ?? loginStatus).id} />;
+          return <CRM companyUserId={selectedUser?.id ?? (loginStatus.isSuperUser ? null : loginStatus.id) } />;
         case 2:
           return <Support />;
         case 3:

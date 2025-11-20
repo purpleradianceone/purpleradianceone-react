@@ -17,6 +17,7 @@ import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 function ConvertLeadModal({
   isOpen,
@@ -26,6 +27,7 @@ function ConvertLeadModal({
   reasonText,
   onReasonChange,
   handleLeadMappedToAccount,
+  isLeadStatusSaving
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -34,6 +36,7 @@ function ConvertLeadModal({
   reasonText: string;
   onReasonChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleLeadMappedToAccount: () => void;
+  isLeadStatusSaving : boolean
 }) {
   const [accountTypeSelected, setAccountTypeSelected] = useState<
     "existingAccount" | "noAccount"
@@ -102,6 +105,7 @@ function ConvertLeadModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
           >
+              { isLeadStatusSaving && <LoadingPopUpAnimation show={isLeadStatusSaving} />}
             <div className="py-4 px-3">
               <FormHeader
                 icon={Handshake}

@@ -7,7 +7,11 @@ import MetricCard from "./MetricCard";
 import PipelineChart from "./PipeLineChart";
 import QuickActions from "./QuickActions";
 import {
+  AlarmClock,
   AlertCircleIcon,
+  CalendarCheck,
+  CalendarClock,
+  ListTodo,
   ShieldAlert,
   Target,
   TrendingUp,
@@ -32,6 +36,7 @@ import AppTutorailManager from "../../tutorails/AppTutorailManager";
 import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
 import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { DashboardComponentJsxKey } from "../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -92,7 +97,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const getCrmModuleAccessOfCompanyUser = async () => {
     setAccessModuleCompanyUser([]);
-    setIsTasksLoading(true);
+   
     const getCrmModuleAccessData = {
       company_id: loginStatus.companyId,
       company_user_id: companyUserId,
@@ -108,7 +113,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
           setAccessModuleCompanyUser(accessModuleOfCompanyUser);
         }
-        getDashboardData();
+       
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -134,7 +139,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     setIsTasksLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      owner_id: companyUserId ?? loginStatus.id,
+      owner_id: companyUserId ?? null,
       requestedby_id: loginStatus.id,
     };
 
@@ -195,6 +200,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -219,6 +226,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -254,9 +263,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   };
 
   useEffect(() => {
-    if (loginStatus?.companyId && loginStatus?.id) {
+    if (loginStatus?.companyId && loginStatus?.id && companyUserId !== null) {
+       setIsTasksLoading(true);       
       getCrmModuleAccessOfCompanyUser();
     }
+     getDashboardData();
   }, [companyUserId]);
 
   useEffect(() => {
@@ -275,7 +286,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const componentMapDefault: { [key: string]: JSX.Element } = {
     // Changed to ensure JSX.Element, not null
-    "Total Leads": (
+    [DashboardComponentJsxKey.TOTAL_LEADS] : (
       <div
         key="Total Leads"
         className="flex col-span-2 w-full gap-4 justify-around"
@@ -397,7 +408,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       </div>
     ),
 
-    "Leads by status": (
+    [DashboardComponentJsxKey.LEADS_BY_STATUS]: (
       <div
         key="Leads by status"
         className="grid grid-cols-1 col-span-1 xl:grid-cols-1 gap-8"
@@ -412,7 +423,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         </div>
       </div>
     ),
-    "12 months performance": (
+    [DashboardComponentJsxKey._12_MONTHS_PERFORMANCE]: (
       <div
         id="monthlyPerformance"
         key="12 months performance"
@@ -421,7 +432,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
-    "Pending tasks": (
+    [DashboardComponentJsxKey.PENDING_TASKS]: (
       <div
         id="pendingTasks"
         key="Pending tasks"
@@ -438,7 +449,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Upcoming tasks": (
+    [DashboardComponentJsxKey.UPCOMING_TASKS]: (
       <div
         id="upcomingTasks"
         key="Upcoming tasks"
@@ -455,7 +466,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Leads by source": (
+    [DashboardComponentJsxKey.LEADS_BY_SOURCE]: (
       <div
         id="leadBySource"
         key="Leads by source"
@@ -470,7 +481,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         ></PipelineChart>
       </div>
     ),
-    "Quick Actions": (
+    [DashboardComponentJsxKey.QUICK_ACTIONS]: (
       <div
         id="quickActions"
         key="Quick Actions"
@@ -480,6 +491,89 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           companyUserId={companyUserId}
           moduleAccessCompanyUser={accessModuleCompanyUser}
         />
+      </div>
+    ),
+    [DashboardComponentJsxKey.TOTAL_PENDING_TASKS]: (
+      <div
+        key="Total Pending Task"
+        className="flex col-span-2 w-full gap-4 justify-around"
+      >
+        <div className="flex grid-cols-4 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <MetricCard
+            title="Total Pending Task"
+            id="totalPendingTaskMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK]?.[0]
+                ?.total_pending_task ?? 0
+            ).toString()}
+            icon={CalendarClock}
+            color="bg-gradient-to-r from-red-500 to-red-600"
+            gradient="bg-gradient-to-r from-red-500 to-red-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Pending Task - Today"
+            id="totalPendingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY]?.[0]
+                ?.total_pending_task_today ?? 0
+            ).toString()}
+            icon={AlarmClock}
+            color="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task - Today"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task"
+            id="totalUpcomingTaskMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK
+              ]?.[0]?.total_upcoming_task ?? 0
+            ).toString()}
+            icon={ListTodo}
+            color="bg-gradient-to-r from-blue-500 to-blue-600"
+            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task - Today"
+            id="totalUpcomingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK_TODAY
+              ]?.[0]?.total_upcoming_task_today ?? 0
+            ).toString()}
+            icon={CalendarCheck}
+            color="bg-gradient-to-r from-teal-500 to-teal-600"
+            gradient="bg-gradient-to-r from-teal-500 to-teal-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task - Today"
+                  )!.value
+                : false
+            }
+          />
+        </div>
       </div>
     ),
   };

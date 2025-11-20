@@ -4,7 +4,7 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import Button from "../ui/Button";
 import MESSAGE from "../../constants/Messages";
 import toast from "react-hot-toast";
-import { SIZE } from "../../constants/AppConstants";
+import { ActionTypeForStockMOdule, SIZE } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useState } from "react";
 import AddStock from "../modals/stock/AddStock";
@@ -17,8 +17,8 @@ import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../constants/Routes";
+import StockLiveForCompanyProduct from "../modals/stock/StockLiveForCompanyProduct";
+import StockTransactions from "../modals/stock/StockTransactions";
 
 const StockManagementList = ({
   liveStockForCompanyProduct,
@@ -26,21 +26,49 @@ const StockManagementList = ({
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
-  
 }: StockManagementListProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { userPreference } = useUserPreference();
   const { userHasAccessToAddStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
-  
-  function handleSelectedStockLiveForCompanyProduct(data : LiveStockForCompanyProduct){
-    navigate(`${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}${data.companyProductId}/${data.companyProductName}/${data.quantityLive}/${data.quantityInward}/${data.quantityOutward}`);
-  }  
+  const [openStockLivePage, setOpenStockLivePage] = useState<boolean>(false);
+  const [openAllTransactionPage, setOpenAllTransactionPage] =
+    useState<boolean>(false);
+  const [openTransactionsPage, setOpenTransactionsPage] =
+    useState<boolean>(false);
+  const [stockForCompanyProductLive, setStockLiveForCompanyProduct] =
+    useState<LiveStockForCompanyProduct | null>(null);
+  const [selectedStockForTransaction, setSelectedStockForTransaction] =
+    useState<LiveStockForCompanyProduct | null>(null);
+  function handleSelectedStockLiveForCompanyProduct(
+    data: LiveStockForCompanyProduct,
+    action: ActionTypeForStockMOdule
+  ) {
+    switch (action) {
+      case ActionTypeForStockMOdule.DETAILS:
+        if (data !== null && data !== undefined) {
+          setStockLiveForCompanyProduct(data);
+          setOpenStockLivePage(true);
+        }
+        break;
+      case ActionTypeForStockMOdule.TRANSACTIONS:
+        if (data !== null && data !== undefined) {
+          setSelectedStockForTransaction(data);
+          setOpenTransactionsPage(true);
+        }
+    }
+
+    // navigate(`${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}${data.companyProductId}/${data.companyProductName}/${data.quantityLive}/${data.quantityInward}/${data.quantityOutward}`);
+  }
+
+  function handleShowAllTransactionButtonClick() {
+    setOpenAllTransactionPage(true);
+  }
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-      useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-  
+  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+
   return (
     <div
       className={`w-full  pt-1  ${
@@ -55,10 +83,10 @@ const StockManagementList = ({
           <span className="section-header-custom">Stock Management</span>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex justify-center items-center  gap-1">
           {/* search box flex div */}
 
-          <div className="relative flex items-start w-80">
+          <div className="  flex items-start w-80">
             <SearchInput
               id="company-user-module-search-box"
               onChange={(e) => {
@@ -68,32 +96,48 @@ const StockManagementList = ({
           </div>
 
           {/* Date FIlters Dropdown */}
-                <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
-                <div className="flex">
-                  <div className="flex ">
-                    <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                      <Calendar className="input-label-custom" />
-                    </div>
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
-                  </div>
+          <div
+            className={`flex flex-wrap items-center gap-0.5 ${
+              isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
+            }`}
+          >
+            <div className="flex">
+              <div className="flex ">
+                <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
+                  <Calendar className="input-label-custom" />
                 </div>
-                {/* Custom Date Picker Div Flex Box*/}
-                <div
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
-                  />
-                </div>
-                </div>
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                ></DateRangeFilterDropdown>
+              </div>
+            </div>
+            {/* Custom Date Picker Div Flex Box*/}
+            {isCustomDateOptionSelected && (
+              <div
+                style={
+                  isCustomDateOptionSelected
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                />
+              </div>
+            )}
+          </div>
+          <Button
+            type="button"
+            onClick={handleShowAllTransactionButtonClick}
+            className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
+                      rounded-md bg-white  hover:bg-gray-50 
+                      focus:outline-none shadow-sm"
+          >
+            <span className="inline md:hidden">Transa...</span>
+           <span className="hidden md:inline"> Transactions</span>
+          </Button>
         </div>
 
         <div id="company-users-module-add-button" className="flex gap-1">
@@ -104,8 +148,7 @@ const StockManagementList = ({
               e.preventDefault();
               if (!userHasAccessToAddStock) {
                 toast.error(
-                  MESSAGE.MODULE_ACCESS.COMPANY_USER
-                    .DENIED_ADD_ACCESS_COMPANY_USER
+                  MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
                 );
                 return;
               } else {
@@ -115,7 +158,7 @@ const StockManagementList = ({
           >
             <div className="flex items-center gap-1">
               <Plus size={SIZE.SIXTEEN} />
-              Add
+              <span className="hidden md:inline">Add</span>
             </div>
           </Button>
         </div>
@@ -128,9 +171,9 @@ const StockManagementList = ({
               : "ag-theme-balham w-full h-[calc(100vh-128px)]"
           }
         >
-          <StockLiveForCompanyProductAgGrid 
-          data={liveStockForCompanyProduct}
-          onRowSelect={handleSelectedStockLiveForCompanyProduct}
+          <StockLiveForCompanyProductAgGrid
+            data={liveStockForCompanyProduct}
+            onRowSelect={handleSelectedStockLiveForCompanyProduct}
           />
         </div>
         <div className="flex items-center justify-end ">
@@ -148,6 +191,30 @@ const StockManagementList = ({
           isOpen={isAddStockModalOpen}
           onClose={() => {
             setIsAddStockModalOpen(false);
+          }}
+        />
+      )}
+      {openStockLivePage && (
+        <StockLiveForCompanyProduct
+          companyStockLive={stockForCompanyProductLive!}
+          handleClose={() => {
+            setOpenStockLivePage(false);
+            setStockLiveForCompanyProduct(null);
+          }}
+        />
+      )}
+      {openTransactionsPage && (
+        <StockTransactions
+          companyProductId={selectedStockForTransaction!.companyProductId}
+          onClose={() => {
+            setOpenTransactionsPage(false);
+          }}
+        />
+      )}
+      {openAllTransactionPage && (
+        <StockTransactions
+          onClose={() => {
+            setOpenAllTransactionPage(false);
           }}
         />
       )}

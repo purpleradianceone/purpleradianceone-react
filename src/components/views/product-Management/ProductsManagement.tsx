@@ -14,6 +14,8 @@ import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../constants/Messages";
 
 function ProductManagement({
   isGridForAccountProduct,
@@ -108,6 +110,8 @@ function ProductManagement({
             defaultAmcCycleName:res.default_amc_cycle_name,
             name: res.name,
             barcode: res.barcode,
+            parentUnitId : res.parent_unit_id,
+            isSerialNumber: res.is_serial_number,
             cost: res.cost,
             description: res.description,
             version: res.version,
@@ -127,7 +131,6 @@ function ProductManagement({
           }
         }
       } catch (error: ApiError | any) {
-        console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
             callFunctionWithEvent: fetchCompanyProducts,
@@ -136,6 +139,8 @@ function ProductManagement({
           if (refreshTokenStatus) {
             fetchCompanyProducts(signal);
           }
+        }else{
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
       }
     }

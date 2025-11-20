@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Mail, Phone, Save, User, UserPlus, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
@@ -21,6 +21,7 @@ import REGEX from "../../../constants/Regex";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
@@ -32,7 +33,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   };
 
   const { isSmallScreen } = useScreenSize();
-
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const {
     formData: addCompanyUserFormData,
     handleChange: handleAddComapnyUserFormDataChange,
@@ -44,6 +45,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
   );
   const handleAddUserSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if(isSaving) return;
     const mobileRegex = REGEX.MOBILE_NUMBER;
     const nameRegex = REGEX.NAME_SPACE_DOT_ALLOWED_ONLY;
     if (addCompanyUserFormData.mobilenumber!.trim() !== "") {
@@ -75,6 +77,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
       };
 
       try {
+        setIsSaving(true)
         const response = await axios.post(
           POST_API.CREATE_USER,
           createCompanyUserData,
@@ -109,7 +112,9 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
           }
         }
-      }
+      }finally{
+        setIsSaving(false)
+      } 
     } else {
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
@@ -128,6 +133,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
 
   return createPortal(
     <>
+      {isSaving && <LoadingPopUpAnimation show={isSaving}/>}
       <div id="add-company-user-modal"
         className={
           isSmallScreen
@@ -143,23 +149,6 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
           >
             <div className="py-6 px-4">
-              {/* <div className="flex border-b items-center gap-3 mb-4">
-                <UserPlus className="text-blue-500" size={SIZE.TWENTY} />
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Add Company User
-                </h2>
-                <button
-                  //  note : this is logic will not work dynamically CHANGES NEEDED
-                  // disabled={
-                  //   loginStatus.activeUsersInCompany >
-                  //   loginStatus.subscriptionAllowedUsers
-                  // }
-                  onClick={onClose}
-                  className="absolute right-4 top-8 text-gray-400 hover:text-gray-600"
-                >
-                  <X size={SIZE.TWENTY} />
-                </button>
-              </div> */}
               <FormHeader
                 icon={UserPlus}
                 onClose={onClose}

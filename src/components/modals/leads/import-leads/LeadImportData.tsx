@@ -20,6 +20,7 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import FinalConfirmationModal from "./FinalConfirmationalModal";
 import { LucideImport, Search, X } from "lucide-react";
 import Button from "../../../ui/Button";
+import toast from "react-hot-toast";
 
 const LeadImportData = ({ 
     selectedLeadTag, 
@@ -207,11 +208,12 @@ const LeadImportData = ({
         withCredentials: true,
       })
       .then((response) => {
-        if (response.data.status) {
-          showMessageSnackbar({
-            message: response.data.message,
-            type: "success",
-          });
+        if (response.data.status === true) {
+          // showMessageSnackbar({
+          //   message: response.data.message,
+          //   type: "success",
+          // });
+          toast.success(response.data.message)
           getLeadImportTags()
           setOpenFinalPopup(false);
         // making aggrid table null

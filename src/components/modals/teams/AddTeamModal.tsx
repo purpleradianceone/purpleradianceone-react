@@ -2,9 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Network, Save, Text, Users, X } from "lucide-react";
-import useScreenSize from "../../../config/hooks/useScreenSize";
 import {
-  NUMBER_VALUES,
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
@@ -30,7 +28,8 @@ import AddTeamModalProps from "../../../@types/modal/AddTeamModalProps";
 import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
-import { createPortal } from "react-dom";
+import FormLayout from "../../ui/FormLayout";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 function AddTeamModal({
   isOpen,
@@ -39,13 +38,13 @@ function AddTeamModal({
 }: AddTeamModalProps) {
   const { userHasAccessToAddTeamManagement, userHasAccessToViewUser } =
     useUserAccessModules();
-  const { isSmallScreen } = useScreenSize();
 
   const [intialAddTeamFormData, setIntialAddTeamFormData] =
     useState<AddTeamFormDataState>({
       name: "",
       description: "",
     });
+  const [isSaving , setIsSaving] = useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const {
@@ -93,9 +92,10 @@ function AddTeamModal({
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-
+    if(isSaving) return;
     if (userHasAccessToAddTeamManagement) {
       if (AddTeamFormData.name !== "" || AddTeamFormData.description !== "") {
+        setIsSaving(true)
         const addTeamPostData = {
           company_id: loginStatus.companyId,
           name: AddTeamFormData.name,
@@ -118,7 +118,7 @@ function AddTeamModal({
             handleCompanyTeamChangeOnAdd();
             setTimeout(() => {
               onClose();
-            }, NUMBER_VALUES.SNACKBAR_DURATION);
+            }, 100);
           }
           else if(!response.data.status){
             toast.error(response.data.message)
@@ -134,6 +134,8 @@ function AddTeamModal({
           } else {
             toast.error(error.response.data);
           }
+        }finally{
+          setIsSaving(false)
         }
       } else {
         toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
@@ -329,22 +331,11 @@ function AddTeamModal({
 
   if (!isOpen) return null;
 
-  return createPortal(
-    <div
-      className={
-        isSmallScreen
-          ? "fixed inset-0 z-50 pt-10 pl-20 pr-2 overflow-hidden bg-black bg-opacity-5"
-          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
-      }
-    >
-      <div className="flex min-h-screen  items-center justify-center">
-        <div
-          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-gray-300
-  [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
-        >
-          <div className="p-4">
+  return (
+    <FormLayout>
+  <>  
+  
+          <div className="">
             {/* Form header */}
             <FormHeader
               preText="Create new team"
@@ -439,10 +430,9 @@ function AddTeamModal({
               )}
             </form>
           </div>
-        </div>
-      </div>
-    </div>,
-    document.body
+        <LoadingPopUpAnimation show={isSaving}/>
+          </>
+          </FormLayout>
   );
 }
 

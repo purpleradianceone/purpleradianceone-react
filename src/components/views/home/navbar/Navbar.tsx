@@ -438,15 +438,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        {/* )} */}
-                        {/* {!userHasAccessToViewUser && (
-                          <NavItem
-                          disable ={true}
-                            // to={ROUTES_URL.GET_COMPANY_USERS}
-                            icon={<Building2 size={SIZE.TWENTY} />}
-                            label="Manage Users"
-                          />
-                        )} */}
 
                         {/* {userHasAccessToViewLead && ( */}
                           <NavItem
@@ -493,8 +484,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<Layers size={SIZE.TWENTY} />}
                             label="Stock"
                           />
+                          
                         {/* )} */}
-                        {/* {userHasAccessToViewTeamManagement && ( */}
                           <NavItem
                           disable={!userHasAccessToViewTeamManagement}
                             to={ROUTES_URL.TEAM_MANAGEMENT}

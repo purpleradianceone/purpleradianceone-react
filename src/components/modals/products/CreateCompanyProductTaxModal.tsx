@@ -7,10 +7,6 @@ import {
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useEffect, useState } from "react";
-// import {
-//   MessageSnackbarState,
-//   ShowMessageSnackbarProps,
-// } from "../../../@types/ui/MessageSnackbarProps";
 import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import axios from "axios";
@@ -23,6 +19,7 @@ import RadioButtons from "../../ui/RadioButton";
 import DatePickerInput from "../../ui/DatePickerInput";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 function CreateCompanyProductTaxModal({
   isOpen,
@@ -39,15 +36,9 @@ function CreateCompanyProductTaxModal({
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
+  const [isSaving , setIsSaving] = useState<boolean>(false);
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
-
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
   const ProductsRadioButtonOptions = [
   {
     label : "HSN",
@@ -76,14 +67,6 @@ function CreateCompanyProductTaxModal({
     "registration"
   );
 
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -98,10 +81,11 @@ function CreateCompanyProductTaxModal({
     
   }
 
-  const hanldeUpdateCompanyProductFormSubmit = async (
+  const hanldeCreateProductTaxFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
+    if(isSaving) return;
     if (
       createCompanyProductTaxFormData.taxRate !== 0 &&
       createCompanyProductTaxFormData.validFrom !== "" &&
@@ -109,6 +93,7 @@ function CreateCompanyProductTaxModal({
         createCompanyProductTaxFormData.sac !== "")
     ) {
       if (userHasAccessToAddProductTax) {
+        setIsSaving(true)
         const updateProductPostData = {
           company_id: loginStatus.companyId,
           company_product_id: product.id,
@@ -118,6 +103,7 @@ function CreateCompanyProductTaxModal({
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
         };
+
         await axios
           .post(POST_API.CREATE_PRODUCT_TAX, updateProductPostData, {
             withCredentials: true,
@@ -131,7 +117,7 @@ function CreateCompanyProductTaxModal({
               handleCreateCompanyProductTax();
               setTimeout(() => {
                 onClose();
-              }, 2000);
+              }, 100);
             } else if (
               response.status === STATUS_CODE.OK &&
               !response.data.status
@@ -143,12 +129,14 @@ function CreateCompanyProductTaxModal({
           .catch(async (error: ApiError | any) => {
             if (error.status === STATUS_CODE.UNATHORISED) {
               const refreshTokenResponse = await RefreshToken({
-                callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
+                callFunctionWithEvent: hanldeCreateProductTaxFormSubmit,
               });
               if (refreshTokenResponse) {
-                hanldeUpdateCompanyProductFormSubmit(event);
+                hanldeCreateProductTaxFormSubmit(event);
               }
             }
+          }).finally(()=>{
+            setIsSaving(false)
           });
       }
     } else {
@@ -164,7 +152,6 @@ function CreateCompanyProductTaxModal({
         taxRate: "",
         validFrom: "",
       });
-      // handleCloseSnackbar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -182,19 +169,8 @@ function CreateCompanyProductTaxModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
+          <LoadingPopUpAnimation show={isSaving}/>
           <div className="p-6">
-            {/* <div className="flex items-center gap-3 mb-6">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-              <h2 className="text-xl font-semibold text-gray-800">
-                Create Tax For : {product.name}
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 text-gray-900 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div> */}
             <FormHeader
             icon={EditIcon}
             onClose={onClose}
@@ -205,7 +181,7 @@ function CreateCompanyProductTaxModal({
 
             <form
               className="space-y-2"
-              onSubmit={hanldeUpdateCompanyProductFormSubmit}
+              onSubmit={hanldeCreateProductTaxFormSubmit}
             >
               <RadioButtons
                 options={ProductsRadioButtonOptions}

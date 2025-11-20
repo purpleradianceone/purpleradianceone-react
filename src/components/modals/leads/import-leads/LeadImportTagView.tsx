@@ -29,7 +29,7 @@ const LeadImportTagView = () => {
       })
       .then((response) => {
         const data = response.data;
-
+        
         setLeadImportTagDataCame(false);
         setLeadImportTagData(data);
       })

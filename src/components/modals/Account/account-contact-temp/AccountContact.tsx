@@ -25,6 +25,7 @@ import StatusChip from "../../../ui/StatusChip";
 import COLORS from "../../../../constants/Colors";
 import ToggleButton from "../../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -50,7 +51,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(true);
 
   const [isActive, setIsActive] = useState<boolean>(true); // default to active
-
+  const [isSaving , setIsSaving] = useState<boolean>(false);
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -194,7 +195,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     e.preventDefault();
     const { name, email, mobileNumber } = accountContactForm;
     let isValid = true;
-
+    if(isSaving)return;
     // Prepare a copy to store validation errors
     const newErrors: typeof errors = { name: "", email: "", mobileNumber: "" };
 
@@ -228,6 +229,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     setErrors(newErrors);
     if (!isValid) return;
 
+    setIsSaving(true)
     //  Proceed with form submission logic here
     const postData = {
       company_id: loginStatus.companyId,
@@ -252,7 +254,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           }),
     };
 
-    console.log(postData);
 
     const api = editingContactId
       ? POST_API.UPDATE_ACCOUNT_CONTACT
@@ -287,6 +288,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         setIsOpenAddAccountContactForm(false);
         // clear the data after api call
         clearStateData();
+        setIsSaving(false);
+        handleStateClearFunctionOnClickOfCancelOrXButton();
       });
   };
 
@@ -983,6 +986,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         </div>,
         document.body
       )}
+      {
+        isSaving && <LoadingPopUpAnimation
+          show={isSaving}
+        />
+      }
     </>
    
   );

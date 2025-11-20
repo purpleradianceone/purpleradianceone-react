@@ -243,7 +243,7 @@ function SettingsTabs() {
         ),
     },
     {
-      label: "Company Preferences",
+      label: "Notifications",
       value: "companyPreference",
       render: () =>
         userHasAccessToViewCompanyPreferences ? (
@@ -287,7 +287,7 @@ function SettingsTabs() {
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white pb-2">
+        <div className="sticky top-0 bg-white ">
           <TabsHeader
             placeholder="Online Lead"
             onResize={undefined}
@@ -322,7 +322,7 @@ function SettingsTabs() {
           </TabsHeader>
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-150px)] p-4">
+        <div className="overflow-y-auto max-h-[calc(100vh-150px)] ">
           <TabsBody
             placeholder="body"
             onResize={undefined}

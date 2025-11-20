@@ -43,6 +43,8 @@ import FormHeader from "../../ui/FormHeader";
 import useUnit from "../../../config/hooks/useUnit";
 import FormLayout from "../../ui/FormLayout";
 import FormSkeleton from "../Account/FormSkeleton";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormCheckbox from "../../ui/FormCheckbox";
 
 function AddProductModal({
   isOpen,
@@ -55,6 +57,7 @@ function AddProductModal({
   const { userHasAccessToAddProduct } = useUserAccessModules();
   // const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
+  const [isSaving , setIsSaving] = useState<boolean>(false);
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
 
@@ -122,6 +125,7 @@ function AddProductModal({
 
   const [selectedUnitId, setUnitId] = useState<number | undefined>(0);
 
+  const [isSerialNumberChecked , setIsSerialNumberChecked ] = useState<boolean >(false)
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
     number | undefined
   >(0);
@@ -167,6 +171,10 @@ function AddProductModal({
     useState<boolean>(false);
   const [selectedUnitError, setSelectedUnitError] = useState<boolean>(false);
 
+
+  function handleCheckboxChangeOfSerialNumber(event : React.ChangeEvent<HTMLInputElement>){
+    setIsSerialNumberChecked(event.target.checked)
+  }
   const validateDropdown = () => {
     if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
       setSelectedProductTypeIdError(true);
@@ -223,6 +231,7 @@ function AddProductModal({
   ) => {
     event.preventDefault();
     validateDropdown();
+    if(isSaving) return;
     if (userHasAccessToAddProduct) {
       if (addProductFormData.name !== "" || addProductFormData.version !== "") {
         if (
@@ -262,6 +271,8 @@ function AddProductModal({
             selectedUnitId !== undefined &&
             addProductFormData.cost !== null
           ) {
+
+            setIsSaving(true)
             const addProductPostData = {
               company_id: loginStatus.companyId,
               product_type_id: selectedProductTypeId,
@@ -272,6 +283,7 @@ function AddProductModal({
               name: addProductFormData.name,
               unit_id : selectedUnitId,
               barcode: addProductFormData.barcode,
+              is_serial_number : isSerialNumberChecked,
               cost: addProductFormData.cost,
               description: addProductFormData.description,
               version: addProductFormData.version,
@@ -282,7 +294,7 @@ function AddProductModal({
               valid_from_string: formattedDate,
               createdby_id: loginStatus.id,
             };
-            console.log(addProductPostData);
+
             await axios
               .post(POST_API.ADD_PRODUCT, addProductPostData, {
                 withCredentials: true,
@@ -293,7 +305,7 @@ function AddProductModal({
                   handleProductChangeOnAdd();
                   setTimeout(() => {
                     onClose();
-                  }, 500);
+                  }, 100);
                 } else {
                   toast.error(response.data.message);
                 }
@@ -307,7 +319,12 @@ function AddProductModal({
                   if (refreshTokenResponse) {
                     handleAddProductFormSubmit(event);
                   }
+                }else{
+                  toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
                 }
+              })
+              .finally(()=>{
+                setIsSaving(false)
               });
           }
         }
@@ -385,22 +402,8 @@ function AddProductModal({
     );
   }
   return (
-  //   <div
-  //     className={
-  //       isSmallScreen
-  //         ? `fixed inset-0 z-50 pt-10   pr-2 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
-  //         : `fixed inset-0 z-50 p-6 overflow-hidden ${OPACITY.POPUP_OPACITY_AND_BACKGROUNG_COLOR}`
-  //     }
-  //   >
-  //     <div className="flex min-h-screen  items-center justify-center">
-  //       <div
-  //         className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
-  // [&::-webkit-scrollbar-track]:bg-gray-300
-  // [&::-webkit-scrollbar-thumb]:bg-gray-400
-  //  [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
-  //       >
   <FormLayout>
-
+          <LoadingPopUpAnimation show={isSaving}/>
           <div className="">
             <FormHeader
               icon={Store}
@@ -485,8 +488,11 @@ function AddProductModal({
                 placeholder="Product Price"
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
+                min={0}
               />
               {/* barcode */}
+              <div className="grid grid-cols-2 gap-6">
+
               <FormInput
                 label="Barcode :"
                 logo={LucideAirplay}
@@ -496,9 +502,17 @@ function AddProductModal({
                 placeholder="Product Bar Code"
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
-                // required={true}
-                // error={errors.code}
-              />
+                />
+                
+               <div className="mt-10">
+                <FormCheckbox
+                label="Has Serial Number"
+                name="is_serial_number"
+                onChange={handleCheckboxChangeOfSerialNumber}
+                checked={isSerialNumberChecked}
+               />
+               </div>
+                </div>
 
               {/* url */}
               <FormInput

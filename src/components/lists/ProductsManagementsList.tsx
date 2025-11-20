@@ -21,6 +21,7 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import COLORS from "../../constants/Colors";
+import AddStock from "../modals/stock/AddStock";
 
 function ProductsManagementList({
   products,
@@ -39,6 +40,7 @@ ProductsManagementListProps) {
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
     useState<boolean>(false);
+  const [openCreateStockModal  , setOpenCreateStockModal] = useState<boolean>(false); 
   const [isCompanyProductUserModalOpen, setIsCompanyProductUserModalOpen] =
     useState<boolean>(false);
   const [isCompanyProductTeamModalOpen, setIsCompanyProductTeamModalOpen] =
@@ -92,6 +94,10 @@ ProductsManagementListProps) {
 
   const handleEditCompanyProductModalOpen = (status: boolean) => {
     setIsEditCompanyProductModalOpen(status);
+  };
+
+  const handleCreateStockModalOpen = (status: boolean) => {
+    setOpenCreateStockModal(status);
   };
 
   const handleCompanyProductUserModalOpen = (status: boolean) => {
@@ -250,6 +256,18 @@ ProductsManagementListProps) {
                 companyProduct={selectedProduct}
               />
             )}
+            {
+              openCreateStockModal && (
+                <AddStock
+                product={selectedProduct}
+                isUsedInProductModal={true}
+                  isOpen={openCreateStockModal}
+                  onClose={() =>{
+                    setOpenCreateStockModal(false)
+                  }}
+                />
+              )
+            }
           </div>
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
@@ -274,6 +292,7 @@ ProductsManagementListProps) {
               handleCompanyProductTeamModalOpen={
                 handleCompanyProductTeamModalOpen
               }
+              handleCreateStockModalOpen={handleCreateStockModalOpen}
               onRowSelect={onRowSelect}
             />
           </div>
