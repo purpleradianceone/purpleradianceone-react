@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
@@ -13,21 +12,26 @@ import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
-import { BoxSelectIcon } from "lucide-react";
+import { Box } from "lucide-react";
+import FormLayout from "../../../ui/FormLayout";
+import StockRulesCard from "./StockRuledCard";
 
 export const StockSerialNumber = ({
   companyProductId,
-  onClose ,
+  onClose,
+  handleStockSerialNumberChange,
+  selectedInwardIds
 }: {
   companyProductId: number | undefined;
-  onClose : ()=> void
+  onClose: () => void;
+  handleStockSerialNumberChange : (id : number[])=> void;
+  selectedInwardIds : number[]
 }) => {
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
 
-  const [stockAvailableSerialNumber, setStockAvailableSerialNumber] = useState<
-    StockAvaibleSerialNumber[]
-  >([]);
+  const [stockAvailableSerialNumberState, setStockAvailableSerialNumberState] =
+    useState<StockAvaibleSerialNumber[]>([]);
 
   const {
     currentPage,
@@ -38,12 +42,14 @@ export const StockSerialNumber = ({
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
-  const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
+  // const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
 
-  useEffect(()=>{
-    console.log(selectedInwardIds);
-    
-  },[selectedInwardIds])
+  // function handleStockSerialNumberChange(ids : number[]){
+  //    setSelectedInwardIds(ids)
+  // }
+  // useEffect(() => {
+  //   console.log(selectedInwardIds);
+  // }, [selectedInwardIds]);
   const getTransactionType = async () => {
     const offset = (currentPage - 1) * pageSize;
     const PostData = {
@@ -82,7 +88,7 @@ export const StockSerialNumber = ({
           })
         );
 
-        setStockAvailableSerialNumber(formattedData);
+        setStockAvailableSerialNumberState(formattedData);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
@@ -100,39 +106,47 @@ export const StockSerialNumber = ({
     getTransactionType();
   }, [currentPage, pageSize]);
 
+  const availableStock =
+    stockAvailableSerialNumberState.length > 0 &&
+    stockAvailableSerialNumberState[0].count;
   return (
     <>
-      {/* // <FormLayout> */}
-      {/* Data Grid Section */}
-      <div
-        className={`ag-theme-balham bg-pink-400 w-full ${
-          userPreference.isLeftMenu
-            ? "h-[calc(100vh-140px)]"
-            : "h-[calc(100vh-148px)]"
-        }`}
-      >
-        <FormHeader
-          icon={BoxSelectIcon}
-          onClose={onClose}
-          preText="Assign Product to account"
-          description="Assign the new product to this Account."
-        />
-        <StockAvailableSerialNumberAgGrid
-          data={stockAvailableSerialNumber}
-          selectedIds={selectedInwardIds}
-          onSelectionChange={(ids) => setSelectedInwardIds(ids)}
-        />
-      </div>
-      <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-        />
-      </div>
-      {/* // </FormLayout> */}
+      <FormLayout>
+        {/* Data Grid Section */}
+
+        <div
+          className={`ag-theme-balham bg-pink-400 w-full ${
+            userPreference.isLeftMenu
+              ? "h-[calc(100vh-140px)]"
+              : "h-[calc(100vh-148px)]"
+          }`}
+        >
+          <FormHeader
+            icon={Box}
+            onClose={onClose}
+            preText="Select the Product available in the Stock"
+            description="Select the product from the stock."
+          />
+          <StockRulesCard
+            availableStock={availableStock}
+          />
+
+          <StockAvailableSerialNumberAgGrid
+            data={stockAvailableSerialNumberState}
+            selectedIds={selectedInwardIds}
+            onSelectionChange={handleStockSerialNumberChange}
+          />
+        </div>
+        <div className="flex items-center justify-end ">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
+      </FormLayout>
     </>
   );
 };

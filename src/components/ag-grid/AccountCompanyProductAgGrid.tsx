@@ -43,6 +43,24 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+        field: "quantityReturn",
+        headerName: "Quantity Return",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "barcode",
+        headerName: "barcode",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "serial_number",
+        headerName: "Serial Number",
+        sortable: true,
+        filter: true,
+      },
+      {
         hide:true,
         field: "unitName",
         headerName: "Unit",

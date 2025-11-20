@@ -488,6 +488,7 @@ function AddProductModal({
                 placeholder="Product Price"
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
+                min={0}
               />
               {/* barcode */}
               <div className="grid grid-cols-2 gap-6">
@@ -505,7 +506,7 @@ function AddProductModal({
                 
                <div className="mt-10">
                 <FormCheckbox
-                label="Has Serial number"
+                label="Has Serial Number"
                 name="is_serial_number"
                 onChange={handleCheckboxChangeOfSerialNumber}
                 checked={isSerialNumberChecked}

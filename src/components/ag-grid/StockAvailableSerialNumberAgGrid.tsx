@@ -1,7 +1,6 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
 import { StockAvaibleSerialNumber } from "../../@types/stock/StockAvailableSerialNumber";
 
 export const StockAvailableSerialNumberAgGrid = ({
@@ -22,7 +21,7 @@ export const StockAvailableSerialNumberAgGrid = ({
       updated = [...selectedIds, id];
     }
 
-    onSelectionChange(updated); // send updated list to parent
+    onSelectionChange(updated); 
   };
 
   const columnDefs = useMemo<ColDef[]>(
@@ -33,13 +32,12 @@ export const StockAvailableSerialNumberAgGrid = ({
         headerName: "Warehouse",
         cellStyle: { color: "black", fontWeight: "bold" },
       },
-      { field: "companyWarehouseId", headerName: "companyWarehouseId" },
-      { field: "barcode", headerName: "barcode" },
-      { field: "serialNumber", headerName: "serialNumber" },
-      { field: "systemCode", headerName: "systemCode" },
-      { field: "createdOn", headerName: "createdOn" },
+      { hide: true, field: "companyWarehouseId" },
+      { field: "barcode" },
+      { field: "serialNumber" },
+      { field: "systemCode" },
+      { field: "createdOn" },
 
-      //  NEW ACTION COLUMN
       {
         headerName: "Actions",
         field: "actions",
@@ -52,6 +50,7 @@ export const StockAvailableSerialNumberAgGrid = ({
 
           return (
             <input
+              className="ml-4 mt-1"
               type="checkbox"
               checked={isChecked}
               onChange={() => params.context.toggleSelect(stockInwardId)}
@@ -77,13 +76,14 @@ export const StockAvailableSerialNumberAgGrid = ({
   return (
     <div className="ag-theme-balham w-full" style={{ height: "100%", width: "100%" }}>
       <AgGridReact
+        key={selectedIds.join(",")}   // 🔥 forces checkbox re-render
         rowData={data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
-        context={{ selectedIds, toggleSelect }}   //  THIS IS IMPORTANT
+        context={{ selectedIds, toggleSelect }}
+        getRowId={(params) => params.data.stockInwardId}   // 🔥 required for persistence
       />
     </div>
   );

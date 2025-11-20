@@ -12,16 +12,16 @@ import FormCheckboxProps from "../../@types/ui/FormCheckboxProps";
  */
 function FormCheckbox({ label, name,onChange,checked }: FormCheckboxProps){
   return (
-    <div className="flex items-center">
+    <div className="flex items-center ">
       <input
         id={name}
         name={name}
         type="checkbox"
-        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+        className="h-4 w-4 text-blue-600 cursor-pointer focus:ring-blue-500 border-gray-300 rounded"
         onChange={onChange}
         checked={checked}
       />
-      <label htmlFor={name} className="ml-2 block input-label-custom">
+      <label htmlFor={name} className="ml-2 block cursor-pointer input-label-custom">
         {label}
       </label>
     </div>
