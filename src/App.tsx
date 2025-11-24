@@ -17,7 +17,10 @@ import { NotificationCountContextProvider } from "./context/notification/Notific
 import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
 import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailDataContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+
+const queryClient = new QueryClient();
 /**
  *
  * @returns JSX.Element of all html elements to be rendered as child element of root element in index.html
@@ -25,6 +28,7 @@ import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailData
 function App() {
   const { confirmHandler, dialogMessage, isDialogOpen } =
     useAxiosForbiddenHandler();
+
   return (
     <LoggedInUserContextProvider>
       <TutorailDataContextProvider>
@@ -34,13 +38,14 @@ function App() {
                 <PanelProvider>
                   <ZoomMeetingContextProvider>
                     <GoogleMeetContextProvider>
+                      <QueryClientProvider client={queryClient}>
                       <NotificationProvider>
                         <Toaster
                           position="top-center"
                           toastOptions={{
                             style: { zIndex: 2147483647 }, // max safe z-index
                           }}
-                        />
+                          />
 
                         <DialogueBox
                           isOpen={isDialogOpen}
@@ -48,9 +53,10 @@ function App() {
                           onConfirm={confirmHandler}
                           title="Session Expired !"
                           message={dialogMessage}
-                        />
+                          />
                         <RouterProvider router={router} />
                       </NotificationProvider>
+                          </QueryClientProvider>
                     </GoogleMeetContextProvider>
                   </ZoomMeetingContextProvider>
                 </PanelProvider>

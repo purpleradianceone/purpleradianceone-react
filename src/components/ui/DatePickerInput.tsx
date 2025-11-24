@@ -68,7 +68,7 @@ function DatePickerInput(props: FormInputProps) {
   };
 
   return (
-    <div className="mt-1 cursor-pointer">
+    <div className=" cursor-pointer">
       <label
         htmlFor={props.name}
         className={
@@ -89,7 +89,7 @@ function DatePickerInput(props: FormInputProps) {
         )}
       </label>
 
-      <div className="mt-1 relative">
+      <div className=" relative">
         <input
           ref={inputRef} // ✅ use local ref instead of props.ref
           readOnly={props.readonly}
@@ -109,6 +109,7 @@ function DatePickerInput(props: FormInputProps) {
           }
           inputMode={props.inputMode}
           max={props.maxDate}
+          min={props.minDate}
         />
       </div>
 

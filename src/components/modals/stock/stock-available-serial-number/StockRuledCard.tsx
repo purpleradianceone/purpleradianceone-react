@@ -2,36 +2,37 @@
 const StockRulesCard = ({ availableStock } : {
     availableStock : number | boolean 
 }) => {
-  // Define the rules content for easy mapping/rendering
+  //rules 
   const rules = [
     {
-      icon: '✅',
-      title: 'Full Stock Available',
-      description: 'if the selected quantity is available and will be assigned automatically, if user does not select it OR  if user selectes then that particular stock will be assigned ',
+      description: 'You may select any available serial numbers from the list. It is not required to select the exact count matching the entered quantity.',
       color: 'text-green-600 bg-green-50',
     },
     {
-      icon: '🚫',
-      title: 'Partial Stock / No Stock ',
-      description: 'If there is no available stock as per the given quantity then the operation will fail. First create the stock for the product and then assign it the account/client.',
+      description: 'If fewer serial numbers are selected, the system will automatically allocate additional serial numbers for the remaining quantity.',
+      color: 'text-red-600 bg-red-50',
+    },
+    {
+      description: 'If more serial numbers are selected, the system will consider only the required quantity as per the entered value.',
+      color: 'text-red-600 bg-red-50',
+    },
+    {
+      description: 'If sufficient stock is not available, the product cannot be mapped to the account.',
       color: 'text-red-600 bg-red-50',
     },
   ];
 
   return (
     <div className=" max-w-full
-      bg-white   space-y-4">
-      
-      {/* Header */}
+      bg-white space-y-1">
 
       {/* Rules List */}
-      <div className="space-y-2">
-      <p className="table-header-custom">📌 How Stock Selection  Work:</p>
+      <div className="space-y-0.5 pt-1">
+      <p className="table-header-custom">📌 Please note the following instructions while selecting serial numbers :</p>
         {rules.map((rule, index) => (
           <div key={index} className="">
             
-            <ul className="input-label-custom list-disc pl-6 space-y-1">
-              <li  className="table-header-custom">{rule.title}</li>
+            <ul className="list-disc pl-6 ">
               <li className="caption-custom">{rule.description}</li>
             </ul>
           </div>
@@ -41,8 +42,8 @@ const StockRulesCard = ({ availableStock } : {
       {/* Available Stock Display (Conditional) */}
       {availableStock  && (
         <div className="">
-          <p className="caption-custom  text-blue-700 font-bold  p-1  flex items-center">
-             Current Available Stock: {availableStock}
+          <p className="pl-5  text-blue-700  text-xs  p-1  flex items-center">
+             Current available stock: {availableStock}
           </p>
         </div>
       )}

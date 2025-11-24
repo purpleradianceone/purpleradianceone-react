@@ -43,8 +43,11 @@ import { useProductType } from "../../../config/hooks/useProductTypes";
 import { Item, range } from "../../../constants/NumberList";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
-import { createPortal } from "react-dom";
 import FormCheckbox from "../../ui/FormCheckbox";
+import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
+import FormSkeleton from "../Account/FormSkeleton";
+import FormLayout from "../../ui/FormLayout";
+import { CompanyProductSlaComponent } from "./CompanyProductSla";
 
 function EditCompanyProductModal({
   isOpen,
@@ -53,8 +56,9 @@ function EditCompanyProductModal({
   handleCompanyProductChange,
   handleCreateCompanyProductTaxAdd,
 }: EditCompanyProductModalProps) {
-  const { intervalTypeData } = useIntervalType();
-  const { productTypeData } = useProductType();
+  const { intervalTypeData, loading: intervalTypeDataLoading } =
+    useIntervalType();
+  const { productTypeData, loading: productTypeLoading } = useProductType();
   const rangeOfNumber: Item[] = range(1, 365);
 
   const intialEditCompanyProductFormData = {
@@ -72,7 +76,7 @@ function EditCompanyProductModal({
     version: product.version,
     url: product.url,
     isActive: product.isActive,
-    isSerialNumber : product.isSerialNumber
+    isSerialNumber: product.isSerialNumber,
   };
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
@@ -97,6 +101,11 @@ function EditCompanyProductModal({
   const { userHasAccessToUpdateProduct } = useUserAccessModules();
 
   const { isSmallScreen } = useScreenSize();
+
+  const {
+    companyProductSla: companyProductSlaData,
+    loading: companyProductSlaLoading,
+  } = useCompanyProductSla(product.id!);
 
   const [companyProductTax, setCompanyProductTax] = useState<ProductTax[]>([]);
   const [companyProductTaxChangeCount, setCompanyProductTaxChangeCount] =
@@ -183,18 +192,9 @@ function EditCompanyProductModal({
   const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
     useState<boolean>(false);
 
-  const [
-    selectedWarrantyIntervalTypeIdError,
-    setSelectedWarrantyIntervalTypeIdError,
-  ] = useState<boolean>(false);
-
-  const [selectedDefaultWarrantyError, setSelectedDefaultWarrantyError] =
-    useState<boolean>(false);
-  const [isSerialNumberChecked , setIsSerialNumberChecked ] = useState<boolean >(product.isSerialNumber!)
-  const [selectedAmcIntervalTypeIdError, setSelectedAmcIntervalTypeIdError] =
-    useState<boolean>(false);
-  const [selectedDefaultAmcError, setSelectedDefaultAmcError] =
-    useState<boolean>(false);
+  const [isSerialNumberChecked, setIsSerialNumberChecked] = useState<boolean>(
+    product.isSerialNumber!
+  );
 
   const validateDropdown = () => {
     if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
@@ -202,41 +202,6 @@ function EditCompanyProductModal({
       // toast.error("Please select 'Product Type'");
     } else {
       setSelectedProductTypeIdError(false);
-    }
-
-    if (
-      selectedWarrantyIntervalTypeId === 0 ||
-      selectedWarrantyIntervalTypeId === undefined
-    ) {
-      setSelectedWarrantyIntervalTypeIdError(true);
-      // toast.error("Please select 'Warranty Time Unit'");
-    } else {
-      setSelectedWarrantyIntervalTypeIdError(false);
-    }
-
-    if (
-      selectedDefaultWarranty === 0 ||
-      selectedDefaultWarranty === undefined
-    ) {
-      setSelectedDefaultWarrantyError(true);
-      // toast.error("Please select 'Warranty Duration'");
-    } else {
-      setSelectedDefaultWarrantyError(false);
-    }
-    if (
-      selectedAmcIntervalTypeId === 0 ||
-      selectedAmcIntervalTypeId === undefined
-    ) {
-      setSelectedAmcIntervalTypeIdError(true);
-      // toast.error("Please select 'AMC Time Unit'");
-    } else {
-      setSelectedAmcIntervalTypeIdError(false);
-    }
-    if (selectedDefaultAmc === 0 || selectedDefaultAmc === undefined) {
-      setSelectedDefaultAmcError(true);
-      // toast.error("Please select 'AMC Cycle Duration'");
-    } else {
-      setSelectedDefaultAmcError(false);
     }
   };
 
@@ -264,15 +229,15 @@ function EditCompanyProductModal({
       updateCompanyProductFormData.version !== null &&
       updateCompanyProductFormData.version !== undefined &&
       selectedProductTypeId !== 0 &&
-      selectedProductTypeId !== undefined &&
-      selectedWarrantyIntervalTypeId !== 0 &&
-      selectedWarrantyIntervalTypeId !== undefined &&
-      selectedDefaultWarranty !== 0 &&
-      selectedDefaultWarranty !== undefined &&
-      selectedAmcIntervalTypeId !== 0 &&
-      selectedAmcIntervalTypeId !== undefined &&
-      selectedDefaultAmc !== 0 &&
-      selectedDefaultAmc !== undefined
+      selectedProductTypeId !== undefined
+      // selectedWarrantyIntervalTypeId !== 0 &&
+      // selectedWarrantyIntervalTypeId !== undefined &&
+      // selectedDefaultWarranty !== 0 &&
+      // selectedDefaultWarranty !== undefined &&
+      // selectedAmcIntervalTypeId !== 0 &&
+      // selectedAmcIntervalTypeId !== undefined &&
+      // selectedDefaultAmc !== 0 &&
+      // selectedDefaultAmc !== undefined
     ) {
       if (
         updateCompanyProductFormData.barcode !==
@@ -297,7 +262,7 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.version ||
         updateCompanyProductFormData.url !==
           intialEditCompanyProductFormData.url ||
-          updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked
+        updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -325,7 +290,7 @@ function EditCompanyProductModal({
                 : updateCompanyProductFormData.default_amc_cycle,
             name: updateCompanyProductFormData.name,
             barcode: updateCompanyProductFormData.barcode,
-            is_serial_number : isSerialNumberChecked,
+            is_serial_number: isSerialNumberChecked,
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
@@ -438,362 +403,354 @@ function EditCompanyProductModal({
 
   if (!isOpen) return null;
 
-  return createPortal(
-    <div
-      className={
-        isSmallScreen
-          ? "fixed inset-0 z-50 pl-20 pt-10 overflow-hidden bg-black bg-opacity-5"
-          : "fixed inset-0 z-50 p-6 overflow-hidden bg-black bg-opacity-5"
-      }
-    >
-      <div className="flex min-h-screen items-center justify-center">
-        <div
-          className="relative w-full max-w-6xl max-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-gray-300
-  [&::-webkit-scrollbar-thumb]:bg-gray-400
-   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+  if (
+    companyProductSlaLoading ||
+    productTypeLoading ||
+    intervalTypeDataLoading
+  ) {
+    return (
+      <FormLayout>
+        <FormSkeleton></FormSkeleton>
+      </FormLayout>
+    );
+  }
+  return (
+    <FormLayout>
+      <div className=" grid grid-cols-1 space-y-1">
+        <FormHeader
+          icon={EditIcon}
+          onClose={onClose}
+          preText="Edit -"
+          userName={product.name || "Name not given"}
+          description="Modify product details to keep information accurate and up to date."
+        />
+        {/* Edit Company product  */}
+        <form
+          className="space-y-2  border  rounded-md p-1 "
+          onSubmit={hanldeUpdateCompanyProductFormSubmit}
         >
-          <div className="p-4">
-            <FormHeader
-              icon={EditIcon}
-              onClose={onClose}
-              preText="Edit -"
-              userName={product.name || "Name not given"}
-              description="Modify product details to keep information accurate and up to date."
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <FormInput
+              label="Product Name : "
+              logo={LucidePresentation}
+              type="text"
+              name="name"
+              required={true}
+              value={updateCompanyProductFormData.name}
+              placeholder="Enter Product Name"
+              defaultValue={intialEditCompanyProductFormData.name}
+              maxLength={256}
+              onChange={handleEditCompanyProductFormDataChange}
+              error={errors.name}
+              onBlur={handleBlur}
             />
-            <form
-              className="space-y-2"
-              onSubmit={hanldeUpdateCompanyProductFormSubmit}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="grid col-span-1 ">
-                  <FormInput
-                    label="Product Name : "
-                    logo={LucidePresentation}
-                    type="text"
-                    name="name"
-                    required={true}
-                    value={updateCompanyProductFormData.name}
-                    placeholder="Enter Product Name"
-                    defaultValue={intialEditCompanyProductFormData.name}
-                    maxLength={256}
-                    onChange={handleEditCompanyProductFormDataChange}
-                    error={errors.name}
-                    onBlur={handleBlur}
-                  />
-                  <FormInput
-                    label="URL : "
-                    logo={LucideLink}
-                    type="text"
-                    name="url"
-                    required={false}
-                    defaultValue={intialEditCompanyProductFormData.url}
-                    value={intialEditCompanyProductFormData.url}
-                    placeholder="Product URL"
-                    onChange={handleEditCompanyProductFormDataChange}
-                    onBlur={handleBlur}
-                    error={errors.url}
-                  />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="">
+                <CustomDropdown
+                  labelName="Product Type"
+                  logo={LucideGroup}
+                  preselectedOption={
+                    intialEditCompanyProductFormData.product_type_id
+                  }
+                  onSelect={(e) => {
+                    if (e) {
+                      setSelectedProductTypeIdError(false);
+                    }
 
-                  <FormInput
-                    label="Version :"
-                    logo={LucideVerified}
-                    type="text"
-                    name="version"
-                    max={20}
-                    defaultValue={intialEditCompanyProductFormData.version}
-                    value={intialEditCompanyProductFormData.version}
-                    placeholder="Product Version"
-                    onChange={handleEditCompanyProductFormDataChange}
-                    onBlur={handleBlur}
-                    required={true}
-                    error={errors.version}
-                  />
-                  <TextAreaInput
-                    logo={Text}
-                    label="Description :"
-                    cols={5}
-                    rows={2}
-                    name="description"
-                    required={false}
-                    placeholder="Enter Product Description"
-                    defaultValue={intialEditCompanyProductFormData.description}
-                    onChange={handleEditCompanyProductFormDataChange}
-                    onBlur={handleBlur}
-                  />
-                </div>
-
-                <div className="grid col-span-1 gap-1">
-                  <div className="grid col-span-1 gap-1">
-                    <FormInput
-                      logo={LucideIndianRupee}
-                      label="Cost :"
-                      type="text"
-                      name="cost"
-                      placeholder="Enter Product Cost"
-                      defaultValue={intialEditCompanyProductFormData.cost}
-                      onChange={handleEditCompanyProductFormDataChange}
-                    />
-                     <div className="grid grid-cols-2 gap-6">
-
-                    <FormInput
-                      label="Barcode :"
-                      logo={LucideAirplay}
-                      type="text"
-                      name="barcode"
-                      placeholder="Enter Bar Code"
-                      onChange={handleEditCompanyProductFormDataChange}
-                      defaultValue={intialEditCompanyProductFormData.barcode}
-                      onBlur={handleBlur}
-                      />
-                    <div className="mt-10">
-                <FormCheckbox
-                label="Has Serial number"
-                name="is_serial_number"
-                onChange={( event : React.ChangeEvent<HTMLInputElement>)=>{
-                  setIsSerialNumberChecked(event.target.checked
-                  )
-                }}
-                checked={isSerialNumberChecked}
-               />
-               </div>
-                      </div>
-                    <div className="mt-2">
-                      <CustomDropdown
-                        labelName="Product Type"
-                        logo={LucideGroup}
-                        preselectedOption={
-                          intialEditCompanyProductFormData.product_type_id
-                        }
-                        onSelect={(e) => {
-                          if (e) {
-                            setSelectedProductTypeIdError(false);
-                          }
-
-                          setSelectedProductTypeId(e);
-                        }}
-                        options={productTypeData}
-                        requiredRedDot={true}
-                      />
-                      {selectedProductTypeIdError && (
-                        <div className="caption-custom-inactive">
-                          Product Type is required
-                        </div>
-                      )}
-                    </div>
+                    setSelectedProductTypeId(e);
+                  }}
+                  options={productTypeData}
+                  requiredRedDot={true}
+                />
+                {selectedProductTypeIdError && (
+                  <div className="caption-custom-inactive">
+                    Product Type is required
                   </div>
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <div>
-                      <CustomDropdown
-                        logo={LucideClock}
-                        labelName="Warranty Duration :"
-                        preselectedOption={
-                          intialEditCompanyProductFormData.default_warranty
-                        }
-                        onSelect={(e) => {
-                          if (e) {
-                            setSelectedDefaultWarrantyError(false);
-                          }
-                          setDefaultWarranty(e);
-                        }}
-                        options={rangeOfNumber}
-                        requiredRedDot={true}
-                      />
-                      {selectedDefaultWarrantyError && (
-                        <div className="caption-custom-inactive">
-                          Warranty Duration is required
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <CustomDropdown
-                        logo={LucideTimer}
-                        labelName="Warranty Time Unit :"
-                        preselectedOption={
-                          intialEditCompanyProductFormData.default_warranty_interval_type_id
-                        }
-                        onSelect={(e) => {
-                          if (e) {
-                            setSelectedWarrantyIntervalTypeIdError(false);
-                          }
-                          setWarrantyIntervalTypeId(e);
-                        }}
-                        options={intervalTypeData}
-                        requiredRedDot={true}
-                      />
-                      {selectedWarrantyIntervalTypeIdError && (
-                        <div className="caption-custom-inactive">
-                          Warranty Time Unit is required
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <div>
-                      <CustomDropdown
-                        logo={LucideClock}
-                        labelName="AMC Cycle Duration :"
-                        preselectedOption={
-                          intialEditCompanyProductFormData.default_amc_cycle
-                        }
-                        onSelect={(e) => {
-                          if (e) {
-                            setSelectedDefaultAmcError(false);
-                          }
-                          setDefaultAmc(e);
-                        }}
-                        options={rangeOfNumber}
-                        requiredRedDot={true}
-                      />
-                      {selectedDefaultAmcError && (
-                        <div className="caption-custom-inactive">
-                          AMC Cycle Duration is required
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <CustomDropdown
-                        logo={LucideTimer}
-                        labelName="AMC Time Unit :"
-                        preselectedOption={
-                          intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
-                        }
-                        onSelect={(e) => {
-                          if (e) {
-                            setSelectedAmcIntervalTypeIdError(false);
-                          }
-                          setAmcIntervalTypeId(e);
-                        }}
-                        options={intervalTypeData}
-                        requiredRedDot={true}
-                      />
-                      {selectedAmcIntervalTypeIdError && (
-                        <div className="caption-custom-inactive">
-                          AMC Time Unit is required
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
-              <div className="flex col-span-2 justify-start">
-                <div className="flex items-center gap-4 justify-start">
-                  <label
-                    htmlFor="isActive"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    {productIsActive ? (
-                      <div>
-                        <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
-                        <span className="input-label-custom">Active</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
-                        <span className="input-label-custom">Inactive</span>
-                      </div>
-                    )}
-                  </label>
-                  {/* <label className="inline-flex items-center cursor-pointer relative">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={productIsActive}
-                      id="isActive"
-                      name="isActive"
-                      onChange={handleProductToggle}
-                    />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label> */}
-                  <ToggleButton
-                    checked={productIsActive}
-                    name="isActive"
-                    onToggle={handleProductToggle}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button type="button" onClick={onClose}>
-                  <div className="flex items-center justify-center gap-0.5">
-                    <X size={16} />
-                    Cancel
-                  </div>
-                </Button>
-                <Button type="submit">
-                  <div className="flex items-center justify-center gap-1">
-                    <Save size={16} />
-                    Save
-                  </div>
-                </Button>
-              </div>
-            </form>
-
-            <div className="inline-flex items-center justify-center w-full">
-              <hr className="w-full h-0.5 mx-auto my-4 border-0 rounded-sm md:my-10 bg-gray-700" />
-              <span className="absolute px-3 table-header-custom -translate-x-1/2 bg-white left-1/2">
-                Product Tax
-              </span>
-            </div>
-            <div
-              className={
-                isSmallScreen
-                  ? "flex justify-self-end max-w-full px-2 mb-2"
-                  : "flex justify-self-end max-w-36 m-3"
-              }
-            >
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleCreateCompanyProductTaxModalOpen(true);
-                }}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  <ClipboardPlus size={16} />
-                  Add Tax
-                </div>
-              </Button>
-            </div>
-
-            {isCreateCompanyProductTaxModalOpen && (
-              <CreateCompanyProductTaxModal
-                isOpen={isCreateCompanyProductTaxModalOpen}
-                handleCreateCompanyProductTax={handleCreateCompanyProductTax}
-                onClose={() => {
-                  setIsCreateCompanyProductTaxModalOpen(false);
-                }}
-                product={product}
+              <FormInput
+                label="URL : "
+                logo={LucideLink}
+                type="text"
+                name="url"
+                required={false}
+                defaultValue={intialEditCompanyProductFormData.url}
+                value={intialEditCompanyProductFormData.url}
+                placeholder="Product URL"
+                onChange={handleEditCompanyProductFormDataChange}
+                onBlur={handleBlur}
+                error={errors.url}
               />
-            )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput
+                logo={LucideIndianRupee}
+                label="Cost :"
+                type="text"
+                name="cost"
+                placeholder="Enter Product Cost"
+                defaultValue={intialEditCompanyProductFormData.cost}
+                onChange={handleEditCompanyProductFormDataChange}
+              />
+              <FormInput
+                label="Version :"
+                logo={LucideVerified}
+                type="text"
+                name="version"
+                max={20}
+                defaultValue={intialEditCompanyProductFormData.version}
+                value={intialEditCompanyProductFormData.version}
+                placeholder="Product Version"
+                onChange={handleEditCompanyProductFormDataChange}
+                onBlur={handleBlur}
+                required={true}
+                error={errors.version}
+              />
+            </div>
 
-            <CreateCompanyProductCompanyUserModal
-              isOpen={isCreateCompanyProductCompanyUserModalOpen}
-              onClose={() => {
-                setIsCreateCompanyProductCompanyUserModalOpen(false);
-              }}
-              product={product}
-            />
+            {/* <div className="grid col-span-1 gap-1"> */}
+            {/* <div className="grid col-span-1 gap-1"> */}
 
-            <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
-              <div
-                className="ag-theme-balham w-full"
-                style={{ height: "440px", width: "100%" }}
-              >
-                <ProductTaxManagementAgGrid
-                  productTax={companyProductTax}
-                  handleCompanyProductTaxChange={handleCompanyProductTaxChange}
+            <div className="grid grid-cols-2 gap-6">
+              <FormInput
+                label="Barcode :"
+                logo={LucideAirplay}
+                type="text"
+                name="barcode"
+                placeholder="Enter Bar Code"
+                onChange={handleEditCompanyProductFormDataChange}
+                defaultValue={intialEditCompanyProductFormData.barcode}
+                onBlur={handleBlur}
+              />
+              <div className="mt-5">
+                <FormCheckbox
+                  label="Has Serial number"
+                  name="is_serial_number"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setIsSerialNumberChecked(event.target.checked);
+                  }}
+                  checked={isSerialNumberChecked}
                 />
               </div>
             </div>
+
+            {/* </div> */}
+            <div className="grid grid-cols-2 gap-3 ">
+              <div>
+                <CustomDropdown
+                  logo={LucideClock}
+                  labelName="Warranty Duration :"
+                  preselectedOption={
+                    intialEditCompanyProductFormData.default_warranty
+                  }
+                  onSelect={(e) => {
+                    setDefaultWarranty(e);
+                  }}
+                  options={rangeOfNumber}
+                  // requiredRedDot={true}
+                />
+                {/* {selectedDefaultWarrantyError && (
+                    <div className="caption-custom-inactive">
+                      Warranty Duration is required
+                    </div>
+                  )} */}
+              </div>
+
+              <div>
+                <CustomDropdown
+                  logo={LucideTimer}
+                  labelName="Warranty Time Unit :"
+                  preselectedOption={
+                    intialEditCompanyProductFormData.default_warranty_interval_type_id
+                  }
+                  onSelect={(e) => {
+                    setWarrantyIntervalTypeId(e);
+                  }}
+                  options={intervalTypeData}
+                  // requiredRedDot={true}
+                />
+                {/* {selectedWarrantyIntervalTypeIdError && (
+                    <div className="caption-custom-inactive">
+                      Warranty Time Unit is required
+                    </div>
+                  )} */}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 ">
+              <div>
+                <CustomDropdown
+                  logo={LucideClock}
+                  labelName="AMC Cycle Duration :"
+                  preselectedOption={
+                    intialEditCompanyProductFormData.default_amc_cycle
+                  }
+                  onSelect={(e) => {
+                    // if (e) {
+                    //   setSelectedDefaultAmcError(false);
+                    // }
+                    setDefaultAmc(e);
+                  }}
+                  options={rangeOfNumber}
+                  // requiredRedDot={true}
+                />
+                {/* {selectedDefaultAmcError && (
+                    <div className="caption-custom-inactive">
+                      AMC Cycle Duration is required
+                    </div>
+                  )} */}
+              </div>
+
+              <div>
+                <CustomDropdown
+                  logo={LucideTimer}
+                  labelName="AMC Time Unit :"
+                  preselectedOption={
+                    intialEditCompanyProductFormData.default_amc_cycle_interval_type_id
+                  }
+                  onSelect={(e) => {
+                    // if (e) {
+                    //   setSelectedAmcIntervalTypeIdError(false);
+                    // }
+                    setAmcIntervalTypeId(e);
+                  }}
+                  options={intervalTypeData}
+                  // requiredRedDot={true}
+                />
+                {/* {selectedAmcIntervalTypeIdError && (
+                    <div className="caption-custom-inactive">
+                      AMC Time Unit is required
+                    </div>
+                  )} */}
+              </div>
+            </div>
+            <div className="col-span-1">
+              <TextAreaInput
+                logo={Text}
+                label="Description :"
+                cols={5}
+                rows={3}
+                name="description"
+                required={false}
+                placeholder="Enter Product Description"
+                defaultValue={intialEditCompanyProductFormData.description}
+                onChange={handleEditCompanyProductFormDataChange}
+                onBlur={handleBlur}
+              />
+            </div>
+            {/* </div> */}
+          </div>
+
+          <div className="flex justify-between items-center m-2  gap-2 ">
+            {/* active toggle button */}
+            <div className="flex items-center justify-center  w-fit  gap-4 ">
+              <label
+                htmlFor="isActive"
+                className="block text-sm mt-3 font-medium text-gray-700"
+              >
+                {productIsActive ? (
+                  <div>
+                    <CheckCircle2 className=" text-green-500 w-4 h-4 inline-block" />{" "}
+                    <span className="input-label-custom">Active</span>
+                  </div>
+                ) : (
+                  <div>
+                    <XCircle className="text-gray-300 w-4 h-4 inline-block" />{" "}
+                    <span className="input-label-custom">Inactive</span>
+                  </div>
+                )}
+              </label>
+              <ToggleButton
+                checked={productIsActive}
+                name="isActive"
+                onToggle={handleProductToggle}
+              />
+            </div>
+
+            {/* cancel and save button */}
+            <div className="flex items-center gap-1">
+              <Button type="button" onClick={onClose}>
+                <div className="flex items-center justify-center gap-0.5">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              <Button type="submit">
+                <div className="flex items-center justify-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
+              </Button>
+            </div>
+          </div>
+        </form>
+
+        {/* Service level agreement */}
+        <div className="w-full ">
+          <CompanyProductSlaComponent
+            companyProductSlaData={companyProductSlaData}
+          />
+        </div>
+
+        {/* Product Tax */}
+        {/* <div className="inline-flex items-center justify-center w-full">
+          <hr className="w-full h-0.5 mx-auto my-0.5 border-0 rounded-sm  bg-gray-700" />
+          <span className="absolute px-3 table-header-custom -translate-x-1/2 bg-white left-1/2">
+            Product Tax
+          </span>
+        </div> */}
+        <div
+          className={
+            isSmallScreen
+              ? "flex justify-self-end max-w-full px-2 mb-2"
+              : "flex justify-self-end max-w-36 m-1"
+          }
+        >
+          <Button
+            type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              handleCreateCompanyProductTaxModalOpen(true);
+            }}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <ClipboardPlus size={16} />
+              Add Tax
+            </div>
+          </Button>
+        </div>
+
+        {isCreateCompanyProductTaxModalOpen && (
+          <CreateCompanyProductTaxModal
+            isOpen={isCreateCompanyProductTaxModalOpen}
+            handleCreateCompanyProductTax={handleCreateCompanyProductTax}
+            onClose={() => {
+              setIsCreateCompanyProductTaxModalOpen(false);
+            }}
+            product={product}
+          />
+        )}
+
+        <CreateCompanyProductCompanyUserModal
+          isOpen={isCreateCompanyProductCompanyUserModalOpen}
+          onClose={() => {
+            setIsCreateCompanyProductCompanyUserModalOpen(false);
+          }}
+          product={product}
+        />
+
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm pb-6">
+          <div
+            className="ag-theme-balham w-full"
+            style={{ height: "300px", width: "100%" }}
+          >
+            <ProductTaxManagementAgGrid
+              productTax={companyProductTax}
+              handleCompanyProductTaxChange={handleCompanyProductTaxChange}
+            />
           </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </FormLayout>
   );
 }
 

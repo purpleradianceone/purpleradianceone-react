@@ -3,7 +3,6 @@ import {
   BoxSelectIcon,
   Info,
   LucideCalendar,
-  LucideClock,
   LucideIndianRupee,
   LucideTimer,
   MapPin,
@@ -15,16 +14,14 @@ import {
 import FormHeader from "../../../ui/FormHeader";
 import FormInput from "../../../ui/FormInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ProductManagement from "../../../views/product-Management/ProductsManagement";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
 import { useFormChange } from "../../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../../config/hooks/useFormValidation";
-import { useIntervalType } from "../../../../config/hooks/useIntervalType";
 import CustomDropdown from "../../leads/CustomDropdown";
-import { Item, range } from "../../../../constants/NumberList";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -116,10 +113,10 @@ const CreateAccountCompanyProduct = ({
     // resets the states for form
     resetAccountCreateForm();
 
-    setWarrantyIntervalTypeId(0);
-    setAmcIntervalTypeId(0);
-    setSelectedWarranty(0);
-    setSelectedAmc(0);
+    // setWarrantyIntervalTypeId(0);
+    // setAmcIntervalTypeId(0);
+    // setSelectedWarranty(0);
+    // setSelectedAmc(0);
     setErrors({
       quantity: "",
       purchaseDate: "",
@@ -136,26 +133,25 @@ const CreateAccountCompanyProduct = ({
     });
     onClose();
   };
-  const { intervalTypeData } = useIntervalType();
 
-  const rangeOfNumber: Item[] = useMemo(() => {
-    return range(1, 365);
-  }, []);
+  // const rangeOfNumber: Item[] = useMemo(() => {
+  //   return range(1, 365);
+  // }, []);
 
-  const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
-    useState<number>(0);
+  // const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] =
+  //   useState<number>(0);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
-  const [SelectedWarranty, setSelectedWarranty] = useState<number>(0);
-  const [selectedAmc, setSelectedAmc] = useState<number | undefined>(0);
-  useEffect(() => {
-    if (selectedProduct) {
-      setSelectedAmc(selectedProduct?.defaultAmcCycle);
-      setAmcIntervalTypeId(selectedProduct.defaultAmcCycleIntervalTypeId);
-      setWarrantyIntervalTypeId(selectedProduct.defaultWarrantyIntervalTypeId);
-      setSelectedWarranty(selectedProduct.defaultWarranty);
-    }
-  }, [selectedProduct]);
+  // const [selectedAmcIntervalTypeId, setAmcIntervalTypeId] = useState<number>(0);
+  // const [SelectedWarranty, setSelectedWarranty] = useState<number>(0);
+  // const [selectedAmc, setSelectedAmc] = useState<number | undefined>(0);
+  // useEffect(() => {
+  //   if (selectedProduct) {
+  //     setSelectedAmc(selectedProduct?.defaultAmcCycle);
+  //     setAmcIntervalTypeId(selectedProduct.defaultAmcCycleIntervalTypeId);
+  //     setWarrantyIntervalTypeId(selectedProduct.defaultWarrantyIntervalTypeId);
+  //     setSelectedWarranty(selectedProduct.defaultWarranty);
+  //   }
+  // }, [selectedProduct]);
   const [errorsData, setErrorsData] = useState<{
     WarrantyIntervalTypeId: boolean;
     Warranty: boolean;
@@ -228,53 +224,53 @@ const CreateAccountCompanyProduct = ({
       toast.error("Quantity is required.");
       return false;
     }
-    if (
-      selectedAmc === 0 ||
-      selectedAmc === null ||
-      selectedAmc === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        SelectedAmc: true,
-      }));
-      return false;
-    }
+    // if (
+    //   selectedAmc === 0 ||
+    //   selectedAmc === null ||
+    //   selectedAmc === undefined
+    // ) {
+    //   setErrorsData((prev) => ({
+    //     ...prev,
+    //     SelectedAmc: true,
+    //   }));
+    //   return false;
+    // }
 
-    if (
-      selectedAmcIntervalTypeId === 0 ||
-      selectedAmcIntervalTypeId === null ||
-      selectedAmcIntervalTypeId === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        AmcIntervalTypeId: true,
-      }));
-      return false;
-    }
+    // if (
+    //   selectedAmcIntervalTypeId === 0 ||
+    //   selectedAmcIntervalTypeId === null ||
+    //   selectedAmcIntervalTypeId === undefined
+    // ) {
+    //   setErrorsData((prev) => ({
+    //     ...prev,
+    //     AmcIntervalTypeId: true,
+    //   }));
+    //   return false;
+    // }
 
-    if (
-      SelectedWarranty === 0 ||
-      SelectedWarranty === null ||
-      SelectedWarranty === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        Warranty: true,
-      }));
-      return false;
-    }
+    // if (
+    //   SelectedWarranty === 0 ||
+    //   SelectedWarranty === null ||
+    //   SelectedWarranty === undefined
+    // ) {
+    //   setErrorsData((prev) => ({
+    //     ...prev,
+    //     Warranty: true,
+    //   }));
+    //   return false;
+    // }
 
-    if (
-      selectedWarrantyIntervalTypeId === 0 ||
-      selectedWarrantyIntervalTypeId === null ||
-      selectedWarrantyIntervalTypeId === undefined
-    ) {
-      setErrorsData((prev) => ({
-        ...prev,
-        WarrantyIntervalTypeId: true,
-      }));
-      return false;
-    }
+    // if (
+    //   selectedWarrantyIntervalTypeId === 0 ||
+    //   selectedWarrantyIntervalTypeId === null ||
+    //   selectedWarrantyIntervalTypeId === undefined
+    // ) {
+    //   setErrorsData((prev) => ({
+    //     ...prev,
+    //     WarrantyIntervalTypeId: true,
+    //   }));
+    //   return false;
+    // }
 
     // All good
     return true;
@@ -290,13 +286,17 @@ const CreateAccountCompanyProduct = ({
     }
   };
   const formattedDate = (date: string) => {
-    const dateObj = new Date(date);
-    const day = dateObj.getDate();
-    const month = dateObj
+    if(date){
+
+      const dateObj = new Date(date);
+      const day = dateObj.getDate();
+      const month = dateObj
       .toLocaleString("defalut", { month: "short" })
       .toLowerCase();
-    const year = dateObj.getFullYear();
-    return `${day}-${month}-${year}`;
+      const year = dateObj.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+    return null;
   };
 
   // Give call to the api
@@ -345,20 +345,20 @@ const CreateAccountCompanyProduct = ({
       company_product_id: selectedProduct?.id,
       unit_id: selectedUnitId,
       quantity: addProductToAccountFormData.quantity,
-      stock_inward_id_array : selectedInwardIds,
+      stock_inward_id_array: selectedInwardIds,
       purchase_date: purchaseDate,
       delivery_date: deliveryDate,
       delivery_address: addProductToAccountFormData.deliveryAddress,
       billing_address: addProductToAccountFormData.billingAddress,
       installation_date: installationDate,
       installed_by: selectedInstalledBy?.id,
-      warranty_interval_type_id: selectedWarrantyIntervalTypeId,
-      warranty: SelectedWarranty,
+      // warranty_interval_type_id: selectedWarrantyIntervalTypeId,
+      // warranty: SelectedWarranty,
       warranty_start_date: warrentyStartDate,
       warranty_end_date: warrrentyEndDate,
       warranty_terms: addProductToAccountFormData.warrantyTerms,
-      amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
-      amc_cycle: selectedAmc,
+      // amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
+      // amc_cycle: selectedAmc,
       amc_cycle_start_date: amcCycleStartDate,
       amc_cycle_end_date: AmcCycleEndDate,
       createdby_id: loginStatus.id,
@@ -398,210 +398,212 @@ const CreateAccountCompanyProduct = ({
     setSelectedUnitId(undefined);
   }, [selectedProduct]);
 
-
-   const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
-    function handleStockSerialNumberChange(ids : number[]){
-     setSelectedInwardIds(ids)
+  const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
+  function handleStockSerialNumberChange(ids: number[]) {
+    setSelectedInwardIds(ids);
   }
   return (
-    <FormLayout>
-   {/* Header */}
-        {isSaving && <LoadingPopUpAnimation show={isSaving} />}
-        <FormHeader
-          icon={BoxSelectIcon}
-          onClose={handleCloseForm}
-          preText="Assign Product to account"
-          description="Assign the new product to this Account."
-        />
-        {!showGrid && !showCompanyUserModule && !showSerialNumberModule && (
-          <>
-            <ProductManagement
-              isGridForAccountProduct={true}
-              onRowSelect={onRowSelectProductForAssingingToAccount}
-            />
-          </>
-        )}
+    <FormLayout width={6}>
+      {/* Header */}
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
+      <FormHeader
+        icon={BoxSelectIcon}
+        onClose={handleCloseForm}
+        preText="Assign Product to account"
+        description="Assign the new product to this Account."
+      />
+      {!showGrid && !showCompanyUserModule && !showSerialNumberModule && (
+        <>
+          <ProductManagement
+            isGridForAccountProduct={true}
+            onRowSelect={onRowSelectProductForAssingingToAccount}
+          />
+        </>
+      )}
 
-        {showGrid && !showCompanyUserModule && (
-          <>
-            <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
-              <Button
-                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
-                onClick={handleGoBackToProductSelection}
-              >
-                <ArrowLeft size={14} />
-                Change Product
-              </Button>
-
-              {selectedProduct && (
-                <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
-                  <span className="text-gray-500">Product:</span>{" "}
-                  {selectedProduct.name}
-                </div>
-              )}
-            </div>
-
-            <form
-              onSubmit={handleCreateAccountCompanyProduct}
-              className="grid grid-cols-2 gap-2 px-2"
+      {showGrid && !showCompanyUserModule && (
+        <>
+          <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
+            <Button
+              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
+              onClick={handleGoBackToProductSelection}
             >
+              <ArrowLeft size={14} />
+              Change Product
+            </Button>
+
+            {selectedProduct && (
+              <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
+                <span className="text-gray-500">Product:</span>{" "}
+                {selectedProduct.name}
+              </div>
+            )}
+          </div>
+
+          <form
+            onSubmit={handleCreateAccountCompanyProduct}
+            className="space-y-2 p-1"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {/* Quantity */}
               <div
                 className={`grid ${
                   selectedProduct?.isSerialNumber
                     ? "grid-cols-2"
-                    : "grid-cols-1"
+                    : "grid-cols-2"
                 } gap-2`}
               >
-
                 <div>
-
-                <FormInput
-                  label="Quantity : "
-                  logo={LucideIndianRupee}
-                  step="any"
-                  required
-                  type="number"
-                  name="quantity"
-                  min={0}
-                  placeholder="Enter quantity here"
-                  // value={addProductToAccountFormData.quantity}
-                  defaultValue={
-                    addProductToAccountFormData.quantity === 0
-                    ? ""
-                    : addProductToAccountFormData.quantity
-                  }
-                  onChange={handleAddProductToAccountFormDataChange}
-                  onBlur={handleBlur}
-                  error={errors.quantity}
-                  />
-                {productUnitConversionFactor !== 0 && (
-                  <p
-                  title="Quantity is converted automatically based on the product base unit and current selected unit."
-                  className="caption-custom-active flex items-center cursor-pointer gap-1"
-                  >
-                    Quantity will be deducted from stock :{" "}
-                    {productUnitConversionFactor}
-                    {selectedProduct?.unitNameInStock}
-                    <Info size={12} className="" />
-                  </p>
-                )}
-                </div>
-                {selectedProduct?.isSerialNumber && (
-                  <div className="flex items-center justify-end mt-2">
-                    <div className="w-full">
-                      <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
-                        <User className="text-blue-500" size={15} />
-                        <div>
-                          Serial Number :
-                          <span className="ml-0 text-red-400">*</span>
-                        </div>
-                      </label>
-
-                      <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1.5 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                        <span className="table-header-custom">
-                          {selectedInwardIds.length>0 ? (
-                            <>
-                              {/* {selectedInstalledBy?.fullname}{" "} */}
-                              <span className="">
-                             Serial number Selected:  {selectedInwardIds.length}
-                              </span>
-                            </>
-                          ) : (
-                            "No serial number selected"
-                          )}
-                        </span>
-
-                        <Button
-                          type="button"
-                          className="text-blue-600 text-sm underline hover:text-blue-800"
-                          onClick={() => {
-                            setShowSerialNumberModule(true);
-                            setShowCompanyUserModule(false);
-                            setShowGrid(false);
-                          }}
-                        >
-                          {selectedInstalledBy ? "Change" : "Select"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {/* Unit */}
-              <div className="mt-4">
-                <CustomDropdown
-                  labelName="Unit :"
-                  logo={LucideTimer}
-                  preselectedOption={
-                    selectedUnitId !== undefined ? selectedUnitId : 0
-                  }
-                  onSelect={(data) => {
-                    if (data) {
-                      // setSelectedUnitError(false);
-                      setErrorsData((prev) => ({
-                        ...prev,
-                        unitIdError: false,
-                      }));
+                  <FormInput
+                    label="Quantity : "
+                    logo={LucideIndianRupee}
+                    step="any"
+                    required
+                    type="number"
+                    name="quantity"
+                    min={0}
+                    placeholder="Enter quantity here"
+                    // value={addProductToAccountFormData.quantity}
+                    defaultValue={
+                      addProductToAccountFormData.quantity === 0
+                        ? ""
+                        : addProductToAccountFormData.quantity
                     }
-                    setSelectedUnitId(data);
-                  }}
-                  options={unitForProductData}
-                  requiredRedDot={true}
-                />
-                {errorsData.unitIdError && (
-                  <div className="caption-custom-inactive">
-                    Product Unit is required
-                  </div>
-                )}
-              </div>
-              {/* installation date */}
-              <DatePickerInput
-                label="Installation Date :"
-                logo={LucideCalendar}
-                name="installationDate"
-                defaultValue={addProductToAccountFormData.installationDate}
-                placeholder="Select Date"
-                onChange={handleAddProductToAccountFormDataChange}
-              />
-
-              <div className="flex items-center justify-end mt-2">
-                <div className="w-full">
-                  <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
-                    <User className="text-blue-500" size={15} />
-                    <div>
-                      Installed By :<span className="ml-0 text-red-400">*</span>
-                    </div>
-                  </label>
-
-                  <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1.5 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                    <span className="table-header-custom">
-                      {selectedInstalledBy ? (
-                        <>
-                          {selectedInstalledBy?.fullname}{" "}
-                          <span className="text-sm">
-                            {` (${
-                              selectedInstalledBy?.email
-                                ? selectedInstalledBy.email
-                                : selectedInstalledBy?.mobilenumber
-                            })`}
-                          </span>
-                        </>
-                      ) : (
-                        "No user selected"
-                      )}
-                    </span>
-
-                    <Button
-                      type="button"
-                      className="text-blue-600 text-sm underline hover:text-blue-800"
-                      onClick={() => {
-                        setShowCompanyUserModule(true);
-                        setShowGrid(false);
-                      }}
+                    onChange={handleAddProductToAccountFormDataChange}
+                    onBlur={handleBlur}
+                    error={errors.quantity}
+                  />
+                  {productUnitConversionFactor !== 0 && (
+                    <p
+                      title="Quantity is converted automatically based on the product base unit and current selected unit."
+                      className="caption-custom-active flex items-center cursor-pointer gap-1"
                     >
-                      {selectedInstalledBy ? "Change" : "Select"}
-                    </Button>
+                      Quantity will be deducted from stock :{" "}
+                      {productUnitConversionFactor}
+                      {selectedProduct?.unitNameInStock}
+                      <Info size={12} className="" />
+                    </p>
+                  )}
+                </div>
+                {/* Unit */}
+                <div className="">
+                  <CustomDropdown
+                    labelName="Unit :"
+                    logo={LucideTimer}
+                    preselectedOption={
+                      selectedUnitId !== undefined ? selectedUnitId : 0
+                    }
+                    onSelect={(data) => {
+                      if (data) {
+                        // setSelectedUnitError(false);
+                        setErrorsData((prev) => ({
+                          ...prev,
+                          unitIdError: false,
+                        }));
+                      }
+                      setSelectedUnitId(data);
+                    }}
+                    options={unitForProductData}
+                    requiredRedDot={true}
+                  />
+                  {errorsData.unitIdError && (
+                    <div className="caption-custom-inactive">
+                      Product Unit is required
+                    </div>
+                  )}
+                </div>
+              </div>
+              {selectedProduct?.isSerialNumber && (
+                <div className="flex items-center justify-end h-fit ">
+                  <div className="w-full ">
+                    <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
+                      <User className="text-blue-500" size={15} />
+                      <div>
+                        Serial Number :
+                        <span className="ml-0 text-red-400">*</span>
+                      </div>
+                    </label>
+
+                    <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                      <span className="table-header-custom">
+                        {selectedInwardIds.length > 0 ? (
+                          <>
+                            {/* {selectedInstalledBy?.fullname}{" "} */}
+                            <span className="">
+                              Serial number Selected: {selectedInwardIds.length}
+                            </span>
+                          </>
+                        ) : (
+                          "No serial number selected"
+                        )}
+                      </span>
+
+                      <Button
+                        type="button"
+                        className="text-blue-600 text-sm underline hover:text-blue-800"
+                        onClick={() => {
+                          setShowSerialNumberModule(true);
+                          setShowCompanyUserModule(false);
+                          setShowGrid(false);
+                        }}
+                      >
+                        {selectedInstalledBy ? "Change" : "Select"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3 ">
+                {/* installation date */}
+                <DatePickerInput
+                  label="Installation Date :"
+                  logo={LucideCalendar}
+                  name="installationDate"
+                  defaultValue={addProductToAccountFormData.installationDate}
+                  placeholder="Select Date"
+                  onChange={handleAddProductToAccountFormDataChange}
+                />
+
+                <div className="flex items-center justify-center  h-fit">
+                  <div className="w-full">
+                    <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
+                      <User className="text-blue-500" size={15} />
+                      <div>
+                        Installed By :
+                        <span className="ml-0 text-red-400">*</span>
+                      </div>
+                    </label>
+
+                    <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                      <span className=" table-header-custom  text-nowrap overflow-auto">
+                        {selectedInstalledBy ? (
+                          <>
+                            {selectedInstalledBy?.fullname || "Name not given"}{" "}
+                            <span className="text-sm">
+                              {/* {` (${
+                                selectedInstalledBy?.email
+                                  ? selectedInstalledBy.email
+                                  : selectedInstalledBy?.mobilenumber
+                              })`} */}
+                            </span>
+                          </>
+                        ) : (
+                          "No user selected"
+                        )}
+                      </span>
+
+                      <Button
+                        type="button"
+                        className="text-blue-600 text-sm underline hover:text-blue-800"
+                        onClick={() => {
+                          setShowCompanyUserModule(true);
+                          setShowGrid(false);
+                        }}
+                      >
+                        {selectedInstalledBy ? "Change" : "Select"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -631,8 +633,7 @@ const CreateAccountCompanyProduct = ({
               </div>
 
               {/* amc cycle duration &&  Amc time unit */}
-              <div className="grid grid-cols-2 gap-3 mt-5">
-                {/* amc cycle duration */}
+              {/* <div className="grid grid-cols-2 gap-3 mt-5">
                 <div>
                   <CustomDropdown
                     labelName="AMC Cycle Duration:"
@@ -663,7 +664,6 @@ const CreateAccountCompanyProduct = ({
                   )}
                 </div>
 
-                {/* Amc time unit */}
                 <div>
                   <CustomDropdown
                     labelName="AMC Time Unit: "
@@ -694,21 +694,19 @@ const CreateAccountCompanyProduct = ({
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               {/* Amc start date & Amc End date */}
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                {/* AMc start date */}
+              <div className="grid grid-cols-2 gap-3 ">
                 <DatePickerInput
                   label="Amc Start Date :"
-                  // required
                   logo={LucideCalendar}
                   name="amcCycleStartDate"
                   defaultValue={addProductToAccountFormData.amcCycleStartDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
+                  maxDate={addProductToAccountFormData.amcCycleEndDate}
                 />
-                {/*Amc End date  */}
                 <DatePickerInput
                   label="Amc End Date :"
                   logo={LucideCalendar}
@@ -716,12 +714,12 @@ const CreateAccountCompanyProduct = ({
                   defaultValue={addProductToAccountFormData.amcCycleEndDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
+                  minDate={addProductToAccountFormData.amcCycleStartDate}
                 />
               </div>
 
               {/* Warranty & warranty time unit */}
-              <div className="grid grid-cols-2 gap-3 mt-7">
-                {/* Warranty */}
+              {/* <div className="grid grid-cols-2 gap-3 mt-7">
                 <div>
                   <CustomDropdown
                     labelName="Warranty :"
@@ -751,7 +749,6 @@ const CreateAccountCompanyProduct = ({
                     </div>
                   )}
                 </div>
-                {/* Warranty time unit */}
                 <div>
                   <CustomDropdown
                     labelName="Warranty Time Unit :"
@@ -782,10 +779,10 @@ const CreateAccountCompanyProduct = ({
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               {/* Warranty start date  & Warranty end date*/}
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-3 ">
                 {/* Warranty start date */}
                 <DatePickerInput
                   label="Warranty Start Date :"
@@ -794,6 +791,7 @@ const CreateAccountCompanyProduct = ({
                   defaultValue={addProductToAccountFormData.warrantyStartDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
+                   maxDate={addProductToAccountFormData.warrantyEndDate}
                 />
 
                 {/* Warranty end date */}
@@ -804,9 +802,10 @@ const CreateAccountCompanyProduct = ({
                   defaultValue={addProductToAccountFormData.warrantyEndDate}
                   placeholder="Select Date"
                   onChange={handleAddProductToAccountFormDataChange}
+                  minDate={addProductToAccountFormData.warrantyStartDate}
                 />
               </div>
-              <div className="col-span-2">
+              {/* <div className="col-span-2"> */}
                 {/* Warranty terms */}
                 <TextAreaInput
                   logo={ShieldCheck}
@@ -840,44 +839,45 @@ const CreateAccountCompanyProduct = ({
                   onChange={handleAddProductToAccountFormDataChange}
                   // onBlur={handleBlur}
                 />
-              </div>
+              {/* </div> */}
+            </div>
 
-              <div className="flex items-center justify-end bg-pink-00 col-span-2">
-                <div className="flex gap-1">
-                  <Button onClick={handleCloseForm} type="button">
-                    <div className="flex items-center gap-0.5">
-                      <X size={SIZE.SIXTEEN} />
-                      Cancel
-                    </div>
-                  </Button>
-                  <Button type="submit">
-                    <div className="flex items-center gap-1">
-                      <Save size={SIZE.SIXTEEN} />
-                      Save
-                    </div>
-                  </Button>
-                </div>
+            <div className="flex items-center justify-end bg-pink-00 col-span-2">
+              <div className="flex gap-1">
+                <Button onClick={handleCloseForm} type="button">
+                  <div className="flex items-center gap-0.5">
+                    <X size={SIZE.SIXTEEN} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button type="submit">
+                  <div className="flex items-center gap-1">
+                    <Save size={SIZE.SIXTEEN} />
+                    Save
+                  </div>
+                </Button>
               </div>
-            </form>
-          </>
-        )}
-        {showCompanyUserModule && !showGrid && !showSerialNumberModule && (
-          <GetCompanyUsers
-            onRowSelect={handleSelctedInstalledByUser}
-            isUsedInAccountProductForAssingingInstalledBy={true}
-          />
-        )}
-        {showSerialNumberModule && !showGrid && !showCompanyUserModule && (
-          <StockSerialNumber
-            companyProductId={selectedProduct?.id}
-            onClose={() => {
-              setShowSerialNumberModule(false);
-              setShowGrid(true);
-            }}
-            selectedInwardIds ={selectedInwardIds}
-            handleStockSerialNumberChange={handleStockSerialNumberChange}
-          />
-        )}
+            </div>
+          </form>
+        </>
+      )}
+      {showCompanyUserModule && !showGrid && !showSerialNumberModule && (
+        <GetCompanyUsers
+          onRowSelect={handleSelctedInstalledByUser}
+          isUsedInAccountProductForAssingingInstalledBy={true}
+        />
+      )}
+      {showSerialNumberModule && !showGrid && !showCompanyUserModule && (
+        <StockSerialNumber
+          companyProductId={selectedProduct?.id}
+          onClose={() => {
+            setShowSerialNumberModule(false);
+            setShowGrid(true);
+          }}
+          selectedInwardIds={selectedInwardIds}
+          handleStockSerialNumberChange={handleStockSerialNumberChange}
+        />
+      )}
     </FormLayout>
   );
 };

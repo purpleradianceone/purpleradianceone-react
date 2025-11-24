@@ -20,12 +20,12 @@ export const StockSerialNumber = ({
   companyProductId,
   onClose,
   handleStockSerialNumberChange,
-  selectedInwardIds
+  selectedInwardIds,
 }: {
   companyProductId: number | undefined;
   onClose: () => void;
-  handleStockSerialNumberChange : (id : number[])=> void;
-  selectedInwardIds : number[]
+  handleStockSerialNumberChange: (id: number[]) => void;
+  selectedInwardIds: number[];
 }) => {
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
@@ -42,14 +42,6 @@ export const StockSerialNumber = ({
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
-  // const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
-
-  // function handleStockSerialNumberChange(ids : number[]){
-  //    setSelectedInwardIds(ids)
-  // }
-  // useEffect(() => {
-  //   console.log(selectedInwardIds);
-  // }, [selectedInwardIds]);
   const getTransactionType = async () => {
     const offset = (currentPage - 1) * pageSize;
     const PostData = {
@@ -112,8 +104,13 @@ export const StockSerialNumber = ({
   return (
     <>
       <FormLayout>
-        {/* Data Grid Section */}
-
+        <FormHeader
+          icon={Box}
+          onClose={onClose}
+          preText="Select the Stock as per the serial number"
+          description="Select the serial number from the stock for the product."
+        />
+        <StockRulesCard availableStock={availableStock} />
         <div
           className={`ag-theme-balham bg-pink-400 w-full ${
             userPreference.isLeftMenu
@@ -121,16 +118,6 @@ export const StockSerialNumber = ({
               : "h-[calc(100vh-148px)]"
           }`}
         >
-          <FormHeader
-            icon={Box}
-            onClose={onClose}
-            preText="Select the Product available in the Stock"
-            description="Select the product from the stock."
-          />
-          <StockRulesCard
-            availableStock={availableStock}
-          />
-
           <StockAvailableSerialNumberAgGrid
             data={stockAvailableSerialNumberState}
             selectedIds={selectedInwardIds}
