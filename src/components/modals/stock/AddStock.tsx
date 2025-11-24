@@ -29,7 +29,6 @@ import {
   useCompanyWarehouse,
   Warehouse,
 } from "../../../config/hooks/useCompanyWarehouse";
-import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import CompanyWarehouseAgGrid from "../../ag-grid/CompanyWarehouseAgGrid";
 import useAdjustmentReason from "../../../config/hooks/useAdjustmentReason";
 import axios from "axios";
@@ -303,9 +302,10 @@ const AddStock = ({
   if (!isOpen) return null;
   if (companyWarehouseLoading || adjustmentReasonLoading)
     return (
-      <FormLayout>
-        <LoadingSpinner />
-      </FormLayout>
+      
+        <LoadingPopUpAnimation
+          show={companyWarehouseLoading || adjustmentReasonLoading}
+        />
     );
 
   return (
