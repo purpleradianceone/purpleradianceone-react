@@ -3,7 +3,7 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Edit, Network, Plus, UserPlus } from "lucide-react";
@@ -382,8 +382,7 @@ function ProductsManagementGrid({
                             handleSelectedProductChange(params.data);
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                                .DENIED_UPDATE_ACCESS
+                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
                             );
                           }
                         }}
@@ -438,28 +437,6 @@ function ProductsManagementGrid({
                           {JSX_CHILDREN_NAME.TEAM}
                         </ActionsDropdownButton>
                       </>
-                      {/* // )} */}
-
-                      {/* {!userHasAccessToUpdateProductTeam && (
-                          <>
-                            <Button
-                             disabled
-                             className={CLASS_NAMES.DISABLED_BUTTON}>
-                              <UserPlus
-                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                              />
-                              {JSX_CHILDREN_NAME.USER}
-                            </Button>
-                            <Button
-                             disabled
-                             className={CLASS_NAMES.DISABLED_BUTTON}>
-                              <Network
-                                className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                              />
-                              {JSX_CHILDREN_NAME.TEAM}
-                            </Button>
-                          </>
-                        )} */}
                     </>
                   </div>,
                   document.body // Render dropdown in body to avoid clipping

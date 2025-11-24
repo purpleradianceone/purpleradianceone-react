@@ -14,8 +14,6 @@ import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast";
-import MESSAGE from "../../../constants/Messages";
 
 function ProductManagement({
   isGridForAccountProduct,
@@ -140,7 +138,7 @@ function ProductManagement({
             fetchCompanyProducts(signal);
           }
         }else{
-          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
+          // toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
       }
     }

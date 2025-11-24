@@ -58,7 +58,7 @@ const AddStock = ({
     useState<Warehouse | null>(null);
   const [showWarehouseSelectionModule, setShowWarehouseSelectionModule] =
     useState<boolean>(false);
- 
+
   const [selectedAdjustmentReasonId, setSelectedAdjustmentReasonId] = useState<
     number | null
   >(null);
@@ -68,19 +68,19 @@ const AddStock = ({
   const { unitForProduct: unitForProductData } = useUnitForProduct({
     companyProductId: selectedProduct?.id,
   });
-   const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(
+  const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(
     product?.parentUnitId || selectedProduct?.parentUnitId
   );
   // Note : new Changes
   useEffect(() => {
     if (product) {
-      setSelectedUnitId(product?.parentUnitId || selectedProduct?.parentUnitId)
+      setSelectedUnitId(product?.parentUnitId || selectedProduct?.parentUnitId);
       setSelectedProduct(product);
       setShowInputForm(true);
-    }else if (selectedProduct) {
-    // Selected from table
-    setSelectedUnitId(selectedProduct.parentUnitId);
-  }
+    } else if (selectedProduct) {
+      // Selected from table
+      setSelectedUnitId(selectedProduct.parentUnitId);
+    }
   }, [product, selectedProduct]);
 
   const [error, setError] = useState<{
@@ -147,12 +147,18 @@ const AddStock = ({
     );
     if (factor?.conversionFactor) {
       const productUnitConversionFactorCalculation =
-        factor?.conversionFactor * addStockFormData.quantity  ;
+        factor?.conversionFactor * addStockFormData.quantity;
       setProductUnitConversionFactor(productUnitConversionFactorCalculation);
     } else {
       setProductUnitConversionFactor(0);
     }
-  }, [selectedUnitId, unitForProductData,addStockFormData.quantity , product?.parentUnitId, selectedProduct?.parentUnitId]);
+  }, [
+    selectedUnitId,
+    unitForProductData,
+    addStockFormData.quantity,
+    product?.parentUnitId,
+    selectedProduct?.parentUnitId,
+  ]);
 
   function handleAdjustmentReasonChange(option: number) {
     if (option !== 0) {
@@ -188,7 +194,7 @@ const AddStock = ({
       toast.error("Quantity is required");
       return false;
     }
-   
+
     if (selectedUnitId === 0 || selectedUnitId === undefined) {
       // setSelectedUnitError(true);
       setError((prev) => ({
@@ -303,7 +309,7 @@ const AddStock = ({
     );
 
   return (
-    <FormLayout>
+    <FormLayout width={5}>
       <>
         <FormHeader
           icon={Plus}
@@ -347,211 +353,209 @@ const AddStock = ({
 
             <form
               onSubmit={handleCreateStockAdjustment}
-              className="grid grid-cols-2 space-2 gap-2"
+              className="space-y-2 p-1"
             >
-              {/* Quantity */}
-              <div className="mt-1.5">
-                <FormInput
-                  label="Quantity : "
-                  logo={LucideIndianRupee}
-                  required
-                  readonly={
-                    product?.isSerialNumber || selectedProduct?.isSerialNumber
-                  }
-                  type="number"
-                  name="quantity"
-                  placeholder="Enter quantity here"
-                  defaultValue={(product?.isSerialNumber || selectedProduct?.isSerialNumber) ?   1 : !(
-                          product?.isSerialNumber ||
-                          selectedProduct?.isSerialNumber
-                        ) && addStockFormData.quantity === 0
-                      ? ""
-                      : addStockFormData.quantity }
-                  value={
-                    product?.isSerialNumber || selectedProduct?.isSerialNumber
-                      ? 1
-                      : !(
-                          product?.isSerialNumber ||
-                          selectedProduct?.isSerialNumber
-                        ) && addStockFormData.quantity === 0
-                      ? ""
-                      : addStockFormData.quantity
-                  }
-                  onChange={handleAddStockFormDataChange}
-                  onBlur={handleBlur}
-                />
-                {errors.quantity && (
-                  <div className="caption-custom-inactive">
-                    Quantity is required
-                  </div>
-                )}
-                {/* {(product?.isSerialNumber ||
-                  selectedProduct?.isSerialNumber) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Quantity */}
+                <div className="mt-1.5">
+                  <FormInput
+                    label="Quantity : "
+                    logo={LucideIndianRupee}
+                    required
+                    readonly={
+                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                    }
+                    type="number"
+                    name="quantity"
+                    placeholder="Enter quantity here"
+                    defaultValue={
+                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                        ? 1
+                        : !(
+                            product?.isSerialNumber ||
+                            selectedProduct?.isSerialNumber
+                          ) && addStockFormData.quantity === 0
+                        ? ""
+                        : addStockFormData.quantity
+                    }
+                    value={
+                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                        ? 1
+                        : !(
+                            product?.isSerialNumber ||
+                            selectedProduct?.isSerialNumber
+                          ) && addStockFormData.quantity === 0
+                        ? ""
+                        : addStockFormData.quantity
+                    }
+                    onChange={handleAddStockFormDataChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.quantity && (
+                    <div className="caption-custom-inactive">
+                      Quantity is required
+                    </div>
+                  )}
+
                   <p
                     title="Quantity is converted automatically based on the Product base unit and selected stock unit."
                     className="caption-custom-active flex items-center cursor-pointer gap-1"
                   >
-                    Quantity will be inserted into the stock : 1 irrespective of
-                    the unit.
+                    Quantity will be inserted into the stock :{" "}
+                    {productUnitConversionFactor}
+                    {selectedProduct?.unitNameInStock}
+                    <Info size={12} className="" />
                   </p>
-                )} */}
-                {/* {
-                  (productUnitConversionFactor !== 0 && ( */}
-                    <p
-                      title="Quantity is converted automatically based on the Product base unit and selected stock unit."
-                      className="caption-custom-active flex items-center cursor-pointer gap-1"
-                    >
-                      Quantity will be inserted into the stock :{" "}
-                      {productUnitConversionFactor}
-                      {selectedProduct?.unitNameInStock}
-                      <Info size={12} className="" />
-                    </p>
-                  {/* // )
-                  // )} */}
-              </div>
-              {/* Unit */}
+                </div>
+                {/* Unit */}
 
-              <div className="mt-4">
-                <CustomDropdown
-                  labelName="Unit :"
-                  logo={LucideTimer}
-                  preselectedOption={
-                    
-                    !selectedUnitId ? (selectedProduct?.parentUnitId || product?.parentUnitId) : selectedUnitId
-                  }
-                  onSelect={(data) => {
-                    if (data) {
-                      setError((prev) => ({
-                        ...prev,
-                        unitIdError: false,
-                      }));
+                <div className="mt-1.5">
+                  <CustomDropdown
+                    labelName="Unit :"
+                    logo={LucideTimer}
+                    preselectedOption={
+                      !selectedUnitId
+                        ? selectedProduct?.parentUnitId || product?.parentUnitId
+                        : selectedUnitId
                     }
-                    setSelectedUnitId(data);
-                  }}
-                  readOnly={selectedProduct?.isSerialNumber && ( selectedProduct?.parentUnitId || product?.parentUnitId) ? true : false}
-                  options={unitForProductData}
-                  requiredRedDot={true}
-                />
-                {error.unitIdError && (
-                  <div className="caption-custom-inactive">
-                    Product Unit is required
-                  </div>
-                )}
-              </div>
-
-              {/* serial number */}
-              <div className="mt-1">
-                <FormInput
-                  label="Serial Number : "
-                  logo={ListOrdered}
-                  type="text"
-                  required={
-                    product?.isSerialNumber || selectedProduct?.isSerialNumber
-                  }
-                  name="serial_number"
-                  placeholder="Enter serial number here"
-                  // value={addProductToAccountFormData.quantity}
-                  defaultValue={addStockFormData.serial_number}
-                  onChange={handleAddStockFormDataChange}
-                  // error={errors.serial_number}
-                />
-              </div>
-
-              {/* warehouse */}
-              <div className=" mt-2">
-                <div className="w-full">
-                  <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700 mb-1 ">
-                    <WarehouseIcon className="text-blue-500" size={15} />
-                    <div>
-                      Warehouse :<span className="ml-0 text-red-400">*</span>
+                    onSelect={(data) => {
+                      if (data) {
+                        setError((prev) => ({
+                          ...prev,
+                          unitIdError: false,
+                        }));
+                      }
+                      setSelectedUnitId(data);
+                    }}
+                    readOnly={
+                      selectedProduct?.isSerialNumber &&
+                      (selectedProduct?.parentUnitId || product?.parentUnitId)
+                        ? true
+                        : false
+                    }
+                    options={unitForProductData}
+                    requiredRedDot={true}
+                  />
+                  {error.unitIdError && (
+                    <div className="caption-custom-inactive">
+                      Product Unit is required
                     </div>
-                  </label>
-
-                  <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1.5 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                    <span className="input-label-custom ">
-                      {selectedCompanyWarehouse ? (
-                        <>
-                          {selectedCompanyWarehouse?.name}{" "}
-                          <span className="text-sm">
-                            ({selectedCompanyWarehouse.warehouseTypeName})
-                          </span>
-                        </>
-                      ) : (
-                        "No Warehouse selected"
-                      )}
-                    </span>
-
-                    <Button
-                      type="button"
-                      className="text-blue-600 text-sm underline hover:text-blue-800"
-                      onClick={() => {
-                        setShowWarehouseSelectionModule(true);
-                        setShowInputForm(false);
-                      }}
-                    >
-                      {selectedCompanyWarehouse ? "Change" : "Select"}
-                    </Button>
-                  </div>
+                  )}
                 </div>
-                {error.warehouseIdError && (
-                  <div className="caption-custom-inactive">
-                    Warehouse is required
-                  </div>
-                )}
-              </div>
 
-              {/* adjustment reason */}
-              <div className="mt-2">
-                <h1 className="input-label-custom  mb-1 gap-1 flex items-center ">
-                  <ClipboardPen className="text-blue-500" size={15} />{" "}
-                  Adjustment Reason :<span className="text-red-400">*</span>
-                </h1>
-                <div className="flex flex-wrap gap-3">
-                  {adjustmentReason.length > 0 &&
-                    adjustmentReason.map((option: any) => (
-                      <label
-                        key={option.id}
-                        className={`flex items-center gap-2 px-2 py-1.5 border rounded cursor-pointer transition ${
-                          selectedAdjustmentReasonId === option.id
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:bg-gray-100"
-                        }`}
+                {/* serial number */}
+                <div className="">
+                  <FormInput
+                    label="Serial Number : "
+                    logo={ListOrdered}
+                    type="text"
+                    required={
+                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                    }
+                    name="serial_number"
+                    placeholder="Enter serial number here"
+                    // value={addProductToAccountFormData.quantity}
+                    defaultValue={addStockFormData.serial_number}
+                    onChange={handleAddStockFormDataChange}
+                    // error={errors.serial_number}
+                  />
+                </div>
+
+                {/* warehouse */}
+                <div className="">
+                  <div className="w-full h-fit">
+                    <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
+                      <WarehouseIcon className="text-blue-500" size={15} />
+                      <div>
+                        Warehouse :<span className="ml-0 text-red-400">*</span>
+                      </div>
+                    </label>
+
+                    <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                      <span className="input-label-custom ">
+                        {selectedCompanyWarehouse ? (
+                          <>
+                            {selectedCompanyWarehouse?.name}{" "}
+                            <span className="text-sm">
+                              ({selectedCompanyWarehouse.warehouseTypeName})
+                            </span>
+                          </>
+                        ) : (
+                          "No Warehouse selected"
+                        )}
+                      </span>
+
+                      <Button
+                        type="button"
+                        className="text-blue-600 text-sm underline hover:text-blue-800"
+                        onClick={() => {
+                          setShowWarehouseSelectionModule(true);
+                          setShowInputForm(false);
+                        }}
                       >
-                        <input
-                          type="radio"
-                          name="adjustmentReason"
-                          value={option.id}
-                          checked={selectedAdjustmentReasonId === option.id}
-                          onChange={() =>
-                            handleAdjustmentReasonChange(option.id)
-                          }
-                          className="accent-blue-600 cursor-pointer"
-                        />
-
-                        <span className="caption-custom">{option.name}</span>
-                      </label>
-                    ))}
-                </div>
-                {error.adjustmentReasonId && (
-                  <div className="caption-custom-inactive">
-                    Adjustment reason is required
+                        {selectedCompanyWarehouse ? "Change" : "Select"}
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </div>
+                  {error.warehouseIdError && (
+                    <div className="caption-custom-inactive">
+                      Warehouse is required
+                    </div>
+                  )}
+                </div>
 
-              {/* description */}
-              <div className="col-span-2 ">
-                <TextAreaInput
-                  logo={ShieldCheck}
-                  cols={4}
-                  label="Description: "
-                  name="description"
-                  rows={3}
-                  defaultValue={addStockFormData.description}
-                  onChange={handleAddStockFormDataChange}
-                />
-              </div>
+                {/* adjustment reason */}
+                <div className="">
+                  <h1 className="input-label-custom  mb-1 gap-1 flex items-center ">
+                    <ClipboardPen className="text-blue-500" size={15} />{" "}
+                    Adjustment Reason :<span className="text-red-400">*</span>
+                  </h1>
+                  <div className="flex flex-wrap gap-3">
+                    {adjustmentReason.length > 0 &&
+                      adjustmentReason.map((option: any) => (
+                        <label
+                          key={option.id}
+                          className={`flex items-center gap-2 px-2 py-1.5 border rounded cursor-pointer transition ${
+                            selectedAdjustmentReasonId === option.id
+                              ? "border-blue-500 bg-blue-50 text-blue-700"
+                              : "border-gray-300 hover:bg-gray-100"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="adjustmentReason"
+                            value={option.id}
+                            checked={selectedAdjustmentReasonId === option.id}
+                            onChange={() =>
+                              handleAdjustmentReasonChange(option.id)
+                            }
+                            className="accent-blue-600 cursor-pointer"
+                          />
 
+                          <span className="caption-custom">{option.name}</span>
+                        </label>
+                      ))}
+                  </div>
+                  {error.adjustmentReasonId && (
+                    <div className="caption-custom-inactive">
+                      Adjustment reason is required
+                    </div>
+                  )}
+                </div>
+
+                {/* description */}
+                <div className="col-span-1 md:col-span-full ">
+                  <TextAreaInput
+                    logo={ShieldCheck}
+                    cols={4}
+                    label="Description: "
+                    name="description"
+                    rows={3}
+                    defaultValue={addStockFormData.description}
+                    onChange={handleAddStockFormDataChange}
+                  />
+                </div>
+              </div>
               <div className="flex items-center justify-end bg-pink-00 col-span-2">
                 <div className="flex gap-1">
                   <Button onClick={handleCloseForm} type="button">

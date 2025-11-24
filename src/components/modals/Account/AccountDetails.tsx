@@ -234,7 +234,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
-            callFunctionWithTwoParamsNotEvent: handleUpdateAccountDetails,
+            callFunctionWithTwoParamsNotEvent: handleAccountStatusToggle,
           });
           if (refreshTokenResponse) {
             handleAccountStatusToggle(event);

@@ -55,7 +55,7 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-        field: "serial_number",
+        field: "serialNumber",
         headerName: "Serial Number",
         sortable: true,
         filter: true,
@@ -133,18 +133,21 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+        hide: true,
         field: "warrantyIntervalName",
         headerName: "Warranty",
         sortable: true,
         filter: true,
       },
       {
+        hide: true,
         field: "warrantyStartDate",
         headerName: "Warranty Start Date",
         sortable: true,
         filter: true,
       },
       {
+        hide: true,
         field: "warrantyEndDate",
         headerName: "Warranty End Date",
         sortable: true,
@@ -158,12 +161,14 @@ const AccountCompanyProductAgGrid = ({
       },
        
       {
+        hide: true,
         field: "amcIntervalName",
         headerName: "AMC",
         sortable: true,
         filter: true,
       },
       {
+        
          hide:true,
         field: "amcCycleIntervalTypeId",
         headerName: "AMC Cycle Interval Type ID",
@@ -178,12 +183,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
+        hide: true,
         field: "amcCycleStartDate",
         headerName: "AMC Cycle Start Date",
         sortable: true,
         filter: true,
       },
       {
+        hide: true,
         field: "amcCycleEndDate",
         headerName: "AMC Cycle End Date",
         sortable: true,

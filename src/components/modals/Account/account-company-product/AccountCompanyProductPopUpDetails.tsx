@@ -6,22 +6,19 @@ import {
   Briefcase,
   Building2,
   Calendar,
-  Clock,
   FileText,
   LucideCalendar,
   LucideIcon,
   MapPin,
   Package,
   Pen,
-  Shield,
   User,
   X,
 } from "lucide-react";
-import { useIntervalType } from "../../../../config/hooks/useIntervalType";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersManagement";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import FormHeader from "../../../ui/FormHeader";
@@ -32,7 +29,7 @@ import TextAreaInput from "../../../ui/TextAreaInput";
 import FormInput from "../../../ui/FormInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
 import IntervalType from "../../../../@types/interval/IntervalType";
-import { Item, range } from "../../../../constants/NumberList";
+import { Item } from "../../../../constants/NumberList";
 
 const AccountCompanyProductPopUpDetails = ({
   selectedProductCard,
@@ -43,7 +40,6 @@ const AccountCompanyProductPopUpDetails = ({
   onClose: () => void;
   refreshKey: number;
 }) => {
-  const { intervalTypeData } = useIntervalType();
   const { loginStatus } = useLoggedInUserContext();
   const [
     openCompanyUserModuleForInstalledByChange,
@@ -60,9 +56,8 @@ const AccountCompanyProductPopUpDetails = ({
     }
   }, [selectedProductCard, refreshKey]);
 
-  const rangeOfNumber: Item[] = useMemo(() => {
-    return range(1, 365);
-  }, []);
+
+ 
   const handleChangeInstalledBy = () => {
     setOpenCompanyUserModuleForInstalledByChange(true);
   };
@@ -107,24 +102,24 @@ const AccountCompanyProductPopUpDetails = ({
     return date.toLocaleDateString("en-US", options);
   }
 
-  const handleValueChange = (title: string, value: string | number) => {
-    console.log(title + " => " + value);
-    if (title === "interval") {
-      updateAccountCompanyProduct("warranty", value);
-    }
+  // const handleValueChange = (title: string, value: string | number) => {
+  //   console.log(title + " => " + value);
+  //   if (title === "interval") {
+  //     updateAccountCompanyProduct("warranty", value);
+  //   }
 
-    if (title === "intervalOption") {
-      updateAccountCompanyProduct("warranty_interval_type_id", value);
-    }
-  
-    if (title === "amcInterval") {
-      updateAccountCompanyProduct("amc_cycle", value);
-    }
+  //   if (title === "intervalOption") {
+  //     updateAccountCompanyProduct("warranty_interval_type_id", value);
+  //   }
 
-    if (title === "amcIntervalOption") {
-      updateAccountCompanyProduct("amc_cycle_interval_type_id", value);
-    }
-  };
+  //   if (title === "amcInterval") {
+  //     updateAccountCompanyProduct("amc_cycle", value);
+  //   }
+
+  //   if (title === "amcIntervalOption") {
+  //     updateAccountCompanyProduct("amc_cycle_interval_type_id", value);
+  //   }
+  // };
   const handleDescriptionChange = (field: string, newValue: string) => {
     if (field === "Delivery Address") {
       updateAccountCompanyProduct("delivery_address", newValue);
@@ -151,17 +146,25 @@ const AccountCompanyProductPopUpDetails = ({
       updateAccountCompanyProduct("installation_date", formattedDate(newValue));
     }
 
-     if (field === "AMC Start Date") {
-      updateAccountCompanyProduct("amc_cycle_start_date", formattedDate(newValue));
+    if (field === "AMC Start Date") {
+      updateAccountCompanyProduct(
+        "amc_cycle_start_date",
+        formattedDate(newValue)
+      );
     }
 
     if (field === "AMC End Date") {
-      updateAccountCompanyProduct("amc_cycle_end_date", formattedDate(newValue));
+      updateAccountCompanyProduct(
+        "amc_cycle_end_date",
+        formattedDate(newValue)
+      );
     }
-   
-   
+
     if (field === "Warranty Start Date") {
-      updateAccountCompanyProduct("warranty_start_date", formattedDate(newValue));
+      updateAccountCompanyProduct(
+        "warranty_start_date",
+        formattedDate(newValue)
+      );
     }
 
     if (field === "Warranty End Date") {
@@ -172,165 +175,73 @@ const AccountCompanyProductPopUpDetails = ({
   const handleClose = () => {
     setOpenCompanyUserModuleForInstalledByChange(false);
   };
-  // const updateAccountCompanyProduct = async (
-  //   field: string,
-  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //   value: any,
-  //   displayName?: string
-  // ) => {
-  //   const postData = {
-  //     id: productData?.id,
-  //     [field]: value,
-  //     company_id: loginStatus.companyId,
-  //     updatedby_id: loginStatus.id,
-  //   };
-
-  //   axios
-  //     .post(POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT, postData, {
-  //       withCredentials: true,
-  //     })
-  //     .then((response) => {
-  //       if (response.data.status) {
-  //         toast.success(response.data.message);
-
-  //         //  Update local popup state so UI refreshes instantly
-  //         if (field === "installed_by") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   installedBy: value,
-  //                   installedByName: displayName!,
-  //                 }
-  //               : prev
-  //           );
-  //         }
-  //         if (field === "billing_address") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   billingAddress: value,
-  //                 }
-  //               : prev
-  //           );
-  //         }
-  //         if (field === "delivery_address") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   deliveryAddress: value,
-  //                 }
-  //               : prev
-  //           );
-  //         }
-
-  //         if (field === "warranty_terms") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   warrantyTerms: value,
-  //                 }
-  //               : prev
-  //           );
-  //         }
-  //         if (field === "quantity") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   quantity: parseInt(value),
-  //                 }
-  //               : prev
-  //           );
-  //         }
-
-  //         if (field === "purchase_date") {
-  //           setProductData((prev) =>
-  //             prev
-  //               ? {
-  //                   ...prev,
-  //                   purchaseDate: formatDate(value),
-  //                 }
-  //               : prev
-  //           );
-  //         }
-
-  //         // wait for backend to update
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       toast.success(error.data.message);
-  //     });
-  // };
+ 
 
   const updateAccountCompanyProduct = async (
-  field: string,
-  value: any,
-  displayName?: string
-) => {
-  // Keep previous state for rollback
-  const previousState = productData;
+    field: string,
+    value: any,
+    displayName?: string
+  ) => {
+    // Keep previous state for rollback
+    const previousState = productData;
 
-  // Optimistically update (optional – to make UI feel fast)
-  setProductData((prev) => {
-    if (!prev) return prev;
-    const updated = { ...prev };
+    // Optimistically update (optional – to make UI feel fast)
+    setProductData((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev };
 
-    switch (field) {
-      case "installed_by":
-        updated.installedBy = value;
-        updated.installedByName = displayName!;
-        break;
-      case "billing_address":
-        updated.billingAddress = value;
-        break;
-      case "delivery_address":
-        updated.deliveryAddress = value;
-        break;
-      case "warranty_terms":
-        updated.warrantyTerms = value;
-        break;
-      case "quantity":
-        updated.quantity = parseInt(value);
-        break;
-      case "purchase_date":
-        updated.purchaseDate = formatDate(value);
-        break;
-      // add other cases if needed
-    }
-    return updated;
-  });
+      switch (field) {
+        case "installed_by":
+          updated.installedBy = value;
+          updated.installedByName = displayName!;
+          break;
+        case "billing_address":
+          updated.billingAddress = value;
+          break;
+        case "delivery_address":
+          updated.deliveryAddress = value;
+          break;
+        case "warranty_terms":
+          updated.warrantyTerms = value;
+          break;
+        case "quantity":
+          updated.quantity = parseInt(value);
+          break;
+        case "purchase_date":
+          updated.purchaseDate = formatDate(value);
+          break;
+        // add other cases if needed
+      }
+      return updated;
+    });
 
-  try {
-    const postData = {
-      id: productData?.id,
-      [field]: value,
-      company_id: loginStatus.companyId,
-      updatedby_id: loginStatus.id,
-    };
+    try {
+      const postData = {
+        id: productData?.id,
+        [field]: value,
+        company_id: loginStatus.companyId,
+        updatedby_id: loginStatus.id,
+      };
 
-    const response = await axios.post(
-      POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT,
-      postData,
-      { withCredentials: true }
-    );
+      const response = await axios.post(
+        POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT,
+        postData,
+        { withCredentials: true }
+      );
 
-    if (response.data.status) {
-      toast.success(response.data.message);
-    } else {
-      toast.error(response.data.message || "Update failed!");
+      if (response.data.status) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message || "Update failed!");
+        //  Rollback to previous data
+        setProductData(previousState);
+      }
+    } catch (error: any) {
+      toast.error("Network error: Unable to update.");
       //  Rollback to previous data
       setProductData(previousState);
     }
-  } catch (error: any) {
-    toast.error("Network error: Unable to update.");
-    //  Rollback to previous data
-    setProductData(previousState);
-  }
-};
+  };
 
   if (selectedProductCard === null) return null;
   return (
@@ -381,82 +292,82 @@ const AccountCompanyProductPopUpDetails = ({
 
           {/* Content */}
           <div className="px-8 pb-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2"> */}
               {/* Left Section */}
-              <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5 ">
-               {/* <div className="flex items-center justify-between w-full "> */}
-                 <div className="col-span-2">
-                  <DisplayComponent
+              <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+                <DisplayComponent
                   icon={Package}
                   title="Quantity"
-                  value={productData.quantity.toLocaleString().concat(" "+productData.unitNameInStock)}
+                  value={productData.quantity
+                    .toLocaleString()
+                    .concat(" " + productData.unitNameInStock)}
                   penLogo={false}
                 />
-                 </div>
-                {/* <DisplayComponent
-                  icon={PencilRuler}
-                  title="Unit"
-                  value={productData.unitName.toLocaleString()}
-                  penLogo={false}
-                /> */}
-               {/* </div> */}
+                {productData.serialNumber && (
+                  <DisplayComponent
+                    icon={Package}
+                    title="Serial Number"
+                    value={
+                      productData.serialNumber ? productData.serialNumber : ""
+                    }
+                    penLogo={false}
+                  />
+                )}
 
-                {/* <InfoBlock
-                  icon={Package}
-                  title="Quantity"
-                  type="number"
-                  value={productData!.quantity}
+                {productData.barcode && (
+                  <DisplayComponent
+                    icon={Package}
+                    title="Barcode"
+                    value={
+                      productData.barcode ? productData.barcode : ""
+                    }
+                    penLogo={false}
+                  />
+                )}
+
+                <InfoBlock
+                  icon={Calendar}
+                  title="Purchase Date"
+                  type="date"
+                  value={productData!.purchaseDate}
                   onValueChange={handleDescriptionChange}
                   penLogo={true}
-                /> */}
-                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5"> */}
-                  <InfoBlock
-                    icon={Calendar}
-                    title="Purchase Date"
-                    type="date"
-                    value={productData!.purchaseDate}
-                    onValueChange={handleDescriptionChange}
-                    penLogo={true}
-                  />
+                />
 
-                  <InfoBlock
-                    icon={Calendar}
-                    title="Delivery Date"
-                    type="date"
-                    value={productData!.deliveryDate}
-                    onValueChange={handleDescriptionChange}
-                    penLogo={true}
-                  />
-                {/* </div> */}
+                <InfoBlock
+                  icon={Calendar}
+                  title="Delivery Date"
+                  type="date"
+                  value={productData!.deliveryDate}
+                  onValueChange={handleDescriptionChange}
+                  penLogo={true}
+                />
 
-                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5"> */}
-                  <InfoBlock
+                <InfoBlock
+                  icon={Calendar}
+                  title="Installation Date"
+                  type="date"
+                  value={productData!.installationDate}
+                  onValueChange={handleDescriptionChange}
+                  penLogo={true}
+                />
+                <div
+                  className="cursor-pointer"
+                  onClick={handleChangeInstalledBy}
+                >
+                  <DisplayComponent
                     icon={Calendar}
-                    title="Installation Date"
-                    type="date"
-                    value={productData!.installationDate}
-                    onValueChange={handleDescriptionChange}
+                    title="Installed By"
+                    value={productData!.installedByName}
                     penLogo={true}
                   />
-                  <div
-                    className="cursor-pointer"
-                    onClick={handleChangeInstalledBy}
-                  >
-                    <DisplayComponent
-                      icon={Calendar}
-                      title="Installed By"
-                      value={productData!.installedByName}
-                      penLogo={true}
-                    />
-                  </div>
-                {/* </div> */}
+                </div>
               </div>
 
               {/* Right Section */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
                   <div className="col-span-2 ">
-                    {/* <span className="font-medium">Warranty</span> */}
                     <InfoRow
                       icon={Shield}
                       title="Warranty"
@@ -489,9 +400,9 @@ const AccountCompanyProductPopUpDetails = ({
                     onValueChange={handleDescriptionChange}
                     penLogo={true}
                   />
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
+                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
                   <div className="col-span-2">
                     <InfoRow
                       icon={Shield}
@@ -526,11 +437,11 @@ const AccountCompanyProductPopUpDetails = ({
                     penLogo={true}
                   />
                 </div>
-                
-              </div>
-            </div>
+                */}
+              {/* </div> */}
+            {/* </div> */}
 
-            <div className="space-y-2">
+            <div className="space-y-2 grid grid-cols-1">
               {/* Addresses */}
 
               <InfoBlock
@@ -592,152 +503,153 @@ const AccountCompanyProductPopUpDetails = ({
 
 export default AccountCompanyProductPopUpDetails;
 
-interface InfoRowProps {
-  icon: LucideIcon;
-  title: string;
-  intervalName: string;
-  intervalOptionName: string;
-  selectedIntervalTypevalue?: string | number;
-  selectedIntervalOptionValue?: string | number;
-  displayValue: string | number;
-  penLogo?: boolean;
-  intervalOption?: IntervalType[];
-  interval?: Item[];
-  onValueChange: (title: string, value: number | string) => void;
-}
+// interface InfoRowProps {
+//   icon: LucideIcon;
+//   title: string;
+//   intervalName: string;
+//   intervalOptionName: string;
+//   selectedIntervalTypevalue?: string | number;
+//   selectedIntervalOptionValue?: string | number;
+//   displayValue: string | number;
+//   penLogo?: boolean;
+//   intervalOption?: IntervalType[];
+//   interval?: Item[];
+//   onValueChange: (title: string, value: number | string) => void;
+// }
 
-function InfoRow({
-  icon: Logo,
-  title,
-  intervalName,
-  intervalOptionName,
-  displayValue,
-  selectedIntervalTypevalue,
-  selectedIntervalOptionValue,
-  penLogo,
-  intervalOption,
-  interval,
-  onValueChange,
-}: InfoRowProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(
-    selectedIntervalTypevalue ?? ""
-  );
-  const [selectedIntervalOption, setSelectedIntervalOption] = useState(
-    selectedIntervalOptionValue ?? ""
-  );
-  const [changedValue, setChangedValue] = useState<string | number>(
-    displayValue ?? ""
-  );
+// function InfoRow({
+//   icon: Logo,
+//   title,
+//   intervalName,
+//   intervalOptionName,
+//   displayValue,
+//   selectedIntervalTypevalue,
+//   selectedIntervalOptionValue,
+//   penLogo,
+//   intervalOption,
+//   interval,
+//   onValueChange,
+// }: InfoRowProps) {
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [selectedValue, setSelectedValue] = useState(
+//     selectedIntervalTypevalue ?? ""
+//   );
+//   const [selectedIntervalOption, setSelectedIntervalOption] = useState(
+//     selectedIntervalOptionValue ?? ""
+//   );
+//   const [changedValue, setChangedValue] = useState<string | number>(
+//     displayValue ?? ""
+//   );
 
-  // Helper function to combine display value
-  const updateLocalDisplayValue = (value: string, optionValue: string) => {
-    if (value && optionValue) {
-      const intervalLabel =
-        interval?.find((i) => i.id.toString() === value)?.name ?? "";
-      const optionLabel =
-        intervalOption?.find((i) => i.id!.toString() === optionValue)?.name ??
-        "";
-      const newDisplay = `${intervalLabel} ${optionLabel}`.trim();
-      setChangedValue(newDisplay);
-    }
-  };
+//   // Helper function to combine display value
+//   const updateLocalDisplayValue = (value: string, optionValue: string) => {
+//     if (value && optionValue) {
+//       const intervalLabel =
+//         interval?.find((i) => i.id.toString() === value)?.name ?? "";
+//       const optionLabel =
+//         intervalOption?.find((i) => i.id!.toString() === optionValue)?.name ??
+//         "";
+//       const newDisplay = `${intervalLabel} ${optionLabel}`.trim();
+//       setChangedValue(newDisplay);
+//     }
+//   };
 
-  // Handle first dropdown change (interval number)
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const newValue = event.target.value;
-      setSelectedValue(newValue);
-      updateLocalDisplayValue(
-        newValue,
-        selectedIntervalOption.toLocaleString()
-      );
-      requestAnimationFrame(() => onValueChange(intervalName, newValue));
-      setIsEditing(false);
-    },
-    [intervalName, onValueChange, selectedIntervalOption]
-  );
+//   // Handle first dropdown change (interval number)
+//   const handleChange = React.useCallback(
+//     (event: React.ChangeEvent<HTMLSelectElement>) => {
+//       const newValue = event.target.value;
+//       setSelectedValue(newValue);
+//       updateLocalDisplayValue(
+//         newValue,
+//         selectedIntervalOption.toLocaleString()
+//       );
+//       requestAnimationFrame(() => onValueChange(intervalName, newValue));
+//       setIsEditing(false);
+//     },
+//     [intervalName, onValueChange, selectedIntervalOption]
+//   );
 
-  // Handle second dropdown change (interval type like day/week)
-  const handleIntervalOptionChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const newValue = event.target.value;
-      setSelectedIntervalOption(newValue);
-      updateLocalDisplayValue(selectedValue.toString(), newValue);
-      requestAnimationFrame(() => onValueChange(intervalOptionName, newValue));
-      setIsEditing(false);
-    },
-    [intervalOptionName, onValueChange, selectedValue]
-  );
+//   // Handle second dropdown change (interval type like day/week)
+//   const handleIntervalOptionChange = React.useCallback(
+//     (event: React.ChangeEvent<HTMLSelectElement>) => {
+//       const newValue = event.target.value;
+//       setSelectedIntervalOption(newValue);
+//       updateLocalDisplayValue(selectedValue.toString(), newValue);
+//       requestAnimationFrame(() => onValueChange(intervalOptionName, newValue));
+//       setIsEditing(false);
+//     },
+//     [intervalOptionName, onValueChange, selectedValue]
+//   );
 
-  // Memoized dropdown options
-  const intervalOptions = React.useMemo(
-    () =>
-      interval?.map((item) => (
-        <option key={item.id} value={item.id}>
-          {item.name}
-        </option>
-      )),
-    [interval]
-  );
+//   // Memoized dropdown options
+//   const intervalOptions = React.useMemo(
+//     () =>
+//       interval?.map((item) => (
+//         <option key={item.id} value={item.id}>
+//           {item.name}
+//         </option>
+//       )),
+//     [interval]
+//   );
 
-  const intervalOptionOptions = React.useMemo(
-    () =>
-      intervalOption?.map((item) => (
-        <option key={item.id} value={item.id!}>
-          {item.name}
-        </option>
-      )),
-    [intervalOption]
-  );
+//   const intervalOptionOptions = React.useMemo(
+//     () =>
+//       intervalOption?.map((item) => (
+//         <option key={item.id} value={item.id!}>
+//           {item.name}
+//         </option>
+//       )),
+//     [intervalOption]
+//   );
 
-  return (
-    // <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-    //   <Logo className="text-blue-500" size={20} />
-     <div className="flex w-full items-start gap-3 p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
-    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
-      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
-    </div>
-      <div>
-        <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
+//   return (
+//     <div className="flex w-full items-start gap-3 p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+//       <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+//         <Logo
+//           className={`${COLORS.FORM_HEADER_ICONS_COLOR}`}
+//           size={SIZE.SIXTEEN}
+//         />
+//       </div>
+//       <div>
+//         <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
 
-        {!isEditing ? (
-          <div
-            className="flex items-center gap-2 hover:bg-gray-200 rounded px-2 cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          >
-            <p className="text-gray-700">
-              {changedValue ? (
-                changedValue
-              ) : (
-                <span className="text-sm italic">Not provided</span>
-              )}
-            </p>
-            {penLogo && <Pen className="text-blue-600" size={12} />}
-          </div>
-        ) : (
-          <div className="flex flex-row gap-2">
-            <select
-              className="border rounded px-2 py-1"
-              value={selectedValue}
-              onChange={handleChange}
-            >
-              {intervalOptions}
-            </select>
+//         {!isEditing ? (
+//           <div
+//             className="flex items-center gap-2 hover:bg-gray-200 rounded px-2 cursor-pointer"
+//             onClick={() => setIsEditing(true)}
+//           >
+//             <p className="text-gray-700">
+//               {changedValue ? (
+//                 changedValue
+//               ) : (
+//                 <span className="text-sm italic">Not provided</span>
+//               )}
+//             </p>
+//             {penLogo && <Pen className="text-blue-600" size={12} />}
+//           </div>
+//         ) : (
+//           <div className="flex flex-row gap-2">
+//             <select
+//               className="border rounded px-2 py-1"
+//               value={selectedValue}
+//               onChange={handleChange}
+//             >
+//               {intervalOptions}
+//             </select>
 
-            <select
-              className="border rounded px-2 py-1"
-              value={selectedIntervalOption}
-              onChange={handleIntervalOptionChange}
-            >
-              {intervalOptionOptions}
-            </select>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+//             <select
+//               className="border rounded px-2 py-1"
+//               value={selectedIntervalOption}
+//               onChange={handleIntervalOptionChange}
+//             >
+//               {intervalOptionOptions}
+//             </select>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
 // this function is only used in the warranty and amc
 
@@ -763,30 +675,31 @@ function DisplayComponent({
   title: string;
   icon: LucideIcon;
 }) {
- return (
-  <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
-    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
-      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
-    </div>
+  return (
+    <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+      <div className="flex-shrink-0 p-1 bg-blue-50 rounded-full">
+        <Logo
+          className={`${COLORS.FORM_HEADER_ICONS_COLOR}`}
+          size={SIZE.SIXTEEN}
+        />
+      </div>
 
-    <div className="flex flex-col w-full">
-      <h4 className="font-semibold text-gray-900 mb-1 text-base">{title}</h4>
+      <div className="flex flex-col w-full">
+        <h4 className="font-semibold text-gray-900 mb-1 text-base">{title}</h4>
 
-      <div className="flex items-center justify-between group px-2 py-1 rounded-md transition-colors duration-200 hover:bg-gray-100 cursor-pointer">
-        <p className="text-gray-700 text-sm">
-          {value.length >30 ? value.substring(0,29).concat("...") : value || <span className="text-gray-400 italic">Not provided</span>}
-        </p>
-        {penLogo && (
-          <Pen
-            className="text-blue-500 "
-            size={14}
-          />
-        )}
+        <div className="flex items-center justify-between group px-2 py-0.5 rounded-md transition-colors duration-200 hover:bg-gray-100 cursor-pointer">
+          <p className="text-gray-700 text-sm">
+            {value.length > 30
+              ? value.substring(0, 29).concat("...")
+              : value || (
+                  <span className="text-gray-400 italic">Not provided</span>
+                )}
+          </p>
+          {penLogo && <Pen className="text-blue-500 " size={14} />}
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
 function InfoBlock({
   icon: Logo,
@@ -801,8 +714,6 @@ function InfoBlock({
   const [isEditing, setIsEditing] = useState(false);
   const [changedValue, setChangedValue] = useState<string | number>(value);
   const prevValueRef = useRef(value);
-
-  
 
   //  Safely handle both string and number date values
   function convertToInputDateFormat(dateValue?: string | number): string {
@@ -871,12 +782,13 @@ function InfoBlock({
   };
 
   return (
-    // <div className="flex items-start gap-3 p-2  bg-gray-50 rounded-lg">
-    //   <Logo className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
     <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
-    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
-      <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={SIZE.SIXTEEN} />
-    </div>
+      <div className="flex-shrink-0 p-1 items-center bg-blue-50 rounded-full">
+        <Logo
+          className={`${COLORS.FORM_HEADER_ICONS_COLOR}`}
+          size={SIZE.FOURTEEN}
+        />
+      </div>
       <div className="w-full">
         <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
 

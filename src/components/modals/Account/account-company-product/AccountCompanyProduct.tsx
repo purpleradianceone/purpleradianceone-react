@@ -118,7 +118,7 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
   }, []);
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full min-h-14">
       {/* Main Content */}
 
       {isLoadingAccountCompanyProduct ? (

@@ -76,14 +76,14 @@ export const StockAvailableSerialNumberAgGrid = ({
   return (
     <div className="ag-theme-balham w-full" style={{ height: "100%", width: "100%" }}>
       <AgGridReact
-        key={selectedIds.join(",")}   // 🔥 forces checkbox re-render
+        key={selectedIds.join(",")}   //  forces checkbox re-render
         rowData={data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
         context={{ selectedIds, toggleSelect }}
-        getRowId={(params) => params.data.stockInwardId}   // 🔥 required for persistence
+        getRowId={(params) => params.data.stockInwardId}   //  required for persistence
       />
     </div>
   );

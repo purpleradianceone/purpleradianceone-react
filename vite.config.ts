@@ -14,6 +14,6 @@ export default defineConfig({
   },
   plugins: [react()],
   define: {
-    global: 'globalThis', // 👈 Fix for SockJS requiring "global"
+    global: 'globalThis', //  Fix for SockJS requiring "global"
   },
 })
