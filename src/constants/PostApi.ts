@@ -1,4 +1,4 @@
-
+export const BASE_URL_FOR_FORM_INTEGRATION = import.meta.env.VITE_BASE_URL_FOR_FORM_INTEGRATION!;
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
 const WEB_SOCKET_URL = import.meta.env.VITE_WEB_SOCKET_URL!;
 export const WEB_SOCKET_CONNECTION_URL =` ${WEB_SOCKET_URL}${import.meta.env.VITE_WEB_SOCKET_CONNECTION_URL!}`;
