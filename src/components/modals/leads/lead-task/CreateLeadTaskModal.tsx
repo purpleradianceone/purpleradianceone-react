@@ -30,7 +30,7 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
@@ -40,9 +40,9 @@ import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadAssociatedUsersModal from "./LeadAssociatedUsersModal";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
-import { createPortal } from "react-dom";
 import MESSAGE from "../../../../constants/Messages";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../../ui/FormLayout";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -177,7 +177,7 @@ function CreateLeadTaskModal({
   };
 
   const createLeadTask = async (event: React.FormEvent) => {
-    if(isSaving) return;
+    if (isSaving) return;
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
       return;
@@ -218,8 +218,8 @@ function CreateLeadTaskModal({
       lead_activity_details: jsonData,
       createdby_id: loginStatus.id,
     };
-    setIsSaving(true)
-   await  axios
+    setIsSaving(true);
+    await axios
       .post(POST_API.CREATE_LEAD_TASK, createLeadTaskPostData, {
         withCredentials: true,
       })
@@ -227,7 +227,7 @@ function CreateLeadTaskModal({
         if (response.data.status) {
           toast.success(response.data.message);
           handleLeadTaskCreate();
-            handleClose();
+          handleClose();
         } else {
           toast.error(response.data.message);
         }
@@ -240,11 +240,12 @@ function CreateLeadTaskModal({
           if (refreshTokenResponse) {
             createLeadTask(event);
           }
-        }else{
-          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
+        } else {
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN);
         }
-      }).finally(()=>{
-        setIsSaving(false)
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
   };
 
@@ -294,83 +295,83 @@ function CreateLeadTaskModal({
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return createPortal(
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-3">
-      <div className="bg-white mt-12 min-h-[60vh]  rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
-        {/* Header */}
-        <FormHeader
-          icon={ClipboardList}
-          onClose={handleClose}
-          preText="Create task for timely action"
-          description="Plan and create a task to schedule follow-ups and ensure timely action."
-        />
-        {isSaving && <LoadingPopUpAnimation show={isSaving} />}
+  return (
+    <FormLayout width={6}>
+      {/* Header */}
+      <FormHeader
+        icon={ClipboardList}
+        onClose={handleClose}
+        preText="Create task for timely action"
+        description="Plan and create a task to schedule follow-ups and ensure timely action."
+      />
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
-        {/* Form Grid */}
-        <form className="space-y-2 mt-2">
-          <div className="grid grid-cols-3 gap-3">
-            {/* type */}
-            <CustomDropdown
-              requiredRedDot
-              logo={Text}
-              labelName="Type:"
-              onSelect={(e) => {
-                if (e !== 4) {
-                  if (e) {
-                    setLeadActivityId(e);
-                  } else {
-                    setLeadActivityId(0);
-                  }
-                } else {
-                  sessionStorage.setItem("leadData", JSON.stringify(leadData));
-                  navigate(ROUTES_URL.SCHEDULE_MEETING);
-                }
-              }}
-              options={leadActivity}
-            ></CustomDropdown>
-            {/* priority */}
-            <CustomDropdown
-              requiredRedDot
-              logo={Text}
-              labelName="Priority :"
-              preselectedOption={2} // id of medium
-              onSelect={(e) => {
+      {/* Form Grid */}
+      <form className="space-y-2 mt-2">
+        <div className="grid grid-cols-3 gap-3">
+          {/* type */}
+          <CustomDropdown
+            requiredRedDot
+            logo={Text}
+            labelName="Type:"
+            onSelect={(e) => {
+              if (e !== 4) {
                 if (e) {
-                  setLeadTaskPriorityId(e);
+                  setLeadActivityId(e);
                 } else {
-                  setLeadTaskPriorityId(0);
+                  setLeadActivityId(0);
                 }
-              }}
-              options={leadTaskPriority}
-            ></CustomDropdown>
+              } else {
+                sessionStorage.setItem("leadData", JSON.stringify(leadData));
+                navigate(ROUTES_URL.SCHEDULE_MEETING);
+              }
+            }}
+            options={leadActivity}
+          ></CustomDropdown>
+          {/* priority */}
+          <CustomDropdown
+            requiredRedDot
+            logo={Text}
+            labelName="Priority :"
+            preselectedOption={2} // id of medium
+            onSelect={(e) => {
+              if (e) {
+                setLeadTaskPriorityId(e);
+              } else {
+                setLeadTaskPriorityId(0);
+              }
+            }}
+            options={leadTaskPriority}
+          />
 
-            {/* Stage */}
-            <CustomDropdown
-              requiredRedDot
-              logo={Text}
-              labelName="Stage"
-              preselectedOption={2}
-              onSelect={(e) => {
-                if (e) {
-                  setLeadTaskStageId(e);
-                } else {
-                  setLeadTaskStageId(0);
-                }
-              }}
-              options={leadTaskStage}
-            ></CustomDropdown>
+          {/* Stage */}
+          <CustomDropdown
+            requiredRedDot
+            logo={Text}
+            labelName="Stage"
+            preselectedOption={2}
+            onSelect={(e) => {
+              if (e) {
+                setLeadTaskStageId(e);
+              } else {
+                setLeadTaskStageId(0);
+              }
+            }}
+            options={leadTaskStage}
+          ></CustomDropdown>
 
-            {leadActivityId !== 3 && leadActivityId !== 8 && leadActivityId !== 0 && (
+          {leadActivityId !== 3 &&
+            leadActivityId !== 8 &&
+            leadActivityId !== 0 && (
               <div className="flex items-center gap-4  mb-0">
                 <label htmlFor="phoneCallBtn" className="input-label-custom">
                   <div className="flex gap-2">
                     <Contact2 className="text-blue-600 mt-0.5" size={16} />
-                    <span>Select Lead Contact :</span>
+                    <span>Lead Contact :</span>
                   </div>
                 </label>
                 <div id="phoneCallBtn" className=" max-w-32 m-0">
                   <Button
-
                     type="submit"
                     onClick={(e) => {
                       e.preventDefault();
@@ -378,148 +379,148 @@ function CreateLeadTaskModal({
                     }}
                   >
                     <span className="flex gap-1 text-nowrap ">
-                      <Contact size={SIZE.TWENTY}></Contact>
+                      <Contact size={14}></Contact>
                       {/* <span>lead contact</span> */}
                     </span>
                   </Button>
                 </div>
               </div>
             )}
-            {leadActivityId === 3 && (
-              <div className="col-span-3">
-                <FormInput
-                  logo={Globe}
-                  value={physicalMeetingAddress}
-                  label="Address"
-                  onChange={(e) => {
-                    setPhysicalMeetingAddress(e.target.value);
-                  }}
-                ></FormInput>
-              </div>
-            )}
-          </div>
-
-          {leadContactDataSelectedArray.length != 0 && (
-            <div className="grid grid-cols-3 input-label-custom">
-              Selected Lead Contacts
-            </div>
-          )}
-          {leadContactDataSelectedArray.length != 0 && (
-            <div className="mt-0.5 grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-              {leadContactDataSelectedArray.map((contact) => (
-                <div
-                  key={contact.id}
-                  className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
-                >
-                  <div className="flex justify-between">
-                    <span className="flex items-center gap-2">
-                      <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
-                      <span className="caption-custom">
-                        {contact.name || contact.email || "Unnamed contact"}
-                      </span>
-                    </span>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setAddCompanyLeadContactIdArray((prev) =>
-                          prev.filter((id) => id !== contact.id)
-                        );
-                        setLeadContactDataSelectedArray((prev) =>
-                          prev.filter((item) => item.id !== contact.id)
-                        );
-                      }}
-                      className="caption-custom hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            {/* Subject */}
-            <div className="mt-2">
+          {leadActivityId === 3 && (
+            <div className="col-span-3">
               <FormInput
-                required
-                logo={FileTextIcon}
-                label="Subject :"
-                type="text"
-                className="test-base"
+                logo={Globe}
+                value={physicalMeetingAddress}
+                label="Address"
                 onChange={(e) => {
-                  setSubject(e.target.value);
+                  setPhysicalMeetingAddress(e.target.value);
                 }}
               ></FormInput>
             </div>
+          )}
+        </div>
 
-            {/* Outcome */}
-            <div className="row-span-2">
-              <TextAreaInput
-                logo={TargetIcon}
-                cols={5}
-                rows={5}
-                label="Outcome"
-                onChange={(e) => {
-                  setResultOutcome(e.target.value);
+        {/* {leadContactDataSelectedArray.length != 0 && (
+          
+        )} */}
+        {leadContactDataSelectedArray.length != 0 && (
+          <div className="border  rounded-md">
+          <div className="grid grid-cols-3 p-1 input-label-custom">
+            Selected Lead Contacts :
+          </div>
+          <div className=" grid grid-cols-3 p-2  max-h-36 gap-0.5 overflow-y-auto">
+            {leadContactDataSelectedArray.map((contact) => (
+              <div
+              key={contact.id}
+              className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-100 rounded-lg"
+              >
+                <div className="flex justify-between">
+                  <span className="flex items-center gap-2">
+                    <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
+                    <span className="caption-custom">
+                      {contact.name || contact.email || "Unnamed contact"}
+                    </span>
+                  </span>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setAddCompanyLeadContactIdArray((prev) =>
+                        prev.filter((id) => id !== contact.id)
+                    );
+                    setLeadContactDataSelectedArray((prev) =>
+                      prev.filter((item) => item.id !== contact.id)
+                  );
                 }}
-                 maxLength={500}
-              ></TextAreaInput>
-            </div>
-
-            {/* End date */}
-            <div className="grid grid-cols-4 gap-2">
-              <div className="col-span-2">
-                <DatePickerInput
-                  label="End Date"
-                  onChange={(e) => {
-                    setDueDate(e.target.value);
-                  }}
-                  logo={Calendar}
-                />
-              </div>
-
-              <div className="mt-2 col-span-2">
-                <label htmlFor="endTime" className="block input-label-custom">
-                  <div className="flex gap-2 text-center">
-                    <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
-                    <span>End Time</span>
-                  </div>
-                </label>
-                <select
-                  id="endTime"
-                  className="mt-1 w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  onChange={(e) => {
-                    setDueTime(e.target.value);
-                  }}
+                className="caption-custom hover:text-red-500"
                 >
-                  <option value="">End Time</option>
-                  {timeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
+            ))}
+          </div>
+                    </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-2">
+          {/* Subject */}
+          {/* <div className=""> */}
+          <FormInput
+            required
+            logo={FileTextIcon}
+            label="Subject :"
+            type="text"
+            placeholder="Enter the subject"
+            className="test-base"
+            onChange={(e) => {
+              setSubject(e.target.value);
+            }}
+          ></FormInput>
+
+          {/* </div> */}
+
+          {/* End date */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="col-span-1">
+              <DatePickerInput
+                label="End Date"
+                onChange={(e) => {
+                  setDueDate(e.target.value);
+                }}
+                logo={Calendar}
+              />
             </div>
 
-            {/* Description */}
-            <div className="col-span-2">
-              <TextAreaInput
-                logo={FileText}
-                cols={5}
-                rows={4}
-                label="Description"
+            <div className=" col-span-1">
+              <label htmlFor="endTime" className="block input-label-custom">
+                <div className="flex gap-1 items-center">
+                  <Clock size={13} className="text-blue-600  justify-center " />
+                  <span>End Time:</span>
+                </div>
+              </label>
+              <select
+                id="endTime"
+                className=" w-full pl-3 pr-10 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 onChange={(e) => {
-                  setDescription(e.target.value);
+                  setDueTime(e.target.value);
                 }}
-                maxLength={500}
-              ></TextAreaInput>
+              >
+                <option value="">Select End Time</option>
+                {timeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
+          {/* Description */}
+          <TextAreaInput
+            logo={FileText}
+            cols={5}
+            rows={3}
+            label="Description:"
+            placeholder="Enter the description"
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            maxLength={500}
+          ></TextAreaInput>
+          {/* Outcome */}
+          <TextAreaInput
+            logo={TargetIcon}
+            cols={5}
+            rows={3}
+            label="Outcome : "
+            placeholder="Enter the outcome"
+            onChange={(e) => {
+              setResultOutcome(e.target.value);
+            }}
+            maxLength={500}
+          ></TextAreaInput>
+        </div>
 
-         
-            {/* <div className="relative grid grid-cols-3 justify-center input-label-custom">
+        {/* <div className="relative grid grid-cols-3 justify-center input-label-custom">
               <div className="flex gap-2 mt-2">
                 <User className="text-blue-600  w-3 h-3 mt-1" />
                 <span>Assign Users : </span>
@@ -546,15 +547,15 @@ function CreateLeadTaskModal({
               </div>
             </div> */}
 
-            <div className="flex items-center gap-4  mb-0">
-                <label htmlFor="assignUsersBtn" className="input-label-custom">
-                  <div className="flex gap-2">
-                    <User className="text-blue-600 mt-0.5" size={16} />
-                    <span>Assign Users : </span>
-                  </div>
-                </label>
-                <div id="assignUsersBtn" className=" max-w-32 m-0">
-                  {/* <Button
+        <div className="flex items-center gap-4  mb-0">
+          <label htmlFor="assignUsersBtn" className="input-label-custom">
+            <div className="flex gap-2">
+              <User className="text-blue-600 mt-0.5" size={16} />
+              <span>Assign Users : </span>
+            </div>
+          </label>
+          <div id="assignUsersBtn" className=" max-w-32 m-0">
+            {/* <Button
 
                     type="submit"
                     onClick={(e) => {
@@ -567,97 +568,96 @@ function CreateLeadTaskModal({
                       <span>lead contact</span>
                     </span>
                   </Button> */}
-                  <Button
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsAssignUsersModalOpen(true);
-                  }}
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsAssignUsersModalOpen(true);
+              }}
+            >
+              <span
+                title="Assign user to this task"
+                className="flex  text-center text-nowrap"
+              >
+                <span className="flex gap-0.5 justify-center">
+                  <UserPlus size={12} className="mt-0.5"></UserPlus>
+                  {/* <span>Assign Users</span> */}
+                </span>
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        {selectedCompanyUsers.length != 0 && (
+          <div className="">
+            <span className="caption-custom">Currently assigned users:</span>
+            <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+              {selectedCompanyUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-100 rounded-lg"
                 >
-                  <span
-                    title="Assign user to this task"
-                    className="flex  text-center text-nowrap"
-                  >
-                    <span className="flex gap-0.5 justify-center">
-                      <UserPlus size={16} className="mt-0.5"></UserPlus>
-                      <span>Assign Users</span>
-                    </span>
-                  </span>
-                </Button>
-                </div>
-              </div>
-          
-
-          {selectedCompanyUsers.length != 0 && (
-            <div className="p-1">
-              <span className="caption-custom">Currently assigned users:</span>
-              <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
-                {selectedCompanyUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-400 rounded-lg"
-                  >
-                    <div className="flex justify-between">
-                      <span className="flex items-center gap-2">
-                        <Users className="h-3 w-3caption-custom rounded-full bg-white" />
-                        <span className="caption-custom">
-                          {user.fullname
-                            ? user.fullname
-                            : user.email || "Unnamed contact"}
-                        </span>
+                  <div className="flex justify-between">
+                    <span className="flex items-center gap-2">
+                      <Users className="h-3 w-3caption-custom rounded-full bg-white" />
+                      <span className="caption-custom">
+                        {user.fullname
+                          ? user.fullname
+                          : user.email || "Unnamed contact"}
                       </span>
-                      <Button
-                        size="sm"
-                        type="button"
-                        onClick={() => {
-                          setAssignedTo((prev) =>
-                            prev.filter((id) => id !== user.id)
-                          );
-                          setSelectedCompanyUsers((prev) =>
-                            prev.filter((item) => item.id !== user.id)
-                          );
-                        }}
-                        className="caption-custom hover:text-red-500"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
+                    </span>
+                    <Button
+                      size="sm"
+                      type="button"
+                      onClick={() => {
+                        setAssignedTo((prev) =>
+                          prev.filter((id) => id !== user.id)
+                        );
+                        setSelectedCompanyUsers((prev) =>
+                          prev.filter((item) => item.id !== user.id)
+                        );
+                      }}
+                      className="caption-custom hover:text-red-500"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </form>
-
-        {/* Footer Buttons */}
-        <div className="flex w-full justify-center gap-4 mt-6">
-          <div className=" flex w-full justify-end ">
-            <div className="flex items-center gap-1 ">
-              {/* Cancel */}
-              <Button onClick={handleClose} type="button">
-                <div className="flex items-center gap-1">
-                  <X size={16} />
-                  Cancel
                 </div>
-              </Button>
-              {/* Save */}
-              <Button 
+              ))}
+            </div>
+          </div>
+        )}
+      </form>
+
+      {/* Footer Buttons */}
+      <div className="flex w-full justify-center gap-4 mt-6">
+        <div className=" flex w-full justify-end ">
+          <div className="flex items-center gap-1 ">
+            {/* Cancel */}
+            <Button onClick={handleClose} type="button">
+              <div className="flex items-center gap-1">
+                <X size={16} />
+                Cancel
+              </div>
+            </Button>
+            {/* Save */}
+            <Button
               type="submit"
               disabled={isSaving}
-              
-              onClick={(event : React.FormEvent<HTMLButtonElement>)=>{
-                if(isSaving) return;
-                createLeadTask(event)
-              }}>
-                <div className="flex items-center gap-1">
-                  <Save size={16} />
-                  {isSaving ? "Saving..." : "Save"} 
-                </div>
-              </Button>
-            </div>
+              onClick={(event: React.FormEvent<HTMLButtonElement>) => {
+                if (isSaving) return;
+                createLeadTask(event);
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <Save size={16} />
+                {isSaving ? "Saving..." : "Save"}
+              </div>
+            </Button>
           </div>
         </div>
       </div>
+      {/* </div> */}
       <LeadAssociatedUsersModal
         isOpen={isAssignUsersModalOpen}
         onClose={() => {
@@ -668,7 +668,7 @@ function CreateLeadTaskModal({
         handleAddCompanyUserEmailCheckboxChange={
           handleAddCompanyUserCheckboxChange
         }
-      ></LeadAssociatedUsersModal>
+      />
 
       {isAddCompanyLeadContactModalOpen && (
         <CompanyLeadContactsSelectionAgGrid
@@ -684,8 +684,7 @@ function CreateLeadTaskModal({
           isUsedForMeetings={false}
         />
       )}
-    </div>,
-    document.body
+    </FormLayout>
   );
 }
 

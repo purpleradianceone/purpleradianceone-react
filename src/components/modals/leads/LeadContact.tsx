@@ -39,6 +39,8 @@ import PrimarySecondaryChip from "../../ui/PrimarySecondaryChip";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../ui/FormLayout";
+import TextAreaInput from "../../ui/TextAreaInput";
 
 type LeadContactFormType = {
   name: string;
@@ -91,7 +93,6 @@ const LeadContact = ({
 
   const inputClass =
     "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
-  const formInputLabelClassName = "block input-label-custom mb-2";
 
   const handleUrl = (link: string): string => {
     try {
@@ -350,12 +351,28 @@ const LeadContact = ({
     }
   }, [isOpenAddLeadContactForm]);
 
+  // const handleAddSocialMedia = () => {
+  //   if (tempHandle.trim()) {
+  //     setSocialMediaHandles((prev) => [...prev, tempHandle.trim()]);
+  //     setTempHandle("");
+  //   }
+  // };
   const handleAddSocialMedia = () => {
-    if (tempHandle.trim()) {
-      setSocialMediaHandles((prev) => [...prev, tempHandle.trim()]);
+  const newHandle = tempHandle.trim();
+
+  if (!newHandle) return;
+
+  if (socialMediaHandles.includes(newHandle)) {
+    toast.error("Already added.")
       setTempHandle("");
-    }
-  };
+
+    return;
+  }
+
+  setSocialMediaHandles(prev => [...prev, newHandle]);
+  setTempHandle("");
+};
+
 
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
@@ -515,7 +532,7 @@ const LeadContact = ({
                   onClick={() => setSelectedContactCard(null)}
                   className="absolute top-6 right-6 caption-custom hover:text-gray-600 transition-colors"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-6">
@@ -575,7 +592,7 @@ const LeadContact = ({
                       }}
                     >
                       <div className="flex gap-2">
-                        <Edit2 size={16} className="mt-1" />
+                        <Edit2 size={14} className="mt-1" />
                         <span>Edit</span>
                       </div>
                     </Button>
@@ -787,297 +804,312 @@ const LeadContact = ({
         )}
 
       {/* Add Contact Form Modal */}
-      {isOpenAddLeadContactForm &&
-        createPortal(
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
-            <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
-              {/* {isSaving && <LoadingPopUpAnimation show={isSaving} />} */}
+      {isOpenAddLeadContactForm && (
+        <FormLayout width={5}>
+          {/* Header */}
+          <FormHeader
+            icon={Contact2}
+            preText={editContactData ? "Edit Contact" : "Add New Contact"}
+            description={
+              editContactData
+                ? "Update the contact's information to keep records accurate and up to date."
+                : "Create a contact for this lead to ensure proper follow-up and engagement."
+            }
+            onClose={() => {
+              // setEditMode(false);
+              setEditingContactId(null);
+              setIsOpenAddLeadContactForm(false);
+              setEditContactData(null);
+              setSocialMediaHandles([]);
+              setLeadContactForm({
+                name: "",
+                email: "",
+                address: "",
+                jobTitle: "",
+                linkedinProfile: "",
+                mobileNumber: "",
+                preferredCommunicationChannel: "",
+                preferredLanguage: "",
+              });
+            }}
+          />
 
-              {/* Header */}
-              <FormHeader
-                icon={Contact2}
-                preText={editContactData ? "Edit Contact" : "Add New Contact"}
-                description={
-                  editContactData
-                    ? "Update the contact's information to keep records accurate and up to date."
-                    : "Create a contact for this lead to ensure proper follow-up and engagement."
+          {/* Form Grid */}
+          <form>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500">
+              <div>
+                <FormInput
+                  logo={User}
+                  label="Full Name :"
+                  required
+                  type="text"
+                  name="name"
+                  onBlur={handleBlur}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  placeholder="Enter full name"
+                  className={inputClass}
+                  onChange={handleFormInputChange}
+                  defaultValue={editContactData?.name || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.name && (
+                  <p className="caption-custom-inactive mt-1">{errors.name}</p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact name cannot be changed
+                  </p>
+                )}
+              </div>
+              <div>
+                <FormInput
+                  label="Email Address :"
+                  logo={Mail}
+                  type="email"
+                  name="email"
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  placeholder="Enter email address"
+                  onChange={handleFormInputChange}
+                  onBlur={handleBlur}
+                  defaultValue={editContactData?.email || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.email && (
+                  <p className="caption-custom-inactive mt-1">{errors.email}</p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact email cannot be changed
+                  </p>
+                )}
+              </div>
+              <div>
+                <FormInput
+                  logo={Phone}
+                  label="Mobile Number :"
+                  type="text"
+                  name="mobileNumber"
+                  minLength={10}
+                  maxLength={10}
+                  placeholder="Enter mobile number"
+                  // className={inputClass}
+                  onChange={handleFormInputChange}
+                  onBlur={handleBlur}
+                  defaultValue={editContactData?.mobileNumber || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.mobileNumber && (
+                  <p className="caption-custom-inactive mt-1 ">
+                    {errors.mobileNumber}
+                  </p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact mobile number cannot be changed
+                  </p>
+                )}
+              </div>
+              {/* job title */}
+              <FormInput
+                label="Job title :"
+                logo={Briefcase}
+                // Job Title
+                type="text"
+                name="jobTitle"
+                maxLength={100}
+                placeholder="Enter job title"
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.jobTitle || ""}
+              />
+              {/* pref language */}
+              <FormInput
+                logo={Languages}
+                label="Preferred Language :"
+                type="text"
+                name="preferredLanguage"
+                maxLength={100}
+                placeholder="eg : Marathi , English etc ..."
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.preferredLanguage || ""}
+              />
+              {/* pref comm channel */}
+              <FormInput
+                logo={MessageCircle}
+                label=" Preferred Communication Channel :"
+                type="text"
+                maxLength={100}
+                name="preferredCommunicationChannel"
+                placeholder="eg : Mail, Phone, WhatsApp etc ..."
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={
+                  editContactData?.preferredCommunicationChannel || ""
                 }
-                onClose={() => {
-                  // setEditMode(false);
-                  setEditingContactId(null);
-                  setIsOpenAddLeadContactForm(false);
-                  setEditContactData(null);
-                  setSocialMediaHandles([]);
-                  setLeadContactForm({
-                    name: "",
-                    email: "",
-                    address: "",
-                    jobTitle: "",
-                    linkedinProfile: "",
-                    mobileNumber: "",
-                    preferredCommunicationChannel: "",
-                    preferredLanguage: "",
-                  });
-                }}
+              />
+              {/* linkedin profile */}
+              <FormInput
+                logo={Globe}
+                label="LinkedIn Profile :"
+                type="text"
+                name="linkedinProfile"
+                maxLength={256}
+                placeholder="Enter linkedIn url"
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.linkedinProfile || ""}
               />
 
-              {/* Form Grid */}
-              <form>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
-                  <div>
-                    <FormInput
-                      logo={User}
-                      label="Full Name"
-                      required
-                      type="text"
-                      name="name"
-                      onBlur={handleBlur}
-                      minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                      maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                      placeholder="Enter full name"
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      defaultValue={editContactData?.name || ""}
-                      readonly={
-                        editContactData?.isPrimary && editContactData !== null
-                      }
-                    />
-                    {errors.name && (
-                      <p className="caption-custom-inactive mt-1">
-                        {errors.name}
-                      </p>
-                    )}
-                    {editContactData?.isPrimary && (
-                      <p className="caption-custom mt-1">
-                        Primary contact name cannot be changed
-                      </p>
-                    )}
+              {/* Social Media Handles */}
+              <div className="col-span-2">
+                {/* <div className="flex  items-center justify-between bg-pink-00  gap-2">
+                  <FormInput
+                    logo={Globe}
+                    label="Social Media Handles :"
+                    type="text"
+                    placeholder="Enter social media url"
+                    value={tempHandle}
+                    onChange={(e) => setTempHandle(e.target.value)}
+                  />
+                  <div className="flex justify-center items-center">
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia();
+                      }}
+                      type="submit"
+                    >
+                      + Add
+                    </Button>
                   </div>
-                  <div>
-                    <FormInput
-                      label="Email Address"
-                      logo={Mail}
-                      type="email"
-                      name="email"
-                      maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                      placeholder="Enter email address"
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.email || ""}
-                      readonly={
-                        editContactData?.isPrimary && editContactData !== null
-                      }
-                    />
-                    {errors.email && (
-                      <p className="caption-custom-inactive mt-1">
-                        {errors.email}
-                      </p>
-                    )}
-                    {editContactData?.isPrimary && (
-                      <p className="caption-custom mt-1">
-                        Primary contact email cannot be changed
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <FormInput
-                      logo={Phone}
-                      label="Mobile Number"
-                      type="text"
-                      name="mobileNumber"
-                      minLength={10}
-                      maxLength={10}
-                      placeholder="Enter mobile number"
-                      // className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.mobileNumber || ""}
-                      readonly={
-                        editContactData?.isPrimary && editContactData !== null
-                      }
-                    />
-                    {errors.mobileNumber && (
-                      <p className="caption-custom-inactive mt-1 ">
-                        {errors.mobileNumber}
-                      </p>
-                    )}
-                    {editContactData?.isPrimary && (
-                      <p className="caption-custom mt-1">
-                        Primary contact mobile number cannot be changed
-                      </p>
-                    )}
-                  </div>
-                  {/* job title */}
-                  <div>
-                    <FormInput
-                      label="Job title"
-                      logo={Briefcase}
-                      // Job Title
-                      type="text"
-                      name="jobTitle"
-                      maxLength={100}
-                      placeholder="Enter job title"
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.jobTitle || ""}
-                    />
-                  </div>
-                  {/* pref language */}
-                  <div>
-                    <FormInput
-                      logo={Languages}
-                      label="Preferred Language"
-                      type="text"
-                      name="preferredLanguage"
-                      maxLength={100}
-                      placeholder="eg : Marathi , English etc ..."
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.preferredLanguage || ""}
-                    />
-                  </div>
-                  {/* pref comm channel */}
-                  <div>
-                    <FormInput
-                      logo={MessageCircle}
-                      label=" Preferred Communication Channel"
-                      type="text"
-                      maxLength={100}
-                      name="preferredCommunicationChannel"
-                      placeholder="eg : Mail, Phone, WhatsApp etc ..."
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={
-                        editContactData?.preferredCommunicationChannel || ""
-                      }
-                    />
-                  </div>
-                  {/* linkedin profile */}
-                  <div>
+                </div> */}
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
                     <FormInput
                       logo={Globe}
-                      label="LinkedIn Profile"
+                      label="Social Media Handles :"
                       type="text"
-                      name="linkedinProfile"
-                      maxLength={256}
-                      placeholder="Enter linkedIn url"
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.linkedinProfile || ""}
+                      placeholder="Enter social media url"
+                      value={tempHandle}
+                      onChange={(e) => setTempHandle(e.target.value)}
                     />
                   </div>
 
-                  {/* Social Media Handles */}
-                  <div className="col-span-2">
-                    <div className="flex col-span-2 items-center justify-between bg-pink-00  gap-2">
-                      <FormInput
-                        logo={Globe}
-                        label="Social Media Handles"
-                        type="text"
-                        placeholder="Enter social media url"
-                        value={tempHandle}
-                        onChange={(e) => setTempHandle(e.target.value)}
-                      />
-                      <div className="flex justify-center items-center">
-                        <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddSocialMedia();
-                          }}
-                          type="submit"
-                        >
-                          {/* <Plus size={14} /> */}+ Add
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1  sm:grid-cols-2 mt-3 gap-2 max-h-36 overflow-y-auto">
-                      {socialMediaHandles.map((handle) => (
-                        <div
-                          key={handle}
-                          className="flex items-center justify-between bg-gray-100 px-3 py-1.5 rounded shadow-sm"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Globe size={14} className="caption-custom" />
-                            <span className="caption-custom">{handle}</span>
-                          </div>
-                          <Button
-                            size="icon"
-                            onClick={() =>
-                              setSocialMediaHandles((prev) =>
-                                prev.filter((h) => h !== handle)
-                              )
-                            }
-                            className="caption-custom hover:text-red-500"
-                          >
-                            <Trash2 size={12} />
-                            {/* <X size={12} /> */}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Address */}
-                  <div className="sm:col-span-2">
-                    <label className={formInputLabelClassName}>
-                      {" "}
-                      <MapPin
-                        size={16}
-                        className="inline mr-2 -mt-1 input-label-custom-blue"
-                      />
-                      Address
-                    </label>
-                    <textarea
-                      placeholder="Enter full address"
-                      name="address"
-                      rows={4}
-                      maxLength={256}
-                      className={inputClass}
-                      onChange={handleFormInputChange}
-                      onBlur={handleBlur}
-                      defaultValue={editContactData?.address || ""}
-                    />
-                  </div>
-                </div>
-
-                {/* Footer Buttons */}
-                <div className="flex justify-end gap-4 mt-6 flex-wrap">
-                  <div className="flex gap-2">
+                  <div className="mt-4">
                     <Button
-                      type="button"
-                      onClick={() => setIsOpenAddLeadContactForm(false)}
-                    >
-                      <div className="flex items-center gap-0.5">
-                        <X size={16} />
-                        Cancel
-                      </div>
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSaving}
-                      onClick={(event) => {
-                        if (isSaving) return;
-                        handleSubmit(event);
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia();
                       }}
+                      type="submit"
                     >
-                      <div className="flex items-center gap-1">
-                        <Save size={16} />
-                        Save
-                      </div>
+                      + Add
                     </Button>
                   </div>
                 </div>
-              </form>
+
+                <div className="grid grid-cols-1  sm:grid-cols-2 mt-1 gap-2 max-h-36 overflow-y-auto">
+                  {socialMediaHandles.map((handle) => (
+                    <div
+                      key={handle}
+                      className="flex items-center justify-between bg-gray-100 px-3 py-1.5 rounded shadow-sm"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Globe size={14} className="caption-custom" />
+                        <span className="caption-custom">{handle}</span>
+                      </div>
+                      <Button
+                        size="icon"
+                        onClick={() =>
+                          setSocialMediaHandles((prev) =>
+                            prev.filter((h) => h !== handle)
+                          )
+                        }
+                        className="caption-custom hover:text-red-500"
+                      >
+                        <Trash2 size={12} />
+                        {/* <X size={12} /> */}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Address */}
+              <div className="sm:col-span-2">
+                <>
+                  {/* <label className={formInputLabelClassName}>
+                  {" "}
+                  <MapPin
+                    size={16}
+                    className="inline mr-2  input-label-custom-blue"
+                    />
+                  Address
+                </label> */}
+                  <TextAreaInput
+                    label="Address :"
+                    logo={MapPin}
+                    placeholder="Enter full address "
+                    name="address"
+                    rows={4}
+                    cols={4}
+                    maxLength={256}
+                    className={inputClass}
+                    onChange={handleFormInputChange}
+                    onBlur={handleBlur}
+                    defaultValue={editContactData?.address || ""}
+                  />
+                </>
+              </div>
             </div>
-            <LoadingPopUpAnimation show={isSaving}/>
-          </div>,
-          document.body
-        )}
+
+            {/* Footer Buttons */}
+            <div className="flex justify-end gap-4 mt-1 flex-wrap">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => setIsOpenAddLeadContactForm(false)}
+                >
+                  <div className="flex items-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSaving}
+                  onClick={(event) => {
+                    if (isSaving) return;
+                    handleSubmit(event);
+                  }}
+                >
+                  <div className="flex items-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
+              </div>
+            </div>
+          </form>
+          {/* </div> */}
+          <LoadingPopUpAnimation show={isSaving} />
+          {/* </div>, */}
+          {/* document.body */}
+        </FormLayout>
+      )}
     </div>
   );
 };

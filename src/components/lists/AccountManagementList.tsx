@@ -71,7 +71,6 @@ function AccountManagementList({
   };
 
   const { userHasAccessToAddAccount } = useUserAccessModules();
-
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
@@ -225,8 +224,6 @@ function AccountManagementList({
         <div className="account-data">
           <AccountDetails
             fetchAccounts={fetchAccounts}
-            // indutryTypeData={industryTypeData!}
-            // businessTypeData = {businessTypeData!}
             company={AccountDataToShowFullDetails!}
             onClose={() => setShowAccountDetails(false)}
           />

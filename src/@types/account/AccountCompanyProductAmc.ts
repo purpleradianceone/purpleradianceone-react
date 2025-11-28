@@ -6,7 +6,7 @@ export type AccountCompanyProductAmc={
     details : string  ,
     isActive: boolean,
     createdBy : string ,
-    updatedNy : string ,
+    updatedBy : string ,
     createdOn : string ,
     updatedOn: string 
 }

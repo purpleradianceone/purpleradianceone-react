@@ -104,7 +104,7 @@ function EditCompanyProductModal({
 
   const {
     companyProductSla: companyProductSlaData,
-    loading: companyProductSlaLoading,
+    refetch: refreshCompanyProductSlaData,
   } = useCompanyProductSla(product.id!);
 
   const [companyProductTax, setCompanyProductTax] = useState<ProductTax[]>([]);
@@ -309,7 +309,7 @@ function EditCompanyProductModal({
                 toast.success(response.data.message);
                 handleCompanyProductChange();
                 setTimeout(() => {
-                  onClose();
+                  // onClose();
                   setIsCreateCompanyProductTaxModalOpen(false);
                 }, 500);
               }
@@ -401,26 +401,65 @@ function EditCompanyProductModal({
     }
   }, [companyProductTaxChangeCount, isOpen]);
 
+  const updateAccountCompanyProductSla = async (
+    id: number,
+    data: {
+      isActive?: boolean;
+      expectedResolutionTimeHours?: number;
+    }
+  ) => {
+    const postData = {
+      company_id: loginStatus.companyId,
+      id: id,
+      expected_resolution_time_hours: data.expectedResolutionTimeHours ?? null,
+      isactive: data.isActive ?? null,
+      updatedby_id: loginStatus.id,
+    };
+
+    await axios
+      .post(POST_API.UPDATE_COMPANY_PRODUCT_SLA, postData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+        refreshCompanyProductSlaData();
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(async (error: ApiError | any) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunctionWithTwoParamsNotEvent: updateAccountCompanyProductSla,
+          });
+          if (refreshTokenResponse) {
+            updateAccountCompanyProductSla(id, data);
+          }
+        }
+      });
+  };
+
   if (!isOpen) return null;
 
   if (
-    companyProductSlaLoading ||
     productTypeLoading ||
     intervalTypeDataLoading
   ) {
     return (
-      <FormLayout>
+      <FormLayout width={6}>
         <FormSkeleton></FormSkeleton>
       </FormLayout>
     );
   }
   return (
-    <FormLayout>
+    <FormLayout width={6}>
       <div className=" grid grid-cols-1 space-y-1">
         <FormHeader
           icon={EditIcon}
           onClose={onClose}
-          preText="Edit -"
+          preText="Edit - "
           userName={product.name || "Name not given"}
           description="Modify product details to keep information accurate and up to date."
         />
@@ -508,9 +547,6 @@ function EditCompanyProductModal({
               />
             </div>
 
-            {/* <div className="grid col-span-1 gap-1"> */}
-            {/* <div className="grid col-span-1 gap-1"> */}
-
             <div className="grid grid-cols-2 gap-6">
               <FormInput
                 label="Barcode :"
@@ -534,7 +570,6 @@ function EditCompanyProductModal({
               </div>
             </div>
 
-            {/* </div> */}
             <div className="grid grid-cols-2 gap-3 ">
               <div>
                 <CustomDropdown
@@ -547,13 +582,7 @@ function EditCompanyProductModal({
                     setDefaultWarranty(e);
                   }}
                   options={rangeOfNumber}
-                  // requiredRedDot={true}
                 />
-                {/* {selectedDefaultWarrantyError && (
-                    <div className="caption-custom-inactive">
-                      Warranty Duration is required
-                    </div>
-                  )} */}
               </div>
 
               <div>
@@ -688,6 +717,7 @@ function EditCompanyProductModal({
         <div className="w-full ">
           <CompanyProductSlaComponent
             companyProductSlaData={companyProductSlaData}
+            onUpdateSla={updateAccountCompanyProductSla}
           />
         </div>
 

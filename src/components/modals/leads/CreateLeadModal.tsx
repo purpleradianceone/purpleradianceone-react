@@ -39,15 +39,14 @@ import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
+import FormLayout from "../../ui/FormLayout";
 
 function CreateLeadModal({
   isOpen,
   onClose,
   onCreateLeadRefreshLeadData,
 }: CreateLeadModalProps) {
-
-
-  const {userHasAccessToViewUser} = useUserAccessModules();
+  const { userHasAccessToViewUser } = useUserAccessModules();
   const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
@@ -100,7 +99,7 @@ function CreateLeadModal({
     setOpenPopUpOfCompanyUserModal(true);
   };
 
-  const [isSaving , setIsSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   //note : these 3 functions that handles changed values from dropdown
   const handleLeadSelectedStatus = (value: number | undefined) => {
     setSelectedStatus(value);
@@ -270,7 +269,7 @@ function CreateLeadModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(isSaving) return;
+    if (isSaving) return;
     if (error.mobileNumber !== "") {
       // showMessageSnackbar({
       //   message: "Please enter a valid mobile number.",
@@ -335,7 +334,7 @@ function CreateLeadModal({
             : createLeadModalFormData.mobileNumber,
       };
 
-      setIsSaving(true)
+      setIsSaving(true);
       await axios
         .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
           withCredentials: true,
@@ -343,7 +342,6 @@ function CreateLeadModal({
         .then((response) => {
           if (response.data.status === true) {
             toast.success(response.data.message);
-          
           } else if (response.data.status == false) {
             toast.error(response.data.message);
           }
@@ -357,11 +355,12 @@ function CreateLeadModal({
               handleSubmit(e);
             }
           }
-        }).finally(()=>{
-            // note : this callback will run to refresh the list of aggrid
-            onClose!();
-            setIsSaving(false);
-            onCreateLeadRefreshLeadData!();
+        })
+        .finally(() => {
+          // note : this callback will run to refresh the list of aggrid
+          onClose!();
+          setIsSaving(false);
+          onCreateLeadRefreshLeadData!();
         });
     }
   };
@@ -401,132 +400,85 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn p-5 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <FormHeader
-          icon={Handshake}
-          onClose={onClose}
-          preText="Create new "
-          userName="Opportunity"
-          description="Fill in the details below to create a new lead."
-        />
+    <FormLayout width={2}   >
+      {/* Header */}
+      <FormHeader
+        icon={Handshake}
+        onClose={onClose}
+        preText="Create new "
+        userName="Opportunity"
+        description="Fill in the details below to create a new lead."
+      />
 
-        {isSaving && <LoadingPopUpAnimation
-        show={isSaving}
-          />}
-        {/* Form */}
-        <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
-          <div className="flex flex-col space-y-1">
-            {/* <div className=""> */}
-            <FormInput
-              label="Name:"
-              logo={User}
-              type="text"
-              name="name"
-              placeholder="Enter Name: "
-              value={createLeadModalFormData.name}
-              onChange={handleCreateLeadModalFormDataChange}
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
+      {/* Form */}
+      <form className="space-y-2 mt-2" onSubmit={handleSubmit}>
+        <div className="grid grid-cols-2 space-y-1 gap-2">
+          <div className="col-span-2">
+
+          <FormInput
+            label="Name:"
+            logo={User}
+            type="text"
+            name="name"
+            placeholder="Enter name "
+            value={createLeadModalFormData.name}
+            onChange={handleCreateLeadModalFormDataChange}
+            autoFocus
             />
-            {/* <label className={createLeadLabelCss} htmlFor="name">
-                Name:
-              </label>
-              <input
-                className={createLeadInputTagCss}
-                type="text"
-                name="name"
-                placeholder="Enter Name: "
-                value={createLeadModalFormData.name}
-                onChange={handleCreateLeadModalFormDataChange}
-              /> */}
-            {/* </div> */}
-            {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
-            <div className="">
-              <FormInput
-                label="Email:"
-                logo={Mail}
-                type="email"
-                name="email"
-                placeholder="Enter Email: "
-                value={createLeadModalFormData.email}
-                onChange={handleCreateLeadModalFormDataChange}
-                onBlur={handleBlur}
-              />
-              {error.email && (
-                <div className="text-red-500 text-xs">{error.email}</div>
-              )}
             </div>
 
-            {/* <FormInput
-              label="Email : "
+          {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
+          <div className="">
+            <FormInput
+              label="Email:"
+              logo={Mail}
               type="email"
               name="email"
-              placeholder="Enter Email"
+              placeholder="Enter email "
               value={createLeadModalFormData.email}
               onChange={handleCreateLeadModalFormDataChange}
-              error={errors.email}
               onBlur={handleBlur}
-            /> */}
-            <div className="">
-              <FormInput
-                type="text"
-                label="Mobile Number:"
-                logo={Phone}
-                className={createLeadInputTagCss}
-                name="mobileNumber"
-                placeholder="Enter Mobile Number: "
-                value={createLeadModalFormData.mobileNumber}
-                onBlur={handleBlur}
-                onChange={handleCreateLeadModalFormDataChange}
               />
-              {/* <label className={createLeadLabelCss} htmlFor="mobileNumber">
-                Mobile Number:
-              </label>
-              <input */}
+            {error.email && (
+              <div className="text-red-500 text-xs">{error.email}</div>
+            )}
+          </div>
 
-              {/* /> */}
-              {error.mobileNumber && (
-                <div className="caption-custom-inactive">
-                  {error.mobileNumber}
+          <div className="">
+            <FormInput
+              type="text"
+              label="Mobile Number:"
+              logo={Phone}
+              className={createLeadInputTagCss}
+              name="mobileNumber"
+              placeholder="Enter mobile number "
+              value={createLeadModalFormData.mobileNumber}
+              onBlur={handleBlur}
+              onChange={handleCreateLeadModalFormDataChange}
+              />
+            {error.mobileNumber && (
+              <div className="caption-custom-inactive">
+                {error.mobileNumber}
+              </div>
+            )}
+          </div>
+             {/* Lead Source */}
+            <div className="space-y-1">
+              <CustomDropdown
+                logo={Link}
+                requiredRedDot
+                labelName="Lead Source :"
+                options={leadSource!}
+                onSelect={handleLeadSelectedSource}
+
+              />
+              {showErrorAtLeadSource && !selectedSource && (
+                <div className="text-red-500 text-xs">
+                  Please select Lead Source
                 </div>
               )}
             </div>
-
-            <div>
-              <div className="flex items-center justify-between pr-60 gap-1 w-full">
-                <Button
-                  onClick={(e) => {
-
-                    e.preventDefault();
-                    if(userHasAccessToViewUser){
-
-                      handleCompanyUserPopUp();
-                    }else{
-                      toast.error(MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS)
-                    }
-                  }}
-                  type="submit"
-                >
-                  <div className="flex gap-1 items-center whitespace-nowrap">
-                    <UserRoundPlus size={16} />
-                    <span>Assign</span>
-                  </div>
-                </Button>
-
-                <span className="caption-custom whitespace-nowrap">
-                  <span className="input-label-custom">Lead Owner :</span>{" "}
-                  {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
-                  {selectedCompanyUser.fullname || loginStatus.fullName}
-                </span>
-              </div>
-
-              <span className="caption-custom">
-                <span className="">Note :</span> If a lead owner is not
-                selected, then lead will be assigned to the lead
-                <span className=""> Creator</span> by default.
-              </span>
-            </div>
-
             {/* Lead Status */}
             <div className="space-y-1">
               <CustomDropdown
@@ -543,59 +495,69 @@ function CreateLeadModal({
               )}
             </div>
 
-            {/* Lead Source */}
-            <div className="space-y-1">
-              <CustomDropdown
-                logo={Link}
-                requiredRedDot
-                labelName="Lead Source :"
-                options={leadSource!}
-                onSelect={handleLeadSelectedSource}
-              />
-              {showErrorAtLeadSource && !selectedSource && (
-                <div className="text-red-500 text-xs">
-                  Please select Lead Source
-                </div>
-              )}
-            </div>
-          </div>
+           
 
-          <div className="flex justify-end ">
-            <div className="flex gap-2">
-              <Button onClick={onClose} type="button">
-                <div className="flex items-center gap-0.5">
-                  <X size={16} />
-                  <span>Cancel</span>
+           <div className="col-span-2">
+            <div className="flex items-center justify-between  gap-1 w-full">
+             <div className="flex items-center gap-x-2">
+               <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToViewUser) {
+                    handleCompanyUserPopUp();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                    );
+                  }
+                }}
+                type="submit"
+              >
+                <div className="flex gap-1 items-center whitespace-nowrap">
+                  <UserRoundPlus size={16} />
+                  <span>Assign</span>
                 </div>
               </Button>
-              <Button type="submit">
-                <div className="flex items-center gap-1">
-                  <Save size={16} />
-                  <span>Save</span>
-                </div>
-              </Button>
+
+              <span className="caption-custom whitespace-nowrap">
+                <span className="input-label-custom">Lead Owner :</span>{" "}
+                {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
+                {selectedCompanyUser.fullname || loginStatus.fullName}
+              </span>
+             </div>
             </div>
+
+            <span className="caption-custom">
+              <span className="">Note :</span> If a lead owner is not selected,
+              then lead will be assigned to the lead
+              <span className=""> Creator</span> by default.
+            </span>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div className="flex justify-end ">
+          <div className="flex gap-2">
+            <Button onClick={onClose} type="button">
+              <div className="flex items-center gap-0.5">
+                <X size={16} />
+                <span>Cancel</span>
+              </div>
+            </Button>
+            <Button type="submit">
+              <div className="flex items-center gap-1">
+                <Save size={16} />
+                <span>Save</span>
+              </div>
+            </Button>
+          </div>
+        </div>
+      </form>
+      {/* </div> */}
 
       {openPopUpOfCompanyUserModal &&
         createPortal(
           <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-              {/* Header with Close Button */}
-              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Select Company User
-              </h3>
-              <button
-                onClick={() => setOpenPopUpOfCompanyUserModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div> */}
-
               <FormHeader
                 icon={UserRoundPlus}
                 onClose={() => setOpenPopUpOfCompanyUserModal(false)}
@@ -616,7 +578,7 @@ function CreateLeadModal({
           </div>,
           document.body
         )}
-    </div>
+    </FormLayout>
   );
 }
 

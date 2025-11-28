@@ -367,8 +367,10 @@ function ProductsManagementGrid({
                           }
                         }}
                       >
+                        <div>
                         <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
                         {JSX_CHILDREN_NAME.EDIT}
+                        </div>
                       </ActionsDropdownButton>
                     </>
 
@@ -435,6 +437,7 @@ function ProductsManagementGrid({
                             className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
                           />
                           {JSX_CHILDREN_NAME.TEAM}
+                          {/* <p className="text-xs">Team</p> */}
                         </ActionsDropdownButton>
                       </>
                     </>
