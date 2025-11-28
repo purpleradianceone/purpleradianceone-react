@@ -4,7 +4,7 @@ import CreateAccountLeadType from "../../../../@types/account/CreateAccountLeadT
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useEffect, useState } from "react";
 import CreateAccountLead from "./CreateAccountLead";
@@ -22,7 +22,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
-  const {userHasAccessToViewLead} = useUserAccessModules();
+  const {userHasAccessToViewLead, userHasAccessToUpdateAccount} = useUserAccessModules();
   const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
@@ -235,7 +235,11 @@ return (
                   name={item.id.toString()}
                   onToggle={() => {
                     // e.stopPropagation();
-                    handleAccountLeadStatusChange(item);
+                    if(userHasAccessToUpdateAccount){
+                      handleAccountLeadStatusChange(item);
+                    }else{
+                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+                    }
                   }}
                 />
                 </div>

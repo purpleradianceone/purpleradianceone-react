@@ -51,12 +51,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
 
 
 
-  // old code working 
-  // useEffect(() => {
-  //   if (preselectedOption) {
-  //     handleSelect(preselectedOption);
-  //   }
-  // }, []);
 
   // its working but if problem occurs use above code and comment below code 
   useEffect(() => {
@@ -70,11 +64,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   }
 }, [preselectedOption, selectedValue]);
 
-//   useEffect(() => {
-//   if (preselectedOption !== undefined) {
-//     handleSelect(preselectedOption);
-//   }
-// }, [preselectedOption]);
 
 
 

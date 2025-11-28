@@ -79,14 +79,6 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
   return createPortal(
     <div className="fixed inset-0  flex justify-center items-center bg-black bg-opacity-5 z-50">
       <div className=" bg-white border p-1 rounded-lg shadow-lg w-1/2 h-1/2 flex flex-col ">
-        {/* <button
-          onClick={onClose} 
-          title="Close"
-          className="self-end  text-xs text-gray-600 hover:text-gray-900 hover:underline"
-        >
-           <X size={18}/>
-        </button>
-        <h1 className="text-base font-semibold">Lead Owner history</h1> */}
         <div className="m-0.5  p-0.5">
           <FormHeader
           icon={History}

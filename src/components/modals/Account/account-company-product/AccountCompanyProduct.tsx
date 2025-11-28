@@ -34,11 +34,26 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
 
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  const handleRowSelectAccountProduct =(data : AccountProduct)=>{
-    if(data){
-      setSelectedProductCard(data)
-    }    
-  }
+  const handleRowSelectAccountProduct = (data: AccountProduct) => {
+    if (data) {
+      // navigate(`/home/manage-accounts/accounts/acc-com-prod-details?acc-id=${data.accountId}&com-prod-id=${data.companyProductId}`)
+      setSelectedProductCard(data);
+    }
+  };
+  // const handleViewAccountCompanyProductDetailsModalOpen = (
+  //   data: AccountProduct,
+  //   status: boolean
+  // ) => {
+  //   if(status){
+  //     setSelectedProductCard(data);
+  //   }
+  // };
+  // function handleViewAccountCompanyProductAMC(data : AccountProduct , status : boolean){
+  //   if(status){
+  //       navigate(`/home/manage-accounts/accounts/prod-details-amc/${data.id}`)
+  //   }
+
+  // }
   const getAccountCompanyProduct = async () => {
     const postData = {
       company_id: loginStatus.companyId,
@@ -64,10 +79,10 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
             companyProductName: item.company_product_name,
             quantity: item.quantity,
             quantityReturn: item.quantity_return,
-	          barcode : item.barcode,
-	          serialNumber:item.serial_number ,
-            unitName : item.unit_name,
-            unitNameInStock : item.unit_name_in_stock,
+            barcode: item.barcode,
+            serialNumber: item.serial_number,
+            unitName: item.unit_name,
+            unitNameInStock: item.unit_name_in_stock,
             purchaseDate: item.purchase_date,
             deliveryDate: item.delivery_date,
             deliveryAddress: item.delivery_address,
@@ -75,17 +90,17 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
             installationDate: item.installation_date,
             installedByName: item.installed_by_name,
             installedBy: item.installed_by,
-            warrantyIntervalTypeId: item.warranty_interval_type_id,
-            warrantyIntervalName: item.warranty_interval_name,
-            warranty: item.warranty,
-            warrantyStartDate: item.warranty_start_date,
-            warrantyEndDate: item.warranty_end_date,
-            warrantyTerms: item.warranty_terms,
-            amcCycleIntervalTypeId: item.amc_cycle_interval_type_id,
-            amcCycle: item.amc_cycle,
-            amcCycleStartDate: item.amc_cycle_start_date,
-            amcCycleEndDate: item.amc_cycle_end_date,
-            amcIntervalName: item.amc_interval_name,
+            // warrantyIntervalTypeId: item.warranty_interval_type_id,
+            // warrantyIntervalName: item.warranty_interval_name,
+            // warranty: item.warranty,
+            // warrantyStartDate: item.warranty_start_date,
+            // warrantyEndDate: item.warranty_end_date,
+            // warrantyTerms: item.warranty_terms,
+            // amcCycleIntervalTypeId: item.amc_cycle_interval_type_id,
+            // amcCycle: item.amc_cycle,
+            // amcCycleStartDate: item.amc_cycle_start_date,
+            // amcCycleEndDate: item.amc_cycle_end_date,
+            // amcIntervalName: item.amc_interval_name,
             updatedBy: item.updatedby,
             createdOn: item.createdon,
             updatedOn: item.updatedon,
@@ -171,25 +186,28 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
             </Button>
           </div>
           <div className="md:col-span-2  w-full h-96">
-              <AccountCompanyProductAgGrid
-                accountProductData={accountCompanyProduct}
-                onRowSelect={handleRowSelectAccountProduct}
-              />
+            <AccountCompanyProductAgGrid
+              accountProductData={accountCompanyProduct}
+              onRowSelect={handleRowSelectAccountProduct}
+              // handleViewAccountCompanyProductDetailsModalOpen={
+              //   handleViewAccountCompanyProductDetailsModalOpen
+              // }
+              // handleViewAccountCompanyProductAMC={handleViewAccountCompanyProductAMC}
+            />
           </div>
         </div>
       )}
 
-     {
-      selectedProductCard &&  
-      <AccountCompanyProductPopUpDetails
-        selectedProductCard={selectedProductCard}
-        onClose={() => {
-          setSelectedProductCard(null);
-          getAccountCompanyProduct();
-        }}
-        refreshKey={refreshKey}
-      />
-     }
+      {selectedProductCard && (
+        <AccountCompanyProductPopUpDetails
+          selectedProductCard={selectedProductCard}
+          onClose={() => {
+            setSelectedProductCard(null);
+            getAccountCompanyProduct();
+          }}
+          refreshKey={refreshKey}
+        />
+      )}
 
       {/* Modal */}
       {showCreateAccountCompanyProduct &&

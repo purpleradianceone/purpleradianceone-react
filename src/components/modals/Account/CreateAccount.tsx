@@ -41,7 +41,6 @@ import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import FormSkeleton from "./FormSkeleton";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
-import { createPortal } from "react-dom";
 import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
@@ -75,7 +74,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   handleCreateAccount,
 }) => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-  const [isSaving, setIsSaving ] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
   const [createAccountFormData, setCreateAccountFormData] =
     useState<AccountFormType>({
@@ -172,41 +171,47 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     const { name, value } = e.target;
 
     if (name === "name") {
-  if (!value.trim()) {
-    setErrors(prev => ({ ...prev, name: "Name is required" }));
-  } else {
-    setErrors(prev => ({ ...prev, name: "" }));
-  }
-}
+      if (!value.trim()) {
+        setErrors((prev) => ({ ...prev, name: "Name is required" }));
+      } else {
+        setErrors((prev) => ({ ...prev, name: "" }));
+      }
+    }
 
-if (name === "email") {
-  if(!value.trim()){
-    setErrors((prev ) =>({
-      ...prev, email :"Email is required"
-    }))
-  }
-  else if (!VALIDATIONS.EMAIL.test(value) && value !== "") {
-    setErrors(prev => ({ ...prev, email: "Please enter valid email address." }));
-  } else {
-    setErrors(prev => ({ ...prev, email: "" }));
-  }
-}
+    if (name === "email") {
+      if (!value.trim()) {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Email is required",
+        }));
+      } else if (!VALIDATIONS.EMAIL.test(value) && value !== "") {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Please enter valid email address.",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: "" }));
+      }
+    }
 
-if (name === "mobilenumber") {
-   if(!value.trim()){
-    setErrors((prev ) =>({
-      ...prev, mobileNumber :"Mobile number is required"
-    }))
-  }
-  else if (
-    !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
-    value.length !== 0
-  ) {
-    setErrors(prev => ({ ...prev, mobileNumber: "Please enter a valid mobile number." }));
-  } else {
-    setErrors(prev => ({ ...prev, mobileNumber: "" }));
-  }
-}
+    if (name === "mobilenumber") {
+      if (!value.trim()) {
+        setErrors((prev) => ({
+          ...prev,
+          mobileNumber: "Mobile number is required",
+        }));
+      } else if (
+        !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
+        value.length !== 0
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          mobileNumber: "Please enter a valid mobile number.",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, mobileNumber: "" }));
+      }
+    }
 
     // if (name === "name" && !value.trim()) {
     //   setErrors((prev) => ({
@@ -262,7 +267,7 @@ if (name === "mobilenumber") {
   // create function call
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(isSaving) return;
+    if (isSaving) return;
     const { name, email, mobilenumber, business_type_id, industry_type_id } =
       createAccountFormData;
     let isValid = true;
@@ -330,7 +335,7 @@ if (name === "mobilenumber") {
 
     setErrors(newErrors);
     if (!isValid) return;
-    setIsSaving(true)
+    setIsSaving(true);
     //  Proceed with form submission logic here
     const postData = {
       name: createAccountFormData.name.trim(),
@@ -389,7 +394,7 @@ if (name === "mobilenumber") {
         }
       })
       .finally(() => {
-        setIsSaving(false)
+        setIsSaving(false);
       });
   };
 
@@ -429,102 +434,110 @@ if (name === "mobilenumber") {
     industryTypeLoading || businessTypeLoading || companyTypeLoading;
 
   if (loadingState) {
-    return createPortal(
-      <div className="fixed top-8 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center  shadow-2xl ">
-        <div className="bg-white rounded-2xl shadow-lg w-full m-20 p-6 h-full max-h-[90vh]  max-w-7xl overflow-auto ">
-          <FormSkeleton />
-        </div>
-      </div>,
-      document.body
+    return (
+      <FormLayout>
+
+        <FormSkeleton />
+      </FormLayout>
+       
     );
   }
   return (
-      <FormLayout>
-        {isSaving && <LoadingPopUpAnimation show={isSaving}/>}
+    <FormLayout width={6}>
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
-        <motion.section
-          ref={ref}
-          initial={{ opacity: 0, y: 40 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        >
-          {/* Close Button */}
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {/* Close Button */}
+        <FormHeader
+          icon={UserCogIcon}
+          preText="Create new account"
+          description="Complete the form below to add a new account and manage it effectively"
+          onClose={() => {
+            handleStateClear();
+            onClose();
+          }}
+        />
 
-          <FormHeader
-            icon={UserCogIcon}
-            preText="Create new account"
-            description="Complete the form below to add a new account and manage it effectively"
-            onClose={() => {
-              handleStateClear();
-              onClose();
-            }}
-          />
+        {/* Form */}
+        <form className=" grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+          {/* name */}
+          <div className="flex flex-col col-span-1">
+            <FormInput
+              required
+              logo={User}
+              type="text"
+              label="Name:"
+              name="name"
+              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+              minLength={VALIDATIONS.MIN_NAME_LENGTH}
+              placeholder="Name"
+              value={createAccountFormData.name}
+              onBlur={handleOnBlur}
+              onChange={handleFormInputChange}
+            />
+            {errors.name && (
+              <p className="text-xs  text-red-600 ">{errors.name}</p>
+            )}
+          </div>
 
-          {/* Form */}
-          <form className=" grid grid-cols-2 gap-3">
-            {/* name */}
-            <div className="flex flex-col col-span-1">
-              <FormInput
-                required
-                logo={User}
-                type="text"
-                label="Name:"
-                name="name"
-                maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                placeholder="Name"
-                value={createAccountFormData.name}
-                onBlur={handleOnBlur}
-                onChange={handleFormInputChange}
-                // className="w-full border rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.name && (
-                <p className="text-xs  text-red-600 ">{errors.name}</p>
-              )}
+          <div className="flex flex-col col-span-1">
+            {/* email */}
+            <FormInput
+              required
+              logo={Mail}
+              type="text"
+              label="Email:"
+              name="email"
+              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+              minLength={VALIDATIONS.MIN_NAME_LENGTH}
+              placeholder="Enter email address"
+              value={createAccountFormData.email}
+              onBlur={handleOnBlur}
+              onChange={handleFormInputChange}
+            />
+            {errors.email && (
+              <p className="text-xs  text-red-600 ">{errors.email}</p>
+            )}
+          </div>
+
+                    <div className="grid grid-cols-2 gap-1">
+          {/* mobile number */}
+          <FormInput
+            required
+            logo={Phone}
+            type="text"
+            label="Mobile Number: "
+            name="mobilenumber"
+            maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+            minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+            placeholder="Enter mobile number"
+            value={createAccountFormData.mobilenumber}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            />
+          {errors.mobileNumber && (
+            <p className="text-xs  text-red-600 mt-1">{errors.mobileNumber}</p>
+          )}
+           {/* Business registration number */}
+          <FormInput
+            logo={Phone}
+            type="text"
+            label="Business Registration Number: "
+            name="business_registration_number"
+            maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+            minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+            placeholder="Enter business registration number"
+            value={createAccountFormData.business_registration_number}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            />
             </div>
-
-            <div className="flex flex-col col-span-1">
-              {/* email */}
-              <FormInput
-                required
-                logo={Mail}
-                type="text"
-                label="Email:"
-                name="email"
-                maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                placeholder="Enter email address"
-                value={createAccountFormData.email}
-                onBlur={handleOnBlur}
-                onChange={handleFormInputChange}
-                // className="w-full border rounded-lg px-3  focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.email && (
-                <p className="text-xs  text-red-600 ">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col col-span-1">
-              {/* mobile number */}
-              <FormInput
-                required
-                logo={Phone}
-                type="text"
-                label="Mobile number: "
-                name="mobilenumber"
-                maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-                minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-                placeholder="Enter mobile number"
-                value={createAccountFormData.mobilenumber}
-                onBlur={handleOnBlur}
-                onChange={handleFormInputChange}
-              />
-              {errors.mobileNumber && (
-                <p className="text-xs  text-red-600 mt-1">
-                  {errors.mobileNumber}
-                </p>
-              )}
-            </div>
+          <div className="grid grid-cols-3 gap-1">
             {/* pan */}
             <FormInput
               logo={FileText}
@@ -535,7 +548,6 @@ if (name === "mobilenumber") {
               value={createAccountFormData.pan}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
             {/* gst */}
             <FormInput
@@ -543,7 +555,7 @@ if (name === "mobilenumber") {
               type="text"
               label="Gst: "
               name="gst"
-              placeholder="Enter email address"
+              placeholder="Enter gst number"
               value={createAccountFormData.email}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
@@ -557,43 +569,41 @@ if (name === "mobilenumber") {
               name="tan"
               maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               minLength={VALIDATIONS.MIN_NAME_LENGTH}
-              placeholder="Enter tan"
+              placeholder="Enter tan number"
               value={createAccountFormData.tan}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
-            <div className="flex flex-col col-span-1">
-              {/* Business type */}
-              <CustomDropdown
-                requiredRedDot
-                logo={Briefcase}
-                labelName="Business Type:"
-                options={businessType}
-                onSelect={handleSelectedBusinessType}
-              />
-              {errors.businessType && (
-                <p className="text-xs  text-red-600 mt-1">
-                  {errors.businessType}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col col-span-1">
-              {/* Industry type */}
-              <CustomDropdown
-                requiredRedDot
-                logo={Factory}
-                labelName="Industry type:"
-                options={industryTypeData}
-                onSelect={handleSelectedIndustryType}
-              />
-              {errors.industryType && (
-                <p className="text-xs  text-red-600 mt-1">
-                  {errors.industryType}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col col-span-1">
+          </div>
+          <div className="grid grid-cols-2 gap-1">
+            {/* Business type */}
+            <CustomDropdown
+              requiredRedDot
+              logo={Briefcase}
+              labelName="Business Type:"
+              options={businessType}
+              onSelect={handleSelectedBusinessType}
+            />
+            {errors.businessType && (
+              <p className="text-xs  text-red-600 mt-1">
+                {errors.businessType}
+              </p>
+            )}
+            {/* Industry type */}
+            <CustomDropdown
+              requiredRedDot
+              logo={Factory}
+              labelName="Industry Type:"
+              options={industryTypeData}
+              onSelect={handleSelectedIndustryType}
+            />
+            {errors.industryType && (
+              <p className="text-xs  text-red-600 mt-1">
+                {errors.industryType}
+              </p>
+            )}
+          </div>
+          <div className="grid grid-cols-3 gap-1">
               {/* Country*/}
               <CustomDropdown
                 logo={Globe}
@@ -608,9 +618,7 @@ if (name === "mobilenumber") {
                 }}
                 options={countries}
               />
-            </div>
 
-            <div className="flex flex-col col-span-1">
               {/* Country*/}
               <CustomDropdown
                 logo={Waypoints}
@@ -626,162 +634,147 @@ if (name === "mobilenumber") {
                 }}
                 options={states}
               />
-            </div>
-            <div className="flex flex-col col-span-1">
-              {/* Country*/}
-              <CustomDropdown
-                logo={MapPinnedIcon}
-                labelName="district"
-                selectedValue={selectedDisctrict}
-                preselectedOption={selectedDisctrict}
-                onSelect={(value) => {
-                  if (value) {
-                    setSelectedDisctrict(value);
-                  } else {
-                    setSelectedDisctrict(0);
-                  }
-                }}
-                options={districts}
-              />
-            </div>
+            {/* Country*/}
+            <CustomDropdown
+              logo={MapPinnedIcon}
+              labelName="District"
+              selectedValue={selectedDisctrict}
+              preselectedOption={selectedDisctrict}
+              onSelect={(value) => {
+                if (value) {
+                  setSelectedDisctrict(value);
+                } else {
+                  setSelectedDisctrict(0);
+                }
+              }}
+              options={districts}
+            />
+          </div>
 
-            <div className="col-span-2  rounded-md">
-              <span className="input-label-custom flex items-center gap-1">
-                <Building2 size={14} className="inline mr-1 text-blue-500" />
-                <span>Company account type:</span>
-              </span>
+          <div className="col-span-1  rounded-md">
+            <span className="input-label-custom flex items-center gap-1">
+              <Building2 size={14} className="inline mr-1 text-blue-500" />
+              <span>Company Account Type:</span>
+            </span>
 
-              <div className="grid grid-cols-2 gap-y-2 p-4 max-h-56 overflow-auto">
-                {companyAccountType.length === 0 ? (
-                  <h1>No account type available.</h1>
-                ) : (
-                  Object.entries(groupedData).map(([parentType, children]) => {
-                    return (
-                      <div key={parentType}>
-                        <span className="input-label-custom-blue">
-                          {" "}
-                          {parentType}{" "}
-                        </span>
+            <div className="grid  grid-cols-2 gap-y-2 p-2 max-h-28 overflow-auto">
+              {companyAccountType.length === 0 ? (
+                <h1 className="caption-custom text-center">
+                  No account type available.
+                </h1>
+              ) : (
+                Object.entries(groupedData).map(([parentType, children]) => {
+                  return (
+                    <div key={parentType}>
+                      <span className="input-label-custom-blue">
+                        {" "}
+                        {parentType}{" "}
+                      </span>
 
-                        {children &&
-                          children.length &&
-                          children.map((item) => (
-                            <div key={item.id} className="flex  items-center">
-                              <div className="flex p-1">
-                                <input
-                                  id={`account-type-${item.id}`}
-                                  name="companyAccountType"
-                                  type="checkbox"
-                                  value={item.id}
-                                  className="h-4 w-4 text-blue-600  focus:ring-blue-500 border-gray-300 rounded"
-                                  onChange={handleAccountTypeCheckboxChange}
-                                />
-                                <label
-                                  htmlFor={`account-type-${item.id}`}
-                                  className="ml-2 block caption-custom cursor-pointer hover:text-blue-700"
-                                >
-                                  {item.companyAccountTypeName}
-                                </label>
-                              </div>
+                      {children &&
+                        children.length &&
+                        children.map((item) => (
+                          <div key={item.id} className="flex  items-center">
+                            <div className="flex p-1">
+                              <input
+                                id={`account-type-${item.id}`}
+                                name="companyAccountType"
+                                type="checkbox"
+                                value={item.id}
+                                className="h-4 w-4 text-blue-600  focus:ring-blue-500 border-gray-300 rounded"
+                                onChange={handleAccountTypeCheckboxChange}
+                              />
+                              <label
+                                htmlFor={`account-type-${item.id}`}
+                                className="ml-2 block caption-custom cursor-pointer hover:text-blue-700"
+                              >
+                                {item.companyAccountTypeName}
+                              </label>
                             </div>
-                          ))}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+                          </div>
+                        ))}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+         
+          {/* website */}
+          <FormInput
+            logo={Globe}
+            type="text"
+            label="Website: "
+            name="website"
+            maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+            minLength={VALIDATIONS.MIN_NAME_LENGTH}
+            placeholder="Enter website url"
+            value={createAccountFormData.website}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+          {/* billing address */}
+          <TextAreaInput
+            logo={MapPin}
+            cols={4}
+            rows={3}
+            label="Billing Address: "
+            name="billing_address"
+            placeholder="Enter Billing address"
+            value={createAccountFormData.billing_address}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+          {/* shipping address */}
+          <TextAreaInput
+            logo={MapPin}
+            cols={4}
+            rows={3}
+            label="Shipping Address: "
+            name="shipping_address"
+            placeholder="Enter Shipping address"
+            value={createAccountFormData.shipping_address}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            // className="w-full col-span-2 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+          {/* registered office address */}
+          <TextAreaInput
+            logo={MapPin}
+            cols={4}
+            rows={3}
+            label="Registered Office Address: "
+            name="registered_office_address"
+            placeholder="Enter registered office address"
+            value={createAccountFormData.registered_office_address}
+            onBlur={handleOnBlur}
+            onChange={handleFormInputChange}
+            // className="w-full border rounded-lg col-span-2 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+
+          <div className="col-span-2 flex justify-end gap-3">
+            <div>
+              <Button type="button" onClick={handleStateClear}>
+                <div className="flex items-center gap-0.5">
+                  <X size={16} /> Cancel
+                </div>
+              </Button>
             </div>
 
-            {/* Business registration number */}
-            <FormInput
-              logo={Phone}
-              type="text"
-              label="Business registration number: "
-              name="business_registration_number"
-              maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-              minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-              placeholder="Enter business registration number"
-              value={createAccountFormData.business_registration_number}
-              onBlur={handleOnBlur}
-              onChange={handleFormInputChange}
-              // className="w-full  border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {/* website */}
-            <FormInput
-              logo={Globe}
-              type="text"
-              label="Website: "
-              name="website"
-              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-              minLength={VALIDATIONS.MIN_NAME_LENGTH}
-              placeholder="Enter website"
-              value={createAccountFormData.website}
-              onBlur={handleOnBlur}
-              onChange={handleFormInputChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {/* billing address */}
-            <TextAreaInput
-              logo={MapPin}
-              cols={4}
-              rows={4}
-              label="Billing address: "
-              name="billing_address"
-              placeholder="Enter Billing address"
-              value={createAccountFormData.billing_address}
-              onBlur={handleOnBlur}
-              onChange={handleFormInputChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {/* shipping address */}
-            <TextAreaInput
-              logo={MapPin}
-              cols={4}
-              rows={4}
-              label="Shipping address: "
-              name="shipping_address"
-              placeholder="Enter Shipping address"
-              value={createAccountFormData.shipping_address}
-              onBlur={handleOnBlur}
-              onChange={handleFormInputChange}
-              // className="w-full col-span-2 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {/* registered office address */}
-            <TextAreaInput
-              logo={MapPin}
-              cols={4}
-              rows={4}
-              label="Registered office address: "
-              name="registered_office_address"
-              placeholder="Enter registered office address"
-              value={createAccountFormData.registered_office_address}
-              onBlur={handleOnBlur}
-              onChange={handleFormInputChange}
-              // className="w-full border rounded-lg col-span-2 px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-
-            <div className="col-span-2 flex justify-end gap-3">
-              <div>
-                <Button type="button" onClick={handleStateClear}>
-                  <div className="flex items-center gap-0.5">
-                    <X size={16} /> Cancel
-                  </div>
-                </Button>
-              </div>
-
-              <div>
-                <Button type="submit" onClick={handleSubmit}>
-                  <div className="flex items-center gap-1">
-                    <Save size={16} /> Save
-                  </div>
-                </Button>
-              </div>
+            <div>
+              <Button type="submit" onClick={handleSubmit}>
+                <div className="flex items-center gap-1">
+                  <Save size={16} /> Save
+                </div>
+              </Button>
             </div>
-          </form>
-        </motion.section>
-          </FormLayout>
-      
-     
+          </div>
+        </form>
+      </motion.section>
+    </FormLayout>
   );
 };
 export default CreateAccount;

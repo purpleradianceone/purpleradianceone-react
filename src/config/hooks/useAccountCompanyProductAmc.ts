@@ -14,7 +14,7 @@ export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>
     const [loading, setIsLoading] = useState<boolean>(true)
     const [accountCompanyProductAmc, setAccountCompanyProductAmc] = useState<AccountCompanyProductAmc[]>([]);
 
-    const getCompanyProductSla = async () => {
+    const getCompanyProductAmc = async () => {
 
         setIsLoading(true)
         const postData = {
@@ -53,16 +53,16 @@ export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>
         } catch (error: ApiError | any) {
             if (error.status === STATUS_CODE.UNATHORISED) {
                 const refreshTokenStatus = await RefreshToken({
-                    callFunctionWithEvent:  getCompanyProductSla,
+                    callFunctionWithEvent:  getCompanyProductAmc,
                 });
                 if (refreshTokenStatus) {
-                    getCompanyProductSla();
+                    getCompanyProductAmc();
                 }
             }
         }
     };
     useEffect(() => {
-        getCompanyProductSla();
+        getCompanyProductAmc();
     }, [accountCompanyProductId]);
 
     return {

@@ -66,6 +66,32 @@ function LeadManagementAgGrid({
         sortable: true,
         filter: true,
       },
+        {
+        field: "countryName",
+        headerName: "Country",
+        sortable: true,
+        filter: true,
+      },
+       {
+        field: "stateName",
+        headerName: "State",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "districtName",
+        headerName: "District",
+        sortable: true,
+        filter: true,
+      },
+
+     
+      {
+        field: "leadDetailAddress",
+        headerName: "Address",
+        sortable: true,
+        filter: true,
+      },
       {
         field: "createdBy",
         headerName: "Created by",
