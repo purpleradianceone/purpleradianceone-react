@@ -104,10 +104,10 @@ export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
 // company purpleradianceone captcha key
-export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
+//export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
 
 // company captcha key
-//export const SITE_KEY = "6Lcs7fIrAAAAAOp4c77x69ruZ5_KPKQuVGdL-PCY";
+export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
 
 // vaibhav captcha key
 // export const SITE_KEY = "6Lfk8W0rAAAAAOTUzGGWBnX9C0Jhta2zRZYt3fXf";
