@@ -1,7 +1,8 @@
 type DateRangePickerProps =  {
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date ) => void;
-  // onSubmitButtonClick:()=>void
+  // startDate? : string ;
+  // endDate? :string ;
 }
 
 export default DateRangePickerProps;

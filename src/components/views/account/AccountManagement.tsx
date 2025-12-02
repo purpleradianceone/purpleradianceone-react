@@ -14,6 +14,7 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 function GetAccounts({
   isUsedForAccountLead,
@@ -22,6 +23,35 @@ function GetAccounts({
   isUsedForAccountLead : boolean;
   handleRowSelectedForLead? : (data: Account | any) => void;
 }) {
+
+  // Restore saved filters when opening this module
+      // useEffect(() => {
+      //   const saved = localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
+      //   if (!saved) return;
+    
+      //   const filters = JSON.parse(saved);
+    
+      //   // Ensure URL & hook initialize first before restoring
+      //   requestAnimationFrame(() => {
+      //     if (filters.page) handlePageChange(filters.page);
+      //     if (filters.size) handlePageSizeChange(filters.size);
+      //     if (filters.search) handleSearchParameterChange(filters.search);
+      //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+    
+      //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+      //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+          
+      //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+      //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+      //     // if (filters.userId) {
+      //     //   setSelectedCompanyUser((prev) => ({
+      //     //     ...prev,
+      //     //     id: filters.userId,
+      //     //     fullname : filters.userName
+      //     //   }));
+      //     // }
+      //   });
+      // }, []);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
@@ -34,6 +64,10 @@ function GetAccounts({
 
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
+  // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
     pageSize,
@@ -48,7 +82,7 @@ function GetAccounts({
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   // Fetch data function
   const fetchAccounts = async () => {
@@ -138,6 +172,34 @@ function GetAccounts({
     }
   }, [userHasAccessToViewAccount]);
 
+   // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
   return (
     <div className="w-full">
       {userHasAccessToViewAccount ? (
@@ -155,6 +217,8 @@ function GetAccounts({
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  searchParameter
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}

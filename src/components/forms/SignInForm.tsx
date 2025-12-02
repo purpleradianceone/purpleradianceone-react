@@ -84,20 +84,6 @@ function SignInForm() {
     message: "",
   });
 
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleMessageSnackbarClose = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   // const isActiveSubscriptionUseRef =useRef<boolean>(false);
 
   const resetLoginStatus = () => {
@@ -148,28 +134,16 @@ function SignInForm() {
 
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
       if (!loginUserCredentials.email) {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.EMAIL_REQUIRED,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.EMAIL_REQUIRED);
         return;
       }
       if (!loginUserCredentials.password) {
-        // showMessageSnackbar({
-        //   message: MESSAGE.ERROR.PASSWORD_REQUIRED,
-        //   type: "error",
-        // });
         toast.error(MESSAGE.ERROR.PASSWORD_REQUIRED);
         return;
       }
     }
 
     if (!captchaToken) {
-      // showMessageSnackbar({
-      //   message: MESSAGE.ERROR.COMPLETE_CAPTCHA,
-      //   type: "error",
-      // });
       toast.error(MESSAGE.ERROR.COMPLETE_CAPTCHA);
       return;
     }
@@ -221,10 +195,6 @@ function SignInForm() {
           // note: is status false , then it will navigate to create subscription page
           if (!response.data.isactive_subscription) {
             setTimeout(() => {
-              // showMessageSnackbar({
-              //   message: MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR,
-              //   type: "error",
-              // });
               toast.error(MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR);
 
               navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
@@ -248,10 +218,6 @@ function SignInForm() {
                 status: "success",
                 message: MESSAGE.SUCCESS.LOGGED_IN,
               });
-              // showMessageSnackbar({
-              //   message: MESSAGE.SUCCESS.LOGIN_SUCCESSFUL,
-              //   type: "success",
-              // });
               toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
 
               // note : changes done here
@@ -288,6 +254,7 @@ function SignInForm() {
                         createdBy: res.createdby,
                         createdOn: res.createdon,
                         id: res.id,
+                        countryId : res.country_id,
                         timezoneId: res.timezone_id,
                         updatedBy: res.updatedby,
                         updatedOn: res.updatedon,

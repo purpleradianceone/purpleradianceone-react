@@ -75,6 +75,8 @@ function AccountManagementList({
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
 
+  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -107,6 +109,7 @@ function AccountManagementList({
                       e.target.value
                     );
                   }}
+                  value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
 
@@ -120,6 +123,7 @@ function AccountManagementList({
                   <DateRangeFilterDropdown
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
+                    selectedOption={selectedDateName}
                   ></DateRangeFilterDropdown>
                 </div>
               </div>

@@ -14,6 +14,7 @@ import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/use
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 function GetCompanyUsers({
   isUsedInAccountProductForAssingingInstalledBy,
@@ -23,6 +24,35 @@ function GetCompanyUsers({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowSelect?: (data: any) => void;
 }) {
+
+  // Restore saved filters when opening this module
+    // useEffect(() => {
+    //   const saved = localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    //   if (!saved) return;
+  
+    //   const filters = JSON.parse(saved);
+  
+    //   // Ensure URL & hook initialize first before restoring
+    //   requestAnimationFrame(() => {
+    //     if (filters.page) handlePageChange(filters.page);
+    //     if (filters.size) handlePageSizeChange(filters.size);
+    //     if (filters.search) handleSearchParameterChange(filters.search);
+    //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+  
+    //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+    //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+        
+    //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+    //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+    //     // if (filters.userId) {
+    //     //   setSelectedCompanyUser((prev) => ({
+    //     //     ...prev,
+    //     //     id: filters.userId,
+    //     //     fullname : filters.userName
+    //     //   }));
+    //     // }
+    //   });
+    // }, []);
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
@@ -33,6 +63,10 @@ function GetCompanyUsers({
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
 
+  // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
     pageSize,
@@ -47,7 +81,7 @@ function GetCompanyUsers({
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const handleCompanyUserChangeOnEdit = (user: CompanyUser) => {
     const userMatches = companyUsers.some(
@@ -130,6 +164,34 @@ function GetCompanyUsers({
     }
   }, [userHasAccessToViewUser]);
 
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
   return (
     <div className="w-full">
       {userHasAccessToViewUser ? (
@@ -148,6 +210,8 @@ function GetCompanyUsers({
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  searchParameter
                 }}
                 paginationData={{
                   selectedPageSize: handlePageSizeChange,
