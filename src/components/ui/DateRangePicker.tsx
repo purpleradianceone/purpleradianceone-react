@@ -1,14 +1,15 @@
 
-import React, {useState } from 'react';
+import React, { useState } from 'react';
 import DateRangePickerProps from '../../@types/ui/DateRangePickerProps';
 // import Button from './ui/Button';
 
 
 
 
-function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePickerProps) {
+function DateRangePicker({ onStartDateChange, onEndDateChange,   }: DateRangePickerProps) {
 
   const getDefaultStartDate = () => {
+   
     const today = new Date();
     const date10DaysAgo = new Date(today); // Create a new Date object to avoid modifying 'today'
     date10DaysAgo.setDate(today.getDate() - 10); // Subtract 10 days
@@ -16,6 +17,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
     // Format the date to YYYY-MM-DD
     return date10DaysAgo.toISOString().split('T')[0];
   };
+
 
   const [startDate, setStartDate] = useState<string>(getDefaultStartDate());
   const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -29,6 +31,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
     setEndDate(e.target.value);
     onEndDateChange( new Date(e.target.value) );
   };
+
   //   // Get current date in YYYY-MM-DD format
   const getCurrentDate = () => {
     const today = new Date();
@@ -44,7 +47,7 @@ function DateRangePicker({ onStartDateChange, onEndDateChange    }: DateRangePic
           <input
             type="date"
             id="start-date"
-            value={startDate}
+            value={startDate }
             onChange={handleStartDateChange}
             max={endDate ? endDate : getCurrentDate() }
             // min={endDate}

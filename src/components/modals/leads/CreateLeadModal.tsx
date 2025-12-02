@@ -39,7 +39,6 @@ import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
-import FormLayout from "../../ui/FormLayout";
 
 function CreateLeadModal({
   isOpen,
@@ -400,7 +399,9 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <FormLayout width={2}   >
+   <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
+      <div className={`bg-white rounded-lg shadow-xl w-full max-w-4xl relative animate-fadeIn p-4 min-h-72 max-h-full`}>
+      
       {/* Header */}
       <FormHeader
         icon={Handshake}
@@ -578,7 +579,8 @@ function CreateLeadModal({
           </div>,
           document.body
         )}
-    </FormLayout>
+        </div>
+        </div>
   );
 }
 

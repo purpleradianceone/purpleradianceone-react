@@ -224,6 +224,8 @@ function GetCompanyUsersList({
         }
       });
   }
+  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
   return (
     <div
       className={`w-full  pt-1  ${
@@ -256,6 +258,7 @@ function GetCompanyUsersList({
               onChange={(e) => {
                 handleSearchOption.handleSearchParameterChange(e.target.value);
               }}
+              value={handleSearchOption.searchParameter}
             ></SearchInput>
           </div>
 
@@ -272,6 +275,7 @@ function GetCompanyUsersList({
               <DateRangeFilterDropdown
                 dropdownOptions={dateRangeDropdownOptions}
                 handleDateIdChange={handleDateRangeIdChange}
+                selectedOption={selectedDateName}
               ></DateRangeFilterDropdown>
             </div>
           </div>

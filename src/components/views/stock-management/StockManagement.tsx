@@ -13,8 +13,28 @@ import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import LiveStockForCompanyProduct from "../../../@types/stock/LiveStockForCompanyProduct";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 const StockManagement = () => {
+  
+    // Restore saved filters when opening this module
+        // useEffect(() => {
+        //   const saved = localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS);
+        //   if (!saved) return;
+      
+        //   const filters = JSON.parse(saved);
+      
+        //   // Ensure URL & hook initialize first before restoring
+        //   requestAnimationFrame(() => {
+        //     if (filters.page) handlePageChange(filters.page);
+        //     if (filters.size) handlePageSizeChange(filters.size);
+        //     if (filters.search) handleSearchParameterChange(filters.search);
+        //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+        //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+        //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+           
+        //   });
+        // }, []);
   const { userHasAccessToViewStock } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -31,6 +51,10 @@ const StockManagement = () => {
     }
   }, [userHasAccessToViewStock]);
 
+    // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
     pageSize,
@@ -45,7 +69,7 @@ const StockManagement = () => {
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
   const getStockLiveForCompanyProduct = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
 
@@ -117,6 +141,37 @@ const StockManagement = () => {
     };
   }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
 
+  
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
+
+
   return (
     <div className="w-full">
       <motion.section
@@ -141,6 +196,8 @@ const StockManagement = () => {
               handleSearchOption={{
                 handleSearchParameterChange,
                 handleDateRangeIdChange: handleDatePageIdChange,
+                dateRangeId,
+                searchParameter
               }}
             />
           </>

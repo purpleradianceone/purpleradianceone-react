@@ -69,6 +69,8 @@ const StockManagementList = ({
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
+    const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
   return (
     <div
       className={`w-full  pt-1  ${
@@ -92,6 +94,7 @@ const StockManagementList = ({
               onChange={(e) => {
                 handleSearchOption.handleSearchParameterChange(e.target.value);
               }}
+              value={handleSearchOption.searchParameter}
             ></SearchInput>
           </div>
 
@@ -109,6 +112,7 @@ const StockManagementList = ({
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
                   handleDateIdChange={handleDateRangeIdChange}
+                  selectedOption={selectedDateName}
                 ></DateRangeFilterDropdown>
               </div>
             </div>
