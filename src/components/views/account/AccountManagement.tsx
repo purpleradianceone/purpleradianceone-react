@@ -17,10 +17,12 @@ import AccountManagementList from "../../lists/AccountManagementList";
 
 function GetAccounts({
   isUsedForAccountLead,
-  handleRowSelectedForLead
+  handleRowSelectedForLead,
+  isUsedForSupportTicketCreation
 } : {
   isUsedForAccountLead : boolean;
   handleRowSelectedForLead? : (data: Account | any) => void;
+  isUsedForSupportTicketCreation?: boolean;
 }) {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -172,6 +174,7 @@ function GetAccounts({
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
                 isUsedForAccountLead={isUsedForAccountLead}
                 handleRowSelectedForLead={handleRowSelectedForLead}
+                isUsedForSupportTicketCreation = {isUsedForSupportTicketCreation}
               />
             </motion.section>
           </div>

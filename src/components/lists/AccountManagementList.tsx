@@ -35,6 +35,7 @@ function AccountManagementList({
   handleCreateCompanyAccountType,
   isUsedForAccountLead,
   handleRowSelectedForLead,
+  isUsedForSupportTicketCreation
 }: {
   fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -45,6 +46,7 @@ function AccountManagementList({
   handleCreateCompanyAccountType: () => void;
   isUsedForAccountLead: boolean;
   handleRowSelectedForLead?: (data: Account | any) => void;
+  isUsedForSupportTicketCreation?: boolean;
 }) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -166,7 +168,7 @@ function AccountManagementList({
           )}
 
           <div>
-            <Button
+            {!isUsedForSupportTicketCreation &&<Button
             disabled={!userHasAccessToAddAccount}
               type="submit"
                onClick={(e) => {
@@ -181,7 +183,7 @@ function AccountManagementList({
               <div className="flex items-center gap-0.5">
                 <Plus size={SIZE.SIXTEEN} /> Create
               </div>
-            </Button>
+            </Button>}
             {openCreateAccountForm && (
               <CreateAccount
                 onClose={() => setOpenAccountForm(false)}

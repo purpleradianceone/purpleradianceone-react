@@ -1,0 +1,9 @@
+type PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle={
+    company_id?: number,
+    id: number | null,
+    name?: string |null,
+    description?: string | null,
+    isactive: boolean,
+    requestedby?: number
+}
+export default PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle;

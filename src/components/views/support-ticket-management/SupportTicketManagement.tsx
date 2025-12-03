@@ -1,0 +1,460 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import POST_API from "../../../constants/PostApi";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
+import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
+import SupportTicketManagementList from "../../lists/SupportTicketManagementList";
+import SupportTicketProps from "../../../@types/support-ticket-management/SupportTicketProps";
+import PostDataToGetSupportTicketData from "../../../@types/support-ticket-management/PostDataToGetSupportTicketData";
+import axiosClient from "../../../axios-client/AxiosClient";
+import { Product } from "../../../@types/products/ProductsManagementProps";
+import { useSupportTicketLifecycle } from "../../../config/hooks/useSupportTicketLifecycle";
+import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
+import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
+
+function SupportTicketManagement({
+  isUsedInSupportTicketModule,
+  handleRowSelectedForShowSupportTicket,
+}: {
+  isUsedInSupportTicketModule: boolean;
+  handleRowSelectedForShowSupportTicket?: (
+    rowData: SupportTicketProps | any
+  ) => void;
+}) {
+  const { userHasAccessToViewSupportTicket } = useUserAccessModules();
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const [supportTicketData, setSupportTicketData] = useState<
+    SupportTicketProps[]
+  >([]);
+
+  const { supportTicketCAtegory } = useSupportTicketCategory();
+  const { supportTicketLifecycle } = useSupportTicketLifecycle();
+  const { supportTicketSource } = useSupportTicketSource();
+
+  const { loginStatus } = useLoggedInUserContext();
+
+  const [supportTicketUpdateCount, setSupportTicketUpdateCount] =
+    useState<number>(0);
+
+  const [selectedSupportTicketCategory, setSelectedSupportTicketCategory] =
+    useState<number | null>(null);
+  const [selectedSupportTicketLifecycle, setSelectedSupportTicketLifecycle] =
+    useState<number | null>(null);
+  const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
+    useState<number | null>(null);
+
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
+
+  const {
+    currentPage,
+    pageSize,
+    dateRangeId,
+    concatDate,
+    searchParameter,
+    totalPages,
+    setTotalPages,
+    handleDatePageIdChange,
+    handleEndDateChange,
+    handlePageChange,
+    handlePageSizeChange,
+    handleSearchParameterChange,
+    handleStartDateChange,
+  } = useSearchFilterPaginationDateHandlers();
+
+  const handleSupportSelectedCategory = (
+    selectedSupportTicketCategory: number | undefined
+  ) => {
+    if (selectedSupportTicketCategory) {
+      setSelectedSupportTicketCategory(selectedSupportTicketCategory);
+    } else {
+      setSelectedSupportTicketCategory(null);
+    }
+  };
+
+  const handleSupportSelectedLifecycle = (
+    selectedSupportTicketLifecycle: number | undefined
+  ) => {
+    if (selectedSupportTicketLifecycle) {
+      setSelectedSupportTicketLifecycle(selectedSupportTicketLifecycle);
+    } else {
+      setSelectedSupportTicketLifecycle(null);
+    }
+  };
+
+  const handleSupportTicketSelectedSource = (
+    selectedSupportTicketSource: number | undefined
+  ) => {
+    if (selectedSupportTicketSource) {
+      setSelectedSupportTicketSource(selectedSupportTicketSource);
+    } else {
+      setSelectedSupportTicketSource(null);
+    }
+  };
+
+  const getSupportTicketData = async (signal: AbortSignal) => {
+    const offset = (currentPage - 1) * pageSize;
+
+    const effectiveDateRangeId = dateRangeId;
+
+    //NOTE : need to work on this
+    const postDataToGetSupportTickets: PostDataToGetSupportTicketData = {
+      company_id: loginStatus.companyId,
+      id: null,
+      company_product_id:
+        selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
+      assignedto: selectedCompanyUser.id === 0 ? null : selectedCompanyUser.id,
+      resolvedby: selectedResolvedBy.id === 0? null : selectedResolvedBy.id,
+      support_ticket_category_id: selectedSupportTicketCategory,
+      support_ticket_source_id: selectedSupportTicketSource,
+      support_ticket_lifecycle_id: selectedSupportTicketLifecycle,
+      search_company_specific_date_range_id:
+        effectiveDateRangeId === 0 ? null : effectiveDateRangeId,
+      limit: pageSize,
+      offset,
+      search_parameter: searchParameter.trim() === ""?null:searchParameter,
+      search_parameter_date: concatDate,
+      requestedby: loginStatus.id,
+    };
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_SUPPORT_TICKET,
+        postDataToGetSupportTickets,
+        {
+          signal,
+          withCredentials: true,
+        }
+      );
+      if (response.status === STATUS_CODE.OK) {
+        const responseData = response.data;
+        if (response.data.length > 0) {
+          setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        }
+
+        const formattedData: SupportTicketProps[] = responseData.map(
+          (item: any) => ({
+            count: item.count,
+            id: item.id,
+            companyId: item.company_id,
+            accountCompanyProductId: item.account_company_product_id,
+            supportTicketCategoryId: item.support_ticket_category_id,
+            supportTicketCategoryName: item.support_ticket_category_name,
+            supportTicketEscalationLevelId:
+              item.support_ticket_escalation_level_id,
+            supportTicketEscalationLevelName:
+              item.support_ticket_escalation_level_name,
+            supportTicketLifecycleId: item.support_ticket_lifecycle_id,
+            supportTicketLifecycleName: item.support_ticket_lifecycle_name,
+            companyProductSlaId: item.company_product_sla_id,
+            companyProductSlaName: item.company_product_sla_name,
+            supportTicketSourceId: item.support_ticket_source_id,
+            supportTicketSourceName: item.support_ticket_source_name,
+            queryDescription: item.query_description,
+            publicNotes: item.public_notes,
+            resolutionApplied: item.resolution_applied,
+            assignedTo: item.assignedto,
+            assignedToName: item.assignedto_name,
+            resolvedBy: item.resolvedby,
+            resolvedByName: item.resolvedby_name,
+            dueDateTime: item.due_date_time,
+            completedAtDateTime: item.completed_at_date_time,
+            createdBy: item.createdby,
+            createdOn: item.createdon,
+            updatedBy: item.updatedby,
+            updatedOn: item.updatedon,
+          })
+        );
+        setSupportTicketData(formattedData);
+      }
+    } catch (error: any) {
+      //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithEvent: getSupportTicketData,
+        });
+
+        // setIsDialogueOpen(!refreshTokenStatus);
+        if (refreshTokenStatus) {
+          getSupportTicketData(signal);
+        }
+      }
+    }
+  };
+
+  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+    number | null
+  >(null);
+  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password: "",
+  });
+
+   const [persistedSelectedResolvedById, setPersistedSelectedResolvedById] = useState<
+    number | null
+  >(null);
+  const [selectedResolvedBy, setSelectedResolvedBy] = useState<CompanyUser>({
+    company_id: 0,
+    id: 0,
+    fullname: "",
+    email: "",
+    mobilenumber: "",
+    createdby: "",
+    isactive: false,
+    requestedby: "",
+    generate_password: "",
+  });
+
+  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<Product>(
+    {
+      id: 0,
+      productTypeId: 0,
+      unitName: "",
+      unitId: 0,
+      unitNameInStock: "",
+      productTypeName: "",
+      defaultWarrantyIntervalTypeId: 0,
+      defaultWarranty: 0,
+      defaultWarrantyName: "",
+      defaultAmcCycleIntervalTypeId: 0,
+      defaultAmcCycle: 0,
+      defaultAmcCycleName: "",
+      name: "",
+      barcode: "",
+      isActive: false,
+    }
+  );
+
+  const handleSelectedCompanyUserCheckBoxChange = (
+    params: CompanyUser | null
+  ) => {
+    if (params) {
+      setPersistedSelectedUserId(params.id);
+      setSelectedCompanyUser({
+        company_id: params.company_id,
+        id: params.id,
+        fullname: params.fullname,
+        email: params.email,
+        mobilenumber: params.mobilenumber,
+        createdby: "",
+        isactive: params.isactive,
+        requestedby: "",
+        generate_password: "",
+      });
+    } else {
+      setPersistedSelectedUserId(null);
+      // Reset selectedCompanyUser to its initial state when null is received
+      setSelectedCompanyUser({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
+    }
+  };
+
+  const handleSelectedCompanyProductCheckBoxChange = (
+    params: Product | null
+  ) => {
+    if (params) {
+      setSelectedCompanyProduct({
+        id: params.id,
+        productTypeId: params.productTypeId,
+        unitName: params.unitName,
+        unitId: params.unitId,
+        unitNameInStock: params.unitNameInStock,
+        productTypeName: params.productTypeName,
+        defaultWarrantyIntervalTypeId: params.defaultWarrantyIntervalTypeId,
+        defaultWarranty: 0,
+        defaultWarrantyName: "",
+        defaultAmcCycleIntervalTypeId: 0,
+        defaultAmcCycle: 0,
+        defaultAmcCycleName: "",
+        name: params.name,
+        barcode: "",
+        isActive: params.isActive,
+      });
+    } else {
+      setSelectedCompanyProduct({
+        id: 0,
+        productTypeId: 0,
+        unitName: "",
+        unitId: 0,
+        unitNameInStock: "",
+        productTypeName: "",
+        defaultWarrantyIntervalTypeId: 0,
+        defaultWarranty: 0,
+        defaultWarrantyName: "",
+        defaultAmcCycleIntervalTypeId: 0,
+        defaultAmcCycle: 0,
+        defaultAmcCycleName: "",
+        name: "",
+        barcode: "",
+        isActive: false,
+      });
+    }
+  };
+
+  const handleSelectedResolvedByCheckBoxChange = (
+    params: CompanyUser | null
+  ) => {
+    if (params) {
+      setPersistedSelectedResolvedById(params.id);
+      setSelectedResolvedBy({
+        company_id: params.company_id,
+        id: params.id,
+        fullname: params.fullname,
+        email: params.email,
+        mobilenumber: params.mobilenumber,
+        createdby: "",
+        isactive: params.isactive,
+        requestedby: "",
+        generate_password: "",
+      });
+    } else {
+      setPersistedSelectedResolvedById(null);
+      setSelectedResolvedBy({
+        company_id: 0,
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+        createdby: "",
+        isactive: false,
+        requestedby: "",
+        generate_password: "",
+      });
+    }
+  };
+
+  const handleAddSupportTicket = () => {
+    setSupportTicketUpdateCount(supportTicketUpdateCount + 1);
+  };
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    getSupportTicketData(signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    supportTicketUpdateCount,
+    pageSize,
+    currentPage,
+    dateRangeId,
+    searchParameter,
+    concatDate,
+    selectedCompanyUser,
+    selectedResolvedBy,
+    selectedCompanyProduct,
+    selectedSupportTicketCategory,
+    selectedSupportTicketLifecycle,
+    selectedSupportTicketSource,
+  ]);
+
+  useEffect(() => {
+    if (!userHasAccessToViewSupportTicket) {
+      setAccessDeniedPopUpOpen(true);
+    }
+  }, [userHasAccessToViewSupportTicket]);
+
+  return (
+    <div className="w-full ">
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {userHasAccessToViewSupportTicket ? (
+          <SupportTicketManagementList
+            // Note : differentaition done because this module is used in account-lead and for lead module also
+            isUsedInSupportTicketModule={isUsedInSupportTicketModule}
+            handleRowSelectedForShowSupportTicket={
+              handleRowSelectedForShowSupportTicket
+            }
+            handleAddSupportTicket={handleAddSupportTicket}
+            handleSearchOption={{
+              handleSearchParameterChange,
+              handleDateRangeIdChange: handleDatePageIdChange,
+            }}
+            supportTicketData={supportTicketData}
+            onEndDateChange={handleEndDateChange}
+            onStartDateChange={handleStartDateChange}
+            paginationData={{
+              selectedPageSize: handlePageSizeChange,
+              currentPage,
+              handlePageChange,
+              totalPages,
+              pageSize,
+            }}
+
+
+
+
+            selectedAssignTo={selectedCompanyUser}
+            handleSelectedCompanyUserCheckBoxChange={
+              handleSelectedCompanyUserCheckBoxChange
+            }
+            persistedSelectedUserId={persistedSelectedUserId}
+
+
+
+
+            selectedResolvedBy={selectedResolvedBy}
+             handleSelectedResolvedByCheckBoxChange = {
+                handleSelectedResolvedByCheckBoxChange
+            }
+            persistedSelectedResolvedById={persistedSelectedResolvedById}
+
+
+
+            handleSelectedCompanyProductCheckBoxChange={
+              handleSelectedCompanyProductCheckBoxChange
+            }
+           
+            selectedCompanyProduct={selectedCompanyProduct}
+            supportTicketCategory={supportTicketCAtegory!}
+            handleSupportSelectedCategory={handleSupportSelectedCategory}
+            supportTicketLifecycle={supportTicketLifecycle!}
+            handleSupportSelectedLifecycle={handleSupportSelectedLifecycle}
+            supportTicketSource={supportTicketSource!}
+            handleSupportSelectedSource={handleSupportTicketSelectedSource}
+          />
+        ) : (
+          <div className="flex-none mx-96 mt-14">
+            <AccessDeniedPopup
+              isOpen={accessDeniedPopUpOpen}
+              onClose={() => {
+                setAccessDeniedPopUpOpen(false);
+                window.history.back();
+              }}
+            />
+          </div>
+        )}
+      </motion.section>
+    </div>
+  );
+}
+
+export default SupportTicketManagement;

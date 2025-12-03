@@ -624,7 +624,7 @@
       window.onload = function () {
         // Call the method in iframe or send message to parent
         console.log("Form loaded");
-        // verifyCompanySecret();
+        verifyCompanySecret();
         // If you want parent to know
         window.parent.postMessage("formLoaded", window.location.origin);
       };
@@ -718,7 +718,7 @@
           return;
         }
 
-        // const apiUrl = `http://localhost:8080/api/authentication/purple-crm-api/verify-client?client_id=${clientId}&origin=${parentOrigin}`;
+        //  const apiUrl = `http://localhost:8080/api/authentication/purple-crm-api/verify-client?client_id=${clientId}&origin=${parentOrigin}`;
         // const apiUrl = `https://cdranalysis.com/api/authentication/purple-crm-api/verify-client?client_id=${clientId}&origin=${parentOrigin}`;
         const apiUrl = `https://purpleradianceone.com/api/authentication/purple-crm-api/verify-client?client_id=${clientId}&origin=${parentOrigin}`;
 
@@ -797,7 +797,7 @@
           token: token,
         };
 
-        // const apiUrl = `http://localhost:8080/api/authentication/purple-crm-api/insert-lead?client_id=${clientId}&origin=${parentOrigin}`;
+        //  const apiUrl = `http://localhost:8080/api/authentication/purple-crm-api/insert-lead?client_id=${clientId}&origin=${parentOrigin}`;
         //const apiUrl = `https://cdranalysis.com/api/authentication/purple-crm-api/insert-lead?client_id=${clientId}&origin=${parentOrigin}`;
         const apiUrl = `https://purpleradianceone.com/api/authentication/purple-crm-api/insert-lead?client_id=${clientId}&origin=${parentOrigin}`;
 

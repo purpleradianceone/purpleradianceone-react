@@ -5,32 +5,34 @@ import { AgGridReact } from "ag-grid-react";
 import AccountProduct from "../../@types/account/AccountProduct";
 
 const AccountCompanyProductAgGrid = ({
-     accountProductData,
+  accountProductData,
   onRowSelect, //selected user for view lead details
-//   handleRowClick,
-} :{
-    accountProductData : AccountProduct [];
-    onRowSelect : (data : AccountProduct)=> void;
+  //   handleRowClick,
+  isUsedForSelection,
+}: {
+  accountProductData: AccountProduct[];
+  onRowSelect: (data: AccountProduct) => void;
+  isUsedForSelection?: boolean;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
-         {
+      {
         field: "companyProductName",
         headerName: "Product",
         sortable: true,
         filter: true,
       },
       {
-        hide:true,
+        hide: true,
         field: "accountId",
         headerName: "Account ID",
         sortable: true,
         filter: true,
       },
       {
-        hide:true,
+        hide: true,
         field: "companyProductId",
         headerName: "Company Product ID",
         sortable: true,
@@ -61,14 +63,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-        hide:true,
+        hide: true,
         field: "unitName",
         headerName: "Unit",
         sortable: true,
         filter: true,
       },
       {
-         hide:true,
+        hide: true,
         field: "unitNameInStock",
         headerName: "Unit In Stock",
         sortable: true,
@@ -86,7 +88,7 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
-       {
+      {
         field: "installationDate",
         headerName: "Installation Date",
         sortable: true,
@@ -110,7 +112,7 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
-     
+
       {
         hide: true,
         field: "installedBy",
@@ -119,14 +121,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-         hide:true,
+        hide: true,
         field: "warrantyIntervalTypeId",
         headerName: "Warranty Interval Type ID",
         sortable: true,
         filter: true,
       },
       {
-         hide:true,
+        hide: true,
         field: "warranty",
         headerName: "Warranty",
         sortable: true,
@@ -159,7 +161,7 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
-       
+
       {
         hide: true,
         field: "amcIntervalName",
@@ -168,15 +170,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-        
-         hide:true,
+        hide: true,
         field: "amcCycleIntervalTypeId",
         headerName: "AMC Cycle Interval Type ID",
         sortable: true,
         filter: true,
       },
       {
-         hide:true,
+        hide: true,
         field: "amcCycle",
         headerName: "AMC Cycle",
         sortable: true,
@@ -196,16 +197,21 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
-      { field: "id",hide:true, headerName: "ID", sortable: true, filter: true },
       {
-        hide:true,
+        field: "id",
+        hide: true,
+        headerName: "ID",
+        sortable: true,
+        filter: true,
+      },
+      {
+        hide: true,
         field: "accountName",
         headerName: "Account Name",
         sortable: true,
         filter: true,
       },
-     
-     
+
       {
         field: "updatedBy",
         headerName: "Updated By",
@@ -213,7 +219,6 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-
         field: "createdOn",
         headerName: "Created On",
         sortable: true,
@@ -247,7 +252,7 @@ const AccountCompanyProductAgGrid = ({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                Details
+                {isUsedForSelection ? "Select" : "Details"}{" "}
               </span>
             </div>
           );
