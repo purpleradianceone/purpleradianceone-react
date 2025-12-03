@@ -6,6 +6,7 @@ import {
   Layers,
   Menu,
   Network,
+  NotebookPen,
   Settings,
   Store,
   UserCogIcon,
@@ -25,7 +26,8 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewMeeting,
-    userHasAccessToViewStock
+    userHasAccessToViewStock,
+    userHasAccessToViewSupportTicket
   } = useUserAccessModules();
 
   return (
@@ -114,6 +116,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewStock}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={NotebookPen }
+              label="Support"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewSupportTicket}
             />
           )}
         </NavLink>

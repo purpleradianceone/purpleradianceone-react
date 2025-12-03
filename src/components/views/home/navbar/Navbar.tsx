@@ -15,6 +15,7 @@ import {
   Menu,
   MessageCircle,
   Network,
+  NotebookPen,
   Settings,
   SettingsIcon,
   Store,
@@ -64,6 +65,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewMeeting,
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewStock,
+    userHasAccessToViewSupportTicket
     
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -486,6 +488,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<Layers size={SIZE.TWENTY} />}
                             label="Stock"
                           />
+
+                          <NavItem
+                          disable={!userHasAccessToViewSupportTicket}
+                            to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                            icon={<NotebookPen  size={SIZE.TWENTY} />}
+                            label="Support"
+                          />
                           
                         {/* )} */}
                           <NavItem
@@ -577,6 +586,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             label="Accounts"
                           />
                          )}
+                         {userHasAccessToViewSupportTicket && (
+                          <NavItem
+                          disable={!userHasAccessToViewSupportTicket}
+                          to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                          icon = {<NotebookPen size={SIZE.TWENTY}/>}
+                          label="Support"
+                          />
+                         )
+
+                         }
                           {userHasAccessToViewProduct && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_MANAGEMENT}

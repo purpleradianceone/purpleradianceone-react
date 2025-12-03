@@ -117,6 +117,7 @@ export const STATUS_CODE = {
     FORBIDDEN : 403,
     PERMANENT_REDIRECT : 308,
     ACCEPTED : 202,
+    INTERNAL_SERVER_ERROR : 500,
 
 }
 export const JSX_CHILDREN_NAME = {
@@ -134,6 +135,8 @@ export const JSX_CHILDREN_NAME = {
     USER : "User",
     UPDATE : "Update",
     MEETINGS : "Meetings",
+    CREATE_SUPPORT_TICKET : "Create",
+
 
 }
 

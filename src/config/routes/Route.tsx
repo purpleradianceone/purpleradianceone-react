@@ -60,6 +60,8 @@ import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthCon
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
 import StockManagement from "../../components/views/stock-management/StockManagement";
+import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
+import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
 
 export const router = createBrowserRouter([
   {
@@ -652,9 +654,39 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
+          <div>
           <Navbar>
             <StockManagement />
           </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <SupportTicketManagement isUsedInSupportTicketModule={true} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ViewSupportTicketManagement/>
+            </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),

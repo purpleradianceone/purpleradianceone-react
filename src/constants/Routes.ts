@@ -68,7 +68,13 @@ const ROUTES_URL = {
 
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",
-    STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/'
+    STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/',
+
+    //Support Tickets
+    SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
+    SUPPORT_TICKET_DETAILS : "/support-ticket/view",
+
+
 
 }
 export default ROUTES_URL;

@@ -18,10 +18,12 @@ import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 function GetAccounts({
   isUsedForAccountLead,
-  handleRowSelectedForLead
+  handleRowSelectedForLead,
+  isUsedForSupportTicketCreation
 } : {
   isUsedForAccountLead : boolean;
   handleRowSelectedForLead? : (data: Account | any) => void;
+  isUsedForSupportTicketCreation?: boolean;
 }) {
 
   // Restore saved filters when opening this module
@@ -232,6 +234,7 @@ const savedFilters = JSON.parse(
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
                 isUsedForAccountLead={isUsedForAccountLead}
                 handleRowSelectedForLead={handleRowSelectedForLead}
+                isUsedForSupportTicketCreation = {isUsedForSupportTicketCreation}
               />
             </motion.section>
           </div>

@@ -7,16 +7,12 @@ import AccountProduct from "../../@types/account/AccountProduct";
 const AccountCompanyProductAgGrid = ({
   accountProductData,
   onRowSelect, //selected user for view lead details
-  // handleViewAccountCompanyProductDetailsModalOpen,
-  // handleViewAccountCompanyProductAMC
+  //   handleRowClick,
+  isUsedForSelection,
 }: {
   accountProductData: AccountProduct[];
   onRowSelect: (data: AccountProduct) => void;
-  // handleViewAccountCompanyProductDetailsModalOpen?: (
-  //   data: AccountProduct,
-  //   status: boolean
-  // ) => void;
-  // handleViewAccountCompanyProductAMC: (data : AccountProduct, status : boolean) => void;
+  isUsedForSelection?: boolean;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -257,7 +253,7 @@ const AccountCompanyProductAgGrid = ({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                Details
+                {isUsedForSelection ? "Select" : "Details"}{" "}
               </span>
             </div>
           );

@@ -81,6 +81,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         {labelName === "status" ||
         labelName === "source" ||
         labelName === "type" ||
+        labelName === "category" ||
+        labelName === "lifecycle" ||
         labelName === "priority" ||
         labelName === "stage"
           ? ""
@@ -129,6 +131,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||
+          labelName === "category" ||
+          labelName === "lifecycle" ||
           labelName === "priority" ||
           labelName === "stage"
             ? selectedOption === undefined
