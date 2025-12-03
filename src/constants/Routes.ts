@@ -63,6 +63,9 @@ const ROUTES_URL = {
 
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
+    ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
+    ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
+
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",
     STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/',

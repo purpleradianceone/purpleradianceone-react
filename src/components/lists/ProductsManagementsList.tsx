@@ -108,6 +108,8 @@ ProductsManagementListProps) {
     setIsCompanyProductTeamModalOpen(status);
   };
 
+  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
   if (userHasAccessToViewProduct) {
     return (
       <div
@@ -142,6 +144,7 @@ ProductsManagementListProps) {
                           e.target.value
                         );
                       }}
+                      value={handleSearchOption.searchParameter}
                     ></SearchInput>
                   </div>
 
@@ -155,6 +158,7 @@ ProductsManagementListProps) {
                       <DateRangeFilterDropdown
                         dropdownOptions={dateRangeDropdownOptions}
                         handleDateIdChange={handleDateRangeIdChange}
+                        selectedOption={selectedDateName}
                       ></DateRangeFilterDropdown>
                     </div>
                   </div>

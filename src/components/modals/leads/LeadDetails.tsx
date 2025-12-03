@@ -18,9 +18,9 @@ import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLea
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
-import MESSAGE from "../../../constants/Messages";
 import COLORS from "../../../constants/Colors";
 import { Save } from "lucide-react";
+import { useUserPreference } from "../../../context/user/UserPreference";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -70,6 +70,15 @@ const LeadDetails = ({
   const [district, setDistrict] = useState<District[]>([]);
 
   const [countryid, setCountryid] = useState<string>("");
+  // useEffect(()=>{
+  //   if(countries){
+
+  //     const countryName = countries.find((item) => item.id === userPreference.countryId);
+  //     if(countryName){
+  //       setCountryid(countryName.name!);
+  //     }
+  //   }
+  // },[userPreference])
   const [stateId, setStateId] = useState<string>("");
   const [districtId, setDistrictId] = useState<string>("");
   const [industryTypeId, setIndustryTypeId] = useState<string>("");
@@ -85,11 +94,6 @@ const LeadDetails = ({
   }, [leadDetailsData]);
 
   const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
-  
-
-
-
-  
 
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
@@ -105,12 +109,7 @@ const LeadDetails = ({
         MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
       )
     ) {
-      // setMessageSnackbar({
-      //   open: true,
-      //   message: MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
-      //   type: "error",
-      // });
-      toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN)
+      toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN);
       return;
     }
 
@@ -151,11 +150,7 @@ const LeadDetails = ({
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
-          toast.success(response.data.message)
+          toast.success(response.data.message);
           setShowSaveLeadButton(false);
           createNewDetailRef.current = false;
 
@@ -164,11 +159,7 @@ const LeadDetails = ({
           return;
         }
         if (response.data.status === false) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "warning",
-          // });
-          toast.error(response.data.message)
+          toast.error(response.data.message);
           return;
         }
       }
@@ -344,14 +335,6 @@ const LeadDetails = ({
     });
   }, [stateData]);
 
-  // const stateOptions = Array.isArray(stateData)
-  //   ? stateData.map((state) => ({
-  //       label: state.name,
-  //       value: state.name,
-  //       id: state.id,
-  //     }))
-  //   : [];
-
   const countryOptions = Array.isArray(countries)
     ? countries.map((country) => ({
         label: country.name,
@@ -368,19 +351,38 @@ const LeadDetails = ({
       }))
     : [];
 
+  const { userPreference } = useUserPreference();
+
+  // useEffect(() => {
+  //   if (!userPreference || !editLeadDetails) return;
+
+  //   // If API returns a selected country ID → use that
+  //   if (editLeadDetails.country_id) {
+  //     setCountryid(String(editLeadDetails.country_id));
+  //     return;
+  //   }
+
+  //   // If country_name is empty → fallback to userPreference
+  //   if (
+  //     !editLeadDetails.country_name ||
+  //     editLeadDetails.country_name.trim().length === 0
+  //   ) {
+  //     setCountryid(String(userPreference.countryId));
+
+  //     //  mark form as modified
+  //     // setShowSaveLeadButton(true);
+  //   }
+  // }, [userPreference, editLeadDetails]);
+
   return (
     <div>
       <form>
         <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
           <span className="table-header-custom">Details</span>
           {showSaveLeadButton && (
-            <button
-              className={COLORS.ADD_BUTTON}
-              onClick={handleSave}
-            >
-              
+            <button className={COLORS.ADD_BUTTON} onClick={handleSave}>
               <div className="flex items-center gap-0.5">
-                <Save className="w-3 h-3 -mt-0.5"/>
+                <Save className="w-3 h-3 -mt-0.5" />
                 Save
               </div>
             </button>
@@ -442,7 +444,7 @@ const LeadDetails = ({
             maxLength={10}
             userHasAccessToUpdate={userHasAccessToUpdateLead}
             type="text"
-            label="Add. Contact number"
+            label="Add. Contact Number"
             value={editLeadDetails.additional_contact_number}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -459,11 +461,12 @@ const LeadDetails = ({
             label="Country"
             handleGetDropdownData={() => {
               getAllCountries();
-              ;
             }}
             selectOptions={countryOptions}
             value={editLeadDetails.country_name}
             selectedId={countryid}
+            defaultSelectedId={userPreference.countryId}
+            hasExistingValue={!!editLeadDetails.country_id}
             onChange={(e) => {
               setShowSaveLeadButton(true);
               setCountryid(e.target.value);
@@ -592,14 +595,6 @@ const LeadDetails = ({
           />
         </div>
       </form>
-
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>
   );
 };
@@ -620,10 +615,12 @@ type FormFieldProps = {
   ) => void;
   type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
-  selectedId?: string;
+  selectedId?: string | number;
   handleGetDropdownData?: () => void | null;
   userHasAccessToUpdate: boolean;
-  maxLength? : number
+  maxLength?: number;
+  defaultSelectedId?: string | number;
+  hasExistingValue?: boolean;
 };
 
 const FormField = ({
@@ -635,7 +632,9 @@ const FormField = ({
   selectedId,
   handleGetDropdownData,
   userHasAccessToUpdate,
-  maxLength
+  maxLength,
+  defaultSelectedId,
+  hasExistingValue,
 }: FormFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -651,31 +650,32 @@ const FormField = ({
         onClick={() => {
           if (userHasAccessToUpdate) {
             setIsEditing(true);
-            handleGetDropdownData!();
+            handleGetDropdownData?.();
+
+            //  APPLY DEFAULT VALUE ONLY WHEN EMPTY
+            if (
+              type === "select" &&
+              !hasExistingValue && // <--- Only apply default if NO backend value exists!
+              (!selectedId || selectedId === "") &&
+              defaultSelectedId
+            ) {
+              const event = {
+                target: { value: String(defaultSelectedId) },
+              } as React.ChangeEvent<HTMLSelectElement>;
+
+              onChange?.(event);
+            }
           } else {
-            toast.error(
-              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                .UPDATE_LEAD_ACCESS_DENIED_message
-            );
+            toast.error("You do not have access to update");
           }
         }}
       >
         {!isEditing ? (
           <span
             className="caption-custom cursor-pointer truncate whitespace-nowrap"
-            title={
-              // selectOptions
-              //   ?.find((opt) => opt.value === value)
-              //   ?.label?.toLocaleString() || value?.toLocaleString()
-              value?.toLocaleString()
-            }
+            title={value?.toLocaleString()}
           >
             {value ? (
-              // selectOptions?.find((opt) => opt.value === value)?.label || (
-              //     <span className="text-sm text-gray-500">
-              //       Select {label.toLowerCase()}
-              //     </span>
-              //   )
               <span className="caption-custom">{value?.toLocaleString()}</span>
             ) : (
               <span className="caption-custom italic">Add here...</span>
@@ -684,14 +684,14 @@ const FormField = ({
         ) : type === "select" ? (
           <select
             autoFocus
-            value={selectedId}
+            value={String(selectedId)}
             onBlur={handleBlur}
             onChange={onChange}
             className="caption-custom border border-gray-300 w-36 rounded p-1 focus:outline-none"
           >
             <option value=""> Select {label} </option>
             {selectOptions?.map((opt) => (
-              <option key={opt.value} value={opt.id!}>
+              <option key={opt.value} value={String(opt.id!)}>
                 {opt.label}
               </option>
             ))}

@@ -39,14 +39,14 @@ const MESSAGE = {
     },
     MODULE_ACCESS: {
         LEAD_MODULE: {
-                        DENIED_VIEW_ACCESS : "You do not have permission to view lead.",
+            DENIED_VIEW_ACCESS : "You do not have permission to view lead.",
             DENIED_ADD_ACCESS : "You do not have permission to create lead.",
             DENIED_ADD_LEAD_IMPORT_ACCESS : "You do not have permission to import leads.",
-            UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update this lead."
+            UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update lead details."
         }, COMPANY_USER: {
             DENIED_VIEW_ACCESS : "You do not have permission to view Company user.",
             DENIED_ADD_ACCESS_COMPANY_USER: "You do not have permission to Add user.",
-            DENIED_UPDATE_ACCESS_COMPANY_USER: "You do not have permission to update user."
+            DENIED_UPDATE_ACCESS_COMPANY_USER: "You do not have permission to update user details."
         }, DASHBOARD: {
             DENIED_UPDATE_ACCESS_DASHBOARD: "You do not have permission to update dashboard settings.",
             DENIED_VIEW_ACCESS_DASHBOARD: "You do not have permission to view dashboard setting of a user."
@@ -64,7 +64,7 @@ const MESSAGE = {
             DENIED_UPDATE_ACCESS : "You do not have permission to update account type.",
         },ACCOUNT_ACCESS : {
             DENIED_ADD_ACCESS : "You do not have permission to add new account.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update account.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update account details.",
             DENIED_ADD_ACCOUNT_IMPORT_ACCESS : "You do not have permission to import accounts.",
 
         },SUPPORT_TICKET_CATEGORY: {

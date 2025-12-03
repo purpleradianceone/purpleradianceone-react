@@ -613,6 +613,18 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
+  //  {
+  //   path: ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //           <Navbar>
+  //             <AccountComProdDetails />
+  //           </Navbar>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
   {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (

@@ -21,20 +21,30 @@ interface UseSearchFilterPaginationDateHandlersResult {
 }
 
 export const useSearchFilterPaginationDateHandlers = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialValue ? : any
 ): UseSearchFilterPaginationDateHandlersResult => {
   const { userPreference } = useUserPreference();
-
   // const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
   const firstValue = userPreference.rowsInGrid;
-  const [pageSize, setPageSize] = useState(firstValue ?? 25);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // const [pageSize, setPageSize] = useState(firstValue ?? 25);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Initialize totalPages
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [dateRangeId, setDateRangeId] = useState(0);
-  const [searchParameter, setSearchParameter] = useState('');
+  // const [startDate, setStartDate] = useState('');
+  // const [endDate, setEndDate] = useState('');
+
+  // const [dateRangeId, setDateRangeId] = useState(0);
+  // const [searchParameter, setSearchParameter] = useState('');
   const [concatDate, setConcatDate] = useState('');
 
+
+  const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
+  const [pageSize, setPageSize] = useState(initialValue?.size || 10);
+  const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
+  const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
+  const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
+  const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
 
   useEffect(() => {
     setPageSize(firstValue)
@@ -145,10 +155,10 @@ export const useSearchFilterPaginationDateHandlers = (
     }
   }, [startDate, endDate, dateRangeId]);
 
-  useEffect(() => {
-    setCurrentPage(1);
+  // useEffect(() => {
+  //   setCurrentPage(1);
 
-  }, []);
+  // }, []);
 
   return {
     pageSize,
@@ -166,5 +176,6 @@ export const useSearchFilterPaginationDateHandlers = (
     handleEndDateChange,
     handleDatePageIdChange,
     handleSearchParameterChange,
+    // initialized
   };
 };

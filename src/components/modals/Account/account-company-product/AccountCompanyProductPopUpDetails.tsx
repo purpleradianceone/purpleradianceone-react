@@ -3,15 +3,15 @@
 import { createPortal } from "react-dom";
 import AccountProduct from "../../../../@types/account/AccountProduct";
 import {
-  Briefcase,
-  Building2,
+  Barcode,
   Calendar,
-  FileText,
+  FileDigit,
   LucideCalendar,
   LucideIcon,
   MapPin,
-  Package,
   Pen,
+  ReceiptText,
+  ShoppingBag,
   User,
   X,
 } from "lucide-react";
@@ -23,13 +23,17 @@ import GetCompanyUsers from "../../../views/manage-company-users/CompanyUsersMan
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import FormHeader from "../../../ui/FormHeader";
 import COLORS from "../../../../constants/Colors";
-import { SIZE } from "../../../../constants/AppConstants";
+import {  SIZE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import FormInput from "../../../ui/FormInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
 import IntervalType from "../../../../@types/interval/IntervalType";
 import { Item } from "../../../../constants/NumberList";
+import { AccountCompanyProductAmcDetails } from "./AccountCompanyProductAmcDetails";
+import { AccountCompanyProductWarrantyDetails } from "./AccountCompanyProductWarrantyDetails";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 const AccountCompanyProductPopUpDetails = ({
   selectedProductCard,
@@ -40,6 +44,7 @@ const AccountCompanyProductPopUpDetails = ({
   onClose: () => void;
   refreshKey: number;
 }) => {
+  const {userHasAccessToUpdateAccount} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [
     openCompanyUserModuleForInstalledByChange,
@@ -56,10 +61,12 @@ const AccountCompanyProductPopUpDetails = ({
     }
   }, [selectedProductCard, refreshKey]);
 
-
- 
   const handleChangeInstalledBy = () => {
-    setOpenCompanyUserModuleForInstalledByChange(true);
+    if(userHasAccessToUpdateAccount){
+      setOpenCompanyUserModuleForInstalledByChange(true);
+    }else{
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+    }
   };
 
   const handleSelctedInstalledByUser = (data: CompanyUser) => {
@@ -175,7 +182,6 @@ const AccountCompanyProductPopUpDetails = ({
   const handleClose = () => {
     setOpenCompanyUserModuleForInstalledByChange(false);
   };
- 
 
   const updateAccountCompanyProduct = async (
     field: string,
@@ -201,9 +207,7 @@ const AccountCompanyProductPopUpDetails = ({
         case "delivery_address":
           updated.deliveryAddress = value;
           break;
-        case "warranty_terms":
-          updated.warrantyTerms = value;
-          break;
+
         case "quantity":
           updated.quantity = parseInt(value);
           break;
@@ -247,10 +251,10 @@ const AccountCompanyProductPopUpDetails = ({
   return (
     productData &&
     createPortal(
-      <div className="fixed inset-0  bg-black bg-opacity-5 flex justify-center items-center z-50 p-4">
-        <div className="bg-gray-50  border rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+      <div className="fixed inset-0  bg-black bg-opacity-5 flex justify-center items-center z-50">
+        <div className="bg-white  border rounded-2xl shadow-xl w-full max-w-6xl max-h-[95vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
           {/* Header */}
-          <div className="relative px-6 pt-4 pb-3">
+          <div className="relative  px-6 pt-4 pb-2">
             <button
               onClick={() => {
                 onClose();
@@ -275,97 +279,97 @@ const AccountCompanyProductPopUpDetails = ({
                     <span className="text-sm italic">Un-Named Product</span>
                   )}
                 </h2>
-                <p className="text-md text-gray-600 mt-1 flex items-center">
-                  <Briefcase size={16} className="inline mr-2" />
+                
+                <p className="table-header-custom mt-1 flex items-center ">
+                  <div className="flex items-center justify-center">
+                    {/* <Briefcase size={16} className="inline mr-2 font-semibold" /> */}
                   {productData!.accountName ? (
                     <>
                       {" "}
-                      <span>account name : {productData.accountName}</span>
+                      <span className="table-header-custom">Account Name : {productData.accountName}</span>
                     </>
                   ) : (
                     <span className="text-sm italic">No account name</span>
                   )}
+                  </div>
                 </p>
               </div>
             </div>
           </div>
 
           {/* Content */}
-          <div className="px-8 pb-2">
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2"> */}
-              {/* Left Section */}
-              <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+          <div className="px-7 pb-2">
+            {/* Left Section */}
+            <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+              <DisplayComponent
+                icon={ShoppingBag}
+                title="Quantity"
+                value={productData.quantity
+                  .toLocaleString()
+                  .concat(" " + productData.unitNameInStock)}
+                penLogo={false}
+              />
+              {productData.serialNumber && (
                 <DisplayComponent
-                  icon={Package}
-                  title="Quantity"
-                  value={productData.quantity
-                    .toLocaleString()
-                    .concat(" " + productData.unitNameInStock)}
+                  icon={FileDigit}
+                  title="Serial Number"
+                  value={
+                    productData.serialNumber ? productData.serialNumber : ""
+                  }
                   penLogo={false}
                 />
-                {productData.serialNumber && (
-                  <DisplayComponent
-                    icon={Package}
-                    title="Serial Number"
-                    value={
-                      productData.serialNumber ? productData.serialNumber : ""
-                    }
-                    penLogo={false}
-                  />
-                )}
+              )}
 
-                {productData.barcode && (
-                  <DisplayComponent
-                    icon={Package}
-                    title="Barcode"
-                    value={
-                      productData.barcode ? productData.barcode : ""
-                    }
-                    penLogo={false}
-                  />
-                )}
+              {productData.barcode && (
+                <DisplayComponent
+                  icon={Barcode}
+                  title="Barcode"
+                  value={productData.barcode ? productData.barcode : ""}
+                  penLogo={false}
+                />
+              )}
 
-                <InfoBlock
-                  icon={Calendar}
-                  title="Purchase Date"
-                  type="date"
-                  value={productData!.purchaseDate}
-                  onValueChange={handleDescriptionChange}
+              <InfoBlock
+                icon={Calendar}
+                title="Purchase Date"
+                type="date"
+                value={productData!.purchaseDate}
+                onValueChange={handleDescriptionChange}
+                penLogo={true}
+                userhasAccessToUpdate={userHasAccessToUpdateAccount}
+              />
+
+              <InfoBlock
+                icon={Calendar}
+                title="Delivery Date"
+                type="date"
+                value={productData!.deliveryDate}
+                onValueChange={handleDescriptionChange}
+                penLogo={true}
+                userhasAccessToUpdate={userHasAccessToUpdateAccount}
+              />
+
+              <InfoBlock
+                icon={Calendar}
+                title="Installation Date"
+                type="date"
+                value={productData!.installationDate}
+                onValueChange={handleDescriptionChange}
+                penLogo={true}
+                userhasAccessToUpdate={userHasAccessToUpdateAccount}
+              />
+              <div className="cursor-pointer" onClick={handleChangeInstalledBy}>
+                <DisplayComponent
+                  icon={User}
+                  title="Installed By"
+                  value={productData!.installedByName}
                   penLogo={true}
                 />
-
-                <InfoBlock
-                  icon={Calendar}
-                  title="Delivery Date"
-                  type="date"
-                  value={productData!.deliveryDate}
-                  onValueChange={handleDescriptionChange}
-                  penLogo={true}
-                />
-
-                <InfoBlock
-                  icon={Calendar}
-                  title="Installation Date"
-                  type="date"
-                  value={productData!.installationDate}
-                  onValueChange={handleDescriptionChange}
-                  penLogo={true}
-                />
-                <div
-                  className="cursor-pointer"
-                  onClick={handleChangeInstalledBy}
-                >
-                  <DisplayComponent
-                    icon={Calendar}
-                    title="Installed By"
-                    value={productData!.installedByName}
-                    penLogo={true}
-                  />
-                </div>
               </div>
+            </div>
 
-              {/* Right Section */}
-              {/* <div className="space-y-2">
+            {/* Right Section */}
+            {/* <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
                   <div className="col-span-2 ">
                     <InfoRow
@@ -402,7 +406,7 @@ const AccountCompanyProductPopUpDetails = ({
                   />
                 </div> */}
 
-                {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
+            {/* <div className="grid grid-cols-2 gap-1  bg-gray-00 rounded p-0.5">
                   <div className="col-span-2">
                     <InfoRow
                       icon={Shield}
@@ -438,10 +442,10 @@ const AccountCompanyProductPopUpDetails = ({
                   />
                 </div>
                 */}
-              {/* </div> */}
+            {/* </div> */}
             {/* </div> */}
 
-            <div className="space-y-2 grid grid-cols-1">
+            <div className=" grid grid-cols-2 gap-1">
               {/* Addresses */}
 
               <InfoBlock
@@ -451,30 +455,41 @@ const AccountCompanyProductPopUpDetails = ({
                 value={productData!.deliveryAddress}
                 penLogo={true}
                 onValueChange={handleDescriptionChange}
+                userhasAccessToUpdate={userHasAccessToUpdateAccount}
               />
 
               <InfoBlock
                 type="textarea"
-                icon={Building2}
+                icon={ReceiptText}
                 title="Billing Address"
                 value={productData!.billingAddress}
                 penLogo={true}
                 onValueChange={handleDescriptionChange}
+                userhasAccessToUpdate={userHasAccessToUpdateAccount}
               />
 
               {/* Warranty Terms */}
 
-              <InfoBlock
+              {/* <InfoBlock
                 type="textarea"
                 icon={FileText}
                 title="Warranty Terms"
                 value={productData!.warrantyTerms}
                 penLogo={true}
                 onValueChange={handleDescriptionChange}
-              />
+              /> */}
             </div>
+            {/* Right Card - Empty for future use */}
+
+            <AccountCompanyProductAmcDetails
+              accountCompanyProductId={selectedProductCard.id}
+            />
+            <AccountCompanyProductWarrantyDetails
+              accountCompanyProductId={selectedProductCard.id}
+            />
           </div>
         </div>
+
         {openCompanyUserModuleForInstalledByChange &&
           createPortal(
             <>
@@ -662,6 +677,7 @@ interface InfoBlockProps {
   onValueChange?: (field: string, newValue: string) => void; // 🔹 callback to parent
   intervalOption?: IntervalType[];
   interval?: Item[];
+  userhasAccessToUpdate : boolean
 }
 
 function DisplayComponent({
@@ -676,7 +692,7 @@ function DisplayComponent({
   icon: LucideIcon;
 }) {
   return (
-    <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+    <div className="flex w-full h-fit items-start gap-3 p-1 bg-white rounded-md shadow-sm hover:shadow-sm transition-shadow duration-100 border border-gray-100">
       <div className="flex-shrink-0 p-1 bg-blue-50 rounded-full">
         <Logo
           className={`${COLORS.FORM_HEADER_ICONS_COLOR}`}
@@ -685,9 +701,9 @@ function DisplayComponent({
       </div>
 
       <div className="flex flex-col w-full">
-        <h4 className="font-semibold text-gray-900 mb-1 text-base">{title}</h4>
+        <h4 className="font-semibold text-gray-900  text-base">{title}</h4>
 
-        <div className="flex items-center justify-between group px-2 py-0.5 rounded-md transition-colors duration-200 hover:bg-gray-100 cursor-pointer">
+        <div className="flex items-center justify-between group px-2  rounded-md transition-colors duration-200 hover:bg-gray-100 ">
           <p className="text-gray-700 text-sm">
             {value.length > 30
               ? value.substring(0, 29).concat("...")
@@ -710,6 +726,7 @@ function InfoBlock({
   type,
   intervalOption,
   interval,
+  userhasAccessToUpdate 
 }: InfoBlockProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [changedValue, setChangedValue] = useState<string | number>(value);
@@ -730,9 +747,13 @@ function InfoBlock({
   }
 
   const handleClick = () => {
-    setChangedValue(value);
-    prevValueRef.current = value;
-    setIsEditing(true);
+    if(userhasAccessToUpdate){
+      setChangedValue(value);
+      prevValueRef.current = value;
+      setIsEditing(true);
+    }else{
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+    }
   };
 
   const handleBlur = (
@@ -782,7 +803,7 @@ function InfoBlock({
   };
 
   return (
-    <div className="flex w-full h-fit items-start gap-3 p-2 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
+    <div className="flex w-full h-fit items-start gap-3 p-1 bg-white rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
       <div className="flex-shrink-0 p-1 items-center bg-blue-50 rounded-full">
         <Logo
           className={`${COLORS.FORM_HEADER_ICONS_COLOR}`}
@@ -790,18 +811,19 @@ function InfoBlock({
         />
       </div>
       <div className="w-full">
-        <h4 className="font-medium text-gray-900 mb-1">{title}</h4>
+        <h4 className="font-medium text-gray-900 ">{title}</h4>
 
         {!isEditing ? (
           <div
             onClick={handleClick}
-            className="flex items-center gap-2 hover:cursor-pointer hover:bg-gray-200 rounded px-2"
+            className="flex w-full  items-center justify-between gap-2 hover:cursor-pointer hover:bg-gray-100 rounded px-1"
           >
-            <p className="text-gray-700">
+            <p className="text-gray-700 text-sm  w-[97%] ">
               {changedValue || (
-                <span className="text-sm italic">Not provided</span>
+                <span className="text-xs italic">Not Provided</span>
               )}
             </p>
+
             {penLogo && <Pen className="text-blue-600" size={12} />}
           </div>
         ) : type === "textarea" ? (
@@ -810,7 +832,7 @@ function InfoBlock({
               autoFocus={true}
               cols={3}
               label={title}
-              rows={2}
+              rows={3}
               defaultValue={changedValue}
               onChange={handleTextAreaChange}
               onBlur={handleBlur}
@@ -828,7 +850,7 @@ function InfoBlock({
         ) : type === "text" ? (
           <FormInput />
         ) : type === "date" ? (
-          <div>
+          <div >
             {/* installation date */}
             <DatePickerInput
               label=""

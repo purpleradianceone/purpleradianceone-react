@@ -28,7 +28,7 @@ type GetCompanyUsersListForLeadProps = {
   isUsedForSettings: boolean;
   //added
   selectedUserId: number | null;
-  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean ;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean;
 };
 
 function GetCompanyUserListForLeadAssignment({
@@ -246,25 +246,19 @@ function GetCompanyUserListForLeadAssignment({
           {/* new end */}
         </div>
 
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          <div
-            className="ag-theme-balhal w-full"
-            style={{ height: "460px", width: "100%" }}
-          >
-            {/* NOTE : STATE MANAGEMENT NEED TO DO */}
-            <CompanyUserAgGridForLead
-              selectedUserId={selectedUserId}
-              handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-              users={users}
-              isUsedForSettings={isUsedForSettings}
-              handleUpdateLeadUser={handleUpdateLeadUser}
-            />
-          </div>
-          {/* <CompanyUserAccessManagementModal
-            isOpen={isAccessModalOpen}
-            onClose={() => setIsAccessModalOpen(false)}
-            users={selectedCompanyUser}
-          /> */}
+        <div
+          className={`ag-theme-balham w-full ${
+            isUsedForSettings ? "h-[60vh]" : "h-[35vh]"
+          } `}
+        >
+          {/* NOTE : STATE MANAGEMENT NEED TO DO */}
+          <CompanyUserAgGridForLead
+            selectedUserId={selectedUserId}
+            handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
+            users={users}
+            isUsedForSettings={isUsedForSettings}
+            handleUpdateLeadUser={handleUpdateLeadUser}
+          />
         </div>
 
         <div className="flex items-center justify-end ">

@@ -1,0 +1,9 @@
+export enum LocalStorageKeys {
+    LEAD_MANAGEMEMNT_FILTERS ='lead_management_filters',
+    COMPANY_MANAGEMEMNT_FILTERS ='company_management_filters',
+    ACCOUNT_MANAGEMEMNT_FILTERS ='account_management_filters',
+    PRODUCT_MANAGEMEMNT_FILTERS ='product_management_filters',
+    STOCK_MANAGEMEMNT_FILTERS ='stock_management_filters',
+    TEAMS_MANAGEMEMNT_FILTERS ='teams_management_filters'
+
+}

@@ -120,7 +120,8 @@ function FormInput({
   autoComplete,
   logo : Icon,
   autoFocus,
-  step
+  step,
+  value
   // onClick
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
@@ -205,6 +206,7 @@ function FormInput({
             maxLength={maxLength}
             pattern={pattern}
             autoFocus={autoFocus}
+            value={value}
           />
         )}
 

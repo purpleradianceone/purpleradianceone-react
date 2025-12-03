@@ -4,6 +4,7 @@ type UserPreference = {
     companyUserId: number,
     timezoneId: number,
     isLeftMenu : boolean,
+    countryId : number,
     isHamburgerMenuCollapsed : boolean,
     timezoneName : string,
     timezoneUTCOffset : string,

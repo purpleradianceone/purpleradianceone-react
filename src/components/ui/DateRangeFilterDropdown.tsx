@@ -23,7 +23,14 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
       setSelectedOption(dateName)
       setIsOpen(false);
     };
-  
+
+    
+  useEffect(() => {
+  if (props.selectedOption) {
+    setSelectedOption(props.selectedOption);
+  }
+}, [props.selectedOption]);
+
     return (
       <div className="relative inline-block" ref={dropdownRef}>
         <button
@@ -77,6 +84,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
                       : 'input-label-custom hover:bg-gray-50'}
                     focus:outline-none focus:bg-gray-50
                   `}
+
                   onClick={() => handleOptionClick(option.search_date_range_id,option.date_range)}
                 >
                   {option.date_range}

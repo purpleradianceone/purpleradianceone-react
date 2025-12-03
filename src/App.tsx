@@ -4,7 +4,7 @@
  * @import SignInForm for SignInForm component from components/forms/SignInForm
  */
 import { RouterProvider } from "react-router-dom";
-import { router } from "./config/routes/Route";
+import {  router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
 import { PanelProvider } from "./context/panel/usePanel";
@@ -54,7 +54,8 @@ function App() {
                           title="Session Expired !"
                           message={dialogMessage}
                           />
-                        <RouterProvider router={router} />
+                        <RouterProvider router={router}  />
+
                       </NotificationProvider>
                           </QueryClientProvider>
                     </GoogleMeetContextProvider>

@@ -136,7 +136,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
       .then((response) => {
         if (response.status === 200) {
           toast.success(response.data);
-          Navigate(ROUTES_URL.SIGN_IN);
           setLoginStatus({
             id: 0,
             companyId: 0,
@@ -156,8 +155,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
             subscriptionId: 0,
             isSuperUser: false,
           });
-
+          
           setNotificationCount(0);
+          localStorage.clear();
+          
+          Navigate(ROUTES_URL.SIGN_IN);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
