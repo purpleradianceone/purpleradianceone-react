@@ -90,7 +90,6 @@ export const notificationsDesription = {
 
 
 export const  SUBSCRIPTION = {
-    // RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
     RAZORPAY_KEY : import.meta.env.VITE_RAZORPAY_API_ID_KEY,
     COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",
     RAZORPAY_CURRENCY : "INR",
@@ -104,8 +103,8 @@ export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
 // company purpleradianceone captcha key
-export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
-
+// export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
+  export const SITE_KEY = import.meta.env.VITE_SITE_KEY_OF_CAPTCHA
 // company captcha key
 // export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
 

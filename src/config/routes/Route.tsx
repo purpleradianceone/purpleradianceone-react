@@ -62,6 +62,8 @@ import AccountImportCsvManagement from "../../components/modals/Account/import-a
 import StockManagement from "../../components/views/stock-management/StockManagement";
 import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
 import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
+import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
+import AccountDetails from "../../components/modals/Account/AccountDetails";
 
 export const router = createBrowserRouter([
   {
@@ -607,6 +609,37 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <GetAccounts isUsedForAccountLead={false} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountDetails
+              />
+              {/* <GetAccounts isUsedForAccountLead={false} /> */}
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:account_id`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+            <CreateMultipleAccountCompanyProduct/>
             </Navbar>
           </div>
         </PrivateRoute>

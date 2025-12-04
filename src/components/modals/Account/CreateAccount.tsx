@@ -198,7 +198,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       if (!value.trim()) {
         setErrors((prev) => ({
           ...prev,
-          mobileNumber: "Mobile number is required",
+          mobileNumber: "Mobile Number is required",
         }));
       } else if (
         !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
@@ -206,7 +206,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       ) {
         setErrors((prev) => ({
           ...prev,
-          mobileNumber: "Please enter a valid mobile number.",
+          mobileNumber: "Please enter a valid Mobile Number.",
         }));
       } else {
         setErrors((prev) => ({ ...prev, mobileNumber: "" }));
@@ -258,9 +258,11 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   ) => {
     const { name, value } = e.target;
 
+  
+
     setCreateAccountFormData({
       ...createAccountFormData,
-      [name]: value.trim(),
+      [name]: value,
     });
   };
 
@@ -506,7 +508,10 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           </div>
 
                     <div className="grid grid-cols-2 gap-1">
+                      <div>
+
           {/* mobile number */}
+
           <FormInput
             required
             logo={Phone}
@@ -523,6 +528,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
           {errors.mobileNumber && (
             <p className="text-xs  text-red-600 mt-1">{errors.mobileNumber}</p>
           )}
+          </div>
            {/* Business registration number */}
           <FormInput
             logo={Phone}
