@@ -218,6 +218,10 @@ function EditCompanyProductModal({
   const hanldeUpdateCompanyProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
+    
+    if(errors){
+      return;
+    }
     validateDropdown();
     event.preventDefault();
 
@@ -512,9 +516,9 @@ function EditCompanyProductModal({
                 logo={LucideLink}
                 type="text"
                 name="url"
-                required={false}
+                // required={false}
                 defaultValue={intialEditCompanyProductFormData.url}
-                value={intialEditCompanyProductFormData.url}
+                // value={intialEditCompanyProductFormData.url}
                 placeholder="Product URL"
                 onChange={handleEditCompanyProductFormDataChange}
                 onBlur={handleBlur}
@@ -538,7 +542,7 @@ function EditCompanyProductModal({
                 name="version"
                 max={20}
                 defaultValue={intialEditCompanyProductFormData.version}
-                value={intialEditCompanyProductFormData.version}
+                // value={intialEditCompanyProductFormData.version}
                 placeholder="Product Version"
                 onChange={handleEditCompanyProductFormDataChange}
                 onBlur={handleBlur}

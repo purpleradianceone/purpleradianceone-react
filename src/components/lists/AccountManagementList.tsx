@@ -16,7 +16,6 @@ import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
-import AccountDetails from "../modals/Account/AccountDetails";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
@@ -31,13 +30,13 @@ function AccountManagementList({
   onStartDateChange,
   onEndDateChange,
   paginationData,
-  fetchAccounts,
+  // fetchAccounts,
   handleCreateCompanyAccountType,
   isUsedForAccountLead,
   handleRowSelectedForLead,
   isUsedForSupportTicketCreation
 }: {
-  fetchAccounts: () => Promise<void>;
+  // fetchAccounts: () => Promise<void>;
   accounts: Account[];
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
@@ -59,14 +58,15 @@ function AccountManagementList({
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
-  const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
-    useState<Account>();
-  const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
+  // const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
+    // useState<Account>();
+  // const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
-  const handleRowSelectedToShowAccountDetails = (data: any) => {
+  const handleRowSelectedToShowAccountDetails = (data: Account) => {
     if (!isUsedForAccountLead) {
-      setAccountDataToShowFullDetails(data);
-      setShowAccountDetails(true);
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`)
+      // setAccountDataToShowFullDetails(data);
+      // setShowAccountDetails(true);
     } else {
       handleRowSelectedForLead!(data);
     }
@@ -226,15 +226,15 @@ function AccountManagementList({
         />
       </div>
 
-      {showAccountDetails && (
+      {/* {showAccountDetails && (
         <div className="account-data">
           <AccountDetails
-            fetchAccounts={fetchAccounts}
-            company={AccountDataToShowFullDetails!}
-            onClose={() => setShowAccountDetails(false)}
+            // fetchAccounts={fetchAccounts}
+            // company={AccountDataToShowFullDetails!}
+            // onClose={() => setShowAccountDetails(false)}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -214,7 +214,7 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <AccountManagementList
-                fetchAccounts={fetchAccounts}
+                // fetchAccounts={fetchAccounts}
                 accounts={accounts}
                 handleSearchOption={{
                   handleSearchParameterChange,
