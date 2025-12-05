@@ -15,7 +15,7 @@ export const useProductType = () => {
     ProductType[]
   >([]);
       const {loginStatus} = useLoggedInUserContext();
-  
+   const [loading , setLoading]= useState<boolean>(true);
 
   const getProductType = async () => {
     const PostData: ProductType = {
@@ -31,7 +31,7 @@ export const useProductType = () => {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
+         setLoading(false)
         setProductTypeData(response.data);
       }
     } catch (error: ApiError | any) {
@@ -52,6 +52,7 @@ export const useProductType = () => {
   }, []);
 
   return {
-    productTypeData,
+    loading,
+    productTypeData
   };
 };

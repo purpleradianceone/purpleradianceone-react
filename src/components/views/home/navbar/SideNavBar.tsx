@@ -3,8 +3,10 @@ import {
   Calendar,
   Handshake,
   Home,
+  Layers,
   Menu,
   Network,
+  NotebookPen,
   Settings,
   Store,
   UserCogIcon,
@@ -24,10 +26,13 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewMeeting,
+    userHasAccessToViewStock,
+    userHasAccessToViewSupportTicket
   } = useUserAccessModules();
 
   return (
     <aside
+      id="left-side-navbar"
       className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
           ${isOpen ? "w-64" : "w-14"}`}
     >
@@ -55,78 +60,98 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         </NavLink>
 
         {/* Enabled Nav Links */}
-          <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={Building2}
-                label="Manage Users"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewUser}
-              />
-            )}
-          </NavLink>
+        <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Building2}
+              label="Manage Users"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewUser}
+            />
+          )}
+        </NavLink>
 
-          <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={Handshake}
-                label="Leads"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewLead}
-              />
-            )}
-          </NavLink>
+        <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Handshake}
+              label="Leads"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewLead}
+            />
+          )}
+        </NavLink>
 
+        <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={UserCogIcon}
+              label="Accounts"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewAccount}
+            />
+          )}
+        </NavLink>
 
-          <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={UserCogIcon}
-                label="Accounts"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewAccount}
-              />
-            )}
-          </NavLink>
+        <NavLink to={ROUTES_URL.PRODUCT_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Store}
+              label="Products"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewProduct}
+            />
+          )}
+        </NavLink>
 
-          <NavLink to={ROUTES_URL.PRODUCT_MANAGEMENT}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={Store}
-                label="Products"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewProduct}
-              />
-            )}
-          </NavLink>
-
-          <NavLink to={ROUTES_URL.TEAM_MANAGEMENT}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={Network}
-                label="Teams"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewTeamManagement}
-              />
-            )}
-          </NavLink>
-          <NavLink to={ROUTES_URL.MEETINGS}>
-            {({ isActive }) => (
-              <SideNavBarItem
-                icon={Calendar}
-                label="Meetings"
-                isOpen={isOpen}
-                isActive={isActive}
-                disabled={!userHasAccessToViewMeeting}
-              />
-            )}
-          </NavLink>
-
+        <NavLink to={ROUTES_URL.STOCK_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Layers}
+              label="Stock"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewStock}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={NotebookPen }
+              label="Support"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewSupportTicket}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.TEAM_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Network}
+              label="Teams"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewTeamManagement}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.MEETINGS}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Calendar}
+              label="Meetings"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewMeeting}
+            />
+          )}
+        </NavLink>
 
         {/* CRM Settings Dropdown */}
         <SideNavBarItem

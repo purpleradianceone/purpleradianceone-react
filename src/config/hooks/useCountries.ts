@@ -14,7 +14,7 @@ import Country from "../../@types/general/Country";
   export const useCountries = () => {
 
       const [countries, setCountries] = useState<Country[]>([]);
-  
+    const [loading , setLoading] = useState<boolean>(true); 
     const getAllCountries = async () => {
     const PostData: Country = {
       id: null,
@@ -30,6 +30,7 @@ import Country from "../../@types/general/Country";
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
+        setLoading(false);
         console.log(response.data);
         setCountries(response.data);
       }
@@ -51,6 +52,7 @@ import Country from "../../@types/general/Country";
         }, []);
       
       return{
+        loading,
           countries,
       }
   

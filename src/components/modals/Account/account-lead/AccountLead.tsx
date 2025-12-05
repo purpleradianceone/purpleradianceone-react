@@ -4,7 +4,7 @@ import CreateAccountLeadType from "../../../../@types/account/CreateAccountLeadT
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useEffect, useState } from "react";
 import CreateAccountLead from "./CreateAccountLead";
@@ -15,12 +15,14 @@ import ToggleButton from "../../../ui/ToggleButton";
 import ROUTES_URL from "../../../../constants/Routes";
 import qs from "query-string";
 import { useNavigate } from "react-router-dom";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
-
+  const {userHasAccessToViewLead, userHasAccessToUpdateAccount} = useUserAccessModules();
   const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
@@ -173,7 +175,7 @@ return (
   <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
     {/* Header */}
     <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-      <span>Account Lead</span>
+      <span>Account related leads</span>
     </div>
 
     {
@@ -189,7 +191,7 @@ return (
       <div className="flex items-center justify-center py-4">
         <span className="italic caption-custom flex gap-1 items-center ">
           <CreateAccountLead account={account} getAccountLead={getAccountLead} />
-          No data available.
+          No leads available.
         </span>
       </div>
     )}
@@ -207,7 +209,11 @@ return (
         {accountLead.map((item: AccountLeadType) => (
           <div
           onClick={() =>{
-            handleAccountLead(item.leadId)
+            if(userHasAccessToViewLead){
+              handleAccountLead(item.leadId)
+            }else{
+              toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_VIEW_ACCESS)
+            }
           }}
             key={item.id}
             className="p-2 cursor-pointer hover:white-text  hover:shadow-md  bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col "
@@ -229,7 +235,11 @@ return (
                   name={item.id.toString()}
                   onToggle={() => {
                     // e.stopPropagation();
-                    handleAccountLeadStatusChange(item);
+                    if(userHasAccessToUpdateAccount){
+                      handleAccountLeadStatusChange(item);
+                    }else{
+                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+                    }
                   }}
                 />
                 </div>

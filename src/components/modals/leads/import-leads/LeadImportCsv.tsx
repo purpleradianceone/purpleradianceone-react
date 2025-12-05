@@ -18,7 +18,7 @@ import {
   ArrowLeft,
   LucideFolderInput,
 } from "lucide-react";
-// import Papa from "papaparse";
+import Papa from "papaparse";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -42,6 +42,10 @@ import InterestType from "../../../../@types/lead-management/InterestType";
 import ApiError from "../../../../@types/error/ApiError";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import COLORS from "../../../../constants/Colors";
+import toast from "react-hot-toast";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
+import MESSAGE from "../../../../constants/Messages";
 
 // --- GENERIC TYPES ---
 interface MappableItem {
@@ -139,13 +143,13 @@ const DroppableCrmField: React.FC<{
   }));
 
   return (
-    <div key={field.id} className="flex items-start gap-1">
+    <div key={field.id} className="flex items-start justify-evenly">
       <label
         htmlFor={`map-${field.id}`}
-        className="w-1/3 input-label-custom pt-2"
+        className="w-1/2 input-label-custom  pt-2"
       >
-        {field.label} :
-        {field.required && <span className="text-red-500 ml-1">*</span>}
+        {field.label}
+        {field.required && <span className="text-red-500 ">*</span>} :
       </label>
       <div
         ref={drop}
@@ -169,7 +173,9 @@ const DroppableCrmField: React.FC<{
             </span>
           ))
         ) : (
-          <span className="text-gray-500 text-sm italic">Drag column here</span>
+          <span className="text-gray-500 text-sm  italic">
+            Drag column here
+          </span>
         )}
       </div>
     </div>
@@ -213,7 +219,7 @@ const GenericValueMappingCard = forwardRef(
       searchPlaceholder,
       totalCrmItems,
       currentPage = 0,
-      itemsPerPage = 40,
+      itemsPerPage = 25,
       onPageChange,
     }: ValueMappingCardProps<T>,
     ref: React.Ref<HTMLDivElement> // added this for component reference
@@ -300,11 +306,11 @@ const GenericValueMappingCard = forwardRef(
       <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm">
         <h3 className="table-header-custom mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className={onSearch ? " mt-12 ": ""}>
             <h4 className="input-label-custom text-center mb-2">
               Your CSV Values (Drag)
             </h4>
-            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-60 overflow-y-auto">
+            <div className="space-y-2 p-2 input-label-custom  bg-white rounded-md border min-h-[100px] max-h-80 overflow-y-auto">
               {unmappedCsvValues.map((s) => (
                 <DraggableCsvValue key={s} value={s} type={itemType} />
               ))}
@@ -342,7 +348,7 @@ const GenericValueMappingCard = forwardRef(
             <h4 className="input-label-custom  text-center mb-2">
               To CRM Values (Drop)
             </h4>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-2 max-h-80 overflow-y-auto">
               {crmValues.map(
                 (item) =>
                   item.id && <DroppableTarget key={item.id} crmItem={item} />
@@ -363,7 +369,7 @@ const GenericValueMappingCard = forwardRef(
                 <button
                   onClick={() => handleInternalPageChange(currentPage + 1)}
                   disabled={currentPage === totalPages - 1}
-                  className="px-3 py-1 rounded-md bg-gray-200input-label-custom  disabled:opacity-50"
+                  className="px-3 py-1 rounded-md bg-gray-200 input-label-custom  disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -399,8 +405,10 @@ const LeadImportCsv = ({
 
   const [isLoadingLeadInterestData, setIsLoadingLeadInterestData] =
     useState<boolean>(true);
-    const [isLoadingLeadSourceAndStatusData, setIsLoadingLeadSourceAndSourceData] =
-    useState<boolean>(true);
+  const [
+    isLoadingLeadSourceAndStatusData,
+    setIsLoadingLeadSourceAndSourceData,
+  ] = useState<boolean>(true);
 
   // Refs for auto-scrolling
   const leadStatusMappingRef = useRef<HTMLDivElement>(null);
@@ -507,7 +515,7 @@ const LeadImportCsv = ({
   // --- STATIC DATA ---
   const crmLeadFields: CrmField[] = useMemo(
     () => [
-      { id: "name", label: "Full Name", required: false },
+      { id: "name", label: "Full Name", required: true },
       { id: "email", label: "Email", required: false },
       { id: "mobilenumber", label: "Mobile Number", required: false },
       { id: "description", label: "Description", required: false },
@@ -565,15 +573,19 @@ const LeadImportCsv = ({
         }
       }
     };
-    await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
-    await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
-    await function(){
-    setIsLoadingLeadSourceAndSourceData(false);
-    }()
+
+    try{
+      await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
+      await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
+    }catch(err : any ){
+      toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
+    }finally{
+        setIsLoadingLeadSourceAndSourceData(false);
+    }
   }, []);
 
   // API call to get lead interest data
-  async function getLeadInterestData() {
+  const  getLeadInterestData = useCallback(async ()=> {
     try {
       const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
         params: {
@@ -585,7 +597,6 @@ const LeadImportCsv = ({
       });
 
       if (response.status === STATUS_CODE.OK) {
-        setIsLoadingLeadInterestData(false);
         setInterestTypeData(response.data);
       }
     } catch (error: any) {
@@ -597,12 +608,16 @@ const LeadImportCsv = ({
         if (refreshTokenStatus) {
           getLeadInterestData();
         }
+      }else{
+              toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
       }
-    }
-  }
+    }finally{
+        setIsLoadingLeadInterestData(false);
+      }
+  },[])
   // Note : called the above function , will get the data once the component renders
   useEffect(() => {
-    getLeadInterestData();
+      getLeadInterestData();
   }, []);
 
   // Note : api call to get company product
@@ -704,8 +719,8 @@ const LeadImportCsv = ({
 
   useEffect(() => {
     fetchApiData();
-    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 40);
-    fetchCompanyUsers("", 0, userPreference.rowsInGrid || 40); // Initial fetch
+    fetchCompanyProducts("", 0, userPreference.rowsInGrid || 25);
+    fetchCompanyUsers("", 0, userPreference.rowsInGrid || 25); // Initial fetch
   }, [fetchApiData, userPreference.rowsInGrid]);
 
   // --- EFFECTS ---
@@ -887,50 +902,41 @@ const LeadImportCsv = ({
   };
   const readCsv = (file: File) => {
     setIsParsing(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const lines = content
-          .split(/[\r\n]+/)
-          .map((l) => l.trim())
-          .filter(Boolean);
-        if (lines.length < 1) throw new Error("CSV file is empty.");
 
-        const parsedData = lines.map((line) => {
-          const newLine = line.replace(/"(.*?)"/g, (content) => {
-            // match: The entire quoted string (e.g., '"cdc,csc"')
-            // content: The content inside the quotes (e.g., 'cdc,csc')
+    Papa.parse(file, {
+      header: false, // since you're manually managing headers
+      skipEmptyLines: true,
+      complete: (results) => {
+        try {
+          const parsedData = results.data as string[][];
 
-            // 1. Replace all commas inside the content with colons (:)
-            const newContent = content.replace(/,/g, ":");
+          if (!parsedData || parsedData.length === 0) {
+            throw new Error("CSV file is empty.");
+          }
 
-            // 2. Re-wrap the modified content with double quotes
-            return `"${newContent}"`;
+          // Set parsed data and headers
+          setCsvData(parsedData);
+          setOriginalCsvHeaders(parsedData[0]);
+
+          // Clear any existing error message
+          handleCloseSnackbar();
+        } catch (err: any) {
+          showMessageSnackbar({
+            message: err.message || "Failed to parse CSV.",
+            type: "error",
           });
-
-          return newLine.split(",").map((cell) => cell.trim());
-        });
-
-        // console.log(
-        //   "_____________________________ line ______________________________"
-        // );
-        // console.log(parsedData);
-        setCsvData(parsedData);
-        setOriginalCsvHeaders(parsedData[0]);
-        // setError(null);
-        handleCloseSnackbar();
-      } catch (err: any) {
+        } finally {
+          setIsParsing(false);
+        }
+      },
+      error: (err) => {
         showMessageSnackbar({
-          message: err.message || "Failed to parse CSV.",
+          message: err.message || "Error reading CSV file.",
           type: "error",
         });
-        // setError(err.message || "Failed to parse CSV.");
-      } finally {
         setIsParsing(false);
-      }
-    };
-    reader.readAsText(file);
+      },
+    });
   };
 
   //   const readCsv = (file: File) => {
@@ -1031,32 +1037,90 @@ const LeadImportCsv = ({
     []
   );
 
+  // const handleValueMap = <T extends MappableItem>(
+  //   crmItem: T,
+  //   csvValue: string,
+  //   currentMapping: ValueMapping,
+  //   setMapping: (m: ValueMapping) => void
+  // ) => {
+  //   if (!crmItem.id) return;
+  //   const newMapping = { ...currentMapping };
+  //   Object.keys(newMapping).forEach((key) => {
+  //     if (newMapping[key] === csvValue) delete newMapping[key];
+  //   });
+  //   newMapping[String(crmItem.id)] = csvValue;
+
+  //   setMapping(newMapping);
+  // };
+
+  // const handleRemoveValueMap = <T extends MappableItem>(
+  //   crmItem: T,
+  //   currentMapping: ValueMapping,
+  //   setMapping: (m: ValueMapping) => void
+  // ) => {
+  //   if (!crmItem.id) return;
+  //   const newMapping = { ...currentMapping };
+  //   delete newMapping[String(crmItem.id)];
+  //   setMapping(newMapping);
+  // };
+
+  // Add this in parent component
+
+  const [ownerCache, setOwnerCache] = useState<Record<string, CompanyUser>>({});
+
+  useEffect(() => {
+    if (companyUsers?.length) {
+      setOwnerCache((prev) => {
+        const updated = { ...prev };
+        companyUsers.forEach((u) => (updated[String(u.id)] = u));
+        return updated;
+      });
+    }
+  }, [companyUsers]);
+
+  const [productCache, setProductCache] = useState<Record<string, any>>({});
+  useEffect(() => {
+    if (productsData?.length) {
+      setProductCache((prev) => {
+        const updated = { ...prev };
+        productsData.forEach((p) => (updated[String(p.id)] = p));
+        return updated;
+      });
+    }
+  }, [productsData]);
+
   const handleValueMap = <T extends MappableItem>(
     crmItem: T,
     csvValue: string,
-    currentMapping: ValueMapping,
-    setMapping: (m: ValueMapping) => void
+    setMapping: React.Dispatch<React.SetStateAction<ValueMapping>>
   ) => {
     if (!crmItem.id) return;
-    const newMapping = { ...currentMapping };
-    Object.keys(newMapping).forEach((key) => {
-      if (newMapping[key] === csvValue) delete newMapping[key];
+
+    setMapping((prev) => {
+      const newMapping = { ...prev };
+
+      // Remove existing entry for this CSV value (to prevent duplicates)
+      Object.keys(newMapping).forEach((key) => {
+        if (newMapping[key] === csvValue) delete newMapping[key];
+      });
+
+      // Map CRM ID → CSV value
+      newMapping[String(crmItem.id)] = csvValue;
+      return newMapping;
     });
-    newMapping[String(crmItem.id)] = csvValue;
-    // console.log("new Mapping : ");
-    // console.log(newMapping);
-    setMapping(newMapping);
   };
 
   const handleRemoveValueMap = <T extends MappableItem>(
     crmItem: T,
-    currentMapping: ValueMapping,
-    setMapping: (m: ValueMapping) => void
+    setMapping: React.Dispatch<React.SetStateAction<ValueMapping>>
   ) => {
     if (!crmItem.id) return;
-    const newMapping = { ...currentMapping };
-    delete newMapping[String(crmItem.id)];
-    setMapping(newMapping);
+
+    setMapping((prev) => {
+      const newMapping = { ...prev };
+      delete newMapping[String(crmItem.id)];
+      return newMapping;
+    });
   };
 
   const processCsvForReview = useCallback(() => {
@@ -1094,17 +1158,11 @@ const LeadImportCsv = ({
       return values.length > 0 ? values.join(" ").trim() : null;
     };
 
-    // Note : NEED TO FIX THIS ERROR ProcessedLeadData
-    // note : error do changes , type changed to any
     const processed: any[] = csvData.slice(1).map((row) => {
       // Get email and mobile for duplicate checking using the new helper
       const email = getConcatenatedCsvValue(row, "email");
       const mobile = getConcatenatedCsvValue(row, "mobileNumber");
       const product = getConcatenatedCsvValue(row, "company_product_id");
-      // console.log("valuse");
-      // console.log(row)
-      // console.log(product);
-      // console.log("valuse");
 
       let isDuplicate = false;
       if (email && emailSet.has(email)) {
@@ -1146,82 +1204,69 @@ const LeadImportCsv = ({
           mappedData[field.id] = crmSource ? crmSource.id : null; // Store ID
           displayData[field.id] = crmSource ? crmSource.name : ""; // Display Name or original CSV
         } else if (field.id === "leadOwner" && csvValue) {
-          const crmOwner = companyUsers?.find(
-            (owner) => ownerValueMapping[String(owner.id)] === csvValue
+          const matchedCrmIdEntry = Object.entries(ownerValueMapping).find(
+            ([_, mappedCsv]) => mappedCsv === csvValue
           );
-          mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
-          displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
+          if (matchedCrmIdEntry) {
+            const crmId = matchedCrmIdEntry[0];
+            const crmOwner = ownerCache[crmId];
+            mappedData[field.id] = crmId;
+            displayData[field.id] = crmOwner ? crmOwner.fullname : "null";
+          }
         }
+
+        // else if (field.id === "leadOwner" && csvValue) {
+        //   const crmOwner = companyUsers?.find(
+        //     (owner) => ownerValueMapping[String(owner.id)] === csvValue
+        //   );
+        //   mappedData[field.id] = crmOwner ? crmOwner.id : null; // Store ID
+        //   displayData[field.id] = crmOwner ? crmOwner.fullname : ""; // Display Name or original CSV
+        // }
         // Note : product data
-        else if (field.id === "company_product_id") {
-          // console.log("inside product cond");
-          // console.log(csvValue);
-          //  console.log("inside product cond");
-          const prodArr = product?.split(",").map((item) => item.trim());
-          // const crmProduct = productsData.filter((p) => {
-          //   console.log(
-          //     " ___________________________________________ data ___________________________________________"
-          //   );
-          //   console.log(p);
+        // else if (field.id === "company_product_id") {
+        //   const prodArr = product?.split(",").map((item) => item.trim());
+        //   const crmProduct = productsData.filter((p) => {
+        //     const mappedValue = productDataValueMapping[String(p.id)];
+        //     return (
+        //       p.id !== undefined &&
+        //       p.id !== null &&
+        //       prodArr?.includes(mappedValue)
+        //     );
+        //   });
 
-          //   const idArr : number[] = [];
-          //    prodArr?.map((x) => {
+        //   // 2. Use map() on the filtered array to extract only the 'id' property.
+        //   const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
 
-          //     console.log(
-          //   );
-          //   console.log(x);
-          //   console.log(productDataValueMapping[String(p.id)]);
-          //   console.log(
-          //   );
+        //   mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
+        //   displayData[field.id] = crmProduct
+        //     ? crmProduct.map((item) => item.name).join(",")
+        //     : null; // Display Name or original CSV
+        // }
+        else if (field.id === "company_product_id" && product) {
+          const prodArr = product.split(",").map((item) => item.trim());
+          const crmProductIds: number[] = [];
+          const crmProductNames: string[] = [];
 
-          //     if (productDataValueMapping[String(p.id)] === x){
-          //           idArr.push(p.id!)
-          //     }
-          //   });
+          prodArr.forEach((csvValue) => {
+            const matchedCrmIdEntry = Object.entries(
+              productDataValueMapping
+            ).find(([, mappedCsv]) => mappedCsv === csvValue);
 
-          //    console.log(
-          //     " ___________________________________________ data ___________________________________________"
-          //   );
-          //    console.log(
-          //     " ___________________________________________ IDARR ___________________________________________"
-          //   );
+            if (matchedCrmIdEntry) {
+              const crmId = Number(matchedCrmIdEntry[0]);
+              const crmProduct = productCache[crmId];
 
-          //   console.log(idArr);
-
-          //   console.log(
-          //     " ___________________________________________ IDARR ___________________________________________"
-          //   );
-          //   return idArr;
-          // });
-
-          const crmProduct = productsData.filter((p) => {
-            // Check for valid ID and if the mapped value is included in prodArr
-            // console.log(
-            //   " ___________________________________________ IDARR ___________________________________________"
-            // );
-            // console.log(prodArr);
-
-            const mappedValue = productDataValueMapping[String(p.id)];
-
-            // console.log(mappedValue);
-            // console.log(
-            //   " ___________________________________________ IDARR ___________________________________________"
-            // );
-            return (
-              p.id !== undefined &&
-              p.id !== null &&
-              prodArr?.includes(mappedValue)
-            );
+              crmProductIds.push(crmId);
+              crmProductNames.push(crmProduct ? crmProduct.name : "null");
+            }
           });
 
-          // 2. Use map() on the filtered array to extract only the 'id' property.
-          const crmProductIds: number[] = crmProduct.map((p) => p.id as number);
-
-          mappedData[field.id] = crmProduct ? crmProductIds : null; // Store ID
-          displayData[field.id] = crmProduct
-            ? crmProduct.map((item) => item.name).join(",")
-            : null; // Display Name or original CSV
+          mappedData[field.id] =
+            crmProductIds.length > 0 ? crmProductIds : null;
+          displayData[field.id] =
+            crmProductNames.length > 0 ? crmProductNames.join(",") : null;
         }
+
         // NOte : lead interest type leadInterestType
         else if (field.id === "lead_interest_id" && csvValue) {
           const crmInterestType = interestTypeData?.find(
@@ -1286,6 +1331,57 @@ const LeadImportCsv = ({
     );
   };
 
+  //  const handleMarkAll = () => {
+  //   setProcessedLeads((prevLeads) =>
+  //     prevLeads.map((lead) => ({
+  //       ...lead,
+  //       isSelectedForImport: true,
+  //     }))
+  //   );
+  // };
+  // const handleMarkAll = () => {
+  //   setProcessedLeads((prevLeads) => {
+  //     // Check if all leads are currently selected
+  //     const allSelected = prevLeads.every((lead) => lead.isSelectedForImport);
+
+  //     // Toggle based on current state
+  //     return prevLeads.map((lead) => ({
+  //       ...lead,
+  //       isSelectedForImport: !allSelected, // mark or unmark all
+  //     }));
+  //   });
+  // };
+
+  const [previousSelections, setPreviousSelections] = useState<boolean[]>([]);
+
+  const handleMarkAll = () => {
+    setProcessedLeads((prevLeads) => {
+      // If no previous state saved → Mark all
+      if (previousSelections.length === 0) {
+        // Save the current selection state before marking all
+        setPreviousSelections(
+          prevLeads.map((lead) => lead.isSelectedForImport)
+        );
+
+        // Mark all leads (including duplicates)
+        return prevLeads.map((lead) => ({
+          ...lead,
+          isSelectedForImport: true,
+        }));
+      } else {
+        // Restore to previous selection state
+        const restoredLeads = prevLeads.map((lead, i) => ({
+          ...lead,
+          isSelectedForImport: previousSelections[i],
+        }));
+
+        // Clear the previous state
+        setPreviousSelections([]);
+        return restoredLeads;
+      }
+    });
+  };
+
   function generateUniqueTag() {
     const randomString = Math.random()
       .toString(36)
@@ -1319,11 +1415,9 @@ const LeadImportCsv = ({
     // const isNameMapped = fieldMappings.name?.length > 0;
     // Note : if Name is mandotory then add this in below condition  !isNameMapped ||
     if (!isContactMapped) {
-      // setError('Please map "Name" and either "Email" or "Mobile Number".');
-      showMessageSnackbar({
-        message: 'Please map "Name" and either "Email" or "Mobile Number.',
-        type: "error",
-      });
+      toast.error(
+        'Please map "Name" and either of "Email" or "Mobile Number".'
+      );
       return;
     }
     setError(null);
@@ -1334,7 +1428,6 @@ const LeadImportCsv = ({
     );
 
     if (leadsToImport.length === 0) {
-      // setError("No leads selected for import.");
       showMessageSnackbar({
         message: "No leads selected for import.",
         type: "error",
@@ -1348,36 +1441,73 @@ const LeadImportCsv = ({
 
     // Note : this function will return the unique import tag.
     const importTag = generateUniqueTag();
-    const payload = {
-      // fieldMappings,
-      // statusValueMapping,
-      // sourceValueMapping,
-      // ownerValueMapping,
-      leadsToImport: leadsToImport.map((lead) => ({
-        // originalRow: lead.originalRow,
-        mappedData: {
-          ...lead.mappedData,
-          createdby: loginStatus.id,
-          company_id: loginStatus.companyId,
-          import_tag: importTag,
-        },
-      })), // Sending only necessary data
+    // Note : This is the old payload working but the logic is changed.
+    // const payload = {
+    //   // fieldMappings,
+    //   // statusValueMapping,
+    //   // sourceValueMapping,
+    //   // ownerValueMapping,
+    //   leadsToImport: leadsToImport.map((lead) => ({
+    //     // originalRow: lead.originalRow,
+    //     mappedData: {
+    //       ...lead.mappedData,
+    //       createdby: loginStatus.id,
+    //       company_id: loginStatus.companyId,
+    //       import_tag: importTag,
+    //     },
+    //   })), // Sending only necessary data
+    // };
+
+    // const csvFileFormatted = convertPayloadToCsv(payload);
+    setIsLoadingSpinnerAfterSubmission(true);
+    const rowsData = leadsToImport.map((lead) => ({
+      ...lead.mappedData,
+      createdby: loginStatus.id,
+      company_id: loginStatus.companyId,
+      import_tag: importTag,
+    }));
+    const leadImportCsvFile = convertToCsvFile(rowsData, "importLeadFile.csv");
+    const reader = new FileReader();
+    console.log("this is the row data");
+
+    console.log(rowsData);
+
+    reader.onload = (e) => {
+      console.log(e.target?.result);
     };
+
+    console.log("this is the csv file data ");
+    reader.readAsText(leadImportCsvFile);
     // console.log("Submitting payload:", payload);
     try {
       // const formData = new FormData();
       // formData.append("csvFile", csvFile);
       // formData.append("mappings", JSON.stringify(payload)); // Send the structured payload
       // formData.append("mappings",payload );
-      const response = await axios.post(POST_API.LEAD_IMPORT_VIA_CSV, payload, {
-        withCredentials: true,
-      });
+      // const response = await axios.post(POST_API.LEAD_IMPORT_VIA_CSV, payload, {
+      //   withCredentials: true,
+      // });
+
+      // new code comment if needed above response os working but old code
+      const formData = new FormData();
+      formData.append("file", leadImportCsvFile, leadImportCsvFile.name);
+      formData.append("company_id", loginStatus.companyId.toString());
+      formData.append("createdby", loginStatus.id.toString());
+      const response = await axios.post(
+        POST_API.UPLOAD_CSV_FOR_IMPORT,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
       // alert("Import simulated successfully! Check console for payload.");
-      setIsLoadingSpinnerAfterSubmission(true);
+
       if (response.status === STATUS_CODE.OK) {
         setIsLoadingSpinnerAfterSubmission(false);
-        // console.log("API Response:", response.data); // Log actual API response
         const data: LeadImportResponse = response.data;
         setLeadImportResponse(data);
         setShowLeadImportResultPopUp(true);
@@ -1415,6 +1545,14 @@ const LeadImportCsv = ({
   const showOwnerMapping =
     fieldMappings.leadOwner?.length > 0 && csvUniqueOwners.length > 0;
 
+  // lead owner changes
+  useEffect(() => {
+    console.log("🧭 Current owner mappings:", ownerValueMapping);
+  }, [ownerValueMapping]);
+  useEffect(() => {
+    console.log("Updated productDataValueMapping:", productDataValueMapping);
+  }, [productDataValueMapping]);
+
   // NOte : product data
   const showProductDataMapping =
     fieldMappings.company_product_id?.length > 0 &&
@@ -1445,14 +1583,13 @@ const LeadImportCsv = ({
                 {/* Import leads via CSV */}
               </h2>
 
-             
-                {!isLoadingLeadInterestData && !isLoadingLeadSourceAndStatusData ? (
-                  <>
-                   <label
-                htmlFor="csv-upload"
-                className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
-              >
-
+              {!isLoadingLeadInterestData &&
+              !isLoadingLeadSourceAndStatusData ? (
+                <>
+                  <label
+                    htmlFor="csv-upload"
+                    className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white  sm:text-xs md:text-sm font-medium px-3 py-1.5 rounded-md cursor-pointer shadow-sm"
+                  >
                     <LucideFolderInput className="w-5 h-5" />
                     <span>{csvFile ? "Change File" : "Browse CSV"}</span>
                     <input
@@ -1461,15 +1598,14 @@ const LeadImportCsv = ({
                       accept=".csv"
                       onChange={handleFileChange}
                       className="hidden"
-                      />
-                      </label>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center w-24 ">
-                    <LoadingSpinner />
-                  </div>
-                )}
-              
+                    />
+                  </label>
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-24 ">
+                  <LoadingSpinner />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1566,7 +1702,7 @@ const LeadImportCsv = ({
                       <Info size={12} />
                     </span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  text-xs">
                     {crmLeadFields.map((field) => (
                       <DroppableCrmField
                         key={field.id}
@@ -1593,14 +1729,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      statusValueMapping,
+                      // statusValueMapping,
                       setStatusValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      statusValueMapping,
+                      // statusValueMapping,
                       setStatusValueMapping
                     )
                   }
@@ -1618,14 +1754,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      sourceValueMapping,
+                      // sourceValueMapping,
                       setSourceValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      sourceValueMapping,
+                      // sourceValueMapping,
                       setSourceValueMapping
                     )
                   }
@@ -1643,14 +1779,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      ownerValueMapping,
+                      // ownerValueMapping,
                       setOwnerValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      ownerValueMapping,
+                      // ownerValueMapping,
                       setOwnerValueMapping
                     )
                   }
@@ -1659,14 +1795,10 @@ const LeadImportCsv = ({
                   searchPlaceholder="Search user..."
                   totalCrmItems={totalCompanyUsers}
                   currentPage={companyUsersCurrentPage}
-                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  itemsPerPage={25}
                   onPageChange={(newPage) => {
                     setCompanyUsersCurrentPage(newPage);
-                    fetchCompanyUsers(
-                      "",
-                      newPage * (userPreference.rowsInGrid || 40),
-                      userPreference.rowsInGrid || 40
-                    );
+                    fetchCompanyUsers("", newPage * 25, 25);
                   }}
                 />
               )}
@@ -1680,35 +1812,55 @@ const LeadImportCsv = ({
                   crmData={productsData}
                   mapping={productDataValueMapping}
                   onDrop={(c, v) =>
-                    handleValueMap(
-                      c,
-                      v,
-                      productDataValueMapping,
-                      setProductDataValueMapping
-                    )
+                    handleValueMap(c, v, setProductDataValueMapping)
                   }
                   onRemove={(c) =>
-                    handleRemoveValueMap(
-                      c,
-                      productDataValueMapping,
-                      setProductDataValueMapping
-                    )
+                    handleRemoveValueMap(c, setProductDataValueMapping)
                   }
                   itemType={ItemTypes.CSV_PRODUCT_VALUE}
-                  onSearch={fetchCompanyProducts} // This is already good
+                  onSearch={fetchCompanyProducts}
                   searchPlaceholder="Search product..."
                   totalCrmItems={totalProductData}
                   currentPage={productDataCurrentPage}
-                  itemsPerPage={userPreference.rowsInGrid || 40}
+                  itemsPerPage={25}
                   onPageChange={(newPage) => {
                     setProductDataCurrentPage(newPage);
-                    fetchCompanyProducts(
-                      "",
-                      newPage * (userPreference.rowsInGrid || 40),
-                      userPreference.rowsInGrid || 40
-                    );
+                    fetchCompanyProducts("", newPage * 25, 25);
                   }}
                 />
+
+                // <GenericValueMappingCard
+                //   ref={productDataMappingRef}
+                //   title="Map Product assigned to lead"
+                //   csvValues={csvUniqueProductData}
+                //   crmData={productsData}
+                //   mapping={productDataValueMapping}
+                //   onDrop={(c, v) =>
+                //     handleValueMap(
+                //       c,
+                //       v,
+                //       // productDataValueMapping,
+                //       setProductDataValueMapping
+                //     )
+                //   }
+                //   onRemove={(c) =>
+                //     handleRemoveValueMap(
+                //       c,
+                //       // productDataValueMapping,
+                //       setProductDataValueMapping
+                //     )
+                //   }
+                //   itemType={ItemTypes.CSV_PRODUCT_VALUE}
+                //   onSearch={fetchCompanyProducts} // This is already good
+                //   searchPlaceholder="Search product..."
+                //   totalCrmItems={totalProductData}
+                //   currentPage={productDataCurrentPage}
+                //   itemsPerPage={10}
+                //   onPageChange={(newPage) => {
+                //     setProductDataCurrentPage(newPage);
+                //     fetchCompanyProducts("", newPage * 10, 10);
+                //   }}
+                // />
               )}
               {/* For lead interest type data  */}
               {showLeadInterestTypeMapping && (
@@ -1722,14 +1874,14 @@ const LeadImportCsv = ({
                     handleValueMap(
                       c,
                       v,
-                      InterestTypeValueMapping,
+                      // InterestTypeValueMapping,
                       setInterestTypeValueMapping
                     )
                   }
                   onRemove={(c) =>
                     handleRemoveValueMap(
                       c,
-                      InterestTypeValueMapping,
+                      // InterestTypeValueMapping,
                       setInterestTypeValueMapping
                     )
                   }
@@ -1768,6 +1920,14 @@ const LeadImportCsv = ({
               potential duplicates (based on Email or Mobile Number). Check the
               box for each record you wish to import.
             </p>
+            <div className="bg-pink-00 w-fit flex items-center justify-start pl-2">
+              <Button
+                // className="bg-blue-500 p-1 rounded-md"
+                onClick={handleMarkAll}
+              >
+                {previousSelections.length === 0 ? "Mark duplicate leads." : "Unmark duplicate leads."}
+              </Button>
+            </div>
             <div className="w-full overflow-x-auto overflow-y-auto max-h-96  border rounded-md">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -1851,7 +2011,12 @@ const LeadImportCsv = ({
           </div>
         )}
       </div>
-      {isLoadingSpinnerAfterSubmission && <LoadingSpinner />}
+      {isLoadingSpinnerAfterSubmission && (
+        <LoadingPopUpAnimation
+          show={isLoadingSpinnerAfterSubmission}
+          text="Loading please wait..."
+        />
+      )}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
           data={LeadImportResponse}

@@ -4,8 +4,8 @@ type EditCompanyProductModalProps = {
     isOpen: boolean;
   onClose: () => void;
   product : Product
-  handleCompanyProductChange : (product: Product) => void;
-  handleCreateCompanyProductTaxAdd : (product : Product) => void;
+  handleCompanyProductChange : () => void;
+  handleCreateCompanyProductTaxAdd : () => void;
 }
 
 export default EditCompanyProductModalProps;

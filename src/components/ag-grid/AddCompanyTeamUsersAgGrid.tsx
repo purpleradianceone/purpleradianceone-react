@@ -132,6 +132,7 @@ function AddCompanyTeamUsersAgGrid({
                   checked={isChecked}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   onChange={(event) => {
+                    // console.log("this is the block");
                     handleCompanyUserCheckBoxChange!(params.data, event);
                   }}
                 />
@@ -145,6 +146,7 @@ function AddCompanyTeamUsersAgGrid({
             const [isActive, setIsActive] = useState<boolean>(
               params.data.isactive
             );
+            
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
 
@@ -202,9 +204,11 @@ function AddCompanyTeamUsersAgGrid({
                 <button
                   id={params.data.id.toString()}
                   onClick={(event) => {
+                    // console.log("this is the below");
+
                     handleCompanyUserUpdateToggle(event);
                   }}
-                  className={`w-6 h-3 rounded-md transition-colors duration-200 ${
+                  className={`w-6 h-5 rounded-md transition-colors duration-200 ${
                     isActive
                       ? "bg-green-500 hover:bg-green-600"
                       : "bg-red-500 hover:bg-red-600"
@@ -252,26 +256,25 @@ function AddCompanyTeamUsersAgGrid({
 
       {isGridForSubscription && (
         <>
-          <div className="mb-2 ag-theme-balham ">
+          <div className="mb-2 ">
             <span className="font-semibold">Net Status Change Count: </span>
             <span>{statusChangeCount}</span>
           </div>
         </>
       )}
 
-<div className="ag-theme-balham w-full h-full">
+      <div className="ag-theme-balham w-full h-full">
         <AgGridReact
-        rowData={companyUsers}
-        columnDefs={companyUserColDefs}
-        defaultColDef={defaultColDef}
-        modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeAlpine}
-        onViewportChanged={handleViewPortChanged}
-        onGridReady={onGridReady}
-      />
-</div>
-      
+          rowData={companyUsers}
+          columnDefs={companyUserColDefs}
+          defaultColDef={defaultColDef}
+          modules={[AllCommunityModule]}
+          overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          theme={themeAlpine}
+          onViewportChanged={handleViewPortChanged}
+          onGridReady={onGridReady}
+        />
+      </div>
     </>
   );
 }

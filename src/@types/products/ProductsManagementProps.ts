@@ -3,6 +3,9 @@ export type Product = {
   id?: number;
   companyId?: number;
   productTypeId: number;
+  unitName: string,
+  unitId : number,
+  unitNameInStock : string,
   productTypeName:string;
   defaultWarrantyIntervalTypeId: number;
   defaultWarranty: number;
@@ -11,7 +14,9 @@ export type Product = {
   defaultAmcCycle: number;
   defaultAmcCycleName: string;
   name: string;
-  code: string;
+  barcode: string;
+  parentUnitId? : number,
+  isSerialNumber? : boolean,
   cost?: number;
   description?: string;
   version?: string;

@@ -10,6 +10,10 @@ type GetCompanyUsersListProps = {
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
     handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
+    isTourFinished? : boolean;
+    isUsedInAccountProductForAssingingInstalledBy? : boolean
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     onRowSelect? : (data : any ) =>void,
 }
 
 export default GetCompanyUsersListProps;

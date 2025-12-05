@@ -25,6 +25,7 @@ import StatusChip from "../../../ui/StatusChip";
 import COLORS from "../../../../constants/Colors";
 import ToggleButton from "../../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -50,7 +51,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(true);
 
   const [isActive, setIsActive] = useState<boolean>(true); // default to active
-
+  const [isSaving , setIsSaving] = useState<boolean>(false);
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -194,7 +195,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     e.preventDefault();
     const { name, email, mobileNumber } = accountContactForm;
     let isValid = true;
-
+    if(isSaving)return;
     // Prepare a copy to store validation errors
     const newErrors: typeof errors = { name: "", email: "", mobileNumber: "" };
 
@@ -228,6 +229,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     setErrors(newErrors);
     if (!isValid) return;
 
+    setIsSaving(true)
     //  Proceed with form submission logic here
     const postData = {
       company_id: loginStatus.companyId,
@@ -252,7 +254,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           }),
     };
 
-    console.log(postData);
 
     const api = editingContactId
       ? POST_API.UPDATE_ACCOUNT_CONTACT
@@ -287,6 +288,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         setIsOpenAddAccountContactForm(false);
         // clear the data after api call
         clearStateData();
+        setIsSaving(false);
+        handleStateClearFunctionOnClickOfCancelOrXButton();
       });
   };
 
@@ -428,8 +431,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       {accountContact.length === 0 ? (
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
-            <button
-              // disabled={!userHasAccessToUpdateLead}
+            <Button
+              disabled={!userHasAccessToUpdateAccount}
               onClick={() => {
                 if (userHasAccessToUpdateAccount) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
@@ -442,15 +445,16 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               className={COLORS.ADD_BUTTON}
             >
               +Add
-            </button>
-            <span className="caption-custom">No contacts available.</span>
+            </Button>
+            <span className=" italic caption-custom">No contacts available.</span>
           </div>
         </div>
       ) : (
         <>
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
-            <button
+            <Button
+            disabled={!userHasAccessToUpdateAccount}
               onClick={() => {
                 if (userHasAccessToUpdateAccount) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
@@ -464,7 +468,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
             >
               {/* <Plus size={10} /> */}
               <span>+Add</span>
-            </button>
+            </Button>
           </div>
 
           {/* Contacts List */}
@@ -530,15 +534,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
 
                   {/* Right: Badges */}
                   <div className="flex  items-end gap-1 text-[10px] font-semibold">
-                    {/* <span
-                        className={`px-2 py-0.5 rounded-full border ${
-                          contact.
-                            ? "bg-green-100 text-green-700 border-green-400"
-                            : "bg-yellow-50 text-yellow-700 border-yellow-300"
-                        }`}
-                      >
-                        {contact.isPrimary ? "Primary" : "Secondary"}
-                      </span> */}
                     <StatusChip isActive={contact.isActive}/>
                   </div>
                 </div>
@@ -594,18 +589,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                         )}
                       </p>
                       <div className="flex items-center gap-3 mt-3">
-                        {/* <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        selectedContactCard.isPrimary
-                          ?
-                           "bg-green-100 text-green-800 border border-green-200"
-                          : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                      }`}
-                    >
-                      {selectedContactCard.isPrimary
-                        ? "Primary Contact"
-                        : "Secondary Contact"}
-                    </span> */}
                         <StatusChip isActive={isActive}/>
                       </div>
                     </div>
@@ -743,29 +726,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             <h4 className="font-medium text-gray-900 ">
                               Status
                             </h4>
-                            {/* <label className="inline-flex items-center cursor-pointer relative self-end">
-                              <input
-                                type="checkbox"
-                                checked={isActive}
-                                onChange={
-                                  userHasAccessToUpdateAccount
-                                    ? () => {
-                                        handleActiveStatusChange(
-                                          selectedContactCard
-                                        );
-                                      }
-                                    : () => {
-                                        toast.error(
-                                          MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
-                                            .DENIED_UPDATE_ACCESS
-                                        );
-                                      }
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                              <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                            </label> */}
                             <ToggleButton
                             checked={isActive}
                             name="isActive"
@@ -1026,6 +986,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         </div>,
         document.body
       )}
+      {
+        isSaving && <LoadingPopUpAnimation
+          show={isSaving}
+        />
+      }
     </>
    
   );

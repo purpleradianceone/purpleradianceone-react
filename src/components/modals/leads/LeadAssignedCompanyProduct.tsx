@@ -12,6 +12,7 @@ import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
 import { Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
+import Button from "../../ui/Button";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -218,12 +219,19 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       </div>
       {data.length == 0 && (
         <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
-          <button
-            onClick={handleAddProductToLeadButtonClick}
+          <Button
+            disabled={!userHasAccessToUpdateLead}
+            onClick={() =>{
+              if(userHasAccessToUpdateLead){
+                handleAddProductToLeadButtonClick()
+              }else{
+                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+              }
+            }}
             className={COLORS.ADD_BUTTON}
           >
             +Add
-          </button>
+          </Button>
           <span className="italic">Product is not assigned to lead.</span>
         </div>
       )}
@@ -231,7 +239,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       {data.length > 0 && (
         <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
           {/* <span>Add</span> */}
-          <button
+          {/* <button
             onClick={() => {
               if (userHasAccessToUpdateLead) {
                 handleAddProductToLeadButtonClick();
@@ -245,7 +253,20 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
             className={COLORS.ADD_BUTTON}
           >
            +Add
-          </button>
+          </button> */}
+           <Button
+            disabled={!userHasAccessToUpdateLead}
+            onClick={() =>{
+              if(userHasAccessToUpdateLead){
+                handleAddProductToLeadButtonClick()
+              }else{
+                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+              }
+            }}
+            className={COLORS.ADD_BUTTON}
+          >
+            +Add
+          </Button>
         </div>
       )}
       {data.length > 0 &&

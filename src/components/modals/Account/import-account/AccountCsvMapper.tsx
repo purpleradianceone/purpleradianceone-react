@@ -23,6 +23,7 @@ import { useIndustryType } from "../../../../config/hooks/useIndustryType";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import MappedAccountDataPopup from "./MappedAccountDataPreview";
 import COLORS from "../../../../constants/Colors";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 // ----------------- TYPES -----------------
 export interface Account {
@@ -617,8 +618,20 @@ export default function AccountCsvMapper({
     return `${prefix}${dateTimeStr}_${randomStr}`;
   }
 
+  const { industryTypeData, loading } = useIndustryType();
+  const { businessType, isLoading: businessTypeLoading } = usebusinessType();
+  const { companyAccountType, isLoading: companyTypeLoading } =
+    useCompanyAccountType();
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [lodingForMappingCsvData, setLodingForMappingCsvData] = useState(false);
+
   // ----------------- IMPORT -----------------
-  const handleImport = () => {
+  const handleImport = async () => {
+    setLodingForMappingCsvData(true);
+    await new Promise((resolve) => setTimeout(resolve, 0)); // allow UI update
+
     const accountTag = generateUniqueAccountId();
     const mappedData: Account[] = csvData.map((row) => {
       const obj: any = {};
@@ -670,13 +683,9 @@ export default function AccountCsvMapper({
     });
     setMappedData(mappedData);
     // console.log("✅ Final Accounts JSON:", mappedData); // for debugging
+    setLodingForMappingCsvData(false);
     setShowPopup(true);
   };
-
-  const { industryTypeData, loading } = useIndustryType();
-  const { businessType, isLoading: businessTypeLoading } = usebusinessType();
-  const { companyAccountType, isLoading: companyTypeLoading } =
-    useCompanyAccountType();
 
   //Dummy filds
   let industryTypes: MappableItem[] = [
@@ -718,9 +727,6 @@ export default function AccountCsvMapper({
   ];
 
   companyAccountTypes = toMappableItems(companyAccountType);
-
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
 
   function onCloseSuccessOrConfirmation() {
     handleButtonClicked(false);
@@ -1016,6 +1022,7 @@ export default function AccountCsvMapper({
             )}
           </div>
         )}
+
         <MappedAccountDataPopup
           open={showPopup}
           onClose={() => setShowPopup(false)}
@@ -1027,6 +1034,13 @@ export default function AccountCsvMapper({
           companyAccountTypes={companyAccountTypes}
         />
       </div>
+
+      {lodingForMappingCsvData && (
+        <LoadingPopUpAnimation
+          show={lodingForMappingCsvData}
+          text="Mapping Account CSV..."
+        />
+      )}
       {showConfirm && (
         <ConfirmationDialog
           open={showConfirm}

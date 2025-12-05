@@ -2,7 +2,7 @@ import TextAreaInputProps from "../../@types/ui/textAreaInputProps";
 
 function TextAreaInput(props: TextAreaInputProps) {
   return (
-    <div className="mt-4">
+    <div className="mt-1">
       <label
         htmlFor={props.name}
         className="block input-label-custom"
@@ -11,6 +11,7 @@ function TextAreaInput(props: TextAreaInputProps) {
         {props.label}{props.required && <span className="text-red-500 align-top">*</span>}
       </label>
       <textarea
+        autoFocus={props.autoFocus}
         name={props.name}
         id={props.id}
         disabled={props.disabled}

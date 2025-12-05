@@ -13,8 +13,10 @@ export const useIntervalType = () => {
   const [intervalTypeData, setIntervalTypeData] = useState<
     IntervalType[]
   >([]);
+  const [loading , setLoading]= useState<boolean>(true);
 
   const getIntervalType = async () => {
+    setLoading(true)
     const PostData: IntervalType = {
       id: null,
       name: null,
@@ -27,6 +29,7 @@ export const useIntervalType = () => {
       });
       if (response.status == STATUS_CODE.OK) {
         console.log(response.data);
+        setLoading(false)
         setIntervalTypeData(response.data);
       }
     } catch (error: ApiError | any) {
@@ -48,5 +51,6 @@ export const useIntervalType = () => {
 
   return {
     intervalTypeData,
+    loading
   };
 };

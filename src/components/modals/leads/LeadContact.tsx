@@ -38,6 +38,10 @@ import StatusChip from "../../ui/StatusChip";
 import PrimarySecondaryChip from "../../ui/PrimarySecondaryChip";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../ui/FormLayout";
+import TextAreaInput from "../../ui/TextAreaInput";
+
 type LeadContactFormType = {
   name: string;
   email: string;
@@ -69,7 +73,7 @@ const LeadContact = ({
     useState<LeadContactType | null>(null);
   const [editingContactId, setEditingContactId] = useState<number | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true); // default to active
-
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [leadContactForm, setLeadContactForm] = useState<LeadContactFormType>({
     name: "",
     email: "",
@@ -89,8 +93,6 @@ const LeadContact = ({
 
   const inputClass =
     "border border-gray-300 p-2 rounded-lg  w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-200 transition-all duration-150 hover:bg-blue-0";
-  const formInputLabelClassName =
-    "block input-label-custom mb-2";
 
   const handleUrl = (link: string): string => {
     try {
@@ -214,6 +216,7 @@ const LeadContact = ({
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     const { name, email, mobileNumber } = leadContactForm;
     let isValid = true;
 
@@ -280,6 +283,7 @@ const LeadContact = ({
           }),
     };
 
+    setIsSaving(true);
     const api = editingContactId
       ? POST_API.UPDATE_LEAD_CONTACT
       : POST_API.CREATE_LEAD_CONTACT;
@@ -291,7 +295,6 @@ const LeadContact = ({
         const data = response.data;
         if (data.status === true) {
           toast.success(data.message);
-          fetchLeadContact();
         } else {
           toast.error(data.message);
         }
@@ -306,22 +309,28 @@ const LeadContact = ({
           if (refreshTokenResponse) {
             handleSubmit(e);
           }
+        } else {
+          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN);
         }
+      })
+      .finally(() => {
+        setIsSaving(false);
+        setIsOpenAddLeadContactForm(false);
+        // Optionally close modal and reset form
+        setSelectedContactCard(null);
+        setLeadContactForm({
+          name: "",
+          email: "",
+          mobileNumber: "",
+          jobTitle: "",
+          preferredLanguage: "",
+          preferredCommunicationChannel: "",
+          linkedinProfile: "",
+          address: "",
+        });
+        setSocialMediaHandles([]);
+        fetchLeadContact();
       });
-
-    // Optionally close modal and reset form
-    setIsOpenAddLeadContactForm(false);
-    setLeadContactForm({
-      name: "",
-      email: "",
-      mobileNumber: "",
-      jobTitle: "",
-      preferredLanguage: "",
-      preferredCommunicationChannel: "",
-      linkedinProfile: "",
-      address: "",
-    });
-    setSocialMediaHandles([]);
   };
 
   //Note : to reset if user clicks on cancel button
@@ -342,19 +351,32 @@ const LeadContact = ({
     }
   }, [isOpenAddLeadContactForm]);
 
+  // const handleAddSocialMedia = () => {
+  //   if (tempHandle.trim()) {
+  //     setSocialMediaHandles((prev) => [...prev, tempHandle.trim()]);
+  //     setTempHandle("");
+  //   }
+  // };
   const handleAddSocialMedia = () => {
-    if (tempHandle.trim()) {
-      setSocialMediaHandles((prev) => [...prev, tempHandle.trim()]);
+  const newHandle = tempHandle.trim();
+
+  if (!newHandle) return;
+
+  if (socialMediaHandles.includes(newHandle)) {
+    toast.error("Already added.")
       setTempHandle("");
-    }
-  };
+
+    return;
+  }
+
+  setSocialMediaHandles(prev => [...prev, newHandle]);
+  setTempHandle("");
+};
+
 
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
     // setEditMode(true);
-    console.log("this is the selected lead contact card");
-
-    console.log(selectedContactCard);
 
     setEditingContactId(selectedContactCard.id);
     setEditContactData(selectedContactCard);
@@ -386,19 +408,39 @@ const LeadContact = ({
     if (selectedContactCard?.isActive !== undefined) {
       setIsActive(selectedContactCard.isActive);
     }
-    console.log(selectedContactCard);
-    
   }, [selectedContactCard]);
-
 
   return (
     <div className={`w-full z-10 px-1 mb-1 `}>
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-1 py-1 text-gray-500">
-        <button
+        <Button
+          disabled={!userHasAccessToUpdateLead}
           onClick={() => {
             if (userHasAccessToUpdateLead) {
-              setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
+              // RESET EVERYTHING RELATED TO EDIT MODE
+              setEditingContactId(null);
+              setEditContactData(null);
+              setSelectedContactCard(null);
+
+              // RESET FORM INPUTS
+              setLeadContactForm({
+                name: "",
+                email: "",
+                mobileNumber: "",
+                jobTitle: "",
+                preferredLanguage: "",
+                preferredCommunicationChannel: "",
+                linkedinProfile: "",
+                address: "",
+              });
+
+              // RESET SOCIAL HANDLES
+              setSocialMediaHandles([]);
+
+              // finally open the form
+              setIsOpenAddLeadContactForm(true);
+              // setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
             } else {
               toast.error(
                 MESSAGE.MODULE_ACCESS.LEAD_MODULE
@@ -409,7 +451,7 @@ const LeadContact = ({
           className={COLORS.ADD_BUTTON}
         >
           +Add
-        </button>
+        </Button>
       </div>
 
       {/* Contacts List */}
@@ -429,7 +471,9 @@ const LeadContact = ({
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
                   } text-white flex items-center justify-center w-9 h-9 rounded-full border  font-semibold shadow-sm`}
                 >
-                  {contact.name ? contact.name.charAt(0).toUpperCase() : contact.email.charAt(0).toUpperCase() || "?"}
+                  {contact.name
+                    ? contact.name.charAt(0).toUpperCase()
+                    : contact.email.charAt(0).toUpperCase() || "?"}
                 </div>
 
                 {/* Text Info */}
@@ -437,7 +481,7 @@ const LeadContact = ({
                   <p className="input-label-custom">
                     {contact.name && contact.name.length > 50
                       ? contact.name.substring(0, 49) + "..."
-                      : contact.name || contact.email || contact.mobileNumber }
+                      : contact.name || contact.email || contact.mobileNumber}
                   </p>
                   <p className="caption-custom flex flex-wrap items-center gap-x-1">
                     {contact.jobTitle && (
@@ -468,223 +512,218 @@ const LeadContact = ({
 
               {/* Right: Badges */}
               <div className="flex  items-end gap-1">
-                <PrimarySecondaryChip
-                isPrimary={contact.isPrimary}
-                />
-                <StatusChip
-                  isActive={contact.isActive}
-                  />
+                <PrimarySecondaryChip isPrimary={contact.isPrimary} />
+                <StatusChip isActive={contact.isActive} />
               </div>
             </div>
           ))
         ) : (
-          <p className="caption-custom text-center">
-            No contacts available
-          </p>
+          <p className="caption-custom text-center">No contacts available</p>
         )}
       </div>
       {/* view in pop up card  */}
-      {selectedContactCard && createPortal(
-        <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
-            {/* Header */}
-            <div className="relative px-8 pt-5 pb-4">
-              <button
-                onClick={() => setSelectedContactCard(null)}
-                className="absolute top-6 right-6 caption-custom hover:text-gray-600 transition-colors"
-              >
-                <X size={24} />
-              </button>
-
-              <div className="flex items-center gap-6">
-                <div
-                  className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white ${
-                    isActive ? "bg-blue-500" : "bg-red-500"
-                  }`}
+      {selectedContactCard &&
+        createPortal(
+          <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
+              {/* Header */}
+              <div className="relative px-8 pt-5 pb-4">
+                <button
+                  onClick={() => setSelectedContactCard(null)}
+                  className="absolute top-6 right-6 caption-custom hover:text-gray-600 transition-colors"
                 >
-                  {selectedContactCard.name !== null
-                    ? selectedContactCard.name.charAt(0).toUpperCase()
-                    : "?"}
-                </div>
-                <div className="flex-1">
-                  <h2
-                    title={selectedContactCard.name ?? ""}
-                    className="section-header-custom"
+                  <X size={20} />
+                </button>
+
+                <div className="flex items-center gap-6">
+                  <div
+                    className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white ${
+                      isActive ? "bg-blue-500" : "bg-red-500"
+                    }`}
                   >
-                    {selectedContactCard.name !==null && selectedContactCard.name.length > 40 ? (
-                      selectedContactCard.name.substring(0, 49) + "..."
-                    ) : selectedContactCard.name ? (
-                      selectedContactCard.name
-                    ) : (
-                      <span className="input-label-custom italic">Unamed contact</span>
-                    )}
-                  </h2>
-                  <p className="input-label-custom mt-1 flex items-center">
-                    <Briefcase size={16} className="inline mr-2" />
-                    {selectedContactCard.jobTitle ?? (
-                      <span className="input-label-custom italic">
-                        No job title specified
-                      </span>
-                    )}
-                  </p>
-                  <div className="flex items-center gap-3 mt-3">
-                    {/* <span
-                      className={`px-3 py-1 rounded-full ${
-                        selectedContactCard.isPrimary
-                          ? "bg-green-100 input-label-custom-active border border-green-200"
-                          : "bg-yellow-100 input-label-custom-orange border border-yellow-200"
-                      }`}
+                    {selectedContactCard.name !== null
+                      ? selectedContactCard.name.charAt(0).toUpperCase()
+                      : "?"}
+                  </div>
+                  <div className="flex-1">
+                    <h2
+                      title={selectedContactCard.name ?? ""}
+                      className="section-header-custom"
                     >
-                      {selectedContactCard.isPrimary
-                        ? "Primary Contact"
-                        : "Secondary Contact"}
-                    </span> */}
-                    <PrimarySecondaryChip
-                    isPrimary={selectedContactCard.isPrimary}
-                    />
-                    {/* <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        isActive
-                          ? "bg-green-100 input-label-custom-active border border-green-200"
-                          : "bg-red-100 input-label-custom-inactive border border-red-200"
-                      }`}
-                    >
-                      {isActive ? "Active" : "Inactive"}
-                    </span> */}
-                    <StatusChip isActive={isActive}/>
-                  </div>
-                </div>
-                <div>
-                  <Button
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (userHasAccessToUpdateLead) {
-                      handleEditLeadContactClick(selectedContactCard);
-                    } else {
-                      toast.error(
-                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
-                      );
-                    }
-                  }}
-                  // className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                >
-                  <div className="flex gap-2">
-                      <Edit2 size={16} className="mt-1"/>
-                  <span>Edit</span>
-                  </div>
-                  
-                </Button>
-                </div>
-                
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="px-8 pb-8">
-              {/* Contact Information Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Mail className="input-label-custom-blue mt-1" size={18} />
-                    <div>
-                      <h4 className="table-header-custom mb-1">
-                        Email Address
-                      </h4>
-                      <p className="input-label-custom">
-                        {selectedContactCard.email ?? (
-                          <span className="input-label-custom italic">Not provided</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Phone className="input-label-custom-active mt-1" size={18} />
-                    <div>
-                      <h4 className="table-header-custom mb-1">
-                        Mobile Number
-                      </h4>
-                      <p className="input-label-custom">
-                        {selectedContactCard.mobileNumber ?? (
-                          <span className="input-label-customc">Not provided</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Languages className="input-label-custom-purple mt-1" size={18} />
-                    <div>
-                      <h4 className="table-header-custom mb-1">
-                        Preferred Language
-                      </h4>
-                      <p className="input-label-custom">
-                        {selectedContactCard.preferredLanguage ?? (
-                          <span className="input-label-custom italic">Not provided</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <MessageCircle className="input-label-custom-orange mt-1" size={18} />
-                    <div>
-                      <h4 className="table-header-custom mb-1">
-                        Preferred Communication
-                      </h4>
-                      <p className="input-label-custom">
-                        {selectedContactCard.preferredCommunicationChannel ?? (
-                          <span className="input-label-custom italic">Not provided</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <Globe className="input-label-custom-blue mt-1" size={18} />
-                    <div>
-                      <h4 className="table-header-custom mb-1">
-                        LinkedIn Profile
-                      </h4>
-                      {selectedContactCard.linkedinProfile ? (
-                        <a
-                          href={selectedContactCard.linkedinProfile}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="input-label-custom-blue hover:text-blue-800 hover:underline"
-                        >
-                          View LinkedIn Profile
-                        </a>
+                      {selectedContactCard.name !== null &&
+                      selectedContactCard.name.length > 40 ? (
+                        selectedContactCard.name.substring(0, 49) + "..."
+                      ) : selectedContactCard.name ? (
+                        selectedContactCard.name
                       ) : (
-                        <p className="input-label-custom italic">
-                          Not provided
-                        </p>
+                        <span className="input-label-custom italic">
+                          Unamed contact
+                        </span>
                       )}
+                    </h2>
+                    <p className="input-label-custom mt-1 flex items-center">
+                      <Briefcase size={16} className="inline mr-2" />
+                      {selectedContactCard.jobTitle ?? (
+                        <span className="input-label-custom italic">
+                          No job title specified
+                        </span>
+                      )}
+                    </p>
+                    <div className="flex items-center gap-3 mt-3">
+                      <PrimarySecondaryChip
+                        isPrimary={selectedContactCard.isPrimary}
+                      />
+                      <StatusChip isActive={isActive} />
+                    </div>
+                  </div>
+                  <div>
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (userHasAccessToUpdateLead) {
+                          handleEditLeadContactClick(selectedContactCard);
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                              .UPDATE_LEAD_ACCESS_DENIED_message
+                          );
+                        }
+                      }}
+                    >
+                      <div className="flex gap-2">
+                        <Edit2 size={14} className="mt-1" />
+                        <span>Edit</span>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="px-8 pb-8">
+                {/* Contact Information Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <Mail
+                        className="input-label-custom-blue mt-1"
+                        size={18}
+                      />
+                      <div>
+                        <h4 className="table-header-custom mb-1">
+                          Email Address
+                        </h4>
+                        <p className="input-label-custom">
+                          {selectedContactCard.email ?? (
+                            <span className="input-label-custom italic">
+                              Not provided
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <Phone
+                        className="input-label-custom-active mt-1"
+                        size={18}
+                      />
+                      <div>
+                        <h4 className="table-header-custom mb-1">
+                          Mobile Number
+                        </h4>
+                        <p className="input-label-custom">
+                          {selectedContactCard.mobileNumber ?? (
+                            <span className="input-label-customc">
+                              Not provided
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <Languages
+                        className="input-label-custom-purple mt-1"
+                        size={18}
+                      />
+                      <div>
+                        <h4 className="table-header-custom mb-1">
+                          Preferred Language
+                        </h4>
+                        <p className="input-label-custom">
+                          {selectedContactCard.preferredLanguage ?? (
+                            <span className="input-label-custom italic">
+                              Not provided
+                            </span>
+                          )}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                    <div className="w-5 h-5 mt-1 flex items-center justify-center">
-                      <div
-                        className={`w-3 h-3 rounded-full -mt-2 ${
-                          isActive ? "bg-green-500" : "bg-red-500"
-                        }`}
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <MessageCircle
+                        className="input-label-custom-orange mt-1"
+                        size={18}
                       />
-                    </div>
-                    <div className="">
-                      <div className="flex gap-4">
-                        <h4 className="table-header-custom ">
-                          Status
+                      <div>
+                        <h4 className="table-header-custom mb-1">
+                          Preferred Communication
                         </h4>
-                        {/* <label className="inline-flex items-center cursor-pointer relative self-end">
-                          <input
-                            type="checkbox"
+                        <p className="input-label-custom">
+                          {selectedContactCard.preferredCommunicationChannel ?? (
+                            <span className="input-label-custom italic">
+                              Not provided
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <Globe
+                        className="input-label-custom-blue mt-1"
+                        size={18}
+                      />
+                      <div>
+                        <h4 className="table-header-custom mb-1">
+                          LinkedIn Profile
+                        </h4>
+                        {selectedContactCard.linkedinProfile ? (
+                          <a
+                            href={selectedContactCard.linkedinProfile}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="input-label-custom-blue hover:text-blue-800 hover:underline"
+                          >
+                            View LinkedIn Profile
+                          </a>
+                        ) : (
+                          <p className="input-label-custom italic">
+                            Not provided
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
+                      <div className="w-5 h-5 mt-1 flex items-center justify-center">
+                        <div
+                          className={`w-3 h-3 rounded-full -mt-2 ${
+                            isActive ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        />
+                      </div>
+                      <div className="">
+                        <div className="flex gap-4">
+                          <h4 className="table-header-custom ">Status</h4>
+                          <ToggleButton
                             checked={isActive}
-                            onChange={
+                            name="isActive"
+                            onToggle={
                               !selectedContactCard.isPrimary &&
                               userHasAccessToUpdateLead
                                 ? () => {
@@ -705,429 +744,371 @@ const LeadContact = ({
                                     }
                                   }
                             }
-                            title={
-                              selectedContactCard.isPrimary
-                                ? "Cannot change the status of the primary contact."
-                                : ""
-                            }
-                            className="sr-only peer"
                           />
-                          <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                          <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                          <span className="ml-3 text-sm table-header-custom">
-                            {isActive ? "Active" : "Inactive"}
-                          </span>
-                        </label> */}
-                        <ToggleButton
-                        checked={isActive}
-                        name="isActive"
-                        onToggle={
-                          !selectedContactCard.isPrimary &&
-                              userHasAccessToUpdateLead
-                                ? () => {
-                                    handleActiveStatusChange(
-                                      selectedContactCard
-                                    );
-                                  }
-                                : () => {
-                                    if (selectedContactCard.isPrimary) {
-                                      toast.error(
-                                        "Update request denied — the user is designated as the Primary Contact."
-                                      );
-                                    } else {
-                                      toast.error(
-                                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                          .UPDATE_LEAD_ACCESS_DENIED_message
-                                      );
-                                    }
-                                  }
-                        }
-                        />
-                      </div>
-                      {selectedContactCard.isPrimary && (
-                        <div className="caption-custom italic mt-1">
-                          Primary contact status cannot be changed
                         </div>
-                      )}
+                        {selectedContactCard.isPrimary && (
+                          <div className="caption-custom italic mt-1">
+                            Primary contact status cannot be changed
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Social Media Profiles */}
+                {selectedContactCard.socialMediaHandles && (
+                  <div className="mb-6">
+                    <h4 className="table-header-custom mb-3 flex items-center gap-2">
+                      <Globe size={18} className="input-label-custom-blue" />
+                      Social Media Profiles
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {selectedContactCard.socialMediaHandles
+                        .split(",")
+                        .filter((link) => link.trim() !== "")
+                        .map((link, index) => (
+                          <a
+                            key={index}
+                            href={link.trim()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-blue-50 input-label-custom-blue hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
+                          >
+                            {handleUrl(link.trim())}
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Address */}
+                {selectedContactCard.address && (
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <MapPin
+                      className="input-label-custom-inactive mt-1"
+                      size={18}
+                    />
+                    <div>
+                      <h4 className="table-header-custom mb-1">Address</h4>
+                      <p className="input-label-custom leading-relaxed">
+                        {selectedContactCard.address}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Social Media Profiles */}
-              {selectedContactCard.socialMediaHandles && (
-                <div className="mb-6">
-                  <h4 className="table-header-custom mb-3 flex items-center gap-2">
-                    <Globe size={18} className="input-label-custom-blue" />
-                    Social Media Profiles
-                  </h4>
-                  <div className="flex flex-wrap gap-3">
-                    {selectedContactCard.socialMediaHandles
-                      .split(",")
-                      .filter((link) => link.trim() !== "")
-                      .map((link, index) => (
-                        <a
-                          key={index}
-                          href={link.trim()}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-blue-50 input-label-custom-blue hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
-                        >
-                          {handleUrl(link.trim())}
-                        </a>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Address */}
-              {selectedContactCard.address && (
-                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                  <MapPin className="input-label-custom-inactive mt-1" size={18} />
-                  <div>
-                    <h4 className="table-header-custom mb-1">Address</h4>
-                    <p className="input-label-custom leading-relaxed">
-                      {selectedContactCard.address}
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* Add Contact Form Modal */}
-      {isOpenAddLeadContactForm && createPortal(
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-6">
-          <div className="bg-white mt-14 rounded-lg w-full max-w-5xl max-h-[80vh] overflow-y-auto px-2 py-2 shadow-2xl sm:px-4 sm:py-4">
-            {/* Header */}
+      {isOpenAddLeadContactForm && (
+        <FormLayout width={5}>
+          {/* Header */}
+          <FormHeader
+            icon={Contact2}
+            preText={editContactData ? "Edit Contact" : "Add New Contact"}
+            description={
+              editContactData
+                ? "Update the contact's information to keep records accurate and up to date."
+                : "Create a contact for this lead to ensure proper follow-up and engagement."
+            }
+            onClose={() => {
+              // setEditMode(false);
+              setEditingContactId(null);
+              setIsOpenAddLeadContactForm(false);
+              setEditContactData(null);
+              setSocialMediaHandles([]);
+              setLeadContactForm({
+                name: "",
+                email: "",
+                address: "",
+                jobTitle: "",
+                linkedinProfile: "",
+                mobileNumber: "",
+                preferredCommunicationChannel: "",
+                preferredLanguage: "",
+              });
+            }}
+          />
 
-            {/* <div className="px-2 py-2  border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {editContactData ? "Edit Contact" : "Add New Contact"}
-                  </h2>
-                  <p className="text-gray-600 mt-1">
-                    {editContactData
-                      ? "Update contact information"
-                      : "Create a new lead contact"}
+          {/* Form Grid */}
+          <form>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500">
+              <div>
+                <FormInput
+                  logo={User}
+                  label="Full Name :"
+                  required
+                  type="text"
+                  name="name"
+                  onBlur={handleBlur}
+                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  placeholder="Enter full name"
+                  className={inputClass}
+                  onChange={handleFormInputChange}
+                  defaultValue={editContactData?.name || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.name && (
+                  <p className="caption-custom-inactive mt-1">{errors.name}</p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact name cannot be changed
                   </p>
-                </div>
-                <button
-                  onClick={() => {
-                    // setEditMode(false);
-                    setEditingContactId(null);
-                    setIsOpenAddLeadContactForm(false);
-                    setEditContactData(null);
-                    setSocialMediaHandles([]);
-                    setLeadContactForm({
-                      name: "",
-                      email: "",
-                      address: "",
-                      jobTitle: "",
-                      linkedinProfile: "",
-                      mobileNumber: "",
-                      preferredCommunicationChannel: "",
-                      preferredLanguage: "",
-                    });
-                  }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X size={24} />
-                </button>
+                )}
               </div>
-            </div> */}
-            <FormHeader
-              icon={Contact2}
-              preText={editContactData ? "Edit Contact" : "Add New Contact"}
-              description= {editContactData
-                      ? "Update the contact's information to keep records accurate and up to date."
-                      : "Create a contact for this lead to ensure proper follow-up and engagement."}
-              onClose={() => {
-                    // setEditMode(false);
-                    setEditingContactId(null);
-                    setIsOpenAddLeadContactForm(false);
-                    setEditContactData(null);
-                    setSocialMediaHandles([]);
-                    setLeadContactForm({
-                      name: "",
-                      email: "",
-                      address: "",
-                      jobTitle: "",
-                      linkedinProfile: "",
-                      mobileNumber: "",
-                      preferredCommunicationChannel: "",
-                      preferredLanguage: "",
-                    });
-                  }}
-            />
+              <div>
+                <FormInput
+                  label="Email Address :"
+                  logo={Mail}
+                  type="email"
+                  name="email"
+                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                  placeholder="Enter email address"
+                  onChange={handleFormInputChange}
+                  onBlur={handleBlur}
+                  defaultValue={editContactData?.email || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.email && (
+                  <p className="caption-custom-inactive mt-1">{errors.email}</p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact email cannot be changed
+                  </p>
+                )}
+              </div>
+              <div>
+                <FormInput
+                  logo={Phone}
+                  label="Mobile Number :"
+                  type="text"
+                  name="mobileNumber"
+                  minLength={10}
+                  maxLength={10}
+                  placeholder="Enter mobile number"
+                  // className={inputClass}
+                  onChange={handleFormInputChange}
+                  onBlur={handleBlur}
+                  defaultValue={editContactData?.mobileNumber || ""}
+                  readonly={
+                    editContactData?.isPrimary && editContactData !== null
+                  }
+                />
+                {errors.mobileNumber && (
+                  <p className="caption-custom-inactive mt-1 ">
+                    {errors.mobileNumber}
+                  </p>
+                )}
+                {editContactData?.isPrimary && (
+                  <p className="caption-custom mt-1">
+                    Primary contact mobile number cannot be changed
+                  </p>
+                )}
+              </div>
+              {/* job title */}
+              <FormInput
+                label="Job title :"
+                logo={Briefcase}
+                // Job Title
+                type="text"
+                name="jobTitle"
+                maxLength={100}
+                placeholder="Enter job title"
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.jobTitle || ""}
+              />
+              {/* pref language */}
+              <FormInput
+                logo={Languages}
+                label="Preferred Language :"
+                type="text"
+                name="preferredLanguage"
+                maxLength={100}
+                placeholder="eg : Marathi , English etc ..."
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.preferredLanguage || ""}
+              />
+              {/* pref comm channel */}
+              <FormInput
+                logo={MessageCircle}
+                label=" Preferred Communication Channel :"
+                type="text"
+                maxLength={100}
+                name="preferredCommunicationChannel"
+                placeholder="eg : Mail, Phone, WhatsApp etc ..."
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={
+                  editContactData?.preferredCommunicationChannel || ""
+                }
+              />
+              {/* linkedin profile */}
+              <FormInput
+                logo={Globe}
+                label="LinkedIn Profile :"
+                type="text"
+                name="linkedinProfile"
+                maxLength={256}
+                placeholder="Enter linkedIn url"
+                className={inputClass}
+                onChange={handleFormInputChange}
+                onBlur={handleBlur}
+                defaultValue={editContactData?.linkedinProfile || ""}
+              />
 
-            {/* Form Grid */}
-            <form>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-500">
-                <div>
-                  {/* <label className={formInputLabelClassName}>
-                    {" "}
-                    <User size={16} className="inline mr-1 text-blue-500" />
-                    Full Name*{" "}
-                  </label> */}
-                  <FormInput
-                    logo={User}
-                    label="Full Name"
-                    required
-                    type="text"
-                    name="name"
-                    onBlur={handleBlur}
-                    minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                    placeholder="Enter full name"
-                    className={inputClass}
-                    onChange={handleFormInputChange}
-                    defaultValue={editContactData?.name || ""}
-                    readonly={
-                      editContactData?.isPrimary && editContactData !== null
-                    }
-                  />
-                  {/* <input
-                    onClick={() => {
-                      if (
-                        editContactData?.isPrimary &&
-                        editContactData !== null
-                      ) {
-                        toast.error(
-                          MESSAGE.ERROR
-                            .PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE
-                        );
-                      }
-                    }}
-                  /> */}
-                  {errors.name && (
-                    <p className="caption-custom-inactive mt-1">{errors.name}</p>
-                  )}
-                  {editContactData?.isPrimary && (
-                    <p className="caption-custom mt-1">
-                      Primary contact name cannot be changed
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <FormInput
-                    label="Email Address"
-                    logo={Mail}
-                    type="email"
-                    name="email"
-                    maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                    placeholder="Enter email address"
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={editContactData?.email || ""}
-                    readonly={
-                      editContactData?.isPrimary && editContactData !== null
-                    }
-                  />
-                  {errors.email && (
-                    <p className="caption-custom-inactive mt-1">{errors.email}</p>
-                  )}
-                  {editContactData?.isPrimary && (
-                    <p className="caption-custom mt-1">
-                      Primary contact email cannot be changed
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <FormInput
-                    logo={Phone}
-                    label="Mobile Number"
-                    type="text"
-                    name="mobileNumber"
-                    minLength={10}
-                    maxLength={10}
-                    placeholder="Enter mobile number"
-                    // className={inputClass}
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={editContactData?.mobileNumber || ""}
-                    readonly={
-                      editContactData?.isPrimary && editContactData !== null
-                    }
-                  />
-                  {errors.mobileNumber && (
-                    <p className="caption-custom-inactive mt-1 ">
-                      {errors.mobileNumber}
-                    </p>
-                  )}
-                  {editContactData?.isPrimary && (
-                    <p className="caption-custom mt-1">
-                      Primary contact mobile number cannot be changed
-                    </p>
-                  )}
-                </div>
-                {/* job title */}
-                <div>
-                  <FormInput
-                    label="Job title"
-                    logo={Briefcase}
-                    // Job Title
-                    type="text"
-                    name="jobTitle"
-                    maxLength={100}
-                    placeholder="Enter job title"
-                    className={inputClass}
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={editContactData?.jobTitle || ""}
-                  />
-                </div>
-                {/* pref language */}
-                <div>
-                  <FormInput
-                    logo={Languages}
-                    label="Preferred Language"
-                    type="text"
-                    name="preferredLanguage"
-                    maxLength={100}
-                    placeholder="eg : Marathi , English etc ..."
-                    className={inputClass}
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={editContactData?.preferredLanguage || ""}
-                  />
-                </div>
-                {/* pref comm channel */}
-                <div>
-                  <FormInput
-                    logo={MessageCircle}
-                    label=" Preferred Communication Channel"
-                    type="text"
-                    maxLength={100}
-                    name="preferredCommunicationChannel"
-                    placeholder="eg : Mail, Phone, WhatsApp etc ..."
-                    className={inputClass}
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={
-                      editContactData?.preferredCommunicationChannel || ""
-                    }
-                  />
-                </div>
-                {/* linkedin profile */}
-                <div>
+              {/* Social Media Handles */}
+              <div className="col-span-2">
+                {/* <div className="flex  items-center justify-between bg-pink-00  gap-2">
                   <FormInput
                     logo={Globe}
-                    label="LinkedIn Profile"
+                    label="Social Media Handles :"
                     type="text"
-                    name="linkedinProfile"
-                    maxLength={256}
-                    placeholder="Enter linkedIn url"
-                    className={inputClass}
-                    onChange={handleFormInputChange}
-                    onBlur={handleBlur}
-                    defaultValue={editContactData?.linkedinProfile || ""}
+                    placeholder="Enter social media url"
+                    value={tempHandle}
+                    onChange={(e) => setTempHandle(e.target.value)}
                   />
-                </div>
+                  <div className="flex justify-center items-center">
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia();
+                      }}
+                      type="submit"
+                    >
+                      + Add
+                    </Button>
+                  </div>
+                </div> */}
 
-                {/* Social Media Handles */}
-                <div className="col-span-2">
-                  <div className="flex col-span-2 items-center justify-between bg-pink-00  gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
                     <FormInput
                       logo={Globe}
-                      label="Social Media Handles"
+                      label="Social Media Handles :"
                       type="text"
                       placeholder="Enter social media url"
                       value={tempHandle}
                       onChange={(e) => setTempHandle(e.target.value)}
                     />
-                    <div className="flex justify-center items-center">
-                      <Button onClick={(e) => {
-                        e.preventDefault();
-                        handleAddSocialMedia()
-                      }} type="submit">
-                        {/* <Plus size={14} /> */}+ Add
-                      </Button>
-                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1  sm:grid-cols-2 mt-3 gap-2 max-h-36 overflow-y-auto">
-                    {socialMediaHandles.map((handle) => (
-                      <div
-                        key={handle}
-                        className="flex items-center justify-between bg-gray-100 px-3 py-1.5 rounded shadow-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Globe size={14} className="caption-custom" />
-                          <span className="caption-custom">
-                            {handle}
-                          </span>
-                        </div>
-                        <Button
-                          size="icon"
-                          onClick={() =>
-                            setSocialMediaHandles((prev) =>
-                              prev.filter((h) => h !== handle)
-                            )
-                          }
-                          className="caption-custom hover:text-red-500"
-                        >
-                          <Trash2 size={12} />
-                          {/* <X size={12} /> */}
-                        </Button>
-                      </div>
-                    ))}
+                  <div className="mt-4">
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddSocialMedia();
+                      }}
+                      type="submit"
+                    >
+                      + Add
+                    </Button>
                   </div>
                 </div>
 
-                {/* Address */}
-                <div className="sm:col-span-2">
-                  <label className={formInputLabelClassName}>
-                    {" "}
-                    <MapPin size={16} className="inline mr-2 -mt-1 input-label-custom-blue" />
-                    Address
-                  </label>
-                  <textarea
-                    placeholder="Enter full address"
+                <div className="grid grid-cols-1  sm:grid-cols-2 mt-1 gap-2 max-h-36 overflow-y-auto">
+                  {socialMediaHandles.map((handle) => (
+                    <div
+                      key={handle}
+                      className="flex items-center justify-between bg-gray-100 px-3 py-1.5 rounded shadow-sm"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Globe size={14} className="caption-custom" />
+                        <span className="caption-custom">{handle}</span>
+                      </div>
+                      <Button
+                        size="icon"
+                        onClick={() =>
+                          setSocialMediaHandles((prev) =>
+                            prev.filter((h) => h !== handle)
+                          )
+                        }
+                        className="caption-custom hover:text-red-500"
+                      >
+                        <Trash2 size={12} />
+                        {/* <X size={12} /> */}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Address */}
+              <div className="sm:col-span-2">
+                <>
+                  {/* <label className={formInputLabelClassName}>
+                  {" "}
+                  <MapPin
+                    size={16}
+                    className="inline mr-2  input-label-custom-blue"
+                    />
+                  Address
+                </label> */}
+                  <TextAreaInput
+                    label="Address :"
+                    logo={MapPin}
+                    placeholder="Enter full address "
                     name="address"
                     rows={4}
+                    cols={4}
                     maxLength={256}
                     className={inputClass}
                     onChange={handleFormInputChange}
                     onBlur={handleBlur}
                     defaultValue={editContactData?.address || ""}
                   />
-                </div>
+                </>
               </div>
+            </div>
 
-              {/* Footer Buttons */}
-              <div className="flex justify-end gap-4 mt-6 flex-wrap">
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => setIsOpenAddLeadContactForm(false)}
-                    // className=" bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm"
-                  >
-                    <div className="flex items-center gap-0.5">
-                      <X size={16} />
-                      Cancel
-                    </div>
-                  </Button>
-                  <Button
-                    // className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
-                    type="submit"
-                    onClick={handleSubmit}
-                  >
-                    <div className="flex items-center gap-1">
-                      <Save size={16} />
-                      Save
-                    </div>
-                  </Button>
-                </div>
+            {/* Footer Buttons */}
+            <div className="flex justify-end gap-4 mt-1 flex-wrap">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => setIsOpenAddLeadContactForm(false)}
+                >
+                  <div className="flex items-center gap-0.5">
+                    <X size={16} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSaving}
+                  onClick={(event) => {
+                    if (isSaving) return;
+                    handleSubmit(event);
+                  }}
+                >
+                  <div className="flex items-center gap-1">
+                    <Save size={16} />
+                    Save
+                  </div>
+                </Button>
               </div>
-            </form>
-          </div>
-        </div>,
-        document.body
+            </div>
+          </form>
+          {/* </div> */}
+          <LoadingPopUpAnimation show={isSaving} />
+          {/* </div>, */}
+          {/* document.body */}
+        </FormLayout>
       )}
     </div>
   );

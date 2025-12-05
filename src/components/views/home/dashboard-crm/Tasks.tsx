@@ -23,8 +23,6 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast";
-import MESSAGE from "../../../../constants/Messages";
 import TaskStageChip from "../../../ui/TaskStageChip";
 
 // Helper function to get icon based on activity name
@@ -98,7 +96,7 @@ function Tasks({
     [key: number]: boolean;
   }>({});
 
-  const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const toggleDescription = (taskId: number) => {
     setExpandedDescriptions((prevState) => ({
@@ -111,8 +109,8 @@ function Tasks({
 
   const getLeadDetails = async (leadId: number) => {
     if(companyUserId === null || companyUserId !== loginStatus.id){
-      toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
-      return ;
+      // toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
+      // return ;
     }
     const postDataToGetLead = {
       company_id: loginStatus.companyId,
@@ -166,12 +164,12 @@ function Tasks({
   return (
     
     <div className="bg-white p-8 h-full flex flex-col">
+      
       <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }} 
     >
       <div className="flex items-center justify-between mb-8 flex-shrink-0">
         <div>
@@ -249,7 +247,15 @@ function Tasks({
                           }}
                           className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
                         >
-                          {task.subject}
+                           {task.leadTaskActivityName} - {task.subject}
+                        </h4>
+                         <h4
+                          onClick={() => {
+                            getLeadDetails(task.leadId);
+                          }}
+                          className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                        >
+                          Lead Name: {task.leadName} ({task.leadStatusName})
                         </h4>
                         <p className="caption-custom mt-1">
                           {displayedDescription}

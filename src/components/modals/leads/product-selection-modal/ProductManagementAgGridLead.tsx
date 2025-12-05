@@ -373,7 +373,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         flex: 1,
       },
     ],
-    [interestTypeData, alreadyAssignedCompanyProduct, actionCellRenderer]
+    [interestTypeData, alreadyAssignedCompanyProduct, actionCellRenderer ]
   );
 
   const defaultColDef = useMemo(() => {

@@ -1,15 +1,17 @@
+
 name: Build and Deploy React App via Docker
 
 on:
   push:
     branches:
       - development
-      - production
+   #   - production
     # - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}   # ✅ Add this line
 
     steps:
       - name: Checkout Source
@@ -36,6 +38,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-deploy
+    environment: ${{ github.ref_name }}   # ✅ Add this line
 
     steps:
       - name: Download Docker Image Artifact
@@ -68,7 +71,10 @@ jobs:
             docker run -d \
               --name react-app \
               --network purple-net \
-              -v /var/certs/cdranalysis.com:/etc/nginx/certs:ro \
+              --build-arg ENV_PROFILE=${{ secrets.ENV_PROFILE }} \
+              --build-arg VITE_RAZORPAY_API_ID_KEY=${{ secrets.VITE_RAZORPAY_API_ID_KEY }} \
+              --build-arg VITE_SITE_KEY_OF_CAPTCHA=${{ secrets.VITE_SITE_KEY_OF_CAPTCHA }} \
+              -v ${{ secrets.LETSENCRYPT_PATH }}:/etc/nginx/certs:ro \
               -p 80:80 -p 443:443 \
               --restart always \
               react-app:${{ github.ref_name }}

@@ -14,8 +14,38 @@ import ApiError from "../../../@types/error/ApiError";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
-function ProductManagement() {
+function ProductManagement({
+  isGridForAccountProduct,
+  onRowSelect
+}: {
+  isGridForAccountProduct? : boolean;
+   onRowSelect? : (data : any ) =>void,
+}) {
+
+   // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS) || "{}"
+);
+  // Restore saved filters when opening this module
+      // useEffect(() => {
+      //   const saved = localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS);
+      //   if (!saved) return;
+    
+      //   const filters = JSON.parse(saved);
+    
+      //   // Ensure URL & hook initialize first before restoring
+      //   requestAnimationFrame(() => {
+      //     if (filters.page) handlePageChange(filters.page);
+      //     if (filters.size) handlePageSizeChange(filters.size);
+      //     if (filters.search) handleSearchParameterChange(filters.search);
+      //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+      //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+      //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+         
+      //   });
+      // }, []);
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -39,38 +69,22 @@ function ProductManagement() {
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
-  const handleProductChangeOnAdd = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) =>
-        products.name !== product.name && products.code !== product.code
-    );
-    if (userMatches) {
-      setProductUpdateCount((prev) => prev + 1);
-    }
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
+
+  const handleProductChangeOnAdd = () => {
+      setProductUpdateCount((prev) => prev + 1);    
   };
 
-  const handleEditProductChange = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) => products.id === product.id
-    );
-
-    if (userMatches) {
+  const handleEditProductChange = () => {
       setProductUpdateCount((prev) => prev + 1);
-    }
+
   };
 
-  const handleCreateCompanyProductTax = (product: Product) => {
-    const userMatches = productsData.some(
-      (products) =>
-        products.name !== product.name && products.code !== product.code
-    );
-    if (userMatches) {
+  const handleCreateCompanyProductTax = () => {
       setProductUpdateCount((prev) => prev + 1);
-    }
   };
 
-  const fetchCompanyProducts = async () => {
+  const fetchCompanyProducts = async (signal : AbortSignal) => {
     if (userHasAccessToViewProduct) {
       const offset = (currentPage - 1) * pageSize;
 
@@ -95,6 +109,7 @@ function ProductManagement() {
           POST_API.GET_PRODUCTS,
           getProductPostData,
           {
+            signal,
             withCredentials: true,
           }
         );
@@ -106,6 +121,9 @@ function ProductManagement() {
             companyId: res.company_id,
             productTypeId:res.product_type_id,
             productTypeName:res.product_type_name,
+            unitName: res.unit_name,
+            unitId : res.unit_id,
+            unitNameInStock : res.unit_name_in_stock,
             defaultWarrantyIntervalTypeId:res.default_warranty_interval_type_id,
             defaultWarranty:res.default_warranty,
             defaultWarrantyName:res.default_warranty_name,
@@ -113,7 +131,9 @@ function ProductManagement() {
             defaultAmcCycle:res.default_amc_cycle,
             defaultAmcCycleName:res.default_amc_cycle_name,
             name: res.name,
-            code: res.code,
+            barcode: res.barcode,
+            parentUnitId : res.parent_unit_id,
+            isSerialNumber: res.is_serial_number,
             cost: res.cost,
             description: res.description,
             version: res.version,
@@ -133,27 +153,36 @@ function ProductManagement() {
           }
         }
       } catch (error: ApiError | any) {
-        console.log(error);
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenStatus = await RefreshToken({
-            callFunction: fetchCompanyProducts,
+            callFunctionWithEvent: fetchCompanyProducts,
           });
 
           if (refreshTokenStatus) {
-            fetchCompanyProducts();
+            fetchCompanyProducts(signal);
           }
+        }else{
+          // toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
       }
     }
   };
 
   useEffect(() => {
+
+    const controller = new AbortController();
+    const {signal} = controller;
     setTimeout(() => {
       setProductsData([]);
-      console.log("Product Data is cleared");
-      console.log(productsData);
-      fetchCompanyProducts();
+      // console.log("Product Data is cleared");
+      // console.log(productsData);
+      fetchCompanyProducts(signal);
     }, 200);
+
+
+    return () =>{
+      controller.abort();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     productUpdateCount,
@@ -169,6 +198,36 @@ function ProductManagement() {
       setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewProduct]);
+
+  
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
 
   return (
     <div className="w-full">
@@ -190,6 +249,8 @@ function ProductManagement() {
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  searchParameter
                 }}
                 paginationData={{
                   selectedPageSize: handlePageSizeChange,
@@ -199,6 +260,8 @@ function ProductManagement() {
                   pageSize,
                 }}
                 products={productsData}
+                isGridForAccountProduct ={isGridForAccountProduct}
+                onRowSelect={onRowSelect}
                 // isListForProductUser={false}
               />
             </div>

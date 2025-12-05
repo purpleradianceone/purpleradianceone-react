@@ -21,7 +21,16 @@ export const REFCURSOR_KEY = {
 
     MY_FIXED_CURSOR_PENDING_TASK :'my_fixed_cursor_pending_task',
 
-    MY_FIXED_CURSOR_UPCOMING_TASK : 'my_fixed_cursor_upcoming_task'
+    MY_FIXED_CURSOR_UPCOMING_TASK : 'my_fixed_cursor_upcoming_task',
+
+    MY_FIXED_CURSOR_TOTAL_PENDING_TASK : "my_fixed_cursor_total_pending_task",
+
+    MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY : "my_fixed_cursor_total_pending_task_today",
+
+    MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK : "my_fixed_cursor_total_upcoming_task",
+
+    MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK_TODAY : "my_fixed_cursor_total_upcoming_task_today"
+
 
 
 }

@@ -15,8 +15,13 @@ import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useSearchParams } from "react-router-dom";
 import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
+import Button from "../../../ui/Button";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
 
 function LeadTasksModal({ ownerId }: { ownerId: number }) {
+  const {userHasAccessToUpdateLead} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
 
@@ -271,15 +276,19 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
             {visibleAssignUsersBtn && (
               <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
                 {/* <span>Add</span> */}
-                <button
-                  disabled={false}
+                <Button
+                  disabled={!userHasAccessToUpdateLead}
                   className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
                   onClick={() => {
-                    setIsCreateLeadTaskModalOpen(true);
+                    if(userHasAccessToUpdateLead){
+                      setIsCreateLeadTaskModalOpen(true);
+                    }else{
+                      toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+                    }
                   }}
                 >
                   +Add
-                </button>
+                </Button>
               </div>
             )}
           </div>

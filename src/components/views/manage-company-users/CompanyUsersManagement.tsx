@@ -5,9 +5,7 @@ import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
-import {
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -16,20 +14,59 @@ import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/use
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
-function GetCompanyUsers() {
+function GetCompanyUsers({
+  isUsedInAccountProductForAssingingInstalledBy,
+  onRowSelect,
+}: {
+  isUsedInAccountProductForAssingingInstalledBy?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowSelect?: (data: any) => void;
+}) {
+
+  // Restore saved filters when opening this module
+    // useEffect(() => {
+    //   const saved = localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    //   if (!saved) return;
+  
+    //   const filters = JSON.parse(saved);
+  
+    //   // Ensure URL & hook initialize first before restoring
+    //   requestAnimationFrame(() => {
+    //     if (filters.page) handlePageChange(filters.page);
+    //     if (filters.size) handlePageSizeChange(filters.size);
+    //     if (filters.search) handleSearchParameterChange(filters.search);
+    //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+  
+    //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+    //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+        
+    //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+    //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+    //     // if (filters.userId) {
+    //     //   setSelectedCompanyUser((prev) => ({
+    //     //     ...prev,
+    //     //     id: filters.userId,
+    //     //     fullname : filters.userName
+    //     //   }));
+    //     // }
+    //   });
+    // }, []);
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
-    false
-  );
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
 
+  // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
     pageSize,
@@ -44,7 +81,7 @@ function GetCompanyUsers() {
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const handleCompanyUserChangeOnEdit = (user: CompanyUser) => {
     const userMatches = companyUsers.some(
@@ -56,13 +93,11 @@ function GetCompanyUsers() {
   };
 
   // Fetch data function
-  const fetchCompanyUsers = async () => {
+  const fetchCompanyUsers = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate
-        ? 0
-        : dateRangeId;
+      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -77,37 +112,42 @@ function GetCompanyUsers() {
 
     try {
       const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+        signal,
         withCredentials: true,
       });
 
       setCompanyUsers(response.data);
       // console.log(response.data);
       if (response.data[0]?.count) {
-        setTotalPages(
-          Math.ceil(response.data[0].count / pageSize)
-        );
+        setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunction: fetchCompanyUsers,
+          callFunctionWithEvent: fetchCompanyUsers,
         });
         if (refreshTokenStatus) {
-          fetchCompanyUsers();
+          fetchCompanyUsers(signal);
         }
       }
     }
   };
 
-
-
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchCompanyUsers();
-    }, 100); // Small delay to allow state updates to settle
+    const controller = new AbortController();
 
-    return () => clearTimeout(timeoutId);
+    const signal = controller.signal;
+    // const timeoutId = setTimeout(() => {
+    //   if (loginStatus.status) {
+        fetchCompanyUsers(signal);
+    //   }
+    // }, 100); // Small delay to allow state updates to settle
+
+    return () => {
+      controller.abort();
+    };
+    // return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,
@@ -124,35 +164,68 @@ function GetCompanyUsers() {
     }
   }, [userHasAccessToViewUser]);
 
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
   return (
     <div className="w-full">
       {userHasAccessToViewUser ? (
         <>
           <div>
             <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      
-    >
-            <GetCompanyUsersList
-              handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
-              onEndDateChange={handleEndDateChange}
-              onStartDateChange={handleStartDateChange}
-              handleSearchOption={{
-                handleSearchParameterChange,
-                handleDateRangeIdChange: handleDatePageIdChange,
-              }}
-              paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
-                pageSize,
-              }}
-              users={companyUsers}
-            />
+              ref={ref}
+              initial={{ opacity: 0, y: 40 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <GetCompanyUsersList
+                handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
+                onEndDateChange={handleEndDateChange}
+                onStartDateChange={handleStartDateChange}
+                handleSearchOption={{
+                  handleSearchParameterChange,
+                  handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  searchParameter
+                }}
+                paginationData={{
+                  selectedPageSize: handlePageSizeChange,
+                  currentPage,
+                  handlePageChange,
+                  totalPages,
+                  pageSize,
+                }}
+                users={companyUsers}
+                isUsedInAccountProductForAssingingInstalledBy={
+                  isUsedInAccountProductForAssingingInstalledBy
+                }
+                onRowSelect={onRowSelect}
+              />
             </motion.section>
           </div>
         </>

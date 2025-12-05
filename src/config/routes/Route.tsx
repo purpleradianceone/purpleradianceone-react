@@ -59,6 +59,11 @@ import GetAccounts from "../../components/views/account/AccountManagement";
 import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
+import StockManagement from "../../components/views/stock-management/StockManagement";
+import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
+import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
+import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
+import AccountDetails from "../../components/modals/Account/AccountDetails";
 
 export const router = createBrowserRouter([
   {
@@ -222,7 +227,9 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <GetCompanyUsers />
+              <GetCompanyUsers
+                isUsedInAccountProductForAssingingInstalledBy={false}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -237,9 +244,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <LeadManagement
-              isUsedInLeadModule={true}
-              />
+              <LeadManagement isUsedInLeadModule={true} />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -254,7 +259,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <ProductManagement />
+              <ProductManagement isGridForAccountProduct={false} />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -357,9 +362,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <ViewLeadManagement />
-          </Navbar>
+            <Navbar>
+              <ViewLeadManagement />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -371,9 +376,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <MeetingScheduler></MeetingScheduler>
-          </Navbar>
+            <Navbar>
+              <MeetingScheduler></MeetingScheduler>
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -385,9 +390,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <TemplatesPage />
-          </Navbar>
+            <Navbar>
+              <TemplatesPage />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -399,9 +404,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <EditorCanvas />
-          </Navbar>
+            <Navbar>
+              <EditorCanvas />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -413,9 +418,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <EditorCanvasWithJson />
-          </Navbar>
+            <Navbar>
+              <EditorCanvasWithJson />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -427,9 +432,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <EmailSetting />
-          </Navbar>
+            <Navbar>
+              <EmailSetting />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -441,9 +446,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <UserPrerefenceManagement />
-          </Navbar>
+            <Navbar>
+              <UserPrerefenceManagement />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -479,26 +484,26 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.MEETINGS,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <Meetings></Meetings>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <Meetings></Meetings>
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
-{
+  {
     path: ROUTES_URL.LEAD_IMPORT_CSV,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            {/* <LeadImportCsv/> */}
-            <LeadImportCsvManagement />
-          </Navbar>
+            <Navbar>
+              {/* <LeadImportCsv/> */}
+              <LeadImportCsvManagement />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -522,18 +527,18 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_LEAD,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <CreateLeadModal
-            isOpen={true}
-            onClose={() => {
-              window.history.back();
-            }}
-          ></CreateLeadModal>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CreateLeadModal
+                isOpen={true}
+                onClose={() => {
+                  window.history.back();
+                }}
+              ></CreateLeadModal>
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -541,18 +546,18 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_COMPANY_USER,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <AddCompanyUserModal
-            isOpen={true}
-            onClose={() => {
-              window.history.back();
-            }}
-          ></AddCompanyUserModal>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AddCompanyUserModal
+                isOpen={true}
+                onClose={() => {
+                  window.history.back();
+                }}
+              ></AddCompanyUserModal>
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -560,19 +565,19 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_PRODUCT,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <AddProductModal
-            isOpen={true}
-            onClose={() => {
-              window.history.back();
-            }}
-            handleProductChangeOnAdd={() => {}}
-          ></AddProductModal>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AddProductModal
+                isOpen={true}
+                onClose={() => {
+                  window.history.back();
+                }}
+                handleProductChangeOnAdd={() => {}}
+              ></AddProductModal>
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -580,19 +585,19 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.CREATE_TEAM,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <AddTeamModal
-            isOpen={true}
-            onClose={() => {
-              window.history.back();
-            }}
-            handleCompanyTeamChangeOnAdd={() => {}}
-          ></AddTeamModal>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AddTeamModal
+                isOpen={true}
+                onClose={() => {
+                  window.history.back();
+                }}
+                handleCompanyTeamChangeOnAdd={() => {}}
+              ></AddTeamModal>
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
@@ -600,16 +605,59 @@ export const router = createBrowserRouter([
     path: ROUTES_URL.ACCOUNT_MANAGEMENT,
     element: (
       <MobileRedirectWrapper>
-      <PrivateRoute>
-        <div>
-        <Navbar>
-          <GetAccounts isUsedForAccountLead={false}/>
-        </Navbar>
-        </div>
-      </PrivateRoute>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <GetAccounts isUsedForAccountLead={false} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
+  {
+    path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountDetails
+              />
+              {/* <GetAccounts isUsedForAccountLead={false} /> */}
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:account_id`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+            <CreateMultipleAccountCompanyProduct/>
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  //  {
+  //   path: ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //           <Navbar>
+  //             <AccountComProdDetails />
+  //           </Navbar>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
   {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
@@ -626,13 +674,68 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-        <IntegrationsPage/>
-        </Navbar>
-        </div>
+            <Navbar>
+              <IntegrationsPage />
+            </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
+  {
+    path: ROUTES_URL.STOCK_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+          <Navbar>
+            <StockManagement />
+          </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <SupportTicketManagement isUsedInSupportTicketModule={true} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ViewSupportTicketManagement/>
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  // {
+  //   path: `${ROUTES_URL.STOCK_LIVE_FOR_COMPANY_PRODUCT}:companyProductId/:product_name/:q_live/:q_inward/:q_outward`,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <Navbar>
+  //           <StockLiveForCompanyProduct
+  //           />
+  //         </Navbar>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
 ]);
 export default router;

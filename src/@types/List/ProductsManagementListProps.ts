@@ -8,9 +8,11 @@ type ProductsManagementListProps = {
     handleSearchOption: HandleSearchOptionProps;
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
-    handleProductChangeOnAdd?: (product: Product) => void;
-    handleEditProductChange?: (product:Product) => void;
-    handleCreateCompanyProductTax? : (product : Product) => void;
+    handleProductChangeOnAdd?: () => void;
+    handleEditProductChange?: () => void;
+    handleCreateCompanyProductTax? : () => void;
+    isGridForAccountProduct? :boolean ,
+     onRowSelect? : (data : Product ) =>void,
     // isListForProductUser : boolean;
 }
  

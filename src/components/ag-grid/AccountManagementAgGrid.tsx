@@ -10,12 +10,13 @@ function AccountManagementAgGrid({
   accounts,
   handleRowClick,
   onRowSelect,
-  isUsedForAccountLead
+  isUsedForAccountLead,
+
 }: {
   accounts: Account[];
   handleRowClick?: (event:  any) => void;
   onRowSelect?: (data: Account | any) => void;
-  isUsedForAccountLead : boolean
+  isUsedForAccountLead : boolean;
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 

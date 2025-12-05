@@ -105,6 +105,7 @@ const CreateAccountCompanyAccountType = ({
         }
         // refresh call for the list
         getAccountCompanyAccountType();
+        onClose()
     })
     .catch(async (error: ApiError | any) => {
         //if exception occurs then rollback to previous state

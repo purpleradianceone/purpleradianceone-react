@@ -34,12 +34,14 @@ type FormInputProps = {
     ref?:React.LegacyRef<HTMLInputElement> | undefined,
     inputMode?:"search" | "email" | "tel" | "text" | "url" | "none" | "numeric" | "decimal" | undefined,
     maxDate? : string
+      minDate? : string
     selectOnChange? : (event : React.ChangeEvent<HTMLSelectElement>) => void ,
     selectOnBlur? : (event : React.FocusEvent<HTMLSelectElement> ) => void;
     countries? : Country[];
     useCountry? : boolean;
     autoComplete? : React.HTMLInputAutoCompleteAttribute;
-    logo?: LucideIcon
+    logo?: LucideIcon;
+    autoFocus?:boolean
     // onClick? : (event: React.MouseEvent<HTMLInputElement, MouseEvent>)  => void;
   }
 

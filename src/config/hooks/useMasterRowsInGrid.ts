@@ -5,6 +5,7 @@ import axios from "axios"
 import ApiError from "../../@types/error/ApiError"
 import { STATUS_CODE } from "../../constants/AppConstants"
 import RefreshToken from "../validations/RefreshToken"
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext"
 
 interface rowsInGridDropdownOptionsResponse {
     id: number,
@@ -12,9 +13,11 @@ interface rowsInGridDropdownOptionsResponse {
 }
 export const useMasterRowsInGrid = () => {
     const [rowsInGridDropdownOptions, setRowsInGridDropdownOptions] = useState<RowsInGridDropdownOptions[]>([])
+    const {loginStatus} = useLoggedInUserContext();
 
     const fetchMasterRowsInGridDropdownOptions = async () => {
-        const postData = {
+        if(loginStatus.status){
+                const postData = {
             id: null,
         };
         setRowsInGridDropdownOptions([]);
@@ -47,6 +50,8 @@ export const useMasterRowsInGrid = () => {
                    }
                 }
             });
+        }
+        
     }
 
     useEffect(() => {

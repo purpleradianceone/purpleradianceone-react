@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useRef, useState } from "react";
@@ -143,7 +144,7 @@ function LeadAssociatedUsersModal({
         }
       }
     } catch (error: ApiError | any) {
-      if (error.status === STATUS_CODE.OK) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenResponse = await RefreshToken({
           callFunctionWithParamsNotEvent: fetchCompanyUsers,
         });

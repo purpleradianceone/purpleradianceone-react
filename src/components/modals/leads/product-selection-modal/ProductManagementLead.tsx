@@ -107,7 +107,7 @@ function ProductManagementLead({
             defaultAmcCycle:res.default_amc_cycle,
             defaultAmcCycleName:res.default_amc_cycle_name,
             name: res.name,
-            code: res.code,
+            barcode: res.barcode,
             cost: res.cost,
             description: res.description,
             version:res.version,
@@ -119,6 +119,9 @@ function ProductManagementLead({
             validFrom: res.valid_from,
             createdBy: res.createdby,
             createdOn: res.createdon,
+            unitId : res.unit_id,
+            unitName : res.unit_name,
+            unitNameInStock: res.unit_name_in_stock
               },
             ]);
           });

@@ -14,9 +14,15 @@ import CompanyUserDropdown, {
 } from "./custom_company_user_dropdown/CustomCompanyUserDropdown";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import DashboardCRM from "./dashboard-crm/DashboardCRM";
+import AppTutorailManager from "../tutorails/AppTutorailManager";
+import { DashboardTabsSteps } from "../../../constants/AppTutorailsSteps";
+import { useTutorailDataContext } from "../../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../../constants/Tutorail";
 
 // ======= Dashboard Components =======
-const CRM: React.FC<{companyUserId:number|null}> = ({companyUserId}) => <DashboardCRM companyUserId={companyUserId} />;
+const CRM: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => (
+  <DashboardCRM companyUserId={companyUserId} />
+);
 const Support: React.FC = () => <SupportDashboard />;
 const Inventory: React.FC = () => <InventoryDashboard />;
 const Finance: React.FC = () => <FinanceDashboard />;
@@ -33,31 +39,38 @@ type DashboardType = {
 
 const Home: React.FC = () => {
   const { loginStatus } = useLoggedInUserContext();
+  const { tutorailData, setTutorailData } = useTutorailDataContext();
   const [modules, setModules] = useState<DashboardType[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const { userPreference } = useUserPreference();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
 
   const renderContent = () => {
-    switch (activeTab) {
-      case 1:
-        return <CRM companyUserId={(selectedUser??loginStatus).id} />;
-      case 2:
-        return <Support />;
-      case 3:
-        return <Inventory />;
-      case 4:
-        return <Finance />;
-      case 5:
-        return <HRMS />;
-      default:
-        return <div>No content available for this dashboard.</div>;
+    if (tourFinished) {
+      switch (activeTab) {
+        case 1:
+          return <CRM companyUserId={selectedUser?.id ?? (loginStatus.isSuperUser ? null : loginStatus.id) } />;
+        case 2:
+          return <Support />;
+        case 3:
+          return <Inventory />;
+        case 4:
+          return <Finance />;
+        case 5:
+          return <HRMS />;
+        default:
+          return <div>No content available for this dashboard.</div>;
+      }
     }
   };
 
   const fetchCompanyUserDashboardAssigned = async () => {
     // setLoading(true);
+    if ((selectedUser ?? loginStatus).id === 0 || loginStatus.companyId === 0) {
+      return;
+    }
     try {
       const getCompanyUserDashboardPostData = {
         company_id: loginStatus.companyId,
@@ -106,8 +119,58 @@ const Home: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleTourEnd = async () => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_DASHBOARD_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: true,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+    setTourFinished(true);
+  };
 
   useEffect(() => {
+    setTourFinished(tutorailData.isDashboardSeen);
     fetchCompanyUserDashboardAssigned();
   }, [selectedUser]);
 
@@ -138,9 +201,14 @@ const Home: React.FC = () => {
     );
   }
 
-
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
+      {!tourFinished && (
+        <AppTutorailManager
+          steps={DashboardTabsSteps}
+          handleTourEnd={handleTourEnd}
+        />
+      )}
       {loginStatus.isSuperUser && (
         <div className="">
           <CompanyUserDropdown
@@ -178,9 +246,12 @@ const Home: React.FC = () => {
             <div className="flex justify-start">
               {modules.map((module) => (
                 <button
+                  id={`${module.dashboard_name}DashboardTab`}
                   key={module.dashboard_id}
                   onClick={() => setActiveTab(module.dashboard_id)}
-                  className={`px-6 py-1 border-b-2 transition-colors
+                  className={`px-6 py-1 ${
+                    tourFinished ? "pt-1" : "pt-6"
+                  } border-b-2 transition-colors
                 ${
                   activeTab === module.dashboard_id
                     ? "main-nav-custom active-header"

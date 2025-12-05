@@ -14,13 +14,6 @@ const AccountCompanyAccountTypeAgGrid = ({
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
-  // createdBy
-  // createdOn
-  // id
-  // isActive
-  // updatedBy
-  // updatedOn
-
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {

@@ -16,7 +16,6 @@ import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
-import AccountDetails from "../modals/Account/AccountDetails";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
@@ -31,12 +30,13 @@ function AccountManagementList({
   onStartDateChange,
   onEndDateChange,
   paginationData,
-  fetchAccounts,
+  // fetchAccounts,
   handleCreateCompanyAccountType,
   isUsedForAccountLead,
   handleRowSelectedForLead,
+  isUsedForSupportTicketCreation
 }: {
-  fetchAccounts: () => Promise<void>;
+  // fetchAccounts: () => Promise<void>;
   accounts: Account[];
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
@@ -45,6 +45,7 @@ function AccountManagementList({
   handleCreateCompanyAccountType: () => void;
   isUsedForAccountLead: boolean;
   handleRowSelectedForLead?: (data: Account | any) => void;
+  isUsedForSupportTicketCreation?: boolean;
 }) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -57,25 +58,27 @@ function AccountManagementList({
   const { handleDateRangeIdChange, isCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
-  const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
-    useState<Account>();
-  const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
+  // const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
+    // useState<Account>();
+  // const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
-  const handleRowSelectedToShowAccountDetails = (data: any) => {
+  const handleRowSelectedToShowAccountDetails = (data: Account) => {
     if (!isUsedForAccountLead) {
-      setAccountDataToShowFullDetails(data);
-      setShowAccountDetails(true);
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`)
+      // setAccountDataToShowFullDetails(data);
+      // setShowAccountDetails(true);
     } else {
       handleRowSelectedForLead!(data);
     }
   };
 
   const { userHasAccessToAddAccount } = useUserAccessModules();
-
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
 
+  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -108,6 +111,7 @@ function AccountManagementList({
                       e.target.value
                     );
                   }}
+                  value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
 
@@ -121,11 +125,13 @@ function AccountManagementList({
                   <DateRangeFilterDropdown
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
+                    selectedOption={selectedDateName}
                   ></DateRangeFilterDropdown>
                 </div>
               </div>
               {/* Custom Date Picker Div Flex Box*/}
               <div
+              className="flex"
                 style={
                   isCustomDateOptionSelected
                     ? { visibility: "visible" }
@@ -138,72 +144,6 @@ function AccountManagementList({
                 />
               </div>
             </div>
-
-            {/* <div className="ml-0.5 min-w-[120px] max-h-[40px]">
-                <CustomDropdown
-                  labelName="source"
-                  options={leadSource!}
-                  onSelect={handleLeadSelectedSource}
-                />
-              </div>
-              <div className="ml-0.5 min-w-[120px]">
-                <CustomDropdown
-                  labelName="status"
-                  options={leadStatus!}
-                  onSelect={handleLeadSelectedStatus}
-                />
-              </div> */}
-
-            {/* <div className="relative flex items-center justify-center w-auto ">
-                <div className="grid ">
-                  {selectedLeadOwner.id === 0 && (
-                    <Button
-                      type="button"
-                      onClick={handleCompanyUserPopUp}
-                      className="flex items-center gap-2 h-7 px-2 py-1 text-xs border border-gray-300 
-                      rounded-md bg-white text-gray-700 hover:bg-gray-50 
-                      focus:outline-none shadow-sm"
-                    >
-                      <span>Owner</span>
-                      <User size={14} />
-                    </Button>
-                  )}
-
-                  {selectedLeadOwner.id !== 0 && (
-                    <div className="border rounded-md border-gray-400 p-0.5">
-                      <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
-                        {" "}
-                        <User size={11} />
-                        Selected Owner:
-                      </span>
-                      <div
-                        title={selectedLeadOwner.fullname}
-                        className={
-                          selectedLeadOwner.id === 0
-                            ? "bg-transparent"
-                            : "relative rounded flex items-center justify-between gap-x-0.5 bg-blue-600 text-white  text-xs p-0.5 "
-                        }
-                      >
-                        <span>
-                          {selectedLeadOwner.fullname.length > 14
-                            ? selectedLeadOwner.fullname.slice(0, 14) + "..."
-                            : selectedLeadOwner.fullname}
-                        </span>
-
-                        <button
-                          title="Select another owner to view assigned leads"
-                          onClick={() => {
-                            handleSelectedCompanyUserCheckBoxChange(null);
-                          }}
-                          className="border-transparent  float-end"
-                        >
-                          <X size={14} className="self-center"></X>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div> */}
           </div>
         </>
 
@@ -217,8 +157,7 @@ function AccountManagementList({
                     handleShowImportModule();
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCOUNT_IMPORT_ACCESS
                     );
                   }
                 }}
@@ -232,17 +171,22 @@ function AccountManagementList({
           )}
 
           <div>
-            <Button
+            {!isUsedForSupportTicketCreation &&<Button
+            disabled={!userHasAccessToAddAccount}
               type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenAccountForm(!openCreateAccountForm);
+               onClick={(e) => {
+                if(userHasAccessToAddAccount){
+                  e.preventDefault();
+                  setOpenAccountForm(!openCreateAccountForm);
+                }else{
+                  toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS)
+                }
               }}
             >
               <div className="flex items-center gap-0.5">
                 <Plus size={SIZE.SIXTEEN} /> Create
               </div>
-            </Button>
+            </Button>}
             {openCreateAccountForm && (
               <CreateAccount
                 onClose={() => setOpenAccountForm(false)}
@@ -282,17 +226,15 @@ function AccountManagementList({
         />
       </div>
 
-      {showAccountDetails && (
+      {/* {showAccountDetails && (
         <div className="account-data">
           <AccountDetails
-            fetchAccounts={fetchAccounts}
-            // indutryTypeData={industryTypeData!}
-            // businessTypeData = {businessTypeData!}
-            company={AccountDataToShowFullDetails!}
-            onClose={() => setShowAccountDetails(false)}
+            // fetchAccounts={fetchAccounts}
+            // company={AccountDataToShowFullDetails!}
+            // onClose={() => setShowAccountDetails(false)}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }

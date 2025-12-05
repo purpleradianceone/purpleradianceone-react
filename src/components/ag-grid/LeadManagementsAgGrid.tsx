@@ -11,6 +11,7 @@ function LeadManagementAgGrid({
   onRowSelect, //selected user for view lead details
   handleRowClick,
   isUsedInLeadModule,
+  
 }: LeadManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -62,6 +63,32 @@ function LeadManagementAgGrid({
       {
         field: "leadSource",
         headerName: "Source",
+        sortable: true,
+        filter: true,
+      },
+        {
+        field: "countryName",
+        headerName: "Country",
+        sortable: true,
+        filter: true,
+      },
+       {
+        field: "stateName",
+        headerName: "State",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "districtName",
+        headerName: "District",
+        sortable: true,
+        filter: true,
+      },
+
+     
+      {
+        field: "leadDetailAddress",
+        headerName: "Address",
         sortable: true,
         filter: true,
       },

@@ -4,7 +4,7 @@
  * @import SignInForm for SignInForm component from components/forms/SignInForm
  */
 import { RouterProvider } from "react-router-dom";
-import { router } from "./config/routes/Route";
+import {  router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
 import { AccessManagementContextProvider } from "./context/user/AccessManagementContext";
 import { PanelProvider } from "./context/panel/usePanel";
@@ -16,9 +16,11 @@ import { Toaster } from "react-hot-toast";
 import { NotificationCountContextProvider } from "./context/notification/NotificationCountContext";
 import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandler";
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
-import { IndustryTypeDataProvider } from "./context/Account/IndustryTypeData";
-import { BusinessTypeDataProvider } from "./context/Account/BusinessTypeData";
+import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailDataContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+
+const queryClient = new QueryClient();
 /**
  *
  * @returns JSX.Element of all html elements to be rendered as child element of root element in index.html
@@ -26,23 +28,24 @@ import { BusinessTypeDataProvider } from "./context/Account/BusinessTypeData";
 function App() {
   const { confirmHandler, dialogMessage, isDialogOpen } =
     useAxiosForbiddenHandler();
+
   return (
     <LoggedInUserContextProvider>
+      <TutorailDataContextProvider>
       <AccessManagementContextProvider>
-        <BusinessTypeDataProvider>
-          <IndustryTypeDataProvider>
             <NotificationCountContextProvider>
               <UserPreferenceContextProvider>
                 <PanelProvider>
                   <ZoomMeetingContextProvider>
                     <GoogleMeetContextProvider>
+                      <QueryClientProvider client={queryClient}>
                       <NotificationProvider>
                         <Toaster
                           position="top-center"
                           toastOptions={{
                             style: { zIndex: 2147483647 }, // max safe z-index
                           }}
-                        />
+                          />
 
                         <DialogueBox
                           isOpen={isDialogOpen}
@@ -50,17 +53,18 @@ function App() {
                           onConfirm={confirmHandler}
                           title="Session Expired !"
                           message={dialogMessage}
-                        />
-                        <RouterProvider router={router} />
+                          />
+                        <RouterProvider router={router}  />
+
                       </NotificationProvider>
+                          </QueryClientProvider>
                     </GoogleMeetContextProvider>
                   </ZoomMeetingContextProvider>
                 </PanelProvider>
               </UserPreferenceContextProvider>
             </NotificationCountContextProvider>
-          </IndustryTypeDataProvider>
-        </BusinessTypeDataProvider>
       </AccessManagementContextProvider>
+      </TutorailDataContextProvider>
     </LoggedInUserContextProvider>
   );
 }

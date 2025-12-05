@@ -13,7 +13,7 @@ import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CreateLeadModal from "../modals/leads/CreateLeadModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -109,7 +109,7 @@ function LeadManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+  const { handleDateRangeIdChange, isCustomDateOptionSelected , setIsCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
@@ -138,11 +138,26 @@ function LeadManagementList({
     navigate(ROUTES_URL.LEAD_IMPORT_CSV);
   };
 
-  if (userHasAccessToViewLead) {
-    const handleCreateLeadModalClose = () => {
-      setIsCreateLeadModalOpen(false);
-    };
+   useEffect(()=>{
+    if(handleSearchOption.dateRangeId===8){
 
+      setIsCustomDateOptionSelected(true)
+    }
+  }, [handleSearchOption.dateRangeId])
+
+  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
+  || "Filter";
+  const handleCreateLeadModalClose = () => {
+    setIsCreateLeadModalOpen(false);
+  };
+
+  // let  startDate ;
+
+  // useEffect(()=>{
+  //   console.log(" this is the start date ");
+  //   console.log(startDate);
+  // }, [startDate])
+  if (userHasAccessToViewLead) { 
     return (
       <div
         className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -163,13 +178,13 @@ function LeadManagementList({
          }
               
 
-          {isLargeScreen && (
+          {/* {isLargeScreen && ( */}
             <>
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-2  px-1 justify-center items-center">
                 {/* search box flex div */}
-                <div className="relative flex items-center justify-center w-auto">
-                  <div className="grid w-56">
+                  <div className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}>
                     <SearchInput
+                    value={handleSearchOption.searchParameter}
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
                           e.target.value
@@ -177,7 +192,6 @@ function LeadManagementList({
                       }}
                     ></SearchInput>
                   </div>
-                </div>
 
                 {/* Date FIlters Dropdown */}
                 <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
@@ -189,7 +203,8 @@ function LeadManagementList({
                     <DateRangeFilterDropdown
                       dropdownOptions={dateRangeDropdownOptions}
                       handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
+                      selectedOption={selectedDateName}
+                      />
                   </div>
                 </div>
                 {/* Custom Date Picker Div Flex Box*/}
@@ -201,8 +216,11 @@ function LeadManagementList({
                   }
                 >
                   <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
+                    onStartDateChange={onStartDateChange.handleStartDateChange}
+                    onEndDateChange={onEndDateChange.handleEndDateChange}
+                    // startDate ={startDate}
+                    // endDate ={endDate}
+
                   />
                 </div>
                 </div>
@@ -210,16 +228,18 @@ function LeadManagementList({
                   <div className="flex gap-1">
                     <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                       <CustomDropdown
+                      selectedValue={handleLeadSelectedSource.selectedLeadSource || undefined}
                         labelName="source"
                         options={leadSource!}
-                        onSelect={handleLeadSelectedSource}
+                        onSelect={handleLeadSelectedSource.handleLeadSelectedSource}
                       />
                     </div>
                     <div className="ml-0.5 min-w-[120px]">
                       <CustomDropdown
+                      selectedValue={handleLeadSelectedStatus.selectedLeadStatus || undefined}
                         labelName="status"
                         options={leadStatus!}
-                        onSelect={handleLeadSelectedStatus}
+                        onSelect={handleLeadSelectedStatus.handleLeadSelectedStatus}
                       />
                     </div>
                   
@@ -242,11 +262,6 @@ function LeadManagementList({
 
                     {selectedLeadOwner.id !== 0 && (
                       <div className="border rounded-md border-gray-400 p-0.5">
-                        {/* <span className=" flex text-xs items-center gap-1 bg-white text-gray-600">
-                          {" "}
-                          <User size={11} />
-                          Selected Owner:
-                        </span> */}
                         <div
                           title={selectedLeadOwner.fullname}
                           className={
@@ -279,7 +294,7 @@ function LeadManagementList({
                  )}
               </div>
             </>
-          )}
+          {/* )} */}
 
           {isUsedInLeadModule && (
             <div className="flex  gap-1">
@@ -388,7 +403,7 @@ function LeadManagementList({
                   handleSelectedCompanyUserChange={
                     handleSelectedCompanyUserCheckBoxChange
                   }
-                  isUsedForSettings={true}
+                  isUsedForSettings={false}
                 />
               </div>
             </div>

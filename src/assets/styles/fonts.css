@@ -26,9 +26,9 @@
 /* Section Headers */
 .section-header-custom {
   font-family: "Inter", sans-serif;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
-  color: #333333;
+  color: #1a1818;
 }
 .section-header-custom-blue {
   font-family: "Inter", sans-serif;

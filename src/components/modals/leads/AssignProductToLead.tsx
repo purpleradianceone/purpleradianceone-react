@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import Button from "../../ui/Button";
 import { createPortal } from "react-dom";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 const AssignProductToLead = ({
   selectedLeadData,
@@ -38,6 +39,7 @@ const AssignProductToLead = ({
 }) => {
   const { position } = usePanel();
   const { loginStatus } = useLoggedInUserContext();
+  const [isSaving, setIsSaving] = useState(false);
 
   const [showSaveButton, SetShowSaveButton] = useState<boolean>(false);
 
@@ -48,6 +50,9 @@ const AssignProductToLead = ({
     event: React.FormEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
+    if(isSaving) return ;
+
+
 
     const PostDataAssignProductToLead: AssignProductToLeadType = {
       company_id: loginStatus.companyId,
@@ -55,6 +60,7 @@ const AssignProductToLead = ({
       input_data: itemData,
       createdby: loginStatus.id,
     };
+    setIsSaving(true)
     try {
       const response = await axios.post(
         POST_API.ASSIGN_PRODUCT_TO_LEAD,
@@ -72,10 +78,6 @@ const AssignProductToLead = ({
         if (response.data.status === false) {
           toast.error(response.data.message);
         }
-        //delay before closing
-        setTimeout(() => {
-          onClose();
-        }, 1000);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
@@ -88,6 +90,11 @@ const AssignProductToLead = ({
           handleProductAddToLead(event);
         }
       }
+    }finally{
+      setTimeout(() => {
+          onClose();
+        }, 100);
+      setIsSaving(false)
     }
   };
 
@@ -140,6 +147,8 @@ const AssignProductToLead = ({
             position === "left" ? " inset-0 top-6 left-6 " : ""
           }bg-white rounded-2xl shadow-lg p-3  w-full max-w-6xl  max-h-[87vh] overflow-y-auto relative animate-fadeIn`}
         >
+                 {isSaving && <LoadingPopUpAnimation show={isSaving} />}
+
           {/* Header with Close Button */}
           <FormHeader
             icon={Package}
@@ -155,7 +164,7 @@ const AssignProductToLead = ({
                   <Button
                     type="submit"
                     onClick={handleProductAddToLead}
-                    disabled={!showSaveButton}
+                    disabled={!showSaveButton || isSaving}
                   >
                     <div className="flex items-center gap-1">
                       <Save size={16} /> Add

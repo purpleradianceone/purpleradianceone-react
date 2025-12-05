@@ -63,7 +63,7 @@ const SalesChart = ({
   }
   return (
     
-     <div className="min-h-full bg-white grid rounded-2xl shadow-lg border border-gray-100 p-4 relative">
+     <div  className="min-h-full bg-white grid rounded-2xl shadow-lg border border-gray-100 p-4 relative">
       <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 40 }}

@@ -3,7 +3,6 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, XCircle } from "lucide-react";
 import { INNERHTML } from "../../../../constants/AppConstants";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
@@ -12,6 +11,7 @@ import ToggleButton from "../../../ui/ToggleButton";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import StatusIndicator from "../../../ui/StatusIndicator";
 
 type CompanyUserAgGridPropsForLead = {
   users: CompanyUsersSearchProps[];
@@ -145,16 +145,22 @@ function CompanyUserAgGridForLead({
         filter: true,
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-1 mt-3">
+            <div className="flex items-center gap-1 ">
               {params.value ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">Active</span>
+                <StatusIndicator
+                  isActive={params.value}
+                />
+                  {/* <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-green-600">Active</span> */}
                 </>
               ) : (
                 <>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">Inactive</span>
+                  {/* <XCircle className="w-4 h-4 text-red-500" />
+                  <span className="text-sm text-red-600">Inactive</span> */}
+                  <StatusIndicator
+                  isActive={params.value}
+                />
                 </>
               )}
             </div>
@@ -178,7 +184,7 @@ function CompanyUserAgGridForLead({
   return (
     <div
       className="ag-theme-balham w-full"
-      style={{ height: "460px", width: "100%" }}
+      style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         ref={gridRef}

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
 import { Handshake, Save, X } from "lucide-react";
 import RadioButtons from "../../../ui/RadioButton";
@@ -17,6 +16,8 @@ import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../../ui/FormLayout";
 
 function ConvertLeadModal({
   isOpen,
@@ -26,6 +27,7 @@ function ConvertLeadModal({
   reasonText,
   onReasonChange,
   handleLeadMappedToAccount,
+  isLeadStatusSaving
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -34,6 +36,7 @@ function ConvertLeadModal({
   reasonText: string;
   onReasonChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleLeadMappedToAccount: () => void;
+  isLeadStatusSaving : boolean
 }) {
   const [accountTypeSelected, setAccountTypeSelected] = useState<
     "existingAccount" | "noAccount"
@@ -92,16 +95,20 @@ function ConvertLeadModal({
   };
 
   if (!isOpen) return null;
-  return createPortal(
-    <>
-      <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
+  return (
+    // <>
+    <FormLayout>
+
+   
+      {/* <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
         <div className="flex min-h-screen items-center justify-center">
           <div
             className="relative w-full max-w-6xl max-h-[90vh] min-h-[85vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
-          >
+          > */}
+              { isLeadStatusSaving && <LoadingPopUpAnimation show={isLeadStatusSaving} />}
             <div className="py-4 px-3">
               <FormHeader
                 icon={Handshake}
@@ -197,11 +204,12 @@ Ensure all details are correct before finalizing the mapping"
                 />
               </form>
             </div>
-          </div>
-        </div>
-      </div>
-    </>,
-    document.body
+             </FormLayout>
+      //     // {/* </div>
+      //   </div>
+      // </div> */}
+    // {/* </>,
+    // document.body */}
   );
 }
 

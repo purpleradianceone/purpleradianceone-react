@@ -2,11 +2,7 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Edit,
-  LucideLayoutDashboard,
-  UserCheck,
-} from "lucide-react";
+import { Edit, LucideLayoutDashboard, UserCheck } from "lucide-react";
 import { createPortal } from "react-dom";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
@@ -16,6 +12,8 @@ import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps"
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
+import AppTutorailManager from "../views/tutorails/AppTutorailManager";
+import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsSteps";
 // import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
@@ -23,10 +21,17 @@ function CompanyUserAgGrid({
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
   handleIsDashboardModalOpen,
+  handleActionsTourEnd,
+  isActionsTourEnded,
+  isUsedInAccountProductForAssingingInstalledBy,
+  onRowSelect
 }: CompanyUserAgGridProps) {
-  const { userHasAccessToViewAccess, userHasAccessToUpdateUser  , userHasAccessToViewDashboard
-  } =
-    useUserAccessModules();
+  const {
+    userHasAccessToViewAccess,
+    userHasAccessToUpdateUser,
+    userHasAccessToViewDashboard,
+  } = useUserAccessModules();
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -77,20 +82,51 @@ function CompanyUserAgGrid({
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-             <StatusIndicator isActive={params.value}/>
+              <StatusIndicator isActive={params.value} />
+            </div>
+          );
+        },
+      },
+       {
+        hide: !isUsedInAccountProductForAssingingInstalledBy,
+        headerName: "Actions",
+        // hide: !isUsedInLeadModule,
+        field: "view",
+        pinned: "right",
+        maxWidth: 80,
+        // minWidth:80,
+        // autoHeight: true,
+        // suppressSizeToFit: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params:   any) => {
+          return (
+            <div className="flex items-center justify-center  ">
+              <span
+                className="lead-details cursor-pointer text-blue-600  "
+                onClick={(e) => {
+                    e.preventDefault();
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+                
+                Select
+              </span>
             </div>
           );
         },
       },
       {
+        hide: isUsedInAccountProductForAssingingInstalledBy,
         headerName: "Actions",
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        headerClass: "company-users-actions-column",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
+
           const [position, setPosition] = useState({
             top: 0,
             left: 0,
@@ -101,6 +137,7 @@ function CompanyUserAgGrid({
 
           const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
+
             setIsActionsDropDownOpen((prev) => !prev);
 
             const rect = (
@@ -124,7 +161,8 @@ function CompanyUserAgGrid({
             const handleClickOutsideActionsDropDown = (event: MouseEvent) => {
               if (
                 dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
+                !dropdownRef.current.contains(event.target as Node) &&
+                !isActionsTourEnded
               ) {
                 setIsActionsDropDownOpen(false);
               }
@@ -144,6 +182,7 @@ function CompanyUserAgGrid({
           return (
             <>
               <button
+                id="actions-button"
                 className="text-blue-600"
                 onClick={handleActionsButtonClick}
               >
@@ -157,7 +196,40 @@ function CompanyUserAgGrid({
                     className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
                     style={{ top: position.top, left: position.left }}
                   >
+                    {isActionsTourEnded && (
+                      <AppTutorailManager
+                        steps={CompanyUsersGridActionsButtonStep}
+                        handleTourEnd={() => {
+                          setIsActionsDropDownOpen(false);
+                          handleActionsTourEnd!();
+                          handleIsAccessModalOpen(false);
+                           handleIdIsEditModalOpen(false);
+                            handleIsDashboardModalOpen(false);
+                        }}
+                        modalOpenTriggerIndices={[0, 2, 4, 5]}
+                        isModalOpen={(index) => {
+                          if (index === 0) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(true);
+                            
+                          }
+                          if (index === 2) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(false);
+                            handleIdIsEditModalOpen(true);
+                          }
+                           if (index === 4) {
+                            handleSelectedCompanyUserChange(params.data)
+                            handleIsAccessModalOpen(false);
+                            handleIdIsEditModalOpen(false);
+                            handleIsDashboardModalOpen(true);
+                          }
+                          
+                        }}
+                      />
+                    )}
                     <ActionsDropdownButton
+                      id="company-user-access-management-action-btn"
                       disabled={!userHasAccessToViewAccess}
                       onClick={() => {
                         if (userHasAccessToViewAccess) {
@@ -179,6 +251,7 @@ function CompanyUserAgGrid({
                     </ActionsDropdownButton>
 
                     <ActionsDropdownButton
+                      id="company-user-edit-action-btn"
                       disabled={!userHasAccessToUpdateUser}
                       onClick={() => {
                         if (userHasAccessToUpdateUser) {
@@ -198,6 +271,7 @@ function CompanyUserAgGrid({
                     </ActionsDropdownButton>
 
                     <ActionsDropdownButton
+                      id="company-user-dashboard-action-btn"
                       disabled={!userHasAccessToViewDashboard}
                       onClick={() => {
                         if (userHasAccessToViewDashboard) {
@@ -212,10 +286,12 @@ function CompanyUserAgGrid({
                         }
                       }}
                     >
-                      <span className="flex gap-1"><LucideLayoutDashboard
-                        className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                      />{" "}
-                      {JSX_CHILDREN_NAME.DASHBOARD}</span>
+                      <span className="flex gap-1">
+                        <LucideLayoutDashboard
+                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                        />{" "}
+                        {JSX_CHILDREN_NAME.DASHBOARD}
+                      </span>
                     </ActionsDropdownButton>
 
                     {/* {!userHasAccessToViewAccess && (
@@ -260,7 +336,6 @@ function CompanyUserAgGrid({
       className="ag-theme-balham w-full "
       style={{ height: "100%", width: "100%" }}
     >
-      
       <AgGridReact
         rowData={users}
         columnDefs={columnDefs}
@@ -268,6 +343,7 @@ function CompanyUserAgGrid({
         modules={[AllCommunityModule]}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
+        context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );

@@ -7,6 +7,11 @@ type CompanyUserAgGridProps = {
   handleIdIsEditModalOpen: (params: boolean) => void;
   handleIsAccessModalOpen: (params: boolean) => void;
   handleIsDashboardModalOpen: (params: boolean) => void;
+  handleActionsTourEnd? : () => void;
+  isActionsTourEnded? : boolean;
+  isUsedInAccountProductForAssingingInstalledBy? : boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowSelect? : (data : any ) =>void,
 };
 
 export default CompanyUserAgGridProps;

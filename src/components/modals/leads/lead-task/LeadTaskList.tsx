@@ -400,7 +400,7 @@ function LeadTaskList({
                   key={activity.id}
                   className={`bg-white min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
                 >
-                  {/* Activity Icon */}
+                 
                   <div className="flex-shrink-0 p-1 bg-gray-200 rounded-full">
                     {" "}
                     {getActivityIcon(
@@ -409,7 +409,7 @@ function LeadTaskList({
                     )}
                   </div>
 
-                  {/* Activity Details */}
+                  
                   <div className="flex-1 min-w-0">
                     <p
                       title={activity.subject}
@@ -437,9 +437,9 @@ function LeadTaskList({
                             <div className="grid grid-cols-3">
                               {activity.assignedToName!.map((name) => (
                                 <span
-                                  key={name} // Added key for list items
+                                  key={name}
                                   className="bg-gray-50 border caption-custom-blue mx-1 rounded-md px-1 py-0"
-                                  title={name} // Added title for better UX
+                                  title={name}
                                 >
                                   {name.length > 20
                                     ? name.substring(0, 20) + "..."
@@ -448,71 +448,70 @@ function LeadTaskList({
                               ))}
                             </div>
                           </div>
-                          <div>
+                          <div className="mt-0 pt-0">
                             {activity.leadActivityDetails && (
-<div className="mt-1 flex gap-2">
-                              <span className="caption-custom-blue">
-                                {activity.leadActivityId !== 3 &&
-                                activity.leadActivityId !== 4
-                                  ? "Contact : "
-                                  : activity.leadActivityId !== 4
-                                  ? "Address:"
-                                  : "Meeting: "}
-                              </span>{" "}
-                              <div
-                                className={
-                                  activity.leadActivityId !== 3 &&
+                              <div className="flex gap-2">
+                                <span className="caption-custom-blue">
+                                  {activity.leadActivityId !== 3 &&
                                   activity.leadActivityId !== 4
-                                    ? "grid grid-cols-2 text-center"
-                                    : "inline-block"
-                                }
-                              >
-                                {activity.leadActivityId !== 3 &&
-                                activity.leadActivityId !== 4 ? (
-                                  getLeadTaskJsonData(activity).map(
-                                    (contact: LeadContactType) => (
-                                      <span
-                                        key={contact.id} // Assuming contact has an id
-                                        className=" rounded-md px-1 caption-custom"
-                                      >
-                                        {contact.name}
-                                      </span>
+                                    ? "Contact : "
+                                    : activity.leadActivityId !== 4
+                                    ? "Address:"
+                                    : "Meeting: "}
+                                </span>{" "}
+                                <div
+                                  className={
+                                    activity.leadActivityId !== 3 &&
+                                    activity.leadActivityId !== 4
+                                      ? "grid grid-cols-2 text-center"
+                                      : "inline-block"
+                                  }
+                                >
+                                  {activity.leadActivityId !== 3 &&
+                                  activity.leadActivityId !== 4 ? (
+                                    getLeadTaskJsonData(activity).map(
+                                      (contact: LeadContactType) => (
+                                        <span
+                                          key={contact.id}
+                                          className=" rounded-md px-1 caption-custom"
+                                        >
+                                          {contact.name}
+                                        </span>
+                                      )
                                     )
-                                  )
-                                ) : activity.leadActivityId !== 4 ? (
-                                  <span className="bg-gray-0 rounded-md px-1 caption-custom">
-                                    {getLeadTaskJsonData(activity)}
-                                  </span>
-                                ) : (
-                                  <span className=" rounded-md caption-custom">
-                                    {getLeadTaskJsonData(activity).map(
-                                      (meetingDetails: any) => {
-                                        return meetingDetails.meetingSummary;
-                                      }
-                                    )}
-                                    <button
-                                      onClick={() => {
-                                        const platform = getLeadTaskJsonData(
-                                          activity
-                                        ).map((meetingDetails: any) => {
-                                          return meetingDetails.platform;
-                                        });
-                                        if (platform[0] === 1) {
-                                          getGoogleMeeting(activity);
-                                        } else if (platform[0] === 2) {
-                                          getZoomMeeting(activity);
+                                  ) : activity.leadActivityId !== 4 ? (
+                                    <span className="bg-gray-0 rounded-md px-1 caption-custom">
+                                      {getLeadTaskJsonData(activity)}
+                                    </span>
+                                  ) : (
+                                    <span className=" rounded-md caption-custom">
+                                      {getLeadTaskJsonData(activity).map(
+                                        (meetingDetails: any) => {
+                                          return meetingDetails.meetingSummary;
                                         }
-                                      }}
-                                      className="caption-custom-blue hover:underline ml-3 focus:outline-none"
-                                    >
-                                      View Details
-                                    </button>
-                                  </span>
-                                )}
+                                      )}
+                                      <button
+                                        onClick={() => {
+                                          const platform = getLeadTaskJsonData(
+                                            activity
+                                          ).map((meetingDetails: any) => {
+                                            return meetingDetails.platform;
+                                          });
+                                          if (platform[0] === 1) {
+                                            getGoogleMeeting(activity);
+                                          } else if (platform[0] === 2) {
+                                            getZoomMeeting(activity);
+                                          }
+                                        }}
+                                        className="caption-custom-blue hover:underline ml-3 focus:outline-none"
+                                      >
+                                        View Details
+                                      </button>
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
                             )}
-                            
                             <span className="caption-custom-blue">
                               Outcome :{" "}
                             </span>{" "}
@@ -595,15 +594,14 @@ function LeadTaskList({
                       }}
                       className="px-2 py-1 bg-white caption-custom rounded hover:bg-gray-200 transition-colors"
                     >
-                      <History size={16} className="caption-custom" /> {/* Adjusted size for better fit */}
+                      <History size={16} className="caption-custom" />{" "}
+                      {/* Adjusted size for better fit */}
                     </button>
                   </div>
-                  
+
                   {/*right corner*/}
                   <div className="absolute bottom-2  right-2 flex items-center space-x-1">
-                   <StatusChip
-                   isActive={activity.isActive}
-                   />
+                    <StatusChip isActive={activity.isActive} />
                   </div>
                 </div>
               ))}

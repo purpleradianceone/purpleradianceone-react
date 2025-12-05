@@ -20,16 +20,16 @@ function SettingsPage() {
             userPreference.isLeftMenu ? "pl-5" : "pl-1"
           } pr-1 gap-1`}
         >
-          <div className="sticky top-16 p-1.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
+          <div className="sticky top-6 p-1 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm   w-full">
             <div className="flex w-full gap-2 justify-center">
-              <div className="flexr">
+              <div className="flex">
                 <span className="section-header-custom">
                   Tailor Settings to Your Needs
                 </span>
               </div>
             </div>
           </div>
-          <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+          <div className="bg-white overflow-y-auto rounded-lg shadow-sm pt-2">
             <SettingsTabs></SettingsTabs>
           </div>
         </div>

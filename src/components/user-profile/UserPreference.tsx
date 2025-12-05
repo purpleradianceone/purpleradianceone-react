@@ -19,20 +19,44 @@ import { alphabets, backgroundColors } from "../../constants/Colors";
 import toast from "react-hot-toast";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import MESSAGE from "../../constants/Messages";
+import { useCountries } from "../../config/hooks/useCountries";
+import Country from "../../@types/general/Country";
 
 const UserPreference = () => {
+  const { countries } = useCountries();
   const classnameForParagragh = "table-data-custom  block truncate w-full";
   const { userPreference, setUserPreference } = useUserPreference();
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { rowsInGridDropdownOptions } = useMasterRowsInGrid();
 
   const navigate = useNavigate();
-  const { userHasAccessToUpdateUser, userHasAccessToUpdateSettingGeneral , userHasAccessToViewSettingGeneral } =
-    useUserAccessModules();
+  const {
+    userHasAccessToUpdateUser,
+    userHasAccessToUpdateSettingGeneral,
+    userHasAccessToViewSettingGeneral,
+  } = useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid
   );
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+
+  // useEffect(() => {
+  //   const country = countries.find(
+  //     (country: Country) => country.id === userPreference.countryId
+  //   );
+  //   setSelectedCountry(country);
+  // }, [userPreference]);
+
+  useEffect(() => {
+    if (userPreference.countryId && countries.length > 0) {
+      const found = countries.find(
+        (c: Country) => c.id === userPreference.countryId
+      );
+      setSelectedCountry(found || null);
+    }
+  }, [userPreference.countryId, countries]);
+
   const [showTimeZoneData, setShowTimeZoneData] = React.useState(false);
   const [selectedTimeZoneData, setSelectedTimeZoneData] =
     React.useState<Timezone>({
@@ -66,21 +90,6 @@ const UserPreference = () => {
     userPreference.timezoneId
   );
 
-  //note : Message Snackbar
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
-
   // timezone states
   const limitForGrid = userPreference.rowsInGrid;
   const [timezoneList, setTimezoneList] = useState<Timezone[]>([]);
@@ -100,12 +109,13 @@ const UserPreference = () => {
       company_id: loginStatus.companyId,
       id: userPreference.id,
       is_left_menu: userPreference.isLeftMenu,
+      country_id: selectedCountry?.id,
       is_hamburger_menu_collapsed: userPreference.isHamburgerMenuCollapsed,
       master_rows_in_grid_id: selectedMasterRowInGrid?.id,
       timezone_id: selectedTimezoneId,
       updatedby: loginStatus.id,
     };
-
+    
     try {
       const response = await axios.post(
         POST_API.UPDATE_COMPANY_USER_PREFERENCE,
@@ -117,10 +127,6 @@ const UserPreference = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          // showMessageSnackbar({
-          //   message: response.data.message,
-          //   type: "success",
-          // });
           toast.success(response.data.message);
 
           setUserPreference({
@@ -139,6 +145,7 @@ const UserPreference = () => {
                 ? userPreference.timezone
                 : selectedTimeZoneData.timezone,
             rowsInGrid: parseInt(selectedMasterRowInGrid!.rowsInGrid),
+            countryId : selectedCountry?.id || userPreference.countryId
           });
           setShowTimeZoneData(false);
         }
@@ -341,6 +348,32 @@ const UserPreference = () => {
       setSelectedRowsPerPage(selectedOptionValue);
     }
   };
+
+  // const handleSelectCountryOptionChange = (
+  //   event: ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const selectedOptionValue = parseInt(event.target.value, 10);
+
+  //   console.log("this is the value ");
+  //   console.log(selectedOptionValue);
+  //   if (!isNaN(selectedOptionValue)) {
+  //     const country = countries.find(
+  //       (country: Country) => country.id === selectedOptionValue
+  //     );
+  //     setSelectedCountry(country!);
+  //     // setSelectedCountryId(selectedOptionValue);
+  //   }
+  // };
+
+  const handleSelectCountryOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const id = Number(e.target.value);
+  const selected = countries.find((c) => c.id === id) || null;
+  setSelectedCountry(selected);
+
+  // if needed: show Save button only when changed
+  // setShowSaveLeadButton(selected?.id !== userPreference.countryId);
+};
+
   // Initial load (now triggered by showing the dropdown)
   useEffect(() => {
     if (showTimeZoneData) {
@@ -385,10 +418,10 @@ const UserPreference = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-100 py-8 px-2 space-y-10">
+    <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
 
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
+      <div className=" bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div
@@ -399,10 +432,15 @@ const UserPreference = () => {
             {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
           </div>
           <div className="flex-1 space-y-1 text-center md:text-left">
-            <h2  title={formData.fullName ?? "Not Provided"} className="section-header-custom block truncate w-full  ">
+            <h2
+              title={formData.fullName ?? "Not Provided"}
+              className="section-header-custom block truncate w-full  "
+            >
               {loginStatus.fullName}
             </h2>
-            <p  className="table-header-custom">{loginStatus.companyName || ""}</p>
+            <p className="table-header-custom">
+              {loginStatus.companyName || ""}
+            </p>
             <button
               className={`mt-2 px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition
                   ${
@@ -452,7 +490,10 @@ const UserPreference = () => {
                 )}
               </>
             ) : (
-              <p title={formData.fullName ?? "Not Provided"} className="table-data-custom block truncate w-full ">
+              <p
+                title={formData.fullName ?? "Not Provided"}
+                className="table-data-custom block truncate w-full "
+              >
                 {formData.fullName || "Not Provided"}
               </p>
             )}
@@ -471,9 +512,7 @@ const UserPreference = () => {
           </div>
 
           <div>
-            <h4 className="table-header-custom">
-              Contact Number
-            </h4>
+            <h4 className="table-header-custom">Contact Number</h4>
             {isEditing ? (
               <>
                 <input
@@ -500,36 +539,46 @@ const UserPreference = () => {
           </div>
 
           <div>
-            <h4 className="table-header-custom">
-              Profile Status
-            </h4>
+            <h4 className="table-header-custom">Profile Status</h4>
             <p className={classnameForParagragh}>
               {loginStatus.status === true ? "Active" : "Inactive"}
             </p>
           </div>
         </div>
       </div>
+      <div className="grid grid-cols-1  gap-3">
+
       {/* PREFERENCE CARD */}
-      <div  className={` ${!userHasAccessToViewSettingGeneral ? "hidden" : ""} max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4`}>
+      <div
+        className={` ${
+          !userHasAccessToViewSettingGeneral ? "hidden" : ""
+        }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2`}
+      >
         {/* button */}
         <div className="flex items-center justify-between">
           <h3 className="section-header-custom">
-            Preferences <span className="caption-custom">(Click to change)</span>
+            Preferences{" "}
+            <span className="caption-custom">(Click to change)</span>
           </h3>
           {(prevTimezoneId.current !== selectedTimezoneId ||
-            userPreference.rowsInGrid != selectedRowsPerPage) && (
+            userPreference.rowsInGrid != selectedRowsPerPage || userPreference.countryId !==selectedCountry?.id) && (
             <button
               onClick={() => {
-                if(userHasAccessToUpdateSettingGeneral){
-
+                if (userHasAccessToUpdateSettingGeneral) {
                   if (prevTimezoneId.current !== selectedTimezoneId) {
                     handleTimezonePreferenceChange();
                     prevTimezoneId.current = selectedTimezoneId;
-                  } else if (userPreference.rowsInGrid !== selectedRowsPerPage) {
+                  } else if (
+                    userPreference.rowsInGrid !== selectedRowsPerPage
+                  ) {
                     handleTimezonePreferenceChange();
+                  }else if (userPreference.countryId !== selectedCountry?.id){
+                                        handleTimezonePreferenceChange();
                   }
-                }else{
-                  toast.error(MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS)
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                  );
                 }
               }}
               className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
@@ -541,9 +590,7 @@ const UserPreference = () => {
         {/* time zone */}
         <div className="flex items-center space-x-4 border-b pb-1">
           {/* Label for the Time Zone setting */}
-          <h4 className="input-label-custom whitespace-nowrap">
-            Time Zone:
-          </h4>
+          <h4 className="input-label-custom whitespace-nowrap">Time Zone:</h4>
 
           {/* Conditional rendering for either the display text or the dropdown */}
           {showTimeZoneData ? (
@@ -576,7 +623,7 @@ const UserPreference = () => {
                   );
                 }
               }}
-              className="input-label-custom text-blue-600 cursor-pointer hover:text-blue-700
+              className="caption-custom text-blue-600 cursor-pointer hover:text-blue-700
                  rounded-md py-1.5 px-3  // Adds padding to match select height
                  focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
               tabIndex={0} // Makes the paragraph focusable for keyboard navigation
@@ -588,13 +635,13 @@ const UserPreference = () => {
           )}
         </div>
         {/* rows in grid  */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 border-b pb-2">
           {/* Label for accessibility and clear identification */}
           <label
             htmlFor="records-per-page-select"
             className="input-label-custom whitespace-nowrap"
           >
-            Records per page:
+            Records Per Page:
           </label>
 
           {/* Display current preference, visually distinct */}
@@ -623,25 +670,76 @@ const UserPreference = () => {
             }}
             value={selectedRowsPerPage}
             id="records-per-page-select" // Link with label's htmlFor
-            className="block caption-custom w-auto rounded-md border-gray-300 shadow-sm
+            className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
                focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-3 pr-8 // Added padding for better appearance
+               sm:pl-1 pr-1 // Added padding for better appearance
                text-gray-900" // Default text color
             aria-label="Select number of records per page" // Good for accessibility
             // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
           >
-            <option className="caption-custom" value="">Select</option>
+            <option className="caption-custom" value="">
+              Select
+            </option>
             {rowsInGridDropdownOptions &&
               rowsInGridDropdownOptions.map((data) => (
-                <option  key={data.id} value={data.rowsInGrid}>
+                <option key={data.id} value={data.rowsInGrid}>
                   {data.rowsInGrid}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div className="flex input-label-custom gap-2">
+          {/* Country Id :{userPreference.countryId} */}
+          Country :{/* Display current preference, visually distinct */}
+          <div className="flex items-center space-x-1">
+            <span className="caption-custom">Current:</span>
+            <span className="caption-custom-blue">
+              {
+                countries.find(
+                  (country: Country) => country.id === userPreference.countryId
+                )?.name
+              }
+            </span>
+          </div>
+          {/* The styled select dropdown */}
+          <select
+            // disabled={!userHasAccessToUpdateSettingGeneral}
+            onClick={() => {
+              if (!userHasAccessToUpdateSettingGeneral) {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
+                );
+                return;
+              }
+            }}
+            onChange={(e) => {
+              if (userHasAccessToUpdateSettingGeneral) {
+                handleSelectCountryOptionChange(e);
+              }
+            }}
+            value={selectedCountry?.id?.toString() ?? ""}
+            id="records-per-page-select" // Link with label's htmlFor
+            className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
+               focus:border-indigo-500 focus:ring-indigo-500
+               sm:pl-1 pr-1 // Added padding for better appearance
+               text-gray-900" // Default text color
+            aria-label="Select number of records per page" // Good for accessibility
+            // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
+          >
+            <option className="caption-custom" value="">
+              Select {}
+            </option>
+            {countries &&
+              countries.map((data) => (
+                <option key={data.id} value={data.id!}>
+                  {data.name}
                 </option>
               ))}
           </select>
         </div>
       </div>
       {/* Subscription Card */}
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-4">
+      <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="section-header-custom">Subscription</h3>
           <button
@@ -668,15 +766,9 @@ const UserPreference = () => {
           </div>
         </div>
       </div>
-      {/* Snackbar */}
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleCloseSnackbar}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>
+    
+</div>
   );
 };
 

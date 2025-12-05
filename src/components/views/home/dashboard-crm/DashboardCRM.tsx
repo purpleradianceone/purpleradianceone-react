@@ -7,7 +7,11 @@ import MetricCard from "./MetricCard";
 import PipelineChart from "./PipeLineChart";
 import QuickActions from "./QuickActions";
 import {
+  AlarmClock,
   AlertCircleIcon,
+  CalendarCheck,
+  CalendarClock,
+  ListTodo,
   ShieldAlert,
   Target,
   TrendingUp,
@@ -28,6 +32,11 @@ import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverag
 import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
 import PieChart from "./PieChart";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { DashboardComponentJsxKey } from "../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -64,6 +73,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const [leadSummaryReportData, setLeadSummaryReportData] = useState<
     LeadSummaryReportType[]
   >([]);
+  const { tutorailData, setTutorailData } = useTutorailDataContext();
+  const [tourFinished, setTourFinished] = useState<boolean>(false);
   const [leadBySource, setLeadBySourcce] = useState<LeadSummaryReportType[]>(
     []
   );
@@ -79,9 +90,14 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
     AccessModuleType[]
   >([]);
+
+  useEffect(() => {
+    setTourFinished(tutorailData.isCrmDashboardSeen);
+  }, [tutorailData]);
+
   const getCrmModuleAccessOfCompanyUser = async () => {
     setAccessModuleCompanyUser([]);
-    setIsTasksLoading(true);
+   
     const getCrmModuleAccessData = {
       company_id: loginStatus.companyId,
       company_user_id: companyUserId,
@@ -97,7 +113,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
           setAccessModuleCompanyUser(accessModuleOfCompanyUser);
         }
-        getDashboardData();
+       
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -123,7 +139,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     setIsTasksLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      owner_id: companyUserId ?? loginStatus.id,
+      owner_id: companyUserId ?? null,
       requestedby_id: loginStatus.id,
     };
 
@@ -184,6 +200,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -208,6 +226,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             {
               id: res.id,
               leadId: res.lead_id,
+              leadName: res.lead_name,
+              leadStatusName: res.lead_status_name,
               leadActivityId: res.lead_activity_id,
               leadTaskActivityName: res.lead_activity_name,
               leadTaskPriorityId: res.lead_task_priority_id,
@@ -243,9 +263,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   };
 
   useEffect(() => {
-    if (loginStatus?.companyId && loginStatus?.id) {
+    if (loginStatus?.companyId && loginStatus?.id && companyUserId !== null) {
+       setIsTasksLoading(true);       
       getCrmModuleAccessOfCompanyUser();
     }
+     getDashboardData();
   }, [companyUserId]);
 
   useEffect(() => {
@@ -264,7 +286,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const componentMapDefault: { [key: string]: JSX.Element } = {
     // Changed to ensure JSX.Element, not null
-    "Total Leads": (
+    [DashboardComponentJsxKey.TOTAL_LEADS] : (
       <div
         key="Total Leads"
         className="flex col-span-2 w-full gap-4 justify-around"
@@ -272,6 +294,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
           <MetricCard
             title="Total Leads"
+            id="totalLeadsMetricCard"
             value={(
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_LEADS]?.[0]
                 ?.total_leads ?? 0
@@ -289,6 +312,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Active Leads"
+            id="activeLeadsMetricCard"
             value={(
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_ACTIVE_LEADS]?.[0]
                 ?.active_leads ?? 0
@@ -306,6 +330,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Converted Leads"
+            id="convertedLeadsMetricCard"
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERTED_LEADS
@@ -324,6 +349,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Unqualified Leads"
+            id="unqualifiedLeadsMetricCard"
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_UNQUALIFIED_LEADS
@@ -342,6 +368,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           />
           <MetricCard
             title="Lost Leads"
+            id="lostLeadsMetricCard"
             value={
               dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_LOST_LEADS]?.[0]
                 ?.lost_leads ?? 0
@@ -360,6 +387,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
           <MetricCard
             title="Conversion Rate"
+            id="conversionRateMetricCard"
             value={`${(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_CONVERSION_RATE
@@ -380,12 +408,12 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       </div>
     ),
 
-    "Leads by status": (
+    [DashboardComponentJsxKey.LEADS_BY_STATUS]: (
       <div
         key="Leads by status"
         className="grid grid-cols-1 col-span-1 xl:grid-cols-1 gap-8"
       >
-        <div className="min-h-[500px]">
+        <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
             <PipelineChart
               pipelineData={leadSummaryReportData}
@@ -395,13 +423,18 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         </div>
       </div>
     ),
-    "12 months performance": (
-      <div key="12 months performance" className="min-h-[700px] col-span-1">
+    [DashboardComponentJsxKey._12_MONTHS_PERFORMANCE]: (
+      <div
+        id="monthlyPerformance"
+        key="12 months performance"
+        className="min-h-[700px] col-span-1"
+      >
         <SalesChart leadsData={monthlyAverageLeads} />
       </div>
     ),
-    "Pending tasks": (
+    [DashboardComponentJsxKey.PENDING_TASKS]: (
       <div
+        id="pendingTasks"
         key="Pending tasks"
         className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-white
@@ -416,8 +449,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Upcoming tasks": (
+    [DashboardComponentJsxKey.UPCOMING_TASKS]: (
       <div
+        id="upcomingTasks"
         key="Upcoming tasks"
         className="h-full col-span-1 border-gray-100 bg-white rounded-2xl overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-white
@@ -432,8 +466,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         />
       </div>
     ),
-    "Leads by source": (
+    [DashboardComponentJsxKey.LEADS_BY_SOURCE]: (
       <div
+        id="leadBySource"
         key="Leads by source"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
@@ -446,8 +481,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         ></PipelineChart>
       </div>
     ),
-    "Quick Actions": (
+    [DashboardComponentJsxKey.QUICK_ACTIONS]: (
       <div
+        id="quickActions"
         key="Quick Actions"
         className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
@@ -455,6 +491,89 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           companyUserId={companyUserId}
           moduleAccessCompanyUser={accessModuleCompanyUser}
         />
+      </div>
+    ),
+    [DashboardComponentJsxKey.TOTAL_PENDING_TASKS]: (
+      <div
+        key="Total Pending Task"
+        className="flex col-span-2 w-full gap-4 justify-around"
+      >
+        <div className="flex grid-cols-4 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <MetricCard
+            title="Total Pending Task"
+            id="totalPendingTaskMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK]?.[0]
+                ?.total_pending_task ?? 0
+            ).toString()}
+            icon={CalendarClock}
+            color="bg-gradient-to-r from-red-500 to-red-600"
+            gradient="bg-gradient-to-r from-red-500 to-red-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Pending Task - Today"
+            id="totalPendingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY]?.[0]
+                ?.total_pending_task_today ?? 0
+            ).toString()}
+            icon={AlarmClock}
+            color="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Pending Task - Today"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task"
+            id="totalUpcomingTaskMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK
+              ]?.[0]?.total_upcoming_task ?? 0
+            ).toString()}
+            icon={ListTodo}
+            color="bg-gradient-to-r from-blue-500 to-blue-600"
+            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task"
+                  )!.value
+                : false
+            }
+          />
+          <MetricCard
+            title="Total Upcoming Task - Today"
+            id="totalUpcomingTaskTodayMetricCard"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_UPCOMING_TASK_TODAY
+              ]?.[0]?.total_upcoming_task_today ?? 0
+            ).toString()}
+            icon={CalendarCheck}
+            color="bg-gradient-to-r from-teal-500 to-teal-600"
+            gradient="bg-gradient-to-r from-teal-500 to-teal-600"
+            visibility={
+              dashboardVisiblity.length !== 0
+                ? dashboardVisiblity.find(
+                    (visibility) => visibility.key == "Total Upcoming Task - Today"
+                  )!.value
+                : false
+            }
+          />
+        </div>
       </div>
     ),
   };
@@ -465,7 +584,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         key="Leads by status"
         className="grid grid-cols-1 xl:grid-cols-1 gap-8"
       >
-        <div className="min-h-[500px]">
+        <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
             <PieChart data={leadSummaryReportData} chartFor="leadByStatus" />
           )}
@@ -475,6 +594,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     "Leads by source": (
       <div
         key="Leads by source"
+        id="leadBySource"
         className="h-full overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-50
@@ -523,6 +643,55 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     return renderedSections;
   };
 
+  const handleTourEnd = async () => {
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_CRM_DASHBOARD_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: tutorailData.isNavbarSeen,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: true,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
+          });
+        }
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleTourEnd,
+          });
+          if (refreshTokenResponse) {
+            handleTourEnd();
+          }
+        }
+      });
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
@@ -533,6 +702,12 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
         )}
         {!isTasksLoading && dashboardVisiblity.length !== 0 && (
           <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">
+            {!tourFinished && (
+              <AppTutorailManager
+                steps={DashboardCrmSteps}
+                handleTourEnd={handleTourEnd}
+              />
+            )}
             {renderDashboardSections()}
           </div>
         )}

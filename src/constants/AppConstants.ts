@@ -14,6 +14,13 @@ export const  STRING_VALUES = {
     
 }
 
+export enum ActionTypeForStockMOdule{
+  DETAILS = "DETAILS",
+  TRANSACTIONS = "TRANSACTIONS"
+}
+
+export const DEBOUNCE_DELAY = 300;
+
 export const OPACITY = {
   POPUP_OPACITY_AND_BACKGROUNG_COLOR : "bg-black bg-opacity-5 ",
 }
@@ -83,7 +90,7 @@ export const notificationsDesription = {
 
 
 export const  SUBSCRIPTION = {
-    RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
+    RAZORPAY_KEY : import.meta.env.VITE_RAZORPAY_API_ID_KEY,
     COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",
     RAZORPAY_CURRENCY : "INR",
 }
@@ -95,9 +102,11 @@ export const  NUMBER_VALUES = {
 export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
-
+// company purpleradianceone captcha key
+// export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
+  export const SITE_KEY = import.meta.env.VITE_SITE_KEY_OF_CAPTCHA
 // company captcha key
-export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
+// export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
 
 // vaibhav captcha key
 // export const SITE_KEY = "6Lfk8W0rAAAAAOTUzGGWBnX9C0Jhta2zRZYt3fXf";
@@ -107,6 +116,7 @@ export const STATUS_CODE = {
     FORBIDDEN : 403,
     PERMANENT_REDIRECT : 308,
     ACCEPTED : 202,
+    INTERNAL_SERVER_ERROR : 500,
 
 }
 export const JSX_CHILDREN_NAME = {
@@ -124,6 +134,8 @@ export const JSX_CHILDREN_NAME = {
     USER : "User",
     UPDATE : "Update",
     MEETINGS : "Meetings",
+    CREATE_SUPPORT_TICKET : "Create",
+
 
 }
 

@@ -29,7 +29,7 @@ const LeadImportTagView = () => {
       })
       .then((response) => {
         const data = response.data;
-
+        
         setLeadImportTagDataCame(false);
         setLeadImportTagData(data);
       })
@@ -173,7 +173,7 @@ const LeadImportTagView = () => {
               className={`px-3 py-1.5 rounded-lg transition-all duration-200 border shadow-sm
               ${
                 selectedLeadTag === data.import_tag
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md table-header-custom"
+                  ? "bg-blue-300 text-white border-blue-600 shadow-md table-header-custom"
                   : "bg-white hover:bg-blue-50 hover:border-blue-300 table-header-custom"
               }`}
             >
@@ -186,6 +186,9 @@ const LeadImportTagView = () => {
       {selectedLeadTag && (
         <div className="pt-4">
           <LeadImportData
+          CancelSelectedLeadTag={()=>{
+            setSelectedLeadTag("")
+          }}
             selectedLeadTag={selectedLeadTag}
             getLeadImportTags={getLeadImportTags}
           />

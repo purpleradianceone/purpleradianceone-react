@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import {
   Aperture,
@@ -14,6 +15,7 @@ import {
   Menu,
   MessageCircle,
   Network,
+  NotebookPen,
   Settings,
   SettingsIcon,
   Store,
@@ -42,10 +44,17 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { alphabets, backgroundColors } from "../../../../constants/Colors";
 import MESSAGE from "../../../../constants/Messages";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+    const [isDashboardRendered,setIsDashboardRendered] = useState<boolean>(false);
+    const {tutorailData,setTutorailData} = useTutorailDataContext();
+      const [istourFinished,setIsTourFinished] = useState<boolean>(false);
 
   const {
     userHasAccessToViewLead,
@@ -55,6 +64,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewUser,
     userHasAccessToViewMeeting,
     userHasAccessToUpdateSettingGeneral,
+    userHasAccessToViewStock,
+    userHasAccessToViewSupportTicket
     
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,13 +113,29 @@ function Navbar({ children }: { children: React.ReactNode }) {
     }
   }, [location]);
 
+
+
+  useEffect(() => {
+
+    
+    const element =location.pathname;
+    if(element === ROUTES_URL.HOME){
+      setIsDashboardRendered(true);
+      setIsTourFinished(tutorailData.isNavbarSeen);
+    }
+    else{
+      setIsDashboardRendered(false);
+      setIsTourFinished(tutorailData.isNavbarSeen);
+    }
+  },[location])
+ 
+
   const handleLogout = async () => {
     await axios
       .post(POST_API.LOGOUT, {}, { withCredentials: true })
       .then((response) => {
         if (response.status === 200) {
           toast.success(response.data);
-          Navigate(ROUTES_URL.SIGN_IN);
           setLoginStatus({
             id: 0,
             companyId: 0,
@@ -128,8 +155,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
             subscriptionId: 0,
             isSuperUser: false,
           });
-
+          
           setNotificationCount(0);
+          localStorage.clear();
+          
+          Navigate(ROUTES_URL.SIGN_IN);
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -183,6 +213,52 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
+    const handleNavbarTutorailFinish = async() => {
+      console.log(tutorailData);
+      const updateTutorailPostData = {
+        company_id : loginStatus.companyId,
+        id : tutorailData.id,
+        column_name : TutorailColumnName.IS_NAVBAR_SEEN,
+        status : true,
+        updatedby_id : loginStatus.id
+      }
+      axios.post(POST_API.UPDATE_COMPANY_USER_TUTORAIL,updateTutorailPostData,{
+        withCredentials:true,
+      }).then((response) => {
+        if(response.data.status){
+            setIsTourFinished(true);
+          setTutorailData({
+            id: tutorailData.id,
+          companyUserId: tutorailData.companyUserId,
+          isNavbarSeen: true,
+          isDashboardSeen: tutorailData.isDashboardSeen,
+          isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+          isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+          isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+          isLeadSeen: tutorailData.isLeadSeen,
+          isAccountSeen: tutorailData.isAccountSeen,
+          isProductSeen: tutorailData.isProductSeen,
+          isTeamSeen: tutorailData.isTeamSeen,
+          isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+          isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+          isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+          createdBy: tutorailData.createdOn,
+          updatedBy: tutorailData.updatedBy,
+          createdOn: tutorailData.createdOn,
+          updatedOn: tutorailData.updatedOn,
+          });
+        }
+      }).catch(async(error) => {
+        if(error.status === STATUS_CODE.UNATHORISED){
+          const refreshTokenResponse = await RefreshToken({callFunction:handleNavbarTutorailFinish})
+          if(refreshTokenResponse){
+            handleNavbarTutorailFinish();
+          }
+        }
+      })
+      
+    }
+
   // useEffect(() => {
   //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
   //   console.log("loginstatus : " + loginStatus.status);
@@ -210,8 +286,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 justify-self-start">
-                    <img src={IMAGE_SOURCE.PR_LOGO} alt="Logo" />
+                  <div className=" justify-self-start">
+                    <img height={28} width={100} src={IMAGE_SOURCE.PR_ONE_LOGO} alt="Logo" />
                   </div>
                 </div>
 
@@ -319,21 +395,23 @@ function Navbar({ children }: { children: React.ReactNode }) {
   } else {
     return (
       <div>
+        {istourFinished ? null : isDashboardRendered  && <AppTutorailManager steps={NavbarSteps} handleTourEnd={handleNavbarTutorailFinish}/>}
+        
         <header>
           <nav
             className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${
               position === "left" ? "h-12" : "h-14"
             }`}
           >
-            <div className="px-4 lg:px-6">
+            <div className="px-2 lg:px-6">
               <div
                 className={`flex ${
                   position === "left" ? "ml-10" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
+                <div title={loginStatus.companyName} id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName}</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName.length>20  ? loginStatus.companyName.substring(0,19).concat("...") : loginStatus.companyName }</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -350,7 +428,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   <>
                     <div className="flex-1 max-w-6xl hidden lg:block">
                       {/* Navbar Icons */}
-                      <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-11  ">
+                      <div className="flex flex-wrap bg-slate-00 justify-around items-center mx-1  ">
                         {/* note : NavItem id created component in navbar/Component folder */}
                         <NavItem
                           to={ROUTES_URL.HOME}
@@ -364,15 +442,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<Building2 size={SIZE.TWENTY} />}
                             label="Manage Users"
                           />
-                        {/* )} */}
-                        {/* {!userHasAccessToViewUser && (
-                          <NavItem
-                          disable ={true}
-                            // to={ROUTES_URL.GET_COMPANY_USERS}
-                            icon={<Building2 size={SIZE.TWENTY} />}
-                            label="Manage Users"
-                          />
-                        )} */}
 
                         {/* {userHasAccessToViewLead && ( */}
                           <NavItem
@@ -397,6 +466,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<UserCogIcon size={SIZE.TWENTY} />}
                             label="Accounts"
                           />
+                          
                         {/* )} */}
                         {/* {!userHasAccessToViewAccount && (
                           <NavItem
@@ -412,8 +482,21 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             icon={<Store size={SIZE.TWENTY} />}
                             label="Products"
                           />
+                           <NavItem
+                          disable={!userHasAccessToViewStock}
+                            to={ROUTES_URL.STOCK_MANAGEMENT}
+                            icon={<Layers size={SIZE.TWENTY} />}
+                            label="Stock"
+                          />
+
+                          <NavItem
+                          disable={!userHasAccessToViewSupportTicket}
+                            to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                            icon={<NotebookPen  size={SIZE.TWENTY} />}
+                            label="Support"
+                          />
+                          
                         {/* )} */}
-                        {/* {userHasAccessToViewTeamManagement && ( */}
                           <NavItem
                           disable={!userHasAccessToViewTeamManagement}
                             to={ROUTES_URL.TEAM_MANAGEMENT}
@@ -503,6 +586,16 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             label="Accounts"
                           />
                          )}
+                         {userHasAccessToViewSupportTicket && (
+                          <NavItem
+                          disable={!userHasAccessToViewSupportTicket}
+                          to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                          icon = {<NotebookPen size={SIZE.TWENTY}/>}
+                          label="Support"
+                          />
+                         )
+
+                         }
                           {userHasAccessToViewProduct && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_MANAGEMENT}
@@ -585,6 +678,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       </Link> */}
                       <div className="relative">
                         <button
+                          id="notifications-navbar"
                           title="Show Notification"
                           onClick={() => {
                             resetNotificationCount();
@@ -614,6 +708,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                       {userHasAccessToUpdateSettingGeneral ? (
                         <Link to={ROUTES_URL.PANEL_CUSTOMIZER}>
                           <button
+                            id="panel-layout-navbar"
                             title="Panel Layout"
                             className="p-2 rounded-lg hover:bg-gray-100"
                           >
@@ -628,6 +723,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                                 .DENIED_UPDATE_ACCESS
                             );
                           }}
+                          id="panel-layout-navbar"
                           title="Panel Layout"
                           className="p-2 rounded-lg opacity-50 cursor-not-allowed hover:bg-gray-100"
                         >
@@ -639,6 +735,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   <div
                     className="flex items-center cursor-pointer relative"
                     onClick={toggleCard}
+                    id="profile-actions-navbar"
                   >
                     <div
                       className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
@@ -775,7 +872,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
               : "mt-14 ml-0 flex justify-center items-center"
           }
         >
-          {children}
+
+          {istourFinished && children}
         </main>
         {accessDeniedPopUpView && (
           <AccessDeniedPopup

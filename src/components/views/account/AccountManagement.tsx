@@ -14,14 +14,46 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 function GetAccounts({
   isUsedForAccountLead,
-  handleRowSelectedForLead
+  handleRowSelectedForLead,
+  isUsedForSupportTicketCreation
 } : {
   isUsedForAccountLead : boolean;
   handleRowSelectedForLead? : (data: Account | any) => void;
+  isUsedForSupportTicketCreation?: boolean;
 }) {
+
+  // Restore saved filters when opening this module
+      // useEffect(() => {
+      //   const saved = localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
+      //   if (!saved) return;
+    
+      //   const filters = JSON.parse(saved);
+    
+      //   // Ensure URL & hook initialize first before restoring
+      //   requestAnimationFrame(() => {
+      //     if (filters.page) handlePageChange(filters.page);
+      //     if (filters.size) handlePageSizeChange(filters.size);
+      //     if (filters.search) handleSearchParameterChange(filters.search);
+      //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+    
+      //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+      //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+          
+      //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+      //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+      //     // if (filters.userId) {
+      //     //   setSelectedCompanyUser((prev) => ({
+      //     //     ...prev,
+      //     //     id: filters.userId,
+      //     //     fullname : filters.userName
+      //     //   }));
+      //     // }
+      //   });
+      // }, []);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
@@ -34,6 +66,10 @@ function GetAccounts({
 
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
+  // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
     pageSize,
@@ -48,7 +84,7 @@ function GetAccounts({
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   // Fetch data function
   const fetchAccounts = async () => {
@@ -103,33 +139,8 @@ function GetAccounts({
         createdBy: res.createdby,
         createdOn: res.createdon,
       }));
-
       setAccounts(formattedData);
-      //       setAccounts([
-      //   {
-      //     count: 1,
-      //     id: 101,
-      //     companyId: 1,
-      //     name: "Acme Corp",
-      //     email: "contact@acmecorp.com",
-      //     mobileNumber: "9876543210",
-      //     industryTypeId: 5,
-      //     industryTypeName: "Technology",
-      //     businessTypeId: 2,
-      //     businessTypeName: "Limited Liability Partnership (LLP)",
-      //     pan: "ABCDE1234F",
-      //     gst: "27ABCDE1234F1Z5",
-      //     tan: "ABCDE1234F",
-      //     billingAddress: "123 Tech Park, Silicon Valley",
-      //     shippingAddress: "123 Tech Park, Silicon Valley",
-      //     registeredOfficeAddress: "123 Tech Park, Silicon Valley",
-      //     businessResgistrationNumber: "C1234567",
-      //     website: "https://www.acmecorp.com",
-      //     isActive: true,
-      //     createdBy: "admin",
-      //     createdOn: "2024-01-15T10:00:00Z",
-      //   },
-      // ])
+      
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
       }
@@ -147,7 +158,6 @@ function GetAccounts({
 
   useEffect(() => {
     fetchAccounts();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pageSize,
@@ -164,6 +174,34 @@ function GetAccounts({
     }
   }, [userHasAccessToViewAccount]);
 
+   // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
   return (
     <div className="w-full">
       {userHasAccessToViewAccount ? (
@@ -176,11 +214,13 @@ function GetAccounts({
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <AccountManagementList
-                fetchAccounts={fetchAccounts}
+                // fetchAccounts={fetchAccounts}
                 accounts={accounts}
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  searchParameter
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
@@ -194,6 +234,7 @@ function GetAccounts({
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
                 isUsedForAccountLead={isUsedForAccountLead}
                 handleRowSelectedForLead={handleRowSelectedForLead}
+                isUsedForSupportTicketCreation = {isUsedForSupportTicketCreation}
               />
             </motion.section>
           </div>

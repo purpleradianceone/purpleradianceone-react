@@ -13,6 +13,8 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import { Handshake } from "lucide-react";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 const CreateAccountLead = ({
   account,
@@ -23,6 +25,7 @@ const CreateAccountLead = ({
   getAccountLead: () => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
+  const {userHasAccessToUpdateAccount} = useUserAccessModules();
 
   const [showLeadsData, setShowLeadsData] = useState<boolean>(false);
 
@@ -71,9 +74,14 @@ const CreateAccountLead = ({
     <div className="  flex  justify-end ">
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
-        <Button
+        <Button 
+          disabled ={!userHasAccessToUpdateAccount}
           onClick={() => {
-            setShowLeadsData(!showLeadsData);
+            if(userHasAccessToUpdateAccount){
+              setShowLeadsData(!showLeadsData);
+            }else{
+              toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+            }
           }}
           className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
         >
