@@ -1,10 +1,11 @@
+
 name: Build and Deploy React App via Docker
 
 on:
   push:
     branches:
       - development
-      - production
+   #   - production
     # - main
 
 jobs:
@@ -22,11 +23,7 @@ jobs:
       # Build Docker image locally (tag without Docker Hub)
       - name: Build Docker Image
         run: |
-          docker build \
-            --build-arg VITE_RAZORPAY_API_ID_KEY=${{ secrets.VITE_RAZORPAY_API_ID_KEY }} \
-            --build-arg VITE_SITE_KEY_OF_CAPTCHA=${{ secrets.VITE_SITE_KEY_OF_CAPTCHA }} \
-            --build-arg ENV_PROFILE=${{ secrets.ENV_PROFILE }} \
-            -t react-app:${{ github.ref_name }} .
+          docker build -t react-app:${{ github.ref_name }} .
 
       # Save Docker image as tarball artifact to send to server
       - name: Save Docker Image
