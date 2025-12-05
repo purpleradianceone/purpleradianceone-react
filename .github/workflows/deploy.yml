@@ -23,7 +23,12 @@ jobs:
       # Build Docker image locally (tag without Docker Hub)
       - name: Build Docker Image
         run: |
-          docker build -t react-app:${{ github.ref_name }} .
+            docker build \
+             --build-arg ENV_PROFILE=${{ secrets.ENV_PROFILE }} \
+            --build-arg VITE_RAZORPAY_API_ID_KEY=${{ secrets.VITE_RAZORPAY_API_ID_KEY }} \
+            --build-arg VITE_SITE_KEY_OF_CAPTCHA=${{ secrets.VITE_SITE_KEY_OF_CAPTCHA }} \
+            -t react-app:${{ github.ref_name }} .
+
 
       # Save Docker image as tarball artifact to send to server
       - name: Save Docker Image
@@ -71,9 +76,6 @@ jobs:
             docker run -d \
               --name react-app \
               --network purple-net \
-              --build-arg ENV_PROFILE=${{ secrets.ENV_PROFILE }} \
-              --build-arg VITE_RAZORPAY_API_ID_KEY=${{ secrets.VITE_RAZORPAY_API_ID_KEY }} \
-              --build-arg VITE_SITE_KEY_OF_CAPTCHA=${{ secrets.VITE_SITE_KEY_OF_CAPTCHA }} \
               -v ${{ secrets.LETSENCRYPT_PATH }}:/etc/nginx/certs:ro \
               -p 80:80 -p 443:443 \
               --restart always \
