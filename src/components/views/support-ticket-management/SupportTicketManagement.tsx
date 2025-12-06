@@ -103,8 +103,6 @@ function SupportTicketManagement({
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;
-
-    //NOTE : need to work on this
     const postDataToGetSupportTickets: PostDataToGetSupportTicketData = {
       company_id: loginStatus.companyId,
       id: null,
@@ -143,6 +141,8 @@ function SupportTicketManagement({
             count: item.count,
             id: item.id,
             companyId: item.company_id,
+            accountName : item.account_name,
+            companyProductName : item.company_product_name,
             accountCompanyProductId: item.account_company_product_id,
             supportTicketCategoryId: item.support_ticket_category_id,
             supportTicketCategoryName: item.support_ticket_category_name,
@@ -388,7 +388,6 @@ function SupportTicketManagement({
       >
         {userHasAccessToViewSupportTicket ? (
           <SupportTicketManagementList
-            // Note : differentaition done because this module is used in account-lead and for lead module also
             isUsedInSupportTicketModule={isUsedInSupportTicketModule}
             handleRowSelectedForShowSupportTicket={
               handleRowSelectedForShowSupportTicket

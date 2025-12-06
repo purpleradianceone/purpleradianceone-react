@@ -7,6 +7,7 @@ import {
   Calendar,
   CreditCard,
   Handshake,
+  Headset,
   Home,
   Layers,
   LayoutPanelLeft,
@@ -15,7 +16,6 @@ import {
   Menu,
   MessageCircle,
   Network,
-  NotebookPen,
   Settings,
   SettingsIcon,
   Store,
@@ -492,7 +492,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           <NavItem
                           disable={!userHasAccessToViewSupportTicket}
                             to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
-                            icon={<NotebookPen  size={SIZE.TWENTY} />}
+                            icon={<Headset  size={SIZE.TWENTY} />}
                             label="Support"
                           />
                           
@@ -590,7 +590,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           <NavItem
                           disable={!userHasAccessToViewSupportTicket}
                           to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
-                          icon = {<NotebookPen size={SIZE.TWENTY}/>}
+                          icon = {<Headset size={SIZE.TWENTY}/>}
                           label="Support"
                           />
                          )

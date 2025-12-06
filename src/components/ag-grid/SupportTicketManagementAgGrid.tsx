@@ -24,13 +24,40 @@ function SupportTicketManagementAgGrid({
       },
       {
         field: "createdOn",
-        headerName: "Created on",
+        headerName: "Created On",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "accountName",
+        headerName: "Account Name",
+        sortable: true,
+        filter: true,
+      },
+       {
+        field: "companyProductName",
+        headerName: "Product Name",
+        sortable: true,
+        filter: true,
+      },
+      
+      {
+        field: "queryDescription",
+        hide: !isUsedInSupportTicketModule,
+        headerName: "Query Description",
+        sortable: true,
+        filter: true,
+      },
+
+       {
+        field: "publicNotes",
+        headerName: "Public Notes",
         sortable: true,
         filter: true,
       },
       {
         field: "createdBy",
-        headerName: "Created by",
+        headerName: "Created By",
         filter: true,
       },
       {
@@ -42,6 +69,19 @@ function SupportTicketManagementAgGrid({
         minWidth: 180,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
+      {
+        field: "resolvedByName",
+        headerName: "Resolved By",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "resolutionApplied",
+        headerName: "Resolution Applied",
+        sortable: true,
+        filter: true,
+      },
+      
       {
         field: "dueDateTime",
         headerName: "Due Date/Time",
@@ -88,33 +128,6 @@ function SupportTicketManagementAgGrid({
       {
         field: "supportTicketSourceName",
         headerName: "Source",
-        sortable: true,
-        filter: true,
-      },
-       {
-        field: "queryDescription",
-        hide: !isUsedInSupportTicketModule,
-        headerName: "Query Description",
-        sortable: true,
-        filter: true,
-      },
-
-       {
-        field: "publicNotes",
-        headerName: "Public Notes",
-        sortable: true,
-        filter: true,
-      },
-
-      {
-        field: "resolutionApplied",
-        headerName: "Resolution Applied",
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: "resolvedByName",
-        headerName: "Resolved By",
         sortable: true,
         filter: true,
       },
