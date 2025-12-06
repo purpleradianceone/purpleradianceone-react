@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import Account from "../../../@types/account/Account";
 import POST_API from "../../../constants/PostApi";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
@@ -20,17 +18,12 @@ import {
   Phone,
   Save,
   TicketPlus,
+  User,
   UserCircle,
-  UserRoundPlus,
   X,
 } from "lucide-react";
-import GetAccounts from "../../views/account/AccountManagement";
 import axiosClient from "../../../axios-client/AxiosClient";
-import AccountProduct from "../../../@types/account/AccountProduct";
-import AccountCompanyProductAgGrid from "../../ag-grid/AccountCompanyProductAgGrid";
 import { CompanyProductSla } from "../../../@types/products/CompanyProductSla";
-import GetCompanyUsersForLead from "../leads/company-users-selection-modal/GetCompanyUsersForLead";
-import { createPortal } from "react-dom";
 import Button from "../../ui/Button";
 import CustomDropdown from "../leads/CustomDropdown";
 import MESSAGE from "../../../constants/Messages";
@@ -42,6 +35,10 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import StageIndicator from "./StageIdicator";
 import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
+import AccountCompanyProductForSupportTicket from "../../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
+import GetAccountCompanyProductFroSupportTicket from "../../views/support-ticket-management/GetAccountCompanyProductFroSupportTicket";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 
 function CreateSupportTicketModal({
   isOpen,
@@ -55,12 +52,12 @@ function CreateSupportTicketModal({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToViewUser } = useUserAccessModules();
 
-  const { supportTicketCAtegory } = useSupportTicketCategory();
-  const { supportTicketSource } = useSupportTicketSource();
+  const { supportTicketCAtegory, isLoading: isLoadingForTicketCategory } =
+    useSupportTicketCategory();
+  const { supportTicketSource, isLoading: isLoadingForTicketSource } =
+    useSupportTicketSource();
 
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-    number | null
-  >(loginStatus.id);
+
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -72,89 +69,36 @@ function CreateSupportTicketModal({
     requestedby: "",
     generate_password: "",
   });
-  const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
-    useState(false);
-
-  const handleCompanyUserPopUp = () => {
-    setOpenPopUpOfCompanyUserModal(true);
-  };
-
-  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-    if (params) {
-      setPersistedSelectedUserId(params.id);
-
-      setSelectedCompanyUser({
-        company_id: params.company_id,
-        id: params.id,
-        fullname: params.fullname,
-        email: params.email,
-        mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
-      });
-      setOpenPopUpOfCompanyUserModal(false);
-    } else {
-      setPersistedSelectedUserId(null);
-      // Reset selectedCompanyUser to its initial state when null is received
-      setSelectedCompanyUser({
-        company_id: 0,
-        id: 0,
-        fullname: "",
-        email: "",
-        mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
-      });
-    }
-  };
+  
 
   const [stage, setStage] = useState(1);
   const [isOpenForAccountSelection, setIsOpenForAccountSelection] =
     useState<boolean>(true);
-  const [
-    isOpenForAccountProductSelection,
-    setIsOpenForAccountProductSelection,
-  ] = useState<boolean>(false);
 
   const [
     isOpenForAddingSupportTicketDetails,
     setIsOpenForAddingSupportTicketDetails,
   ] = useState<boolean>(false);
 
-  const [selectedAccount, setSelectedAccont] = useState<Account>({
-    count: 0,
-    id: 0,
-    companyId: 0,
-    name: "",
-    email: "",
-    mobileNumber: "",
-    industryTypeId: 0,
-    industryTypeName: "",
-    businessTypeId: 0,
-    businessTypeName: "",
-    countryId: 0,
-    stateId: 0,
-    districtId: 0,
-    countryName: "",
-    stateName: "",
-    districtName: "",
-    pan: "",
-    gst: "",
-    tan: "",
-    billingAddress: "",
-    shippingAddress: "",
-    registeredOfficeAddress: "",
-    businessResgistrationNumber: "",
-    website: "",
-    isActive: false,
-    createdBy: "",
-    createdOn: "",
-  });
-  const [accountProducts, setAccontProducts] = useState<AccountProduct[]>([]);
+  const [selectedAccount, setSelectedAccont] =
+    useState<AccountCompanyProductForSupportTicket>({
+      count: 0,
+      id: 0,
+      accountId: 0,
+      accountName: "",
+      companyProductId: 0,
+      companyProductName: "",
+      quantity: 0,
+      barcode: "",
+      serialNumber: 0,
+      unitName: "",
+      purchaseDate: "",
+      isActive: false,
+      createdBy: "",
+      updatedBy: "",
+      createdOn: "",
+      updatedOn: "",
+    });
   const [
     isLoadingForAccountCompanyProducts,
     setIsLoadingForAccountCompanyProducts,
@@ -168,47 +112,10 @@ function CreateSupportTicketModal({
   const [isSupportTicketCreating, setIsSupportTicketCreating] =
     useState<boolean>(false);
 
-  const [selectedAccountCompanyProduct, setSelectedAccountCompanyProduct] =
-    useState<AccountProduct>({
-      accountId: 0,
-      companyProductId: 0,
-      quantity: 0,
-      quantityReturn: 0,
-      barcode: "",
-      serialNumber: "",
-      purchaseDate: "",
-      deliveryDate: "",
-      deliveryAddress: "",
-      billingAddress: "",
-      installationDate: "",
-      installedBy: 0,
-      // warrantyIntervalTypeId: 0,
-      // warranty: 0,
-      // warrantyStartDate: "",
-      // warrantyEndDate: "",
-      // warrantyTerms: "",
-      // amcCycleIntervalTypeId: 0,
-      // amcCycle: 0,
-      // amcCycleStartDate: "",
-      // amcCycleEndDate: "",
-      unitName: "",
-      unitNameInStock: "",
-      id: 0,
-      accountName: "",
-      companyProductName: "",
-      installedByName: "",
-      warrantyIntervalName: "",
-      amcIntervalName: "",
-      updatedBy: "",
-      createdOn: "",
-      updatedOn: "",
-      createdBy: "",
-    });
-
   const [selectedSupportTicketCategory, setSelectedSupportTicketCategory] =
     useState<number | undefined>(undefined);
-  // NOTE : ADD THIS selectedSource
-  const [selectedSource, setSelectedSource] = useState<number | undefined>(
+
+    const [selectedSource, setSelectedSource] = useState<number | undefined>(
     undefined
   );
 
@@ -238,106 +145,37 @@ function CreateSupportTicketModal({
   const [showErrorAtCompanyProductSla, setShowErrorAtCompanyProductSla] =
     useState<boolean>(false);
 
-  const handleRowSelectAccountProduct = (data: AccountProduct) => {
-    if (data) {
-      setSelectedAccountCompanyProduct(data);
-      setIsOpenForAccountProductSelection(false);
-      setIsOpenForAddingSupportTicketDetails(true);
-      setStage(3);
-    }
-  };
-
   useEffect(() => {
     if (selectedAccount) {
-      getAccountProducts();
-    } else {
-      clearSelectedAccountCompanyProduct();
-      setAccontProducts([]);
-    }
-  }, [selectedAccount]);
-
-  useEffect(() => {
-    if (selectedAccountCompanyProduct.id !== 0) {
       getCompanyProductSla();
     } else {
       setCompanyProductSla([]);
     }
-  }, [selectedAccountCompanyProduct]);
+  }, [selectedAccount]);
 
   const clearSelectedAccount = () => {
     setSelectedAccont({
       count: 0,
       id: 0,
-      companyId: 0,
-      name: "",
-      email: "",
-      mobileNumber: "",
-      industryTypeId: 0,
-      industryTypeName: "",
-      businessTypeId: 0,
-      businessTypeName: "",
-      countryId: 0,
-      stateId: 0,
-      districtId: 0,
-      countryName: "",
-      stateName: "",
-      districtName: "",
-      pan: "",
-      gst: "",
-      tan: "",
-      billingAddress: "",
-      shippingAddress: "",
-      registeredOfficeAddress: "",
-      businessResgistrationNumber: "",
-      website: "",
+      accountId: 0,
+      accountName: "",
+      companyProductId: 0,
+      companyProductName: "",
+      quantity: 0,
+      barcode: "",
+      serialNumber: 0,
+      unitName: "",
+      purchaseDate: "",
       isActive: false,
       createdBy: "",
-      createdOn: "",
-    });
-  };
-
-  const clearSelectedAccountCompanyProduct = () => {
-    setSelectedAccountCompanyProduct({
-      accountId: 0,
-      companyProductId: 0,
-      quantity: 0,
-      quantityReturn: 0,
-      barcode: "",
-      serialNumber: "",
-      purchaseDate: "",
-      deliveryDate: "",
-      deliveryAddress: "",
-      billingAddress: "",
-      installationDate: "",
-      installedBy: 0,
-      // warrantyIntervalTypeId: 0,
-      // warranty: 0,
-      // warrantyStartDate: "",
-      // warrantyEndDate: "",
-      // warrantyTerms: "",
-      // amcCycleIntervalTypeId: 0,
-      // amcCycle: 0,
-      // amcCycleStartDate: "",
-      // amcCycleEndDate: "",
-      unitName: "",
-      unitNameInStock: "",
-      id: 0,
-      accountName: "",
-      companyProductName: "",
-      installedByName: "",
-      warrantyIntervalName: "",
-      amcIntervalName: "",
       updatedBy: "",
       createdOn: "",
       updatedOn: "",
-      createdBy: "",
     });
   };
 
   const clearAllData = async () => {
-    setAccontProducts([]);
     setIsOpenForAddingSupportTicketDetails(false);
-    setIsOpenForAccountProductSelection(false);
     setStage(1);
     setIsOpenForAccountSelection(true);
     setIsLoadingForAccountCompanyProducts(false);
@@ -368,8 +206,10 @@ function CreateSupportTicketModal({
       requestedby: "",
       generate_password: "",
     });
-    clearSelectedAccountCompanyProduct();
     clearSelectedAccount();
+    localStorage.removeItem(
+      LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+    );
   };
 
   const initialCreatSupportTicketFormData: CreateSupportTicket = {
@@ -392,6 +232,7 @@ function CreateSupportTicketModal({
   const validateForm = (): boolean => {
     let flagVariable: boolean = true;
     if (createSupportTicketModalFormData.query_description === "") {
+      toast.error("Please enter a query description.");
       setError((prev) => ({
         ...prev,
         query_description: "Please enter a query description.",
@@ -405,6 +246,7 @@ function CreateSupportTicketModal({
     }
     if (selectedSource === undefined) {
       setShowErrorAtSupportTicketSource(true);
+      toast.error("Please select support ticket source.");
       flagVariable = false;
     } else {
       setShowErrorAtSupportTicketSource(false);
@@ -412,6 +254,7 @@ function CreateSupportTicketModal({
 
     if (selectedSupportTicketCategory === undefined) {
       setShowErrorAtSupportTicketCategory(true);
+      toast.error("Please select support ticket category.");
       flagVariable = false;
     } else {
       setShowErrorAtSupportTicketCategory(false);
@@ -419,6 +262,7 @@ function CreateSupportTicketModal({
 
     if (selectedCompanyProductSla === undefined) {
       setShowErrorAtCompanyProductSla(true);
+      toast.error("Please select product sla.");
       flagVariable = false;
     } else {
       setShowErrorAtCompanyProductSla(false);
@@ -430,9 +274,9 @@ function CreateSupportTicketModal({
       selectedSupportTicketCategory === undefined ||
       selectedCompanyProductSla === undefined
     ) {
-      toast.error(
-        "Please fill Query Discription and select source, ticket category and product SLA"
-      );
+      // toast.error(
+      //   "Please fill Query Discription and select source, ticket category and product SLA"
+      // );
       flagVariable = false;
     }
 
@@ -445,7 +289,7 @@ function CreateSupportTicketModal({
     setIsSupportTicketCreating(true);
     const postData = {
       company_id: loginStatus.companyId,
-      account_company_product_id: selectedAccountCompanyProduct?.id,
+      account_company_product_id: selectedAccount?.id,
       company_product_sla_id: selectedCompanyProductSla,
       support_ticket_category_id: selectedSupportTicketCategory,
       support_ticket_source_id: selectedSource,
@@ -486,91 +330,14 @@ function CreateSupportTicketModal({
       });
   };
 
-  const getAccountProducts = async () => {
-    if (selectedAccount.id === 0) return;
-    setAccontProducts([]);
-    setIsLoadingForAccountCompanyProducts(true);
-    clearSelectedAccountCompanyProduct();
-    setSelectedCompanyProductSla(undefined);
-    const postDataForAccountProducts = {
-      company_id: loginStatus.companyId,
-      account_id: selectedAccount?.id,
-      company_product_id: null,
-      requestedby: loginStatus.id,
-    };
-
-    await axiosClient
-      .post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT, postDataForAccountProducts, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.status === STATUS_CODE.OK) {
-          const formattedData: AccountProduct[] = response.data.map(
-            (item: any) => ({
-              id: item.id,
-              accountId: item.account_id,
-              accountName: item.account_name,
-              companyProductId: item.company_product_id,
-              companyProductName: item.company_product_name,
-              quantity: item.quantity,
-              quantityReturn: item.quantity_return,
-              barcode: item.barcode,
-              serialNumber: item.serial_number,
-              unitName: item.unit_name,
-              unitNameInStock: item.unit_name_in_stock,
-              purchaseDate: item.purchase_date,
-              deliveryDate: item.delivery_date,
-              deliveryAddress: item.delivery_address,
-              billingAddress: item.billing_address,
-              installationDate: item.installation_date,
-              installedByName: item.installed_by_name,
-              installedBy: item.installed_by,
-              warrantyIntervalTypeId: item.warranty_interval_type_id,
-              warrantyIntervalName: item.warranty_interval_name,
-              warranty: item.warranty,
-              warrantyStartDate: item.warranty_start_date,
-              warrantyEndDate: item.warranty_end_date,
-              warrantyTerms: item.warranty_terms,
-              amcCycleIntervalTypeId: item.amc_cycle_interval_type_id,
-              amcCycle: item.amc_cycle,
-              amcCycleStartDate: item.amc_cycle_start_date,
-              amcCycleEndDate: item.amc_cycle_end_date,
-              amcIntervalName: item.amc_interval_name,
-              updatedBy: item.updatedby,
-              createdOn: item.createdon,
-              updatedOn: item.updatedon,
-              createdBy: item.createdby,
-            })
-          );
-          setAccontProducts(formattedData);
-        }
-        setIsLoadingForAccountCompanyProducts(false);
-      })
-      .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: getAccountProducts,
-          });
-          if (refreshTokenResponse) {
-            getAccountProducts();
-          }
-        }
-        if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-          toast.error(error.response?.data);
-        }
-      })
-      .finally(() => {
-        setIsLoadingForAccountCompanyProducts(false);
-      });
-  };
-
   const getCompanyProductSla = async () => {
-    if (selectedAccountCompanyProduct.id === 0) return;
+    if (selectedAccount.id === 0) return;
     setCompanyProductSla([]);
+    setSelectedCompanyProductSla(undefined);
     setIsLoadingForCompanyProductSla(true);
     const postDataForCompanyProductSla = {
       company_id: loginStatus.companyId,
-      company_product_id: selectedAccountCompanyProduct.companyProductId,
+      company_product_id: selectedAccount.companyProductId,
       isactive: true,
       requestedby_id: loginStatus.id,
     };
@@ -602,10 +369,10 @@ function CreateSupportTicketModal({
       .catch(async (error) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
-            callFunction: getAccountProducts,
+            callFunction: getCompanyProductSla,
           });
           if (refreshTokenResponse) {
-            getAccountProducts();
+            getCompanyProductSla();
           }
         }
         if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
@@ -635,15 +402,9 @@ function CreateSupportTicketModal({
   if (!isOpen) return null;
   return (
     <FormLayout>
-      {(isSupportTicketCreating ||
-        isLoadingForAccountCompanyProducts ||
-        isLoadingForCompanyProductSla) && (
+      {(isSupportTicketCreating || isLoadingForAccountCompanyProducts) && (
         <LoadingPopUpAnimation
-          show={
-            isSupportTicketCreating ||
-            isLoadingForAccountCompanyProducts ||
-            isLoadingForCompanyProductSla
-          }
+          show={isSupportTicketCreating || isLoadingForAccountCompanyProducts}
         />
       )}
       <div className="py-4 px-3">
@@ -663,93 +424,68 @@ function CreateSupportTicketModal({
               setStage(value);
               if (value === 1) {
                 setIsOpenForAccountSelection(true);
-                setIsOpenForAccountProductSelection(false);
                 setIsOpenForAddingSupportTicketDetails(false);
                 clearSelectedAccount();
-                clearSelectedAccountCompanyProduct();
               }
               if (value === 2) {
                 setIsOpenForAccountSelection(false);
-                setIsOpenForAccountProductSelection(true);
-                setIsOpenForAddingSupportTicketDetails(false);
-                clearSelectedAccountCompanyProduct();
-              }
-              if (value === 3) {
-                setIsOpenForAccountSelection(false);
-                setIsOpenForAccountProductSelection(false);
                 setIsOpenForAddingSupportTicketDetails(true);
               }
             }}
           />
         </div>
 
-        {(selectedAccount.id !== 0 || selectedAccountCompanyProduct.id !== 0) &&
-          stage > 1 && (
-            <div className="flex gap-10 p-4 rounded-xl border bg-white shadow-sm">
-              {/* Selected Account */}
-              {selectedAccount.id !== 0 && stage >= 2 && (
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
-                    <UserCircle size={18} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Selected Account</p>
-                    <p className="font-semibold text-gray-800">
-                      {selectedAccount.name || "No account selected"}
-                    </p>
-                  </div>
+        {selectedAccount.id !== 0 && stage > 1 && (
+          <div className="flex gap-10 p-2 rounded-xl border bg-white shadow-sm">
+            {/* Selected Account */}
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                  <UserCircle size={18} className="text-blue-600" />
                 </div>
-              )}
+                <div>
+                  <p className="caption-custom">Account</p>
+                  <p className="table-header-custom">
+                    {selectedAccount.accountName || "No account selected"}
+                  </p>
+                </div>
+              </div>
+            )}
 
-              {/* Selected Product */}
-              {selectedAccountCompanyProduct.id !== 0 && stage >= 2 && (
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
-                    <Package size={18} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Selected Product</p>
-                    <p className="font-semibold text-gray-800">
-                      {selectedAccountCompanyProduct.companyProductName ||
-                        "No product selected"}
-                    </p>
-                  </div>
+            {/* Selected Product */}
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+                  <Package size={18} className="text-blue-600" />
                 </div>
-              )}
-            </div>
-          )}
+                <div>
+                  <p className="caption-custom">Selected Product</p>
+                  <p className="table-header-custom">
+                    {selectedAccount.companyProductName ||
+                      "No product selected"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <form className="space-y-0">
           {isOpenForAccountSelection && (
             <div className="md:col-span-2  w-full h-96">
-              <GetAccounts
-                isUsedForAccountLead={true}
-                handleRowSelectedForLead={(data) => {
+              <GetAccountCompanyProductFroSupportTicket
+                handleRowSelect={(data) => {
                   setSelectedAccont(data);
                   setIsOpenForAccountSelection(false);
-                  setIsOpenForAccountProductSelection(true);
-                  setIsOpenForAddingSupportTicketDetails(false);
+                  setIsOpenForAddingSupportTicketDetails(true);
                   setStage(2);
                 }}
-                isUsedForSupportTicketCreation={true}
               />
             </div>
           )}
-          {selectedAccount.id !== 0 && isOpenForAccountProductSelection && (
-            <div>
-              {isOpenForAccountProductSelection && (
-                <div className="md:col-span-2  w-full h-96">
-                  <AccountCompanyProductAgGrid
-                    accountProductData={accountProducts}
-                    onRowSelect={handleRowSelectAccountProduct}
-                    isUsedForSelection={true}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+
           {selectedAccount.id !== 0 &&
-            selectedAccountCompanyProduct.id !== 0 &&
+            selectedAccount.id !== 0 &&
             isOpenForAddingSupportTicketDetails && (
               <div>
                 {/* Form */}
@@ -811,86 +547,117 @@ function CreateSupportTicketModal({
                         onChange={handleSupportTicketModalFormDataChange}
                       />
                     </div>
-                    <div className="space-y-1">
-                      <CustomDropdown
-                        logo={Clock}
-                        preselectedOption={selectedSupportTicketCategory}
-                        requiredRedDot
-                        labelName="Ticket Category :"
-                        options={supportTicketCAtegory!}
-                        onSelect={handleLeadSelectedSupportTicketCategory}
-                      />
-                      {showErrorAtSupportTicketCategory &&
-                        !selectedSupportTicketCategory && (
-                          <div className="text-red-500 text-xs">
-                            Please select ticket category
-                          </div>
-                        )}
-                    </div>
 
-                    <div className="space-y-1">
-                      <CustomDropdown
-                        logo={Link}
-                        preselectedOption={selectedSource}
-                        requiredRedDot
-                        labelName="Ticket Source :"
-                        options={supportTicketSource!}
-                        onSelect={handleLeadSelectedSource}
-                      />
-                      {showErrorAtSupportTicketSource && !selectedSource && (
-                        <div className="text-red-500 text-xs">
-                          Please select ticket source
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      <CustomDropdown
-                        logo={Clock}
-                        preselectedOption={selectedCompanyProductSla}
-                        requiredRedDot
-                        labelName="Product SLA :"
-                        options={companyProductSla!}
-                        onSelect={handleLeadSelectedCompanyProductSla}
-                      />
-                      {showErrorAtCompanyProductSla &&
-                        !selectedCompanyProductSla && (
+                    {!isLoadingForTicketCategory ? (
+                      <div className="space-y-1">
+                        <CustomDropdown
+                          logo={Clock}
+                          preselectedOption={selectedSupportTicketCategory}
+                          requiredRedDot
+                          labelName="Ticket Category :"
+                          options={supportTicketCAtegory!}
+                          onSelect={handleLeadSelectedSupportTicketCategory}
+                        />
+                        {showErrorAtSupportTicketCategory &&
+                          !selectedSupportTicketCategory && (
+                            <div className="text-red-500 text-xs">
+                              Please select ticket category
+                            </div>
+                          )}
+                      </div>
+                    ) : (
+                      <div className="space-y-1 animate-pulse">
+                        {/* Label skeleton */}
+                        <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                        {/* Dropdown skeleton */}
+                        <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                      </div>
+                    )}
+
+                    {!isLoadingForTicketSource ? (
+                      <div className="space-y-1">
+                        <CustomDropdown
+                          logo={Link}
+                          preselectedOption={selectedSource}
+                          requiredRedDot
+                          labelName="Ticket Source :"
+                          options={supportTicketSource!}
+                          onSelect={handleLeadSelectedSource}
+                        />
+                        {showErrorAtSupportTicketSource && !selectedSource && (
                           <div className="text-red-500 text-xs">
-                            Please select product SLA
+                            Please select ticket source
                           </div>
                         )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-1 animate-pulse">
+                        {/* Label skeleton */}
+                        <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                        {/* Dropdown skeleton */}
+                        <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                      </div>
+                    )}
+
+                    {!isLoadingForCompanyProductSla ? (
+                      <div className="space-y-1">
+                        <CustomDropdown
+                          logo={Clock}
+                          preselectedOption={selectedCompanyProductSla}
+                          requiredRedDot
+                          labelName="Product SLA :"
+                          options={companyProductSla!}
+                          onSelect={handleLeadSelectedCompanyProductSla}
+                        />
+                        {showErrorAtCompanyProductSla &&
+                          !selectedCompanyProductSla && (
+                            <div className="text-red-500 text-xs">
+                              Please select product SLA
+                            </div>
+                          )}
+                      </div>
+                    ) : (
+                      <div className="space-y-1 animate-pulse">
+                        {/* Label skeleton */}
+                        <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                        {/* Dropdown skeleton */}
+                        <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                      </div>
+                    )}
 
                     <div>
-                      <div className="flex items-center justify-between pr-60 pt-2 gap-1 w-full">
-                        <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (userHasAccessToViewUser) {
-                              handleCompanyUserPopUp();
-                            } else {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.COMPANY_USER
-                                  .DENIED_VIEW_ACCESS
-                              );
-                            }
-                          }}
-                          type="submit"
-                        >
-                          <div className="flex gap-1 items-center whitespace-nowrap">
-                            <UserRoundPlus size={16} />
-                            <span>Assign</span>
-                          </div>
-                        </Button>
-
-                        <span className="caption-custom whitespace-nowrap">
-                          <span className="input-label-custom">
-                            Assign To :
-                          </span>{" "}
-                          {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
-                          {selectedCompanyUser.fullname || loginStatus.fullName}
-                        </span>
-                      </div>
-
+                      <CompanyUserSearchFieldInput
+                        label="Assign To:"
+                        required
+                        placeholder={loginStatus.fullName}
+                        defaultValue={selectedCompanyUser.fullname === ""?loginStatus.fullName:selectedCompanyUser.fullname}
+                        logo={User}
+                        onUserSelected={(user) => {
+                          if (user) {
+                            setSelectedCompanyUser(user);
+                          } else {
+                            setSelectedCompanyUser({
+                              company_id: 0,
+                              id: 0,
+                              fullname: "",
+                              email: "",
+                              mobilenumber: "",
+                              createdby: "",
+                              isactive: false,
+                              requestedby: "",
+                              generate_password: "",
+                            });
+                          }
+                        }}
+                        isDisabled={!userHasAccessToViewUser}
+                        disabledMessage={
+                          MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                        }
+                        // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
+                      />
                       <span className="caption-custom">
                         <span className="">Note :</span> If a support ticket
                         assign to is not selected, then ticket will assigned to
@@ -932,30 +699,6 @@ function CreateSupportTicketModal({
                     </div>
                   </div>
                 </form>
-                {openPopUpOfCompanyUserModal &&
-                  createPortal(
-                    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-                        <FormHeader
-                          icon={UserRoundPlus}
-                          onClose={() => setOpenPopUpOfCompanyUserModal(false)}
-                          preText="Select Company User"
-                          description="Select the user to assign him/her to support ticket."
-                        />
-                        {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                        <div className="p-1">
-                          <GetCompanyUsersForLead
-                            selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                            handleSelectedCompanyUserChange={
-                              handleSelectedCompanyUserChange
-                            }
-                            isUsedForSettings={false}
-                          />
-                        </div>
-                      </div>
-                    </div>,
-                    document.body
-                  )}
               </div>
             )}
         </form>

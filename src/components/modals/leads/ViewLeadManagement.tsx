@@ -8,7 +8,6 @@ import {
   Plus,
   Save,
   Settings,
-  Text,
   User2,
   X,
 } from "lucide-react";
@@ -51,10 +50,9 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
+import { createPortal } from "react-dom";
 import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
-import FormLayout from "../../ui/FormLayout";
-import TextAreaInput from "../../ui/TextAreaInput";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -144,7 +142,7 @@ const ViewLeadManagement = () => {
   const [isLeadStatusSaving, setIsLeadStatusSaving] = useState<boolean>(false);
   const handleSaveStatusUpdate = async () => {
     if (!selectedLeadData || selectedStatusId === null) return;
-    if (isLeadStatusSaving) return;
+    if(isLeadStatusSaving) return;
 
     const postDataForLeadStatusUpdate = {
       company_id: loginStatus.companyId,
@@ -155,7 +153,7 @@ const ViewLeadManagement = () => {
     };
 
     try {
-      setIsLeadStatusSaving(true);
+      setIsLeadStatusSaving(true)
       const response = await axios.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
@@ -163,6 +161,7 @@ const ViewLeadManagement = () => {
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
+        
           const updatedStatusName = leadStatus?.find(
             (item) => item.id === selectedStatusId
           )?.name;
@@ -199,7 +198,7 @@ const ViewLeadManagement = () => {
           handleSaveStatusUpdate();
         }
       }
-    } finally {
+    }finally{
       setIsLeadStatusSaving(false);
     }
   };
@@ -222,20 +221,12 @@ const ViewLeadManagement = () => {
     number | null
   >(selectedLeadData.companyUserId);
 
-  useEffect(() => {
-    console.log(" persistance user : ", persistedSelectedUserId);
-  }, [persistedSelectedUserId]);
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
   const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-    console.log("params id ", params?.id);
-
-    if (params && params?.id !== persistedSelectedUserId) {
-      setReasonInputBoxOpenForLeadOwner(true);
-    } else {
-      setReasonInputBoxOpenForLeadOwner(false);
-    }
     if (params) {
+      setPersistedSelectedUserId(params.id);
+
       setSelectedCompanyUser({
         company_id: params.company_id,
         id: params.id,
@@ -248,7 +239,7 @@ const ViewLeadManagement = () => {
         generate_password: "",
       });
     } else {
-      // setPersistedSelectedUserId(null);
+      setPersistedSelectedUserId(null);
       // Reset selectedCompanyUser to its initial state when null is received
       setSelectedCompanyUser({
         company_id: 0,
@@ -290,7 +281,6 @@ const ViewLeadManagement = () => {
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
-          setPersistedSelectedUserId(selectedCompanyUser.id);
           toast.success(response.data.message);
           const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
           parsedQuery.leadOwner = selectedCompanyUser.fullname.toString();
@@ -337,7 +327,6 @@ const ViewLeadManagement = () => {
         requestedby: "",
         generate_password: "",
       });
-      handleLeadOwnerChangeStateClear();
     }
   };
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
@@ -692,14 +681,13 @@ const ViewLeadManagement = () => {
 
   // Note : Clears the states when user clicks on lead owner change button
   function handleLeadOwnerChangeStateClear() {
-    // setPersistedSelectedUserId(selectedLeadData.companyUserId);
-    setIsLeadOwnerPopUpOpen(false);
-    setReasonInputBoxOpenForLeadOwner(false);
     setReasonTextForLeadOwnerChange("");
+    setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
+    setPersistedSelectedUserId(selectedLeadData.companyUserId);
   }
   return (
     <div
-      className={`fixed top-8 inset-0 z-10 bg-white ${
+      className={` fixed top-8 inset-0 z-10 bg-white ${
         userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
       } overflow-auto`}
     >
@@ -715,11 +703,11 @@ const ViewLeadManagement = () => {
             <button
               className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
-                navigate(ROUTES_URL.GET_LEAD_MANAGEMENT);
+                navigate(-1);
               }}
             >
               <ArrowLeft size={14} />
-              <span>Leads</span>
+              <span>back</span>
             </button>
           </div>
 
@@ -852,7 +840,7 @@ const ViewLeadManagement = () => {
         </div>
         {reasonInputBoxOpen && selectedStatusId !== 9 && (
           <StatusUpdateModal
-            isLeadStatusSaving={isLeadStatusSaving}
+          isLeadStatusSaving={isLeadStatusSaving}
             handleCancel={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
@@ -865,7 +853,7 @@ const ViewLeadManagement = () => {
 
         {reasonInputBoxOpen && selectedStatusId === 9 && (
           <ConvertLeadModal
-            isLeadStatusSaving={isLeadStatusSaving}
+          isLeadStatusSaving={isLeadStatusSaving}
             isOpen={reasonInputBoxOpen}
             onClose={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
@@ -875,30 +863,28 @@ const ViewLeadManagement = () => {
             leadData={selectedLeadData}
             handleLeadConversion={handleSaveStatusUpdate}
             onReasonChange={(e) => setReasonText(e.target.value)}
-            reasonText={reasonText}
-            handleLeadMappedToAccount={() => {
-              const parsedQuery = JSON.parse(
-                searchParams.get("leadData") || "{}"
-              );
-              parsedQuery.leadStatusId = "9";
-              parsedQuery.leadStatus = "Converted";
-              const newQueryString = qs.stringify({
-                leadData: JSON.stringify(parsedQuery),
-              });
+              reasonText={reasonText}
+              handleLeadMappedToAccount={()=>{
+               const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
+          parsedQuery.leadStatusId = "9";
+          parsedQuery.leadStatus = "Converted";
+          const newQueryString = qs.stringify({
+            leadData: JSON.stringify(parsedQuery),
+          });
 
-              setSelectedLeadData((prev: any) => ({
-                ...prev,
-                leadStatus: "Converted",
-              }));
-              setReasonInputBoxOpen(false);
-              setReasonText("");
-              setSelectedStatusId(null);
+          setSelectedLeadData((prev: any) => ({
+            ...prev,
+            leadStatus: "Converted",
+          }));
+          setReasonInputBoxOpen(false);
+          setReasonText("");
+          setSelectedStatusId(null);
 
-              const newPath = `${window.location.pathname}?${newQueryString}`;
-              navigate(newPath, { replace: true });
-            }}
-          />
-        )}
+          const newPath = `${window.location.pathname}?${newQueryString}`;
+          navigate(newPath, { replace: true });
+              }}
+            />
+          )}
 
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 p-2">
@@ -945,6 +931,7 @@ const ViewLeadManagement = () => {
                   </div>
                 </div>
                 <div
+                
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -976,7 +963,7 @@ const ViewLeadManagement = () => {
                 </div>
 
                 <div
-                  className="ml-4"
+                className="ml-4"
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -1017,12 +1004,13 @@ const ViewLeadManagement = () => {
                   value={selectedLeadData?.createdOn}
                 />
                 <div className="ml-4">
-                  <Detail
-                    type="none"
-                    label="Created by"
-                    value={selectedLeadData?.createdBy}
+
+                <Detail
+                  type="none"
+                  label="Created by"
+                  value={selectedLeadData?.createdBy}
                   />
-                </div>
+                  </div>
                 <div
                   className="flex"
                   title={
@@ -1060,7 +1048,7 @@ const ViewLeadManagement = () => {
                   </div>
                 </div>
               </div>
-              {/* {reasonInputBoxOpenForLeadOwner && (
+              {reasonInputBoxOpenForLeadOwner && (
                 <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
                   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                     <div className="flex flex-col gap-1">
@@ -1104,7 +1092,7 @@ const ViewLeadManagement = () => {
                     </div>
                   </div>
                 </div>
-              )} */}
+              )}
             </div>
             {/* Lead Details */}
             <div className="shadow-md rounded-sm">
@@ -1265,79 +1253,62 @@ const ViewLeadManagement = () => {
         />
 
         {/* lead owner pop up open */}
-        {isLeadOwnerPopUpOpen && (
-          <FormLayout width={4}>
-            {/* Header with Close Button */}
-            <FormHeader
-              preText="Assign new lead owner."
-              description="Select and assign a new owner to manage this lead."
-              onClose={() => {
-                setIsLeadOwnerPopUpOpen(false);
-                setReasonInputBoxOpenForLeadOwner(false);
-                setReasonTextForLeadOwnerChange("");
-              }}
-              icon={User2}
-            />
-            {/* NOTE : CALL TO THE MODAL COMPONENT */}
-            <div className="">
-              <GetCompanyUsersForLead
-                isUsedForSettings={false}
-                selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                handleSelectedCompanyUserChange={
-                  handleSelectedCompanyUserChange
-                }
-              />
-            </div>
-            {reasonInputBoxOpenForLeadOwner && (
-              <div className="flex flex-col gap-1">
-                <p className="caption-custom">
-                  Current Lead Owner :{selectedLeadData.leadOwner}
-                </p>
-                <p className="caption-custom">
-                  Selected User : {selectedCompanyUser.fullname}
-                </p>
-                {/* <label className="table-header-custom">Reason (Optional)</label> */}
-                <TextAreaInput
-                  cols={2}
-                  logo={Text}
-                  label="Reason (Optional)"
-                  rows={2}
-                  placeholder="Enter reason for updating lead owner"
-                  className="border rounded  p-1 input-label-custom"
-                  value={reasonTextForLeadOwnerChange}
-                  onChange={(e) =>
-                    setReasonTextForLeadOwnerChange(e.target.value)
-                  }
+        {isLeadOwnerPopUpOpen &&
+          createPortal(
+            <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
+              <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
+                {/* Header with Close Button */}
+                {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800">
+                  Select Company User
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsLeadOwnerPopUpOpen(false);
+
+                    if (
+                      selectedCompanyUser.id !== 0 &&
+                      selectedCompanyUser.id !== null &&
+                      selectedCompanyUser.id === persistedSelectedUserId
+                    ) {
+                      setReasonInputBoxOpenForLeadOwner(true);
+                    }
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div> */}
+                <FormHeader
+                  preText="Assign new lead owner."
+                  description="Select and assign a new owner to manage this lead."
+                  onClose={() => {
+                    setIsLeadOwnerPopUpOpen(false);
+
+                    if (
+                      selectedCompanyUser.id !== 0 &&
+                      selectedCompanyUser.id !== null &&
+                      selectedCompanyUser.id === persistedSelectedUserId
+                    ) {
+                      setReasonInputBoxOpenForLeadOwner(true);
+                    }
+                  }}
+                  icon={User2}
                 />
-                <div className="flex justify-end ">
-                  <div className="flex gap-1">
-                    <Button
-                      type="submit"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleLeadOwnerChange();
-                      }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <Save size={16} />
-                        Save
-                      </div>
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleLeadOwnerChangeStateClear}
-                    >
-                      <div className="flex items-center ">
-                        <X size={18} />
-                        Cancel
-                      </div>
-                    </Button>
-                  </div>
+                {/* NOTE : CALL TO THE MODAL COMPONENT */}
+                <div className="">
+                  <GetCompanyUsersForLead
+                  isUsedForSettings={false}
+                    selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                    handleSelectedCompanyUserChange={
+                      handleSelectedCompanyUserChange
+                    }
+                  />
                 </div>
               </div>
-            )}
-          </FormLayout>
-        )}
+            </div>,
+            document.body
+          )}
         <AssignProductToLead
           selectedLeadData={selectedLeadData}
           isOpen={isAddProductModalOpen}
@@ -1464,9 +1435,7 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${
-                label === "Name" ? "w-fit" : "w-48"
-              } focus:outline-none focus:ring-0 `}
+              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${label==="Name" ? "w-fit" : "w-48"} focus:outline-none focus:ring-0 `}
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1518,14 +1487,14 @@ const Detail: React.FC<DetailProps> = ({
           className={`input-label-custom hover:bg-slate-100      cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
-          {value ? (
-            <>
-              {value} {/* Icon never gets truncated */}
-              <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" />
-            </>
-          ) : (
-            <span className="input-label-custom">Add here...</span>
-          )}
+          {
+          value?
+          <>
+          
+         {value} {/* Icon never gets truncated */}
+            <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" /> 
+          </>
+            :<span className="input-label-custom">Add here...</span>}
         </div>
       ) : (
         <div
@@ -1538,11 +1507,7 @@ const Detail: React.FC<DetailProps> = ({
         >
           <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
             {/* Only the text truncates */}
-            <span
-              className={`truncate ${
-                label === "Name" ? "" : " max-w-[205px]"
-              } `}
-            >
+            <span className={`truncate ${label==="Name" ? "" : " max-w-[205px]"} `}>
               {value ? (
                 value
               ) : (
@@ -1554,6 +1519,32 @@ const Detail: React.FC<DetailProps> = ({
             <Edit3 className="ml-1 h-3 w-3 text-slate-400 flex-shrink-0" />
           </div>
         </div>
+
+        // <div
+        //   title={value ?? "Enter value "}
+        //   className={`table-header-custom flex items-center min-w-48 max-w-fit gap-3 justify-between ${
+        //     label === "Name"
+        //       ? "table-header-custom p-0  border-gray-200 "
+        //       : "input-label-custom"
+        //   }   truncate overflow-hidden ${
+        //     hasBorder ? "border rounded-md px-1 border-gray-200 " : ""
+        //   }   cursor-pointer`}
+        //   onClick={handleClick}
+        // >
+        //   {value ? (
+
+        //     <>
+        //     {value}
+        //     </>
+        //   ) : (
+        //     <>
+        //       <span className=" p-1 caption-custom flex items-center justify-between italic">
+        //         Add here...
+        //       </span>
+        //     </>
+        //   )}
+        //   <Pen size={12} className="caption-custom "/>
+        // </div>
       )}
     </div>
   );

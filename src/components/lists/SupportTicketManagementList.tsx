@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Calendar,
-  NotebookPen,
+  Headset,
   ShoppingBag,
   TicketPlus,
   User,
@@ -76,6 +76,8 @@ function SupportTicketManagementList({
       count: 0,
       id: 0,
       companyId: 0,
+      accountName: "",
+      companyProductName: "",
       accountCompanyProductId: 0,
       supportTicketCategoryId: 0,
       supportTicketCategoryName: "",
@@ -133,7 +135,7 @@ function SupportTicketManagementList({
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
-  const handleRowClickedForShowLead = (event: any) => {
+  const handleRowClicked = (event: any) => {
     if (isUsedInSupportTicketModule) {
       const rowData: SupportTicketProps = event.data;
       const queryParams = qs.stringify({
@@ -143,13 +145,13 @@ function SupportTicketManagementList({
     }
   };
 
-  const handleRowSelectedForShowLead = (rowData: SupportTicketProps | any) => {
+  const handleRowSelected = (rowData: SupportTicketProps | any) => {
     // Note : If used in the lead module then below if block will work
     if (isUsedInSupportTicketModule) {
-      const queryParams = qs.stringify({
-        supportTicketData: JSON.stringify(rowData),
-      });
-      navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
+      // const queryParams = qs.stringify({
+      //   supportTicketData: JSON.stringify(rowData),
+      // });
+      // navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
     } else {
       handleRowSelectedForShowSupportTicket!(rowData);
     }
@@ -168,14 +170,12 @@ function SupportTicketManagementList({
       >
         {/* sticky */}
         <div
-          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-fit`}
         >
           {isUsedInSupportTicketModule && (
             <div className="flex gap-2">
               {!isSmallScreen && (
-                <NotebookPen
-                  className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-                />
+                <Headset className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
               )}
 
               {(isMediumScreen || isLargeScreen) && (
@@ -184,8 +184,12 @@ function SupportTicketManagementList({
             </div>
           )}
 
-          <>
-            <div className={`flex gap-2 ${isCustomDateOptionSelected?"":"px-4"} justify-center items-center`}>
+          <div>
+            <div
+              className={`flex gap-2 ${
+                isCustomDateOptionSelected ? "" : "px-4"
+              } justify-center items-center`}
+            >
               {/* search box flex div */}
               <div
                 className={`relative flex items-start ${
@@ -402,7 +406,7 @@ function SupportTicketManagementList({
                 </div>
               )}
             </div>
-          </>
+          </div>
 
           {isUsedInSupportTicketModule && (
             <div className="flex  gap-1">
@@ -441,8 +445,8 @@ function SupportTicketManagementList({
           >
             <SupportTicketManagementAgGrid
               isUsedInSupportTicketModule={isUsedInSupportTicketModule}
-              handleRowClick={handleRowClickedForShowLead}
-              onRowSelect={handleRowSelectedForShowLead}
+              handleRowClick={handleRowClicked}
+              onRowSelect={handleRowSelected}
               handleSupportTicketDataFormChange={
                 handleSupportTicketDataFormChange
               }
@@ -465,8 +469,7 @@ function SupportTicketManagementList({
             onPageSizeChange={paginationData.selectedPageSize}
           />
         </div>
-        {(openPopUpOfCompanyUserModal ||
-          openPopUpOfResolvedByModal) &&
+        {(openPopUpOfCompanyUserModal || openPopUpOfResolvedByModal) &&
           createPortal(
             <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">

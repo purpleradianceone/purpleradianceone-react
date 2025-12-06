@@ -1,5 +1,5 @@
 import React from "react";
-import { UserCircle, PackageSearch, FileText } from "lucide-react"; // Lucide icons
+import { PackageSearch, FileText } from "lucide-react"; // Lucide icons
 
 interface StageIndicatorProps {
   stage: number;
@@ -8,9 +8,8 @@ interface StageIndicatorProps {
 
 const StageIndicator: React.FC<StageIndicatorProps> = ({ stage, onStageChange }) => {
   const stages = [
-    { id: 1, label: "Account Selection", icon: <UserCircle size={16} /> },
-    { id: 2, label: "Account Product Selection", icon: <PackageSearch size={16} /> },
-    { id: 3, label: "Details", icon: <FileText size={16} /> },
+    { id: 1, label: "Account Product Selection", icon: <PackageSearch size={16} /> },
+    { id: 2, label: "Details", icon: <FileText size={16} /> },
   ];
 
   const handleClick = (id: number) => {
