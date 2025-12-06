@@ -61,10 +61,13 @@ const ROUTES_URL = {
     FACEBOOK_OAUTH : "/authenticate/facebook",
     INTEGRATIONS_SETTINGS : "/settings/integrations",
 
+    // Account module
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
+    ACCOUNT_DETAILS : "/home/manage-accounts/accounts",
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
     ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
     ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
+    ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "/home/manage-accounts/accounts/create",
 
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",

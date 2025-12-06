@@ -17,6 +17,8 @@ import CreateAccountCompanyProduct from "./CreateAccountCompanyProduct";
 import AccountProduct from "../../../../@types/account/AccountProduct";
 import AccountCompanyProductPopUpDetails from "./AccountCompanyProductPopUpDetails";
 import AccountCompanyProductAgGrid from "../../../ag-grid/AccountCompanyProductAgGrid";
+// import { Link } from "react-router-dom";
+// import ROUTES_URL from "../../../../constants/Routes";
 
 const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -144,46 +146,83 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
         !isLoadingAccountCompanyProduct ? (
         <div className="flex items-center justify-center w-full   h-full">
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
-            <Button
-              disabled={!userHasAccessToUpdateAccount}
-              onClick={() => {
-                if (userHasAccessToUpdateAccount) {
-                  setShowCreateAccountCompanyProduct(
-                    !showCreateAccountCompanyProduct
-                  );
-                } else {
+            {/* <Link
+            to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
+
+              // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${12}`}
+              onClick={(e) => {
+                if (!userHasAccessToUpdateAccount) {
+                  e.preventDefault();
                   toast.error(
                     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
                   );
                 }
               }}
-              className={COLORS.ADD_BUTTON}
-            >
-              +Add
-            </Button>
+              className={
+                !userHasAccessToUpdateAccount
+                  ? "pointer-events-none opacity-85"
+                  : ""
+              }
+            > */}
+              {" "}
+              <Button
+                disabled={!userHasAccessToUpdateAccount}
+                // onClick={() => {
+                //   if (userHasAccessToUpdateAccount) {
+                //     setShowCreateAccountCompanyProduct(
+                //       !showCreateAccountCompanyProduct
+                //     );
+                //   } else {
+                //     toast.error(
+                //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                //     );
+                //   }
+                // }}
+                className={COLORS.ADD_BUTTON}
+              >
+                +Add
+              </Button>
+            {/* </Link> */}
             <span className="italic caption-custom">No data available.</span>
           </div>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-1 w-full">
           <div className="col-span-2 flex justify-end p-0.5">
-            <Button
-              disabled={!userHasAccessToUpdateAccount}
-              onClick={() => {
-                if (userHasAccessToUpdateAccount) {
-                  setShowCreateAccountCompanyProduct(
-                    !showCreateAccountCompanyProduct
-                  );
-                } else {
+            {/* <Link
+              to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
+              onClick={(e) => {
+                if (!userHasAccessToUpdateAccount) {
+                  e.preventDefault();
                   toast.error(
                     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
                   );
                 }
               }}
-              className={COLORS.ADD_BUTTON}
-            >
-              +Add
-            </Button>
+              className={
+                !userHasAccessToUpdateAccount
+                  ? "pointer-events-none opacity-85"
+                  : ""
+              }
+            > */}
+              <Button
+                disabled={!userHasAccessToUpdateAccount}
+                onClick={() => {
+                  if (userHasAccessToUpdateAccount) {
+                    setShowCreateAccountCompanyProduct(
+                      !showCreateAccountCompanyProduct
+                    );
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                    );
+                  }
+                }}
+                className={COLORS.ADD_BUTTON}
+              >
+                +Add
+              </Button>
+            {/* </Link> */}
           </div>
           <div className="md:col-span-2  w-full h-96">
             <AccountCompanyProductAgGrid

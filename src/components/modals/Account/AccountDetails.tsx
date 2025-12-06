@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Building2,
   Mail,
@@ -38,23 +38,62 @@ import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
 import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
+import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
+import ROUTES_URL from "../../../constants/Routes";
+import { useNavigate, useParams } from "react-router-dom";
+import { parseInt } from "lodash";
 // Note this is the type
-interface AccountDetailsProps {
-  company: Account;
-  onClose: () => void;
+// interface AccountDetailsProps {
+//   // company: Account;
+//   // onClose: () => void;
 
-  fetchAccounts: () => Promise<void>;
-}
+//   fetchAccounts: () => Promise<void>;
+// }
 
-const AccountDetails: React.FC<AccountDetailsProps> = ({
-  company,
-  onClose,
-  fetchAccounts,
-}) => {
+const AccountDetails: React.FC = () => {
+  const navigate = useNavigate();
+  const {accountId } = useParams();
+  const {accountDetails :company, loading } = useAccountDetails(parseInt(accountId!));
+
+  useEffect(()=> {
+    if(company){
+      setFormData(company)
+    }
+  }, [company])
+  
+  
+  const [formData, setFormData] = useState<Account >({
+    count : 0,
+    id : 0,
+    companyId : 0,
+    name : '',
+    email : '',
+    mobileNumber : '',
+    industryTypeId : 0,
+    industryTypeName : '',
+    businessTypeId : 0,
+    businessTypeName : '',
+    countryId : 0,
+    stateId : 0,
+    districtId : 0,
+    countryName : '',
+    stateName : '',
+    districtName :'',
+    pan :'',
+    gst : '',
+    tan : '',
+    billingAddress : '',
+    shippingAddress : '',
+    registeredOfficeAddress : '',
+    businessResgistrationNumber :'',
+    website : '',
+    isActive : false,
+    createdBy : '',
+    createdOn : '',
+  });
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Account>(company);
   const [originalValues, setOriginalValues] = useState<{
     [key: string]: string;
   }>({});
@@ -124,10 +163,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       toast.error(error);
       setErrors((prev) => ({ ...prev, [fieldName]: error }));
       // Revert to original value on error
+
       setFormData((prev) => ({
         ...prev,
         [fieldName]:
-          originalValues[fieldName] || company[fieldName as keyof Account],
+          originalValues[fieldName] || company![fieldName as keyof Account],
       }));
       return;
     }
@@ -168,10 +208,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           setFormData((prev) => ({
             ...prev,
             [fieldName]:
-              originalValues[fieldName] || company[fieldName as keyof Account],
+              originalValues[fieldName] || company![fieldName as keyof Account],
           }));
         }
-        fetchAccounts();
+        // fetchAccounts();
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -187,7 +227,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
           setFormData((prev) => ({
             ...prev,
             [fieldName]:
-              originalValues[fieldName] || company[fieldName as keyof Account],
+              originalValues[fieldName] || company![fieldName as keyof Account],
           }));
         }
       });
@@ -229,7 +269,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         } else {
           toast.error(response.data.message);
         }
-        fetchAccounts();
+        // fetchAccounts();
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -321,7 +361,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     const currentValue = formData[fieldName as keyof Account] as string;
     const originalValue =
       originalValues[fieldName] ||
-      (company[fieldName as keyof Account] as string);
+      (company![fieldName as keyof Account] as string);
 
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
@@ -343,14 +383,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         : formData.districtName;
     const originalValue =
       fieldName === "businessTypeName"
-        ? company.businessTypeName
+        ? company!.businessTypeName
         : fieldName === "industryTypeName"
-        ? company.industryTypeName
+        ? company!.industryTypeName
         : fieldName === "countryName"
-        ? company.countryName
+        ? company!.countryName
         : fieldName === "stateName"
-        ? company.stateName
-        : company.districtName;
+        ? company!.stateName
+        : company!.districtName;
 
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
@@ -367,7 +407,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       setFormData((prev) => ({
         ...prev,
         [fieldName]:
-          originalValues[fieldName] || company[fieldName as keyof Account],
+          originalValues[fieldName] || company![fieldName as keyof Account],
       }));
       setEditingField(null);
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
@@ -809,7 +849,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
     }
   };
 
-  if (isIndustryTypeLoading || isBusinessTypeLoading) {
+  if (isIndustryTypeLoading || isBusinessTypeLoading || loading ) {
     return (
       <div
         className={` ${
@@ -820,6 +860,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       </div>
     );
   }
+  
   return (
     <div
       className={`${
@@ -831,7 +872,10 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         <div className="bg-white rounded-2xl  p-2 mb-1 border">
           <button
             className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1   hover:text-indigo-500 hover:border-blue-600"
-            onClick={onClose}
+            // onClick={onClose}
+            onClick={()=>{
+              navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
+            }}
           >
             <ArrowLeft size={14} />{" "}
             <span className="caption-custom hover:text-blue-700">
@@ -944,25 +988,25 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Account Contacts
             </h3>
-            <AccountContact accountId={company.id} />
+            <AccountContact accountId={company!.id} />
           </div>
           {/* Account Lead */}
           <div>
-            <AccountLead account={company} />
+            <AccountLead account={company!} />
           </div>
           {/* Account company type */}
           <div className="bg-white rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Company Account Type
             </h3>
-            <AccountCompanyType accountId={company.id} />
+            <AccountCompanyType accountId={company!.id} />
           </div>
           {/* Account company product */}
           <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Product Details
             </h3>
-            <AccountCompanyProduct accountId={company.id} />
+            <AccountCompanyProduct accountId={company!.id} />
           </div>
         </div>
       </div>
