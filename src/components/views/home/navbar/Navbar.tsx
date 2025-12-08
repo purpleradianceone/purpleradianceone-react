@@ -48,6 +48,7 @@ import AppTutorailManager from "../../tutorails/AppTutorailManager";
 import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
 import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
 import { TutorailColumnName } from "../../../../constants/Tutorail";
+import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -131,6 +132,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
  
 
   const handleLogout = async () => {
+    cancelAllRequests();
     await axios
       .post(POST_API.LOGOUT, {}, { withCredentials: true })
       .then((response) => {
@@ -155,10 +157,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
             subscriptionId: 0,
             isSuperUser: false,
           });
-          
           setNotificationCount(0);
           localStorage.clear();
-          
           Navigate(ROUTES_URL.SIGN_IN);
         }
       })
