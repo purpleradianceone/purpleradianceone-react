@@ -1,6 +1,6 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { StockAvaibleSerialNumber } from "../../@types/stock/StockAvailableSerialNumber";
 
 export const StockAvailableSerialNumberAgGrid = ({
@@ -12,7 +12,7 @@ export const StockAvailableSerialNumberAgGrid = ({
   selectedIds: number[];
   onSelectionChange: (ids: number[]) => void;
 }) => {
-  const toggleSelect = (id: number) => {
+  const toggleSelect = useCallback((id: number) => {
     let updated;
 
     if (selectedIds.includes(id)) {
@@ -22,7 +22,7 @@ export const StockAvailableSerialNumberAgGrid = ({
     }
 
     onSelectionChange(updated); 
-  };
+  },[selectedIds, onSelectionChange]);
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -50,7 +50,7 @@ export const StockAvailableSerialNumberAgGrid = ({
 
           return (
             <input
-              className="ml-4 mt-1"
+              className="ml-4 mt-1 cursor-pointer"
               type="checkbox"
               checked={isChecked}
               onChange={() => params.context.toggleSelect(stockInwardId)}
@@ -59,7 +59,7 @@ export const StockAvailableSerialNumberAgGrid = ({
         },
       },
     ],
-    [selectedIds]
+    []
   );
 
   const defaultColDef = useMemo(

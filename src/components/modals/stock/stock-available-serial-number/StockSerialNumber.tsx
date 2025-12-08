@@ -8,7 +8,6 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useEffect, useState } from "react";
 import Pagination from "../../../ag-grid/Pagination";
-import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
@@ -25,9 +24,8 @@ export const StockSerialNumber = ({
   companyProductId: number | undefined;
   onClose: () => void;
   handleStockSerialNumberChange: (id: number[]) => void;
-  selectedInwardIds: number[];
+  selectedInwardIds: number[] ;
 }) => {
-  const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
 
   const [stockAvailableSerialNumberState, setStockAvailableSerialNumberState] =
@@ -42,7 +40,7 @@ export const StockSerialNumber = ({
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
-  const getTransactionType = async () => {
+  const getStockAvailableSerialNumber = async () => {
     const offset = (currentPage - 1) * pageSize;
     const PostData = {
       company_id: loginStatus.companyId,
@@ -86,17 +84,17 @@ export const StockSerialNumber = ({
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getTransactionType,
+          callFunctionWithEvent: getStockAvailableSerialNumber,
         });
         if (refreshTokenStatus) {
-          getTransactionType();
+          getStockAvailableSerialNumber();
         }
       }
     }
   };
   useEffect(() => {
-    getTransactionType();
-  }, [currentPage, pageSize]);
+    getStockAvailableSerialNumber();
+  }, [currentPage, pageSize  ]);
 
   const availableStock =
     stockAvailableSerialNumberState.length > 0 &&
@@ -112,15 +110,17 @@ export const StockSerialNumber = ({
         />
         <StockRulesCard availableStock={availableStock} />
         <div
-          className={`ag-theme-balham bg-pink-400 w-full ${
-            userPreference.isLeftMenu
-              ? "h-[calc(100vh-140px)]"
-              : "h-[calc(100vh-148px)]"
-          }`}
+          // className={`ag-theme-balham bg-pink-400 w-full ${
+          //   userPreference.isLeftMenu
+          //     ? "h-[calc(100vh-140px)]"
+          //     : "h-[calc(100vh-148px)]"
+          // }`
+          className={`ag-theme-balham bg-pink-400 w-full h-[40vh] `
+        }
         >
           <StockAvailableSerialNumberAgGrid
             data={stockAvailableSerialNumberState}
-            selectedIds={selectedInwardIds}
+            selectedIds={selectedInwardIds!}
             onSelectionChange={handleStockSerialNumberChange}
           />
         </div>

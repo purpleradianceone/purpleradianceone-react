@@ -10,8 +10,8 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  ArrowLeft,
   Edit3,
+  ChevronRight,
 } from "lucide-react";
 import Account from "../../../@types/account/Account";
 import { useUserPreference } from "../../../context/user/UserPreference";
@@ -40,23 +40,18 @@ import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link,  useParams } from "react-router-dom";
 import { parseInt } from "lodash";
-// Note this is the type
-// interface AccountDetailsProps {
-//   // company: Account;
-//   // onClose: () => void;
+import { PageLayout } from "../../ui/PageLayout";
+import Button from "../../ui/Button";
 
-//   fetchAccounts: () => Promise<void>;
-// }
 
 const AccountDetails: React.FC = () => {
-  const navigate = useNavigate();
   const {accountId } = useParams();
   const {accountDetails :company, loading } = useAccountDetails(parseInt(accountId!));
 
   useEffect(()=> {
-    if(company){
+    if(company!=null ){
       setFormData(company)
     }
   }, [company])
@@ -862,27 +857,19 @@ const AccountDetails: React.FC = () => {
   }
   
   return (
-    <div
-      className={`${
-        userPreference.isLeftMenu ? "ml-14  mt-5" : " mt-7"
-      }  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-1 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
-    >
+    <PageLayout>
+    <div className="flex items-center  gap-3 mx-2 my-1">
+        <Link to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
+          <Button className="flex caption-custom items-center justify-center hover:text-gray-800">
+            <span>Accounts</span>
+          </Button>
+        </Link>
+            <ChevronRight size={16} />
+        <h1 className="table-header-custom">Account Details</h1>
+      </div>
       <div className="pb-3">
         {/* Header Section */}
         <div className="bg-white rounded-2xl  p-2 mb-1 border">
-          <button
-            className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1   hover:text-indigo-500 hover:border-blue-600"
-            // onClick={onClose}
-            onClick={()=>{
-              navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
-            }}
-          >
-            <ArrowLeft size={14} />{" "}
-            <span className="caption-custom hover:text-blue-700">
-              {" "}
-              Accounts
-            </span>
-          </button>
 
           {/* Main header */}
           <div className="flex items-start justify-between">
@@ -1010,7 +997,7 @@ const AccountDetails: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+      </PageLayout>
   );
 };
 

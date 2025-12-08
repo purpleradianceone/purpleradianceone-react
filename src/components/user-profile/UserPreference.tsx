@@ -349,29 +349,10 @@ const UserPreference = () => {
     }
   };
 
-  // const handleSelectCountryOptionChange = (
-  //   event: ChangeEvent<HTMLSelectElement>
-  // ) => {
-  //   const selectedOptionValue = parseInt(event.target.value, 10);
-
-  //   console.log("this is the value ");
-  //   console.log(selectedOptionValue);
-  //   if (!isNaN(selectedOptionValue)) {
-  //     const country = countries.find(
-  //       (country: Country) => country.id === selectedOptionValue
-  //     );
-  //     setSelectedCountry(country!);
-  //     // setSelectedCountryId(selectedOptionValue);
-  //   }
-  // };
-
   const handleSelectCountryOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   const id = Number(e.target.value);
   const selected = countries.find((c) => c.id === id) || null;
   setSelectedCountry(selected);
-
-  // if needed: show Save button only when changed
-  // setShowSaveLeadButton(selected?.id !== userPreference.countryId);
 };
 
   // Initial load (now triggered by showing the dropdown)

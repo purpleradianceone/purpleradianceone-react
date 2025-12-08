@@ -17,8 +17,6 @@ import CreateAccountCompanyProduct from "./CreateAccountCompanyProduct";
 import AccountProduct from "../../../../@types/account/AccountProduct";
 import AccountCompanyProductPopUpDetails from "./AccountCompanyProductPopUpDetails";
 import AccountCompanyProductAgGrid from "../../../ag-grid/AccountCompanyProductAgGrid";
-// import { Link } from "react-router-dom";
-// import ROUTES_URL from "../../../../constants/Routes";
 
 const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -148,8 +146,6 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
             {/* <Link
             to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
-
-              // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${12}`}
               onClick={(e) => {
                 if (!userHasAccessToUpdateAccount) {
                   e.preventDefault();
@@ -167,17 +163,17 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
               {" "}
               <Button
                 disabled={!userHasAccessToUpdateAccount}
-                // onClick={() => {
-                //   if (userHasAccessToUpdateAccount) {
-                //     setShowCreateAccountCompanyProduct(
-                //       !showCreateAccountCompanyProduct
-                //     );
-                //   } else {
-                //     toast.error(
-                //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
-                //     );
-                //   }
-                // }}
+                onClick={() => {
+                  if (userHasAccessToUpdateAccount) {
+                    setShowCreateAccountCompanyProduct(
+                      !showCreateAccountCompanyProduct
+                    );
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                    );
+                  }
+                }}
                 className={COLORS.ADD_BUTTON}
               >
                 +Add
