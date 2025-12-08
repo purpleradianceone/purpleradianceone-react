@@ -37,12 +37,13 @@ export default function CompanyUserSearchFieldInput({
   isDisabled = false,
   disabledMessage = null,
 }: CompanyUserSearchFieldProps) {
-
   const [query, setQuery] = useState(defaultValue);
   const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
   const [results, setResults] = useState<CompanyUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const [activeIndex, setActiveIndex] = useState(-1); 
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -51,31 +52,28 @@ export default function CompanyUserSearchFieldInput({
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
 
-  // ---------------- PRE-SELECTED TEXT SUPPORT ----------------
+  // ---------------- PRE POPULATE ----------------
   useEffect(() => {
     if (defaultValue && defaultValue.trim().length > 0) {
       setQuery(defaultValue);
 
-      setSelectedUser({
+      const user = {
         id: 0,
         fullname: defaultValue,
         email: "",
-      } as CompanyUser);
+      } as CompanyUser;
 
-      onUserSelected({
-        id: 0,
-        fullname: defaultValue,
-        email: "",
-      } as CompanyUser);
+      setSelectedUser(user);
+      onUserSelected(user);
     }
   }, [defaultValue]);
 
-  // ---------------- DISABLED HANDLER ----------------
+  // ---------------- DISABLED ----------------
   const handleDisabled = () => {
     toast.error(disabledMessage || "You are not authorised");
   };
 
-  // ---------------- API SEARCH ----------------
+  // ---------------- SEARCH API ----------------
   const fetchUsers = async (searchText: string) => {
     if (!searchText.trim() || searchText.trim().length < 2 || isDisabled) {
       setResults([]);
@@ -94,6 +92,7 @@ export default function CompanyUserSearchFieldInput({
 
       if (response?.status === STATUS_CODE.OK) {
         setResults(response.data || []);
+        setActiveIndex(0); // set first as active
       } else {
         setResults([]);
       }
@@ -104,7 +103,6 @@ export default function CompanyUserSearchFieldInput({
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((txt: string) => fetchUsers(txt), 300),
     [isDisabled]
@@ -114,9 +112,9 @@ export default function CompanyUserSearchFieldInput({
     if (isDisabled) return;
 
     if (query && !selectedUser) {
-      if(query !== defaultValue){
-      debouncedSearch(query);
-      setShowDropdown(true);
+      if (query !== defaultValue) {
+        debouncedSearch(query);
+        setShowDropdown(true);
       }
     }
   }, [query, selectedUser, debouncedSearch, isDisabled]);
@@ -160,7 +158,7 @@ export default function CompanyUserSearchFieldInput({
     onUserSelected(user);
   };
 
-  // ---------------- CLEAR FIELD ----------------
+  // ---------------- CLEAR ----------------
   const clearSelected = () => {
     if (isDisabled) return handleDisabled();
 
@@ -171,7 +169,7 @@ export default function CompanyUserSearchFieldInput({
     onUserSelected(null);
   };
 
-  // ---------------- CLICK OUTSIDE ----------------
+  //Outside check
   useEffect(() => {
     const handleOutside = (event: MouseEvent) => {
       if (
@@ -187,23 +185,61 @@ export default function CompanyUserSearchFieldInput({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
+  //Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || results.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => Math.min(prev + 1, results.length - 1));
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((prev) => Math.max(prev - 1, 0));
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && results[activeIndex]) {
+        handleSelect(results[activeIndex]);
+      }
+    }
+
+    if (e.key === "Escape") {
+      setShowDropdown(false);
+    }
+  };
+
+  // Auto-scroll active item into view
+  useEffect(() => {
+    if (!dropdownRef.current) return;
+
+    const activeItem = dropdownRef.current.querySelector(".active-item");
+    if (activeItem) {
+      (activeItem as HTMLElement).scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [activeIndex]);
+
   return (
     <div className="mt-0 w-full relative">
-
-      {/* Label */}
       <label className="flex items-center input-label-custom">
         {Icon && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR} />}
+
         {label}
         {required && <span className="caption-custom-inactive align-top">*</span>}
       </label>
 
-      {/* Input */}
       <div className="mt-1 relative w-full">
         <input
           ref={inputRef}
           type="text"
           readOnly={readOnly || isDisabled}
           value={query}
+          onKeyDown={handleKeyDown} 
           onChange={(e) => {
             if (isDisabled) return handleDisabled();
             setQuery(e.target.value);
@@ -225,7 +261,6 @@ export default function CompanyUserSearchFieldInput({
           }
         />
 
-        {/* Clear */}
         {query && !readOnly && !isDisabled && (
           <button
             onClick={clearSelected}
@@ -235,7 +270,6 @@ export default function CompanyUserSearchFieldInput({
           </button>
         )}
 
-        {/* Search icon */}
         {!readOnly && !isDisabled && (
           <Search
             className={`absolute ${query ? "right-8" : "right-3"} top-2 text-gray-400`}
@@ -244,8 +278,10 @@ export default function CompanyUserSearchFieldInput({
         )}
       </div>
 
-      {/* Dropdown Portal */}
-      {showDropdown && !readOnly && !isDisabled &&
+      {/* Dropdown */}
+      {showDropdown &&
+        !readOnly &&
+        !isDisabled &&
         createPortal(
           <div
             ref={dropdownRef}
@@ -255,18 +291,24 @@ export default function CompanyUserSearchFieldInput({
             {isLoading ? (
               <div className="p-2 table-header-custom">Searching...</div>
             ) : results.length > 0 ? (
-              results.map((user) => (
+              results.map((user, index) => (
                 <div
                   key={user.id}
                   onMouseDown={() => handleSelect(user)}
-                  className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+                  className={`px-2 py-1 cursor-pointer 
+                  ${
+                    index === activeIndex
+                      ? "bg-blue-100 active-item"
+                      : "hover:bg-gray-100"
+                  }`}
                 >
                   <div className="table-header-custom">{user.fullname}</div>
                   <div className="caption-custom">{user.email}</div>
                 </div>
               ))
             ) : (
-              query.length >= 2 && query !== defaultValue && (
+              query.length >= 2 &&
+              query !== defaultValue && (
                 <div className="p-2 table-header-custom">No users found</div>
               )
             )}
@@ -274,7 +316,6 @@ export default function CompanyUserSearchFieldInput({
           document.body
         )}
 
-      {/* Error */}
       {error && <div className="mt-0 ml-0.5 caption-custom-inactive">{error}</div>}
     </div>
   );

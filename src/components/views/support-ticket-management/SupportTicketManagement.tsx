@@ -142,6 +142,7 @@ function SupportTicketManagement({
             id: item.id,
             companyId: item.company_id,
             accountName : item.account_name,
+            companyProductId : item.company_product_id,
             companyProductName : item.company_product_name,
             accountCompanyProductId: item.account_company_product_id,
             supportTicketCategoryId: item.support_ticket_category_id,
