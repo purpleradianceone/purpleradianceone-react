@@ -4,7 +4,6 @@ import {
   Calendar,
   ClipboardList,
   Clock,
-  Contact,
   Contact2,
   FileText,
   FileTextIcon,
@@ -13,7 +12,7 @@ import {
   TargetIcon,
   Text,
   User,
-  UserPlus,
+  
   Users,
   X,
 } from "lucide-react";
@@ -363,28 +362,58 @@ function CreateLeadTaskModal({
           {leadActivityId !== 3 &&
             leadActivityId !== 8 &&
             leadActivityId !== 0 && (
-              <div className="flex items-center gap-4  mb-0">
-                <label htmlFor="phoneCallBtn" className="input-label-custom">
-                  <div className="flex gap-2">
-                    <Contact2 className="text-blue-600 mt-0.5" size={16} />
-                    <span>Lead Contact :</span>
-                  </div>
-                </label>
-                <div id="phoneCallBtn" className=" max-w-32 m-0">
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsAddCompanyLeadContactModalOpen(true);
-                    }}
-                  >
-                    <span className="flex gap-1 text-nowrap ">
-                      <Contact size={14}></Contact>
-                      {/* <span>lead contact</span> */}
-                    </span>
-                  </Button>
+              // <div className="flex items-center gap-4  mb-0">
+              //   <label htmlFor="phoneCallBtn" className="input-label-custom">
+              //     <div className="flex gap-2">
+              //       <Contact2 className="text-blue-600 mt-0.5" size={16} />
+              //       <span>Lead Contact :</span>
+              //     </div>
+              //   </label>
+              //   <div id="phoneCallBtn" className=" max-w-32 m-0">
+              //     <Button
+              //       type="submit"
+              //       onClick={(e) => {
+              //         e.preventDefault();
+              //         setIsAddCompanyLeadContactModalOpen(true);
+              //       }}
+              //     >
+              //       <span className="flex gap-1 text-nowrap ">
+              //         <Contact size={14}></Contact>
+              //         {/* <span>lead contact</span> */}
+              //       </span>
+              //     </Button>
+              //   </div>
+              // </div>
+              // Select lead contact
+            <div className="flex items-center  justify-start gap-2   mb-0">
+              <label
+                // htmlFor="phoneCallBtn"
+                className="block input-label-custom"
+              >
+                <div className="flex gap-1">
+                  <Contact2 className="text-blue-600 mt-0.5" size={16} />
+                  <span>Lead Contact:</span>
                 </div>
+              </label>
+              <div 
+              // id="phoneCallBtn" 
+              className="mb-1   ">
+                <Button
+                  className="bg-white text-blue-800 "
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsAddCompanyLeadContactModalOpen(true);
+                  }}
+                >
+                  <span className="text-xs text-blue-500  text-nowrap underline ">
+                   {leadContactDataSelectedArray.length ===0 ?  "Select" : "Select/Change"} 
+                    {/* <Contact size={14}></Contact> */}
+                    {/* <span>lead contact</span> */}
+                  </span>
+                </Button>
               </div>
+            </div>
             )}
           {leadActivityId === 3 && (
             <div className="col-span-3">
@@ -405,10 +434,10 @@ function CreateLeadTaskModal({
         )} */}
         {leadContactDataSelectedArray.length != 0 && (
           <div className="border  rounded-md">
-          <div className="grid grid-cols-3 p-1 input-label-custom">
-            Selected Lead Contacts :
+          <div className=" p-1 table-header-custom">
+            Selected Contacts :
           </div>
-          <div className=" grid grid-cols-3 p-2  max-h-36 gap-0.5 overflow-y-auto">
+          <div className=" grid grid-cols-3 p-1  max-h-36 gap-0.5 overflow-y-auto">
             {leadContactDataSelectedArray.map((contact) => (
               <div
               key={contact.id}
@@ -547,14 +576,14 @@ function CreateLeadTaskModal({
               </div>
             </div> */}
 
-        <div className="flex items-center gap-4  mb-0">
+        <div className="flex items-center gap-2  mb-0">
           <label htmlFor="assignUsersBtn" className="input-label-custom">
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <User className="text-blue-600 mt-0.5" size={16} />
               <span>Assign Users : </span>
             </div>
           </label>
-          <div id="assignUsersBtn" className=" max-w-32 m-0">
+          <div id="assignUsersBtn" className=" mb-1">
             {/* <Button
 
                     type="submit"
@@ -570,28 +599,34 @@ function CreateLeadTaskModal({
                   </Button> */}
             <Button
               type="submit"
+               className="bg-white text-blue-800 "
               onClick={(e) => {
                 e.preventDefault();
                 setIsAssignUsersModalOpen(true);
               }}
             >
-              <span
+              {/* <span
                 title="Assign user to this task"
                 className="flex  text-center text-nowrap"
               >
                 <span className="flex gap-0.5 justify-center">
                   <UserPlus size={12} className="mt-0.5"></UserPlus>
                   {/* <span>Assign Users</span> */}
-                </span>
-              </span>
+                {/* </span> */}
+              {/* </span> */} 
+              <span className="text-xs text-blue-500  text-nowrap underline ">
+                   {selectedCompanyUsers.length ===0 ?  "Select" : "Select/Change"} 
+                    {/* <Contact size={14}></Contact> */}
+                    {/* <span>lead contact</span> */}
+                  </span>
             </Button>
           </div>
         </div>
 
         {selectedCompanyUsers.length != 0 && (
-          <div className="">
-            <span className="caption-custom">Currently assigned users:</span>
-            <div className=" grid grid-cols-3 max-h-36 gap-0.5 overflow-y-auto">
+          <div className="border rounded-md">
+            <span className="p-1 table-header-custom">Currently Assigned Users:</span>
+            <div className=" grid grid-cols-3 p-1 max-h-36 gap-0.5 overflow-y-auto">
               {selectedCompanyUsers.map((user) => (
                 <div
                   key={user.id}

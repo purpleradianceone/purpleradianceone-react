@@ -64,6 +64,7 @@ import SupportTicketManagement from "../../components/views/support-ticket-manag
 import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
 import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
 import AccountDetails from "../../components/modals/Account/AccountDetails";
+import { PageLayout } from "../../components/ui/PageLayout";
 
 export const router = createBrowserRouter([
   {
@@ -633,13 +634,15 @@ export const router = createBrowserRouter([
   },
 
   {
-    path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:account_id`,
+    path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:accountId`,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
             <Navbar>
+              <PageLayout>
             <CreateMultipleAccountCompanyProduct/>
+              </PageLayout>
             </Navbar>
           </div>
         </PrivateRoute>

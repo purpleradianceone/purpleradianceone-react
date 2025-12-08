@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import Account from "../../@types/account/Account";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useAccountDetails = (accountId: number) => {
     const { loginStatus } = useLoggedInUserContext();
@@ -25,7 +25,7 @@ export const useAccountDetails = (accountId: number) => {
         };
 
         try {
-            const response = await axios.post(POST_API.GET_ACCOUNT, postData, {
+            const response = await axiosClient.post(POST_API.GET_ACCOUNT, postData, {
                 withCredentials: true,
             });
 
