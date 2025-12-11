@@ -12,7 +12,7 @@ type SupportTicketHistory = {
     support_ticket_source_id: number;
     support_ticket_source_name: string;
     query_description: string;
-    public_note: string;
+    public_notes: string;
     resolution_applied: string;
     assignedto: number;
     assignedto_name: string;

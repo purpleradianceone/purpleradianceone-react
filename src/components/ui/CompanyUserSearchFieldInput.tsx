@@ -233,7 +233,7 @@ export default function CompanyUserSearchFieldInput({
         {required && <span className="caption-custom-inactive align-top">*</span>}
       </label>
 
-      <div className="mt-1 relative w-full">
+      <div className="relative w-full">
         <input
           ref={inputRef}
           type="text"
@@ -254,17 +254,17 @@ export default function CompanyUserSearchFieldInput({
           placeholder={placeholder}
           className={
             isDisabled
-              ? "appearance-none block w-full px-3 py-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
+              ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
-              ? "appearance-none block w-full px-3 py-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
-              : "appearance-none block w-full px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
+              : "appearance-none block w-full px-3 pb-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           }
         />
 
         {query && !readOnly && !isDisabled && (
           <button
             onClick={clearSelected}
-            className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+            className="absolute right-2 top-1.5 text-gray-400 hover:text-gray-600"
           >
             <X size={16} />
           </button>
@@ -272,7 +272,7 @@ export default function CompanyUserSearchFieldInput({
 
         {!readOnly && !isDisabled && (
           <Search
-            className={`absolute ${query ? "right-8" : "right-3"} top-2 text-gray-400`}
+            className={`absolute ${query ? "right-8" : "right-3"} top-1.5 text-gray-400`}
             size={16}
           />
         )}
