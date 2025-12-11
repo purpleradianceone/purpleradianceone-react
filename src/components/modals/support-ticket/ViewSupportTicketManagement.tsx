@@ -1,5 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit3, HeadsetIcon, History, ShoppingBag } from "lucide-react";
+import {
+  Edit3,
+  HeadsetIcon,
+  History,
+  Hourglass,
+  ListTree,
+  LucideText,
+  ShoppingBag,
+  StickyNote,
+  TrendingUp,
+  User,
+  Wrench,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useUserPreference } from "../../../context/user/UserPreference";
@@ -22,9 +34,12 @@ import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import SupportTicketHistoryView from "./SupportTicketHistoryView";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
-import FormInput from "../../ui/FormInput";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
+import { SupportTicketLIfecycleChangeModal } from "./SupportTicketLifecycleChangeModal";
+import TextAreaInput from "../../ui/TextAreaInput";
+import { useSupportTicketEscalationLevel } from "../../../config/hooks/useSupportTicketEscalationLevel";
+import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
 
 const ViewSupportTicketManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -41,9 +56,17 @@ const ViewSupportTicketManagement = () => {
     number | undefined
   >();
   const [
+    selectedSupportTicketEscalationId,
+    setSelectedSupportTicketEscalationId,
+  ] = useState<number | undefined>();
+  const [
     selectedSupportTicketLifecycleId,
     setSelectedSupportTicketLifecycleId,
-  ] = useState<number | null>(null);
+  ] = useState<number | undefined>(undefined);
+  const [
+    selectedSupportTicketLifecycleName,
+    setSelectedSupportTicketLifecycleName,
+  ] = useState<string | undefined>(undefined);
 
   const navigate = useNavigate();
   const {
@@ -54,13 +77,30 @@ const ViewSupportTicketManagement = () => {
   const {
     companyProductSla,
     loading: isLoadingForCompanyProductSla,
-    refetch: refetchCompanyProductSla,
+    // refetch: refetchCompanyProductSla,
   } = useCompanyProductSla(selectedSupportTicket.companyProductId);
+
+  const {
+    supportTicketCAtegory,
+    isLoading: isLoadingForSupportTicketCategory,
+  } = useSupportTicketCategory();
+
+  const {
+    supportTickeEscalationLevel,
+    isLoading: isLoadingForSupportTicketEscalationLevel,
+  } = useSupportTicketEscalationLevel();
 
   const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
     useState<boolean>(false);
 
-  const handleSaveSupportTicketLifecycleUpdate = async () => {
+  const [isLoadingForLifecycleChanging, setIsLoadingForLifecycleChanging] =
+    useState<boolean>(false);
+
+  const handleSaveSupportTicketLifecycleUpdate = async (
+    lifecycleFormData: any
+  ) => {
+    setIsLoadingForLifecycleChanging(true);
+    // console.log(lifecycleFormData);
     if (!selectedSupportTicket || selectedSupportTicketLifecycleId === null)
       return;
 
@@ -69,7 +109,11 @@ const ViewSupportTicketManagement = () => {
       id: selectedSupportTicket.id,
       company_product_sla_id: selectedCompanyProductSla,
       support_ticket_lifecycle_id: selectedSupportTicketLifecycleId,
+      query_description: lifecycleFormData.queryDescription,
+      public_notes: lifecycleFormData.publicNotes,
+      resolution_applied: lifecycleFormData.resolutionApplied,
       updatedby_id: loginStatus.id,
+      selectedSupportTicketEscalationId: selectedSupportTicketEscalationId
     };
 
     try {
@@ -88,7 +132,9 @@ const ViewSupportTicketManagement = () => {
             searchParams.get("supportTicketData") || "{}"
           );
           parsedQuery.supportTicketLifecycleId =
-            selectedSupportTicketLifecycleId.toString();
+            selectedSupportTicketLifecycleId
+              ? selectedSupportTicketLifecycleId.toString()
+              : null;
           parsedQuery.supportTicketLifecycleName =
             updatedStatusName!.toString();
           const newQueryString = qs.stringify({
@@ -99,8 +145,12 @@ const ViewSupportTicketManagement = () => {
             ...prev,
             supportTicketLifecycleName: updatedStatusName,
             supportTicketLifecycleId: selectedSupportTicketLifecycleId,
+            queryDescription: lifecycleFormData.queryDescription,
+            publicNotes: lifecycleFormData.publicNotes,
           }));
-          setSelectedSupportTicketLifecycleId(null);
+
+          setSelectedSupportTicketLifecycleId(undefined);
+          setSelectedSupportTicketLifecycleName(undefined);
 
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
@@ -115,16 +165,9 @@ const ViewSupportTicketManagement = () => {
         toast.error(error.response?.data);
       }
     } finally {
-      //
+      setIsLoadingForLifecycleChanging(false);
     }
   };
-  useEffect(() => {
-    refetchCompanyProductSla();
-    console.log("company product id" + selectedSupportTicket.companyProductId);
-    console.log(
-      "company product id 2" + selectedSupportTicket.company_product_id
-    );
-  }, [selectedSupportTicket.companyProductSlaId]);
 
   // const handleClickLeadOwnerChange = () => {
   //   // setIsLeadOwnerPopUpOpen(true);
@@ -193,6 +236,14 @@ const ViewSupportTicketManagement = () => {
     // }
   };
 
+  function handleFormDataChange(e: any) {
+    const { name, value } = e.target;
+
+    setSelectedSupportTicket((prev: any) => {
+      return { ...prev, [name]: value };
+    });
+  }
+
   return (
     <div
       className={`fixed top-8 inset-0 z-10 bg-white ${
@@ -218,6 +269,7 @@ const ViewSupportTicketManagement = () => {
               <span>back</span>
             </button>
           </div>
+          <div>abc</div>
         </div>
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
@@ -250,8 +302,14 @@ const ViewSupportTicketManagement = () => {
                     }}
                     onClick={async () => {
                       if (userHasAccessToUpdateSupportTicket) {
-                        setSelectedSupportTicketLifecycleId(item.id);
-                        await handleSaveSupportTicketLifecycleUpdate();
+                        if (
+                          selectedSupportTicket.supportTicketLifecycleId !==
+                          item.id
+                        ) {
+                          setSelectedSupportTicketLifecycleId(item.id);
+                          setSelectedSupportTicketLifecycleName(item.name);
+                        }
+                        /////////////////////////////////////////////////////////////////////////////////////
                       } else {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
@@ -317,195 +375,293 @@ const ViewSupportTicketManagement = () => {
 
         {/**Sections */}
         <div className="w-full flex flex-col gap-1 p-2">
-          {/* Column 1 */}
-          <div className="w-full md:w-[99hv] flex flex-col gap-2">
-            {/* Support Ticket Basic Info */}
-            <div className=" flex shadow-sm border rounded-sm p-1  ">
-              <div className="grid grid-cols-2 gap-2  ">
-                <div className=" flex items-center gap-3 col-span-3  ">
-                  <div className="bg-blue-600 p-2 rounded text-white">
-                    <HeadsetIcon size={30} />
-                  </div>
-                  <div className="table-header-custom">
-                    <Detail
-                      label="Account"
-                      hasBorder={false}
-                      type={"none"}
-                      value={selectedSupportTicket?.accountName}
-                    />
-                  </div>
+          {/* First Column */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex w-full gap-4">
+              {/* Account */}
+              <div className="flex items-center gap-3 w-fit">
+                <div className="bg-blue-600 p-2 rounded text-white">
+                  <HeadsetIcon size={30} strokeWidth={3} />
                 </div>
-                <div className=" flex items-center gap-3 col-span-3  ">
-                  <div className="bg-blue-600  p-2 rounded text-white">
-                    <ShoppingBag size={30} />
-                  </div>
-                  <div className="table-header-custom">
-                    <Detail
-                      label="Support Product"
-                      hasBorder={false}
-                      type={"none"}
-                      value={selectedSupportTicket?.companyProductName}
+                <div className="table-header-custom w-full">
+                  <Detail
+                    label="Account"
+                    hasBorder={false}
+                    type={"none"}
+                    value={selectedSupportTicket?.accountName}
+                  />
+                </div>
+              </div>
+
+              {/* Product */}
+              <div className="flex items-center gap-3 w-fit">
+                <div className="bg-blue-600 p-2 rounded text-white">
+                  <ShoppingBag size={30} strokeWidth={3} />
+                </div>
+                <div className="table-header-custom w-full">
+                  <Detail
+                    label="Support Product"
+                    hasBorder={false}
+                    type={"none"}
+                    value={selectedSupportTicket?.companyProductName}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Support Ticket Basic Info */}
+            <div className="flex shadow-sm border rounded-sm p-1 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Assign To */}
+                  <div className="flex relative w-full">
+                    <CompanyUserSearchFieldInput
+                      logo={User}
+                      label="Assign To"
+                      placeholder={selectedSupportTicket.assignedToName}
+                      defaultValue={selectedSupportTicket.assignedToName}
+                      onUserSelected={(user) => {
+                        if (user) {
+                          // setSelectedCompanyUser(user);
+                        }
+                      }}
+                      isDisabled={!userHasAccessToUpdateSupportTicket}
+                      disabledMessage={
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
+                      }
                     />
                   </div>
+
+                  {/** Ticket Category */}
+                  {isLoadingForSupportTicketCategory ? (
+                    <div className="flex flex-col gap-1 w-full animate-pulse">
+                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-9 w-full bg-gray-200 rounded"></div>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <CustomDropdown
+                        logo={ListTree}
+                        labelName="Ticket Category"
+                        options={supportTicketCAtegory}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketCategoryId
+                        }
+                        onSelect={(value) => {
+                          setSelectedCompanyProductSla(value);
+
+                          const result = companyProductSla?.find(
+                            (item) => item.id === value
+                          );
+
+                          setSelectedSupportTicket({
+                            ...selectedSupportTicket,
+                            supportTicketCategoryName: result?.name,
+                            supportTicketCategoryId: value,
+                          });
+
+                          handleLeadInfoSave();
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Product SLA */}
+                  {isLoadingForCompanyProductSla ? (
+                    <div className="flex flex-col gap-1 w-full animate-pulse">
+                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-9 w-full bg-gray-200 rounded"></div>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <CustomDropdown
+                        logo={Hourglass}
+                        labelName="Product SLA"
+                        options={companyProductSla}
+                        preselectedOption={
+                          selectedSupportTicket?.companyProductSlaId
+                        }
+                        onSelect={(value) => {
+                          setSelectedCompanyProductSla(value);
+
+                          const result = companyProductSla?.find(
+                            (item) => item.id === value
+                          );
+
+                          setSelectedSupportTicket({
+                            ...selectedSupportTicket,
+                            companyProductSlaName: result?.name,
+                            companyProductSlaId: value,
+                          });
+
+                          handleLeadInfoSave();
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/**Escalation Level */}
+                  {isLoadingForSupportTicketEscalationLevel ? (
+                    <div className="flex flex-col gap-1 w-full animate-pulse">
+                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-9 w-full bg-gray-200 rounded"></div>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <CustomDropdown
+                        logo={TrendingUp}
+                        labelName="Escalation Level"
+                        options={supportTickeEscalationLevel}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketEscalationLevelId
+                        }
+                        onSelect={(value) => {
+                          setSelectedSupportTicketEscalationId(value);
+
+                          const result = supportTickeEscalationLevel?.find(
+                            (item) => item.id === value
+                          );
+
+                          setSelectedSupportTicket({
+                            ...selectedSupportTicket,
+                            supportTicketEscalationLevelName: result?.name,
+                            supportTicketEscalationLevelId: value,
+                          });
+
+                          handleLeadInfoSave();
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
+                <div className="grid grid-cols-1 pt-2">
+                  <div>
+                    <div className="w-full">
+                      <Detail
+                        type="none"
+                        label="Resolved By"
+                        value={selectedSupportTicket?.resolvedByName || "Not resolved"}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-3">
+                    {/* Created By */}
+                    <div className="w-full">
+                      <Detail
+                        type="none"
+                        label="Created By"
+                        value={selectedSupportTicket?.createdBy}
+                      />
+                    </div>
+
+                    {/* Created On */}
+                    <div className="w-full">
+                      <Detail
+                        type="none"
+                        label="Created On"
+                        value={selectedSupportTicket?.createdOn}
+                      />
+                    </div>
+
+                    {/* Updated By */}
+                    <div className="w-full">
+                      <Detail
+                        type="none"
+                        label="Updated By"
+                        value={selectedSupportTicket?.updatedBy}
+                      />
+                    </div>
+
+                    {/* Updated On */}
+                    <div className="w-full">
+                      <Detail
+                        type="none"
+                        label="Updated On"
+                        value={selectedSupportTicket?.updatedOn}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* Query Description */}
                 <div
                   onClick={() => {
                     if (!userHasAccessToUpdateSupportTicket) {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
                       );
                     }
                   }}
-                  title={
-                    userHasAccessToUpdateSupportTicket
-                      ? ""
-                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
-                  }
                 >
-                  <Detail
-                    // hasBorder={true}
-                    label="Public Note"
-                    type={userHasAccessToUpdateSupportTicket ? "text" : "none"}
-                    value={selectedSupportTicket?.publicNotes}
-                    onChange={(e) => {
-                      setSelectedSupportTicket({
-                        ...selectedSupportTicket,
-                        publicNotes: e.target.value.trim(),
-                      });
-                    }}
-                    handleSupportTicketInfoSave={handleLeadInfoSave}
-                    rows={7}
+                  <TextAreaInput
+                    logo={LucideText}
+                    label="Query Description"
+                    name="queryDescription"
+                    defaultValue={selectedSupportTicket?.queryDescription}
+                    onChange={handleFormDataChange}
+                    readonly={!userHasAccessToUpdateSupportTicket}
+                    disabled={!userHasAccessToUpdateSupportTicket}
+                    rows={3}
+                    cols={0}
                   />
                 </div>
 
-                {/* <div
-                  className="ml-4"
+                {/* Public Notes */}
+                <div
                   onClick={() => {
                     if (!userHasAccessToUpdateSupportTicket) {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
                       );
                     }
                   }}
-                  title={
-                    userHasAccessToUpdateSupportTicket
-                      ? ""
-                      : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
-                  }
                 >
-                  <Detail
-                    label="Product SLA"
-                    // hasBorder={true}
-                    type={userHasAccessToUpdateSupportTicket ? "text" : "none"}
-                    value={selectedSupportTicket?.companyProductSlaName}
-                    onChange={(e) => {
-                      setSelectedSupportTicket({
-                        ...selectedSupportTicket,
-                        companyProductSlaName: e.target.value,
-                      });
-                    }}
-                    handleSupportTicketInfoSave={handleLeadInfoSave}
+                  <TextAreaInput
+                    logo={StickyNote}
+                    label="Public Notes"
+                    name="publicNotes"
+                    defaultValue={selectedSupportTicket?.publicNotes}
+                    onChange={handleFormDataChange}
+                    readonly={!userHasAccessToUpdateSupportTicket}
+                    disabled={!userHasAccessToUpdateSupportTicket}
+                    rows={3}
+                    cols={0}
                   />
-                </div> */}
-                <div className="flex relative ">
-                  <CompanyUserSearchFieldInput
-                    label="Assign To"
-                    placeholder={selectedSupportTicket.assignedToName}
-                    defaultValue={selectedSupportTicket.assignedToName}
-                    onUserSelected={(user) => {
-                      if (user) {
-                        // setSelectedCompanyUser(user);
-                      }
-                    }}
-                    isDisabled={!userHasAccessToUpdateSupportTicket}
-                    disabledMessage={
-                      MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                        .UPDATE_ACCESS_DENIED_MESSAGE
+                </div>
+
+                {/* Resolution */}
+                <div
+                  onClick={() => {
+                    if (!userHasAccessToUpdateSupportTicket) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
+                      );
                     }
-                  />
-                </div>
-                <div>
-                  <div>
-                    <FormInput
-                      label="Query Description"
-                      defaultValue={selectedSupportTicket?.queryDescription}
-                      value={selectedSupportTicket.queryDescription}
-                      maxLength={5}
-                    />
-                  </div>
-                </div>
-                {isLoadingForCompanyProductSla ? (
-                  <div className="flex flex-col gap-1 w-full animate-pulse">
-                    {/* Label skeleton */}
-                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
-
-                    {/* Input skeleton */}
-                    <div className="h-9 w-full bg-gray-200 rounded"></div>
-                  </div>
-                ) : (
-                  <div>
-                    <CustomDropdown
-                      labelName="Product SLA"
-                      options={companyProductSla}
-                      preselectedOption={
-                        selectedSupportTicket?.companyProductSlaId
-                      }
-                      onSelect={(value) => {
-                        setSelectedCompanyProductSla(value);
-                        const result = companyProductSla?.find(item => item.id === 1);
-                        setSelectedSupportTicket({
-                          ...selectedSupportTicket,
-                          companyProductSlaName: result?.name,
-                        });
-                        setSelectedSupportTicket({
-                          ...selectedSupportTicket,
-                          companyProductSlaId: value
-                        });
-
-                        handleLeadInfoSave();
-
-                      }}
-                    />
-                  </div>
-                )}
-                <div>
-                  <Detail
-                    type="none"
-                    label="Created on"
-                    value={selectedSupportTicket?.createdOn}
-                  />
-                </div>
-                <div className="ml-4">
-                  <Detail
-                    type="none"
-                    label="Created by"
-                    value={selectedSupportTicket?.createdBy}
-                  />
-                </div>
-                <div>
-                  <Detail
-                    type="none"
-                    label="Updated By"
-                    value={selectedSupportTicket?.updatedBy}
-                  />
-                </div>
-                <div>
-                  <Detail
-                    type="none"
-                    label="Updated On"
-                    value={selectedSupportTicket?.updatedOn}
+                  }}
+                >
+                  <TextAreaInput
+                    logo={Wrench}
+                    label="Resolution Applied"
+                    name="resolutionApplied"
+                    defaultValue={selectedSupportTicket?.resolutionApplied}
+                    onChange={(e) => {
+                      if (userHasAccessToUpdateSupportTicket)
+                        handleFormDataChange(e);
+                    }}
+                    readonly={!userHasAccessToUpdateSupportTicket}
+                    disabled={!userHasAccessToUpdateSupportTicket}
+                    rows={3}
+                    cols={0}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/**Second column*/}
+          {/* Second Column */}
           <div>second column</div>
         </div>
 
@@ -516,6 +672,21 @@ const ViewSupportTicketManagement = () => {
             isOpen={isOpenLeadStatusHistory}
             onClose={() => {
               setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+            }}
+          />
+        )}
+
+        {selectedSupportTicketLifecycleId && (
+          <SupportTicketLIfecycleChangeModal
+            isLoading={isLoadingForLifecycleChanging}
+            previousSupportTicketStatus={selectedSupportTicket}
+            selectedSupportTicketLifecycleName={
+              selectedSupportTicketLifecycleName
+            }
+            handleSubmit={handleSaveSupportTicketLifecycleUpdate}
+            onClose={() => {
+              setSelectedSupportTicketLifecycleId(undefined);
+              setSelectedSupportTicketLifecycleName(undefined);
             }}
           />
         )}
@@ -673,9 +844,9 @@ const Detail: React.FC<DetailProps> = ({
             {value ? (
               <span
                 className={`${
-                  ["Lead source", "Created by", "Created on"].includes(label)
+                  ["Updated By", "Updated On", "Created By", "Created On"].includes(label)
                     ? ""
-                    : "border border-gray-200 rounded-md px-1"
+                    : "border border-gray-200 rounded-md px-1 py-0.5"
                 }`}
               >
                 {value}
@@ -683,12 +854,12 @@ const Detail: React.FC<DetailProps> = ({
             ) : (
               <span
                 className={`${
-                  ["Lead source", "Created by", "Created on"].includes(label)
+                  ["Updated By","Updated On", "Created By", "Created On"].includes(label)
                     ? ""
                     : "border border-gray-200 rounded-md"
                 } caption-custom px-1`}
               >
-                {["Lead source", "Created by", "Created on"].includes(label)
+                {["Updated By", "Created By", "Created On"].includes(label)
                   ? "Data not found"
                   : "Add here..."}
               </span>

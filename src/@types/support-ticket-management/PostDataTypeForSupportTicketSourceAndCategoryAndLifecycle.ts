@@ -3,6 +3,7 @@ type PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle={
     id: number | null,
     name?: string |null,
     description?: string | null,
+    weight?: number | null,
     isactive: boolean,
     requestedby?: number
 }

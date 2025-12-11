@@ -5,32 +5,31 @@ import POST_API from "../../constants/PostApi";
 import { useEffect, useState } from "react";
 import PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle from "../../@types/support-ticket-management/PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle";
 import axiosClient from "../../axios-client/AxiosClient";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
-export const useSupportTicketCategory = () => {
+export const useSupportTicketEscalationLevel = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const [supportTicketCAtegory, setSupportTicketCAtegory] = useState<
+  const [supportTickeEscalationLevel, setSupportTicketEscalationLevel] = useState<
     PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const getSupportTicketCategory = async () => {
+  const getSupportTicketEscalationLevel = async () => {
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
       name: null,
-      description: null,
       isactive: true,
       requestedby: loginStatus.id,
     };
 
     await axiosClient
-      .post(POST_API.GET_SUPPORT_TICKET_CATEGORY, postData, {
+      .post(POST_API.GET_SUPPORT_TICKET_ESCALATION_LEVEL, postData, {
         withCredentials: true,
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setSupportTicketCAtegory(response.data);
+          setSupportTicketEscalationLevel(response.data);
           setIsLoading(false);
         }
       })
@@ -43,11 +42,12 @@ export const useSupportTicketCategory = () => {
   };
 
   useEffect(() => {
-    getSupportTicketCategory();
+    getSupportTicketEscalationLevel();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     isLoading,
-    supportTicketCAtegory,
+    supportTickeEscalationLevel,
   };
 };

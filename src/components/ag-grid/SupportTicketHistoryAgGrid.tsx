@@ -42,7 +42,7 @@ const SupportTicketHistoryAgGrid: React.FC<{
         hide: false,
       },
       {
-        field: "public_note",
+        field: "public_notes",
         headerName: "Public Note",
         hide: false,
 

@@ -169,7 +169,7 @@ function SupportTicketManagementList({
         } pr-1 gap-1`}
       >
         {/* sticky */}
-        <div
+        {/* <div
           className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-fit`}
         >
           {isUsedInSupportTicketModule && (
@@ -190,7 +190,6 @@ function SupportTicketManagementList({
                 isCustomDateOptionSelected ? "" : "px-4"
               } justify-center items-center`}
             >
-              {/* search box flex div */}
               <div
                 className={`relative flex items-start ${
                   isCustomDateOptionSelected ? "w-36 left-1" : "w-64"
@@ -205,7 +204,6 @@ function SupportTicketManagementList({
                 ></SearchInput>
               </div>
 
-              {/* Date FIlters Dropdown */}
               <div
                 className={`flex flex-wrap gap-0.5 ${
                   isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
@@ -222,7 +220,6 @@ function SupportTicketManagementList({
                     ></DateRangeFilterDropdown>
                   </div>
                 </div>
-                {/* Custom Date Picker Div Flex Box*/}
                 {
                   <div
                     style={
@@ -433,6 +430,256 @@ function SupportTicketManagementList({
               </Button>
             </div>
           )}
+        </div> */}
+
+        {/* sticky */}
+        <div
+          className={`
+    z-10 top-12 mt-1 p-1
+    flex flex-wrap items-center justify-between 
+    gap-3 text-sm 
+    ${COLORS.GRID_HEADER_SECTION_BG_COLOR}
+    rounded-lg shadow-sm mb-1.5 
+    w-full
+  `}
+        >
+          {/* LEFT SECTION - Support Label */}
+          {isUsedInSupportTicketModule && (
+            <div className="flex gap-2 items-center">
+              {!isSmallScreen && (
+                <Headset className={`${isCustomDateOptionSelected?"w-6 h-6 text-blue-600":COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `} />
+              )}
+
+              {((isMediumScreen || isLargeScreen) && !isCustomDateOptionSelected) && (
+                <span className={`${isCustomDateOptionSelected?"text-xs":"section-header-custom"} `}>Support</span>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2 w-fit">
+            {/* Search Box */}
+            <div
+              className={`relative flex items-start ${
+                isCustomDateOptionSelected ? "w-32 sm:w-40" : "w-40 sm:w-64"
+              }`}
+            >
+              <SearchInput
+                onChange={(e) => {
+                  handleSearchOption.handleSearchParameterChange(
+                    e.target.value
+                  );
+                }}
+              />
+            </div>
+            {/* DATE FILTERS */}
+            <div className="flex flex-wrap items-center gap-2 w-fit">
+              <div className="flex items-center gap-1">
+                <Calendar className="input-label-custom size-4" />
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                />
+              </div>
+
+              {/* Custom Date Picker */}
+              {isCustomDateOptionSelected && (
+                <div
+                  style={
+                    isCustomDateOptionSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
+                >
+                  <DateRangePicker
+                    onStartDateChange={onStartDateChange}
+                    onEndDateChange={onEndDateChange}
+                  />
+                </div>
+              )}
+
+              {/* SUPPORT TICKET FILTERS */}
+              {isUsedInSupportTicketModule && (
+                <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                  {/* Category */}
+                  <div className="min-w-[110px]">
+                    <CustomDropdown
+                      labelName="category"
+                      options={supportTicketCategory!}
+                      onSelect={handleSupportSelectedCategory}
+                    />
+                  </div>
+
+                  {/* Source */}
+                  <div className="min-w-[110px]">
+                    <CustomDropdown
+                      labelName="source"
+                      options={supportTicketSource!}
+                      onSelect={handleSupportSelectedSource}
+                    />
+                  </div>
+
+                  {/* Lifecycle */}
+                  <div className="min-w-[110px]">
+                    <CustomDropdown
+                      labelName="lifecycle"
+                      options={supportTicketLifecycle!}
+                      onSelect={handleSupportSelectedLifecycle}
+                    />
+                  </div>
+
+                  {/* Assigned To */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="grid">
+                      {selectedAssignTo.id === 0 ? (
+                        <Button
+                          type="button"
+                          onClick={handleCompanyUserPopUp}
+                          className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
+                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                        >
+                          <User size={14} />
+                          <span>AssignedTo</span>
+                        </Button>
+                      ) : (
+                        <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div
+                            title={selectedAssignTo.fullname}
+                            className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                          >
+                            <span onClick={handleCompanyUserPopUp}>
+                              {selectedAssignTo.fullname.length > 14
+                                ? selectedAssignTo.fullname.slice(0, 14) + "..."
+                                : selectedAssignTo.fullname}
+                            </span>
+
+                            <button
+                              title="Clear"
+                              onClick={() =>
+                                handleSelectedCompanyUserCheckBoxChange(null)
+                              }
+                              className="border-transparent"
+                            >
+                              <X size={14} className="self-center" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Resolved By */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="grid">
+                      {selectedResolvedBy.id === 0 ? (
+                        <Button
+                          type="button"
+                          onClick={handleResolvedByPopUp}
+                          className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
+                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                        >
+                          <UserCheck size={14} />
+                          <span>ResolvedBy</span>
+                        </Button>
+                      ) : (
+                        <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div
+                            title={selectedResolvedBy.fullname}
+                            className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                          >
+                            <span onClick={handleResolvedByPopUp}>
+                              {selectedResolvedBy.fullname.length > 14
+                                ? selectedResolvedBy.fullname.slice(0, 14) +
+                                  "..."
+                                : selectedResolvedBy.fullname}
+                            </span>
+
+                            <button
+                              title="Clear"
+                              onClick={() =>
+                                handleSelectedResolvedByCheckBoxChange(null)
+                              }
+                              className="border-transparent"
+                            >
+                              <X size={14} className="self-center" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Product */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="grid">
+                      {selectedCompanyProduct.id === 0 ? (
+                        <Button
+                          type="button"
+                          onClick={handleCompanyProductPopUp}
+                          className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
+                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                        >
+                          <ShoppingBag size={14} />
+                          <span>Product</span>
+                        </Button>
+                      ) : (
+                        <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div
+                            title={selectedCompanyProduct.name}
+                            className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                          >
+                            <span onClick={handleCompanyProductPopUp}>
+                              {selectedCompanyProduct.name.length > 14
+                                ? selectedCompanyProduct.name.slice(0, 14) +
+                                  "..."
+                                : selectedCompanyProduct.name}
+                            </span>
+
+                            <button
+                              title="Clear"
+                              onClick={() =>
+                                handleSelectedCompanyProductCheckBoxChange(null)
+                              }
+                              className="border-transparent"
+                            >
+                              <X size={14} className="self-center" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* RIGHT SECTION - Create Button */}
+                  {isUsedInSupportTicketModule && (
+                    <div className="flex gap-1 justify-end w-fit">
+                      <Button
+                        type="submit"
+                        disabled={!userHasAccessToAddSupportTicket}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!userHasAccessToAddSupportTicket) {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                                .DENIED_ADD_ACCESS
+                            );
+                            return;
+                          }
+                          setIsCreateSupportTicketModalOpen(true);
+                        }}
+                      >
+                        <span className="flex items-center gap-1">
+                          {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                          {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                          {isLargeScreen &&
+                            JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                        </span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
