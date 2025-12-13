@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Headset, Save, X } from "lucide-react";
+import { Headset, LucideText, Save, StickyNote, Wrench, X } from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import FormLayout from "../../ui/FormLayout";
 import { useState } from "react";
-import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import TextAreaInput from "../../ui/TextAreaInput";
 
 export function SupportTicketLIfecycleChangeModal({
   isLoading,  
@@ -48,24 +48,34 @@ export function SupportTicketLIfecycleChangeModal({
         />
         <form className="mt-2">
             <div className="gap-2">
-          <FormInput
+          <TextAreaInput
+            logo={LucideText}
             label="Query Description"
             name="queryDescription"
             onChange={handleFormChange}
             autoFocus={true}
+            rows={2}
+            cols={0}
           />
-          <FormInput
-            label="Public Note"
-            name="publicNotes"
-            onChange={(e) => handleFormChange(e)}
-            autoFocus={true}
-          />
-          <FormInput
+          <TextAreaInput
+            logo={Wrench}
             label="Resolution Applied"
             name="resolutionApplied"
             onChange={handleFormChange}
-            autoFocus={true}
+            // autoFocus={true}
+            rows={2}
+            cols={0}
           />
+          <TextAreaInput
+            logo={StickyNote}
+            label="Public Note"
+            name="publicNotes"
+            onChange={(e) => handleFormChange(e)}
+            // autoFocus={true}
+            rows={2}
+            cols={0}
+          />
+          
           </div>
           <div className="flex items-center  justify-end gap-3 mt-3">
             <div className="flex gap-2">

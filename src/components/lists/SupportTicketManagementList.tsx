@@ -434,14 +434,9 @@ function SupportTicketManagementList({
 
         {/* sticky */}
         <div
-          className={`
-    z-10 top-12 mt-1 p-1
-    flex flex-wrap items-center justify-between 
-    gap-3 text-sm 
-    ${COLORS.GRID_HEADER_SECTION_BG_COLOR}
-    rounded-lg shadow-sm mb-1.5 
-    w-full
-  `}
+          className={`z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+                      w-full
+                    `}
         >
           {/* LEFT SECTION - Support Label */}
           {isUsedInSupportTicketModule && (
