@@ -3,34 +3,33 @@ import { STATUS_CODE } from "../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
 import { useEffect, useState } from "react";
-import PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle from "../../@types/support-ticket-management/PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle";
 import axiosClient from "../../axios-client/AxiosClient";
 import toast from "react-hot-toast";
+import SupportTicketTaskStage from "../../@types/support-ticket-management/SupportTicketTaskStage";
 
-export const useSupportTicketSource = () => {
+export const useSupportTicketTaskStage = () => {
   const { loginStatus } = useLoggedInUserContext();
- const [supportTicketSource, setSupportTicketSource] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
+ const [supportTicketTaskStage, setSupportTicketStage] = useState<
+    SupportTicketTaskStage[] 
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const getSupportTicketSource = async () => {
+  const getSupportTicketTaskStage = async () => {
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
       name: null,
-      description: null,
       isactive: true,
       requestedby: loginStatus.id,
     };
 
     await axiosClient
-      .post(POST_API.GET_SUPPORT_TICKET_SOURCE, postData, {
+      .post(POST_API.GET_SUPPORT_TICKET_TASK_STAGE, postData, {
         withCredentials: true,
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setSupportTicketSource(response.data);
+          setSupportTicketStage(response.data);
           setIsLoading(false);
         }
       })
@@ -43,12 +42,12 @@ export const useSupportTicketSource = () => {
   };
 
   useEffect(() => {
-    getSupportTicketSource();
+    getSupportTicketTaskStage();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     isLoading,
-    supportTicketSource,
+    supportTicketTaskStage,
   };
 };

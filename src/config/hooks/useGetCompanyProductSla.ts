@@ -63,6 +63,7 @@ export const useCompanyProductSla = (companyProductId : number) =>{
     };
     useEffect(() => {
         getCompanyProductSla();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [companyProductId]);
 
     return {

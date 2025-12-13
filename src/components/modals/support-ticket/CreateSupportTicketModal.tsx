@@ -52,7 +52,7 @@ function CreateSupportTicketModal({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToViewUser } = useUserAccessModules();
 
-  const { supportTicketCAtegory, isLoading: isLoadingForTicketCategory } =
+  const { supportTicketCategory, isLoading: isLoadingForTicketCategory } =
     useSupportTicketCategory();
   const { supportTicketSource, isLoading: isLoadingForTicketSource } =
     useSupportTicketSource();
@@ -555,7 +555,7 @@ function CreateSupportTicketModal({
                           preselectedOption={selectedSupportTicketCategory}
                           requiredRedDot
                           labelName="Ticket Category :"
-                          options={supportTicketCAtegory!}
+                          options={supportTicketCategory!}
                           onSelect={handleLeadSelectedSupportTicketCategory}
                         />
                         {showErrorAtSupportTicketCategory &&

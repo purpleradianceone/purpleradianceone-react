@@ -10,8 +10,8 @@ import toast from "react-hot-toast";
 export const useSupportTicketLifecycle = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [supportTicketLifecycle, setSupportTicketLifecycle] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] | null
-  >(null);
+    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const getSupportTicketLifecycle = async () => {
@@ -44,6 +44,7 @@ export const useSupportTicketLifecycle = () => {
 
   useEffect(() => {
     getSupportTicketLifecycle();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

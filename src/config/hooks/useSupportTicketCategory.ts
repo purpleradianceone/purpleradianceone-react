@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 
 export const useSupportTicketCategory = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const [supportTicketCAtegory, setSupportTicketCAtegory] = useState<
+  const [supportTicketCategory, setSupportTicketCategory] = useState<
     PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -30,7 +30,7 @@ export const useSupportTicketCategory = () => {
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setSupportTicketCAtegory(response.data);
+          setSupportTicketCategory(response.data);
           setIsLoading(false);
         }
       })
@@ -44,10 +44,11 @@ export const useSupportTicketCategory = () => {
 
   useEffect(() => {
     getSupportTicketCategory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     isLoading,
-    supportTicketCAtegory,
+    supportTicketCategory,
   };
 };

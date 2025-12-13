@@ -35,7 +35,7 @@ function SupportTicketManagement({
     SupportTicketProps[]
   >([]);
 
-  const { supportTicketCAtegory } = useSupportTicketCategory();
+  const { supportTicketCategory } = useSupportTicketCategory();
   const { supportTicketLifecycle } = useSupportTicketLifecycle();
   const { supportTicketSource } = useSupportTicketSource();
 
@@ -434,7 +434,7 @@ function SupportTicketManagement({
             }
            
             selectedCompanyProduct={selectedCompanyProduct}
-            supportTicketCategory={supportTicketCAtegory!}
+            supportTicketCategory={supportTicketCategory!}
             handleSupportSelectedCategory={handleSupportSelectedCategory}
             supportTicketLifecycle={supportTicketLifecycle!}
             handleSupportSelectedLifecycle={handleSupportSelectedLifecycle}
