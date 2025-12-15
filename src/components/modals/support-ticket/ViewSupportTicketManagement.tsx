@@ -5,6 +5,7 @@ import {
   HeadsetIcon,
   History,
   Hourglass,
+  Layers,
   ListTree,
   LucideText,
   ShoppingBag,
@@ -17,7 +18,6 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import qs from "query-string";
 
 import { useSupportTicketLifecycle } from "../../../config/hooks/useSupportTicketLifecycle";
 import { useEffect, useRef, useState } from "react";
@@ -45,6 +45,7 @@ import Button from "../../ui/Button";
 import SupportTicketTasksModal from "./SupportTicketTasksModal";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
+import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 
 const ViewSupportTicketManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -58,28 +59,41 @@ const ViewSupportTicketManagement = () => {
     JSON.parse(searchParams.get("supportTicketData") || "{}")
   );
 
+  const [formData, setFormData] = useState({
+    queryDescription: selectedSupportTicket.queryDescription,
+    publicNotes: selectedSupportTicket.publicNotes,
+    resolutionApplied: selectedSupportTicket.resolutionApplied,
+  });
+
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
     company_id: 0,
     email: "",
-    fullname: "",
+    fullname: selectedSupportTicket.assignedToName,
     mobilenumber: "",
     generate_password: "",
     createdby: "",
-    id: 0,
+    id: selectedSupportTicket.assignedTo,
     isactive: false,
     requestedby: "",
   });
 
   const [selectedSupportTicketCategory, setSelectedSupportTicketCategor] =
     useState({
-      id: 0,
+      id: selectedSupportTicket.supportTicketCategoryId,
       name: "",
     });
 
   const [selectedCompanyProductSla, setSelectedCompanyProductSla] = useState({
-    id: 0,
+    id: selectedSupportTicket.companyProductSlaId,
     name: "",
   });
+
+  const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
+    useState({
+      id: selectedSupportTicket.supportTicketSourceId,
+      name: "",
+    });
+
   const [
     selectedSupportTicketEscalationId,
     setSelectedSupportTicketEscalationId,
@@ -115,6 +129,9 @@ const ViewSupportTicketManagement = () => {
     isLoading: isLoadingForSupportTicketEscalationLevel,
   } = useSupportTicketEscalationLevel();
 
+  const { supportTicketSource, isLoading: isLoadingForSupportTicketSource } =
+    useSupportTicketSource();
+
   const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
     useState<boolean>(false);
 
@@ -132,7 +149,7 @@ const ViewSupportTicketManagement = () => {
     const postDataForLeadStatusUpdate = {
       company_id: loginStatus.companyId,
       id: selectedSupportTicket.id,
-      company_product_sla_id: selectedCompanyProductSla,
+      company_product_sla_id: selectedCompanyProductSla.id,
       support_ticket_lifecycle_id: selectedSupportTicketLifecycleId,
       query_description: lifecycleFormData.queryDescription,
       public_notes: lifecycleFormData.publicNotes,
@@ -153,32 +170,47 @@ const ViewSupportTicketManagement = () => {
             (item) => item.id === selectedSupportTicketLifecycleId
           )?.name;
 
-          const parsedQuery = JSON.parse(
-            searchParams.get("supportTicketData") || "{}"
-          );
-          parsedQuery.supportTicketLifecycleId =
-            selectedSupportTicketLifecycleId
-              ? selectedSupportTicketLifecycleId.toString()
-              : null;
-          parsedQuery.supportTicketLifecycleName =
-            updatedStatusName!.toString();
-          const newQueryString = qs.stringify({
-            supportTicketData: JSON.stringify(parsedQuery),
-          });
+          const updatedSupportTicketLifecycle = {
+            supportTicketLifecycleId: selectedSupportTicketLifecycleId,
+            supportTicketLifecycleName: updatedStatusName,
+            queryDescription:lifecycleFormData.queryDescription.trim() ===""?selectedSupportTicket.queryDescription: lifecycleFormData.queryDescription,
+            resolutionApplied: lifecycleFormData.resolutionApplied.trim()===""?selectedSupportTicket.resolutionApplied:lifecycleFormData.resolutionApplied,
+            publicNotes: lifecycleFormData.publicNotes.trim()===""?selectedSupportTicket.publicNotes:lifecycleFormData.publicNotes,
+            resolvedBy:
+              selectedSupportTicketLifecycleId === 4 
+                ? loginStatus.id
+                : selectedSupportTicketLifecycleId! >=4 ? selectedSupportTicket.resolvedBy:null,
+            resolvedByName:
+              selectedSupportTicketLifecycleId === 4
+                ? loginStatus.fullName
+                : selectedSupportTicketLifecycleId! >=4 ? selectedSupportTicket.resolvedByName:null,
+          };
 
           setSelectedSupportTicket((prev: any) => ({
             ...prev,
-            supportTicketLifecycleName: updatedStatusName,
-            supportTicketLifecycleId: selectedSupportTicketLifecycleId,
-            queryDescription: lifecycleFormData.queryDescription,
-            publicNotes: lifecycleFormData.publicNotes,
+            ...updatedSupportTicketLifecycle,
           }));
 
+          //updating the url params
+          const searchParams = new URLSearchParams(location.search);
+
+          const existingData = searchParams.get("supportTicketData");
+
+          const updatedQueryData = {
+            ...(existingData ? JSON.parse(existingData) : {}),
+            ...updatedSupportTicketLifecycle,
+          };
+
+          searchParams.set(
+            "supportTicketData",
+            JSON.stringify(updatedQueryData)
+          );
           setSelectedSupportTicketLifecycleId(undefined);
           setSelectedSupportTicketLifecycleName(undefined);
 
-          const newPath = `${window.location.pathname}?${newQueryString}`;
-          navigate(newPath, { replace: true });
+          navigate(`${location.pathname}?${searchParams.toString()}`, {
+            replace: true,
+          });
 
           toast.success(response.data.message);
         } else {
@@ -197,11 +229,34 @@ const ViewSupportTicketManagement = () => {
   // const handleClickLeadOwnerChange = () => {
   //   // setIsLeadOwnerPopUpOpen(true);
   // };
+  function handleFormDataChange(e: any) {
+    const { name, value } = e.target;
+    setFormData((prev: any) => {
+      return { ...prev, [name]: value };
+    });
+    // setSelectedSupportTicket((prev: any) => {
+    //   return { ...prev, [name]: value };
+    // });
+  }
 
   const handSupportTicketInfoSave = async () => {
+    if (
+      selectedSupportTicketCategory?.id ===
+        selectedSupportTicket.supportTicketCategoryId &&
+      selectedCompanyProductSla.id ===
+        selectedSupportTicket.companyProductSlaId &&
+      selectedAssignTo.id === selectedSupportTicket.assignedTo &&
+      selectedSupportTicketSource.id ===
+        selectedSupportTicket.supportTicketSourceId &&
+      formData.queryDescription === selectedSupportTicket.queryDescription &&
+      formData.publicNotes === selectedSupportTicket.publicNotes &&
+      formData.resolutionApplied === selectedSupportTicket.resolutionApplied
+    )
+      return;
+
     const PostDataForSupportTicketUpdate = {
       company_id: loginStatus.companyId,
-      id: selectedSupportTicket.id, 
+      id: selectedSupportTicket.id,
       support_ticket_category_id:
         selectedSupportTicketCategory?.id !== 0
           ? selectedSupportTicketCategory?.id
@@ -210,10 +265,12 @@ const ViewSupportTicketManagement = () => {
         selectedCompanyProductSla.id !== 0
           ? selectedCompanyProductSla.id
           : selectedSupportTicket.companyProductSlaId,
-      support_ticket_source_id: selectedSupportTicket.supportTicketSourceId,
-      query_description: selectedSupportTicket.queryDescription,
-      public_notes: selectedSupportTicket.publicNotes,
-      resolution_applied: selectedSupportTicket.resolutionApplied,
+      support_ticket_source_id:
+        selectedSupportTicketSource.id ||
+        selectedSupportTicket.supportTicketSourceId,
+      query_description: formData.queryDescription,
+      public_notes: formData.publicNotes,
+      resolution_applied: formData.resolutionApplied,
       assignedto:
         selectedAssignTo.id !== 0
           ? selectedAssignTo.id
@@ -223,8 +280,6 @@ const ViewSupportTicketManagement = () => {
     };
     console.log(PostDataForSupportTicketUpdate);
 
-    return
-
     try {
       const response = await axiosClient.post(
         POST_API.UPDATE_SUPPORT_TICKET,
@@ -232,26 +287,41 @@ const ViewSupportTicketManagement = () => {
         { withCredentials: true }
       );
       if (response.data.status) {
-        setSelectedSupportTicket((prev: any) => ({
-          ...prev,
+        //updating the local state
+        const updatedSupportTicket = {
           assignedTo: selectedAssignTo.id,
           assignedToName: selectedAssignTo.fullname,
           supportTicketCategoryId: selectedSupportTicketCategory?.id,
           supportTicketCategoryName: selectedSupportTicketCategory?.name,
           companyProductSlaId: selectedCompanyProductSla?.id,
           companyProductSlaName: selectedCompanyProductSla?.name,
+          supportTicketSourceId: selectedSupportTicketSource?.id,
+          supportTicketSourceName: selectedSupportTicketSource?.name,
+          queryDescription: formData.queryDescription,
+          publicNotes: formData.publicNotes,
+          resolutionApplied: formData.resolutionApplied,
+        };
+        setSelectedSupportTicket((prev: any) => ({
+          ...prev,
+          ...updatedSupportTicket,
         }));
-        //parse query string
-        const rawLeadData = window.location.search;
-        const urlParams = new URLSearchParams(rawLeadData);
-        const supportTicketDataStr = urlParams.get("supportTicketData");
-        const parsedQuery = JSON.parse(supportTicketDataStr || "{}");
 
-        const newQueryString = qs.stringify({
-          supportTicketData: JSON.stringify(parsedQuery),
+        //updating the url params
+        const searchParams = new URLSearchParams(location.search);
+
+        const existingData = searchParams.get("supportTicketData");
+
+        const updatedQueryData = {
+          ...(existingData ? JSON.parse(existingData) : {}),
+          ...updatedSupportTicket,
+        };
+
+        searchParams.set("supportTicketData", JSON.stringify(updatedQueryData));
+
+        navigate(`${location.pathname}?${searchParams.toString()}`, {
+          replace: true,
         });
-        const newPath = `${window.location.pathname}?${newQueryString}`;
-        navigate(newPath, { replace: true });
+
         toast.success(response.data.message);
       } else if (response.data.status === false) {
         toast.error(response.data.message);
@@ -271,12 +341,29 @@ const ViewSupportTicketManagement = () => {
     }
   };
 
-  function handleFormDataChange(e: any) {
-    const { name, value } = e.target;
-    setSelectedSupportTicket((prev: any) => {
-      return { ...prev, [name]: value };
-    });
-  }
+  useEffect(() => {
+    if (
+      (selectedCompanyProductSla.id !== 0 &&
+        selectedCompanyProductSla.id !==
+          selectedSupportTicket.companyProductSlaId) ||
+      (selectedSupportTicketCategory.id !== 0 &&
+        selectedSupportTicketCategory.id !==
+          selectedSupportTicket.supportTicketCategoryId) ||
+      (selectedAssignTo.id !== 0 &&
+        selectedAssignTo.id !== selectedSupportTicket.assignedTo) ||
+      (selectedSupportTicketSource.id !== 0 &&
+        selectedSupportTicketSource.id !==
+          selectedSupportTicket.supportTicketSourceId)
+    ) {
+      handSupportTicketInfoSave();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedCompanyProductSla.id,
+    selectedSupportTicketCategory.id,
+    selectedAssignTo.id,
+    selectedSupportTicketSource.id,
+  ]);
 
   return (
     <div
@@ -451,7 +538,11 @@ const ViewSupportTicketManagement = () => {
                 </div>
                 <Detail
                   type="none"
-                  label="Resolved By"
+                  label={
+                    selectedSupportTicket?.resolvedByName
+                      ? "Resolved By"
+                      : "Resolved Status"
+                  }
                   value={
                     selectedSupportTicket?.resolvedByName || "Not Resolved"
                   }
@@ -479,16 +570,16 @@ const ViewSupportTicketManagement = () => {
                     onUserSelected={(user) => {
                       if (user) {
                         setSelectedAssignTo(user);
-                        handSupportTicketInfoSave();
+                        // handSupportTicketInfoSave();
                       } else {
                         setSelectedAssignTo({
                           company_id: 0,
                           email: "",
-                          fullname: "",
+                          fullname: selectedSupportTicket.assignedToName,
                           mobilenumber: "",
                           generate_password: "",
                           createdby: "",
-                          id: 0,
+                          id: selectedSupportTicket.assignedTo,
                           isactive: false,
                           requestedby: "",
                         });
@@ -511,19 +602,20 @@ const ViewSupportTicketManagement = () => {
                         selectedSupportTicket?.supportTicketCategoryId
                       }
                       onSelect={(value) => {
-                        const result = supportTicketCategory?.find(
-                          (item) => item.id === value
-                        );
-                        // setSelectedSupportTicket({
-                        //   ...selectedSupportTicket,
-                        //   supportTicketCategoryName: result?.name,
-                        //   supportTicketCategoryId: value,
-                        // });
-                        setSelectedSupportTicketCategor({
-                          id: value || 0,
-                          name: result?.name || "",
-                        });
-                        handSupportTicketInfoSave();
+                        if (userHasAccessToUpdateSupportTicket) {
+                          const result = supportTicketCategory?.find(
+                            (item) => item.id === value
+                          );
+                          setSelectedSupportTicketCategor({
+                            id: value || 0,
+                            name: result?.name || "",
+                          });
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                              .UPDATE_ACCESS_DENIED_MESSAGE
+                          );
+                        }
                       }}
                     />
                   )}
@@ -543,26 +635,50 @@ const ViewSupportTicketManagement = () => {
                         selectedSupportTicket?.companyProductSlaId
                       }
                       onSelect={(value) => {
-                        if(userHasAccessToUpdateSupportTicket ){
-                        if( value!==selectedSupportTicket?.companyProductSlaId){
+                        if (userHasAccessToUpdateSupportTicket) {
                           const result = companyProductSla?.find(
-                          (item) => item.id === value
-                        );
-                        setSelectedCompanyProductSla({
-                          id: value || 0,
-                          name: result?.name || "",
-                        });
-                        handSupportTicketInfoSave();
+                            (item) => item.id === value
+                          );
+                          setSelectedCompanyProductSla({
+                            id: value || 0,
+                            name: result?.name || "",
+                          });
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                              .UPDATE_ACCESS_DENIED_MESSAGE
+                          );
                         }
-                        
-                      }else{
-                        toast.error(MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE)
-                      }
                       }}
                     />
                   )}
 
-                  {/* Escalation Level */}
+                  {/* Support ticket source */}
+                  {isLoadingForSupportTicketSource ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <CustomDropdown
+                      logo={Layers}
+                      labelName="Source"
+                      options={supportTicketSource}
+                      preselectedOption={
+                        selectedSupportTicket?.supportTicketSourceId
+                      }
+                      onSelect={(value) => {
+                        const result = supportTicketSource?.find(
+                          (item) => item.id === value
+                        );
+                        setSelectedSupportTicketSource({
+                          id: value,
+                          name: result?.name || "",
+                        });
+                      }}
+                    />
+                  )}
+
                   {isLoadingForSupportTicketEscalationLevel ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
                       <div className="h-4 w-24 bg-gray-200 rounded" />
@@ -586,7 +702,7 @@ const ViewSupportTicketManagement = () => {
                           supportTicketEscalationLevelName: result?.name,
                           supportTicketEscalationLevelId: value,
                         });
-                        handSupportTicketInfoSave();
+                        // handSupportTicketInfoSave();
                       }}
                     />
                   )}
@@ -632,7 +748,9 @@ const ViewSupportTicketManagement = () => {
               name="queryDescription"
               defaultValue={selectedSupportTicket?.queryDescription}
               onChange={(e) => {
-                if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
+                if (userHasAccessToUpdateSupportTicket) {
+                  handleFormDataChange(e);
+                }
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
@@ -877,6 +995,10 @@ const Detail: React.FC<DetailProps> = ({
                     "Updated On",
                     "Created By",
                     "Created On",
+                    "Account",
+                    "Support Product",
+                    "Resolved Status",
+                    "Resolved By",
                   ].includes(label)
                     ? ""
                     : "border border-gray-200 rounded-md px-1 py-0.5"
