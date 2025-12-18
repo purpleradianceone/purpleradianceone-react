@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 export const useSupportTicketLifecycle = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [supportTicketLifecycle, setSupportTicketLifecycle] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
+    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -23,6 +23,8 @@ export const useSupportTicketLifecycle = () => {
       isactive: true,
       requestedby: loginStatus.id,
     };
+
+    // if (postData.company_id === 0) return;
 
     await axiosClient
       .post(POST_API.GET_SUPPORT_TICKET_LIFECYCLE, postData, {
@@ -44,7 +46,7 @@ export const useSupportTicketLifecycle = () => {
 
   useEffect(() => {
     getSupportTicketLifecycle();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

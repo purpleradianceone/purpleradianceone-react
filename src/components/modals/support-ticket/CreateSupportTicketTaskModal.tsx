@@ -16,7 +16,7 @@ import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import SupportTicketTaskStage from "../../../@types/support-ticket-management/SupportTicketTaskStage";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SupportTicketProps from "../../../@types/support-ticket-management/SupportTicketProps";
 import FormLayout from "../../ui/FormLayout";
 import FormHeader from "../../ui/FormHeader";
@@ -52,6 +52,7 @@ function CreateSupportTicketTaskModal({
     useUserAccessModules();
 
   const [description, setDescription] = useState<string>("");
+
   const generateTimeOptions = () => {
     const options = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -64,16 +65,21 @@ function CreateSupportTicketTaskModal({
     return options;
   };
 
-  const timeOptions = generateTimeOptions();
+
+
+  const timeOptions = useMemo(() => generateTimeOptions(), []);
+
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>(timeOptions[0]);
   const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
-  const [leadData, setLeadData] = useState<SupportTicketProps>();
+  const [supportTicketData, setSupportTicketData] =
+    useState<SupportTicketProps>();
+
   const [assignedTo, setAssignedTo] = useState<CompanyUser>({
-    id: 0,
+    id: supportTicketData?.assignedTo || 0,
     company_id: 0,
-    fullname: "",
+    fullname: supportTicketData?.assignedToName || "",
     email: "",
     mobilenumber: "",
     isactive: false,
@@ -159,18 +165,20 @@ function CreateSupportTicketTaskModal({
   }
 
   const createSupportTicketTask = async (event: React.FormEvent) => {
+    // console.log(assignedTo);
     if (isSaving) return;
     if (handleFormChange()) return;
 
     event.preventDefault();
     const createSupportTicketTaskPostData = {
       company_id: loginStatus.companyId,
-      support_ticket_id: leadData!.id,
+      support_ticket_id: supportTicketData!.id,
       support_ticket_task_stage_id: leadTaskStageId,
       description: description,
       result_outcome: resultOutcome,
-      assignedto: assignedTo.id === 0 ? leadData?.assignedTo : assignedTo.id,
-      due_date_time: `${dueDate} ${dueTime}:00`,
+      assignedto:
+        assignedTo.id === 0 ? supportTicketData?.assignedTo : assignedTo.id,
+      due_date_time: `${dueDate} ${dueTime || '00:00'}:00`,
       createdby_id: loginStatus.id,
     };
     setIsSaving(true);
@@ -209,11 +217,27 @@ function CreateSupportTicketTaskModal({
   };
 
   useEffect(() => {
+    if (timeOptions) setDueTime(timeOptions[0]);
+  }, [timeOptions]);
+
+  useEffect(() => {
     if (isOpen) {
       const supportTicketData = JSON.parse(
         searchParams.get("supportTicketData") || "{}"
       );
-      setLeadData(supportTicketData);
+      setSupportTicketData(supportTicketData);
+
+      setAssignedTo({
+        id: supportTicketData?.assignedTo || 0,
+        company_id: 0,
+        fullname: supportTicketData?.assignedToName || "",
+        email: "",
+        mobilenumber: "",
+        isactive: false,
+        requestedby: "",
+        createdby: "",
+        generate_password: "",
+      });
     }
     if (!isOpen) {
       resetStates();
@@ -281,13 +305,12 @@ function CreateSupportTicketTaskModal({
               </label>
               <select
                 id="endTime"
-                value={timeOptions[0]}
+                defaultValue={dueTime}
                 className=" w-full pl-3 pr-10 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 onChange={(e) => {
                   setDueTime(e.target.value);
                 }}
                 required={true}
-                
               >
                 <option value="">Select End Time</option>
                 {timeOptions.map((option) => (
@@ -332,35 +355,51 @@ function CreateSupportTicketTaskModal({
             maxLength={500}
           ></TextAreaInput>
         </div>
-        <div className="grid grid-cols-2 items-center  gap-2  mb-0">
-          <CompanyUserSearchFieldInput
-            logo={User}
-            label="Assign To:"
-            defaultValue={leadData?.assignedToName}
-            placeholder={leadData?.assignedToName}
-            onUserSelected={(user) => {
-              if (user) {
-                //
-                setAssignedTo(user);
-              } else {
-                setAssignedTo({
-                  id: 0,
-                  company_id: 0,
-                  fullname: "",
-                  email: "",
-                  mobilenumber: "",
-                  isactive: false,
-                  requestedby: "",
-                  createdby: "",
-                  generate_password: "",
-                });
-              }
-            }}
-            isDisabled={!userHasAccessToViewUser}
-            disabledMessage={
-              MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
-            }
-          />
+        <div className="grid grid-cols-1 items-center  gap-2  mb-0">
+          <div>
+            <div className="grid grid-cols-2">
+              <CompanyUserSearchFieldInput
+                logo={User}
+                label="Assign To:"
+                defaultValue={supportTicketData?.assignedToName}
+                // placeholder={leadData?.assignedToName}
+                onUserSelected={(user) => {
+                  if (user && user?.id) {
+                    //
+                    setAssignedTo(user);
+                  }
+                  if (user === null || user === undefined) {
+                    setAssignedTo({
+                      id: supportTicketData?.assignedTo || 0,
+                      company_id: 0,
+                      fullname: supportTicketData?.assignedToName || "",
+                      email: "",
+                      mobilenumber: "",
+                      isactive: false,
+                      requestedby: "",
+                      createdby: "",
+                      generate_password: "",
+                    });
+                  }
+                  console.log("selected user:")
+                  console.log(user)
+                }}
+                isDisabled={!userHasAccessToViewUser}
+                disabledMessage={
+                  MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                }
+              />
+            </div>
+            <span className="caption-custom">
+              <span className="">Note :</span> If the task "Assign To" is not
+              selected or is removed, the task will be assigned to the
+              <span className="table-header-custom active">
+                {" "}
+                ticket creator
+              </span>{" "}
+              by default.
+            </span>
+          </div>
         </div>
       </form>
 

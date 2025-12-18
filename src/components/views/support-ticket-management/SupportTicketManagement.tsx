@@ -19,6 +19,7 @@ import { Product } from "../../../@types/products/ProductsManagementProps";
 import { useSupportTicketLifecycle } from "../../../config/hooks/useSupportTicketLifecycle";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 function SupportTicketManagement({
   isUsedInSupportTicketModule,
@@ -44,14 +45,11 @@ function SupportTicketManagement({
   const [supportTicketUpdateCount, setSupportTicketUpdateCount] =
     useState<number>(0);
 
-  const [selectedSupportTicketCategory, setSelectedSupportTicketCategory] =
-    useState<number | null>(null);
-  const [selectedSupportTicketLifecycle, setSelectedSupportTicketLifecycle] =
-    useState<number | null>(null);
-  const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
-    useState<number | null>(null);
-
-  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
+  // Read filters from LocalStorage (before hook initializes)
+  const savedFilters = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
+      "{}"
+  );
 
   const {
     currentPage,
@@ -67,7 +65,68 @@ function SupportTicketManagement({
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
+
+  const [selectedSupportTicketCategory, setSelectedSupportTicketCategory] =
+    useState<number | null>(savedFilters.selectedSupportTicketCategory || null);
+
+  const [selectedSupportTicketLifecycle, setSelectedSupportTicketLifecycle] =
+    useState<number | null>(
+      savedFilters.selectedSupportTicketLifecycle || null
+    );
+
+  const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
+    useState<number | null>(savedFilters.selectedSupportTicketSource || null);
+
+  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>(
+    savedFilters.selectedCompanyUser || {
+      company_id: 0,
+      id: 0,
+      fullname: "",
+      email: "",
+      mobilenumber: "",
+      createdby: "",
+      isactive: false,
+      requestedby: "",
+      generate_password: "",
+    }
+  );
+
+  const [selectedResolvedBy, setSelectedResolvedBy] = useState<CompanyUser>(
+    savedFilters.selectedResolvedBy || {
+      company_id: 0,
+      id: 0,
+      fullname: "",
+      email: "",
+      mobilenumber: "",
+      createdby: "",
+      isactive: false,
+      requestedby: "",
+      generate_password: "",
+    }
+  );
+
+  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<Product>(
+    savedFilters.selectedCompanyProduct || {
+      id: 0,
+      productTypeId: 0,
+      unitName: "",
+      unitId: 0,
+      unitNameInStock: "",
+      productTypeName: "",
+      defaultWarrantyIntervalTypeId: 0,
+      defaultWarranty: 0,
+      defaultWarrantyName: "",
+      defaultAmcCycleIntervalTypeId: 0,
+      defaultAmcCycle: 0,
+      defaultAmcCycleName: "",
+      name: "",
+      barcode: "",
+      isActive: false,
+    }
+  );
+
+  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const handleSupportSelectedCategory = (
     selectedSupportTicketCategory: number | undefined
@@ -109,7 +168,7 @@ function SupportTicketManagement({
       company_product_id:
         selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
       assignedto: selectedCompanyUser.id === 0 ? null : selectedCompanyUser.id,
-      resolvedby: selectedResolvedBy.id === 0? null : selectedResolvedBy.id,
+      resolvedby: selectedResolvedBy.id === 0 ? null : selectedResolvedBy.id,
       support_ticket_category_id: selectedSupportTicketCategory,
       support_ticket_source_id: selectedSupportTicketSource,
       support_ticket_lifecycle_id: selectedSupportTicketLifecycle,
@@ -117,11 +176,12 @@ function SupportTicketManagement({
         effectiveDateRangeId === 0 ? null : effectiveDateRangeId,
       limit: pageSize,
       offset,
-      search_parameter: searchParameter.trim() === ""?null:searchParameter,
+      search_parameter: searchParameter.trim() === "" ? null : searchParameter,
       search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
     try {
+      if (postDataToGetSupportTickets.company_id === 0) return;
       const response = await axiosClient.post(
         POST_API.GET_SUPPORT_TICKET,
         postDataToGetSupportTickets,
@@ -141,9 +201,9 @@ function SupportTicketManagement({
             count: item.count,
             id: item.id,
             companyId: item.company_id,
-            accountName : item.account_name,
-            companyProductId : item.company_product_id,
-            companyProductName : item.company_product_name,
+            accountName: item.account_name,
+            companyProductId: item.company_product_id,
+            companyProductName: item.company_product_name,
             accountCompanyProductId: item.account_company_product_id,
             supportTicketCategoryId: item.support_ticket_category_id,
             supportTicketCategoryName: item.support_ticket_category_name,
@@ -189,61 +249,10 @@ function SupportTicketManagement({
     }
   };
 
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-    number | null
-  >(null);
-  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
-    company_id: 0,
-    id: 0,
-    fullname: "",
-    email: "",
-    mobilenumber: "",
-    createdby: "",
-    isactive: false,
-    requestedby: "",
-    generate_password: "",
-  });
-
-   const [persistedSelectedResolvedById, setPersistedSelectedResolvedById] = useState<
-    number | null
-  >(null);
-  const [selectedResolvedBy, setSelectedResolvedBy] = useState<CompanyUser>({
-    company_id: 0,
-    id: 0,
-    fullname: "",
-    email: "",
-    mobilenumber: "",
-    createdby: "",
-    isactive: false,
-    requestedby: "",
-    generate_password: "",
-  });
-
-  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<Product>(
-    {
-      id: 0,
-      productTypeId: 0,
-      unitName: "",
-      unitId: 0,
-      unitNameInStock: "",
-      productTypeName: "",
-      defaultWarrantyIntervalTypeId: 0,
-      defaultWarranty: 0,
-      defaultWarrantyName: "",
-      defaultAmcCycleIntervalTypeId: 0,
-      defaultAmcCycle: 0,
-      defaultAmcCycleName: "",
-      name: "",
-      barcode: "",
-      isActive: false,
-    }
-  );
-
   const handleSelectedCompanyUserCheckBoxChange = (
     params: CompanyUser | null
   ) => {
     if (params) {
-      setPersistedSelectedUserId(params.id);
       setSelectedCompanyUser({
         company_id: params.company_id,
         id: params.id,
@@ -256,7 +265,6 @@ function SupportTicketManagement({
         generate_password: "",
       });
     } else {
-      setPersistedSelectedUserId(null);
       // Reset selectedCompanyUser to its initial state when null is received
       setSelectedCompanyUser({
         company_id: 0,
@@ -318,7 +326,6 @@ function SupportTicketManagement({
     params: CompanyUser | null
   ) => {
     if (params) {
-      setPersistedSelectedResolvedById(params.id);
       setSelectedResolvedBy({
         company_id: params.company_id,
         id: params.id,
@@ -331,7 +338,6 @@ function SupportTicketManagement({
         generate_password: "",
       });
     } else {
-      setPersistedSelectedResolvedById(null);
       setSelectedResolvedBy({
         company_id: 0,
         id: 0,
@@ -379,6 +385,50 @@ function SupportTicketManagement({
     }
   }, [userHasAccessToViewSupportTicket]);
 
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+
+      selectedCompanyUser: selectedCompanyUser,
+      selectedResolvedBy: selectedResolvedBy,
+      selectedCompanyProduct: selectedCompanyProduct,
+      selectedSupportTicketCategory: selectedSupportTicketCategory,
+      selectedSupportTicketLifecycle: selectedSupportTicketLifecycle,
+      selectedSupportTicketSource: selectedSupportTicketSource,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId,
+
+    selectedCompanyUser,
+    selectedResolvedBy,
+    selectedCompanyProduct,
+    selectedSupportTicketCategory,
+    selectedSupportTicketLifecycle,
+    selectedSupportTicketSource,
+  ]);
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(
+        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+      );
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
+
   return (
     <div className="w-full ">
       <motion.section
@@ -397,6 +447,8 @@ function SupportTicketManagement({
             handleSearchOption={{
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
+              dateRangeId,
+              searchParameter,
             }}
             supportTicketData={supportTicketData}
             onEndDateChange={handleEndDateChange}
@@ -408,31 +460,24 @@ function SupportTicketManagement({
               totalPages,
               pageSize,
             }}
-
-
-
-
             selectedAssignTo={selectedCompanyUser}
             handleSelectedCompanyUserCheckBoxChange={
               handleSelectedCompanyUserCheckBoxChange
             }
-            persistedSelectedUserId={persistedSelectedUserId}
-
-
-
-
-            selectedResolvedBy={selectedResolvedBy}
-             handleSelectedResolvedByCheckBoxChange = {
-                handleSelectedResolvedByCheckBoxChange
+            // persistedSelectedUserId={persistedSelectedUserId}
+            persistedSelectedUserId={
+              selectedCompanyUser.id !== 0 ? selectedCompanyUser.id : null
             }
-            persistedSelectedResolvedById={persistedSelectedResolvedById}
-
-
-
+            selectedResolvedBy={selectedResolvedBy}
+            handleSelectedResolvedByCheckBoxChange={
+              handleSelectedResolvedByCheckBoxChange
+            }
+            persistedSelectedResolvedById={
+              selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
+            }
             handleSelectedCompanyProductCheckBoxChange={
               handleSelectedCompanyProductCheckBoxChange
             }
-           
             selectedCompanyProduct={selectedCompanyProduct}
             supportTicketCategory={supportTicketCategory!}
             handleSupportSelectedCategory={handleSupportSelectedCategory}

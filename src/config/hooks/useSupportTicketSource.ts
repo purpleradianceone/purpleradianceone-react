@@ -9,8 +9,8 @@ import toast from "react-hot-toast";
 
 export const useSupportTicketSource = () => {
   const { loginStatus } = useLoggedInUserContext();
- const [supportTicketSource, setSupportTicketSource] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
+  const [supportTicketSource, setSupportTicketSource] = useState<
+    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -24,6 +24,8 @@ export const useSupportTicketSource = () => {
       requestedby: loginStatus.id,
     };
 
+    // if (postData.company_id === 0) return;
+
     await axiosClient
       .post(POST_API.GET_SUPPORT_TICKET_SOURCE, postData, {
         withCredentials: true,
@@ -36,7 +38,7 @@ export const useSupportTicketSource = () => {
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(async (error: ApiError | any) => {
-       if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+        if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
           toast.error(error.response?.data);
         }
       });
@@ -44,7 +46,7 @@ export const useSupportTicketSource = () => {
 
   useEffect(() => {
     getSupportTicketSource();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

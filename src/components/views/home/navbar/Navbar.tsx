@@ -49,6 +49,7 @@ import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
 import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
 import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
+import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -132,11 +133,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
  
 
   const handleLogout = async () => {
-    cancelAllRequests();
+   await cancelAllRequests();
     await axios
       .post(POST_API.LOGOUT, {}, { withCredentials: true })
       .then((response) => {
         if (response.status === 200) {
+          localStorage.removeItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS);
+          localStorage.removeItem(LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET);
           toast.success(response.data);
           setLoginStatus({
             id: 0,
@@ -157,6 +160,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
             subscriptionId: 0,
             isSuperUser: false,
           });
+
           setNotificationCount(0);
           localStorage.clear();
           Navigate(ROUTES_URL.SIGN_IN);

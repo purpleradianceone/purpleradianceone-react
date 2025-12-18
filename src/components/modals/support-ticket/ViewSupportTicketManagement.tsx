@@ -36,7 +36,10 @@ import SupportTicketHistoryView from "./SupportTicketHistoryView";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
-import { SupportTicketLIfecycleChangeModal } from "./SupportTicketLifecycleChangeModal";
+import {
+  SupportTicketLIfecycleChangeModal,
+  supportTicketLifecycleType,
+} from "./SupportTicketLifecycleChangeModal";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useSupportTicketEscalationLevel } from "../../../config/hooks/useSupportTicketEscalationLevel";
 import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
@@ -64,6 +67,14 @@ const ViewSupportTicketManagement = () => {
     publicNotes: selectedSupportTicket.publicNotes,
     resolutionApplied: selectedSupportTicket.resolutionApplied,
   });
+
+  useEffect(() => {
+    setFormData({
+      queryDescription: selectedSupportTicket.queryDescription,
+      publicNotes: selectedSupportTicket.publicNotes,
+      resolutionApplied: selectedSupportTicket.resolutionApplied,
+    });
+  }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
     company_id: 0,
@@ -139,7 +150,7 @@ const ViewSupportTicketManagement = () => {
     useState<boolean>(false);
 
   const handleSaveSupportTicketLifecycleUpdate = async (
-    lifecycleFormData: any
+    lifecycleFormData: supportTicketLifecycleType
   ) => {
     setIsLoadingForLifecycleChanging(true);
     // console.log(lifecycleFormData);
@@ -154,6 +165,10 @@ const ViewSupportTicketManagement = () => {
       query_description: lifecycleFormData.queryDescription,
       public_notes: lifecycleFormData.publicNotes,
       resolution_applied: lifecycleFormData.resolutionApplied,
+      resolvedby:
+        selectedSupportTicketLifecycleId! >= 4
+          ? lifecycleFormData.resolvedBy.id
+          : null,
       updatedby_id: loginStatus.id,
       selectedSupportTicketEscalationId: selectedSupportTicketEscalationId,
     };
@@ -173,17 +188,26 @@ const ViewSupportTicketManagement = () => {
           const updatedSupportTicketLifecycle = {
             supportTicketLifecycleId: selectedSupportTicketLifecycleId,
             supportTicketLifecycleName: updatedStatusName,
-            queryDescription:lifecycleFormData.queryDescription.trim() ===""?selectedSupportTicket.queryDescription: lifecycleFormData.queryDescription,
-            resolutionApplied: lifecycleFormData.resolutionApplied.trim()===""?selectedSupportTicket.resolutionApplied:lifecycleFormData.resolutionApplied,
-            publicNotes: lifecycleFormData.publicNotes.trim()===""?selectedSupportTicket.publicNotes:lifecycleFormData.publicNotes,
+            queryDescription:
+              lifecycleFormData.queryDescription.trim() === ""
+                ? selectedSupportTicket.queryDescription
+                : lifecycleFormData.queryDescription,
+            resolutionApplied:
+              lifecycleFormData.resolutionApplied.trim() === ""
+                ? selectedSupportTicket.resolutionApplied
+                : lifecycleFormData.resolutionApplied,
+            publicNotes:
+              lifecycleFormData.publicNotes.trim() === ""
+                ? selectedSupportTicket.publicNotes
+                : lifecycleFormData.publicNotes,
             resolvedBy:
-              selectedSupportTicketLifecycleId === 4 
-                ? loginStatus.id
-                : selectedSupportTicketLifecycleId! >=4 ? selectedSupportTicket.resolvedBy:null,
+              selectedSupportTicketLifecycleId! >= 4
+                ? lifecycleFormData.resolvedBy.id
+                : null,
             resolvedByName:
-              selectedSupportTicketLifecycleId === 4
-                ? loginStatus.fullName
-                : selectedSupportTicketLifecycleId! >=4 ? selectedSupportTicket.resolvedByName:null,
+              selectedSupportTicketLifecycleId! >= 4
+                ? lifecycleFormData.resolvedBy.fullname
+                : null,
           };
 
           setSelectedSupportTicket((prev: any) => ({
@@ -248,9 +272,12 @@ const ViewSupportTicketManagement = () => {
       selectedAssignTo.id === selectedSupportTicket.assignedTo &&
       selectedSupportTicketSource.id ===
         selectedSupportTicket.supportTicketSourceId &&
-      formData.queryDescription === selectedSupportTicket.queryDescription &&
-      formData.publicNotes === selectedSupportTicket.publicNotes &&
-      formData.resolutionApplied === selectedSupportTicket.resolutionApplied
+      formData.queryDescription.trim() ===
+        selectedSupportTicket.queryDescription.trim() &&
+      formData.publicNotes.trim() ===
+        selectedSupportTicket.publicNotes.trim() &&
+      formData.resolutionApplied.trim() ===
+        selectedSupportTicket.resolutionApplied.trim()
     )
       return;
 
@@ -539,6 +566,7 @@ const ViewSupportTicketManagement = () => {
                 <Detail
                   type="none"
                   label={
+                    selectedSupportTicket?.resolvedByName !== "NA" &&
                     selectedSupportTicket?.resolvedByName
                       ? "Resolved By"
                       : "Resolved Status"
@@ -560,7 +588,7 @@ const ViewSupportTicketManagement = () => {
                   <CompanyUserSearchFieldInput
                     logo={User}
                     label="Assign To"
-                    placeholder={selectedSupportTicket.assignedToName}
+                    // placeholder={selectedSupportTicket.assignedToName}
                     defaultValue={selectedSupportTicket.assignedToName}
                     isDisabled={!userHasAccessToUpdateSupportTicket}
                     disabledMessage={
@@ -568,10 +596,11 @@ const ViewSupportTicketManagement = () => {
                         .UPDATE_ACCESS_DENIED_MESSAGE
                     }
                     onUserSelected={(user) => {
-                      if (user) {
+                      if (user && user.id !== 0) {
                         setSelectedAssignTo(user);
                         // handSupportTicketInfoSave();
-                      } else {
+                      }
+                      if (user === null || user === undefined) {
                         setSelectedAssignTo({
                           company_id: 0,
                           email: "",
@@ -827,6 +856,7 @@ const ViewSupportTicketManagement = () => {
           <SupportTicketLIfecycleChangeModal
             isLoading={isLoadingForLifecycleChanging}
             previousSupportTicketStatus={selectedSupportTicket}
+            selectedSupportTicketLifecyclId={selectedSupportTicketLifecycleId}
             selectedSupportTicketLifecycleName={
               selectedSupportTicketLifecycleName
             }
@@ -1027,7 +1057,6 @@ const Detail: React.FC<DetailProps> = ({
           </p>
         </div>
       ) : type === "text" ? (
-        // ⭐ MULTI-LINE DISPLAY
         <div
           className={`input-label-custom border border-gray-200 rounded-md p-1 w-64 whitespace-pre-wrap cursor-pointer hover:bg-slate-100`}
           onClick={handleClick}

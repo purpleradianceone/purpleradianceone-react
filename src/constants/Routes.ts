@@ -75,9 +75,7 @@ const ROUTES_URL = {
 
     //Support Tickets
     SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
-    SUPPORT_TICKET_DETAILS : "/support-ticket/view",
-
-
+    SUPPORT_TICKET_DETAILS : "/home/manage-support-ticket/support-tickets/support-ticket/details",
 
 }
 export default ROUTES_URL;

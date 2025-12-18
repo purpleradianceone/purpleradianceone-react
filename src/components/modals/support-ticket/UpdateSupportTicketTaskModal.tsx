@@ -10,7 +10,7 @@ import {
   User2,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { format, parse } from "date-fns";
 import toast from "react-hot-toast";
@@ -31,6 +31,7 @@ import DatePickerInput from "../../ui/DatePickerInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import Button from "../../ui/Button";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
 
 function UpdateSupportTicketTaskModal({
   isOpen,
@@ -60,7 +61,7 @@ function UpdateSupportTicketTaskModal({
     }
     return options;
   };
-  const timeOptions = generateTimeOptions();
+const timeOptions = useMemo(() => generateTimeOptions(), []);
 
   const parsedDate = parse(
     supportTicketTask.dueDateTime,
@@ -78,12 +79,18 @@ function UpdateSupportTicketTaskModal({
 
   const [supportTicketTaskStageId, setSupportTicketTaskStageId] =
     useState<number>(supportTicketTask.supportTicketTaskStageId);
-  const [assignedTo, setAssignedTo] = useState<number>(
-    supportTicketTask.assignedTo
-  );
-  const [assignedToName, setAssignedToName] = useState<string>(
-    supportTicketTask.assignToName
-  );
+  const [assignedTo, setAssignedTo] = useState<CompanyUser | null>({
+    id: supportTicketTask.assignedTo,
+    fullname: supportTicketTask.assignToName,
+    email: "",
+    mobilenumber: "",
+    company_id: 0,
+    createdby: "",
+    generate_password: "",
+    isactive: true,
+    requestedby: "",
+  });
+
   const [resultOutcome, setResultOutcome] = useState<string>(
     supportTicketTask.resultOutcome || ""
   );
@@ -100,18 +107,26 @@ function UpdateSupportTicketTaskModal({
   const resetStates = () => {
     setDescription("");
     setDueDate("");
-    setDueTime("");
+    setDueTime(timeOptions[0]);
     setSupportTicketTaskStageId(0);
-    setAssignedTo(supportTicketTask.assignedTo);
-    setAssignedToName(supportTicketTask.assignToName);
+    setAssignedTo({
+      id: supportTicketTask.assignedTo,
+      fullname: supportTicketTask.assignToName,
+      email: "",
+      mobilenumber: "",
+      company_id: 0,
+      createdby: "",
+      generate_password: "",
+      isactive: true,
+      requestedby: "",
+    });
   };
-
-
-
 
   const updateSupportTicketTask = async (
     event: React.FormEvent<HTMLButtonElement>
   ) => {
+    // console.log(assignedTo);
+    
     if (isSaving) return;
     event.preventDefault();
     const updateSupportTicketTaskPostData = {
@@ -120,8 +135,8 @@ function UpdateSupportTicketTaskModal({
       support_ticket_task_stage_id: supportTicketTaskStageId,
       description: description,
       result_outcome: resultOutcome,
-      assignedto: assignedTo,
-      due_date_time: `${dueDate} ${dueTime || dueTimeValue}:00`,
+      assignedto: assignedTo?.id || 0,
+      due_date_time: `${dueDate} ${dueTime || '00:00'}:00`,
       isactive: isActive,
       updatedby_id: loginStatus.id,
     };
@@ -164,7 +179,6 @@ function UpdateSupportTicketTaskModal({
         setIsSaving(false);
       });
   };
-
 
   const handleIsActiveCheckboxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -322,30 +336,50 @@ function UpdateSupportTicketTaskModal({
           ></TextAreaInput>
         </div>
 
-        <div className="grid grid-cols-2 items-center gap-2  mb-0">
-          <CompanyUserSearchFieldInput
-            logo={User2}
-            label={"Assign To"}
-            placeholder={assignedToName}
-            defaultValue={supportTicketTask.assignToName}
-            onUserSelected={(user) => {
-              if (user) {
-                setAssignedTo(user.id);
-                setAssignedToName(user.fullname);
-              } else {
-                setAssignedTo(supportTicketTask.assignedTo);
-                setAssignedToName(supportTicketTask.assignToName);
-              }
-            }}
-          />
-          <div className="flex items-center col-span-2 justify-end gap-3 border-blue-00">
-            <ToggleButton
-              name="isActive"
-              checked={isActive}
-              onToggle={handleIsActiveCheckboxChange}
-              wantLabel={true}
+        <div className="">
+          <div className="grid grid-cols-2">
+            <CompanyUserSearchFieldInput
+              logo={User2}
+              label={"Assign To"}
+              defaultValue={assignedTo?.fullname || ""}
+              onUserSelected={(user) => {
+                if (user && user?.id) {
+                  setAssignedTo(user);
+                }
+                if (user === null) {
+                  setAssignedTo({
+                    id: supportTicketTask.assignedTo,
+                    fullname: supportTicketTask.assignToName,
+                    email: "",
+                    mobilenumber: "",
+                    company_id: 0,
+                    createdby: "",
+                    generate_password: "",
+                    isactive: true,
+                    requestedby: "",
+                  });
+                }
+              }}
             />
           </div>
+          <span className="caption-custom">
+            <span className="">Note :</span> If the task assignee is not
+            selected or is removed, the task will be assigned to the
+            <span className="table-header-custom active">
+              {" "}
+              previous assignee
+            </span>{" "}
+            by default.
+          </span>
+        </div>
+
+        <div className="flex items-center col-span-2 justify-end gap-3 border-blue-00">
+          <ToggleButton
+            name="isActive"
+            checked={isActive}
+            onToggle={handleIsActiveCheckboxChange}
+            wantLabel={true}
+          />
         </div>
       </form>
 
