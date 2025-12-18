@@ -9,9 +9,8 @@ import toast from "react-hot-toast";
 
 export const useSupportTicketEscalationLevel = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const [supportTickeEscalationLevel, setSupportTicketEscalationLevel] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] 
-  >([]);
+  const [supportTickeEscalationLevel, setSupportTicketEscalationLevel] =
+    useState<PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const getSupportTicketEscalationLevel = async () => {
@@ -22,6 +21,8 @@ export const useSupportTicketEscalationLevel = () => {
       isactive: true,
       requestedby: loginStatus.id,
     };
+
+    // if (postData.company_id === 0) return;
 
     await axiosClient
       .post(POST_API.GET_SUPPORT_TICKET_ESCALATION_LEVEL, postData, {
@@ -43,7 +44,7 @@ export const useSupportTicketEscalationLevel = () => {
 
   useEffect(() => {
     getSupportTicketEscalationLevel();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Headset, LucideText, Save, StickyNote, Wrench, X } from "lucide-react";
+import {
+  Headset,
+  LucideText,
+  Save,
+  StickyNote,
+  User,
+  Wrench,
+  X,
+} from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import FormLayout from "../../ui/FormLayout";
 import { useState } from "react";
@@ -7,25 +15,51 @@ import Button from "../../ui/Button";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import TextAreaInput from "../../ui/TextAreaInput";
+import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import CompanyUser from "../../../@types/company-users/CompanyUser";
+import MESSAGE from "../../../constants/Messages";
+
+export  type supportTicketLifecycleType = {
+    queryDescription: string;
+    publicNotes: string;
+    resolutionApplied: string;
+    resolvedBy: CompanyUser;
+  }
 
 export function SupportTicketLIfecycleChangeModal({
-  isLoading,  
+  isLoading,
   previousSupportTicketStatus,
+  selectedSupportTicketLifecyclId,
   selectedSupportTicketLifecycleName,
   handleSubmit,
   onClose,
 }: {
-  isLoading: boolean,  
+  isLoading: boolean;
   previousSupportTicketStatus: any;
+  selectedSupportTicketLifecyclId: number | undefined;
   selectedSupportTicketLifecycleName: string | undefined;
   handleSubmit: (supportTicketData: any) => void;
   onClose: () => void;
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<supportTicketLifecycleType>({
     queryDescription: "",
     publicNotes: "",
     resolutionApplied: "",
+    resolvedBy: {
+      company_id: 0,
+      id: previousSupportTicketStatus.assignedTo,
+      fullname: previousSupportTicketStatus.assignedToName,
+      email: "",
+      mobilenumber: "",
+      createdby: "",
+      isactive: true,
+      requestedby: "",
+      generate_password: "",
+      all_leads_visible: true,
+    },
   });
+
+  const { userHasAccessToViewUser } = useUserAccessModules();
 
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
@@ -47,35 +81,86 @@ export function SupportTicketLIfecycleChangeModal({
           description={`support ticket lifecycle is updating from ${previousSupportTicketStatus.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
         <form className="mt-2">
-            <div className="gap-2">
-          <TextAreaInput
-            logo={LucideText}
-            label="Query Description"
-            name="queryDescription"
-            onChange={handleFormChange}
-            autoFocus={true}
-            rows={2}
-            cols={0}
-          />
-          <TextAreaInput
-            logo={Wrench}
-            label="Resolution Applied"
-            name="resolutionApplied"
-            onChange={handleFormChange}
-            // autoFocus={true}
-            rows={2}
-            cols={0}
-          />
-          <TextAreaInput
-            logo={StickyNote}
-            label="Public Note"
-            name="publicNotes"
-            onChange={(e) => handleFormChange(e)}
-            // autoFocus={true}
-            rows={2}
-            cols={0}
-          />
-          
+          <div className="gap-2">
+            <TextAreaInput
+              logo={LucideText}
+              label="Query Description"
+              name="queryDescription"
+              onChange={handleFormChange}
+              autoFocus={true}
+              rows={2}
+              cols={0}
+            />
+            <TextAreaInput
+              logo={Wrench}
+              label="Resolution Applied"
+              name="resolutionApplied"
+              onChange={handleFormChange}
+              // autoFocus={true}
+              rows={2}
+              cols={0}
+            />
+            <TextAreaInput
+              logo={StickyNote}
+              label="Public Note"
+              name="publicNotes"
+              onChange={(e) => handleFormChange(e)}
+              // autoFocus={true}
+              rows={2}
+              cols={0}
+            />
+            {selectedSupportTicketLifecyclId!>=4 &&<div className="mt-2">
+              <div className="grid grid-cols-1">
+              <CompanyUserSearchFieldInput
+                label="Resolved By:"
+                required
+                // placeholder={loginStatus.fullName}
+                defaultValue={
+                  formData.resolvedBy.fullname === ""
+                    ? previousSupportTicketStatus.assignedToName
+                    : formData.resolvedBy.fullname
+                }
+                logo={User}
+                onUserSelected={(user) => {
+                  if (user) {
+                    setFormData((prev) => {
+                      return {
+                        ...prev,
+                        resolvedBy: user,
+                      };
+                    });
+                  } else {
+                    setFormData((prev) => {
+                      return {
+                        ...prev,
+                        resolvedBy: {
+                          company_id: 0,
+                          id: previousSupportTicketStatus.assignedTo,
+                          fullname: previousSupportTicketStatus.assignedToName,
+                          email: "",
+                          mobilenumber: "",
+                          createdby: "",
+                          isactive: true,
+                          requestedby: "",
+                          generate_password: "",
+                          all_leads_visible: true,
+                        },
+                      };
+                    });
+                  }
+                }}
+                isDisabled={!userHasAccessToViewUser}
+                disabledMessage={
+                  MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                }
+                // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
+              /></div>
+              <span className="caption-custom">
+                <span className="">Note :</span> If “Resolved By” is not selected  or is removed, it will be set to the
+                <span className="table-header-custom active"> ticket creator</span> by
+                default.
+              </span>
+            </div>}
           </div>
           <div className="flex items-center  justify-end gap-3 mt-3">
             <div className="flex gap-2">
@@ -86,6 +171,18 @@ export function SupportTicketLIfecycleChangeModal({
                     queryDescription: "",
                     publicNotes: "",
                     resolutionApplied: "",
+                    resolvedBy: {
+                      company_id: 0,
+                      id: 0,
+                      fullname: "",
+                      email: "",
+                      mobilenumber: "",
+                      createdby: "",
+                      isactive: true,
+                      requestedby: "",
+                      generate_password: "",
+                      all_leads_visible: true,
+                    },
                   });
                   onClose();
                 }}
@@ -99,8 +196,7 @@ export function SupportTicketLIfecycleChangeModal({
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
-                 handleSubmit(formData);
-               
+                  handleSubmit(formData);
                 }}
                 disabled={!userHasAccessToUpdateSupportTicket}
               >
@@ -112,11 +208,7 @@ export function SupportTicketLIfecycleChangeModal({
             </div>
           </div>
         </form>
-        {isLoading&&
-        <LoadingPopUpAnimation
-        show={isLoading}     
-        />
-}
+        {isLoading && <LoadingPopUpAnimation show={isLoading} />}
       </FormLayout>
     </>
   );

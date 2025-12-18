@@ -14,9 +14,12 @@ import RefreshToken from "../config/validations/RefreshToken";
 // ───────────────────────────────────────────────────────────────
 const controllers = new Set<AbortController>();
 
-export const cancelAllRequests = (): void => {
-  controllers.forEach((controller) => controller.abort());
+export const cancelAllRequests = async (): Promise<void> => {
+  controllers.forEach((controller) => {
+    controller.abort();
+  });
   controllers.clear();
+  await Promise.resolve();
 };
 
 // ───────────────────────────────────────────────────────────────
@@ -52,6 +55,15 @@ const processQueue = (error: unknown | null): void => {
 // ───────────────────────────────────────────────────────────────
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    const companyId = localStorage.getItem("companyId"); //For api call blocking after logout
+
+    if (!companyId || Number(companyId) === 0) {
+      return Promise.reject({
+        message: "User may be log out. API call blocked.",
+        isBlocked: true,
+      });
+    }
+
     // Add AbortController
     const controller = new AbortController();
     config.signal = controller.signal;

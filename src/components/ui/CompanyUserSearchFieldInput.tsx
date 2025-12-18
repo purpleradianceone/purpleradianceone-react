@@ -27,7 +27,7 @@ interface CompanyUserSearchFieldProps {
 
 export default function CompanyUserSearchFieldInput({
   label,
-  placeholder = "Search company users...",
+  placeholder = "Search with name, email, mobilenumber...",
   required,
   error,
   logo: Icon,
@@ -64,7 +64,7 @@ export default function CompanyUserSearchFieldInput({
       } as CompanyUser;
 
       setSelectedUser(user);
-      onUserSelected(user);
+      // onUserSelected(user);
     }
   }, [defaultValue]);
 
@@ -86,6 +86,7 @@ export default function CompanyUserSearchFieldInput({
       const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, {
         company_id: loginStatus.companyId,
         search_parameter: searchText.trim(),
+        isactive: true,
         limit: userPreference.rowsInGrid,
         requestedby: loginStatus.id,
       });

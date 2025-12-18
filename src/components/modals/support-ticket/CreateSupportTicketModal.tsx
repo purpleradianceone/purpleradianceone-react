@@ -57,7 +57,6 @@ function CreateSupportTicketModal({
   const { supportTicketSource, isLoading: isLoadingForTicketSource } =
     useSupportTicketSource();
 
-
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -69,7 +68,6 @@ function CreateSupportTicketModal({
     requestedby: "",
     generate_password: "",
   });
-  
 
   const [stage, setStage] = useState(1);
   const [isOpenForAccountSelection, setIsOpenForAccountSelection] =
@@ -115,7 +113,7 @@ function CreateSupportTicketModal({
   const [selectedSupportTicketCategory, setSelectedSupportTicketCategory] =
     useState<number | undefined>(undefined);
 
-    const [selectedSource, setSelectedSource] = useState<number | undefined>(
+  const [selectedSource, setSelectedSource] = useState<number | undefined>(
     undefined
   );
 
@@ -300,6 +298,8 @@ function CreateSupportTicketModal({
         selectedCompanyUser.id === 0 ? loginStatus.id : selectedCompanyUser.id,
       createdby_id: loginStatus.id,
     };
+    console.log("create support ticket data:");
+    console.log(postData);
 
     await axiosClient
       .post(POST_API.CREATE_SUPPORT_TICKET, postData, { withCredentials: true })
@@ -327,6 +327,9 @@ function CreateSupportTicketModal({
         if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
           toast.error(error.response?.data);
         }
+      })
+      .finally(() => {
+        setIsSupportTicketCreating(false);
       });
   };
 
@@ -632,13 +635,18 @@ function CreateSupportTicketModal({
                       <CompanyUserSearchFieldInput
                         label="Assign To:"
                         required
-                        placeholder={loginStatus.fullName}
-                        defaultValue={selectedCompanyUser.fullname === ""?loginStatus.fullName:selectedCompanyUser.fullname}
+                        // placeholder={loginStatus.fullName}
+                        defaultValue={
+                          selectedCompanyUser.fullname === ""
+                            ? loginStatus.fullName
+                            : selectedCompanyUser.fullname
+                        }
                         logo={User}
                         onUserSelected={(user) => {
-                          if (user) {
+                          if (user && user.id !== 0) {
                             setSelectedCompanyUser(user);
-                          } else {
+                          }
+                          if (user === null || user === undefined) {
                             setSelectedCompanyUser({
                               company_id: 0,
                               id: 0,
@@ -660,7 +668,8 @@ function CreateSupportTicketModal({
                       />
                       <span className="caption-custom">
                         <span className="">Note :</span> If a support ticket
-                        assign to is not selected, then ticket will assigned to
+                        assign to is not selected or is removed, then ticket
+                        will assigned to
                         <span className="table-header-custom active">
                           {" "}
                           creator
