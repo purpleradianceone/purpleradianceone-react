@@ -7,7 +7,6 @@ import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import PostDataToGetLeadData from "../../../@types/lead-management/PostDataToGetLeadData";
 import LeadDataProps from "../../../@types/lead-management/LeadProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -17,6 +16,7 @@ import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-ma
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function LeadManagement({
   isUsedInLeadModule,
@@ -156,7 +156,7 @@ useEffect(()=>{
       requestedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(POST_API.GET_LEAD, postDataToGetLeads, {
+      const response = await axiosClient.post(POST_API.GET_LEAD, postDataToGetLeads, {
         signal,
         withCredentials: true,
       });
@@ -220,7 +220,7 @@ useEffect(()=>{
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatus,
         {
@@ -251,7 +251,7 @@ useEffect(()=>{
       description: null,
       isactive: true,
     };
-    axios
+    axiosClient
       .post(POST_API.GET_LEAD_SOURCE, postDataForLeadSource, {
         withCredentials: true,
       })

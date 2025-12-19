@@ -53,8 +53,7 @@ import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
 import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
-import FormLayout from "../../ui/FormLayout";
-import TextAreaInput from "../../ui/TextAreaInput";
+
 import { PageLayout } from "../../ui/PageLayout";
 
 
