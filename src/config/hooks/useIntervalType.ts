@@ -28,7 +28,6 @@ export const useIntervalType = () => {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
         setLoading(false)
         setIntervalTypeData(response.data);
       }

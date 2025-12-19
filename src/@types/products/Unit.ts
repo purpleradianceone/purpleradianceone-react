@@ -3,6 +3,7 @@ type UnitType={
     name : string,
     symbol: string,
     isActive: boolean,
+    isBaseUnit: boolean,
     generalUsage: string
 }
 

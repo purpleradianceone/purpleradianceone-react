@@ -29,7 +29,6 @@ import District from "../../@types/general/District";
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
         setDistricts(response.data);
       }
     } catch (error: ApiError | any) {
@@ -44,7 +43,9 @@ import District from "../../@types/general/District";
     }
   };
       useEffect(() => {
-            getAllDistricts();
+        if(stateId){
+          getAllDistricts();
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [stateId]);

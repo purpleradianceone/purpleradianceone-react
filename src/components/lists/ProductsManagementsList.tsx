@@ -131,13 +131,12 @@ ProductsManagementListProps) {
                   <span className="section-header-custom ">Products</span>
                 </>
               )}
-            </div>
 
-            {isLargeScreen && (
-              <>
-                <div className="flex gap-1 justify-center">
+            {/* {isLargeScreen && ( */}
+              {/* <> */}
+                <div className="flex gap-1 justify-center items-center">
                   {/* search box flex div */}
-                  <div className="relative flex items-start w-80 mt-1">
+                  <div className="relative flex items-start w-80">
                     <SearchInput
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
@@ -145,7 +144,7 @@ ProductsManagementListProps) {
                         );
                       }}
                       value={handleSearchOption.searchParameter}
-                    ></SearchInput>
+                      ></SearchInput>
                   </div>
 
                   {/* Date FIlters Dropdown */}
@@ -169,17 +168,18 @@ ProductsManagementListProps) {
                   className="flex"
                   style={
                     isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
+                    ? { visibility: "visible" }
+                    : { visibility: "hidden" }
                   }
-                >
+                  >
                   <DateRangePicker
                     onStartDateChange={onStartDateChange}
                     onEndDateChange={onEndDateChange}
-                  />
+                    />
                 </div>
-              </>
-            )}
+              {/* </> */}
+            {/* )} */}
+                    </div>
 
             {!isGridForAccountProduct && (
               <>
@@ -277,6 +277,7 @@ ProductsManagementListProps) {
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
             className={
+              isGridForAccountProduct? "ag-theme-balham w-full h-[40vh]":
               userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
                 : "ag-theme-balham w-full h-[calc(100vh-120px)]"

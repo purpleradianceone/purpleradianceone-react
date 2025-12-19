@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import {  useMemo, useRef } from "react";
 import { INNERHTML } from "../../constants/AppConstants";
@@ -7,12 +8,13 @@ import AccountProduct from "../../@types/account/AccountProduct";
 const AccountCompanyProductAgGrid = ({
   accountProductData,
   onRowSelect, //selected user for view lead details
-  //   handleRowClick,
+    handleRowClick,
   isUsedForSelection,
 }: {
   accountProductData: AccountProduct[];
   onRowSelect: (data: AccountProduct) => void;
   isUsedForSelection?: boolean;
+  handleRowClick? : (event : any) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -417,7 +419,7 @@ const AccountCompanyProductAgGrid = ({
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: onRowSelect }}
-        // onRowClicked={handleRowClick}
+        onRowClicked={handleRowClick}
       />
     </div>
   );

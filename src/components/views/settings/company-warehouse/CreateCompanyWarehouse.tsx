@@ -116,7 +116,6 @@ function CreateCompanyWarehouse({
       createdby_id: loginStatus.id,
     };
 
-    alert(JSON.stringify(postDataToAddNewCompanyWarehouse, null, 2));
 
     axios
       .post(

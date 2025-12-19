@@ -9,9 +9,9 @@ import { toast } from "react-hot-toast";
 
 export const useSupportTicketCategory = () => {
   const { loginStatus } = useLoggedInUserContext();
-  const [supportTicketCAtegory, setSupportTicketCAtegory] = useState<
-    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[] | null
-  >(null);
+  const [supportTicketCategory, setSupportTicketCategory] = useState<
+    PostDataTypeForSupportTicketSourceAndCategoryAndLifecycle[]
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const getSupportTicketCategory = async () => {
@@ -24,13 +24,15 @@ export const useSupportTicketCategory = () => {
       requestedby: loginStatus.id,
     };
 
+    // if (postData.company_id === 0) return;
+
     await axiosClient
       .post(POST_API.GET_SUPPORT_TICKET_CATEGORY, postData, {
         withCredentials: true,
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setSupportTicketCAtegory(response.data);
+          setSupportTicketCategory(response.data);
           setIsLoading(false);
         }
       })
@@ -44,10 +46,11 @@ export const useSupportTicketCategory = () => {
 
   useEffect(() => {
     getSupportTicketCategory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     isLoading,
-    supportTicketCAtegory,
+    supportTicketCategory,
   };
 };

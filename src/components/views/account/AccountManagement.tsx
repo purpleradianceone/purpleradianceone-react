@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
@@ -15,6 +14,7 @@ import { motion } from "framer-motion";
 import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function GetAccounts({
   isUsedForAccountLead,
@@ -106,7 +106,7 @@ const savedFilters = JSON.parse(
     };
 
     try {
-      const response = await axios.post(POST_API.GET_ACCOUNT, postData, {
+      const response = await axiosClient.post(POST_API.GET_ACCOUNT, postData, {
         withCredentials: true,
       });
 

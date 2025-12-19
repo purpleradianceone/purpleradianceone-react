@@ -10,8 +10,8 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  ArrowLeft,
   Edit3,
+  ChevronRight,
 } from "lucide-react";
 import Account from "../../../@types/account/Account";
 import { useUserPreference } from "../../../context/user/UserPreference";
@@ -40,57 +40,76 @@ import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { parseInt } from "lodash";
-// Note this is the type
-// interface AccountDetailsProps {
-//   // company: Account;
-//   // onClose: () => void;
-
-//   fetchAccounts: () => Promise<void>;
-// }
+import { PageLayout } from "../../ui/PageLayout";
+import Button from "../../ui/Button";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../constants/Messages";
 
 const AccountDetails: React.FC = () => {
+  const { accountId } = useParams();
+  const { accountDetails: company, loading : accountDetailsLoading } = useAccountDetails(
+    parseInt(accountId!)
+  );
   const navigate = useNavigate();
-  const {accountId } = useParams();
-  const {accountDetails :company, loading } = useAccountDetails(parseInt(accountId!));
 
-  useEffect(()=> {
-    if(company){
-      setFormData(company)
+  const parsedAccountId = Number(accountId);
+
+  useEffect(()=>{
+    if(!accountId || Number.isNaN(parsedAccountId)){
+      navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
     }
-  }, [company])
-  
-  
-  const [formData, setFormData] = useState<Account >({
-    count : 0,
-    id : 0,
-    companyId : 0,
-    name : '',
-    email : '',
-    mobileNumber : '',
-    industryTypeId : 0,
-    industryTypeName : '',
-    businessTypeId : 0,
-    businessTypeName : '',
-    countryId : 0,
-    stateId : 0,
-    districtId : 0,
-    countryName : '',
-    stateName : '',
-    districtName :'',
-    pan :'',
-    gst : '',
-    tan : '',
-    billingAddress : '',
-    shippingAddress : '',
-    registeredOfficeAddress : '',
-    businessResgistrationNumber :'',
-    website : '',
-    isActive : false,
-    createdBy : '',
-    createdOn : '',
+  },[accountId, parsedAccountId, navigate])
+
+  useEffect(()=>{
+    if( !accountDetailsLoading && company===undefined){
+      navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
+      return;
+    }
+  }, [accountDetailsLoading, company, navigate])
+  useEffect(() => {
+    console.log("this is the data ");
+
+    console.log(company);
+    if (company != null ) {
+      
+      
+      setFormData(company);
+    }
+  }, [company]);
+
+
+  const [formData, setFormData] = useState<Account>({
+    count: 0,
+    id: 0,
+    companyId: 0,
+    name: "",
+    email: "",
+    mobileNumber: "",
+    industryTypeId: 0,
+    industryTypeName: "",
+    businessTypeId: 0,
+    businessTypeName: "",
+    countryId: 0,
+    stateId: 0,
+    districtId: 0,
+    countryName: "",
+    stateName: "",
+    districtName: "",
+    pan: "",
+    gst: "",
+    tan: "",
+    billingAddress: "",
+    shippingAddress: "",
+    registeredOfficeAddress: "",
+    businessResgistrationNumber: "",
+    website: "",
+    isActive: false,
+    createdBy: "",
+    createdOn: "",
   });
+  const { userHasAccessToUpdateAccount } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -154,10 +173,68 @@ const AccountDetails: React.FC = () => {
     }
   };
 
+  function permissionVerification(fieldName: string): boolean {
+    if (!userHasAccessToUpdateAccount) {
+      setFormData((prev) => {
+        const updated: any = {
+          ...prev,
+
+          // Always revert the field that user tried to update
+          [fieldName]:
+            originalValues[fieldName] || company![fieldName as keyof Account],
+        };
+
+        // If country changed → revert country + state + district
+        if (fieldName === "countryName") {
+          updated.countryId =
+            originalValues["countryId"] || company!["countryId"];
+          updated.countryName =
+            originalValues["countryName"] || company!["countryName"];
+
+          updated.stateId = originalValues["stateId"] || company!["stateId"];
+          updated.stateName =
+            originalValues["stateName"] || company!["stateName"];
+
+          updated.districtId =
+            originalValues["districtId"] || company!["districtId"];
+          updated.districtName =
+            originalValues["districtName"] || company!["districtName"];
+        }
+
+        // If state changed → revert only state + district
+        if (fieldName === "stateName") {
+          updated.stateId = originalValues["stateId"] || company!["stateId"];
+          updated.stateName =
+            originalValues["stateName"] || company!["stateName"];
+
+          updated.districtId =
+            originalValues["districtId"] || company!["districtId"];
+          updated.districtName =
+            originalValues["districtName"] || company!["districtName"];
+        }
+
+        // If district changed → revert only district
+        if (fieldName === "districtName") {
+          updated.districtId =
+            originalValues["districtId"] || company!["districtId"];
+          updated.districtName =
+            originalValues["districtName"] || company!["districtName"];
+        }
+
+        return updated;
+      });
+
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
+      return false;
+    }
+    return true;
+  }
   const handleUpdateAccountDetails = async (
     fieldName: string,
     value: string
   ) => {
+    const premission = permissionVerification(fieldName);
+    if (!premission) return;
     const error = validateField(fieldName, value);
     if (error) {
       toast.error(error);
@@ -173,6 +250,10 @@ const AccountDetails: React.FC = () => {
     }
 
     setErrors((prev) => ({ ...prev, [fieldName]: "" }));
+
+    // console.log(" this is the field name : ");
+    // console.log(fieldName , value);
+
     const postData = {
       id: formData.id,
       company_id: loginStatus.companyId,
@@ -201,6 +282,10 @@ const AccountDetails: React.FC = () => {
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
+          setOriginalValues((prev) => ({
+            ...prev,
+            [fieldName]: value,
+          }));
           setFormData((prev) => ({ ...prev, [fieldName]: value }));
         } else {
           toast.error(response.data.message);
@@ -370,32 +455,52 @@ const AccountDetails: React.FC = () => {
     setEditingField(null);
   };
 
-  const handleDropdownBlur = (fieldName: string) => {
-    const currentValue =
-      fieldName === "businessTypeName"
-        ? formData.businessTypeName
-        : fieldName === "industryTypeName"
-        ? formData.industryTypeName
-        : fieldName === "countryName"
-        ? formData.countryName
-        : fieldName === "stateName"
-        ? formData.stateName
-        : formData.districtName;
+  // const handleDropdownBlur = (fieldName: string) => {
+  //   const currentValue =
+  //     fieldName === "businessTypeName"
+  //       ? formData.businessTypeName
+  //       : fieldName === "industryTypeName"
+  //       ? formData.industryTypeName
+  //       : fieldName === "countryName"
+  //       ? formData.countryName
+  //       : fieldName === "stateName"
+  //       ? formData.stateName
+  //       : formData.districtName;
+  //   const originalValue =
+  //     fieldName === "businessTypeName"
+  //       ? originalValues!.businessTypeName
+  //       : fieldName === "industryTypeName"
+  //       ? originalValues!.industryTypeName
+  //       : fieldName === "countryName"
+  //       ? originalValues!.countryName
+  //       : fieldName === "stateName"
+  //       ? originalValues!.stateName
+  //       : originalValues!.districtName;
+  //   // Only call API if value actually changed
+  //   if (currentValue !== originalValue) {
+  //     handleUpdateAccountDetails(fieldName, currentValue || "");
+  //   }
+  //   setEditingField(null);
+  // };
+
+  const handleDropdownBlur = (fieldName: string, newValue: string) => {
+    const currentValue = newValue;
+
     const originalValue =
       fieldName === "businessTypeName"
-        ? company!.businessTypeName
+        ? originalValues.businessTypeName
         : fieldName === "industryTypeName"
-        ? company!.industryTypeName
+        ? originalValues.industryTypeName
         : fieldName === "countryName"
-        ? company!.countryName
+        ? originalValues.countryName
         : fieldName === "stateName"
-        ? company!.stateName
-        : company!.districtName;
+        ? originalValues.stateName
+        : originalValues.districtName;
 
-    // Only call API if value actually changed
     if (currentValue !== originalValue) {
-      handleUpdateAccountDetails(fieldName, currentValue || "");
+      handleUpdateAccountDetails(fieldName, currentValue);
     }
+
     setEditingField(null);
   };
 
@@ -443,15 +548,25 @@ const AccountDetails: React.FC = () => {
                 const selectedOption = options.find(
                   (opt) => opt.id!.toString() === e.target.value
                 );
-                if (selectedOption) {
-                  handleDropdownChange(
-                    fieldName,
-                    e.target.value,
-                    selectedOption.name!
-                  );
-                }
+                // if (selectedOption) {
+                //   handleDropdownChange(
+                //     fieldName,
+                //     e.target.value,
+                //     selectedOption.name!
+                //   );
+                // }
+                if (!selectedOption) return;
+
+                handleDropdownChange(
+                  fieldName,
+                  e.target.value,
+                  selectedOption.name!
+                );
+                setTimeout(() => {
+                  handleDropdownBlur(fieldName, selectedOption.name!);
+                }, 0);
               }}
-              onBlur={() => handleDropdownBlur(fieldName)}
+              // onBlur={() => handleDropdownBlur(fieldName)}
               className={`w-full caption-custom bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 hasError ? "border-red-500" : "border-blue-500"
               }`}
@@ -849,7 +964,9 @@ const AccountDetails: React.FC = () => {
     }
   };
 
-  if (isIndustryTypeLoading || isBusinessTypeLoading || loading ) {
+  const [showName, setShowName] = useState<boolean>(false);
+
+  if (isIndustryTypeLoading || isBusinessTypeLoading || accountDetailsLoading) {
     return (
       <div
         className={` ${
@@ -860,30 +977,46 @@ const AccountDetails: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
-    <div
-      className={`${
-        userPreference.isLeftMenu ? "ml-14  mt-5" : " mt-7"
-      }  fixed inset-0 bg-white z-10 overflow-auto  py-8 px-1 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen`}
-    >
-      <div className="pb-3">
+    <PageLayout onScrollChange={setShowName}>
+      <div
+        className="sticky top-0 z-20 bg-white py-1 border-b transition-all duration-200"
+      >
+        <div className="flex text-center justify-start items-center gap-3 mx-1 ">
+          <Link to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
+            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+              Accounts
+            </Button>
+          </Link>
+
+          <ChevronRight size={16} />
+
+          <h1 className="table-header-custom">Account Details</h1>
+
+          {/*  Appears only on scroll */}
+          {showName && (
+            
+              <span
+                className={`
+                ml-2 max-w-[240px] truncate text-sm text-gray-500
+                transition-all duration-200 ease-out
+                will-change-transform will-change-opacity ${
+                showName
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-1 pointer-events-none"
+                } `}
+              >
+                ({formData.name})
+              </span>
+            
+          )}
+        </div>
+      </div>
+
+      <div className="pb-3 mt-0.5">
         {/* Header Section */}
         <div className="bg-white rounded-2xl  p-2 mb-1 border">
-          <button
-            className="flex items-center text-xs text-gray-400 gap-1 border-gray-400 rounded-md px-1   hover:text-indigo-500 hover:border-blue-600"
-            // onClick={onClose}
-            onClick={()=>{
-              navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
-            }}
-          >
-            <ArrowLeft size={14} />{" "}
-            <span className="caption-custom hover:text-blue-700">
-              {" "}
-              Accounts
-            </span>
-          </button>
-
           {/* Main header */}
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
@@ -1010,7 +1143,7 @@ const AccountDetails: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
@@ -1037,7 +1170,7 @@ const Skeleton: React.FC = () => {
         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
       </div>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Side (Contact, Mobile, Website) */}
         <div className="flex flex-col space-y-4">
           <div className="p-4 bg-white rounded-md border border-gray-200">

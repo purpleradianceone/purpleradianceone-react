@@ -31,7 +31,6 @@ import Country from "../../@types/general/Country";
       });
       if (response.status == STATUS_CODE.OK) {
         setLoading(false);
-        console.log(response.data);
         setCountries(response.data);
       }
     } catch (error: ApiError | any) {

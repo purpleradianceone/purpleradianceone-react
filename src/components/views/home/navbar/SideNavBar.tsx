@@ -2,11 +2,11 @@ import {
   Building2,
   Calendar,
   Handshake,
+  Headset,
   Home,
   Layers,
   Menu,
   Network,
-  NotebookPen,
   Settings,
   Store,
   UserCogIcon,
@@ -122,7 +122,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         <NavLink to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
-              icon={NotebookPen }
+              icon={Headset}
               label="Support"
               isOpen={isOpen}
               isActive={isActive}

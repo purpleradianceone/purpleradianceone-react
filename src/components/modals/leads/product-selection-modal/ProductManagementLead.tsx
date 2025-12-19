@@ -149,17 +149,19 @@ function ProductManagementLead({
 
 
   useEffect(() => {
-    setTimeout(() => {
+    // setTimeout(() => {
       setProductsData([]);
+      console.log("call is going ");
+      console.log("pageSize : "+pageSize+ "currentPage: "+ currentPage+ "dateRangeId : "+ dateRangeId+ "search_parameter" +searchParameter  + "concatDate : "+ concatDate);
+      
       fetchCompanyProducts();
-    }, 200);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, 200);
   }, [
     pageSize,
     currentPage,
     dateRangeId,
     searchParameter,
-    concatDate,
+    concatDate
   ]);
 
   useEffect(() => {

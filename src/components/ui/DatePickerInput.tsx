@@ -94,6 +94,7 @@ function DatePickerInput(props: FormInputProps) {
           ref={inputRef} // ✅ use local ref instead of props.ref
           readOnly={props.readonly}
           type="date"
+          value={props.value}
           defaultValue={props.defaultValue}
           onClick={openDatePicker} // ✅ click input also opens picker
           name={props.name}

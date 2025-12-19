@@ -258,8 +258,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   ) => {
     const { name, value } = e.target;
 
-  
-
     setCreateAccountFormData({
       ...createAccountFormData,
       [name]: value,
@@ -438,10 +436,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
   if (loadingState) {
     return (
       <FormLayout>
-
         <FormSkeleton />
       </FormLayout>
-       
     );
   }
   return (
@@ -507,42 +503,43 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             )}
           </div>
 
-                    <div className="grid grid-cols-2 gap-1">
-                      <div>
+          <div className="grid grid-cols-2 gap-1">
+            <div>
+              {/* mobile number */}
 
-          {/* mobile number */}
-
-          <FormInput
-            required
-            logo={Phone}
-            type="text"
-            label="Mobile Number: "
-            name="mobilenumber"
-            maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-            minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-            placeholder="Enter mobile number"
-            value={createAccountFormData.mobilenumber}
-            onBlur={handleOnBlur}
-            onChange={handleFormInputChange}
-            />
-          {errors.mobileNumber && (
-            <p className="text-xs  text-red-600 mt-1">{errors.mobileNumber}</p>
-          )}
-          </div>
-           {/* Business registration number */}
-          <FormInput
-            logo={Phone}
-            type="text"
-            label="Business Registration Number: "
-            name="business_registration_number"
-            maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-            minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-            placeholder="Enter business registration number"
-            value={createAccountFormData.business_registration_number}
-            onBlur={handleOnBlur}
-            onChange={handleFormInputChange}
-            />
+              <FormInput
+                required
+                logo={Phone}
+                type="text"
+                label="Mobile Number: "
+                name="mobilenumber"
+                maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                placeholder="Enter mobile number"
+                value={createAccountFormData.mobilenumber}
+                onBlur={handleOnBlur}
+                onChange={handleFormInputChange}
+              />
+              {errors.mobileNumber && (
+                <p className="text-xs  text-red-600 mt-1">
+                  {errors.mobileNumber}
+                </p>
+              )}
             </div>
+            {/* Business registration number */}
+            <FormInput
+              logo={Phone}
+              type="text"
+              label="Business Registration Number: "
+              name="business_registration_number"
+              maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+              minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+              placeholder="Enter business registration number"
+              value={createAccountFormData.business_registration_number}
+              onBlur={handleOnBlur}
+              onChange={handleFormInputChange}
+            />
+          </div>
           <div className="grid grid-cols-3 gap-1">
             {/* pan */}
             <FormInput
@@ -562,7 +559,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
               label="Gst: "
               name="gst"
               placeholder="Enter gst number"
-              value={createAccountFormData.email}
+              value={createAccountFormData.gst}
               onBlur={handleOnBlur}
               onChange={handleFormInputChange}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -610,36 +607,36 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             )}
           </div>
           <div className="grid grid-cols-3 gap-1">
-              {/* Country*/}
-              <CustomDropdown
-                logo={Globe}
-                labelName="Country"
-                preselectedOption={selectedCountryId}
-                onSelect={(selectedValue) => {
-                  if (selectedValue) {
-                    setSelectedCountryId(selectedValue);
-                  } else {
-                    setSelectedCountryId(0);
-                  }
-                }}
-                options={countries}
-              />
+            {/* Country*/}
+            <CustomDropdown
+              logo={Globe}
+              labelName="Country"
+              preselectedOption={selectedCountryId}
+              onSelect={(selectedValue) => {
+                if (selectedValue) {
+                  setSelectedCountryId(selectedValue);
+                } else {
+                  setSelectedCountryId(0);
+                }
+              }}
+              options={countries}
+            />
 
-              {/* Country*/}
-              <CustomDropdown
-                logo={Waypoints}
-                labelName="State"
-                selectedValue={selectedState}
-                preselectedOption={selectedState}
-                onSelect={(value) => {
-                  if (value) {
-                    setSelectedState(value);
-                  } else {
-                    setSelectedState(0);
-                  }
-                }}
-                options={states}
-              />
+            {/* Country*/}
+            <CustomDropdown
+              logo={Waypoints}
+              labelName="State"
+              selectedValue={selectedState}
+              preselectedOption={selectedState}
+              onSelect={(value) => {
+                if (value) {
+                  setSelectedState(value);
+                } else {
+                  setSelectedState(0);
+                }
+              }}
+              options={states}
+            />
             {/* Country*/}
             <CustomDropdown
               logo={MapPinnedIcon}
@@ -706,7 +703,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             </div>
           </div>
 
-         
           {/* website */}
           <FormInput
             logo={Globe}
@@ -730,6 +726,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             name="billing_address"
             placeholder="Enter Billing address"
             value={createAccountFormData.billing_address}
+            maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
             onBlur={handleOnBlur}
             onChange={handleFormInputChange}
             // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -743,6 +740,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             name="shipping_address"
             placeholder="Enter Shipping address"
             value={createAccountFormData.shipping_address}
+            maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
             onBlur={handleOnBlur}
             onChange={handleFormInputChange}
             // className="w-full col-span-2 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -756,6 +754,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
             name="registered_office_address"
             placeholder="Enter registered office address"
             value={createAccountFormData.registered_office_address}
+            maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
             onBlur={handleOnBlur}
             onChange={handleFormInputChange}
             // className="w-full border rounded-lg col-span-2 px-3 py-2 focus:ring-2 focus:ring-blue-500"

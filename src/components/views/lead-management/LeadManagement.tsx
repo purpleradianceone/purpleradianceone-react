@@ -7,7 +7,6 @@ import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import PostDataToGetLeadData from "../../../@types/lead-management/PostDataToGetLeadData";
 import LeadDataProps from "../../../@types/lead-management/LeadProps";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -17,6 +16,7 @@ import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-ma
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function LeadManagement({
   isUsedInLeadModule,
@@ -31,6 +31,50 @@ const savedFilters = JSON.parse(
   localStorage.getItem(LocalStorageKeys.LEAD_MANAGEMEMNT_FILTERS) || "{}"
 );
 
+useEffect(()=>{
+
+  if(!savedFilters) return;
+
+  requestAnimationFrame(()=> {
+    if(savedFilters.leadStatus) setSelectedLeadStatus(savedFilters.leadStatus);
+    if(savedFilters.leadSource) setSelectedLeadSource(savedFilters.leadSource);
+    if (savedFilters.userId) {
+        setSelectedCompanyUser((prev) => ({
+          ...prev,
+          id: savedFilters.userId,
+          fullname : savedFilters.userName
+        }));
+      }
+  })
+}, [])
+// useEffect(() => {
+    
+//     const saved = localStorage.getItem(LocalStorageKeys.LEAD_MANAGEMEMNT_FILTERS);
+//     if (!saved) return;
+
+//     const filters = JSON.parse(saved);
+
+//     // Ensure URL & hook initialize first before restoring
+//     requestAnimationFrame(() => {
+//       if (filters.page) handlePageChange(filters.page);
+//       if (filters.size) handlePageSizeChange(filters.size);
+//       if (filters.search) handleSearchParameterChange(filters.search);
+//       if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+
+//       if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+//       if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+      
+//       if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+//         if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+//       if (filters.userId) {
+//         setSelectedCompanyUser((prev) => ({
+//           ...prev,
+//           id: filters.userId,
+//           fullname : filters.userName
+//         }));
+//       }
+//     });
+//   }, []);
     const {
     currentPage,
     pageSize,
@@ -49,34 +93,7 @@ const savedFilters = JSON.parse(
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
   // Restore saved filters when opening this module
-  // useEffect(() => {
-    
-  //   const saved = localStorage.getItem(LocalStorageKeys.LEAD_MANAGEMEMNT_FILTERS);
-  //   if (!saved) return;
-
-  //   const filters = JSON.parse(saved);
-
-  //   // Ensure URL & hook initialize first before restoring
-  //   requestAnimationFrame(() => {
-  //     if (filters.page) handlePageChange(filters.page);
-  //     if (filters.size) handlePageSizeChange(filters.size);
-  //     if (filters.search) handleSearchParameterChange(filters.search);
-  //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
-
-  //     if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
-  //     if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
-      
-  //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
-  //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
-  //     if (filters.userId) {
-  //       setSelectedCompanyUser((prev) => ({
-  //         ...prev,
-  //         id: filters.userId,
-  //         fullname : filters.userName
-  //       }));
-  //     }
-  //   });
-  // }, []);
+  
 
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
@@ -139,7 +156,7 @@ const savedFilters = JSON.parse(
       requestedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(POST_API.GET_LEAD, postDataToGetLeads, {
+      const response = await axiosClient.post(POST_API.GET_LEAD, postDataToGetLeads, {
         signal,
         withCredentials: true,
       });
@@ -203,7 +220,7 @@ const savedFilters = JSON.parse(
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatus,
         {
@@ -234,7 +251,7 @@ const savedFilters = JSON.parse(
       description: null,
       isactive: true,
     };
-    axios
+    axiosClient
       .post(POST_API.GET_LEAD_SOURCE, postDataForLeadSource, {
         withCredentials: true,
       })

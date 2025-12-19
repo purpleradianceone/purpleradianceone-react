@@ -29,7 +29,6 @@ import State from "../../@types/general/State";
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
         setStates(response.data);
       }
     } catch (error: ApiError | any) {
@@ -44,8 +43,10 @@ import State from "../../@types/general/State";
     }
   };
       useEffect(() => {
-            getAllStates();
+        if(countryId){
 
+          getAllStates(); 
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [countryId]);
       
