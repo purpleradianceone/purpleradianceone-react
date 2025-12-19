@@ -775,6 +775,7 @@ const ViewSupportTicketManagement = () => {
               logo={LucideText}
               label="Query Description"
               name="queryDescription"
+              value={formData.queryDescription}
               defaultValue={selectedSupportTicket?.queryDescription}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
@@ -797,6 +798,7 @@ const ViewSupportTicketManagement = () => {
               logo={Wrench}
               label="Resolution Applied"
               name="resolutionApplied"
+              value={formData.resolutionApplied}
               defaultValue={selectedSupportTicket?.resolutionApplied}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
@@ -817,6 +819,7 @@ const ViewSupportTicketManagement = () => {
               logo={StickyNote}
               label="Public Notes"
               name="publicNotes"
+              value={formData.publicNotes}
               defaultValue={selectedSupportTicket?.publicNotes}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);

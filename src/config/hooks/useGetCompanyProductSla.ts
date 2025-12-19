@@ -5,9 +5,9 @@ import ApiError from "../../@types/error/ApiError";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
 import { CompanyProductSla } from "../../@types/products/CompanyProductSla";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useCompanyProductSla = (companyProductId : number) =>{
     const {loginStatus} = useLoggedInUserContext();
@@ -24,7 +24,7 @@ export const useCompanyProductSla = (companyProductId : number) =>{
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_COMPANY_PRODUCT_SLA
                 , postData, {
                 withCredentials: true,

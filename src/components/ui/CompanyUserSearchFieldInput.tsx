@@ -43,10 +43,12 @@ export default function CompanyUserSearchFieldInput({
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const [activeIndex, setActiveIndex] = useState(-1); 
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  let abortController = new AbortController();
+
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
 
   const { loginStatus } = useLoggedInUserContext();
@@ -76,20 +78,37 @@ export default function CompanyUserSearchFieldInput({
   // ---------------- SEARCH API ----------------
   const fetchUsers = async (searchText: string) => {
     if (!searchText.trim() || searchText.trim().length < 2 || isDisabled) {
+      abortController.abort();
       setResults([]);
       return;
     }
 
+    //abort previous request
+    if (abortController) {
+      abortController.abort();
+      console.log("previous request is cancled");
+    }
+
+    // const controller = new AbortController();
+    abortController = new AbortController();
+
     try {
       setIsLoading(true);
 
-      const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, {
-        company_id: loginStatus.companyId,
-        search_parameter: searchText.trim(),
-        isactive: true,
-        limit: userPreference.rowsInGrid,
-        requestedby: loginStatus.id,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_COMPANY_USERS,
+        {
+          company_id: loginStatus.companyId,
+          search_parameter: searchText.trim(),
+          isactive: true,
+          limit: userPreference.rowsInGrid,
+          requestedby: loginStatus.id,
+        },
+        {
+          withCredentials: true,
+          signal: abortController.signal,
+        }
+      );
 
       if (response?.status === STATUS_CODE.OK) {
         setResults(response.data || []);
@@ -97,7 +116,11 @@ export default function CompanyUserSearchFieldInput({
       } else {
         setResults([]);
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.code === "ERR_CANCELED") {
+        console.log("Request canceled:", searchText);
+        return;
+      }
       console.error("SEARCH ERROR:", err);
     } finally {
       setIsLoading(false);
@@ -105,9 +128,19 @@ export default function CompanyUserSearchFieldInput({
   };
 
   const debouncedSearch = useCallback(
-    debounce((txt: string) => fetchUsers(txt), 300),
+    debounce((txt: string) => fetchUsers(txt), 500),
     [isDisabled]
   );
+
+  // cleanup AbortController on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+      if (abortController) {
+        abortController.abort();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isDisabled) return;
@@ -231,7 +264,9 @@ export default function CompanyUserSearchFieldInput({
         {Icon && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR} />}
 
         {label}
-        {required && <span className="caption-custom-inactive align-top">*</span>}
+        {required && (
+          <span className="caption-custom-inactive align-top">*</span>
+        )}
       </label>
 
       <div className="relative w-full">
@@ -240,7 +275,7 @@ export default function CompanyUserSearchFieldInput({
           type="text"
           readOnly={readOnly || isDisabled}
           value={query}
-          onKeyDown={handleKeyDown} 
+          onKeyDown={handleKeyDown}
           onChange={(e) => {
             if (isDisabled) return handleDisabled();
             setQuery(e.target.value);
@@ -273,7 +308,9 @@ export default function CompanyUserSearchFieldInput({
 
         {!readOnly && !isDisabled && (
           <Search
-            className={`absolute ${query ? "right-8" : "right-3"} top-1.5 text-gray-400`}
+            className={`absolute ${
+              query ? "right-8" : "right-3"
+            } top-1.5 text-gray-400`}
             size={16}
           />
         )}
@@ -317,7 +354,9 @@ export default function CompanyUserSearchFieldInput({
           document.body
         )}
 
-      {error && <div className="mt-0 ml-0.5 caption-custom-inactive">{error}</div>}
+      {error && (
+        <div className="mt-0 ml-0.5 caption-custom-inactive">{error}</div>
+      )}
     </div>
   );
 }

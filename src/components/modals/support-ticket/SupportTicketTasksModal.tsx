@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router-dom";
 
 import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
-import { SITE_KEY, STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 import toast from "react-hot-toast";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
@@ -115,8 +115,6 @@ function SupportTicketTasksModal() {
 
 
   useEffect(() => {
-    console.log('site key')
-    console.log(SITE_KEY);
     const supportTicketSearchParam = JSON.parse(
       searchParams.get("supportTicketData") || "{}"
     );

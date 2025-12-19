@@ -51,6 +51,8 @@ function SupportTicketManagement({
       "{}"
   );
 
+  
+
   const {
     currentPage,
     pageSize,
@@ -181,7 +183,7 @@ function SupportTicketManagement({
       requestedby: loginStatus.id,
     };
     try {
-      if (postDataToGetSupportTickets.company_id === 0) return;
+      if (postDataToGetSupportTickets.company_id === 0 || pageSize === 10) return;
       const response = await axiosClient.post(
         POST_API.GET_SUPPORT_TICKET,
         postDataToGetSupportTickets,
