@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import GetCompanyUsersList from "../../lists/CompanyUsersList";
-import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
@@ -15,6 +14,7 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function GetCompanyUsers({
   isUsedInAccountProductForAssingingInstalledBy,
@@ -111,7 +111,7 @@ const savedFilters = JSON.parse(
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+      const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, postData, {
         signal,
         withCredentials: true,
       });
