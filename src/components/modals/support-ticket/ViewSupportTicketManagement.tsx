@@ -12,6 +12,7 @@ import {
   StickyNote,
   TrendingUp,
   User,
+  UserCheck2Icon,
   Wrench,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -88,6 +89,18 @@ const ViewSupportTicketManagement = () => {
     requestedby: "",
   });
 
+  const [selectedResolvedBy, setSelectedResolvedBy] = useState<CompanyUser>({
+    company_id: 0,
+    email: "",
+    fullname: selectedSupportTicket.resolvedByName,
+    mobilenumber: "",
+    generate_password: "",
+    createdby: "",
+    id: selectedSupportTicket.resolvedBy,
+    isactive: false,
+    requestedby: "",
+  });
+
   const [selectedSupportTicketCategory, setSelectedSupportTicketCategor] =
     useState({
       id: selectedSupportTicket.supportTicketCategoryId,
@@ -157,7 +170,7 @@ const ViewSupportTicketManagement = () => {
     if (!selectedSupportTicket || selectedSupportTicketLifecycleId === null)
       return;
 
-    const postDataForLeadStatusUpdate = {
+    const postDataForSupportLifecycleUpdate = {
       company_id: loginStatus.companyId,
       id: selectedSupportTicket.id,
       company_product_sla_id: selectedCompanyProductSla.id,
@@ -176,7 +189,7 @@ const ViewSupportTicketManagement = () => {
     try {
       const response = await axiosClient.post(
         POST_API.UPDATE_SUPPORT_TICKET,
-        postDataForLeadStatusUpdate,
+        postDataForSupportLifecycleUpdate,
         { withCredentials: true }
       );
       if (response?.status == STATUS_CODE.OK) {
@@ -277,7 +290,8 @@ const ViewSupportTicketManagement = () => {
       formData.publicNotes.trim() ===
         selectedSupportTicket.publicNotes.trim() &&
       formData.resolutionApplied.trim() ===
-        selectedSupportTicket.resolutionApplied.trim()
+        selectedSupportTicket.resolutionApplied.trim() &&
+      selectedResolvedBy.id === selectedSupportTicket.resolvedBy
     )
       return;
 
@@ -302,7 +316,7 @@ const ViewSupportTicketManagement = () => {
         selectedAssignTo.id !== 0
           ? selectedAssignTo.id
           : selectedSupportTicket.assignTo,
-
+      resolvedby: selectedResolvedBy.id,
       updatedby_id: loginStatus.id,
     };
     console.log(PostDataForSupportTicketUpdate);
@@ -327,6 +341,8 @@ const ViewSupportTicketManagement = () => {
           queryDescription: formData.queryDescription,
           publicNotes: formData.publicNotes,
           resolutionApplied: formData.resolutionApplied,
+          resolvedBy: selectedResolvedBy.id,
+          resolvedByName: selectedResolvedBy.fullname,
         };
         setSelectedSupportTicket((prev: any) => ({
           ...prev,
@@ -380,7 +396,9 @@ const ViewSupportTicketManagement = () => {
         selectedAssignTo.id !== selectedSupportTicket.assignedTo) ||
       (selectedSupportTicketSource.id !== 0 &&
         selectedSupportTicketSource.id !==
-          selectedSupportTicket.supportTicketSourceId)
+          selectedSupportTicket.supportTicketSourceId) ||
+      (selectedResolvedBy.id !== 0 &&
+        selectedResolvedBy.id !== selectedSupportTicket.resolvedBy)
     ) {
       handSupportTicketInfoSave();
     }
@@ -390,6 +408,7 @@ const ViewSupportTicketManagement = () => {
     selectedSupportTicketCategory.id,
     selectedAssignTo.id,
     selectedSupportTicketSource.id,
+    selectedResolvedBy.id,
   ]);
 
   return (
@@ -732,6 +751,39 @@ const ViewSupportTicketManagement = () => {
                           supportTicketEscalationLevelId: value,
                         });
                         // handSupportTicketInfoSave();
+                      }}
+                    />
+                  )}
+
+                  {selectedSupportTicket.resolvedBy && (
+                    <CompanyUserSearchFieldInput
+                      logo={UserCheck2Icon}
+                      label="Resolved By"
+                      // placeholder={selectedSupportTicket.assignedToName}
+                      defaultValue={selectedSupportTicket.resolvedByName}
+                      isDisabled={!userHasAccessToUpdateSupportTicket}
+                      disabledMessage={
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
+                      }
+                      onUserSelected={(user) => {
+                        if (user && user.id !== 0) {
+                          setSelectedResolvedBy(user);
+                          // handSupportTicketInfoSave();
+                        }
+                        if (user === null || user === undefined) {
+                          setSelectedResolvedBy({
+                            company_id: 0,
+                            email: "",
+                            fullname: selectedSupportTicket.assignedToName,
+                            mobilenumber: "",
+                            generate_password: "",
+                            createdby: "",
+                            id: selectedSupportTicket.assignedTo,
+                            isactive: false,
+                            requestedby: "",
+                          });
+                        }
                       }}
                     />
                   )}
