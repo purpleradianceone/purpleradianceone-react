@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import AccountCompanyProductType from "../../../../@types/account/AccountCompanyProductType";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
@@ -8,8 +9,6 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
-import Button from "../../../ui/Button";
-import COLORS from "../../../../constants/Colors";
 import MESSAGE from "../../../../constants/Messages";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
@@ -17,6 +16,10 @@ import CreateAccountCompanyProduct from "./CreateAccountCompanyProduct";
 import AccountProduct from "../../../../@types/account/AccountProduct";
 import AccountCompanyProductPopUpDetails from "./AccountCompanyProductPopUpDetails";
 import AccountCompanyProductAgGrid from "../../../ag-grid/AccountCompanyProductAgGrid";
+import { Link } from "react-router-dom";
+import ROUTES_URL from "../../../../constants/Routes";
+import Button from "../../../ui/Button";
+import COLORS from "../../../../constants/Colors";
 
 const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -36,22 +39,16 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
 
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
     if (data) {
-      // navigate(`/home/manage-accounts/accounts/acc-com-prod-details?acc-id=${data.accountId}&com-prod-id=${data.companyProductId}`)
       setSelectedProductCard(data);
     }
   };
-  // const handleViewAccountCompanyProductDetailsModalOpen = (
-  //   data: AccountProduct,
-  //   status: boolean
-  // ) => {
-  //   if(status){
-  //     setSelectedProductCard(data);
-  //   }
-  // };
-  // function handleViewAccountCompanyProductAMC(data : AccountProduct , status : boolean){
-  //   if(status){
-  //       navigate(`/home/manage-accounts/accounts/prod-details-amc/${data.id}`)
-  //   }
+
+  function handleRowClick(event :any){
+    if(event.data){
+      setSelectedProductCard(event.data);
+    }
+  }
+ 
 
   // }
   const getAccountCompanyProduct = async () => {
@@ -144,7 +141,7 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
         !isLoadingAccountCompanyProduct ? (
         <div className="flex items-center justify-center w-full   h-full">
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
-            {/* <Link
+            <Link
             to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
               onClick={(e) => {
                 if (!userHasAccessToUpdateAccount) {
@@ -159,33 +156,33 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
                   ? "pointer-events-none opacity-85"
                   : ""
               }
-            > */}
+            >
               {" "}
               <Button
                 disabled={!userHasAccessToUpdateAccount}
-                onClick={() => {
-                  if (userHasAccessToUpdateAccount) {
-                    setShowCreateAccountCompanyProduct(
-                      !showCreateAccountCompanyProduct
-                    );
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
-                    );
-                  }
-                }}
+                // onClick={() => {
+                //   if (userHasAccessToUpdateAccount) {
+                //     setShowCreateAccountCompanyProduct(
+                //       !showCreateAccountCompanyProduct
+                //     );
+                //   } else {
+                //     toast.error(
+                //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                //     );
+                //   }
+                // }}
                 className={COLORS.ADD_BUTTON}
               >
                 +Add
               </Button>
-            {/* </Link> */}
+            </Link>
             <span className="italic caption-custom">No data available.</span>
           </div>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-1 w-full">
           <div className="col-span-2 flex justify-end p-0.5">
-            {/* <Link
+            <Link
               to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
               onClick={(e) => {
                 if (!userHasAccessToUpdateAccount) {
@@ -200,30 +197,31 @@ const AccountCompanyProduct = ({ accountId }: AccountCompanyProductType) => {
                   ? "pointer-events-none opacity-85"
                   : ""
               }
-            > */}
+            >
               <Button
                 disabled={!userHasAccessToUpdateAccount}
-                onClick={() => {
-                  if (userHasAccessToUpdateAccount) {
-                    setShowCreateAccountCompanyProduct(
-                      !showCreateAccountCompanyProduct
-                    );
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
-                    );
-                  }
-                }}
+                // onClick={() => {
+                //   if (userHasAccessToUpdateAccount) {
+                //     setShowCreateAccountCompanyProduct(
+                //       !showCreateAccountCompanyProduct
+                //     );
+                //   } else {
+                //     toast.error(
+                //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                //     );
+                //   }
+                // }}
                 className={COLORS.ADD_BUTTON}
               >
                 +Add
               </Button>
-            {/* </Link> */}
+            </Link>
           </div>
           <div className="md:col-span-2  w-full h-96">
             <AccountCompanyProductAgGrid
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}
+              handleRowClick={handleRowClick}
               // handleViewAccountCompanyProductDetailsModalOpen={
               //   handleViewAccountCompanyProductDetailsModalOpen
               // }

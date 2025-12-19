@@ -40,7 +40,7 @@ export const useSearchFilterPaginationDateHandlers = (
 
 
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
-  const [pageSize, setPageSize] = useState(initialValue?.size || 10);
+  const [pageSize, setPageSize] = useState(firstValue|| 25);
   const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
   const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
   const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");

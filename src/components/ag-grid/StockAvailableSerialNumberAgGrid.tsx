@@ -83,7 +83,7 @@ export const StockAvailableSerialNumberAgGrid = ({
         modules={[AllCommunityModule]}
         theme={themeBalham}
         context={{ selectedIds, toggleSelect }}
-        getRowId={(params) => params.data.stockInwardId}   //  required for persistence
+        getRowId={(params) => params.data.stockInwardId.toString()}   //  required for persistence
       />
     </div>
   );

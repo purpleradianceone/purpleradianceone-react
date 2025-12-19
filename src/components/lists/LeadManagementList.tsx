@@ -346,6 +346,7 @@ function LeadManagementList({
         <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
           <div
             className={
+              !isUsedInLeadModule ? `ag-theme-balham w-full h-[60vh]`:
               userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
                 : "ag-theme-balham w-full h-[calc(100vh-128px)]"

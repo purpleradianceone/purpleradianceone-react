@@ -210,7 +210,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   return (
     <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
       {/* Header row */}
-      <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.7fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
+      <div className="grid grid-cols-[2.3fr_1.2fr_1fr_1fr_0.5fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
         <div className="table-header-custom">Product Name</div>
         <div className="table-header-custom">Req. Quantity</div>
         <div className="table-header-custom">Exp. Cost</div>
@@ -238,22 +238,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       {/* Data rows */}
       {data.length > 0 && (
         <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
-          {/* <span>Add</span> */}
-          {/* <button
-            onClick={() => {
-              if (userHasAccessToUpdateLead) {
-                handleAddProductToLeadButtonClick();
-              } else {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                    .UPDATE_LEAD_ACCESS_DENIED_message
-                );
-              }
-            }}
-            className={COLORS.ADD_BUTTON}
-          >
-           +Add
-          </button> */}
+         
            <Button
             disabled={!userHasAccessToUpdateLead}
             onClick={() =>{
@@ -284,7 +269,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                   className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-slate-50  border shadow-sm  border-gray-100 rounded-md p-1 mb-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
                 >
                   <div
-                    // className="text-[13px] font-medium text-gray-800 truncate "
                     className={`  input-label-custom rounded-lg ${
                       !product.isActive ? "opacity-50 " : ""
                     }`}
@@ -331,7 +315,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         }
                         className="border rounded w-20 input-label-custom"
                       >
-                        <option value="">Select</option>
+                        {/* <option value="">Select</option> */}
                         {interestTypeData.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.name}
@@ -377,13 +361,6 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                       >
                         {product.quantityRequired}
                       </div>
-
-                      {/* <div
-                        className="cursor-pointer text-center border rounded-lg "
-                        onClick={() =>
-                          product.isActive && handleEditClick(product)
-                        }
-                      > */}
                       <div
                         className={`input-label-custom cursor-pointer text-center border rounded-lg ${
                           !product.isActive
@@ -443,10 +420,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                                 : "translate-x-0"
                             }`}
                           ></div>
-                        </button>
-
-
-                        
+                        </button>                        
                       </div>
                     </>
                   )}

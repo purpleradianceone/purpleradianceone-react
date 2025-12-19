@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
@@ -14,6 +13,7 @@ import FormHeader from "../../../ui/FormHeader";
 import { Box } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import StockRulesCard from "./StockRuledCard";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 export const StockSerialNumber = ({
   companyProductId,
@@ -51,7 +51,7 @@ export const StockSerialNumber = ({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_STOCK_AVAILABLE_SERIAL_NUMBER,
         PostData,
         {
@@ -94,7 +94,7 @@ export const StockSerialNumber = ({
   };
   useEffect(() => {
     getStockAvailableSerialNumber();
-  }, [currentPage, pageSize  ]);
+  }, [currentPage, pageSize , companyProductId ]);
 
   const availableStock =
     stockAvailableSerialNumberState.length > 0 &&

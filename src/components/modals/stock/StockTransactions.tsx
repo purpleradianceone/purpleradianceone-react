@@ -193,8 +193,8 @@ const StockTransactions = ({
       <div
         className={`ag-theme-balham w-full ${
           userPreference.isLeftMenu
-            ? "h-[calc(100vh-140px)]"
-            : "h-[calc(100vh-148px)]"
+            ? "h-[60vh]"
+            : "h-[60vh]"
         }`}
       >
         <TransactionAgGrid data={transactions} />

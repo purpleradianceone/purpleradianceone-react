@@ -19,7 +19,7 @@ import {
 import EditCompanyProductModalProps from "../../../@types/modal/EditCompanyProductModal";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -215,15 +215,18 @@ function EditCompanyProductModal({
     setCompanyProductTaxChangeCount((prev) => prev + 1);
   };
 
-  const hanldeUpdateCompanyProductFormSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    
-    if(errors){
-      return;
+  function validate()  {
+    if(errors.url ){
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
+      return false;
     }
+    return true;
+  }
+  const hanldeUpdateCompanyProductFormSubmit = async () => {
+    // event.preventDefault();
+    const isvalid =validate();
+    if(!isvalid) return;
     validateDropdown();
-    event.preventDefault();
 
     if (
       updateCompanyProductFormData.name !== "" &&
@@ -325,7 +328,7 @@ function EditCompanyProductModal({
                   callFunctionWithEvent: hanldeUpdateCompanyProductFormSubmit,
                 });
                 if (refreshTokenResponse) {
-                  hanldeUpdateCompanyProductFormSubmit(event);
+                  hanldeUpdateCompanyProductFormSubmit();
                 }
               }
             });
@@ -470,7 +473,13 @@ function EditCompanyProductModal({
         {/* Edit Company product  */}
         <form
           className="space-y-2  border  rounded-md p-1 "
-          onSubmit={hanldeUpdateCompanyProductFormSubmit}
+          onSubmit={
+            (e)=>{
+
+              e.preventDefault()
+              hanldeUpdateCompanyProductFormSubmit()
+            }
+          }
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <FormInput
@@ -482,7 +491,8 @@ function EditCompanyProductModal({
               value={updateCompanyProductFormData.name}
               placeholder="Enter Product Name"
               defaultValue={intialEditCompanyProductFormData.name}
-              maxLength={256}
+              minLength={VALIDATIONS.MIN_NAME_LENGTH}
+              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               onChange={handleEditCompanyProductFormDataChange}
               error={errors.name}
               onBlur={handleBlur}
@@ -529,7 +539,8 @@ function EditCompanyProductModal({
               <FormInput
                 logo={LucideIndianRupee}
                 label="Cost :"
-                type="text"
+                type="number"
+                min={0}
                 name="cost"
                 placeholder="Enter Product Cost"
                 defaultValue={intialEditCompanyProductFormData.cost}
@@ -663,6 +674,7 @@ function EditCompanyProductModal({
                 cols={5}
                 rows={3}
                 name="description"
+                maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 required={false}
                 placeholder="Enter Product Description"
                 defaultValue={intialEditCompanyProductFormData.description}
