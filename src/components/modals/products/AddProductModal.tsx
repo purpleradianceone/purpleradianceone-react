@@ -15,7 +15,7 @@ import {
   Text,
   X,
 } from "lucide-react";
-import { GAP, STATUS_CODE } from "../../../constants/AppConstants";
+import { GAP, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
@@ -181,6 +181,8 @@ function AddProductModal({
     }
   };
 
+
+
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -342,6 +344,41 @@ function AddProductModal({
     // }
   }, [isOpen]);
 
+ const filteredUnits = useMemo(() => {
+  return isSerialNumberChecked
+    ? unitData.filter(unit => unit.isBaseUnit)
+    : unitData;
+}, [unitData, isSerialNumberChecked]);
+
+
+useEffect(() => {
+  if (
+    isSerialNumberChecked &&
+    selectedUnitId &&
+    !unitData.find(
+      unit => unit.id === selectedUnitId && unit.isBaseUnit
+    )
+  ) {
+    setUnitId(undefined);
+  }
+}, [isSerialNumberChecked, selectedUnitId, unitData]);
+
+
+  // const [unitDataFiltered , setUnitDataFiltered ] = useState<UnitType[]>([]);
+
+  // useEffect(()=> {
+  //   setUnitDataFiltered(unitData)
+  // }, [unitData])
+
+  // useEffect(()=>{
+
+  //   if(addProductFormData.isSerialNumber){
+  //     const filteredParentUnits= unitData.filter((item)=> item.isBaseUnit);
+  //     console.log("this is the filter");
+      
+  //     setUnitDataFiltered(filteredParentUnits);
+  //   }
+  // } , [addProductFormData.isSerialNumber])
   if (!isOpen) return null;
 
   if (unitDataLoading || intervalTypeLoading || productTypeLoading) {
@@ -397,7 +434,8 @@ function AddProductModal({
                     }
                     setUnitId(data);
                   }}
-                  options={unitData}
+                  // options={unitData}
+                  options={filteredUnits}
                   requiredRedDot={true}
                 />
                 {selectedUnitError && (
@@ -642,7 +680,8 @@ function AddProductModal({
                 cols={5}
                 rows={3}
                 required={false}
-                maxLength={256}
+                // maxLength={256}
+                maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
               />

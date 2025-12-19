@@ -17,9 +17,6 @@ export const useCreateCall = <T,>(
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Track retry count
-//   const retryCount = useRef(0);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const triggerCall = async (postData: Record<string, any>) => {
     setLoading(true);
@@ -33,27 +30,7 @@ export const useCreateCall = <T,>(
 
       setData(response.data);
       setSuccess(true);
-    //   retryCount.current = 0; // reset on success
-      
-
     }
-    //  catch (err: any) {
-    //   const status = err?.response?.status;
-
-    //   // ---- Handle 401 Refresh Token Retry ----
-    //   if (status === 401 ) {
-    //     // retryCount.current++;
-    //     const refreshed = await RefreshToken({ callFunction: triggerCall });
-    //     if (refreshed) {
-    //       return triggerCall(postData);
-    //     }
-    //   }
-    //   // ---- Other Errors ----
-    //   const message = err?.response?.data || "Something went wrong";
-    //   setError(message);
-    //   toast.error(message);
-    //   return null;
-    // } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: ApiError | any) {
             if (error.status === STATUS_CODE.UNATHORISED) {

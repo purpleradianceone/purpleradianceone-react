@@ -36,6 +36,7 @@ const useUnit = () =>{
                     id: item.id,
                     name: item.name,
                     isActive: item.isactive,
+                    isBaseUnit: item.is_base_unit,
                     symbol: item.symbol,
                     generalUsage: item.general_usage
                 }

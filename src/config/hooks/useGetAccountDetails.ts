@@ -5,12 +5,16 @@ import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axiosClient from "../../axios-client/AxiosClient";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 export const useAccountDetails = (accountId: number) => {
     const { loginStatus } = useLoggedInUserContext();
     const [accountDetails, setAccountDetails] = useState<Account>();
-
-    const [loading, setLoading] = useState(true);
+    
+      const navigate = useNavigate();
+    
+    const [loading, setLoading] = useState<boolean>(true);
     const fetchAccountDetails = async () => {
         const postData = {
             company_id: loginStatus.companyId,
@@ -33,6 +37,10 @@ export const useAccountDetails = (accountId: number) => {
            if (response.status === STATUS_CODE.OK) {
                 const res = response.data[0]; // SINGLE OBJECT
 
+                if(res===undefined){
+                    navigate(ROUTES_URL.ACCOUNT_MANAGEMENT)
+                    return;
+                }
                 const formattedData: Account = {
                     count: res.count,
                     id: res.id,

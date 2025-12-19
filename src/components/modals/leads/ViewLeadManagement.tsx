@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ArrowLeft,
+  ChevronRight,
   Edit3,
   Handshake,
   History,
@@ -21,7 +22,7 @@ import {
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../../constants/Routes";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import LeadStatusHistory from "./LeadStatusHistory";
@@ -45,7 +46,6 @@ import MESSAGE from "../../../constants/Messages";
 import LeadTasksModal from "./lead-task/LeadTasksModal";
 import LeadSettingForLead from "./lead-settings/LeadSettingsForLead";
 import toast from "react-hot-toast";
-import { useUserPreference } from "../../../context/user/UserPreference";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
@@ -53,6 +53,10 @@ import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
 import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
+import FormLayout from "../../ui/FormLayout";
+import TextAreaInput from "../../ui/TextAreaInput";
+import { PageLayout } from "../../ui/PageLayout";
+
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -63,7 +67,6 @@ const ViewLeadManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [isUpdateLeadFormOpen, setIsUpdateLeadFormOpen] =
     useState<boolean>(false);
-  const { userPreference } = useUserPreference();
   const [searchParams] = useSearchParams();
   const [reasonInputBoxOpen, setReasonInputBoxOpen] = useState<boolean>(false);
   const [reasonInputBoxOpenForLeadOwner, setReasonInputBoxOpenForLeadOwner] =
@@ -685,21 +688,105 @@ const ViewLeadManagement = () => {
     setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
     setPersistedSelectedUserId(selectedLeadData.companyUserId);
   }
+
+  const [showName , setShowName ]= useState<boolean>(false);
   return (
-    <div
-      className={` fixed top-8 inset-0 z-10 bg-white ${
-        userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
-      } overflow-auto`}
+
+    <PageLayout 
+      onScrollChange={setShowName}
+      scrollTopValue={70}
+
     >
+      {/* header navigation bar */}
+        <div
+  className="
+    sticky top-0
+    z-20
+    bg-white
+        py-0.5
+        border-b
+    
+  "
+>
+
+       <div className=" flex items-center justify-between  gap-3    ">
+        <div className="flex gap-3 items-center">
+          <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+          <Button className="flex caption-custom ml-1 items-center justify-center hover:text-gray-800">
+            <span>Leads</span>
+          </Button>
+        </Link>
+        <ChevronRight size={16} />
+        <h1 className="table-header-custom">Lead Details</h1>
+
+         {/*  Appears only on scroll */}
+          {showName && (
+            <>
+              {/* <ChevronRight size={16} /> */}
+              <span
+                className={`
+    ml-2 max-w-[240px] truncate text-sm text-gray-500
+  transition-all duration-200 ease-out
+  will-change-transform will-change-opacity ${
+    showName
+      ? "opacity-100 translate-x-0"
+      : "opacity-0 -translate-x-1 pointer-events-none"
+  } `}
+              >
+                ({selectedLeadData.name  || selectedLeadData.email || selectedLeadData.mobileNumber})
+              </span>
+            </>
+          )}
+        </div>
+         {/**Add Setting in lead details page here  */}
+          <div className=" flex items-center min-w-20 justify-end mr-2  ">
+            {/* new code  */}
+            <div className="relative inline-block">
+              <button
+                onClick={() => {
+                  if (userHasAccessToUpdateLead) {
+                    setIsLeadSettingModalOpen(true);
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .UPDATE_LEAD_ACCESS_DENIED_message
+                    );
+                  }
+                }}
+                className="px-1 py-0.5 caption-custom flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
+              >
+                <Settings size={12} />
+                <span>Lead setting</span>
+              </button>
+              {isLeadSettingModalOpen && (
+                <LeadSettingForLead
+                isOpen={isLeadSettingModalOpen}
+                onClose={() => {
+                  setIsLeadSettingModalOpen(false);
+                }}
+                lead={selectedLeadData}
+                />
+              )}
+            </div>
+          </div>
+      </div>
+                </div>
+   
+    {/* // <div */}
+    {/* //   className={`fixed top-8 inset-0 z-10 bg-white ${
+    //     userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
+    //   } overflow-auto`}
+    // > */}
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {/* Header */}
-        <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
+        {/* Header hidden */}
+        <div className="hidden   bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
           <div className="flex w-[30%] gap-6">
+            
             <button
               className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
@@ -777,7 +864,7 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Lead Status Section */}
-        <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
+        <div className="   flex  bg-slate-100   rounded-sm">
           <div className="flex w-full">
             <div
               className="flex w-[100%] border bg-white"
@@ -887,7 +974,7 @@ const ViewLeadManagement = () => {
           )}
 
         {/* Sections  */}
-        <div className="w-full flex flex-col md:flex-row gap-1 p-2">
+        <div className="w-full flex flex-col md:flex-row gap-1 mt-1">
           {/* Column 1 */}
           <div className="w-full md:w-1/2 flex flex-col gap-2">
             {/* Lead Basic Info */}
@@ -1120,9 +1207,9 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Column 2 */}
-          <div className="w-full md:w-1/2 flex  flex-col gap-0 shadow-sm">
+          <div className="w-full md:w-1/2 flex border  flex-col gap-0 shadow-sm">
             {/* Meeting / Contact / Span Tabs */}
-            <div className="bg-slate-200 pl-1  flex caption-custom gap-4">
+            <div className="bg-slate-200 pl-1 mb-2 border-b-2 flex caption-custom gap-4">
               <span
                 id="contact"
                 className={`cursor-pointer ${
@@ -1320,7 +1407,8 @@ const ViewLeadManagement = () => {
           interestTypeData={interestTypeData}
         />
       </motion.section>
-    </div>
+    {/* </div> */}
+     </PageLayout>
   );
 };
 export default ViewLeadManagement;

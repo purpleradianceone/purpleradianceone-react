@@ -72,6 +72,19 @@ function AccountManagementList({
     }
   };
 
+  // Note : Click anywhere in the row 
+   const handleOnRowClick = (event : any 
+   ) => {
+     const data = event.data;
+    if (!isUsedForAccountLead) {
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`)
+      // setAccountDataToShowFullDetails(data);
+      // setShowAccountDetails(true);
+    } else {
+      handleRowSelectedForLead!(data);
+    }
+  };
+
   const { userHasAccessToAddAccount } = useUserAccessModules();
   const handleShowImportModule = () => {
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
@@ -86,7 +99,7 @@ function AccountManagementList({
       <div
         className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           {!isSmallScreen && (
             <UserRoundCogIcon
               className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
@@ -96,11 +109,10 @@ function AccountManagementList({
           {(isMediumScreen || isLargeScreen) && (
             <span className="section-header-custom mt-1">{" Accounts"} </span>
           )}
-        </div>
 
         {/* {isLargeScreen && ( */}
-        <>
-          <div className="flex gap-2 justify-center items-center">
+        {/* <> */}
+          <div className="flex gap-2  justify-center items-center">
             {/* search box flex div */}
             <div className="flex gap-1">
               {/* search box flex div */}
@@ -112,7 +124,7 @@ function AccountManagementList({
                     );
                   }}
                   value={handleSearchOption.searchParameter}
-                ></SearchInput>
+                  />
               </div>
 
               {/* Date FIlters Dropdown */}
@@ -126,26 +138,27 @@ function AccountManagementList({
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
                     selectedOption={selectedDateName}
-                  ></DateRangeFilterDropdown>
+                    ></DateRangeFilterDropdown>
                 </div>
               </div>
               {/* Custom Date Picker Div Flex Box*/}
               <div
               className="flex"
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
+              style={
+                isCustomDateOptionSelected
+                ? { visibility: "visible" }
+                : { visibility: "hidden" }
+              }
               >
                 <DateRangePicker
                   onStartDateChange={onStartDateChange}
                   onEndDateChange={onEndDateChange}
-                />
+                  />
               </div>
             </div>
           </div>
-        </>
+        {/* </> */}
+                  </div>
 
         <div className="flex gap-2">
           {!isUsedForAccountLead && (
@@ -209,7 +222,7 @@ function AccountManagementList({
         >
           <AccountManagementAgGrid
             accounts={accounts}
-            // handleRowClick={(e) => {handleRowClick}}
+            handleRowClick={handleOnRowClick}
             onRowSelect={handleRowSelectedToShowAccountDetails}
             isUsedForAccountLead={isUsedForAccountLead}
           />
