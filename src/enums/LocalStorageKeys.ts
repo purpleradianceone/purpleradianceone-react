@@ -7,5 +7,4 @@ export enum LocalStorageKeys {
     TEAMS_MANAGEMEMNT_FILTERS ='teams_management_filters',
     ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET = 'account_company_product_for_support_ticket_filters',
     SUPPORT_TICKET_MANAGEMENT_FILTERS = 'support_ticket_management_filters',
-
 }
