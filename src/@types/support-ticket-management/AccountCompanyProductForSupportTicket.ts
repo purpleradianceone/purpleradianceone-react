@@ -3,6 +3,8 @@ type AccountCompanyProductForSupportTicket = {
     id : number,
     accountId: number,
     accountName: string,
+    accountEmail: string,
+    accountMobileNumber: string,
     companyProductId : number,
     companyProductName : string,
     quantity : number,
