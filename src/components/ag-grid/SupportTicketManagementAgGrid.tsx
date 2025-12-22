@@ -34,6 +34,19 @@ function SupportTicketManagementAgGrid({
         sortable: true,
         filter: true,
       },
+      {
+        field: "accountEmail",
+        headerName: "Email",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "accountMobileNumber",
+        headerName: "Mobile Number",
+        maxWidth: 140,
+        sortable: true,
+        filter: true,
+      },
        {
         field: "companyProductName",
         headerName: "Product Name",

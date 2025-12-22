@@ -48,7 +48,7 @@ function SupportTicketManagementList({
 
   selectedAssignTo,
   persistedSelectedUserId,
-  handleSelectedCompanyUserCheckBoxChange,
+  handleSelectedAssignToCheckBoxChange,
 
   selectedResolvedBy,
   persistedSelectedResolvedById,
@@ -84,6 +84,8 @@ function SupportTicketManagementList({
       id: 0,
       companyId: 0,
       accountName: "",
+      accountEmail: "",
+      accountMobileNumber: "",
       companyProductName: "",
       accountCompanyProductId: 0,
       supportTicketCategoryId: 0,
@@ -332,7 +334,7 @@ function SupportTicketManagementList({
                               <button
                                 title="Clear"
                                 onClick={() =>
-                                  handleSelectedCompanyUserCheckBoxChange(null)
+                                  handleSelectedAssignToCheckBoxChange(null)
                                 }
                                 className="border-transparent"
                               >
@@ -525,7 +527,7 @@ function SupportTicketManagementList({
                     } // Pass the persisted ID
                     handleSelectedCompanyUserChange={(params) => {
                       if (openPopUpOfCompanyUserModal) {
-                        handleSelectedCompanyUserCheckBoxChange(params);
+                        handleSelectedAssignToCheckBoxChange(params);
                         setOpenPopUpOfCompanyUserModal(false);
                       }
                       if (openPopUpOfResolvedByModal) {

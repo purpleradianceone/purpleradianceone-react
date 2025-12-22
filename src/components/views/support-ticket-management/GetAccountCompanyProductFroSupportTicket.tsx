@@ -85,6 +85,8 @@ function GetAccountCompanyProductFroSupportTicket({
           id: res.id,
           accountId: res.account_id,
           accountName: res.account_name,
+          accountEmail: res.account_email,
+          accountMobileNumber: res.account_mobilenumber,
           companyProductId: res.company_product_id,
           companyProductName: res.company_product_name,
           quantity: res.quantity,
