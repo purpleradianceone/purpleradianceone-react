@@ -64,7 +64,14 @@ function AccountManagementList({
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: Account) => {
     if (!isUsedForAccountLead) {
-      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`)
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}` , 
+        {
+          state : {
+            accountName : data.name,
+          }
+        }
+      )
+    
       // setAccountDataToShowFullDetails(data);
       // setShowAccountDetails(true);
     } else {
@@ -77,9 +84,13 @@ function AccountManagementList({
    ) => {
      const data = event.data;
     if (!isUsedForAccountLead) {
-      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`)
-      // setAccountDataToShowFullDetails(data);
-      // setShowAccountDetails(true);
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`, 
+        {
+          state : {
+            accountName : data.name,
+          }
+          , replace: false
+        })
     } else {
       handleRowSelectedForLead!(data);
     }

@@ -146,6 +146,7 @@ export const SIZE = {
     TWELEVE : 12,
     FOURTEEN : 14,
     SIXTEEN : 16,
+    LUCIDE_LOGO_INPUT_LABEL_SIZE: 14
 }
 
 export const INNERHTML = {

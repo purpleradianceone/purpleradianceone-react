@@ -240,27 +240,53 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
 
+      // {
+      //   headerName: "Actions",
+      //   field: "view",
+      //   pinned: "right",
+      //   maxWidth: 80,
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   cellRenderer: (params: AccountProduct | any) => {
+      //     return (
+      //       <div className="flex items-center justify-center  ">
+      //         <button
+      //           className="lead-details cursor-pointer text-blue-600  "
+      //           onClick={(e) => {
+      //             e.preventDefault();
+      //             e.stopPropagation()
+      //             params.context.handleRowSelect(params.data);
+      //           }}
+      //         >
+      //           {isUsedForSelection ? "Select" : "Details"}{" "}
+      //         </button>
+      //       </div>
+      //     );
+      //   },
+      // },
+
       {
-        headerName: "Actions",
-        field: "view",
-        pinned: "right",
-        maxWidth: 80,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params: AccountProduct | any) => {
-          return (
-            <div className="flex items-center justify-center  ">
-              <span
-                className="lead-details cursor-pointer text-blue-600  "
-                onClick={() => {
-                  params.context.handleRowSelect(params.data);
-                }}
-              >
-                {isUsedForSelection ? "Select" : "Details"}{" "}
-              </span>
-            </div>
-          );
-        },
-      },
+  headerName: "Actions",
+  field: "view",
+  pinned: "right",
+  maxWidth: 80,
+  cellRenderer: (params: any) => {
+    return (
+      <div className="flex items-center justify-center">
+        <button
+          className="lead-details cursor-pointer text-blue-600"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation(); // ⭐ THIS IS THE FIX
+            params.context.handleRowSelect(params.data);
+          }}
+        >
+          {isUsedForSelection ? "Select" : "Details"}
+        </button>
+      </div>
+    );
+  },
+}
+
       // {
       //   headerName: "Actions",
       //   sortable: false,

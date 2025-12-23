@@ -56,7 +56,6 @@ import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
 import { PageLayout } from "../../ui/PageLayout";
 
-
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
   const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
@@ -144,7 +143,7 @@ const ViewLeadManagement = () => {
   const [isLeadStatusSaving, setIsLeadStatusSaving] = useState<boolean>(false);
   const handleSaveStatusUpdate = async () => {
     if (!selectedLeadData || selectedStatusId === null) return;
-    if(isLeadStatusSaving) return;
+    if (isLeadStatusSaving) return;
 
     const postDataForLeadStatusUpdate = {
       company_id: loginStatus.companyId,
@@ -155,7 +154,7 @@ const ViewLeadManagement = () => {
     };
 
     try {
-      setIsLeadStatusSaving(true)
+      setIsLeadStatusSaving(true);
       const response = await axios.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
@@ -163,7 +162,6 @@ const ViewLeadManagement = () => {
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
-        
           const updatedStatusName = leadStatus?.find(
             (item) => item.id === selectedStatusId
           )?.name;
@@ -200,7 +198,7 @@ const ViewLeadManagement = () => {
           handleSaveStatusUpdate();
         }
       }
-    }finally{
+    } finally {
       setIsLeadStatusSaving(false);
     }
   };
@@ -688,42 +686,27 @@ const ViewLeadManagement = () => {
     setPersistedSelectedUserId(selectedLeadData.companyUserId);
   }
 
-  const [showName , setShowName ]= useState<boolean>(false);
+  const [showName, setShowName] = useState<boolean>(false);
   return (
-
-    <PageLayout 
-      onScrollChange={setShowName}
-      scrollTopValue={70}
-
-    >
+    <PageLayout onScrollChange={setShowName} scrollTopValue={70}>
       {/* header navigation bar */}
-        <div
-  className="
-    sticky top-0
-    z-20
-    bg-white
-        py-0.5
-        border-b
-    
-  "
->
+      <div className="sticky top-0 z-20 bg-white py-0.5 border-b">
+        <div className=" flex items-center justify-between  gap-3    ">
+          <div className="flex gap-3 items-center">
+            <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+              <Button className="flex caption-custom ml-1 items-center justify-center hover:text-gray-800">
+                <span>Leads</span>
+              </Button>
+            </Link>
+            <ChevronRight size={16} />
+            <h1 className="table-header-custom">Lead Details</h1>
 
-       <div className=" flex items-center justify-between  gap-3    ">
-        <div className="flex gap-3 items-center">
-          <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
-          <Button className="flex caption-custom ml-1 items-center justify-center hover:text-gray-800">
-            <span>Leads</span>
-          </Button>
-        </Link>
-        <ChevronRight size={16} />
-        <h1 className="table-header-custom">Lead Details</h1>
-
-         {/*  Appears only on scroll */}
-          {showName && (
-            <>
-              {/* <ChevronRight size={16} /> */}
-              <span
-                className={`
+            {/*  Appears only on scroll */}
+            {showName && (
+              <>
+                {/* <ChevronRight size={16} /> */}
+                <span
+                  className={`
     ml-2 max-w-[240px] truncate text-sm text-gray-500
   transition-all duration-200 ease-out
   will-change-transform will-change-opacity ${
@@ -731,13 +714,17 @@ const ViewLeadManagement = () => {
       ? "opacity-100 translate-x-0"
       : "opacity-0 -translate-x-1 pointer-events-none"
   } `}
-              >
-                ({selectedLeadData.name  || selectedLeadData.email || selectedLeadData.mobileNumber})
-              </span>
-            </>
-          )}
-        </div>
-         {/**Add Setting in lead details page here  */}
+                >
+                  (
+                  {selectedLeadData.name ||
+                    selectedLeadData.email ||
+                    selectedLeadData.mobileNumber}
+                  )
+                </span>
+              </>
+            )}
+          </div>
+          {/**Add Setting in lead details page here  */}
           <div className=" flex items-center min-w-20 justify-end mr-2  ">
             {/* new code  */}
             <div className="relative inline-block">
@@ -759,20 +746,20 @@ const ViewLeadManagement = () => {
               </button>
               {isLeadSettingModalOpen && (
                 <LeadSettingForLead
-                isOpen={isLeadSettingModalOpen}
-                onClose={() => {
-                  setIsLeadSettingModalOpen(false);
-                }}
-                lead={selectedLeadData}
+                  isOpen={isLeadSettingModalOpen}
+                  onClose={() => {
+                    setIsLeadSettingModalOpen(false);
+                  }}
+                  lead={selectedLeadData}
                 />
               )}
             </div>
           </div>
+        </div>
       </div>
-                </div>
-   
-    {/* // <div */}
-    {/* //   className={`fixed top-8 inset-0 z-10 bg-white ${
+
+      {/* // <div */}
+      {/* //   className={`fixed top-8 inset-0 z-10 bg-white ${
     //     userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
     //   } overflow-auto`}
     // > */}
@@ -785,7 +772,6 @@ const ViewLeadManagement = () => {
         {/* Header hidden */}
         <div className="hidden   bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
           <div className="flex w-[30%] gap-6">
-            
             <button
               className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
@@ -926,7 +912,7 @@ const ViewLeadManagement = () => {
         </div>
         {reasonInputBoxOpen && selectedStatusId !== 9 && (
           <StatusUpdateModal
-          isLeadStatusSaving={isLeadStatusSaving}
+            isLeadStatusSaving={isLeadStatusSaving}
             handleCancel={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
               setSelectedStatusId(null);
@@ -939,7 +925,7 @@ const ViewLeadManagement = () => {
 
         {reasonInputBoxOpen && selectedStatusId === 9 && (
           <ConvertLeadModal
-          isLeadStatusSaving={isLeadStatusSaving}
+            isLeadStatusSaving={isLeadStatusSaving}
             isOpen={reasonInputBoxOpen}
             onClose={() => {
               setReasonInputBoxOpen(!reasonInputBoxOpen);
@@ -949,28 +935,30 @@ const ViewLeadManagement = () => {
             leadData={selectedLeadData}
             handleLeadConversion={handleSaveStatusUpdate}
             onReasonChange={(e) => setReasonText(e.target.value)}
-              reasonText={reasonText}
-              handleLeadMappedToAccount={()=>{
-               const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
-          parsedQuery.leadStatusId = "9";
-          parsedQuery.leadStatus = "Converted";
-          const newQueryString = qs.stringify({
-            leadData: JSON.stringify(parsedQuery),
-          });
+            reasonText={reasonText}
+            handleLeadMappedToAccount={() => {
+              const parsedQuery = JSON.parse(
+                searchParams.get("leadData") || "{}"
+              );
+              parsedQuery.leadStatusId = "9";
+              parsedQuery.leadStatus = "Converted";
+              const newQueryString = qs.stringify({
+                leadData: JSON.stringify(parsedQuery),
+              });
 
-          setSelectedLeadData((prev: any) => ({
-            ...prev,
-            leadStatus: "Converted",
-          }));
-          setReasonInputBoxOpen(false);
-          setReasonText("");
-          setSelectedStatusId(null);
+              setSelectedLeadData((prev: any) => ({
+                ...prev,
+                leadStatus: "Converted",
+              }));
+              setReasonInputBoxOpen(false);
+              setReasonText("");
+              setSelectedStatusId(null);
 
-          const newPath = `${window.location.pathname}?${newQueryString}`;
-          navigate(newPath, { replace: true });
-              }}
-            />
-          )}
+              const newPath = `${window.location.pathname}?${newQueryString}`;
+              navigate(newPath, { replace: true });
+            }}
+          />
+        )}
 
         {/* Sections  */}
         <div className="w-full flex flex-col md:flex-row gap-1 mt-1">
@@ -1017,7 +1005,6 @@ const ViewLeadManagement = () => {
                   </div>
                 </div>
                 <div
-                
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -1049,7 +1036,7 @@ const ViewLeadManagement = () => {
                 </div>
 
                 <div
-                className="ml-4"
+                  className="ml-4"
                   onClick={() => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
@@ -1090,13 +1077,12 @@ const ViewLeadManagement = () => {
                   value={selectedLeadData?.createdOn}
                 />
                 <div className="ml-4">
-
-                <Detail
-                  type="none"
-                  label="Created by"
-                  value={selectedLeadData?.createdBy}
+                  <Detail
+                    type="none"
+                    label="Created by"
+                    value={selectedLeadData?.createdBy}
                   />
-                  </div>
+                </div>
                 <div
                   className="flex"
                   title={
@@ -1384,7 +1370,7 @@ const ViewLeadManagement = () => {
                 {/* NOTE : CALL TO THE MODAL COMPONENT */}
                 <div className="">
                   <GetCompanyUsersForLead
-                  isUsedForSettings={false}
+                    isUsedForSettings={false}
                     selectedUserId={persistedSelectedUserId} // Pass the persisted ID
                     handleSelectedCompanyUserChange={
                       handleSelectedCompanyUserChange
@@ -1406,8 +1392,8 @@ const ViewLeadManagement = () => {
           interestTypeData={interestTypeData}
         />
       </motion.section>
-    {/* </div> */}
-     </PageLayout>
+      {/* </div> */}
+    </PageLayout>
   );
 };
 export default ViewLeadManagement;
@@ -1522,7 +1508,9 @@ const Detail: React.FC<DetailProps> = ({
           type !== "none" && (
             <input
               type={type}
-              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${label==="Name" ? "w-fit" : "w-48"} focus:outline-none focus:ring-0 `}
+              className={`input-label-custom border border-gray-400 rounded-sm  p-0 m-0 ${
+                label === "Name" ? "w-fit" : "w-48"
+              } focus:outline-none focus:ring-0 `}
               value={value}
               onChange={onChange}
               onBlur={handleBlur}
@@ -1574,14 +1562,14 @@ const Detail: React.FC<DetailProps> = ({
           className={`input-label-custom hover:bg-slate-100      cursor-pointer`}
           onClick={handleClickLeadOwnerChange}
         >
-          {
-          value?
-          <>
-          
-         {value} {/* Icon never gets truncated */}
-            <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" /> 
-          </>
-            :<span className="input-label-custom">Add here...</span>}
+          {value ? (
+            <>
+              {value} {/* Icon never gets truncated */}
+              <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" />
+            </>
+          ) : (
+            <span className="input-label-custom">Add here...</span>
+          )}
         </div>
       ) : (
         <div
@@ -1594,7 +1582,11 @@ const Detail: React.FC<DetailProps> = ({
         >
           <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
             {/* Only the text truncates */}
-            <span className={`truncate ${label==="Name" ? "" : " max-w-[205px]"} `}>
+            <span
+              className={`truncate ${
+                label === "Name" ? "" : " max-w-[205px]"
+              } `}
+            >
               {value ? (
                 value
               ) : (

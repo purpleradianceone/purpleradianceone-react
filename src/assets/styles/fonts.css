@@ -120,12 +120,24 @@
 /* Table Data */
 .table-data-custom {
   font-family: "Roboto", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+  color: #363535;
 }
 
+.card-header {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #363535;
+}
 
+.card-data {
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #363535;
+}
 
 
 /* Action Buttons */
