@@ -228,7 +228,7 @@ function GetCompanyUsersList({
   || "Filter";
   return (
     <div
-      className={`w-full  pt-1  ${
+      className={`w-full   pt-1  ${
         userPreference.isLeftMenu ? "pl-5" : "pl-1"
       } pr-1 gap-1`}
     >
@@ -347,6 +347,7 @@ function GetCompanyUsersList({
         
         <div
           className={
+            isUsedInAccountProductForAssingingInstalledBy ? `ag-theme-balham w-full h-[calc(70vh-122px)]` :
             userPreference.isLeftMenu
               ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
               : "ag-theme-balham w-full h-[calc(100vh-130px)]"

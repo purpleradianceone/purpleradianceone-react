@@ -64,7 +64,8 @@ import SupportTicketManagement from "../../components/views/support-ticket-manag
 import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
 import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
 import AccountDetails from "../../components/modals/Account/AccountDetails";
-import { PageLayout } from "../../components/ui/PageLayout";
+import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
+import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
 
 export const router = createBrowserRouter([
   {
@@ -616,39 +617,86 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-  {
-    path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
-    element: (
-      <MobileRedirectWrapper>
-        <PrivateRoute>
-          <div>
-            <Navbar>
-              <AccountDetails
-              />
-              {/* <GetAccounts isUsedForAccountLead={false} /> */}
-            </Navbar>
-          </div>
-        </PrivateRoute>
-      </MobileRedirectWrapper>
-    ),
-  },
+  // {
+  //   path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <AccountDetails
+  //             />
+  //             {/* <GetAccounts isUsedForAccountLead={false} /> */}
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+  // {
+  //   path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:accountId`,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <PageLayout>
+  //           <CreateMultipleAccountCompanyProduct/>
+  //             </PageLayout>
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+  //  {
+  //   path:`${ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS}/:accountCompanyProductId`,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <PageLayout>
+  //           <AccountCompanyProductDetails/>
+  //             </PageLayout>
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+
+  // this is new 
 
   {
-    path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:accountId`,
-    element: (
-      <MobileRedirectWrapper>
-        <PrivateRoute>
-          <div>
-            <Navbar>
-              <PageLayout>
-            <CreateMultipleAccountCompanyProduct/>
-              </PageLayout>
-            </Navbar>
-          </div>
-        </PrivateRoute>
-      </MobileRedirectWrapper>
-    ),
-  },
+  path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+  element: (
+    <MobileRedirectWrapper>
+      <PrivateRoute>
+        <AccountNavbarBreadcrumb/>
+        {/* <AccountLayout /> */}
+      </PrivateRoute>
+    </MobileRedirectWrapper>
+  ),
+  children: [
+    {
+      index: true,
+      element: <AccountDetails />,
+    },
+    {
+      path: "products/:productId",
+      element: <AccountCompanyProductDetails />,
+    },
+    {
+      path : ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
+      element: <CreateMultipleAccountCompanyProduct/>
+    }
+  ],
+},
+
   //  {
   //   path: ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS,
   //   element: (

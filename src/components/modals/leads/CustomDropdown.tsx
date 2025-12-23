@@ -127,7 +127,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             ? "Select Option"
             : options.find((o) => o.id === selectedOption)?.name ?? ""}
         </div> */}
-        <div className="caption-custom">
+        <div className="input-label-custom">
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||

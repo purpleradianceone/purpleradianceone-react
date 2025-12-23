@@ -24,7 +24,7 @@ const ROUTES_URL = {
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
-    LEAD_DETAILS : "/lead/view",
+    LEAD_DETAILS : "/home/manage-leads/leads/lead/view",
     SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
     EMAIL_TEMPLATE : "/email-template",
@@ -67,7 +67,9 @@ const ROUTES_URL = {
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
     ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
     ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
-    ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "/home/manage-accounts/accounts/create",
+    // ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "/home/manage-accounts/accounts/create",
+
+    ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "assign-products",
 
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",

@@ -26,8 +26,8 @@ type AccountProduct ={
 	accountName : string,
 	companyProductName : string,
 	installedByName:  string,
-	warrantyIntervalName : string,
-	amcIntervalName : string,
+	warrantyIntervalName? : string,
+	amcIntervalName? : string,
 	updatedBy : string,
 	createdOn : string,
 	updatedOn : string

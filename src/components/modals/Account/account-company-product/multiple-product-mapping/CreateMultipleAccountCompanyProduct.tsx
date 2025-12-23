@@ -12,7 +12,6 @@ import DatePickerInput from "../../../../ui/DatePickerInput";
 import { nanoid } from "nanoid";
 import {
   Box,
-  ChevronRight,
   Info,
   LucideCalendar,
   LucideIcon,
@@ -25,8 +24,7 @@ import {
   X,
 } from "lucide-react";
 import TextAreaInput from "../../../../ui/TextAreaInput";
-import { PageLayout } from "../../../../ui/PageLayout";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import ROUTES_URL from "../../../../../constants/Routes";
 import Button from "../../../../ui/Button";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
@@ -92,12 +90,18 @@ interface ProductRow {
 }
 
 export const CreateMultipleAccountCompanyProduct = () => {
+
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateAccount } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
-  const { accountId } = useParams();
+  const { accountId } = useParams<{accountId : string }>();
+
+  // const accountId = Number(accountId);
+  // useEffect(()=>{
+    
+  // })
   const [rows, setRows] = useState<ProductRow[]>([
     {
       rowNaNoId: nanoid(),
@@ -820,9 +824,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
   if (!userHasAccessToUpdateAccount) return <div>permission denied</div>;
 
   return (
-    <PageLayout>
+    // <PageLayout>
+    <>
       {/* Header navigation bar */}
-      <div className="sticky top-0 z-20 bg-white py-1 border-b">
+      {/* <div className="sticky top-0 z-20 bg-white py-1 border-b">
         <div className="flex items-center gap-3 mx-0.5 ">
           <Link to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
             <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
@@ -842,7 +847,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
           <h1 className="table-header-custom">Assign Products</h1>
         </div>
-      </div>
+      </div> */}
 
       {/* form */}
       <form>
@@ -1374,7 +1379,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
           }}
         />
       )}
-    </PageLayout>
+    {/* </PageLayout> */}
+        </>
+
   );
 };
 

@@ -19,7 +19,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
-import { Save } from "lucide-react";
+import {  Pen, Save } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
 
 const LeadDetails = ({
@@ -380,7 +380,7 @@ const LeadDetails = ({
         <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
           <span className="table-header-custom">Details</span>
           {showSaveLeadButton && (
-            <button className={COLORS.ADD_BUTTON} onClick={handleSave}>
+            <button type="submit" className={COLORS.ADD_BUTTON} onClick={handleSave}>
               <div className="flex items-center gap-0.5">
                 <Save className="w-3 h-3 -mt-0.5" />
                 Save
@@ -644,7 +644,7 @@ const FormField = ({
 
   return (
     <div className="flex w-full  items-center border-b  ">
-      <div className="input-label-custom w-[50%]">{label}</div>
+      <div className="caption-custom w-[50%]">{label}</div>
       <div
         className="flex items-center w-[50%]   min-w-[150px]"
         onClick={() => {
@@ -672,14 +672,15 @@ const FormField = ({
       >
         {!isEditing ? (
           <span
-            className="caption-custom cursor-pointer truncate whitespace-nowrap"
+            className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
             title={value?.toLocaleString()}
           >
             {value ? (
-              <span className="caption-custom">{value?.toLocaleString()}</span>
+              <span className="card-data">{value?.toLocaleString()}</span>
             ) : (
               <span className="caption-custom italic">Add here...</span>
             )}
+            <Pen size={9} className="text-gray-600"/>
           </span>
         ) : type === "select" ? (
           <select
@@ -705,7 +706,8 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
-            className="caption-custom border border-gray-300 rounded p-1 focus:outline-none"
+            
+            className="caption-custom border border-gray-300 rounded p-1 focus:outline-none "
           />
         ) : (
           <input
