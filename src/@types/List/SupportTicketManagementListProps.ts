@@ -17,7 +17,7 @@ type SupportTicketManagementListProps = {
 
     selectedAssignTo : CompanyUser;
     persistedSelectedUserId : number | null;
-    handleSelectedCompanyUserCheckBoxChange: ( params: CompanyUser | null) => void;
+    handleSelectedAssignToCheckBoxChange: ( params: CompanyUser | null) => void;
 
 
     selectedResolvedBy: CompanyUser;

@@ -12,7 +12,9 @@ import FormHeader from "../../ui/FormHeader";
 import {
   Clock,
   Link,
+  LucideMail,
   LucideMessageCircleQuestion,
+  LucidePhoneCall,
   Notebook,
   Package,
   Phone,
@@ -84,6 +86,8 @@ function CreateSupportTicketModal({
       id: 0,
       accountId: 0,
       accountName: "",
+      accountEmail: "",
+      accountMobileNumber: "",
       companyProductId: 0,
       companyProductName: "",
       quantity: 0,
@@ -157,6 +161,8 @@ function CreateSupportTicketModal({
       id: 0,
       accountId: 0,
       accountName: "",
+      accountEmail: "",
+      accountMobileNumber: "",
       companyProductId: 0,
       companyProductName: "",
       quantity: 0,
@@ -449,7 +455,45 @@ function CreateSupportTicketModal({
                 <div>
                   <p className="caption-custom">Account</p>
                   <p className="table-header-custom">
-                    {selectedAccount.accountName || "No account selected"}
+                    {selectedAccount.accountName?
+                    selectedAccount.accountName.length>25? `${selectedAccount.accountName.slice(0,25)}...`:selectedAccount.accountName
+                    : "No account selected"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                  <LucideMail size={18} className="text-blue-600" />
+                </div>
+                <div>
+                  <p className="caption-custom">Email</p>
+                  <p className="table-header-custom">
+                    {selectedAccount.accountEmail
+                      ? selectedAccount.accountEmail.length > 30
+                        ? `${selectedAccount.accountEmail.slice(0, 30)}...`
+                        : selectedAccount.accountEmail
+                      : "NA"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                  <LucidePhoneCall size={18} className="text-blue-600" />
+                </div>
+                <div>
+                  <p className="caption-custom">Mobile Number</p>
+                  <p className="table-header-custom">
+                    {selectedAccount.accountMobileNumber
+                      ? selectedAccount.accountMobileNumber.length > 30
+                        ? `${selectedAccount.accountMobileNumber.slice(0,30)}...`
+                        : selectedAccount.accountMobileNumber
+                      : "NA"}
                   </p>
                 </div>
               </div>
@@ -464,8 +508,10 @@ function CreateSupportTicketModal({
                 <div>
                   <p className="caption-custom">Selected Product</p>
                   <p className="table-header-custom">
-                    {selectedAccount.companyProductName ||
-                      "No product selected"}
+                    {selectedAccount.companyProductName ?
+                    selectedAccount.companyProductName.length > 25?
+                     `${selectedAccount.companyProductName.slice(0,30)}...`:selectedAccount.companyProductName
+                    :"No product selected"}
                   </p>
                 </div>
               </div>
