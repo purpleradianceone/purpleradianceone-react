@@ -8,10 +8,10 @@ import {
   Network,
   Settings,
 } from "lucide-react";
-import ROUTES_URL from "../../../../constants/Routes";
+import ROUTES_URL from "../../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { getQuickActionColor } from "../../../../constants/QuickActionsStyle";
+import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
+import { getQuickActionColor } from "../../../../../constants/QuickActionsStyle";
 
 type AccessModuleType = {
   id: number;

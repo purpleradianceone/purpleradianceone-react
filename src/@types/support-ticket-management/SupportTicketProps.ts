@@ -1,6 +1,7 @@
 type SupportTicketProps = {
     count? : number ,
     id : number ,
+    ticketNumber: string,
     companyId : number ,
     accountName : string,
     accountEmail : string,

@@ -3,7 +3,7 @@ export type CompanyProductSla ={
     companyProductId: number,
     name: string,
     colorCode: string ,
-    expectedResolutionTimeHours : string,
+    expectedResolutionTimeHours : number,
     isActive : boolean,
     createdBy: string,
     updatedBy : string ,

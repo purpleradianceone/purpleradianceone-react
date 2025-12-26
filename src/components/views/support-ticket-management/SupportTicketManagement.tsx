@@ -202,6 +202,7 @@ function SupportTicketManagement({
           (item: any) => ({
             count: item.count,
             id: item.id,
+            ticketNumber: item.ticket_number,
             companyId: item.company_id,
             accountName: item.account_name,
             accountEmail : item.account_email,
