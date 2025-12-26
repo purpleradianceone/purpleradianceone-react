@@ -311,3 +311,13 @@
 .custom-height-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #ededf3; /* A darker shade on hover for interactivity */
 }
+
+/*For scrollbar hiding*/
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+}

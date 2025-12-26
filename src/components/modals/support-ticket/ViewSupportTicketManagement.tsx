@@ -12,6 +12,7 @@ import {
   LucideText,
   ShoppingBag,
   StickyNote,
+  TicketIcon,
   TrendingUp,
   User,
   UserCheck2Icon,
@@ -416,23 +417,23 @@ const ViewSupportTicketManagement = () => {
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
-        {/* Header */}
-        <div className="sticky top-0 z-20 bg-slate-100 py-1 border-b transition-all duration-200">
-          <div className="flex text-center justify-start items-center gap-3 ml-0.5 ">
-            <Link to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
-              <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
-                Support
-              </Button>
-            </Link>
+      {/* Header */}
+      <div className="sticky top-0 z-20 bg-slate-100 py-1 border-b transition-all duration-200">
+        <div className="flex text-center justify-start items-center gap-3 ml-0.5 ">
+          <Link to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
+            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+              Support
+            </Button>
+          </Link>
 
-            <ChevronRight size={16} />
+          <ChevronRight size={16} />
 
-            <h1 className="table-header-custom">Support Ticket Details</h1>
+          <h1 className="table-header-custom">Support Ticket Details</h1>
 
-            {/*  Appears only on scroll */}
-            {showAccountName && (
-              <span
-                className={`
+          {/*  Appears only on scroll */}
+          {showAccountName && (
+            <span
+              className={`
                 ml-1 max-w-[700px] truncate text-sm text-gray-500
                 transition-all duration-200 ease-out
                 will-change-transform will-change-opacity justify-center items-center ${
@@ -440,60 +441,273 @@ const ViewSupportTicketManagement = () => {
                     ? "opacity-100 translate-x-0"
                     : "opacity-0 -translate-x-1 pointer-events-none"
                 } `}
-              >
-                  (<span>Account:</span> <span className="table-data-custom">{`  ${selectedSupportTicket.accountName},  `}</span>
-                    <span>Support Product:</span> <span className="table-data-custom">{`  ${selectedSupportTicket.companyProductName}`}</span>
-                
-                )
-              </span>
-            )}
-          </div>
+            >
+              (<span>Ticket Number:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.ticketNumber},  `}</span>
+              <span>Account:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.accountName},  `}</span>
+              <span>Support Product:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.companyProductName}`}</span>
+              )
+            </span>
+          )}
         </div>
-        <motion.section
-          ref={ref}
-          initial={{ opacity: 0, y: 40 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        >
-          {/*Support Ticket Lifecycle*/}
-          {!isLoadingForSupportTicketLifecycle ? (
-            <div className="mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm">
-              <div className="flex w-full">
-                <div
-                  className="flex w-[100%] border bg-white"
-                  style={{
-                    clipPath:
-                      "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                  }}
-                >
-                  {supportTicketLifecycle!.map((item: any) => (
-                    <button
-                      title={item.name}
-                      key={item.id}
-                      className={`flex-1 overflow-hidden ${
-                        selectedSupportTicket.supportTicketLifecycleName ===
-                        item.name
-                          ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
-                          : "hover:bg-blue-700 table-header-custom hover:text-white"
-                      }
+      </div>
+      <motion.section
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {/*Support Ticket Lifecycle*/}
+        {!isLoadingForSupportTicketLifecycle ? (
+          <div className="mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm">
+            <div className="flex w-full">
+              <div
+                className="flex w-[100%] border bg-white"
+                style={{
+                  clipPath:
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                }}
+              >
+                {supportTicketLifecycle!.map((item: any) => (
+                  <button
+                    title={item.name}
+                    key={item.id}
+                    className={`flex-1 overflow-hidden ${
+                      selectedSupportTicket.supportTicketLifecycleName ===
+                      item.name
+                        ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                        : "hover:bg-blue-700 table-header-custom hover:text-white"
+                    }
               ${
                 selectedSupportTicketLifecycleId === item.id &&
                 "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
               } text-center p-1`}
-                      style={{
-                        clipPath:
-                          "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                      }}
-                      onClick={async () => {
+                    style={{
+                      clipPath:
+                        "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                    }}
+                    onClick={async () => {
+                      if (userHasAccessToUpdateSupportTicket) {
+                        if (
+                          selectedSupportTicket.supportTicketLifecycleId !==
+                          item.id
+                        ) {
+                          setSelectedSupportTicketLifecycleId(item.id);
+                          setSelectedSupportTicketLifecycleName(item.name);
+                        }
+                        /////////////////////////////////////////////////////////////////////////////////////
+                      } else {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .UPDATE_ACCESS_DENIED_MESSAGE
+                        );
+                      }
+                    }}
+                  >
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+              {/* status history */}
+              <div className="flex justify-end caption-custom  mb-1 px-2">
+                {/* <span className="font-semibold ">Lead Status</span> */}
+                <button
+                  onClick={() => {
+                    setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+                  }}
+                >
+                  <span
+                    title="Status history"
+                    className="flex items-center justify-center hover:text-blue-600 "
+                  >
+                    <History size={12} className="mt-0" />
+                    History
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mx-1 mt-2 flex bg-slate-100 shadow rounded-sm animate-pulse">
+            <div className="flex w-full">
+              {/* Skeleton for lifecycle buttons */}
+              <div
+                className="flex w-[100%] border bg-white"
+                style={{
+                  clipPath:
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <div
+                    key={s}
+                    className="flex-1 p-1 mx-1 bg-slate-200 rounded"
+                    style={{
+                      height: "28px",
+                      clipPath:
+                        "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                    }}
+                  ></div>
+                ))}
+              </div>
+
+              {/* Skeleton for History button */}
+              <div className="flex justify-end caption-custom mb-1 px-2 items-center">
+                <div className="w-14 h-4 bg-slate-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/**Sections */}
+        <div className="w-full flex flex-col gap-1 p-1">
+          {/** Section 1 */}
+          {/* SUPPORT TICKET DETAILS */}
+          <div className="w-full flex flex-col gap-4 ">
+            {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
+            <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
+              <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
+                <div className="flex gap-6">
+                  {/* Ticket Number */}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <TicketIcon size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Ticket Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.ticketNumber}
+                    />
+                  </div>
+                  {/* Account */}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <HeadsetIcon size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Account"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountName}
+                    />
+                  </div>
+                  {/* Account Email */}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <LucideMail size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Email"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountEmail}
+                    />
+                  </div>
+                  {/* Account Mobile Number*/}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <LucidePhoneCall size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Mobile Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountMobileNumber}
+                    />
+                  </div>
+
+                  {/* Support Product Name*/}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <ShoppingBag size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Support Product"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.companyProductName}
+                    />
+                  </div>
+                </div>
+                <Detail
+                  type="none"
+                  label={
+                    selectedSupportTicket?.resolvedByName !== "NA" &&
+                    selectedSupportTicket?.resolvedByName
+                      ? "Resolved By"
+                      : "Resolved Status"
+                  }
+                  value={
+                    selectedSupportTicket?.resolvedByName || "Not Resolved"
+                  }
+                />
+              </div>
+            </div>
+
+            {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* LEFT SIDE FORM */}
+              <div className="flex flex-col gap-4">
+                {/* 4 DROPDOWNS GRID */}
+                <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {/* Assign To */}
+                  <CompanyUserSearchFieldInput
+                    logo={User}
+                    label="Assign To"
+                    // placeholder={selectedSupportTicket.assignedToName}
+                    defaultValue={selectedSupportTicket.assignedToName}
+                    isDisabled={!userHasAccessToUpdateSupportTicket}
+                    disabledMessage={
+                      MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                        .UPDATE_ACCESS_DENIED_MESSAGE
+                    }
+                    onUserSelected={(user) => {
+                      if (user && user.id !== 0) {
+                        setSelectedAssignTo(user);
+                        // handSupportTicketInfoSave();
+                      }
+                      if (user === null || user === undefined) {
+                        setSelectedAssignTo({
+                          company_id: 0,
+                          email: "",
+                          fullname: selectedSupportTicket.assignedToName,
+                          mobilenumber: "",
+                          generate_password: "",
+                          createdby: "",
+                          id: selectedSupportTicket.assignedTo,
+                          isactive: false,
+                          requestedby: "",
+                        });
+                      }
+                    }}
+                  />
+
+                  {/* Ticket Category */}
+                  {isLoadingForSupportTicketCategory ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <CustomDropdown
+                      logo={ListTree}
+                      labelName="Ticket Category"
+                      options={supportTicketCategory}
+                      preselectedOption={
+                        selectedSupportTicket?.supportTicketCategoryId
+                      }
+                      onSelect={(value) => {
                         if (userHasAccessToUpdateSupportTicket) {
-                          if (
-                            selectedSupportTicket.supportTicketLifecycleId !==
-                            item.id
-                          ) {
-                            setSelectedSupportTicketLifecycleId(item.id);
-                            setSelectedSupportTicketLifecycleName(item.name);
-                          }
-                          /////////////////////////////////////////////////////////////////////////////////////
+                          const result = supportTicketCategory?.find(
+                            (item) => item.id === value
+                          );
+                          setSelectedSupportTicketCategor({
+                            id: value || 0,
+                            name: result?.name || "",
+                          });
                         } else {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
@@ -501,148 +715,102 @@ const ViewSupportTicketManagement = () => {
                           );
                         }
                       }}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
-                {/* status history */}
-                <div className="flex justify-end caption-custom  mb-1 px-2">
-                  {/* <span className="font-semibold ">Lead Status</span> */}
-                  <button
-                    onClick={() => {
-                      setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
-                    }}
-                  >
-                    <span
-                      title="Status history"
-                      className="flex items-center justify-center hover:text-blue-600 "
-                    >
-                      <History size={12} className="mt-0" />
-                      History
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="mx-1 mt-2 flex bg-slate-100 shadow rounded-sm animate-pulse">
-              <div className="flex w-full">
-                {/* Skeleton for lifecycle buttons */}
-                <div
-                  className="flex w-[100%] border bg-white"
-                  style={{
-                    clipPath:
-                      "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                  }}
-                >
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <div
-                      key={s}
-                      className="flex-1 p-1 mx-1 bg-slate-200 rounded"
-                      style={{
-                        height: "28px",
-                        clipPath:
-                          "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                    />
+                  )}
+
+                  {/* Product SLA */}
+                  {isLoadingForCompanyProductSla ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <CustomDropdown
+                      logo={Hourglass}
+                      labelName="Product SLA"
+                      options={companyProductSla}
+                      preselectedOption={
+                        selectedSupportTicket?.companyProductSlaId
+                      }
+                      onSelect={(value) => {
+                        if (userHasAccessToUpdateSupportTicket) {
+                          const result = companyProductSla?.find(
+                            (item) => item.id === value
+                          );
+                          setSelectedCompanyProductSla({
+                            id: value || 0,
+                            name: result?.name || "",
+                          });
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                              .UPDATE_ACCESS_DENIED_MESSAGE
+                          );
+                        }
                       }}
-                    ></div>
-                  ))}
-                </div>
+                    />
+                  )}
 
-                {/* Skeleton for History button */}
-                <div className="flex justify-end caption-custom mb-1 px-2 items-center">
-                  <div className="w-14 h-4 bg-slate-200 rounded"></div>
-                </div>
-              </div>
-            </div>
-          )}
+                  {/* Support ticket source */}
+                  {isLoadingForSupportTicketSource ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <CustomDropdown
+                      logo={Layers}
+                      labelName="Source"
+                      options={supportTicketSource}
+                      preselectedOption={
+                        selectedSupportTicket?.supportTicketSourceId
+                      }
+                      onSelect={(value) => {
+                        const result = supportTicketSource?.find(
+                          (item) => item.id === value
+                        );
+                        setSelectedSupportTicketSource({
+                          id: value,
+                          name: result?.name || "",
+                        });
+                      }}
+                    />
+                  )}
 
-          {/**Sections */}
-          <div className="w-full flex flex-col gap-1 p-1">
-            {/** Section 1 */}
-            {/* SUPPORT TICKET DETAILS */}
-            <div className="w-full flex flex-col gap-4 ">
-              {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
-              <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
-                <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
-                  <div className="flex gap-6">
-                    {/* Account */}
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-1.5 rounded text-white">
-                        <HeadsetIcon size={30} strokeWidth={2} />
-                      </div>
-                      <Detail
-                        label="Account"
-                        hasBorder={false}
-                        type="none"
-                        value={selectedSupportTicket?.accountName}
-                      />
+                  {isLoadingForSupportTicketEscalationLevel ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
                     </div>
-                    {/* Account */}
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-1.5 rounded text-white">
-                        <LucideMail size={30} strokeWidth={2} />
-                      </div>
-                      <Detail
-                        label="Email"
-                        hasBorder={false}
-                        type="none"
-                        value={selectedSupportTicket?.accountEmail}
-                      />
-                    </div>
-                    {/* Account */}
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-1.5 rounded text-white">
-                        <LucidePhoneCall size={30} strokeWidth={2} />
-                      </div>
-                      <Detail
-                        label="Mobile Number"
-                        hasBorder={false}
-                        type="none"
-                        value={selectedSupportTicket?.accountMobileNumber}
-                      />
-                    </div>
+                  ) : (
+                    <CustomDropdown
+                      logo={TrendingUp}
+                      labelName="Escalation Level"
+                      options={supportTickeEscalationLevel}
+                      preselectedOption={
+                        selectedSupportTicket?.supportTicketEscalationLevelId
+                      }
+                      onSelect={(value) => {
+                        setSelectedSupportTicketEscalationId(value);
+                        const result = supportTickeEscalationLevel?.find(
+                          (item) => item.id === value
+                        );
+                        setSelectedSupportTicket({
+                          ...selectedSupportTicket,
+                          supportTicketEscalationLevelName: result?.name,
+                          supportTicketEscalationLevelId: value,
+                        });
+                        // handSupportTicketInfoSave();
+                      }}
+                    />
+                  )}
 
-                    {/* Support Product */}
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-1.5 rounded text-white">
-                        <ShoppingBag size={30} strokeWidth={2} />
-                      </div>
-                      <Detail
-                        label="Support Product"
-                        hasBorder={false}
-                        type="none"
-                        value={selectedSupportTicket?.companyProductName}
-                      />
-                    </div>
-                  </div>
-                  <Detail
-                    type="none"
-                    label={
-                      selectedSupportTicket?.resolvedByName !== "NA" &&
-                      selectedSupportTicket?.resolvedByName
-                        ? "Resolved By"
-                        : "Resolved Status"
-                    }
-                    value={
-                      selectedSupportTicket?.resolvedByName || "Not Resolved"
-                    }
-                  />
-                </div>
-              </div>
-
-              {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* LEFT SIDE FORM */}
-                <div className="flex flex-col gap-4">
-                  {/* 4 DROPDOWNS GRID */}
-                  <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {/* Assign To */}
+                  {selectedSupportTicket.resolvedBy && (
                     <CompanyUserSearchFieldInput
-                      logo={User}
-                      label="Assign To"
+                      logo={UserCheck2Icon}
+                      label="Resolved By"
                       // placeholder={selectedSupportTicket.assignedToName}
-                      defaultValue={selectedSupportTicket.assignedToName}
+                      defaultValue={selectedSupportTicket.resolvedByName}
                       isDisabled={!userHasAccessToUpdateSupportTicket}
                       disabledMessage={
                         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
@@ -650,11 +818,11 @@ const ViewSupportTicketManagement = () => {
                       }
                       onUserSelected={(user) => {
                         if (user && user.id !== 0) {
-                          setSelectedAssignTo(user);
+                          setSelectedResolvedBy(user);
                           // handSupportTicketInfoSave();
                         }
                         if (user === null || user === undefined) {
-                          setSelectedAssignTo({
+                          setSelectedResolvedBy({
                             company_id: 0,
                             email: "",
                             fullname: selectedSupportTicket.assignedToName,
@@ -668,297 +836,143 @@ const ViewSupportTicketManagement = () => {
                         }
                       }}
                     />
-
-                    {/* Ticket Category */}
-                    {isLoadingForSupportTicketCategory ? (
-                      <div className="flex flex-col gap-2 animate-pulse w-full">
-                        <div className="h-4 w-24 bg-gray-200 rounded" />
-                        <div className="h-10 bg-gray-200 rounded" />
-                      </div>
-                    ) : (
-                      <CustomDropdown
-                        logo={ListTree}
-                        labelName="Ticket Category"
-                        options={supportTicketCategory}
-                        preselectedOption={
-                          selectedSupportTicket?.supportTicketCategoryId
-                        }
-                        onSelect={(value) => {
-                          if (userHasAccessToUpdateSupportTicket) {
-                            const result = supportTicketCategory?.find(
-                              (item) => item.id === value
-                            );
-                            setSelectedSupportTicketCategor({
-                              id: value || 0,
-                              name: result?.name || "",
-                            });
-                          } else {
-                            toast.error(
-                              MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                                .UPDATE_ACCESS_DENIED_MESSAGE
-                            );
-                          }
-                        }}
-                      />
-                    )}
-
-                    {/* Product SLA */}
-                    {isLoadingForCompanyProductSla ? (
-                      <div className="flex flex-col gap-2 animate-pulse w-full">
-                        <div className="h-4 w-24 bg-gray-200 rounded" />
-                        <div className="h-10 bg-gray-200 rounded" />
-                      </div>
-                    ) : (
-                      <CustomDropdown
-                        logo={Hourglass}
-                        labelName="Product SLA"
-                        options={companyProductSla}
-                        preselectedOption={
-                          selectedSupportTicket?.companyProductSlaId
-                        }
-                        onSelect={(value) => {
-                          if (userHasAccessToUpdateSupportTicket) {
-                            const result = companyProductSla?.find(
-                              (item) => item.id === value
-                            );
-                            setSelectedCompanyProductSla({
-                              id: value || 0,
-                              name: result?.name || "",
-                            });
-                          } else {
-                            toast.error(
-                              MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                                .UPDATE_ACCESS_DENIED_MESSAGE
-                            );
-                          }
-                        }}
-                      />
-                    )}
-
-                    {/* Support ticket source */}
-                    {isLoadingForSupportTicketSource ? (
-                      <div className="flex flex-col gap-2 animate-pulse w-full">
-                        <div className="h-4 w-24 bg-gray-200 rounded" />
-                        <div className="h-10 bg-gray-200 rounded" />
-                      </div>
-                    ) : (
-                      <CustomDropdown
-                        logo={Layers}
-                        labelName="Source"
-                        options={supportTicketSource}
-                        preselectedOption={
-                          selectedSupportTicket?.supportTicketSourceId
-                        }
-                        onSelect={(value) => {
-                          const result = supportTicketSource?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedSupportTicketSource({
-                            id: value,
-                            name: result?.name || "",
-                          });
-                        }}
-                      />
-                    )}
-
-                    {isLoadingForSupportTicketEscalationLevel ? (
-                      <div className="flex flex-col gap-2 animate-pulse w-full">
-                        <div className="h-4 w-24 bg-gray-200 rounded" />
-                        <div className="h-10 bg-gray-200 rounded" />
-                      </div>
-                    ) : (
-                      <CustomDropdown
-                        logo={TrendingUp}
-                        labelName="Escalation Level"
-                        options={supportTickeEscalationLevel}
-                        preselectedOption={
-                          selectedSupportTicket?.supportTicketEscalationLevelId
-                        }
-                        onSelect={(value) => {
-                          setSelectedSupportTicketEscalationId(value);
-                          const result = supportTickeEscalationLevel?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedSupportTicket({
-                            ...selectedSupportTicket,
-                            supportTicketEscalationLevelName: result?.name,
-                            supportTicketEscalationLevelId: value,
-                          });
-                          // handSupportTicketInfoSave();
-                        }}
-                      />
-                    )}
-
-                    {selectedSupportTicket.resolvedBy && (
-                      <CompanyUserSearchFieldInput
-                        logo={UserCheck2Icon}
-                        label="Resolved By"
-                        // placeholder={selectedSupportTicket.assignedToName}
-                        defaultValue={selectedSupportTicket.resolvedByName}
-                        isDisabled={!userHasAccessToUpdateSupportTicket}
-                        disabledMessage={
-                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                            .UPDATE_ACCESS_DENIED_MESSAGE
-                        }
-                        onUserSelected={(user) => {
-                          if (user && user.id !== 0) {
-                            setSelectedResolvedBy(user);
-                            // handSupportTicketInfoSave();
-                          }
-                          if (user === null || user === undefined) {
-                            setSelectedResolvedBy({
-                              company_id: 0,
-                              email: "",
-                              fullname: selectedSupportTicket.assignedToName,
-                              mobilenumber: "",
-                              generate_password: "",
-                              createdby: "",
-                              id: selectedSupportTicket.assignedTo,
-                              isactive: false,
-                              requestedby: "",
-                            });
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
+                  )}
                 </div>
+              </div>
 
-                {/* RIGHT SIDE DETAILS */}
-                <div className="flex flex-col gap-4">
-                  {/* Created/Updated Info */}
-                  <div className="p-4 bg-white shadow rounded-lg border grid grid-cols-2 gap-1">
-                    <Detail
-                      label="Created By"
-                      type="none"
-                      value={selectedSupportTicket?.createdBy}
-                    />
-                    <Detail
-                      label="Created On"
-                      type="none"
-                      value={selectedSupportTicket?.createdOn}
-                    />
+              {/* RIGHT SIDE DETAILS */}
+              <div className="flex flex-col gap-4">
+                {/* Created/Updated Info */}
+                <div className="p-4 bg-white shadow rounded-lg border grid grid-cols-2 gap-1">
+                  <Detail
+                    label="Created By"
+                    type="none"
+                    value={selectedSupportTicket?.createdBy}
+                  />
+                  <Detail
+                    label="Created On"
+                    type="none"
+                    value={selectedSupportTicket?.createdOn}
+                  />
 
-                    <Detail
-                      label="Updated By"
-                      type="none"
-                      value={selectedSupportTicket?.updatedBy}
-                    />
-                    <Detail
-                      label="Updated On"
-                      type="none"
-                      value={selectedSupportTicket?.updatedOn}
-                    />
-                  </div>
+                  <Detail
+                    label="Updated By"
+                    type="none"
+                    value={selectedSupportTicket?.updatedBy}
+                  />
+                  <Detail
+                    label="Updated On"
+                    type="none"
+                    value={selectedSupportTicket?.updatedOn}
+                  />
                 </div>
               </div>
             </div>
-
-            {/* Second Column */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-              {/* Query Description */}
-              <TextAreaInput
-                logo={LucideText}
-                label="Query Description"
-                name="queryDescription"
-                value={formData.queryDescription}
-                defaultValue={selectedSupportTicket?.queryDescription}
-                onChange={(e) => {
-                  if (userHasAccessToUpdateSupportTicket) {
-                    handleFormDataChange(e);
-                  }
-                }}
-                readonly={!userHasAccessToUpdateSupportTicket}
-                disabled={!userHasAccessToUpdateSupportTicket}
-                onBlur={() => {
-                  if (userHasAccessToUpdateSupportTicket) {
-                    handSupportTicketInfoSave();
-                  }
-                }}
-                rows={2}
-                cols={0}
-              />
-
-              {/* Resolution */}
-              <TextAreaInput
-                logo={Wrench}
-                label="Resolution Applied"
-                name="resolutionApplied"
-                value={formData.resolutionApplied}
-                defaultValue={selectedSupportTicket?.resolutionApplied}
-                onChange={(e) => {
-                  if (userHasAccessToUpdateSupportTicket)
-                    handleFormDataChange(e);
-                }}
-                readonly={!userHasAccessToUpdateSupportTicket}
-                disabled={!userHasAccessToUpdateSupportTicket}
-                onBlur={() => {
-                  if (userHasAccessToUpdateSupportTicket) {
-                    handSupportTicketInfoSave();
-                  }
-                }}
-                rows={2}
-                cols={0}
-              />
-
-              {/* Public Notes */}
-              <TextAreaInput
-                logo={StickyNote}
-                label="Public Notes"
-                name="publicNotes"
-                value={formData.publicNotes}
-                defaultValue={selectedSupportTicket?.publicNotes}
-                onChange={(e) => {
-                  if (userHasAccessToUpdateSupportTicket)
-                    handleFormDataChange(e);
-                }}
-                readonly={!userHasAccessToUpdateSupportTicket}
-                disabled={!userHasAccessToUpdateSupportTicket}
-                onBlur={() => {
-                  if (userHasAccessToUpdateSupportTicket) {
-                    handSupportTicketInfoSave();
-                  }
-                }}
-                rows={2}
-                cols={0}
-              />
-            </div>
-
-            {/* third Column */}
-            <div className="mt-3">
-              <SupportTicketTasksModal
-              // ownerId ={selectedSupportTicket?.assignedToId}
-              />
-            </div>
           </div>
 
-          {/* Support Ticket history */}
-          {isOpenLeadStatusHistory && (
-            <SupportTicketHistoryView
-              selectedSupportTicket={selectedSupportTicket}
-              isOpen={isOpenLeadStatusHistory}
-              onClose={() => {
-                setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+          {/* Second Column */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+            {/* Query Description */}
+            <TextAreaInput
+              logo={LucideText}
+              label="Query Description"
+              name="queryDescription"
+              value={formData.queryDescription}
+              defaultValue={selectedSupportTicket?.queryDescription}
+              onChange={(e) => {
+                if (userHasAccessToUpdateSupportTicket) {
+                  handleFormDataChange(e);
+                }
               }}
+              readonly={!userHasAccessToUpdateSupportTicket}
+              disabled={!userHasAccessToUpdateSupportTicket}
+              onBlur={() => {
+                if (userHasAccessToUpdateSupportTicket) {
+                  handSupportTicketInfoSave();
+                }
+              }}
+              rows={2}
+              cols={0}
             />
-          )}
 
-          {selectedSupportTicketLifecycleId && (
-            <SupportTicketLIfecycleChangeModal
-              isLoading={isLoadingForLifecycleChanging}
-              previousSupportTicketStatus={selectedSupportTicket}
-              selectedSupportTicketLifecyclId={selectedSupportTicketLifecycleId}
-              selectedSupportTicketLifecycleName={
-                selectedSupportTicketLifecycleName
-              }
-              handleSubmit={handleSaveSupportTicketLifecycleUpdate}
-              onClose={() => {
-                setSelectedSupportTicketLifecycleId(undefined);
-                setSelectedSupportTicketLifecycleName(undefined);
+            {/* Resolution */}
+            <TextAreaInput
+              logo={Wrench}
+              label="Resolution Applied"
+              name="resolutionApplied"
+              value={formData.resolutionApplied}
+              defaultValue={selectedSupportTicket?.resolutionApplied}
+              onChange={(e) => {
+                if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
               }}
+              readonly={!userHasAccessToUpdateSupportTicket}
+              disabled={!userHasAccessToUpdateSupportTicket}
+              onBlur={() => {
+                if (userHasAccessToUpdateSupportTicket) {
+                  handSupportTicketInfoSave();
+                }
+              }}
+              rows={2}
+              cols={0}
             />
-          )}
-        </motion.section>
+
+            {/* Public Notes */}
+            <TextAreaInput
+              logo={StickyNote}
+              label="Public Notes"
+              name="publicNotes"
+              value={formData.publicNotes}
+              defaultValue={selectedSupportTicket?.publicNotes}
+              onChange={(e) => {
+                if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
+              }}
+              readonly={!userHasAccessToUpdateSupportTicket}
+              disabled={!userHasAccessToUpdateSupportTicket}
+              onBlur={() => {
+                if (userHasAccessToUpdateSupportTicket) {
+                  handSupportTicketInfoSave();
+                }
+              }}
+              rows={2}
+              cols={0}
+            />
+          </div>
+
+          {/* third Column */}
+          <div className="mt-3">
+            <SupportTicketTasksModal
+            // ownerId ={selectedSupportTicket?.assignedToId}
+            />
+          </div>
+        </div>
+
+        {/* Support Ticket history */}
+        {isOpenLeadStatusHistory && (
+          <SupportTicketHistoryView
+            selectedSupportTicket={selectedSupportTicket}
+            isOpen={isOpenLeadStatusHistory}
+            onClose={() => {
+              setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+            }}
+          />
+        )}
+
+        {selectedSupportTicketLifecycleId && (
+          <SupportTicketLIfecycleChangeModal
+            isLoading={isLoadingForLifecycleChanging}
+            previousSupportTicketStatus={selectedSupportTicket}
+            selectedSupportTicketLifecyclId={selectedSupportTicketLifecycleId}
+            selectedSupportTicketLifecycleName={
+              selectedSupportTicketLifecycleName
+            }
+            handleSubmit={handleSaveSupportTicketLifecycleUpdate}
+            onClose={() => {
+              setSelectedSupportTicketLifecycleId(undefined);
+              setSelectedSupportTicketLifecycleName(undefined);
+            }}
+          />
+        )}
+      </motion.section>
     </PageLayout>
   );
 };
@@ -1123,6 +1137,7 @@ const Detail: React.FC<DetailProps> = ({
                     "Resolved By",
                     "Email",
                     "Mobile Number",
+                    "Ticket Number",
                   ].includes(label)
                     ? ""
                     : "border border-gray-200 rounded-md px-1 py-0.5"

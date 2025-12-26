@@ -89,6 +89,8 @@ function GetAccountCompanyProductFroSupportTicket({
           accountMobileNumber: res.account_mobilenumber,
           companyProductId: res.company_product_id,
           companyProductName: res.company_product_name,
+          isAmc: res.is_amc,
+          isWarranty: res.is_warranty,
           quantity: res.quantity,
           barcode: res.barcode,
           serialNumber: res.serial_number,

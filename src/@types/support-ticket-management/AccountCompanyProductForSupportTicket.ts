@@ -7,6 +7,8 @@ type AccountCompanyProductForSupportTicket = {
     accountMobileNumber: string,
     companyProductId : number,
     companyProductName : string,
+    isAmc : boolean,
+    isWarranty: boolean,
     quantity : number,
     barcode : string,
     serialNumber : number,

@@ -1,4 +1,4 @@
-import MonthlyAverageLeads from '../../../../@types/home/dashboard/MonthlyAverageLeads';
+import MonthlyAverageLeads from '../../../../../@types/home/dashboard/MonthlyAverageLeads';
 import { useState } from 'react';
 
 const SalesLineChart = ({
