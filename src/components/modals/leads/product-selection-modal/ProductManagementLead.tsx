@@ -151,8 +151,6 @@ function ProductManagementLead({
   useEffect(() => {
     // setTimeout(() => {
       setProductsData([]);
-      console.log("call is going ");
-      console.log("pageSize : "+pageSize+ "currentPage: "+ currentPage+ "dateRangeId : "+ dateRangeId+ "search_parameter" +searchParameter  + "concatDate : "+ concatDate);
       
       fetchCompanyProducts();
     // }, 200);

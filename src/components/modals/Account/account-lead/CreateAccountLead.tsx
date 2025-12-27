@@ -5,7 +5,6 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import Button from "../../../ui/Button";
 import LeadManagement from "../../../views/lead-management/LeadManagement";
 import LeadDataProps from "../../../../@types/lead-management/LeadProps";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
@@ -15,6 +14,7 @@ import FormHeader from "../../../ui/FormHeader";
 import { Handshake } from "lucide-react";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const CreateAccountLead = ({
   account,
@@ -47,7 +47,7 @@ const CreateAccountLead = ({
       createdby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.data.status) {

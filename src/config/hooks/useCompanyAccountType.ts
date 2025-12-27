@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../validations/RefreshToken";
 import toast from "react-hot-toast";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useCompanyAccountType = () => {
 
@@ -27,7 +27,7 @@ export const useCompanyAccountType = () => {
             requestedby_id: loginStatus.id,
         };
 
-        axios
+        axiosClient
             .post(
                 POST_API.GET_COMPANY_ACCOUNT_TYPE,
                 PostDataToGetCompanyAccountType,

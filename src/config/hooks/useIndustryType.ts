@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import industryType from "../../@types/general/industryType";
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useIndustryType = () => {
     const [industryTypeData, setIndustryTypeData] = useState<industryType[]>([]);
@@ -17,7 +17,7 @@ export const useIndustryType = () => {
         };
 
         try {
-            const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+            const response = await axiosClient.post(POST_API.GET_INDUSTRY_TYPE, postData, {
                 withCredentials: true,
             });
 

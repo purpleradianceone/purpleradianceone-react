@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
 import { useEffect, useState } from "react"; // Import useState
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
 import MeetingPlatforms from "../../@types/meeting/MeetingPlatform";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useMeetingPlatform = () => {
   // 1. Use useState to declare meetingPlatform as a state variable
@@ -15,7 +15,7 @@ export const useMeetingPlatform = () => {
 
   const getMeetingPlatform = async () => {
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_MEETING_PLATFORMS,
         {},
         {

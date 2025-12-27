@@ -276,7 +276,7 @@ const AccountCompanyProduct = (
         </div>
       ) : (
         
-        <div className="grid md:grid-cols-2 gap-1 w-full">
+        <div className="grid grid-cols-2 gap-1 w-full">
           <div className="col-span-2 flex justify-end p-0.5">
             <Link
             to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
@@ -317,7 +317,7 @@ const AccountCompanyProduct = (
               </Button>
             </Link>
           </div>
-          <div className="md:col-span-2  w-full h-96">
+          <div className="col-span-2  w-full h-96">
             <AccountCompanyProductAgGrid
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}

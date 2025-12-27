@@ -16,7 +16,6 @@ export function handleApiError(error: unknown) {
   }
 
   const status = error.response?.status; //  CORRECT  
-  console.log("this is the res error " + status);
   
   const message =
     error.response?.data?.message?.trim() ||

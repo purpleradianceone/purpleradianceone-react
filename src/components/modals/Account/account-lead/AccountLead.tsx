@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import CreateAccountLeadType from "../../../../@types/account/CreateAccountLeadType";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
@@ -17,6 +16,7 @@ import qs from "query-string";
 import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -34,7 +34,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       requestedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.GET_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
@@ -89,7 +89,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       updatedby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.UPDATE_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.data.status) {
@@ -121,7 +121,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       id: leadId,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD, postDataToGetLead, {
         withCredentials: true,
       })
@@ -172,7 +172,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
   }
 
 return (
-  <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
+  <div className="bg-white border flex flex-col h-full  rounded-lg p-1  max-h-96 overflow-auto">
     {/* Header */}
     <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Account related leads</span>
@@ -188,7 +188,7 @@ return (
     }
     {/* Empty State */}
     {!isLoading && accountLead.length === 0 && (
-      <div className="flex items-center justify-center py-4">
+      <div className="flex items-center justify-center h-full ">
         <span className="italic caption-custom flex gap-1 items-center ">
           <CreateAccountLead account={account} getAccountLead={getAccountLead} />
           No leads available.

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import POST_API from "../../../../constants/PostApi";
 import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import Pagination from "../../../ag-grid/Pagination";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
@@ -18,6 +17,7 @@ import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const AccountImportData = ({
   onCloseOrUnselectTag,
@@ -65,7 +65,7 @@ const AccountImportData = ({
 
     try {
       setResponeCame(true);
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_ACCOUNT_IMPORT_DATA,
         postDataToGetAccountImportData,
         { withCredentials: true }
@@ -138,7 +138,7 @@ const AccountImportData = ({
       updatedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(
         POST_API.UPDATE_ACCOUNT_IMPORT_DATA,
         postDataToUpdateAccountImport,
@@ -177,7 +177,7 @@ const AccountImportData = ({
       createdby: loginStatus.id,
     };
     setShowLoadingSpinner(true);
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_IMPORT_FROM_IMPORT_TAG, postData, {
         withCredentials: true,
       })

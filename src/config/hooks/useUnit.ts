@@ -17,6 +17,7 @@ const useUnit = () =>{
         const PostData = {
             id: null,
             name: null,
+            is_base_unit : null,
             general_usage: null,
             isactive: true,
         };

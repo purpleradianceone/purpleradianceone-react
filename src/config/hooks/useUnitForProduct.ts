@@ -1,21 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// import { useEffect, useState } from "react";
-// import ApiError from "../../@types/error/ApiError";
-// import { STATUS_CODE } from "../../constants/AppConstants";
-// import RefreshToken from "../validations/RefreshToken";
-// import POST_API from "../../constants/PostApi";
-// import axios from "axios";
-// import UnitForProduct from "../../@types/products/UnitForProduct";
+
 
 import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
 import { STATUS_CODE } from "../../constants/AppConstants";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
 import UnitForProduct from "../../@types/products/UnitForProduct";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
+import axiosClient from "../../axios-client/AxiosClient";
 
 // const useUnitForProduct = ({
 //     companyProductId
@@ -93,7 +85,7 @@ const useUnitForProduct = ({
   const [unitForProduct, setUnitForProduct] = useState<UnitForProduct[]>([]);
 
   // =============================
-  // 1️⃣ Main API call
+  //  Main API call
   // =============================
   const getUnitForProduct = async (
     productId: number
@@ -106,7 +98,7 @@ const useUnitForProduct = ({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_UNIT_FOR_COMPANY_PRODUCT,
         PostData,
         { withCredentials: true }
