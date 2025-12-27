@@ -10,7 +10,6 @@ import {
 } from "lucide-react"; // Corrected import for Lucide React icons
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import StatusChip from "../../ui/StatusChip";
-import LeadTaskType from "../../../@types/lead-management/LeadTaskType";
 import { useState } from "react";
 import SupportTicketTaskProps from "../../../@types/support-ticket-management/SupportTicketTaskProps";
 import SupportTicketTaskStage from "../../../@types/support-ticket-management/SupportTicketTaskStage";
@@ -29,14 +28,14 @@ function SupportTicketTaskList({
   handleSupportTicketTaskUpdate: () => void;
   isLoading: boolean;
 }) {
-  const [isUpdateLeadTaskModalOpen, setIsUpdateLeadTaskModalOpen] =
+  const [isUpdateSupportTicketTaskModalOpen, setIsUpdateSupportTicketTaskModalOpen] =
     useState<boolean>(false);
   const [selecedSupportTicketTask, setSelecedSupportTicketTask] =
     useState<SupportTicketTaskProps>();
   // State to manage expanded card
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
-  const getActivityIcon = (type: LeadTaskType["leadActivityId"]) => {
+  const getActivityIcon = (type: number) => {
     switch (type) {
       case 1:
         return <Phone size={20} />;
@@ -208,7 +207,7 @@ function SupportTicketTaskList({
                     </span>
                     <button
                       onClick={() => {
-                        setIsUpdateLeadTaskModalOpen(true);
+                        setIsUpdateSupportTicketTaskModalOpen(true);
                         setSelecedSupportTicketTask(activity);
                       }}
                       className="px-2 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
@@ -226,11 +225,11 @@ function SupportTicketTaskList({
             </div>
           )}
         </div>
-        {isUpdateLeadTaskModalOpen && (
+        {isUpdateSupportTicketTaskModalOpen && (
           <UpdateSupportTicketTaskModal
-            isOpen={isUpdateLeadTaskModalOpen}
+            isOpen={isUpdateSupportTicketTaskModalOpen}
             handleClose={(value: boolean) => {
-              setIsUpdateLeadTaskModalOpen(value);
+              setIsUpdateSupportTicketTaskModalOpen(value);
             }}
             supportTicketTask={selecedSupportTicketTask!}
             supportTicketTaskStage={supportTicketTaskStage}

@@ -37,13 +37,13 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 function CreateSupportTicketTaskModal({
   isOpen,
   handleClose,
-  leadTaskStage,
-  handleLeadTaskCreate,
+  supportTicketTaskStage,
+  handleSupportTicketTaskCreate,
 }: {
   isOpen: boolean;
   handleClose: () => void;
-  leadTaskStage: SupportTicketTaskStage[];
-  handleLeadTaskCreate: () => void;
+  supportTicketTaskStage: SupportTicketTaskStage[];
+  handleSupportTicketTaskCreate: () => void;
 }) {
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
@@ -71,7 +71,7 @@ function CreateSupportTicketTaskModal({
 
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>(timeOptions[0]);
-  const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
+  const [supportTicketTaskStageId, setSupportTicketTaskStageId] = useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [supportTicketData, setSupportTicketData] =
     useState<SupportTicketProps>();
@@ -97,7 +97,7 @@ function CreateSupportTicketTaskModal({
     });
     setDueDate("");
     setDueTime(timeOptions[0]);
-    setLeadTaskStageId(0);
+    setSupportTicketTaskStageId(0);
     setAssignedTo({
       id: 0,
       company_id: 0,
@@ -120,12 +120,12 @@ function CreateSupportTicketTaskModal({
   function handleFormChange(): boolean {
     let flagVariable = false;
 
-    if (leadTaskStageId === 0) {
+    if (supportTicketTaskStageId === 0) {
       setErrors((prev) => ({
         ...prev,
-        supportTicketTaskStageError: "Please select Lead Task Stage",
+        supportTicketTaskStageError: "Please select Ticket Task Stage",
       }));
-      toast.error("Please Select Lead Task Stage");
+      toast.error("Please Select Ticket Task Stage");
       flagVariable = true;
     } else {
       setErrors((prev) => ({
@@ -173,7 +173,7 @@ function CreateSupportTicketTaskModal({
     const createSupportTicketTaskPostData = {
       company_id: loginStatus.companyId,
       support_ticket_id: supportTicketData!.id,
-      support_ticket_task_stage_id: leadTaskStageId,
+      support_ticket_task_stage_id: supportTicketTaskStageId,
       description: description,
       result_outcome: resultOutcome,
       assignedto:
@@ -193,7 +193,7 @@ function CreateSupportTicketTaskModal({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-          handleLeadTaskCreate();
+          handleSupportTicketTaskCreate();
           handleClose();
         } else {
           toast.error(response.data.message);
@@ -268,12 +268,12 @@ function CreateSupportTicketTaskModal({
               preselectedOption={1}
               onSelect={(e) => {
                 if (e) {
-                  setLeadTaskStageId(e);
+                  setSupportTicketTaskStageId(e);
                 } else {
-                  setLeadTaskStageId(0);
+                  setSupportTicketTaskStageId(0);
                 }
               }}
-              options={leadTaskStage}
+              options={supportTicketTaskStage}
             ></CustomDropdown>
             {errors.supportTicketTaskStageError !== "" && (
               <div className="caption-custom-inactive">
@@ -362,7 +362,6 @@ function CreateSupportTicketTaskModal({
                 logo={User}
                 label="Assign To:"
                 defaultValue={supportTicketData?.assignedToName}
-                // placeholder={leadData?.assignedToName}
                 onUserSelected={(user) => {
                   if (user && user?.id) {
                     //

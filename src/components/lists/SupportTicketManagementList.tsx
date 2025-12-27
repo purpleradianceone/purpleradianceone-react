@@ -20,7 +20,7 @@ import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import Pagination from "../ag-grid/Pagination";
 import CustomDropdown from "../modals/leads/CustomDropdown";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import qs from "query-string";
 import ROUTES_URL from "../../constants/Routes";
 import { usePanel } from "../../context/panel/usePanel";
@@ -68,6 +68,9 @@ function SupportTicketManagementList({
       "{}"
   );
 
+  const [searchParams] = useSearchParams();
+
+
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
@@ -75,7 +78,7 @@ function SupportTicketManagementList({
   const { userHasAccessToViewSupportTicket, userHasAccessToAddSupportTicket } =
     useUserAccessModules();
   const [isCreateSupportTicketModalOpen, setIsCreateSupportTicketModalOpen] =
-    useState<boolean>(false);
+    useState<boolean>(searchParams.get("fromDashboard") === "true");
 
   const [selectedSupportTicketForEdit, setSelectedSupportTicketForEdit] =
     useState<SupportTicketProps>({
@@ -140,7 +143,7 @@ function SupportTicketManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+  const { handleDateRangeIdChange, isCustomDateOptionSelected, setIsCustomDateOptionSelected} =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
@@ -155,7 +158,6 @@ function SupportTicketManagementList({
   };
 
   const handleRowSelected = (rowData: SupportTicketProps | any) => {
-    // Note : If used in the lead module then below if block will work
     if (isUsedInSupportTicketModule) {
       // const queryParams = qs.stringify({
       //   supportTicketData: JSON.stringify(rowData),
@@ -167,7 +169,7 @@ function SupportTicketManagementList({
   };
 
   if (userHasAccessToViewSupportTicket) {
-    const handleCreateLeadModalClose = () => {
+    const handleCreateSupportTicketModalClose = () => {
       setIsCreateSupportTicketModalOpen(false);
     };
 
@@ -178,9 +180,12 @@ function SupportTicketManagementList({
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      console.log("Filter parameters:");
-      console.log(handleSearchOption.searchParameter);
-      console.log(handleSearchOption.dateRangeId);
+      // console.log("Filter parameters:");
+      // console.log(handleSearchOption.searchParameter);
+      // console.log(handleSearchOption.dateRangeId);
+      if(handleSearchOption.dateRangeId === 8){
+        setIsCustomDateOptionSelected(true);
+      }
     }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId]);
     return (
       <div
@@ -279,6 +284,8 @@ function SupportTicketManagementList({
                             <DateRangePicker
                               onStartDateChange={onStartDateChange}
                               onEndDateChange={onEndDateChange}
+                              initialStartDate={savedFilters.customStartDate}
+                              initialEndDate={savedFilters.customEndDate}
                             />
                           </div>
                         )}
@@ -507,7 +514,7 @@ function SupportTicketManagementList({
           </div>
           <CreateSupportTicketModal
             isOpen={isCreateSupportTicketModalOpen}
-            onClose={handleCreateLeadModalClose}
+            onClose={handleCreateSupportTicketModalClose}
             handleSupportTicketCreated={handleAddSupportTicket}
           ></CreateSupportTicketModal>
         </div>

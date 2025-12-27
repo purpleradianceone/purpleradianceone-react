@@ -129,7 +129,7 @@ function SupportTasksTabs({
         {/* Scrollable content */}
         <div className="overflow-y-auto max-h-[calc(100vh-150px)]">
           <TabsBody
-            placeholder="Online Lead"
+            placeholder="Support Tasks"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             onResize={undefined}

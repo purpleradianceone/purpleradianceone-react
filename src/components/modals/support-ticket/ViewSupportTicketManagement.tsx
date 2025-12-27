@@ -158,7 +158,7 @@ const ViewSupportTicketManagement = () => {
   const { supportTicketSource, isLoading: isLoadingForSupportTicketSource } =
     useSupportTicketSource();
 
-  const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
+  const [isOpenSupportTicketHistory, setIsOpenSupportTicketHistory] =
     useState<boolean>(false);
 
   const [isLoadingForLifecycleChanging, setIsLoadingForLifecycleChanging] =
@@ -265,9 +265,7 @@ const ViewSupportTicketManagement = () => {
     }
   };
 
-  // const handleClickLeadOwnerChange = () => {
-  //   // setIsLeadOwnerPopUpOpen(true);
-  // };
+ 
   function handleFormDataChange(e: any) {
     const { name, value } = e.target;
     setFormData((prev: any) => {
@@ -402,6 +400,9 @@ const ViewSupportTicketManagement = () => {
       (selectedResolvedBy.id !== 0 &&
         selectedResolvedBy.id !== selectedSupportTicket.resolvedBy)
     ) {
+      if (!userHasAccessToUpdateSupportTicket) {
+        return;
+      }
       handSupportTicketInfoSave();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -497,12 +498,12 @@ const ViewSupportTicketManagement = () => {
                           setSelectedSupportTicketLifecycleId(item.id);
                           setSelectedSupportTicketLifecycleName(item.name);
                         }
-                        /////////////////////////////////////////////////////////////////////////////////////
                       } else {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
                             .UPDATE_ACCESS_DENIED_MESSAGE
                         );
+                        //✔️
                       }
                     }}
                   >
@@ -512,10 +513,9 @@ const ViewSupportTicketManagement = () => {
               </div>
               {/* status history */}
               <div className="flex justify-end caption-custom  mb-1 px-2">
-                {/* <span className="font-semibold ">Lead Status</span> */}
                 <button
                   onClick={() => {
-                    setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+                    setIsOpenSupportTicketHistory(!isOpenSupportTicketHistory);
                   }}
                 >
                   <span
@@ -663,6 +663,7 @@ const ViewSupportTicketManagement = () => {
                     disabledMessage={
                       MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
                         .UPDATE_ACCESS_DENIED_MESSAGE
+                      //✔️
                     }
                     onUserSelected={(user) => {
                       if (user && user.id !== 0) {
@@ -696,9 +697,9 @@ const ViewSupportTicketManagement = () => {
                       logo={ListTree}
                       labelName="Ticket Category"
                       options={supportTicketCategory}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketCategoryId
-                      }
+                      preselectedOption={selectedSupportTicketCategory?.id}
+                      selectedValue={selectedSupportTicketCategory?.id}
+                      readOnly={!userHasAccessToUpdateSupportTicket}
                       onSelect={(value) => {
                         if (userHasAccessToUpdateSupportTicket) {
                           const result = supportTicketCategory?.find(
@@ -708,11 +709,6 @@ const ViewSupportTicketManagement = () => {
                             id: value || 0,
                             name: result?.name || "",
                           });
-                        } else {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .UPDATE_ACCESS_DENIED_MESSAGE
-                          );
                         }
                       }}
                     />
@@ -732,6 +728,7 @@ const ViewSupportTicketManagement = () => {
                       preselectedOption={
                         selectedSupportTicket?.companyProductSlaId
                       }
+                      readOnly={!userHasAccessToUpdateSupportTicket}
                       onSelect={(value) => {
                         if (userHasAccessToUpdateSupportTicket) {
                           const result = companyProductSla?.find(
@@ -741,11 +738,6 @@ const ViewSupportTicketManagement = () => {
                             id: value || 0,
                             name: result?.name || "",
                           });
-                        } else {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .UPDATE_ACCESS_DENIED_MESSAGE
-                          );
                         }
                       }}
                     />
@@ -765,14 +757,17 @@ const ViewSupportTicketManagement = () => {
                       preselectedOption={
                         selectedSupportTicket?.supportTicketSourceId
                       }
+                      readOnly={!userHasAccessToUpdateSupportTicket}
                       onSelect={(value) => {
-                        const result = supportTicketSource?.find(
-                          (item) => item.id === value
-                        );
-                        setSelectedSupportTicketSource({
-                          id: value,
-                          name: result?.name || "",
-                        });
+                        if (userHasAccessToUpdateSupportTicket) {
+                          const result = supportTicketSource?.find(
+                            (item) => item.id === value
+                          );
+                          setSelectedSupportTicketSource({
+                            id: value,
+                            name: result?.name || "",
+                          });
+                        }
                       }}
                     />
                   )}
@@ -790,6 +785,7 @@ const ViewSupportTicketManagement = () => {
                       preselectedOption={
                         selectedSupportTicket?.supportTicketEscalationLevelId
                       }
+                      readOnly={!userHasAccessToUpdateSupportTicket}
                       onSelect={(value) => {
                         setSelectedSupportTicketEscalationId(value);
                         const result = supportTickeEscalationLevel?.find(
@@ -947,12 +943,12 @@ const ViewSupportTicketManagement = () => {
         </div>
 
         {/* Support Ticket history */}
-        {isOpenLeadStatusHistory && (
+        {isOpenSupportTicketHistory && (
           <SupportTicketHistoryView
             selectedSupportTicket={selectedSupportTicket}
-            isOpen={isOpenLeadStatusHistory}
+            isOpen={isOpenSupportTicketHistory}
             onClose={() => {
-              setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+              setIsOpenSupportTicketHistory(!isOpenSupportTicketHistory);
             }}
           />
         )}
@@ -989,7 +985,6 @@ type DetailProps = {
     >
   ) => void;
   handleSupportTicketInfoSave?: () => Promise<void>;
-  handleClickLeadOwnerChange?: () => void;
   hasBorder?: boolean;
   rows?: number;
 };
@@ -1001,7 +996,6 @@ const Detail: React.FC<DetailProps> = ({
   options = [],
   onChange,
   handleSupportTicketInfoSave,
-  handleClickLeadOwnerChange,
   hasBorder,
   rows = 3,
 }) => {
@@ -1172,21 +1166,6 @@ const Detail: React.FC<DetailProps> = ({
           title={value}
         >
           {value || <span className="italic text-gray-400">Add here...</span>}
-        </div>
-      ) : label === "Lead owner" ? (
-        <div
-          title={value}
-          className="input-label-custom hover:bg-slate-100 cursor-pointer"
-          onClick={handleClickLeadOwnerChange}
-        >
-          {value ? (
-            <>
-              {value}
-              <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" />
-            </>
-          ) : (
-            <span className="input-label-custom">Add here...</span>
-          )}
         </div>
       ) : (
         <div

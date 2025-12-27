@@ -8,7 +8,7 @@ import SupportTicketProps from "../../@types/support-ticket-management/SupportTi
 
 function SupportTicketManagementAgGrid({
   supportTickets,
-  onRowSelect, //selected user for view lead details
+  onRowSelect, 
   handleRowClick,
   isUsedInSupportTicketModule,
   

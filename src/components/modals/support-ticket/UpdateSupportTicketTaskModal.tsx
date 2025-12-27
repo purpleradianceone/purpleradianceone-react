@@ -32,6 +32,7 @@ import TextAreaInput from "../../ui/TextAreaInput";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import Button from "../../ui/Button";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 function UpdateSupportTicketTaskModal({
   isOpen,
@@ -46,6 +47,7 @@ function UpdateSupportTicketTaskModal({
   supportTicketTaskStage: SupportTicketTaskStage[];
   handleSupportTicketTaskUpdate: () => void;
 }) {
+  const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   //   const [searchParams] = useSearchParams();
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -61,7 +63,7 @@ function UpdateSupportTicketTaskModal({
     }
     return options;
   };
-const timeOptions = useMemo(() => generateTimeOptions(), []);
+  const timeOptions = useMemo(() => generateTimeOptions(), []);
 
   const parsedDate = parse(
     supportTicketTask.dueDateTime,
@@ -126,7 +128,12 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
     event: React.FormEvent<HTMLButtonElement>
   ) => {
     // console.log(assignedTo);
-    
+    if (!userHasAccessToUpdateSupportTicket) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
+      );
+      return;
+    }
     if (isSaving) return;
     event.preventDefault();
     const updateSupportTicketTaskPostData = {
@@ -136,7 +143,7 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
       description: description,
       result_outcome: resultOutcome,
       assignedto: assignedTo?.id || 0,
-      due_date_time: `${dueDate} ${dueTime || '00:00'}:00`,
+      due_date_time: `${dueDate} ${dueTime || "00:00"}:00`,
       isactive: isActive,
       updatedby_id: loginStatus.id,
     };
@@ -183,6 +190,12 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
   const handleIsActiveCheckboxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!userHasAccessToUpdateSupportTicket) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
+      );
+      return;
+    }
     const { checked } = event.target;
 
     const updateSupportTicketTaskPostData = {
@@ -225,10 +238,6 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
   };
 
   useEffect(() => {
-    // if (isOpen) {
-    //   const supportTicketSearchParam = JSON.parse(searchParams.get("supportTicketData") || "{}");
-    //   setLeadData(supportTicketSearchParam);
-    // }
     if (!isOpen) {
       resetStates();
     }
@@ -264,6 +273,7 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
             }}
             options={supportTicketTaskStage}
             selectedValue={supportTicketTask.supportTicketTaskStageId}
+            readOnly={!userHasAccessToUpdateSupportTicket}
           ></CustomDropdown>
 
           <div className="grid grid-cols-2 gap-2">
@@ -277,6 +287,7 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
                 }}
                 logo={Calendar}
                 required={true}
+                readonly={!userHasAccessToUpdateSupportTicket}
               />
             </div>
 
@@ -320,6 +331,8 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
             }}
             maxLength={500}
             required={true}
+            readonly={!userHasAccessToUpdateSupportTicket}
+            disabled={!userHasAccessToUpdateSupportTicket}
           ></TextAreaInput>
 
           {/* outcome */}
@@ -333,6 +346,8 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
               setResultOutcome(e.target.value);
             }}
             maxLength={500}
+            readonly={!userHasAccessToUpdateSupportTicket}
+            disabled={!userHasAccessToUpdateSupportTicket}
           ></TextAreaInput>
         </div>
 
@@ -360,6 +375,8 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
                   });
                 }
               }}
+              // isDisabled={!userHasAccessToUpdateSupportTicket}
+              readOnly={!userHasAccessToUpdateSupportTicket}
             />
           </div>
           <span className="caption-custom">
@@ -404,6 +421,13 @@ const timeOptions = useMemo(() => generateTimeOptions(), []);
               type="submit"
               disabled={isSaving}
               onClick={(event: React.FormEvent<HTMLButtonElement>) => {
+                if (!userHasAccessToUpdateSupportTicket) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                      .UPDATE_ACCESS_DENIED_MESSAGE
+                  );
+                  return;
+                }
                 if (isSaving) return;
                 updateSupportTicketTask(event);
               }}

@@ -81,6 +81,7 @@ const MESSAGE = {
             DENIED_ADD_ACCESS : "You do not have permission to add new Stock.",
             DENIED_UPDATE_ACCESS : "You do not have permission to update Stock.",
         },SUPPORT_MODULE: {
+            DENIED_VIEW_ACCESS : "You do not have permission to view support ticket.",
             DENIED_ADD_ACCESS : "You do not have permission to create support ticket.",
             UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update support ticket details.",
 
