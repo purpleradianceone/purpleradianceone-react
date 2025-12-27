@@ -1,4 +1,3 @@
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import AccountProduct from "../../@types/account/AccountProduct";
@@ -7,6 +6,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useGetAccountCompanyProductDetails = (accountId: number, companyProductId: number) => {
     const { loginStatus } = useLoggedInUserContext();
@@ -26,7 +26,7 @@ export const useGetAccountCompanyProductDetails = (accountId: number, companyPro
             requestedby: loginStatus.id,
         };
 
-        await axios
+        await axiosClient
             .post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT, postData, {
                 withCredentials: true,
             })

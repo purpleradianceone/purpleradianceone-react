@@ -24,7 +24,6 @@ import { useFormValidation } from "../../../../config/hooks/useFormValidation";
 import CustomDropdown from "../../leads/CustomDropdown";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
@@ -35,6 +34,7 @@ import useUnitForProduct from "../../../../config/hooks/useUnitForProduct";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import { StockSerialNumber } from "../../stock/stock-available-serial-number/StockSerialNumber";
 import FormLayout from "../../../ui/FormLayout";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const CreateAccountCompanyProduct = ({
   onClose,
@@ -359,7 +359,7 @@ const CreateAccountCompanyProduct = ({
       amc_cycle_end_date: AmcCycleEndDate,
       createdby_id: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_COMPANY_PRODUCT, postData, {
         withCredentials: true,
       })

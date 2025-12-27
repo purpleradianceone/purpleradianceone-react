@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import AccountImportData from "./AccountImportData";
 import AccountImportTagData from "../../../../@types/account/AccountImportTagData";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const AccountImportTagView = ({
   isTagClick,
@@ -30,7 +30,7 @@ const AccountImportTagView = ({
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_ACCOUNT_IMPORT_IMPORT_TAG, postDataToGetAccountImportTags, {
         withCredentials: true,
       })

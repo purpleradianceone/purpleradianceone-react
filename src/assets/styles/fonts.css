@@ -172,6 +172,8 @@
   color: #757575;
 }
 
+
+
 .caption-custom.white-text {
   font-family: "Roboto", sans-serif;
   font-size: 12px;
@@ -312,6 +314,14 @@
   background-color: #ededf3; /* A darker shade on hover for interactivity */
 }
 
+
+.datepicker-popper {
+  z-index: 9999 !important;
+}
+
+.datepicker-calendar {
+  background-color: white !important;
+
 /*For scrollbar hiding*/
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE & Edge */
@@ -320,4 +330,5 @@
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;             /* Chrome, Safari */
+
 }

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
 import { useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
 import { STATUS_CODE } from "../../constants/AppConstants";
+import axiosClient from "../../axios-client/AxiosClient";
 
 
 
@@ -24,7 +24,7 @@ export const useCreateCall = <T,>(
     setError(null);
 
     try {
-      const response = await axios.post(apiUrl, postData, {
+      const response = await axiosClient.post(apiUrl, postData, {
         withCredentials: true,
       });
 

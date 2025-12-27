@@ -41,8 +41,8 @@ type FormInputProps = {
     useCountry? : boolean;
     autoComplete? : React.HTMLInputAutoCompleteAttribute;
     logo?: LucideIcon;
-    autoFocus?:boolean
-    // onClick? : (event: React.MouseEvent<HTMLInputElement, MouseEvent>)  => void;
+    autoFocus?:boolean;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement> | undefined;
   }
 
   /**

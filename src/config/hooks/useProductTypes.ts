@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import { useEffect, useState } from "react";
@@ -9,6 +8,7 @@ import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
 import ProductType from "../../@types/product-type/ProductType";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useProductType = () => {
   const [productTypeData, setProductTypeData] = useState<
@@ -27,7 +27,7 @@ export const useProductType = () => {
     };
 
     try {
-      const response = await axios.post(POST_API.GET_PRODUCT_TYPE, PostData, {
+      const response = await axiosClient.post(POST_API.GET_PRODUCT_TYPE, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {

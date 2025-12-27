@@ -14,7 +14,6 @@ import {
   ShoppingBag,
   User,
 } from "lucide-react";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 import React, { useEffect, useRef, useState } from "react";
@@ -33,6 +32,8 @@ import { AccountCompanyProductAmcDetails } from "./AccountCompanyProductAmcDetai
 import { AccountCompanyProductWarrantyDetails } from "./AccountCompanyProductWarrantyDetails";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../../config/error/handleApiError";
 
 const AccountCompanyProductPopUpDetails = ({
   selectedProductCard,
@@ -66,7 +67,7 @@ const AccountCompanyProductPopUpDetails = ({
 
   const handleSelctedInstalledByUser = (data: CompanyUser) => {
     if (data.id === productData?.installedBy) {
-      toast.error("Select different user.");
+      toast.error(MESSAGE.ERROR.SELECT_DIFFERENT_USER);
       return;
     }
     if ((data.id > 0 && data.id !== null) || data.id !== undefined) {
@@ -204,7 +205,7 @@ const AccountCompanyProductPopUpDetails = ({
         updatedby_id: loginStatus.id,
       };
 
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT,
         postData,
         { withCredentials: true }
@@ -218,7 +219,7 @@ const AccountCompanyProductPopUpDetails = ({
         setProductData(previousState);
       }
     } catch (error: any) {
-      toast.error("Network error: Unable to update.");
+      handleApiError(error);
       //  Rollback to previous data
       setProductData(previousState);
     }
@@ -228,9 +229,8 @@ const AccountCompanyProductPopUpDetails = ({
   return (
     <div>
       {/* Header */}
-      {/* <span className="caption-custom">Assigned Product details</span> */}
-      <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1   rounded p-0.5 pt-1">
-        <div className=" col-span-1 flex items-center">
+        <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1   rounded p-0.5 pt-1">
+        <div className=" col-span-4 flex items-center">
           <div className="flex items-center gap-4">
             {/* Logo */}
             <div

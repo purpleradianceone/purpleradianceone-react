@@ -5,8 +5,8 @@ import ROUTES_URL from "../../../../../constants/Routes";
 import { getAccountCompanyProductDetails } from "../../../../../config/apis/api";
 import { handleApiError } from "../../../../../config/error/handleApiError";
 import AccountProduct from "../../../../../@types/account/AccountProduct";
-import AccountCompanyProductPopUpDetails from "../AccountCompanyProductPopUpDetails";
 import AccountProductDetailsSkeleton from "../../account-skeletons/AccountProductDetailsSkeleton";
+import { AccountCompanyProductDetailsCard } from "./AccountCompanyProductDetailsCard";
 
 export const AccountCompanyProductDetails: React.FC = () => {
   const { productId, accountId } = useParams<{
@@ -59,7 +59,8 @@ export const AccountCompanyProductDetails: React.FC = () => {
         const item = response.data?.[0];
 
         if (!item) {
-          throw new Error("No product data returned from API");
+          navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}`)
+          // throw new Error("No product data returned from API");
         }
 
         const formattedData: AccountProduct = {
@@ -90,7 +91,6 @@ export const AccountCompanyProductDetails: React.FC = () => {
         setAccountCompanyProduct(formattedData);
       } catch (error) {
         handleApiError(error);
-        console.error("Failed to fetch product details", error);
       }
     };
 
@@ -101,8 +101,11 @@ export const AccountCompanyProductDetails: React.FC = () => {
     <AccountProductDetailsSkeleton/>
   );
   return (
-    <AccountCompanyProductPopUpDetails
+    <AccountCompanyProductDetailsCard 
       selectedProductCard={accountCompanyProduct}
     />
+    // <AccountCompanyProductPopUpDetails
+    //   selectedProductCard={accountCompanyProduct}
+    // />
   );
 };

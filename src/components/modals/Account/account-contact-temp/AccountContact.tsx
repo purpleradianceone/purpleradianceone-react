@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +25,7 @@ import COLORS from "../../../../constants/Colors";
 import ToggleButton from "../../../ui/ToggleButton";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -72,7 +72,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       requestedby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.GET_ACCOUNT_CONTACT, postData, {
         withCredentials: true,
       })
@@ -258,7 +258,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     const api = editingContactId
       ? POST_API.UPDATE_ACCOUNT_CONTACT
       : POST_API.CREATE_ACCOUNT_CONTACT;
-    await axios
+    await axiosClient
       .post(api, postData, {
         withCredentials: true,
       })
@@ -347,7 +347,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     };
 
     const api = POST_API.UPDATE_ACCOUNT_CONTACT;
-    await axios
+    await axiosClient
       .post(api, postData, {
         withCredentials: true,
       })
