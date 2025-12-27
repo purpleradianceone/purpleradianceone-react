@@ -5,13 +5,13 @@ import { Import, LucideCheckCircle, LucideScanEye, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import { OPACITY, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
@@ -107,7 +107,7 @@ const MappedAccountDataPopup = ({
       formData.append("createdby", loginStatus.id.toString());
       console.log(accountImportCsvFile);
 
-      await axios
+      await axiosClient
         .post(POST_API.UPLOAD_CSV_FOR_IMPORT, formData, {
           headers: {
             "Content-Type": "multipart/form-data",

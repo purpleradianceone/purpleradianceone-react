@@ -10,20 +10,20 @@ import {
   CheckSquare,
   Notebook,
 } from "lucide-react";
-import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import LeadTaskType from "../../../../../@types/lead-management/LeadTaskType";
+import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import POST_API from "../../../../../constants/PostApi";
+import { STATUS_CODE } from "../../../../../constants/AppConstants";
+import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import qs from "query-string";
-import ApiError from "../../../../@types/error/ApiError";
-import RefreshToken from "../../../../config/validations/RefreshToken";
+import ApiError from "../../../../../@types/error/ApiError";
+import RefreshToken from "../../../../../config/validations/RefreshToken";
 import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../../constants/Routes";
+import ROUTES_URL from "../../../../../constants/Routes";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import TaskStageChip from "../../../ui/TaskStageChip";
+import TaskStageChip from "../../../../ui/TaskStageChip";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: LeadTaskType) => {
@@ -170,10 +170,12 @@ function Tasks({
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }} 
+      className="flex flex-col h-full"
+
     >
-      <div className="flex items-center justify-between mb-8 flex-shrink-0">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div>
-          <h3 className="section-header-custom mb-2">
+          <h3 className="section-header-custom mb-1">
             {taskType === "upcoming"
               ? "Upcoming Tasks"
               : taskType === "pending"
@@ -190,7 +192,7 @@ function Tasks({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+      <div className="flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar">
         {isLoading && <LoadingSpinner></LoadingSpinner>}
         {!isLoading && (
           <div className="space-y-4">

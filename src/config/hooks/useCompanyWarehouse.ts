@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
@@ -7,6 +6,7 @@ import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export type Warehouse = {
     id: number,
@@ -34,9 +34,8 @@ export const useCompanyWarehouse = () => {
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_COMPANY_WAREHOUSE
-                // 'http://localhost:8080/api/inventory/purple-crm-api/get/company-warehouse'
                 , PostData, {
                 withCredentials: true,
             });

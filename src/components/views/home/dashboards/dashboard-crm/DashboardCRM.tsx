@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../../constants/Routes";
-import MetricCard from "./MetricCard";
-import PipelineChart from "./PipeLineChart";
-import QuickActions from "./QuickActions";
+import ROUTES_URL from "../../../../../constants/Routes";
+import MetricCard from "../dashboards_components/MetricCard";
+import PipelineChart from "../dashboards_components/PipeLineChart";
+import QuickActions from "../dashboards_components/QuickActions";
 import {
   AlarmClock,
   AlertCircleIcon,
@@ -18,25 +18,25 @@ import {
   Users,
   WineIcon,
 } from "lucide-react";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-import LeadSummaryReportType from "../../../../@types/home/dashboard/LeadSummaryReportType";
-import ApiError from "../../../../@types/error/ApiError";
-import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
+import POST_API from "../../../../../constants/PostApi";
+import { STATUS_CODE } from "../../../../../constants/AppConstants";
+import RefreshToken from "../../../../../config/validations/RefreshToken";
+import LeadSummaryReportType from "../../../../../@types/home/dashboard/LeadSummaryReportType";
+import ApiError from "../../../../../@types/error/ApiError";
+import LeadTaskType from "../../../../../@types/lead-management/LeadTaskType";
 import SalesChart from "./SalesChart";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
-import MonthlyAverageLeads from "../../../../@types/home/dashboard/MonthlyAverageLeads";
-import { REFCURSOR_KEY } from "../../../../constants/RefcursorConstants";
+import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
+import MonthlyAverageLeads from "../../../../../@types/home/dashboard/MonthlyAverageLeads";
+import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
-import PieChart from "./PieChart";
-import AppTutorailManager from "../../tutorails/AppTutorailManager";
-import { DashboardCrmSteps } from "../../../../constants/AppTutorailsSteps";
-import { TutorailColumnName } from "../../../../constants/Tutorail";
-import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
-import { DashboardComponentJsxKey } from "../../../../enums/dashboard/DashboardComponentJsxKey.enum";
+import PieChart from "../dashboards_components/PieChart";
+import AppTutorailManager from "../../../tutorails/AppTutorailManager";
+import { DashboardCrmSteps } from "../../../../../constants/AppTutorailsSteps";
+import { TutorailColumnName } from "../../../../../constants/Tutorail";
+import { useTutorailDataContext } from "../../../../../context/tutorail/useTutorailDataContext";
+import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -712,92 +712,6 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           </div>
         )}
       </div>
-
-      {/* <div className="grid grid-cols-3">
-        <div className="p-10 ">
-          <h1 className="ml-10 text-xl font-bold ">Lead By Source</h1>
-          <DashboardChartComponent
-            type="Pie"
-            data={
-              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_LEAD_BY_SOURCE] ??
-                []) as PieDataItem[]
-            }
-            colors={["#8884d8", "#82ca9d", "#ffc658"]}
-          />
-        </div>
-
-        <div className="p-10">
-          <h1 className="ml-10 text-xl font-bold">Lead By Status</h1>
-          <DashboardChartComponent
-            type="Bar"
-            data={
-              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_LEAD_BY_STATUS] ??
-                []) as BarDataItem[]
-            }
-            colors={["#8884d8", "#82ca9d", "#ffc658"]}
-          />
-        </div>
-
-        <div className="p-10">
-          <h1 className="ml-10 text-xl font-bold">12 Month Performance</h1>
-          <DashboardChartComponent
-            type="Bar"
-            data={
-              (dashboardData[
-                REFCURSOR_KEY.MY_FIXED_CURSOR_12_MONTH_PERFORMANCE
-              ] ?? []) as BarDataItemFor12MonthPerformance[]
-            }
-            colors={["#8884d8", "#82ca9d", "#ffc658"]}
-          />
-        </div>
-      </div>
-
-      <div className="p-10">
-        <h1 className="ml-10 text-xl font-bold">12 Month Performance</h1>
-        <DashboardChartComponent
-          type="Bar"
-          data={
-            (dashboardData[
-              REFCURSOR_KEY.MY_FIXED_CURSOR_12_MONTH_PERFORMANCE
-            ] ?? []) as BarDataItemFor12MonthPerformance[]
-          }
-          colors={["#8884d8", "#82ca9d", "#ffc658"]}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 h-[calc(100vh-90px)] w-full px-6">
-        <div className="flex flex-col bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-bold mb-1">Pending Tasks</h2>
-          <p className="text-gray-500 mb-4">
-            Your Pending activities and deadlines
-          </p>
-        
-        <DashboardChartComponent
-            type="List"
-            data={
-              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_PENDING_TASK] ??
-                []) as PendingTaskList[]
-            }
-            colors={["#8884d8", "#82ca9d", "#ffc658"]}
-          />
-        </div>
-
-        <div className="flex flex-col bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-bold mb-1">Upcoming Tasks</h2>
-          <p className="text-gray-500 mb-4">
-            Your scheduled activities and deadlines
-          </p>
-
-          <DashboardChartComponent
-            type="List"
-            data={
-              (dashboardData[REFCURSOR_KEY.MY_FIXED_CURSOR_UPCOMING_TASK] ??
-                []) as PendingTaskList[]
-            }
-            colors={["#8884d8", "#82ca9d", "#ffc658"]}
-          />
-        </div>
-      </div> */}
     </>
   );
 };

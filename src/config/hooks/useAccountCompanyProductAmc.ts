@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../validations/RefreshToken";
 import { AccountCompanyProductAmc } from "../../@types/account/AccountCompanyProductAmc";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>{
     const {loginStatus} = useLoggedInUserContext();
@@ -25,7 +25,7 @@ export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_ACCOUNT_COMPANY_PRODUCT_AMC
                 , postData, {
                 withCredentials: true,

@@ -5,8 +5,8 @@ import ApiError from "../../@types/error/ApiError";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
 import UnitType from "../../@types/products/Unit";
+import axiosClient from "../../axios-client/AxiosClient";
 
 const useUnit = () =>{
     const [loading, setIsLoading] = useState<boolean>(true)
@@ -17,12 +17,13 @@ const useUnit = () =>{
         const PostData = {
             id: null,
             name: null,
+            is_base_unit : null,
             general_usage: null,
             isactive: true,
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_UNIT
                 , PostData, {
                 withCredentials: true,

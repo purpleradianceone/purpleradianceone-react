@@ -54,6 +54,11 @@ export default function CompanyUserSearchFieldInput({
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
 
+  const [lastSelectedUser, setLastSelectedUser] =
+  useState<CompanyUser | null>(null);
+const [isExplicitClear, setIsExplicitClear] = useState(false);
+
+
   // ---------------- PRE POPULATE ----------------
   useEffect(() => {
     if (defaultValue && defaultValue.trim().length > 0) {
@@ -67,6 +72,7 @@ export default function CompanyUserSearchFieldInput({
 
       setSelectedUser(user);
       // onUserSelected(user);
+      setLastSelectedUser(user)
     }
   }, [defaultValue]);
 
@@ -186,15 +192,20 @@ export default function CompanyUserSearchFieldInput({
   const handleSelect = (user: CompanyUser) => {
     if (isDisabled) return handleDisabled();
 
+    setIsExplicitClear(false)
+    setLastSelectedUser(user); //  persist valid selection
     setSelectedUser(user);
     setQuery(user.fullname);
     setShowDropdown(false);
     onUserSelected(user);
+
   };
 
   // ---------------- CLEAR ----------------
   const clearSelected = () => {
     if (isDisabled) return handleDisabled();
+
+    setIsExplicitClear(true)
 
     setSelectedUser(null);
     setQuery("");
@@ -212,12 +223,19 @@ export default function CompanyUserSearchFieldInput({
         !inputRef.current?.contains(event.target as Node)
       ) {
         setShowDropdown(false);
+
+        // ✅ RESTORE PREVIOUS VALUE
+      if ( lastSelectedUser && !isExplicitClear) {
+        setSelectedUser(lastSelectedUser);
+        setQuery(lastSelectedUser.fullname);
+        onUserSelected(lastSelectedUser);
+      }
       }
     };
 
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
-  }, []);
+  }, [query, lastSelectedUser , isExplicitClear]);
 
   //Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -278,6 +296,7 @@ export default function CompanyUserSearchFieldInput({
           onKeyDown={handleKeyDown}
           onChange={(e) => {
             if (isDisabled) return handleDisabled();
+            setIsExplicitClear(false)
             setQuery(e.target.value);
             setSelectedUser(null);
             setShowDropdown(true);

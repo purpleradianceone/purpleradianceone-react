@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-
-
-  import axios from "axios";
   import POST_API from "../../constants/PostApi";
   import { STATUS_CODE } from "../../constants/AppConstants";
   import { useEffect, useState } from "react";
@@ -10,6 +6,7 @@
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   import ApiError from "../../@types/error/ApiError";
 import District from "../../@types/general/District";
+import axiosClient from "../../axios-client/AxiosClient";
   
   export const useDistricts = (stateId : number) => {
 
@@ -25,7 +22,7 @@ import District from "../../@types/general/District";
     };
 
     try {
-      const response = await axios.post(POST_API.GET_DISTRICT, PostData, {
+      const response = await axiosClient.post(POST_API.GET_DISTRICT, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {

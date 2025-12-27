@@ -23,3 +23,15 @@ export const getStockLiveForCompanyProduct  = async (payload: any
     const response = await axiosClient.post(POST_API.GET_STOCK_LIVE_COMPANY_PRODUCT, payload, { withCredentials: true })
     return response;
 }
+// getAccountCompanyProductDetails
+export const getAccountCompanyProductDetails  = async (payload: any
+) => {
+    const response = await axiosClient.post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT, payload, { withCredentials: true })
+    return response;
+}
+
+export const fetchCompanyProductName  = async (payload: any
+) => {
+    const response = await axiosClient.post(POST_API.GET_PRODUCTS, payload, { withCredentials: true })
+    return response;
+}

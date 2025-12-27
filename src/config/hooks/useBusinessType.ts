@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import axios from "axios";
 import ApiError from "../../@types/error/ApiError";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
@@ -7,6 +6,7 @@ import RefreshToken from "../validations/RefreshToken";
 import POST_API from "../../constants/PostApi";
 import { useEffect, useState } from "react";
 import BusinessType from "../../@types/account/BusinessType";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const usebusinessType = () => {
 
@@ -24,7 +24,7 @@ export const usebusinessType = () => {
             requestedby: loginStatus.id,
         };
 
-        await axios
+        await axiosClient
             .post(POST_API.GET_BUSINESS_TYPE, postData, {
                 withCredentials: true,
             })

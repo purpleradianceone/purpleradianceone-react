@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-
-
-  import axios from "axios";
   import POST_API from "../../constants/PostApi";
   import { STATUS_CODE } from "../../constants/AppConstants";
   import { useEffect, useState } from "react";
@@ -10,6 +6,7 @@
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   import ApiError from "../../@types/error/ApiError";
 import Country from "../../@types/general/Country";
+import axiosClient from "../../axios-client/AxiosClient";
   
   export const useCountries = () => {
 
@@ -26,7 +23,7 @@ import Country from "../../@types/general/Country";
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+      const response = await axiosClient.post(POST_API.GET_COUNTRY, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {

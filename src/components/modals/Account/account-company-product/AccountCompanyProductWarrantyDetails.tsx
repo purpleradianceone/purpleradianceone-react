@@ -18,7 +18,7 @@ export const AccountCompanyProductWarrantyDetails: React.FC<
         Warranty Details
       </h3>
 
-      <div className={"ag-theme-balham w-full h-[25vh]"}>
+      <div className={"ag-theme-balham w-full h-[20vh]"}>
         {loading && <LoadingSpinner />}
         {!loading && <AccountCompanyProductWarrantyAgGrid data={data} />}
       </div>

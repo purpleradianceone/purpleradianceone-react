@@ -5,16 +5,18 @@ import POST_API from "../../../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../../../@types/error/ApiError";
-import { STATUS_CODE, VALIDATIONS } from "../../../../../constants/AppConstants";
+import {
+  STATUS_CODE,
+  VALIDATIONS,
+} from "../../../../../constants/AppConstants";
 import RefreshToken from "../../../../../config/validations/RefreshToken";
 import FormInput from "../../../../ui/FormInput";
-import DatePickerInput from "../../../../ui/DatePickerInput";
 import { nanoid } from "nanoid";
 import {
   Box,
-  ChevronRight,
+  Calendar,
+  FileDigit,
   Info,
-  LucideCalendar,
   LucideIcon,
   LucideTimer,
   MapPin,
@@ -25,8 +27,7 @@ import {
   X,
 } from "lucide-react";
 import TextAreaInput from "../../../../ui/TextAreaInput";
-import { PageLayout } from "../../../../ui/PageLayout";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ROUTES_URL from "../../../../../constants/Routes";
 import Button from "../../../../ui/Button";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
@@ -48,6 +49,10 @@ import {
 } from "../../../../../config/apis/api";
 import MESSAGE from "../../../../../constants/Messages";
 import { handleApiError } from "../../../../../config/error/handleApiError";
+import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
+import { format } from "date-fns";
+import { calculateEndDate } from "../../../../../utils/date/calculateEndDate";
+import LoadingPopUpAnimation from "../../../../views/card/LoadingPopUpAnimation";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -58,21 +63,23 @@ interface ProductRow {
   serialNumber: number[];
   isSerialNumber: boolean;
   productQuantity?: number;
-  purchaseDate: string;
-  deliveryDate: string;
+  purchaseDate: Date | null;
+  deliveryDate: Date | null;
   deliveryAddress: string;
   billingAddress: string;
-  installationDate: string;
+  installationDate: Date | null;
   installedBy: string;
   installedById: number;
-  warrantyStartDate: string;
-  warrantyEndDate: string;
+  warrantyStartDate: Date | null;
+  warrantyEndDate: Date | null;
   warrantyTerms: string;
-  amcCycleStartDate: string;
-  amcCycleEndDate: string;
+  amcCycleStartDate: Date | null;
+  amcCycleEndDate: Date | null;
   warranty: number;
   amc: number;
   conversionFactor: number;
+  conversionFactorString: string;
+  unitName : string ,
   productWarranty?: string;
   productAmc?: string;
   productWarrantyId?: number;
@@ -97,31 +104,35 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const { userHasAccessToUpdateAccount } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
-  const { accountId } = useParams();
+  const { accountId } = useParams<{ accountId: string }>();
+
   const [rows, setRows] = useState<ProductRow[]>([
     {
       rowNaNoId: nanoid(),
       product: "",
       productId: null,
       quantity: 0,
-      purchaseDate: "",
+      purchaseDate: null,
       warranty: 0,
       amc: 0,
-      installedBy: loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
-      amcCycleEndDate: "",
-      amcCycleStartDate: "",
+      installedBy:
+        loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
+      amcCycleEndDate: null,
+      amcCycleStartDate: null,
       billingAddress: "",
       deliveryAddress: "",
-      deliveryDate: "",
-      installationDate: "",
+      deliveryDate: null,
+      installationDate: null,
       unit_id: 0,
-      warrantyEndDate: "",
-      warrantyStartDate: "",
+      warrantyEndDate: null,
+      warrantyStartDate: null,
       warrantyTerms: "",
       serialNumber: [],
       isSerialNumber: false,
       installedById: loginStatus.id,
       conversionFactor: 0,
+      conversionFactorString: "",
+      unitName:""
     },
   ]);
 
@@ -263,25 +274,28 @@ export const CreateMultipleAccountCompanyProduct = () => {
         rowNaNoId: nanoid(),
         product: "",
         productId: null,
-        purchaseDate: "",
+        purchaseDate: null,
         warranty: 12,
         amc: 1,
-        installedBy: loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
-        amcCycleEndDate: "",
-        amcCycleStartDate: "",
+        installedBy:
+          loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
+        amcCycleEndDate: null,
+        amcCycleStartDate: null,
         billingAddress: "",
         deliveryAddress: "",
-        deliveryDate: "",
-        installationDate: "",
+        deliveryDate: null,
+        installationDate: null,
         quantity: 0,
         unit_id: 0,
-        warrantyEndDate: "",
-        warrantyStartDate: "",
+        warrantyEndDate: null,
+        warrantyStartDate: null,
         warrantyTerms: "",
         serialNumber: [],
         isSerialNumber: false,
         installedById: loginStatus.id,
         conversionFactor: 0,
+        conversionFactorString: "",
+        unitName : ""
       },
     ]);
   };
@@ -294,9 +308,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
   // };
 
   // nanoid changes
-  const deleteRow = (rowId : string )=>{
-    setRows((prev)=> prev.filter((r)=> r.rowNaNoId !== rowId))
-  }
+  const deleteRow = (rowId: string) => {
+    setRows((prev) => prev.filter((r) => r.rowNaNoId !== rowId));
+  };
 
   const validateRows = (): boolean => {
     let isValid = true;
@@ -313,7 +327,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         unit: !row.unit_id,
         installedBy: !row.installedBy?.trim(),
         installedById: row.installedById <= 0,
-        purchaseDate: !row.purchaseDate?.trim(),
+        purchaseDate: !row.purchaseDate,
         zeroQuantity: qty < 1,
         quantity: false,
       };
@@ -345,13 +359,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     //  Show toasts ONLY ONCE
     if (hasStockError) {
-      toast.error("Entered quantity exceeds available stock.");
+      toast.error(MESSAGE.ERROR.QUANTITY_EXCEEDS);
     }
 
     if (hasMandatoryError) {
-      toast.error("Please fill all mandatory fields.");
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
     }
-
     return isValid;
   };
 
@@ -367,10 +380,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
         const newRow: ProductRow = { ...row };
         const newHasError = { ...row.hasError };
 
-        if (!newRow.product) {
-          toast.error("Select priduct first.");
-          return newRow;
-        }
+        // if (!newRow.product) {
+        //   toast.error(MESSAGE.ERROR.SELECT_PRODUCT_FIRST);
+        //   return newRow;
+        // }
 
         if (field === "quantity") {
           const qty = Number(value);
@@ -434,6 +447,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
           if (!row.installationDate) newRow.installationDate = value as any;
 
           if (
+            value &&
             !row.warrantyStartDate &&
             !row.warrantyEndDate &&
             newRow.productWarrantyNumber &&
@@ -442,13 +456,14 @@ export const CreateMultipleAccountCompanyProduct = () => {
             newRow.warrantyStartDate = value as any;
 
             newRow.warrantyEndDate = calculateEndDate(
-              value as any,
+              value as Date,
               newRow.productWarrantyNumber!,
               newRow.productWarrantyId!
             );
           }
 
           if (
+            value &&
             !row.amcCycleStartDate &&
             !row.amcCycleEndDate &&
             newRow.productAmcNumber &&
@@ -456,7 +471,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
           ) {
             newRow.amcCycleStartDate = value as any;
             newRow.amcCycleEndDate = calculateEndDate(
-              value as any,
+              value as Date,
               newRow.productAmcNumber,
               newRow.productAmcId
             );
@@ -481,44 +496,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const [showSerialNumberModule, setShowSerialNumberModule] =
     useState<boolean>(false);
   const { unitForProduct, getUnitForProduct } = useUnitForProduct({});
-  const calculateEndDate = (
-    startDate: string,
-    count: number,
-    intervalId: number
-  ): string => {
-    // SAFELY parse YYYY-MM-DD
-    const parts = startDate.split("-").map(Number);
-    const end = new Date(parts[0], parts[1] - 1, parts[2]);
-
-    // Add duration
-    switch (intervalId) {
-      case 1: // Year
-        end.setFullYear(end.getFullYear() + count);
-        break;
-
-      case 2: // Month
-        end.setMonth(end.getMonth() + count);
-        break;
-
-      case 3: // Day
-        end.setDate(end.getDate() + count);
-        break;
-    }
-
-    // Subtract ONE day (inclusive range)
-    end.setDate(end.getDate() - 1);
-
-    // Format manually (NO timezone shift)
-    const yyyy = end.getFullYear();
-    const mm = String(end.getMonth() + 1).padStart(2, "0");
-    const dd = String(end.getDate()).padStart(2, "0");
-
-    console.log("this is the date:");
-    // alert()
-    console.log(`${yyyy}-${mm}-${dd}`);
-
-    return `${yyyy}-${mm}-${dd}`;
-  };
 
   // ==============================
   // HANDLE PRODUCT SELECT
@@ -576,7 +553,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
   //         productAmcId: item.defaultAmcCycleIntervalTypeId,
   //       };
 
-  //       // 🔁 Force recalculation if purchase date exists
+  //       //  Force recalculation if purchase date exists
   //       if (newRow.purchaseDate) {
   //         const start = new Date(newRow.purchaseDate);
 
@@ -624,13 +601,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     // Duplicate check
     if (rows.some((r, i) => r.productId === item.id && i !== index)) {
-      toast.error("This product is already selected in another row!");
+      toast.error(MESSAGE.ERROR.DUPLICATE_PRODUCT);
       return;
     }
 
     //  Enable loader for this row
     setRows((prev) =>
-      prev.map((row, i) => (i === index ? { ...row, isLoading: true } : row))
+      prev.map((row, i) =>
+        i === index ? { ...row, isLoading: true, unit_id: 0 } : row
+      )
     );
 
     try {
@@ -654,7 +633,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
       const stock = stockRes.data?.[0];
 
       if (!stock || stock.quantity_live === 0) {
-        toast.error("Selected Product doesn't have stock.");
+        toast.error(MESSAGE.ERROR.STOCK_NOT_AVAILABLE_FOR_PRODUCT);
         setRows((prev) =>
           prev.map((row, i) =>
             i === index ? { ...row, isLoading: false } : row
@@ -664,7 +643,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
       }
 
       setUnitsForRows((prev) => ({ ...prev, [index]: units }));
-
+                                
       setRows((prev) =>
         prev.map((row, i) => {
           if (i !== index) return row;
@@ -676,7 +655,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             productQuantity: stock.quantity_live,
             isSerialNumber: item.isSerialNumber!,
             unit_id: item.isSerialNumber ? item.unitId : row.unit_id,
-
+            unitName : units[0].unitNameInStock,
             productWarranty: item.defaultWarrantyName,
             productWarrantyNumber: item.defaultWarranty,
             productWarrantyId: item.defaultWarrantyIntervalTypeId,
@@ -690,34 +669,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
             },
           };
 
-          //  Recalculate dates if purchaseDate exists
-          if (newRow.purchaseDate) {
-            if (newRow.productWarrantyNumber && newRow.productWarrantyId) {
-              newRow.warrantyStartDate = newRow.purchaseDate;
-
-              newRow.warrantyEndDate = calculateEndDate(
-                newRow.purchaseDate,
-                newRow.productWarrantyNumber!,
-                newRow.productWarrantyId!
-              );
-            }
-
-            if (newRow.productAmcNumber && newRow.productAmcId) {
-              newRow.amcCycleStartDate = newRow.purchaseDate;
-              newRow.amcCycleEndDate = calculateEndDate(
-                newRow.purchaseDate,
-                newRow.productAmcNumber,
-                newRow.productAmcId
-              );
-            }
-          }
-
           return { ...newRow, isLoading: false };
         })
       );
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: any) {
-      toast.error("Failed to load product data.");
+      toast.error(MESSAGE.ERROR.FAILED_TO_LOAD_PRODUCT_DATA);
 
       setRows((prev) =>
         prev.map((row, i) => (i === index ? { ...row, isLoading: false } : row))
@@ -733,6 +690,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }
   };
 
+  const [showLoadingAnimationForAssignApi, setShowLoadingAnimationForAssignApi]= useState<boolean>(false);
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
     if (!validateRows()) {
@@ -746,18 +704,34 @@ export const CreateMultipleAccountCompanyProduct = () => {
       company_id: loginStatus.companyId,
       account_id: Number(accountId),
       company_product_id: row.productId,
-      purchase_date: row.purchaseDate === "" ? null : row.purchaseDate,
-      delivery_date: row.deliveryDate === "" ? null : row.deliveryDate,
-      installation_date:
-        row.installationDate === "" ? null : row.installationDate,
-      warranty_start_date:
-        row.warrantyStartDate === "" ? null : row.warrantyStartDate,
-      warranty_end_date:
-        row.warrantyEndDate === "" ? null : row.warrantyEndDate,
-      amc_cycle_start_date:
-        row.amcCycleStartDate === "" ? null : row.amcCycleStartDate,
-      amc_cycle_end_date:
-        row.amcCycleEndDate === "" ? null : row.amcCycleEndDate,
+      purchase_date: row.purchaseDate
+        ? format(row.purchaseDate, "yyyy-MM-dd")
+        : null,
+      delivery_date: row.deliveryDate
+        ? format(row.deliveryDate, "yyyy-MM-dd")
+        : null,
+      installation_date: row.installationDate
+        ? format(row.installationDate, "yyyy-MM-dd")
+        : null,
+      warranty_start_date: row.warrantyStartDate
+        ? format(row.warrantyStartDate, "yyyy-MM-dd")
+        : null,
+      warranty_end_date: row.warrantyEndDate
+        ? format(row.warrantyEndDate, "yyyy-MM-dd")
+        : null,
+      amc_cycle_start_date: row.amcCycleStartDate
+        ? format(row.amcCycleStartDate, "yyyy-MM-dd")
+        : null,
+      amc_cycle_end_date: row.amcCycleEndDate
+        ? format(row.amcCycleEndDate, "yyyy-MM-dd")
+        : null,
+      // purchase_date: row.purchaseDate === "" ? null : row.purchaseDate,
+      // delivery_date: row.deliveryDate === "" ? null : row.deliveryDate,
+      // installation_date:row.installationDate === "" ? null : row.installationDate,
+      // warranty_start_date:row.warrantyStartDate === "" ? null : row.warrantyStartDate,
+      // warranty_end_date:row.warrantyEndDate === "" ? null : row.warrantyEndDate,
+      // amc_cycle_start_date:row.amcCycleStartDate === "" ? null : row.amcCycleStartDate,
+      // amc_cycle_end_date:row.amcCycleEndDate === "" ? null : row.amcCycleEndDate,
       delivery_address: row.deliveryAddress,
       billing_address: row.billingAddress,
       installed_by: row.installedById || loginStatus.id,
@@ -766,6 +740,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }));
 
     try {
+      setShowLoadingAnimationForAssignApi(true);
       const response = await createMultipleAccountCompanyProduct(payloadList);
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status === true) {
@@ -778,7 +753,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-      // toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG);
+    }finally{
+      setShowLoadingAnimationForAssignApi(false)
     }
   };
 
@@ -790,13 +766,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const [unitsForRows, setUnitsForRows] = useState<
     Record<number, UnitForProduct[]>
   >({});
-
-  // const openSerialNumberPopup = (rowIndex: number) => {
-  //   // setActiveRow(rowIndex);
-  //   setSerialRowIndex(rowIndex);
-  //   setSelectedCompanyProductId(rows[rowIndex].productId!);
-  //   setShowSerialNumberModule(true);
-  // };
 
   // nanoid changes
   const openSerialNumberPopup = (rowId: string) => {
@@ -820,30 +789,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
   if (!userHasAccessToUpdateAccount) return <div>permission denied</div>;
 
   return (
-    <PageLayout>
-      {/* Header navigation bar */}
-      <div className="sticky top-0 z-20 bg-white py-1 border-b">
-        <div className="flex items-center gap-3 mx-0.5 ">
-          <Link to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
-            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
-              Accounts
-            </Button>
-          </Link>
-
-          <ChevronRight size={16} className="text-gray-400" />
-
-          <Link to={`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}`}>
-            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
-              Account Details
-            </Button>
-          </Link>
-
-          <ChevronRight size={16} className="text-gray-400" />
-
-          <h1 className="table-header-custom">Assign Products</h1>
-        </div>
-      </div>
-
+    <>
       {/* form */}
       <form>
         <div className=" w-full py-0.5 ">
@@ -980,8 +926,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       )}
                     </div>
                     <button
-                    // nanoid changes
-                    onClick={()=> deleteRow(row.rowNaNoId)}
+                      // nanoid changes
+                      onClick={() => deleteRow(row.rowNaNoId)}
                       // onClick={() => deleteRow(index)}
                       className={` ${
                         index == 0 ? "hidden" : ""
@@ -1006,6 +952,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         <FormInput
                           logo={Box}
                           label="Quantity :"
+                          readonly={!row.productId}
                           required
                           placeholder="Enter Product Quantity"
                           type="number"
@@ -1023,7 +970,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               const finalFactor =
                                 qty * Number(selectedUnit.conversionFactor);
                               updateRow(index, "conversionFactor", finalFactor);
+
+                      
                             }
+
                             // if(qty){
 
                             updateRow(index, "quantity", qty);
@@ -1046,7 +996,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         <CustomDropdown
                           labelName="Unit :"
                           logo={LucideTimer}
-                          readOnly={row.isSerialNumber}
+                          readOnly={!row.productId || row.isSerialNumber}
                           selectedValue={row.unit_id}
                           onSelect={(unit) => {
                             //  Clear selection
@@ -1060,6 +1010,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
                             updateRow(index, "unit_id", unit!);
                             // }
 
+                           
+
                             const finalFactor =
                               Number(row.quantity) *
                               Number(
@@ -1069,6 +1021,11 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                             if (finalFactor) {
                               updateRow(index, "conversionFactor", finalFactor);
+                              // updateRow(
+                              //   index,
+                              //   "conversionFactorString",
+                              //   finalFactor + unnit!
+                              // );
                             }
                           }}
                           options={unitsForRows[index] || []}
@@ -1088,14 +1045,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                 className="caption-custom-active flex items-center cursor-pointer gap-1"
                               >
                                 Quantity will be deducted from stock :{" "}
-                                {row.conversionFactor}
-                                {
+                                {row.conversionFactor + row.unitName}
+                                {/* {row.conversionFactor} */}
+                                {/* {
                                   unitForProduct.find(
                                     (item) =>
                                       item.conversionFactor ===
                                       row.conversionFactor
                                   )?.unitNameInStock
-                                }
+                                } */}
                                 <Info size={12} className="" />
                               </p>
                             )}
@@ -1104,7 +1062,20 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                       {/* PURCHASE DATE */}
                       <div>
-                        <DatePickerInput
+                        <ControlledDatePicker
+                          readonly={!row.productId}
+                          isRequired={true}
+                          logo={Calendar}
+                          label="Purchase Date"
+                          onCommit={(date) => {
+                            // if (!date) return;
+                            console.log("this is the date purchase : " + date);
+
+                            updateRow(index, "purchaseDate", date);
+                          }}
+                          value={row.purchaseDate}
+                        />
+                        {/* <DatePickerInput
                           required
                           label="Purchase Date :"
                           logo={LucideCalendar}
@@ -1112,13 +1083,14 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           placeholder="Select Date"
                           value={row.purchaseDate ?? ""}
                           onChange={(e) => {
-                            console.log(e.target.value);
-                            // if(e.target.value){
-                            updateRow(index, "purchaseDate", e.target.value);
-                            // }
+                            // console.log(e.target.value);
+                            // console.log("this is the ");
+
+                            if (e.target.value) {
+                              updateRow(index, "purchaseDate", e.target.value);
+                            }
                           }}
-                          // error={handleError}
-                        />
+                        /> */}
                         {row.hasError?.purchaseDate && (
                           <p className="text-red-500 text-xs mt-1">
                             Purchase Date is required
@@ -1126,7 +1098,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         )}
                       </div>
                       {/* Delivery date */}
-                      <DatePickerInput
+                      {/* <DatePickerInput
                         label="Delivery Date :"
                         logo={LucideCalendar}
                         name="deliveryDate"
@@ -1135,11 +1107,21 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         onChange={(e) =>
                           updateRow(index, "deliveryDate", e.target.value)
                         }
+                      /> */}
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Delivery Date"
+                        onCommit={(date) => {
+                          console.log("this is the date purchase : " + date);
+                          updateRow(index, "deliveryDate", date);
+                        }}
+                        value={row.deliveryDate}
                       />
                     </div>
                     <div className="col-span-2 grid grid-cols-4 gap-x-1">
                       {/* Warranty start date */}
-                      <DatePickerInput
+                      {/* <DatePickerInput
                         label="Warranty Start Date :"
                         logo={LucideCalendar}
                         name="warrantyStartDate"
@@ -1148,10 +1130,19 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         onChange={(e) =>
                           updateRow(index, "warrantyStartDate", e.target.value)
                         }
+                      /> */}
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Warranty Start Date"
+                        onCommit={(date) => {
+                          updateRow(index, "warrantyStartDate", date);
+                        }}
+                        value={row.warrantyStartDate}
                       />
 
                       {/* Warranty end date */}
-                      <DatePickerInput
+                      {/* <DatePickerInput
                         label="Warranty End Date :"
                         logo={LucideCalendar}
                         name="warrantyEndDate"
@@ -1160,8 +1151,35 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         onChange={(e) =>
                           updateRow(index, "warrantyEndDate", e.target.value)
                         }
+                      /> */}
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Warranty End Date"
+                        onCommit={(date) => {
+                          updateRow(index, "warrantyEndDate", date);
+                        }}
+                        value={row.warrantyEndDate}
                       />
-                      <DatePickerInput
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="AMC Start Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleStartDate", date);
+                        }}
+                        value={row.amcCycleStartDate}
+                      />
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Amc End Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleEndDate", date);
+                        }}
+                        value={row.amcCycleEndDate}
+                      />
+                      {/* <DatePickerInput
                         label="Amc Start Date :"
                         logo={LucideCalendar}
                         name="amcCycleStartDate"
@@ -1170,8 +1188,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         onChange={(e) =>
                           updateRow(index, "amcCycleStartDate", e.target.value)
                         }
-                      />
-                      <DatePickerInput
+                      /> */}
+                      {/* <DatePickerInput
                         label="Amc End Date :"
                         logo={LucideCalendar}
                         name="amcCycleEndDate"
@@ -1180,16 +1198,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         onChange={(e) =>
                           updateRow(index, "amcCycleEndDate", e.target.value)
                         }
-                      />
+                      /> */}
                     </div>
                     <div
-                      className={`col-span-2 grid gap-1 bg-pink-00 ${
-                        row.isSerialNumber ? "grid-cols-2" : "grid-cols-1"
-                      }`}
+                      className={`col-span-2 grid  ${row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"} gap-1 bg-pink-00 mt-1.5`}
                     >
                       {/* INSTALLED BY */}
-                      <div className={`grid grid-cols-2 gap-x-1 mt-1`}>
+                      <div className="mt-1 ">
                         <CompanyUserSearchFieldInput
+                          readOnly={!row.productId}
                           label="Installed By :"
                           required
                           onUserSelected={(data) => {
@@ -1215,7 +1232,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           </p>
                         )}
                         {/* <div> */}
-                        <DatePickerInput
+                        {/* <DatePickerInput
                           label="Installation Date :"
                           logo={LucideCalendar}
                           name="installationDate"
@@ -1224,14 +1241,23 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           onChange={(e) =>
                             updateRow(index, "installationDate", e.target.value)
                           }
-                        />
+                        /> */}
                       </div>
+                      <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Installation Date"
+                        onCommit={(date) => {
+                          updateRow(index, "installationDate", date);
+                        }}
+                        value={row.installationDate}
+                      />
                       {row !== undefined && row?.isSerialNumber === true && (
                         <div>
                           <div className="flex items-center justify-end h-fit ">
                             <div className="w-full ">
                               <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
-                                <User className="text-blue-500" size={15} />
+                                <FileDigit className="text-blue-500" size={15} />
                                 <div>
                                   Serial Number :
                                   <span className="ml-0 text-red-400">*</span>
@@ -1239,16 +1265,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               </label>
 
                               <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                                <span className="table-header-custom">
+                                <span className="table-header-custom  truncate">
                                   {row.serialNumber.length > 0 ? (
                                     <>
                                       <span className="">
-                                        Serial number Selected:{" "}
+                                        Item count:{" "}
                                         {row.serialNumber.length}
                                       </span>
                                     </>
                                   ) : (
-                                    "No serial number selected"
+                                    "No item chosen"
                                   )}
                                 </span>
 
@@ -1272,10 +1298,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           </div>
                         </div>
                       )}
+                      {/* </div> */}
                     </div>
                     <div className="col-span-2">
                       {/* Warranty terms */}
                       <TextAreaInput
+                      disabled={!row.productId}
+                        readonly={!row.productId}
                         placeholder="Enter Warranty Terms "
                         logo={ShieldCheck}
                         cols={4}
@@ -1292,6 +1321,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
                     <div className="col-span-4 grid grid-cols-2 gap-x-1">
                       {/* Billing address */}
                       <TextAreaInput
+                       disabled={!row.productId}
+                        readonly={!row.productId}
                         placeholder="Enter Billing Address"
                         logo={MapPin}
                         cols={4}
@@ -1306,6 +1337,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       />
                       {/* Delivery address */}
                       <TextAreaInput
+                      disabled={!row.productId}
+                        readonly={!row.productId}
                         placeholder="Enter Delivery Address"
                         logo={MapPin}
                         cols={4}
@@ -1342,26 +1375,22 @@ export const CreateMultipleAccountCompanyProduct = () => {
           </div>
         </div>
       </form>
+      {
+        showLoadingAnimationForAssignApi && (
+          <LoadingPopUpAnimation show={showLoadingAnimationForAssignApi}/>
+        )
+      }
       {showSerialNumberModule && serialRowIndex !== null && (
         <StockSerialNumber
           companyProductId={selectedCompanyProductId!} // required for API call
-          // selectedInwardIds={rows[serialRowIndex].serialNumber ?? []} // pass existing selected serials
           selectedInwardIds={
             rows.find((r) => r.rowNaNoId === serialRowIndex)?.serialNumber || []
           }
           onClose={() => {
-            // setActiveRow(null);
-            // setSearchText("");
-            // setShowSerialNumberModule(false);
-
             // new code
             setSerialRowIndex(null);
             setShowSerialNumberModule(false);
           }}
-          // handleStockSerialNumberChange={(selectedSerialIds) => {
-          //   updateRow(serialRowIndex!, "serialNumber", selectedSerialIds);
-          // }}
-
           // nanoid changes
           handleStockSerialNumberChange={(selectedSerialIds) => {
             setRows((prev) =>
@@ -1374,7 +1403,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
           }}
         />
       )}
-    </PageLayout>
+    </>
   );
 };
 
@@ -1455,6 +1484,7 @@ function CompanyUserSearchFieldInput({
         search_parameter: searchText.trim() === "" ? null : searchText.trim(),
         limit: userPreference.rowsInGrid,
         requestedby: loginStatus.id,
+        isactive:true
       });
 
       if (response?.status === STATUS_CODE.OK) {
@@ -1641,9 +1671,9 @@ function CompanyUserSearchFieldInput({
           placeholder={placeholder}
           className={
             isDisabled
-              ? "appearance-none block w-full px-3 py-0.5 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
+              ? " table-header-custom appearance-none block w-full px-3 py-0.5 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
-              ? "appearance-none block w-full px-3 py-0.5 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
+              ? "appearance-none block w-full px-3 py-0.5 border table-header-custom bg-gray-100 border-gray-300 rounded-md shadow-sm"
               : "table-header-custom appearance-none block w-full px-3 py-0.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           }
         />

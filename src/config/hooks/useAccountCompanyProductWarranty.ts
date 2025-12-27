@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../validations/RefreshToken";
 import { AccountCompanyProductWarranty } from "../../@types/account/AccountCompanyProductWarranty";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useAccountCompanyProductWarranty = (accountCompanyProductId : number) =>{
     const {loginStatus} = useLoggedInUserContext();
@@ -25,7 +25,7 @@ export const useAccountCompanyProductWarranty = (accountCompanyProductId : numbe
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_ACCOUNT_COMPANY_PRODUCT_WARRANTY
                 , postData, {
                 withCredentials: true,

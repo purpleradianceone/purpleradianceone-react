@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import MESSAGE from "../../constants/Messages";
+import toast from "react-hot-toast";
 
 export function handleApiError(error: unknown) {
   if (!(error instanceof AxiosError)) {
@@ -9,25 +9,30 @@ export function handleApiError(error: unknown) {
     return;
   }
 
+  // Network-level error (server not reachable, CORS, etc.)
   if (error.code === "ERR_NETWORK") {
     toast.error("Network error. Please check your internet connection.");
     return;
   }
 
-  if (!error.response) {
-    // request cancelled or no response received
-    return;
-  }
-
-  const status = error.response.status;
+  const status = error.response?.status; //  CORRECT  
+  
   const message =
-    error.response.data?.message?.trim() ||
-    error.response.data?.error?.trim() ||
+    error.response?.data?.message?.trim() ||
+    error.response?.data?.error?.trim() ||
     MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN;
 
   switch (status) {
     case 400:
-      toast.error(message);
+      toast.error("Bad request! Something went wrong.");
+      break;
+
+    case 401:
+      toast.error("Unauthorized. Please login again.");
+      break;
+
+    case 403:
+      toast.error("You do not have permission to perform this action.");
       break;
 
     case 404:

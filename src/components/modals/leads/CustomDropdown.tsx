@@ -94,7 +94,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         role="button"
         tabIndex={0}
         className={`w-full flex justify-between py-1 px-1 border-2 rounded-md cursor-pointer text-gray-700 
-          ${readOnly ? "bg-gray-200" : "bg-white"}`}
+          ${readOnly ? "bg-gray-100" : "bg-white"}`}
         onClick={() => {
           if (!readOnly) {
             setShowDropdown((prev) => !prev);
@@ -127,7 +127,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             ? "Select Option"
             : options.find((o) => o.id === selectedOption)?.name ?? ""}
         </div> */}
-        <div className="caption-custom">
+        <div className="input-label-custom">
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||

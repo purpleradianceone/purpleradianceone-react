@@ -26,6 +26,15 @@ const MESSAGE = {
         EMAIL_NOT_VALID_ERROR : "Please enter valid email id.",
         PASSWORD_VALIDATION_ERROR :  "Password must be 8–20 characters long and include at least 1 uppercase , 1 lowercase, 1 number, and 1 special character.",
         YOU_ARE_NOT_ON_YOUR_DASHBOARD : "You are not on your Dashboard.",
+
+        // ACCOUNT PRODUCT MAPPING  / DETAILS 
+        SELECT_PRODUCT_FIRST: "Select Product first.",
+        QUANTITY_EXCEEDS: "Entered quantity exceeds available stock.",
+        DUPLICATE_PRODUCT :"This product is already selected in another row!",
+        STOCK_NOT_AVAILABLE_FOR_PRODUCT : "Selected Product doesn't have stock.",
+        FAILED_TO_LOAD_PRODUCT_DATA : "Failed to load product data",
+        SELECT_DIFFERENT_USER : "Select different user.",
+
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",

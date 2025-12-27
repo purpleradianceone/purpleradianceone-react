@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LeadSummaryReportType from "../../../../@types/home/dashboard/LeadSummaryReportType";
+import LeadSummaryReportType from "../../../../../@types/home/dashboard/LeadSummaryReportType";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 

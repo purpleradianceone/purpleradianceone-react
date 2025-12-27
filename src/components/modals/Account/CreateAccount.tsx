@@ -31,7 +31,6 @@ import {
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useIndustryType } from "../../../config/hooks/useIndustryType";
@@ -46,6 +45,7 @@ import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
 import FormLayout from "../../ui/FormLayout";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 type CreateAccountType = {
   onClose: () => void;
@@ -363,7 +363,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
     };
     console.log(postData);
 
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT, postData, {
         withCredentials: true,
       })

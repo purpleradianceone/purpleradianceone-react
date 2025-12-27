@@ -10,6 +10,8 @@ import FormLayout from "../../ui/FormLayout";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormHeader from "../../ui/FormHeader";
 import {
+  AlarmClockCheck,
+  AlarmClockMinusIcon,
   Clock,
   Link,
   LucideMail,
@@ -17,11 +19,13 @@ import {
   LucidePhoneCall,
   Notebook,
   Package,
-  Phone,
   Save,
+  ShieldCheck,
+  ShieldX,
   TicketPlus,
   User,
   UserCircle,
+  Wrench,
   X,
 } from "lucide-react";
 import axiosClient from "../../../axios-client/AxiosClient";
@@ -29,7 +33,6 @@ import { CompanyProductSla } from "../../../@types/products/CompanyProductSla";
 import Button from "../../ui/Button";
 import CustomDropdown from "../leads/CustomDropdown";
 import MESSAGE from "../../../constants/Messages";
-import FormInput from "../../ui/FormInput";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import CreateSupportTicket from "../../../@types/support-ticket-management/CreateSuppoetTicket";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -41,6 +44,7 @@ import AccountCompanyProductForSupportTicket from "../../../@types/support-ticke
 import GetAccountCompanyProductFroSupportTicket from "../../views/support-ticket-management/GetAccountCompanyProductFroSupportTicket";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import TextAreaInput from "../../ui/TextAreaInput";
 
 function CreateSupportTicketModal({
   isOpen,
@@ -90,6 +94,8 @@ function CreateSupportTicketModal({
       accountMobileNumber: "",
       companyProductId: 0,
       companyProductName: "",
+      isAmc: false,
+      isWarranty: false,
       quantity: 0,
       barcode: "",
       serialNumber: 0,
@@ -147,6 +153,60 @@ function CreateSupportTicketModal({
   const [showErrorAtCompanyProductSla, setShowErrorAtCompanyProductSla] =
     useState<boolean>(false);
 
+  const getCompanyProductSla = async () => {
+    if (selectedAccount.id === 0) return;
+    setCompanyProductSla([]);
+    setSelectedCompanyProductSla(undefined);
+    setIsLoadingForCompanyProductSla(true);
+    const postDataForCompanyProductSla = {
+      company_id: loginStatus.companyId,
+      company_product_id: selectedAccount.companyProductId,
+      isactive: true,
+      requestedby_id: loginStatus.id,
+    };
+
+    await axiosClient
+      .post(POST_API.GET_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status === STATUS_CODE.OK) {
+          const formattedData: CompanyProductSla[] = response.data.map(
+            (item: any) => ({
+              id: item.id,
+              companyProductId: item.company_product_id,
+              name: `${item.name} (Resolution Time: ${item.expected_resolution_time_hours}hr)`,
+              colorCode: item.color_code,
+              expectedResolutionTimeHours: item.expected_resolution_time_hours,
+              isActive: item.isactive,
+              createdBy: item.createdby,
+              updatedBy: item.updatedby,
+              createdOn: item.createdon,
+              updatedOn: item.updatedon,
+            })
+          );
+          setCompanyProductSla(formattedData);
+        }
+        setIsLoadingForCompanyProductSla(false);
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: getCompanyProductSla,
+          });
+          if (refreshTokenResponse) {
+            getCompanyProductSla();
+          }
+        }
+        if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+          toast.error(error.response?.data);
+        }
+      })
+      .finally(() => {
+        setIsLoadingForCompanyProductSla(false);
+      });
+  };
+
   useEffect(() => {
     if (selectedAccount) {
       getCompanyProductSla();
@@ -165,6 +225,8 @@ function CreateSupportTicketModal({
       accountMobileNumber: "",
       companyProductId: 0,
       companyProductName: "",
+      isAmc: false,
+      isWarranty: false,
       quantity: 0,
       barcode: "",
       serialNumber: 0,
@@ -239,7 +301,7 @@ function CreateSupportTicketModal({
       toast.error("Please enter a query description.");
       setError((prev) => ({
         ...prev,
-        query_description: "Please enter a query description.",
+        query_description: "Please enter a query description",
       }));
       flagVariable = false;
     } else {
@@ -339,61 +401,7 @@ function CreateSupportTicketModal({
       });
   };
 
-  const getCompanyProductSla = async () => {
-    if (selectedAccount.id === 0) return;
-    setCompanyProductSla([]);
-    setSelectedCompanyProductSla(undefined);
-    setIsLoadingForCompanyProductSla(true);
-    const postDataForCompanyProductSla = {
-      company_id: loginStatus.companyId,
-      company_product_id: selectedAccount.companyProductId,
-      isactive: true,
-      requestedby_id: loginStatus.id,
-    };
-
-    await axiosClient
-      .post(POST_API.GET_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.status === STATUS_CODE.OK) {
-          const formattedData: CompanyProductSla[] = response.data.map(
-            (item: any) => ({
-              id: item.id,
-              companyProductId: item.company_product_id,
-              name: `${item.name} (Resolution Time: ${item.expected_resolution_time_hours}hr)`,
-              colorCode: item.color_code,
-              expectedResolutionTimeHours: item.expected_resolution_time_hours,
-              isActive: item.isactive,
-              createdBy: item.createdby,
-              updatedBy: item.updatedby,
-              createdOn: item.createdon,
-              updatedOn: item.updatedon,
-            })
-          );
-          setCompanyProductSla(formattedData);
-        }
-        setIsLoadingForCompanyProductSla(false);
-      })
-      .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: getCompanyProductSla,
-          });
-          if (refreshTokenResponse) {
-            getCompanyProductSla();
-          }
-        }
-        if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-          toast.error(error.response?.data);
-        }
-      })
-      .finally(() => {
-        setIsLoadingForCompanyProductSla(false);
-      });
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === "query_description" && value === "") {
       setError((prev) => ({
@@ -445,7 +453,7 @@ function CreateSupportTicketModal({
         </div>
 
         {selectedAccount.id !== 0 && stage > 1 && (
-          <div className="flex gap-10 p-2 rounded-xl border bg-white shadow-sm">
+          <div className="flex gap-6 p-2 rounded-xl border bg-white shadow-sm">
             {/* Selected Account */}
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
@@ -454,10 +462,13 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Account</p>
-                  <p className="table-header-custom">
-                    {selectedAccount.accountName?
-                    selectedAccount.accountName.length>25? `${selectedAccount.accountName.slice(0,25)}...`:selectedAccount.accountName
-                    : "No account selected"}
+                  <p 
+                  title={selectedAccount.accountName.length > 25 ? selectedAccount.accountName : undefined}
+
+                  className="table-header-custom max-w-[150px] select-text truncate">
+                    {selectedAccount.accountName
+                      ? selectedAccount.accountName
+                      : "No account selected"}
                   </p>
                 </div>
               </div>
@@ -470,11 +481,12 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Email</p>
-                  <p className="table-header-custom">
+                  <p
+                  title={selectedAccount.accountEmail.length > 25 ? selectedAccount.accountEmail : undefined}
+
+                  className="table-header-custom max-w-[150px] select-text truncate">
                     {selectedAccount.accountEmail
-                      ? selectedAccount.accountEmail.length > 30
-                        ? `${selectedAccount.accountEmail.slice(0, 30)}...`
-                        : selectedAccount.accountEmail
+                      ? selectedAccount.accountEmail
                       : "NA"}
                   </p>
                 </div>
@@ -488,11 +500,12 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Mobile Number</p>
-                  <p className="table-header-custom">
+                  <p 
+                  title={selectedAccount.accountMobileNumber.length > 25 ? selectedAccount.accountMobileNumber : undefined}
+
+                  className="table-header-custom max-w-[150px] select-text truncate">
                     {selectedAccount.accountMobileNumber
-                      ? selectedAccount.accountMobileNumber.length > 30
-                        ? `${selectedAccount.accountMobileNumber.slice(0,30)}...`
-                        : selectedAccount.accountMobileNumber
+                      ? selectedAccount.accountMobileNumber
                       : "NA"}
                   </p>
                 </div>
@@ -507,11 +520,64 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Selected Product</p>
+                  <p
+                  title={selectedAccount.companyProductName.length > 30 ? selectedAccount.companyProductName : undefined}
+                   className="table-header-custom max-w-[200px] select-text truncate">
+                    {selectedAccount.companyProductName
+                      ? selectedAccount.companyProductName
+                      : "No product selected"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div
+                  className={`h-10 w-10 flex items-center justify-center rounded-full ${
+                    selectedAccount.isAmc ? "bg-green-100" : "bg-red-100"
+                  }`}
+                >
+                  {selectedAccount.isAmc ? (
+                    <AlarmClockCheck size={18} className="text-blue-600" />
+                  ) : (
+                    <AlarmClockMinusIcon size={18} className="text-red-600" />
+                  )}
+                </div>
+                <div>
+                  <p className="caption-custom">AMC</p>
                   <p className="table-header-custom">
-                    {selectedAccount.companyProductName ?
-                    selectedAccount.companyProductName.length > 25?
-                     `${selectedAccount.companyProductName.slice(0,30)}...`:selectedAccount.companyProductName
-                    :"No product selected"}
+                    {selectedAccount.companyProductName
+                      ? selectedAccount.isAmc
+                        ? `Active`
+                        : `Due`
+                      : "No product selected"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {selectedAccount.id !== 0 && stage >= 2 && (
+              <div className="flex items-center gap-3">
+                <div
+                  className={`h-10 w-10 flex items-center justify-center rounded-full ${
+                    selectedAccount.isWarranty ? "bg-green-100" : "bg-red-100"
+                  }`}
+                >
+                  {selectedAccount.isWarranty ? (
+                    <ShieldCheck size={18} className="text-blue-600" />
+                  ) : (
+                    <ShieldX size={18} className="text-red-600" />
+                  )}
+                </div>
+                <div>
+                  <p className="caption-custom">Warranty</p>
+                  <p className="table-header-custom">
+                    {selectedAccount.companyProductName
+                      ? selectedAccount.isWarranty
+                        ? `Active`
+                        : `Out of warranty`
+                      : "No product selected"}
                   </p>
                 </div>
               </div>
@@ -539,14 +605,13 @@ function CreateSupportTicketModal({
               <div>
                 {/* Form */}
                 <form className="space-y-4 mt-2">
-                  <div className="grid grid-cols-2 space-y-1 space-x-1">
+                  <div className="grid grid-cols-3 space-y-1 space-x-1">
                     <div className="">
-                      <FormInput
+                      <TextAreaInput
                         label="Query Description:"
                         logo={LucideMessageCircleQuestion}
-                        type="text"
                         name="query_description"
-                        placeholder="Enter Query Description: "
+                        placeholder="Enter query description"
                         value={
                           createSupportTicketModalFormData.query_description
                         }
@@ -556,36 +621,35 @@ function CreateSupportTicketModal({
                         onChange={handleSupportTicketModalFormDataChange}
                         required={true}
                         onBlur={handleBlur}
+                        cols={0}
+                        rows={3}
+                        error={error.query_description}
                       />
-                      {error.query_description && (
-                        <div className="caption-custom-inactive">
-                          {error.query_description}
-                        </div>
-                      )}
                     </div>
+
                     <div className="">
-                      <FormInput
+                      <TextAreaInput
                         label="Public Notes:"
                         logo={Notebook}
-                        type="text"
                         name="public_notes"
-                        placeholder="Enter Public Notes: "
+                        placeholder="Enter public notes "
                         value={createSupportTicketModalFormData.public_notes}
                         defaultValue={
                           createSupportTicketModalFormData.public_notes
                         }
                         onChange={handleSupportTicketModalFormDataChange}
+                        cols={0}
+                        rows={3}
                         // onBlur={handleBlur}
                       />
                     </div>
 
                     <div className="">
-                      <FormInput
-                        type="text"
+                      <TextAreaInput
                         label="Resolution Applied:"
-                        logo={Phone}
+                        logo={Wrench}
                         name="resolution_applied"
-                        placeholder="Enter Resolution Applied If Needed: "
+                        placeholder="Enter resolution applied if needed "
                         value={
                           createSupportTicketModalFormData.resolution_applied
                         }
@@ -594,6 +658,8 @@ function CreateSupportTicketModal({
                         }
                         // onBlur={handleBlur}
                         onChange={handleSupportTicketModalFormDataChange}
+                        cols={0}
+                        rows={3}
                       />
                     </div>
 
@@ -677,7 +743,12 @@ function CreateSupportTicketModal({
                       </div>
                     )}
 
-                    <div>
+
+
+                    
+                  </div>
+                  <div className="grid grid-cols-1">
+                    <div className="grid grid-cols-3">
                       <CompanyUserSearchFieldInput
                         label="Assign To:"
                         required
@@ -712,6 +783,7 @@ function CreateSupportTicketModal({
                         }
                         // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
                       />
+                      </div>
                       <span className="caption-custom">
                         <span className="">Note :</span> If a support ticket
                         assign to is not selected or is removed, then ticket
@@ -723,7 +795,6 @@ function CreateSupportTicketModal({
                         by default.
                       </span>
                     </div>
-                  </div>
 
                   <div className="flex justify-end ">
                     <div className="flex gap-2">

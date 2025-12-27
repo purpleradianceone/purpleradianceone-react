@@ -10,7 +10,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
-import { Save } from "lucide-react";
+import { Edit2, Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
 import Button from "../../ui/Button";
 
@@ -346,7 +346,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                   ) : (
                     <>
                       <div
-                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom flex justify-center gap-2 items-center cursor-pointer  border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -360,9 +360,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         }}
                       >
                         {product.quantityRequired}
+                        <span>
+
+                        <Edit2 size={9}/>
+                        </span>
                       </div>
                       <div
-                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom cursor-pointer flex items-center justify-center gap-2 border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -375,10 +379,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           handleEditClick(product);
                         }}
                       >
-                        ₹{product.costExpected}
+                        ₹{product.costExpected}<span>
+
+                        <Edit2 size={9}/>
+                        </span>
                       </div>
                       <div
-                        className={`input-label-custom cursor-pointer text-center border rounded-lg ${
+                        className={`input-label-custom cursor-pointer flex items-center justify-center gap-1 border rounded-lg ${
                           !product.isActive
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -391,7 +398,10 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           handleEditClick(product);
                         }}
                       >
-                        {product.leadInterestName}
+                        {product.leadInterestName}<span>
+
+                        <Edit2 size={9}/>
+                        </span>
                       </div>
                       <div className="flex items-center justify-start sm:justify-center">
                         <button

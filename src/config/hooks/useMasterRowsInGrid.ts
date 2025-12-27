@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import RowsInGridDropdownOptions from "../../@types/ag-grid/RowsInGridDropdownOptions"
 import POST_API from "../../constants/PostApi"
-import axios from "axios"
 import ApiError from "../../@types/error/ApiError"
 import { STATUS_CODE } from "../../constants/AppConstants"
 import RefreshToken from "../validations/RefreshToken"
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext"
+import axiosClient from "../../axios-client/AxiosClient"
 
 interface rowsInGridDropdownOptionsResponse {
     id: number,
@@ -21,7 +21,7 @@ export const useMasterRowsInGrid = () => {
             id: null,
         };
         setRowsInGridDropdownOptions([]);
-        await axios.post(POST_API.GET_MASTER_ROWS_IN_GRID, postData, {
+        await axiosClient.post(POST_API.GET_MASTER_ROWS_IN_GRID, postData, {
             withCredentials: true,
         })
             .then((response) => {
