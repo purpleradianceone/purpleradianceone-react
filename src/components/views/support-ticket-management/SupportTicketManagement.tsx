@@ -51,13 +51,13 @@ function SupportTicketManagement({
       "{}"
   );
 
-  
-
   const {
     currentPage,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
     totalPages,
     setTotalPages,
@@ -162,7 +162,7 @@ function SupportTicketManagement({
 
   const getSupportTicketData = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
-
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const effectiveDateRangeId = dateRangeId;
     const postDataToGetSupportTickets: PostDataToGetSupportTicketData = {
       company_id: loginStatus.companyId,
@@ -183,7 +183,8 @@ function SupportTicketManagement({
       requestedby: loginStatus.id,
     };
     try {
-      if (postDataToGetSupportTickets.company_id === 0 || pageSize === 10) return;
+      if (postDataToGetSupportTickets.company_id === 0 || pageSize === 10)
+        return;
       const response = await axiosClient.post(
         POST_API.GET_SUPPORT_TICKET,
         postDataToGetSupportTickets,
@@ -205,7 +206,7 @@ function SupportTicketManagement({
             ticketNumber: item.ticket_number,
             companyId: item.company_id,
             accountName: item.account_name,
-            accountEmail : item.account_email,
+            accountEmail: item.account_email,
             accountMobileNumber: item.account_mobilenumber,
             companyProductId: item.company_product_id,
             companyProductName: item.company_product_name,
@@ -254,9 +255,7 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedAssignToCheckBoxChange = (
-    params: CompanyUser | null
-  ) => {
+  const handleSelectedAssignToCheckBoxChange = (params: CompanyUser | null) => {
     if (params) {
       setSelectedAssignTo({
         company_id: params.company_id,
@@ -397,7 +396,9 @@ function SupportTicketManagement({
       size: pageSize,
       search: searchParameter,
       dateRangeId,
-
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
       selectedAssignTo: selectedAssignTo,
       selectedResolvedBy: selectedResolvedBy,
       selectedCompanyProduct: selectedCompanyProduct,
@@ -415,7 +416,9 @@ function SupportTicketManagement({
     pageSize,
     searchParameter,
     dateRangeId,
-
+    concatDate,
+    startDate,
+    endDate,
     selectedAssignTo,
     selectedResolvedBy,
     selectedCompanyProduct,
@@ -425,13 +428,14 @@ function SupportTicketManagement({
   ]);
   // Note : On refresh button click clear the storage
   useEffect(() => {
-    window.addEventListener("beforeunload", clearLeadFilters);
-    function clearLeadFilters() {
+    window.addEventListener("beforeunload", clearSupportTicketFilters);
+    function clearSupportTicketFilters() {
       localStorage.removeItem(
         LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
       );
     }
-    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+    return () =>
+      window.removeEventListener("beforeunload", clearSupportTicketFilters);
   }, []);
 
   return (

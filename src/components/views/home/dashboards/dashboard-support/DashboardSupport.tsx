@@ -258,7 +258,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_INPROGRESS_SUPPORT_TICKETS
-              ]?.[0]?.converted_leads ?? 0
+              ]?.[0]?.inprogress_support_tickets ?? 0
             ).toString()}
             icon={TicketSlashIcon}
             color="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -356,9 +356,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-red-500 to-red-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Pending Task"
-                  )!.value
+                ? getVisibility("Total Pending Task")
                 : false
             }
           />
@@ -375,10 +373,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) =>
-                      visibility.key == "Total Pending Task - Today"
-                  )!.value
+                ? getVisibility("Total Pending Task - Today")
                 : false
             }
           />
@@ -395,9 +390,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-blue-500 to-blue-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Upcoming Task"
-                  )!.value
+                ? getVisibility("Total Upcoming Task")
                 : false
             }
           />
@@ -414,10 +407,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-teal-500 to-teal-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) =>
-                      visibility.key == "Total Upcoming Task - Today"
-                  )!.value
+                ? getVisibility("Total Upcoming Task - Today")
                 : false
             }
           />

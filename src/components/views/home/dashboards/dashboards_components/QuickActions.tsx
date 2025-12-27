@@ -7,6 +7,7 @@ import {
   Store,
   Network,
   Settings,
+  Headset,
 } from "lucide-react";
 import ROUTES_URL from "../../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
@@ -189,6 +190,34 @@ const QuickActions: React.FC<QuickActionsProp> = ({
           ? moduleAccessCompanyUser.filter(
               (molule) => molule.crm_module_id === 20
             )[0].view ?? false
+          : false,
+    },
+    {
+      id: 13,
+      title: "Support",
+      description: "Support Ticket Management  ",
+      icon: Headset,
+      shortcut: "Support Tickets",
+      route: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 22
+            )[0].view ?? false
+          : false,
+    },
+    {
+      id: 14,
+      title: "Support",
+      description: "Create Support Ticket Management",
+      icon: Headset,
+      shortcut: "Create Ticket",
+      route: `${ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}?fromDashboard=true`,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 22
+            )[0].add ?? false
           : false,
     },
   ];
