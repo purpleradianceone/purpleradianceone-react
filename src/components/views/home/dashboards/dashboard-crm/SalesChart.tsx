@@ -1,4 +1,4 @@
-import MonthlyAverageLeads from '../../../../@types/home/dashboard/MonthlyAverageLeads';
+import MonthlyAverageLeads from '../../../../../@types/home/dashboard/MonthlyAverageLeads';
 import { useState } from 'react';
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";

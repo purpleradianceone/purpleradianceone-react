@@ -314,10 +314,21 @@
   background-color: #ededf3; /* A darker shade on hover for interactivity */
 }
 
+
 .datepicker-popper {
   z-index: 9999 !important;
 }
 
 .datepicker-calendar {
   background-color: white !important;
+
+/*For scrollbar hiding*/
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+
 }

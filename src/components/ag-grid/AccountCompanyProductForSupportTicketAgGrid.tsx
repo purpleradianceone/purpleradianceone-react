@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import AccountCompanyProductForSupportTicket from "../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
+import StatusIndicator from "../ui/StatusIndicator";
 
 function AccountCompanyProductForSupportTicketAgGrid({
   accountCompanyProductsForSupportTickt,
@@ -34,7 +35,25 @@ function AccountCompanyProductForSupportTicketAgGrid({
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
+        minWidth: 140,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+          {
+        field: "accountEmail",
+        headerName: "Email",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
         minWidth: 160,
+        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+      },
+          {
+        field: "accountMobileNumber",
+        headerName: "Mobile Number",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        flex: 1,
+        minWidth: 140,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
       {
@@ -51,10 +70,48 @@ function AccountCompanyProductForSupportTicketAgGrid({
         minWidth: 200,
       },
       {
+        field: "isAmc",
+        headerName: "AMC",
+        sortable: true,
+        filter: true,
+        minWidth:100,
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center text-sm gap-1 mt-1">
+              <StatusIndicator isActive={params.value}
+               />
+            </div>
+          );
+        },
+      },
+       {
+        field: "isWarranty",
+        headerName: "Warranty",
+        sortable: true,
+        filter: true,
+        minWidth:130,
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center text-sm gap-1 mt-1">
+              <StatusIndicator isActive={params.value}
+              inactiveLabel="Out Of Warranty" />
+            </div>
+          );
+        },
+      },
+      {
         field: "quantity",
         headerName: "Quantity",
         sortable: true,
         filter: true,
+        minWidth:90
+      },
+      {
+        field: "unitName",
+        headerName: "Unit",
+        sortable: true,
+        filter: true,
+        minWidth: 90
       },
       {
         field: "barcode",
@@ -68,12 +125,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
         sortable: true,
         filter: true,
       },
-      {
-        field: "unitName",
-        headerName: "Unit",
-        sortable: true,
-        filter: true,
-      },
+      
       {
         field: "purchaseDate",
         headerName: "Purchase Date",

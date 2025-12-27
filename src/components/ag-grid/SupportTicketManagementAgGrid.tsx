@@ -19,8 +19,9 @@ function SupportTicketManagementAgGrid({
     () => [
       {
         hide: false,
-        field: "id",
-        headerName: "Ticket Id",
+        field: "ticketNumber",
+        headerName: "Ticket Number",
+        minWidth: 130,
       },
       {
         field: "createdOn",
@@ -31,6 +32,19 @@ function SupportTicketManagementAgGrid({
       {
         field: "accountName",
         headerName: "Account Name",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "accountEmail",
+        headerName: "Email",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "accountMobileNumber",
+        headerName: "Mobile Number",
+        maxWidth: 140,
         sortable: true,
         filter: true,
       },
@@ -110,19 +124,21 @@ function SupportTicketManagementAgGrid({
         sortable: true,
         filter: true,
         flex: 1.5,
-        minWidth: 200,
+        minWidth: 150,
       },
       {
         field: "supportTicketLifecycleName",
         headerName: "Lifecycle",
         sortable: true,
         filter: true,
+        minWidth: 100
       },
       {
         field: "companyProductSlaName",
         headerName: "Product SLA",
         sortable: true,
         filter: true,
+        minWidth: 120,
       },
       
       {
@@ -130,12 +146,14 @@ function SupportTicketManagementAgGrid({
         headerName: "Source",
         sortable: true,
         filter: true,
+        minWidth: 100,
       },
       {
         field: "updatedBy",
         headerName: "Updated by",
         sortable: true,
         filter: true,
+        minWidth: 120,
       },
       {
         field: "updatedOn",

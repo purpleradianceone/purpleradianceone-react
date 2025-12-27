@@ -7,9 +7,12 @@ import {
   Hourglass,
   Layers,
   ListTree,
+  LucideMail,
+  LucidePhoneCall,
   LucideText,
   ShoppingBag,
   StickyNote,
+  TicketIcon,
   TrendingUp,
   User,
   UserCheck2Icon,
@@ -17,7 +20,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { useUserPreference } from "../../../context/user/UserPreference";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { useSupportTicketLifecycle } from "../../../config/hooks/useSupportTicketLifecycle";
@@ -50,10 +52,10 @@ import SupportTicketTasksModal from "./SupportTicketTasksModal";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
+import { PageLayout } from "../../ui/PageLayout";
 
 const ViewSupportTicketManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-  const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
 
   const [searchParams] = useSearchParams();
@@ -411,43 +413,55 @@ const ViewSupportTicketManagement = () => {
     selectedResolvedBy.id,
   ]);
 
+  const [showAccountName, setShowAccountName] = useState<boolean>(false);
+
   return (
-    <div
-      className={`fixed top-8 inset-0 z-10 bg-white ${
-        userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
-      } overflow-auto`}
-    >
+    <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
+      {/* Header */}
+      <div className="sticky top-0 z-20 bg-slate-100 py-1 border-b transition-all duration-200">
+        <div className="flex text-center justify-start items-center gap-3 ml-0.5 ">
+          <Link to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
+            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+              Support
+            </Button>
+          </Link>
+
+          <ChevronRight size={16} />
+
+          <h1 className="table-header-custom">Support Ticket Details</h1>
+
+          {/*  Appears only on scroll */}
+          {showAccountName && (
+            <span
+              className={`
+                ml-1 max-w-[700px] truncate text-sm text-gray-500
+                transition-all duration-200 ease-out
+                will-change-transform will-change-opacity justify-center items-center ${
+                  showAccountName
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-1 pointer-events-none"
+                } `}
+            >
+              (<span>Ticket Number:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.ticketNumber},  `}</span>
+              <span>Account:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.accountName},  `}</span>
+              <span>Support Product:</span>{" "}
+              <span className="table-data-custom">{`  ${selectedSupportTicket.companyProductName}`}</span>
+              )
+            </span>
+          )}
+        </div>
+      </div>
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {/* Header */}
-        <div className="flex mt-1 bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
-          <div className="flex w-fit gap-6">
-            {/* <button
-              className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              <ArrowLeft size={14} />
-              <span>back</span>
-            </button> */}
-            <Link to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
-              <Button className="flex caption-custom items-center justify-center hover:text-gray-800">
-                <span>Support</span>
-              </Button>
-            </Link>
-            <ChevronRight size={16} />
-            <h1 className="table-header-custom">Support Ticket Details</h1>
-          </div>
-          {/* <div>abc</div> */}
-        </div>
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
-          <div className="mx-2 mt-2  flex  bg-slate-100  shadow rounded-sm">
+          <div className="mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm">
             <div className="flex w-full">
               <div
                 className="flex w-[100%] border bg-white"
@@ -516,7 +530,7 @@ const ViewSupportTicketManagement = () => {
             </div>
           </div>
         ) : (
-          <div className="mx-2 mt-2 flex bg-slate-100 shadow rounded-sm animate-pulse">
+          <div className="mx-1 mt-2 flex bg-slate-100 shadow rounded-sm animate-pulse">
             <div className="flex w-full">
               {/* Skeleton for lifecycle buttons */}
               <div
@@ -548,18 +562,30 @@ const ViewSupportTicketManagement = () => {
         )}
 
         {/**Sections */}
-        <div className="w-full flex flex-col gap-1 p-2">
+        <div className="w-full flex flex-col gap-1 p-1">
           {/** Section 1 */}
           {/* SUPPORT TICKET DETAILS */}
-          <div className="w-full flex flex-col gap-4 p-1">
+          <div className="w-full flex flex-col gap-4 ">
             {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
             <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
               <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
                 <div className="flex gap-6">
+                  {/* Ticket Number */}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <TicketIcon size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Ticket Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.ticketNumber}
+                    />
+                  </div>
                   {/* Account */}
                   <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-2 rounded text-white">
-                      <HeadsetIcon size={30} strokeWidth={3} />
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <HeadsetIcon size={30} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Account"
@@ -568,11 +594,35 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.accountName}
                     />
                   </div>
-
-                  {/* Support Product */}
+                  {/* Account Email */}
                   <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-2 rounded text-white">
-                      <ShoppingBag size={30} strokeWidth={3} />
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <LucideMail size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Email"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountEmail}
+                    />
+                  </div>
+                  {/* Account Mobile Number*/}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <LucidePhoneCall size={30} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Mobile Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountMobileNumber}
+                    />
+                  </div>
+
+                  {/* Support Product Name*/}
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <ShoppingBag size={30} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Support Product"
@@ -821,7 +871,7 @@ const ViewSupportTicketManagement = () => {
           </div>
 
           {/* Second Column */}
-          <div className="px-1 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
             {/* Query Description */}
             <TextAreaInput
               logo={LucideText}
@@ -889,7 +939,7 @@ const ViewSupportTicketManagement = () => {
           </div>
 
           {/* third Column */}
-          <div className="mt-3 p-1">
+          <div className="mt-3">
             <SupportTicketTasksModal
             // ownerId ={selectedSupportTicket?.assignedToId}
             />
@@ -923,7 +973,7 @@ const ViewSupportTicketManagement = () => {
           />
         )}
       </motion.section>
-    </div>
+    </PageLayout>
   );
 };
 export default ViewSupportTicketManagement;
@@ -1074,7 +1124,8 @@ const Detail: React.FC<DetailProps> = ({
           <p className="input-label-custom text-gray-800 whitespace-nowrap overflow-x-hidden text-clip">
             {value ? (
               <span
-                className={`${
+                title={value.length > 30 ? value : undefined}
+                className={`inline-block max-w-[250px] select-text truncate ${
                   [
                     "Updated By",
                     "Updated On",
@@ -1084,6 +1135,9 @@ const Detail: React.FC<DetailProps> = ({
                     "Support Product",
                     "Resolved Status",
                     "Resolved By",
+                    "Email",
+                    "Mobile Number",
+                    "Ticket Number",
                   ].includes(label)
                     ? ""
                     : "border border-gray-200 rounded-md px-1 py-0.5"

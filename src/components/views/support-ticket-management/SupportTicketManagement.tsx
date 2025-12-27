@@ -80,8 +80,8 @@ function SupportTicketManagement({
   const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
     useState<number | null>(savedFilters.selectedSupportTicketSource || null);
 
-  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>(
-    savedFilters.selectedCompanyUser || {
+  const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>(
+    savedFilters.selectedAssignTo || {
       company_id: 0,
       id: 0,
       fullname: "",
@@ -169,7 +169,7 @@ function SupportTicketManagement({
       id: null,
       company_product_id:
         selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
-      assignedto: selectedCompanyUser.id === 0 ? null : selectedCompanyUser.id,
+      assignedto: selectedAssignTo.id === 0 ? null : selectedAssignTo.id,
       resolvedby: selectedResolvedBy.id === 0 ? null : selectedResolvedBy.id,
       support_ticket_category_id: selectedSupportTicketCategory,
       support_ticket_source_id: selectedSupportTicketSource,
@@ -202,8 +202,11 @@ function SupportTicketManagement({
           (item: any) => ({
             count: item.count,
             id: item.id,
+            ticketNumber: item.ticket_number,
             companyId: item.company_id,
             accountName: item.account_name,
+            accountEmail : item.account_email,
+            accountMobileNumber: item.account_mobilenumber,
             companyProductId: item.company_product_id,
             companyProductName: item.company_product_name,
             accountCompanyProductId: item.account_company_product_id,
@@ -251,11 +254,11 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedCompanyUserCheckBoxChange = (
+  const handleSelectedAssignToCheckBoxChange = (
     params: CompanyUser | null
   ) => {
     if (params) {
-      setSelectedCompanyUser({
+      setSelectedAssignTo({
         company_id: params.company_id,
         id: params.id,
         fullname: params.fullname,
@@ -268,7 +271,7 @@ function SupportTicketManagement({
       });
     } else {
       // Reset selectedCompanyUser to its initial state when null is received
-      setSelectedCompanyUser({
+      setSelectedAssignTo({
         company_id: 0,
         id: 0,
         fullname: "",
@@ -373,7 +376,7 @@ function SupportTicketManagement({
     dateRangeId,
     searchParameter,
     concatDate,
-    selectedCompanyUser,
+    selectedAssignTo,
     selectedResolvedBy,
     selectedCompanyProduct,
     selectedSupportTicketCategory,
@@ -395,7 +398,7 @@ function SupportTicketManagement({
       search: searchParameter,
       dateRangeId,
 
-      selectedCompanyUser: selectedCompanyUser,
+      selectedAssignTo: selectedAssignTo,
       selectedResolvedBy: selectedResolvedBy,
       selectedCompanyProduct: selectedCompanyProduct,
       selectedSupportTicketCategory: selectedSupportTicketCategory,
@@ -413,7 +416,7 @@ function SupportTicketManagement({
     searchParameter,
     dateRangeId,
 
-    selectedCompanyUser,
+    selectedAssignTo,
     selectedResolvedBy,
     selectedCompanyProduct,
     selectedSupportTicketCategory,
@@ -462,13 +465,13 @@ function SupportTicketManagement({
               totalPages,
               pageSize,
             }}
-            selectedAssignTo={selectedCompanyUser}
-            handleSelectedCompanyUserCheckBoxChange={
-              handleSelectedCompanyUserCheckBoxChange
+            selectedAssignTo={selectedAssignTo}
+            handleSelectedAssignToCheckBoxChange={
+              handleSelectedAssignToCheckBoxChange
             }
             // persistedSelectedUserId={persistedSelectedUserId}
             persistedSelectedUserId={
-              selectedCompanyUser.id !== 0 ? selectedCompanyUser.id : null
+              selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
             }
             selectedResolvedBy={selectedResolvedBy}
             handleSelectedResolvedByCheckBoxChange={

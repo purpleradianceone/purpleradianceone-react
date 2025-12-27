@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Calendar,
   Headset,
   ShoppingBag,
   TicketPlus,
@@ -48,7 +47,7 @@ function SupportTicketManagementList({
 
   selectedAssignTo,
   persistedSelectedUserId,
-  handleSelectedCompanyUserCheckBoxChange,
+  handleSelectedAssignToCheckBoxChange,
 
   selectedResolvedBy,
   persistedSelectedResolvedById,
@@ -82,8 +81,11 @@ function SupportTicketManagementList({
     useState<SupportTicketProps>({
       count: 0,
       id: 0,
+      ticketNumber: "",
       companyId: 0,
       accountName: "",
+      accountEmail: "",
+      accountMobileNumber: "",
       companyProductName: "",
       accountCompanyProductId: 0,
       supportTicketCategoryId: 0,
@@ -179,7 +181,7 @@ function SupportTicketManagementList({
       console.log("Filter parameters:");
       console.log(handleSearchOption.searchParameter);
       console.log(handleSearchOption.dateRangeId);
-    }, [handleSearchOption.searchParameter,handleSearchOption.dateRangeId]);
+    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId]);
     return (
       <div
         className={`w-full ${
@@ -189,25 +191,25 @@ function SupportTicketManagementList({
         {/* sticky */}
         {
           <div
-            className={`z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
                       w-full
                     `}
           >
             {/* LEFT SECTION - Support Label */}
             {isUsedInSupportTicketModule && (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center w-fit">
                 {!isSmallScreen && (
                   <Headset
                     className={`${
                       isCustomDateOptionSelected
-                        ? "w-6 h-6 text-blue-600"
+                        ? "w-4 h-4 text-blue-600"
                         : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
                     } `}
                   />
                 )}
 
                 {(isMediumScreen || isLargeScreen) &&
-                  !isCustomDateOptionSelected && (
+                  (
                     <span
                       className={`${
                         isCustomDateOptionSelected
@@ -225,7 +227,7 @@ function SupportTicketManagementList({
               {/* Search Box */}
               <div
                 className={`relative flex items-start ${
-                  isCustomDateOptionSelected ? "w-32 sm:w-40" : "w-40 sm:w-64"
+                  isCustomDateOptionSelected ? "w-44 " : "w-44"
                 }`}
               >
                 <SearchInput
@@ -239,30 +241,51 @@ function SupportTicketManagementList({
               </div>
               {/* DATE FILTERS */}
               <div className="flex flex-wrap items-center gap-2 w-fit">
-                <div className="flex items-center gap-1">
-                  <Calendar className="input-label-custom size-4" />
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                    selectedOption={selectedDateName}
-                  ></DateRangeFilterDropdown>
-                </div>
-
-                {/* Custom Date Picker */}
-                {isCustomDateOptionSelected && (
-                  <div
-                    style={
-                      isCustomDateOptionSelected
-                        ? { visibility: "visible" }
-                        : { visibility: "hidden" }
-                    }
-                  >
-                    <DateRangePicker
-                      onStartDateChange={onStartDateChange}
-                      onEndDateChange={onEndDateChange}
-                    />
+                {/* <div className="grid grid-cols-1 items-center justify-center gap-1">
+                  <div className="flex w-full justify-center items-start">
+                    <DateRangeFilterDropdown
+                      dropdownOptions={dateRangeDropdownOptions}
+                      handleDateIdChange={handleDateRangeIdChange}
+                      selectedOption={selectedDateName}
+                    ></DateRangeFilterDropdown>
                   </div>
-                )}
+                  {isCustomDateOptionSelected && (
+                    <div className="max-w-fit"
+                      style={
+                        isCustomDateOptionSelected
+                          ? { visibility: "visible" }
+                          : { visibility: "hidden" }
+                      }
+                    >
+                      <DateRangePicker
+                        onStartDateChange={onStartDateChange}
+                        onEndDateChange={onEndDateChange}
+                      />
+                    </div>
+                  )}
+                </div> */}
+                <div>
+                  <div className="grid grid-cols-1 justify-center gap-1 w-full">
+                    {/* Shared width wrapper */}
+                    <div className="relative w-fit flex justify-center">
+                      <div className="flex col-span-2 w-fit">
+                        <DateRangeFilterDropdown
+                          dropdownOptions={dateRangeDropdownOptions}
+                          handleDateIdChange={handleDateRangeIdChange}
+                          selectedOption={selectedDateName}
+                        />
+                        {isCustomDateOptionSelected && (
+                          <div className="mt-1 w-fit">
+                            <DateRangePicker
+                              onStartDateChange={onStartDateChange}
+                              onEndDateChange={onEndDateChange}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* SUPPORT TICKET FILTERS */}
                 {isUsedInSupportTicketModule && (
@@ -332,7 +355,7 @@ function SupportTicketManagementList({
                               <button
                                 title="Clear"
                                 onClick={() =>
-                                  handleSelectedCompanyUserCheckBoxChange(null)
+                                  handleSelectedAssignToCheckBoxChange(null)
                                 }
                                 className="border-transparent"
                               >
@@ -525,7 +548,7 @@ function SupportTicketManagementList({
                     } // Pass the persisted ID
                     handleSelectedCompanyUserChange={(params) => {
                       if (openPopUpOfCompanyUserModal) {
-                        handleSelectedCompanyUserCheckBoxChange(params);
+                        handleSelectedAssignToCheckBoxChange(params);
                         setOpenPopUpOfCompanyUserModal(false);
                       }
                       if (openPopUpOfResolvedByModal) {
