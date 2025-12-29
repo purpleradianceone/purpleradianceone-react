@@ -457,7 +457,12 @@ function SupportTicketManagement({
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
               dateRangeId,
+              startDate,
+              endDate,
               searchParameter,
+              selectedSupportTicketCategory: selectedSupportTicketCategory ?? undefined,
+              selectedSupportTicketSource: selectedSupportTicketSource ?? undefined,
+              selectedSupportTicketLifecycle: selectedSupportTicketLifecycle ?? undefined ,
             }}
             supportTicketData={supportTicketData}
             onEndDateChange={handleEndDateChange}

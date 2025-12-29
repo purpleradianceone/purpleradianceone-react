@@ -35,7 +35,6 @@ import SupportTicketManagementListProps from "../../@types/List/SupportTicketMan
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
 import ProductManagement from "../views/product-Management/ProductsManagement";
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
-import { LocalStorageKeys } from "../../enums/LocalStorageKeys";
 function SupportTicketManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -62,11 +61,7 @@ function SupportTicketManagementList({
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
 }: SupportTicketManagementListProps) {
-  // Read filters from LocalStorage (before hook initializes)
-  const savedFilters = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-      "{}"
-  );
+ 
 
   const [searchParams] = useSearchParams();
 
@@ -180,13 +175,12 @@ function SupportTicketManagementList({
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      // console.log("Filter parameters:");
-      // console.log(handleSearchOption.searchParameter);
-      // console.log(handleSearchOption.dateRangeId);
       if(handleSearchOption.dateRangeId === 8){
         setIsCustomDateOptionSelected(true);
       }
-    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId]);
+    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
+
+    
     return (
       <div
         className={`w-full ${
@@ -284,8 +278,8 @@ function SupportTicketManagementList({
                             <DateRangePicker
                               onStartDateChange={onStartDateChange}
                               onEndDateChange={onEndDateChange}
-                              initialStartDate={savedFilters.customStartDate}
-                              initialEndDate={savedFilters.customEndDate}
+                              initialStartDate={handleSearchOption.startDate}
+                              initialEndDate={handleSearchOption.endDate}
                             />
                           </div>
                         )}
@@ -301,7 +295,8 @@ function SupportTicketManagementList({
                     <div className="min-w-[110px]">
                       <CustomDropdown
                         preselectedOption={
-                          savedFilters.selectedSupportTicketCategory || null
+                          // savedFilters.selectedSupportTicketCategory || null
+                          handleSearchOption.selectedSupportTicketCategory
                         }
                         labelName="category"
                         options={supportTicketCategory!}
@@ -314,7 +309,8 @@ function SupportTicketManagementList({
                       <CustomDropdown
                         labelName="source"
                         preselectedOption={
-                          savedFilters.selectedSupportTicketSource || null
+                          // savedFilters.selectedSupportTicketSource || null
+                          handleSearchOption.selectedSupportTicketSource
                         }
                         options={supportTicketSource!}
                         onSelect={handleSupportSelectedSource}
@@ -326,7 +322,8 @@ function SupportTicketManagementList({
                       <CustomDropdown
                         labelName="lifecycle"
                         preselectedOption={
-                          savedFilters.selectedSupportTicketLifecycle || null
+                          // savedFilters.selectedSupportTicketLifecycle || null
+                          handleSearchOption.selectedSupportTicketLifecycle
                         }
                         options={supportTicketLifecycle!}
                         onSelect={handleSupportSelectedLifecycle}
