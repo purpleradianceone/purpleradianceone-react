@@ -80,13 +80,13 @@ useEffect(()=>{
     pageSize,
     dateRangeId,
     concatDate,
+    endDate,
+    startDate,
     searchParameter,
     totalPages,
     setTotalPages,
     handleDatePageIdChange,
     handleEndDateChange,
-    endDate,
-    startDate,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -137,6 +137,7 @@ useEffect(()=>{
   };
 
   const getLeadsData = async (signal: AbortSignal) => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;
@@ -357,6 +358,7 @@ useEffect(()=>{
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
       leadStatus: selectedLeadStatus,
       leadSource: selectedLeadSource,
       userId: selectedCompanyUser.id,
@@ -374,11 +376,13 @@ useEffect(()=>{
     pageSize,
     searchParameter,
     dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
     selectedLeadStatus,
     selectedLeadSource,
     persistedSelectedUserId,
-    startDate,
-    endDate
+
   ]);
 
   // Note : On refresh button click clear the storage
@@ -410,7 +414,9 @@ useEffect(()=>{
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
               searchParameter: searchParameter,
-              dateRangeId : dateRangeId
+              dateRangeId : dateRangeId,
+              startDate,
+              endDate,
             }}
             leadData={leadData}
             onEndDateChange={{

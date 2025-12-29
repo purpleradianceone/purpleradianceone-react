@@ -40,6 +40,8 @@ function GetAccountCompanyProductFroSupportTicket({
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
     totalPages,
     setTotalPages,
@@ -53,6 +55,7 @@ function GetAccountCompanyProductFroSupportTicket({
 
   // Fetch data function
   const fetchAccountCompanyProductForSupportTicket = async () => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -137,25 +140,45 @@ function GetAccountCompanyProductFroSupportTicket({
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
       LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
       JSON.stringify(filters)
     );
-  }, [currentPage, pageSize, searchParameter, dateRangeId]);
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
+  ]);
 
-
-    function clearAccountCompanyProductForSupportTicketFilters() {
-      localStorage.removeItem(
-        LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
-      );
-    }
+  function clearAccountCompanyProductForSupportTicketFilters() {
+    localStorage.removeItem(
+      LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+    );
+  }
   // Note : On refresh button click clear the storage
   useEffect(() => {
-    window.addEventListener("beforeunload", clearAccountCompanyProductForSupportTicketFilters);
-    window.addEventListener("close", clearAccountCompanyProductForSupportTicketFilters);
-    return () => window.removeEventListener("beforeunload", clearAccountCompanyProductForSupportTicketFilters);
+    window.addEventListener(
+      "beforeunload",
+      clearAccountCompanyProductForSupportTicketFilters
+    );
+    window.addEventListener(
+      "close",
+      clearAccountCompanyProductForSupportTicketFilters
+    );
+    return () =>
+      window.removeEventListener(
+        "beforeunload",
+        clearAccountCompanyProductForSupportTicketFilters
+      );
   }, []);
   return (
     <div className="w-full">
@@ -174,6 +197,8 @@ function GetAccountCompanyProductFroSupportTicket({
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
                   dateRangeId,
+                  startDate,
+                  endDate,
                   searchParameter,
                 }}
                 onEndDateChange={handleEndDateChange}

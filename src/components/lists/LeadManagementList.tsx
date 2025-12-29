@@ -138,19 +138,18 @@ function LeadManagementList({
     navigate(ROUTES_URL.LEAD_IMPORT_CSV);
   };
 
-   useEffect(()=>{
-    if(handleSearchOption.dateRangeId===8){
-
-      setIsCustomDateOptionSelected(true)
-    }
-  }, [handleSearchOption.dateRangeId])
 
   const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
-  || "Filter";
+  || "Date Filter";
   const handleCreateLeadModalClose = () => {
     setIsCreateLeadModalOpen(false);
   };
 
+   useEffect(() => {
+      if(handleSearchOption.dateRangeId === 8){
+        setIsCustomDateOptionSelected(true);
+      }
+    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
   // let  startDate ;
 
   // useEffect(()=>{
@@ -195,7 +194,7 @@ function LeadManagementList({
 
                 {/* Date FIlters Dropdown */}
                 <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
-                <div className="flex">
+                <div className="flex mx-3 gap-1">
                   <div className="flex ">
                     <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
                       <Calendar className="input-label-custom" />
@@ -206,9 +205,9 @@ function LeadManagementList({
                       selectedOption={selectedDateName}
                       />
                   </div>
-                </div>
-                {/* Custom Date Picker Div Flex Box*/}
-                <div
+
+                  {/* Custom Date Picker Div Flex Box*/}
+                  {isCustomDateOptionSelected&&<div
                   style={
                     isCustomDateOptionSelected
                       ? { visibility: "visible" }
@@ -218,11 +217,13 @@ function LeadManagementList({
                   <DateRangePicker
                     onStartDateChange={onStartDateChange.handleStartDateChange}
                     onEndDateChange={onEndDateChange.handleEndDateChange}
-                    // startDate ={startDate}
-                    // endDate ={endDate}
+                    initialStartDate={handleSearchOption.startDate}
+                    initialEndDate={handleSearchOption.endDate}
 
                   />
+                </div>}
                 </div>
+                
                 </div>
                 {isUsedInLeadModule && (
                   <div className="flex gap-1">

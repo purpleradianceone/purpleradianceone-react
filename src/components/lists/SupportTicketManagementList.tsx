@@ -171,7 +171,7 @@ function SupportTicketManagementList({
     const selectedDateName =
       dateRangeDropdownOptions.find(
         (o) => o.search_date_range_id === handleSearchOption.dateRangeId
-      )?.date_range || "Filter";
+      )?.date_range || "Date Filter";
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -240,33 +240,10 @@ function SupportTicketManagementList({
               </div>
               {/* DATE FILTERS */}
               <div className="flex flex-wrap items-center gap-2 w-fit">
-                {/* <div className="grid grid-cols-1 items-center justify-center gap-1">
-                  <div className="flex w-full justify-center items-start">
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                      selectedOption={selectedDateName}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                  {isCustomDateOptionSelected && (
-                    <div className="max-w-fit"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-                  )}
-                </div> */}
                 <div>
                   <div className="grid grid-cols-1 justify-center gap-1 w-full">
                     {/* Shared width wrapper */}
-                    <div className="relative w-fit flex justify-center">
+                    <div className="relative w-fit flex justify-center gap-1">
                       <div className="flex col-span-2 w-fit">
                         <DateRangeFilterDropdown
                           dropdownOptions={dateRangeDropdownOptions}

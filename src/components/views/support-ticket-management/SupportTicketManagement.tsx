@@ -161,8 +161,8 @@ function SupportTicketManagement({
   };
 
   const getSupportTicketData = async (signal: AbortSignal) => {
-    const offset = (currentPage - 1) * pageSize;
     if (dateRangeId === 8 && concatDate.trim() === "") return;
+    const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId = dateRangeId;
     const postDataToGetSupportTickets: PostDataToGetSupportTicketData = {
       company_id: loginStatus.companyId,
