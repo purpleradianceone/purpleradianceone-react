@@ -605,7 +605,7 @@ function CreateSupportTicketModal({
               <div>
                 {/* Form */}
                 <form className="space-y-4 mt-2">
-                  <div className="grid grid-cols-3 space-y-1 space-x-1">
+                  <div className="grid grid-cols-3 gap-2">
                     <div className="">
                       <TextAreaInput
                         label="Query Description:"
