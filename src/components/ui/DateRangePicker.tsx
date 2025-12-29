@@ -39,11 +39,13 @@ function DateRangePicker({
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value);
     onStartDateChange(new Date(e.target.value));
+    onEndDateChange(new Date(endDate));//  passing current selected end date for saving in filter
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value);
     onEndDateChange(new Date(e.target.value));
+    onStartDateChange(new Date(startDate));// passing current selected start date for saving in filter
   };
 
   //   // Get current date in YYYY-MM-DD format
