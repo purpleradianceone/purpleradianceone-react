@@ -60,6 +60,8 @@ const savedFilters = JSON.parse(
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
     totalPages,
     setTotalPages,
@@ -85,6 +87,7 @@ const savedFilters = JSON.parse(
   };
 
   const fetchCompanyProducts = async (signal : AbortSignal) => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     if (userHasAccessToViewProduct) {
       const offset = (currentPage - 1) * pageSize;
 
@@ -207,6 +210,9 @@ const savedFilters = JSON.parse(
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
@@ -217,7 +223,10 @@ const savedFilters = JSON.parse(
     currentPage,
     pageSize,
     searchParameter,
-    dateRangeId
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate
   ]);
 
   // Note : On refresh button click clear the storage
@@ -250,6 +259,8 @@ const savedFilters = JSON.parse(
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
                   dateRangeId,
+                  startDate,
+                  endDate,
                   searchParameter
                 }}
                 paginationData={{

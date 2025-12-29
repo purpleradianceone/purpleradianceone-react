@@ -8,7 +8,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Pagination from "../ag-grid/Pagination";
@@ -34,7 +34,7 @@ function AccountManagementList({
   handleCreateCompanyAccountType,
   isUsedForAccountLead,
   handleRowSelectedForLead,
-  isUsedForSupportTicketCreation
+  isUsedForSupportTicketCreation,
 }: {
   // fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -55,23 +55,24 @@ function AccountManagementList({
   const [openCreateAccountForm, setOpenAccountForm] = useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   // const [AccountDataToShowFullDetails, setAccountDataToShowFullDetails] =
-    // useState<Account>();
+  // useState<Account>();
   // const [showAccountDetails, setShowAccountDetails] = useState<boolean>(false);
   // Note : To open the details component of that account
   const handleRowSelectedToShowAccountDetails = (data: Account) => {
     if (!isUsedForAccountLead) {
-      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}` , 
-        {
-          state : {
-            accountName : data.name,
-          }
-        }
-      )
-    
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`, {
+        state: {
+          accountName: data.name,
+        },
+      });
+
       // setAccountDataToShowFullDetails(data);
       // setShowAccountDetails(true);
     } else {
@@ -79,18 +80,16 @@ function AccountManagementList({
     }
   };
 
-  // Note : Click anywhere in the row 
-   const handleOnRowClick = (event : any 
-   ) => {
-     const data = event.data;
+  // Note : Click anywhere in the row
+  const handleOnRowClick = (event: any) => {
+    const data = event.data;
     if (!isUsedForAccountLead) {
-      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`, 
-        {
-          state : {
-            accountName : data.name,
-          }
-          , replace: false
-        })
+      navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${data.id}`, {
+        state: {
+          accountName: data.name,
+        },
+        replace: false,
+      });
     } else {
       handleRowSelectedForLead!(data);
     }
@@ -101,8 +100,21 @@ function AccountManagementList({
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
 
-  const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
-  || "Filter";
+  const selectedDateName =
+    dateRangeDropdownOptions.find(
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+    )?.date_range || "Date Filter";
+
+  useEffect(() => {
+    if (handleSearchOption.dateRangeId === 8) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
+
   return (
     <div
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
@@ -121,8 +133,8 @@ function AccountManagementList({
             <span className="section-header-custom mt-1">{" Accounts"} </span>
           )}
 
-        {/* {isLargeScreen && ( */}
-        {/* <> */}
+          {/* {isLargeScreen && ( */}
+          {/* <> */}
           <div className="flex gap-2  justify-center items-center">
             {/* search box flex div */}
             <div className="flex gap-1">
@@ -135,11 +147,11 @@ function AccountManagementList({
                     );
                   }}
                   value={handleSearchOption.searchParameter}
-                  />
+                />
               </div>
 
               {/* Date FIlters Dropdown */}
-              <div className="flex mx-3">
+              <div className="flex mx-3 gap-1">
                 <div className="flex">
                   <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
                     <Calendar className="input-label-custom mt-1" />
@@ -149,27 +161,31 @@ function AccountManagementList({
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
                     selectedOption={selectedDateName}
-                    ></DateRangeFilterDropdown>
+                  ></DateRangeFilterDropdown>
                 </div>
-              </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              <div
-              className="flex"
-              style={
-                isCustomDateOptionSelected
-                ? { visibility: "visible" }
-                : { visibility: "hidden" }
-              }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                  />
+                {/* Custom Date Picker Div Flex Box*/}
+                {isCustomDateOptionSelected && (
+                  <div
+                    className="flex"
+                    style={
+                      isCustomDateOptionSelected
+                        ? { visibility: "visible" }
+                        : { visibility: "hidden" }
+                    }
+                  >
+                    <DateRangePicker
+                      onStartDateChange={onStartDateChange}
+                      onEndDateChange={onEndDateChange}
+                      initialStartDate={handleSearchOption.startDate}
+                      initialEndDate={handleSearchOption.endDate}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        {/* </> */}
-                  </div>
+          {/* </> */}
+        </div>
 
         <div className="flex gap-2">
           {!isUsedForAccountLead && (
@@ -181,7 +197,8 @@ function AccountManagementList({
                     handleShowImportModule();
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCOUNT_IMPORT_ACCESS
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                        .DENIED_ADD_ACCOUNT_IMPORT_ACCESS
                     );
                   }
                 }}
@@ -195,22 +212,26 @@ function AccountManagementList({
           )}
 
           <div>
-            {!isUsedForSupportTicketCreation &&<Button
-            disabled={!userHasAccessToAddAccount}
-              type="submit"
-               onClick={(e) => {
-                if(userHasAccessToAddAccount){
-                  e.preventDefault();
-                  setOpenAccountForm(!openCreateAccountForm);
-                }else{
-                  toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS)
-                }
-              }}
-            >
-              <div className="flex items-center gap-0.5">
-                <Plus size={SIZE.SIXTEEN} /> Create
-              </div>
-            </Button>}
+            {!isUsedForSupportTicketCreation && (
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                type="submit"
+                onClick={(e) => {
+                  if (userHasAccessToAddAccount) {
+                    e.preventDefault();
+                    setOpenAccountForm(!openCreateAccountForm);
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS
+                    );
+                  }
+                }}
+              >
+                <div className="flex items-center gap-0.5">
+                  <Plus size={SIZE.SIXTEEN} /> Create
+                </div>
+              </Button>
+            )}
             {openCreateAccountForm && (
               <CreateAccount
                 onClose={() => setOpenAccountForm(false)}

@@ -6,7 +6,7 @@ import MESSAGE from "../../constants/Messages";
 import toast from "react-hot-toast";
 import { ActionTypeForStockMOdule, SIZE } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddStock from "../modals/stock/AddStock";
 import StockManagementListProps from "../../@types/stock/StockManagementListProps";
 import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
@@ -66,11 +66,20 @@ const StockManagementList = ({
     setOpenAllTransactionPage(true);
   }
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
+  const { handleDateRangeIdChange, isCustomDateOptionSelected, setIsCustomDateOptionSelected } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
     const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
-  || "Filter";
+  || "Date Filter";
+
+  useEffect(() => {
+        if(handleSearchOption.dateRangeId === 8){
+          setIsCustomDateOptionSelected(true);
+        }
+  }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
+  
+
+
   return (
     <div
       className={`w-full  pt-1  ${
@@ -104,7 +113,7 @@ const StockManagementList = ({
               isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
             }`}
           >
-            <div className="flex">
+            <div className="flex gap-1">
               <div className="flex ">
                 <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
                   <Calendar className="input-label-custom" />
@@ -128,6 +137,8 @@ const StockManagementList = ({
                 <DateRangePicker
                   onStartDateChange={onStartDateChange}
                   onEndDateChange={onEndDateChange}
+                  initialStartDate={handleSearchOption.startDate}
+                  initialEndDate={handleSearchOption.endDate}
                 />
               </div>
             )}
