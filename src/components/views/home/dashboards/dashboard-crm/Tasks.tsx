@@ -105,9 +105,13 @@ function Tasks({
     }));
   };
 
+  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
+
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
   const getLeadDetails = async (leadId: number) => {
+    if(isLoadingForNavigate)return;
+    setIsLoadingForNavigate(true);
     if(companyUserId === null || companyUserId !== loginStatus.id){
       // toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
       // return ;
@@ -158,6 +162,8 @@ function Tasks({
             getLeadDetails(leadId);
           }
         }
+      }).finally(()=>{
+        setIsLoadingForNavigate(false);
       });
   };
 
@@ -192,7 +198,7 @@ function Tasks({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar">
+      <div className={`flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar ${isLoadingForNavigate?"cursor-wait":"cursor-default"}`}>
         {isLoading && <LoadingSpinner></LoadingSpinner>}
         {!isLoading && (
           <div className="space-y-4">
@@ -230,6 +236,9 @@ function Tasks({
                     // borderColor: getBorderColorFromHex(task.colorCode),
                     animationDelay: `${index * 0.1}s`,
                   }}
+                   onClick={() => {
+                            getLeadDetails(task.leadId);
+                          }}
                 >
                   <div
                     className="p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
@@ -245,7 +254,7 @@ function Tasks({
                       <div>
                         <h4
                           onClick={() => {
-                            getLeadDetails(task.leadId);
+                            // getLeadDetails(task.leadId);
                           }}
                           className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
                         >
@@ -253,7 +262,7 @@ function Tasks({
                         </h4>
                          <h4
                           onClick={() => {
-                            getLeadDetails(task.leadId);
+                            // getLeadDetails(task.leadId);
                           }}
                           className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
                         >
