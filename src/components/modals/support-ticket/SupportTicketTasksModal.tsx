@@ -53,6 +53,7 @@ function SupportTicketTasksModal() {
   const getSupportTicketTasks = async () => {
     setIsLoading(true);
     setSupportTicketTasks([]);
+    if(loginStatus.companyId === 0)return;
     const getSupportTicketTaskPostData = {
       company_id: loginStatus.companyId,
       support_ticket_id: supportTicketData!.id,
@@ -90,7 +91,7 @@ function SupportTicketTasksModal() {
           });
         }
       })
-      .catch(async (error) => {
+      .catch((error) => {
         handleApiError(error);
       })
       .finally(() => {
