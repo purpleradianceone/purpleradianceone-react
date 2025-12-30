@@ -28,6 +28,7 @@ import { EmailTemplateList } from "./email-template-custom/TemplateList";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
 import COLORS from "../../constants/Colors";
+import { LocalStorageKeys } from "../../enums/LocalStorageKeys";
 
 export type TemplateType = {
   id: number;
@@ -50,6 +51,12 @@ export const TemplatesPage: React.FC = () => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
 
+  // Read filters from LocalStorage (before hook initializes)
+  const savedFilters = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.EMAIL_TEMPLATE_MANAGEMENT_FILTERS) ||
+      "{}"
+  );
+
   const limit: number = 10;
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number>(0);
@@ -59,20 +66,25 @@ export const TemplatesPage: React.FC = () => {
   const {
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
     handleDatePageIdChange,
     handleEndDateChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-    useDateRangeIdChange({
-      dateRangeDropdownOptions,
-      handleSearchOption: {
-        handleDateRangeIdChange: handleDatePageIdChange,
-      },
-    });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({
+    dateRangeDropdownOptions,
+    handleSearchOption: {
+      handleDateRangeIdChange: handleDatePageIdChange,
+    },
+  });
 
   const handleTemplateCreate = (type: string) => {
     setShowModal(false);
@@ -137,6 +149,7 @@ export const TemplatesPage: React.FC = () => {
   // Removed 'loadingTemplates' and 'hasMoreTemplates' as dependencies to prevent loops
   const getTemplatesOfCompany = useCallback(
     async ({ typeId, reset = false }: { typeId: number; reset?: boolean }) => {
+      if (dateRangeId === 8 && concatDate.trim() === "") return;
       // We use a functional update for setOffset to get the latest value
       // and avoid including 'offset' in useCallback dependencies.
       setLoadingTemplates(true); // Set loading state for templates
@@ -304,6 +317,43 @@ export const TemplatesPage: React.FC = () => {
     }
   }, [userHasAccessToViewEmailTemplateSetting]);
 
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      search: searchParameter,
+      dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [searchParameter, dateRangeId, concatDate, startDate, endDate]);
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearSupportTicketFilters);
+    function clearSupportTicketFilters() {
+      localStorage.removeItem(
+        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+      );
+    }
+    return () =>
+      window.removeEventListener("beforeunload", clearSupportTicketFilters);
+  }, []);
+
+  const selectedDateName =
+    dateRangeDropdownOptions.find((o) => o.search_date_range_id === dateRangeId)
+      ?.date_range || "Date Filter";
+
+  useEffect(() => {
+    if (dateRangeId === 8) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [searchParameter, dateRangeId, setIsCustomDateOptionSelected]);
+
   if (!userHasAccessToViewEmailTemplateSetting)
     return (
       <div className="flex-none mx-96 mt-14">
@@ -324,14 +374,19 @@ export const TemplatesPage: React.FC = () => {
       }  gap-1 h-screen flex flex-col `}
     >
       {/* Header */}
-      <div className={`sticky z-10 top-12 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm w-full mb-2`}>
-        <div className="flex  justify-between w-full items-center">
+      <div
+        className={`p-1 sticky z-10 top-12 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm w-full mb-2`}
+      >
+        <div className="flex  justify-start w-full items-center">
           <div className="flex gap-2">
-            {<LayoutDashboard className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
-
+            {
+              <LayoutDashboard
+                className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+              />
+            }
             <span className="section-header-custom">Templates</span>
           </div>
-          <div>
+          <div className="w-fit">
             <EmailTypeDropdown
               activeTab={activeTab}
               onTabChange={handleTabChange}
@@ -339,34 +394,31 @@ export const TemplatesPage: React.FC = () => {
             />
           </div>
 
+          {/* search box flex div */}
+          <div className={`flex ${isCustomDateOptionSelected?"w-60":"w-64"} `}>
+            <SearchInput
+              onChange={(e) => {
+                handleSearchParameterChange(e.target.value);
+              }}
+            ></SearchInput>
+          </div>
+        </div>
+
+        {/* Date FIlters Dropdown */}
+        <div className="flex w-full gap-2">
           <div className="flex">
-            {/* search box flex div */}
-            <div className="relative flex items-start w-52 transition-colors hover:border-gray-400">
-              <div className="grid w-full">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchParameterChange(e.target.value);
-                  }}
-                ></SearchInput>
-              </div>
+            <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+              <Calendar className="mt-1 input-label-custom" />
             </div>
+            <DateRangeFilterDropdown
+              dropdownOptions={dateRangeDropdownOptions}
+              handleDateIdChange={handleDateRangeIdChange}
+              selectedOption={selectedDateName}
+            ></DateRangeFilterDropdown>
           </div>
 
-          {/* Date FIlters Dropdown */}
-          <div className={`flex gap-0.5 flex-wrap ${isCustomDateOptionSelected ? 'max-h-14' : 'max-h-9'}`}>
-            <div className="flex mx-1">
-              <div className="flex">
-                <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                  <Calendar className="mt-1 input-label-custom" />
-                </div>
-                <DateRangeFilterDropdown
-                  dropdownOptions={dateRangeDropdownOptions}
-                  handleDateIdChange={handleDateRangeIdChange}
-                ></DateRangeFilterDropdown>
-              </div>
-            </div>
-            {/* Custom Date Picker Div Flex Box*/}
-
+          {/* Custom Date Picker Div Flex Box*/}
+          {isCustomDateOptionSelected && (
             <div
               style={
                 isCustomDateOptionSelected
@@ -377,29 +429,31 @@ export const TemplatesPage: React.FC = () => {
               <DateRangePicker
                 onStartDateChange={handleStartDateChange}
                 onEndDateChange={handleEndDateChange}
+                initialStartDate={startDate}
+                initialEndDate={endDate}
               />
             </div>
-          </div>
+          )}
+        </div>
 
-          <div className="flex max-w-60 min-h-7 h-8">
-            <Button
-              type="submit"
-              disabled={!userHasAccessToAddEmailTemplateSetting}
-              onClick={(e) => {
-                e.preventDefault();
-                if (userHasAccessToAddEmailTemplateSetting) {
-                  setShowModal(true);
-                } else {
-                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                }
-              }}
-            >
-              <div className="flex items-center justify-center gap-0.5">
-                <LucidePlus size={SIZE.SIXTEEN} />
-                Template
-              </div>
-            </Button>
-          </div>
+        <div className="flex max-w-60 min-h-7 h-8">
+          <Button
+            type="submit"
+            disabled={!userHasAccessToAddEmailTemplateSetting}
+            onClick={(e) => {
+              e.preventDefault();
+              if (userHasAccessToAddEmailTemplateSetting) {
+                setShowModal(true);
+              } else {
+                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+              }
+            }}
+          >
+            <div className="flex items-center justify-center gap-0.5">
+              <LucidePlus size={SIZE.SIXTEEN} />
+              Template
+            </div>
+          </Button>
         </div>
       </div>
 
