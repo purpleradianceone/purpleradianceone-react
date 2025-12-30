@@ -95,22 +95,22 @@ const ViewSupportTicketManagement = () => {
   });
   useEffect(() => {
     setFormData({
-    queryDescription:
-      selectedSupportTicket.queryDescription !== null &&
-      selectedSupportTicket.queryDescription !== undefined
-        ? selectedSupportTicket.queryDescription
-        : "",
-    publicNotes:
-      selectedSupportTicket.publicNotes !== null &&
-      selectedSupportTicket.publicNotes !== undefined
-        ? selectedSupportTicket.publicNotes
-        : "",
-    resolutionApplied:
-      selectedSupportTicket.resolutionApplied != null &&
-      selectedSupportTicket.resolutionApplied !== undefined
-        ? selectedSupportTicket.resolutionApplied
-        : "",
-  });
+      queryDescription:
+        selectedSupportTicket.queryDescription !== null &&
+        selectedSupportTicket.queryDescription !== undefined
+          ? selectedSupportTicket.queryDescription
+          : "",
+      publicNotes:
+        selectedSupportTicket.publicNotes !== null &&
+        selectedSupportTicket.publicNotes !== undefined
+          ? selectedSupportTicket.publicNotes
+          : "",
+      resolutionApplied:
+        selectedSupportTicket.resolutionApplied != null &&
+        selectedSupportTicket.resolutionApplied !== undefined
+          ? selectedSupportTicket.resolutionApplied
+          : "",
+    });
   }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
@@ -420,8 +420,14 @@ const ViewSupportTicketManagement = () => {
       handleApiError(error);
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
+      setkeyForAssignTo((prev) => prev + 1);
+      setkeyForResolvedBy((prev) => prev + 1);
     }
   };
+
+  //
+  const [keyForAssignTo, setkeyForAssignTo] = useState<number>(0);
+  const [keyForResolvedBy, setkeyForResolvedBy] = useState<number>(0);
 
   useEffect(() => {
     if (
@@ -501,11 +507,13 @@ const ViewSupportTicketManagement = () => {
       >
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
-          <div className={`mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm ${
-            isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
-              ? "cursor-wait"
-              : "cursor-default"
-          }`}>
+          <div
+            className={`mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm ${
+              isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+                ? "cursor-wait"
+                : "cursor-default"
+            }`}
+          >
             <div className="flex w-full">
               <div
                 className="flex w-[100%] border bg-white"
@@ -711,6 +719,7 @@ const ViewSupportTicketManagement = () => {
                     }`}
                   >
                     <CompanyUserSearchFieldInput
+                      key={keyForAssignTo}
                       logo={User}
                       label="Assign To"
                       // placeholder={selectedSupportTicket.assignedToName}
@@ -977,6 +986,7 @@ const ViewSupportTicketManagement = () => {
                       }`}
                     >
                       <CompanyUserSearchFieldInput
+                        key={keyForResolvedBy}
                         logo={UserCheck2Icon}
                         label="Resolved By"
                         // placeholder={selectedSupportTicket.assignedToName}

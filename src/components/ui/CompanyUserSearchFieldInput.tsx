@@ -13,8 +13,8 @@ import { STATUS_CODE } from "../../constants/AppConstants";
 import { useUserPreference } from "../../context/user/UserPreference";
 
 interface CompanyUserSearchFieldProps {
-  label:string ,
-  labelClassname?: string
+  label: string;
+  labelClassname?: string;
   required?: boolean;
   placeholder?: string;
   onUserSelected: (user: CompanyUser | null) => void;
@@ -28,12 +28,13 @@ interface CompanyUserSearchFieldProps {
   hasPenLogo?: boolean;
   hasBorder?: boolean;
   hasSearchLogo?: boolean;
-  has?:{
-    xLogo? : boolean,
-    penLogo? : boolean,
-    border? : boolean,
-    searchLogo? : boolean
-  }
+
+  has?: {
+    xLogo?: boolean;
+    penLogo?: boolean;
+    border?: boolean;
+    searchLogo?: boolean;
+  };
 }
 
 export default function CompanyUserSearchFieldInput({
@@ -52,13 +53,12 @@ export default function CompanyUserSearchFieldInput({
   // hasPenLogo = false,
   // hasBorder = true,
   // hasSearchLogo = true,
-  has={
-    border:true,
-    penLogo:false ,
-    searchLogo:true,
-    xLogo:true
-  }
-  
+  has = {
+    border: true,
+    penLogo: false,
+    searchLogo: true,
+    xLogo: true,
+  },
 }: CompanyUserSearchFieldProps) {
   const [query, setQuery] = useState(defaultValue);
   const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
@@ -81,7 +81,6 @@ export default function CompanyUserSearchFieldInput({
     null
   );
   const [isExplicitClear, setIsExplicitClear] = useState(false);
-
 
   // ---------------- PRE POPULATE ----------------
   useEffect(() => {
@@ -308,7 +307,11 @@ export default function CompanyUserSearchFieldInput({
 
   return (
     <div className="mt-0 w-full relative">
-      <label className={`flex items-center ${labelClassname || "input-label-custom" } `} >
+      <label
+        className={`flex items-center ${
+          labelClassname || "input-label-custom"
+        } `}
+      >
         {Icon && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR} />}
 
         {label}
@@ -339,12 +342,12 @@ export default function CompanyUserSearchFieldInput({
           placeholder={placeholder}
           className={
             isDisabled
-              ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
+              ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
-              ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
+              ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
               : `appearance-none block w-full  ${
                   has.border
-                    ? "border border-gray-300 px-3  pb-1 rounded-md shadow-sm focus:outline-none"
+                    ? "border border-gray-300 px-1 pb-1 pt-1 rounded-md shadow-sm focus:outline-none"
                     : ""
                 }   focus:ring-blue-500 focus:border-blue-500`
           }
