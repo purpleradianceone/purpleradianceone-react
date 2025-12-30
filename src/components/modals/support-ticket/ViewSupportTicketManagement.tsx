@@ -296,9 +296,7 @@ const ViewSupportTicketManagement = () => {
         }
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-        toast.error(error.response?.data);
-      }
+      handleApiError(error);
     } finally {
       setIsLoadingForLifecycleChanging(false);
     }
