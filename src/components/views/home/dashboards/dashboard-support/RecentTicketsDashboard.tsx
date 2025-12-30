@@ -17,6 +17,7 @@ import { STATUS_CODE } from "../../../../../constants/AppConstants";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../../constants/Messages";
+import { useState } from "react";
 
   const getSupportTicketLifecycleColor = (lifecycleId: number) => {
   switch (lifecycleId) {
@@ -52,12 +53,15 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
 
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   
 
   const getSupportTicketDetails = async (supportTicketId: number) => {
+    if(isLoadingForNavigate)return;
+    setIsLoadingForNavigate(true);
     if (userHasAccessToViewSupportTicket) {
       try {
         const response = await axiosClient.post(
@@ -117,6 +121,8 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
         }
       } catch (error: any) {
         handleApiError(error);
+      }finally{
+        setIsLoadingForNavigate(false);
       }
     } else {
       toast.error(MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_ACCESS);
@@ -126,11 +132,11 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
 
 
   return (
-    <div className="bg-white p-8 min-h-28 max-h-[640px] w-full flex flex-col rounded-2xl">
+    <div className={`bg-white p-8 min-h-28 max-h-[640px] w-full flex flex-col rounded-2xl ${isLoadingForNavigate ? "cursor-wait" : "cursor-default"}`}>
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
-        animate={inView ? { opacity: 1, y: 0 } : undefined}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="flex flex-col h-full"
       >
@@ -157,11 +163,11 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
               {recentTickets.map((ticket, index) => (
                 <div
                   key={ticket.id}
-                  className="flex items-start space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer"
+                  className={`flex items-start space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"}  group`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => getSupportTicketDetails(ticket.id)}
                 >
-                  <div className={`p-2 rounded-xl ${getSupportTicketLifecycleColor(ticket.support_ticket_lifecycle_id)} shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0`}>
+                  <div className={`p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0 ${getSupportTicketLifecycleColor(ticket.support_ticket_lifecycle_id)} `}>
                     <Ticket className={`w-5 h-5 text-blue-600`} />
                   </div>
 

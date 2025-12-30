@@ -9,7 +9,6 @@ import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import toast from "react-hot-toast";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import { useSupportTicketTaskStage } from "../../../config/hooks/useSupportTicketTaskStage";
@@ -17,6 +16,7 @@ import SupportTasksTabs from "./tabs/SupportTasksTabs";
 import SupportTicketTaskProps from "../../../@types/support-ticket-management/SupportTicketTaskProps";
 import SupportTicketProps from "../../../@types/support-ticket-management/SupportTicketProps";
 import CreateSupportTicketTaskModal from "./CreateSupportTicketTaskModal";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 function SupportTicketTasksModal() {
 // { ownerId }: { ownerId: number }
@@ -91,14 +91,7 @@ function SupportTicketTasksModal() {
         }
       })
       .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: getSupportTicketTasks,
-          });
-          if (refreshTokenResponse) {
-            getSupportTicketTasks();
-          }
-        }
+        handleApiError(error);
       })
       .finally(() => {
         setIsLoading(false);

@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { format, parse } from "date-fns";
 import toast from "react-hot-toast";
 import SupportTicketTaskProps from "../../../@types/support-ticket-management/SupportTicketTaskProps";
@@ -20,7 +19,6 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import axiosClient from "../../../axios-client/AxiosClient";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import FormLayout from "../../ui/FormLayout";
 import FormHeader from "../../ui/FormHeader";
@@ -33,6 +31,7 @@ import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import Button from "../../ui/Button";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 function UpdateSupportTicketTaskModal({
   isOpen,
@@ -171,16 +170,7 @@ function UpdateSupportTicketTaskModal({
         }
       })
       .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: updateSupportTicketTask,
-          });
-          if (refreshTokenResponse) {
-            updateSupportTicketTask(event);
-          }
-        } else {
-          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN);
-        }
+        handleApiError(error);
       })
       .finally(() => {
         setIsSaving(false);
@@ -206,7 +196,7 @@ function UpdateSupportTicketTaskModal({
       updatedby_id: loginStatus.id,
     };
 
-    axios
+    axiosClient
       .post(
         POST_API.UPDATE_SUPPORT_TICKET_TASK,
         updateSupportTicketTaskPostData,
@@ -226,14 +216,7 @@ function UpdateSupportTicketTaskModal({
         }
       })
       .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: handleIsActiveCheckboxChange,
-          });
-          if (refreshTokenResponse) {
-            handleIsActiveCheckboxChange(event);
-          }
-        }
+        handleApiError(error);
       });
   };
 
@@ -257,7 +240,9 @@ function UpdateSupportTicketTaskModal({
       />
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
       {/* Form Grid */}
-      <form className="space-y-1">
+      <form
+        className={`space-y-1 ${isSaving ? "cursor-wait" : "cursor-default"}`}
+      >
         <div className="grid grid-cols-2 gap-2 mt-2">
           {/* Stage */}
           <CustomDropdown

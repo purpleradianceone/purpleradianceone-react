@@ -22,8 +22,6 @@ import FormLayout from "../../ui/FormLayout";
 import FormHeader from "../../ui/FormHeader";
 import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import CustomDropdown from "../leads/CustomDropdown";
@@ -33,6 +31,7 @@ import TextAreaInput from "../../ui/TextAreaInput";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 function CreateSupportTicketTaskModal({
   isOpen,
@@ -200,16 +199,7 @@ function CreateSupportTicketTaskModal({
         }
       })
       .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: createSupportTicketTask,
-          });
-          if (refreshTokenResponse) {
-            createSupportTicketTask(event);
-          }
-        } else {
-          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN);
-        }
+        handleApiError(error);
       })
       .finally(() => {
         setIsSaving(false);
@@ -257,7 +247,7 @@ function CreateSupportTicketTaskModal({
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
       {/* Form Grid */}
-      <form className="space-y-2 mt-2">
+      <form className={`space-y-2 mt-2 ${isSaving?"cursor-wait": "cursor-default"}`}>
         <div className="grid grid-cols-2 gap-3">
           {/* Stage */}
           <div>

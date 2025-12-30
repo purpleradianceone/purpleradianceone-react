@@ -49,10 +49,10 @@ import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicket
 import ROUTES_URL from "../../../constants/Routes";
 import Button from "../../ui/Button";
 import SupportTicketTasksModal from "./SupportTicketTasksModal";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import { PageLayout } from "../../ui/PageLayout";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 const ViewSupportTicketManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -71,6 +71,12 @@ const ViewSupportTicketManagement = () => {
     resolutionApplied: selectedSupportTicket.resolutionApplied,
   });
 
+  const [errorData, setErrorData] = useState({
+    ticketCatagoryError: false,
+    productSlaError: false,
+    ticketSourceError: false,
+    escalationLevelError: false,
+  });
   useEffect(() => {
     setFormData({
       queryDescription: selectedSupportTicket.queryDescription,
@@ -163,6 +169,11 @@ const ViewSupportTicketManagement = () => {
 
   const [isLoadingForLifecycleChanging, setIsLoadingForLifecycleChanging] =
     useState<boolean>(false);
+
+  const [
+    isLoadingForSupportTicketInfoSave,
+    setIsLoadingForSupportTicketInfoSave,
+  ] = useState<boolean>(false);
 
   const handleSaveSupportTicketLifecycleUpdate = async (
     lifecycleFormData: supportTicketLifecycleType
@@ -265,7 +276,6 @@ const ViewSupportTicketManagement = () => {
     }
   };
 
- 
   function handleFormDataChange(e: any) {
     const { name, value } = e.target;
     setFormData((prev: any) => {
@@ -277,6 +287,8 @@ const ViewSupportTicketManagement = () => {
   }
 
   const handSupportTicketInfoSave = async () => {
+    setIsLoadingForSupportTicketInfoSave(true);
+
     if (
       selectedSupportTicketCategory?.id ===
         selectedSupportTicket.supportTicketCategoryId &&
@@ -370,17 +382,9 @@ const ViewSupportTicketManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handSupportTicketInfoSave,
-        });
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          handSupportTicketInfoSave();
-        }
-      } else if (error.status === 400) {
-        toast.error(error.response.data);
-      }
+      handleApiError(error);
+    } finally {
+      setIsLoadingForSupportTicketInfoSave(false);
     }
   };
 
@@ -562,7 +566,13 @@ const ViewSupportTicketManagement = () => {
         )}
 
         {/**Sections */}
-        <div className="w-full flex flex-col gap-1 p-1">
+        <div
+          className={`w-full flex flex-col gap-1 p-1 ${
+            isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+              ? "cursor-wait"
+              : "cursor-default"
+          }`}
+        >
           {/** Section 1 */}
           {/* SUPPORT TICKET DETAILS */}
           <div className="w-full flex flex-col gap-4 ">
@@ -663,7 +673,6 @@ const ViewSupportTicketManagement = () => {
                     disabledMessage={
                       MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
                         .UPDATE_ACCESS_DENIED_MESSAGE
-                      //✔️
                     }
                     onUserSelected={(user) => {
                       if (user && user.id !== 0) {
@@ -693,25 +702,47 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={ListTree}
-                      labelName="Ticket Category"
-                      options={supportTicketCategory}
-                      preselectedOption={selectedSupportTicketCategory?.id}
-                      selectedValue={selectedSupportTicketCategory?.id}
-                      readOnly={!userHasAccessToUpdateSupportTicket}
-                      onSelect={(value) => {
-                        if (userHasAccessToUpdateSupportTicket) {
-                          const result = supportTicketCategory?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedSupportTicketCategor({
-                            id: value || 0,
-                            name: result?.name || "",
-                          });
-                        }
-                      }}
-                    />
+                    <div className="space-y-1">
+                      <CustomDropdown
+                        logo={ListTree}
+                        labelName="Ticket Category"
+                        options={supportTicketCategory}
+                        preselectedOption={selectedSupportTicketCategory?.id}
+                        selectedValue={selectedSupportTicketCategory?.id}
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = supportTicketCategory?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedSupportTicketCategor({
+                                id: value || 0,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketCatagoryError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketCatagoryError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.ticketCatagoryError && (
+                        <div className="text-red-500 text-xs">
+                          Please select ticket category
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {/* Product SLA */}
@@ -721,26 +752,48 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={Hourglass}
-                      labelName="Product SLA"
-                      options={companyProductSla}
-                      preselectedOption={
-                        selectedSupportTicket?.companyProductSlaId
-                      }
-                      readOnly={!userHasAccessToUpdateSupportTicket}
-                      onSelect={(value) => {
-                        if (userHasAccessToUpdateSupportTicket) {
-                          const result = companyProductSla?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedCompanyProductSla({
-                            id: value || 0,
-                            name: result?.name || "",
-                          });
+                    <div className="space-y-1">
+                      <CustomDropdown
+                        logo={Hourglass}
+                        labelName="Product SLA"
+                        options={companyProductSla}
+                        preselectedOption={
+                          selectedSupportTicket?.companyProductSlaId
                         }
-                      }}
-                    />
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = companyProductSla?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedCompanyProductSla({
+                                id: value || 0,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.productSlaError && (
+                        <div className="text-red-500 text-xs">
+                          Please select company product SLA
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {/* Support ticket source */}
@@ -750,26 +803,48 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={Layers}
-                      labelName="Source"
-                      options={supportTicketSource}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketSourceId
-                      }
-                      readOnly={!userHasAccessToUpdateSupportTicket}
-                      onSelect={(value) => {
-                        if (userHasAccessToUpdateSupportTicket) {
-                          const result = supportTicketSource?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedSupportTicketSource({
-                            id: value,
-                            name: result?.name || "",
-                          });
+                    <div className="space-y-1">
+                      <CustomDropdown
+                        logo={Layers}
+                        labelName="Source"
+                        options={supportTicketSource}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketSourceId
                         }
-                      }}
-                    />
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = supportTicketSource?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedSupportTicketSource({
+                                id: value,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketSourceError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketSourceError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.ticketSourceError && (
+                        <div className="text-red-500 text-xs">
+                          Please select ticket source
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {isLoadingForSupportTicketEscalationLevel ? (
@@ -778,27 +853,48 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={TrendingUp}
-                      labelName="Escalation Level"
-                      options={supportTickeEscalationLevel}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketEscalationLevelId
-                      }
-                      readOnly={!userHasAccessToUpdateSupportTicket}
-                      onSelect={(value) => {
-                        setSelectedSupportTicketEscalationId(value);
-                        const result = supportTickeEscalationLevel?.find(
-                          (item) => item.id === value
-                        );
-                        setSelectedSupportTicket({
-                          ...selectedSupportTicket,
-                          supportTicketEscalationLevelName: result?.name,
-                          supportTicketEscalationLevelId: value,
-                        });
-                        // handSupportTicketInfoSave();
-                      }}
-                    />
+                    <div className="space-y-1">
+                      <CustomDropdown
+                        logo={TrendingUp}
+                        labelName="Escalation Level"
+                        options={supportTickeEscalationLevel}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketEscalationLevelId
+                        }
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          setSelectedSupportTicketEscalationId(value);
+                          const result = supportTickeEscalationLevel?.find(
+                            (item) => item.id === value
+                          );
+                          if (value) {
+                            setSelectedSupportTicket({
+                              ...selectedSupportTicket,
+                              supportTicketEscalationLevelName: result?.name,
+                              supportTicketEscalationLevelId: value,
+                            });
+                            setErrorData((prev) => {
+                              return {
+                                ...prev,
+                                escalationLevelError: false,
+                              };
+                            });
+                          } else {
+                            setErrorData((prev) => {
+                              return {
+                                ...prev,
+                                escalationLevelError: true,
+                              };
+                            });
+                          }
+                        }}
+                      />
+                      {errorData.escalationLevelError && (
+                        <div className="text-red-500 text-xs">
+                          Please select escalation level
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {selectedSupportTicket.resolvedBy && (

@@ -64,7 +64,7 @@ const getActivityIcon = (activity: SupportTicketTaskDashboardProps) => {
 const getIconColorFromHex = (colorCode: string) => {
   const hex = colorCode.replace("#", "");
   const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 2), 16);
   return `rgba(${r}, ${g}, ${b}, 0.6)`;
 };
@@ -101,6 +101,9 @@ function SupportTasksDashboard({
     [key: number]: boolean;
   }>({});
 
+  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
+
+
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const toggleDescription = (taskId: number) => {
@@ -113,6 +116,8 @@ function SupportTasksDashboard({
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
   const getSupportTicketDetails = async (supportTicketId: number) => {
+    if(isLoadingForNavigate)return;
+    setIsLoadingForNavigate(true);
     if (companyUserId === null || companyUserId !== loginStatus.id) {
       // toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
       // return ;
@@ -174,6 +179,8 @@ function SupportTasksDashboard({
         })
         .catch(async (error: any) => {
           handleApiError(error);
+        }).finally(()=>{
+          setIsLoadingForNavigate(false)
         });
     } else {
       toast.error(MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_ACCESS);
@@ -181,7 +188,7 @@ function SupportTasksDashboard({
   };
 
   return (
-    <div className="bg-white p-8 h-full flex flex-col ">
+    <div className={`bg-white p-8 h-full flex flex-col ${isLoadingForNavigate ? "cursor-wait" : "cursor-default"}`}>
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
@@ -242,6 +249,9 @@ function SupportTasksDashboard({
                     style={{
                       animationDelay: `${index * 0.1}s`,
                     }}
+                    onClick={()=>{
+                          getSupportTicketDetails(task.support_ticket_id);
+                    }}
                   >
                     <div
                       className="p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
@@ -260,9 +270,9 @@ function SupportTasksDashboard({
                         <div>
                           <h4
                             onClick={() => {
-                              getSupportTicketDetails(task.support_ticket_id);
+                              // getSupportTicketDetails(task.support_ticket_id);
                             }}
-                            className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                            className={`table-header-custom  ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                           >
                             Ticket Number: {task.ticket_number}
                             {/* ({task.support_ticket_task_stage_name}) */}

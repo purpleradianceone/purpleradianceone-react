@@ -478,7 +478,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       {isTasksLoading ? (
-        <div className="flex justify-center items-center mt-48">
+        <div className={`grid justify-center items-center min-h-[100vh] ${isTasksLoading?"cursor-wait":"cursor-default"}`}>
           <LoadingSpinner />
         </div>
       ) : (
