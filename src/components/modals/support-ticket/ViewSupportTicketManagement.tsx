@@ -65,10 +65,26 @@ const ViewSupportTicketManagement = () => {
     JSON.parse(searchParams.get("supportTicketData") || "{}")
   );
 
-  const [formData, setFormData] = useState({
-    queryDescription: selectedSupportTicket.queryDescription,
-    publicNotes: selectedSupportTicket.publicNotes,
-    resolutionApplied: selectedSupportTicket.resolutionApplied,
+  const [formData, setFormData] = useState<{
+    queryDescription: string;
+    publicNotes: string;
+    resolutionApplied: string;
+  }>({
+    queryDescription:
+      selectedSupportTicket.queryDescription !== null &&
+      selectedSupportTicket.queryDescription !== undefined
+        ? selectedSupportTicket.queryDescription
+        : "",
+    publicNotes:
+      selectedSupportTicket.publicNotes !== null &&
+      selectedSupportTicket.publicNotes !== undefined
+        ? selectedSupportTicket.publicNotes
+        : "",
+    resolutionApplied:
+      selectedSupportTicket.resolutionApplied != null &&
+      selectedSupportTicket.resolutionApplied !== undefined
+        ? selectedSupportTicket.resolutionApplied
+        : "",
   });
 
   const [errorData, setErrorData] = useState({
@@ -79,10 +95,22 @@ const ViewSupportTicketManagement = () => {
   });
   useEffect(() => {
     setFormData({
-      queryDescription: selectedSupportTicket.queryDescription,
-      publicNotes: selectedSupportTicket.publicNotes,
-      resolutionApplied: selectedSupportTicket.resolutionApplied,
-    });
+    queryDescription:
+      selectedSupportTicket.queryDescription !== null &&
+      selectedSupportTicket.queryDescription !== undefined
+        ? selectedSupportTicket.queryDescription
+        : "",
+    publicNotes:
+      selectedSupportTicket.publicNotes !== null &&
+      selectedSupportTicket.publicNotes !== undefined
+        ? selectedSupportTicket.publicNotes
+        : "",
+    resolutionApplied:
+      selectedSupportTicket.resolutionApplied != null &&
+      selectedSupportTicket.resolutionApplied !== undefined
+        ? selectedSupportTicket.resolutionApplied
+        : "",
+  });
   }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
@@ -287,7 +315,6 @@ const ViewSupportTicketManagement = () => {
   }
 
   const handSupportTicketInfoSave = async () => {
-
     if (
       selectedSupportTicketCategory?.id ===
         selectedSupportTicket.supportTicketCategoryId &&
@@ -297,17 +324,24 @@ const ViewSupportTicketManagement = () => {
       selectedSupportTicketSource.id ===
         selectedSupportTicket.supportTicketSourceId &&
       formData.queryDescription.trim() ===
-        selectedSupportTicket.queryDescription.trim() &&
+        (selectedSupportTicket.queryDescription
+          ? selectedSupportTicket.queryDescription.trim()
+          : "") &&
       formData.publicNotes.trim() ===
-        selectedSupportTicket.publicNotes.trim() &&
+        (selectedSupportTicket.publicNotes
+          ? selectedSupportTicket.publicNotes.trim()
+          : "") &&
       formData.resolutionApplied.trim() ===
-        selectedSupportTicket.resolutionApplied.trim() &&
+        (selectedSupportTicket.resolutionApplied
+          ? selectedSupportTicket.resolutionApplied.trim()
+          : "") &&
       selectedResolvedBy.id === selectedSupportTicket.resolvedBy
-    )
+    ) {
       return;
+    }
 
     setIsLoadingForSupportTicketInfoSave(true);
-    
+
     const PostDataForSupportTicketUpdate = {
       company_id: loginStatus.companyId,
       id: selectedSupportTicket.id,
@@ -467,7 +501,11 @@ const ViewSupportTicketManagement = () => {
       >
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
-          <div className="mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm">
+          <div className={`mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm ${
+            isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+              ? "cursor-wait"
+              : "cursor-default"
+          }`}>
             <div className="flex w-full">
               <div
                 className="flex w-[100%] border bg-white"
@@ -665,36 +703,44 @@ const ViewSupportTicketManagement = () => {
                 {/* 4 DROPDOWNS GRID */}
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* Assign To */}
-                  <CompanyUserSearchFieldInput
-                    logo={User}
-                    label="Assign To"
-                    // placeholder={selectedSupportTicket.assignedToName}
-                    defaultValue={selectedSupportTicket.assignedToName}
-                    isDisabled={!userHasAccessToUpdateSupportTicket}
-                    disabledMessage={
-                      MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                        .UPDATE_ACCESS_DENIED_MESSAGE
-                    }
-                    onUserSelected={(user) => {
-                      if (user && user.id !== 0) {
-                        setSelectedAssignTo(user);
-                        // handSupportTicketInfoSave();
+                  <div
+                    className={` ${
+                      isLoadingForSupportTicketInfoSave
+                        ? "cursor-wait"
+                        : "cursor-pointer"
+                    }`}
+                  >
+                    <CompanyUserSearchFieldInput
+                      logo={User}
+                      label="Assign To"
+                      // placeholder={selectedSupportTicket.assignedToName}
+                      defaultValue={selectedSupportTicket.assignedToName}
+                      isDisabled={!userHasAccessToUpdateSupportTicket}
+                      disabledMessage={
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
                       }
-                      if (user === null || user === undefined) {
-                        setSelectedAssignTo({
-                          company_id: 0,
-                          email: "",
-                          fullname: selectedSupportTicket.assignedToName,
-                          mobilenumber: "",
-                          generate_password: "",
-                          createdby: "",
-                          id: selectedSupportTicket.assignedTo,
-                          isactive: false,
-                          requestedby: "",
-                        });
-                      }
-                    }}
-                  />
+                      onUserSelected={(user) => {
+                        if (user && user.id !== 0) {
+                          setSelectedAssignTo(user);
+                          // handSupportTicketInfoSave();
+                        }
+                        if (user === null || user === undefined) {
+                          setSelectedAssignTo({
+                            company_id: 0,
+                            email: "",
+                            fullname: selectedSupportTicket.assignedToName,
+                            mobilenumber: "",
+                            generate_password: "",
+                            createdby: "",
+                            id: selectedSupportTicket.assignedTo,
+                            isactive: false,
+                            requestedby: "",
+                          });
+                        }
+                      }}
+                    />
+                  </div>
 
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
@@ -703,7 +749,13 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <div className="space-y-1">
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
                       <CustomDropdown
                         logo={ListTree}
                         labelName="Ticket Category"
@@ -753,7 +805,13 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <div className="space-y-1">
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
                       <CustomDropdown
                         logo={Hourglass}
                         labelName="Product SLA"
@@ -804,7 +862,13 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <div className="space-y-1">
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
                       <CustomDropdown
                         logo={Layers}
                         labelName="Source"
@@ -854,7 +918,13 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <div className="space-y-1">
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
                       <CustomDropdown
                         logo={TrendingUp}
                         labelName="Escalation Level"
@@ -899,36 +969,44 @@ const ViewSupportTicketManagement = () => {
                   )}
 
                   {selectedSupportTicket.resolvedBy && (
-                    <CompanyUserSearchFieldInput
-                      logo={UserCheck2Icon}
-                      label="Resolved By"
-                      // placeholder={selectedSupportTicket.assignedToName}
-                      defaultValue={selectedSupportTicket.resolvedByName}
-                      isDisabled={!userHasAccessToUpdateSupportTicket}
-                      disabledMessage={
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                          .UPDATE_ACCESS_DENIED_MESSAGE
-                      }
-                      onUserSelected={(user) => {
-                        if (user && user.id !== 0) {
-                          setSelectedResolvedBy(user);
-                          // handSupportTicketInfoSave();
+                    <div
+                      className={` ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CompanyUserSearchFieldInput
+                        logo={UserCheck2Icon}
+                        label="Resolved By"
+                        // placeholder={selectedSupportTicket.assignedToName}
+                        defaultValue={selectedSupportTicket.resolvedByName}
+                        isDisabled={!userHasAccessToUpdateSupportTicket}
+                        disabledMessage={
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .UPDATE_ACCESS_DENIED_MESSAGE
                         }
-                        if (user === null || user === undefined) {
-                          setSelectedResolvedBy({
-                            company_id: 0,
-                            email: "",
-                            fullname: selectedSupportTicket.assignedToName,
-                            mobilenumber: "",
-                            generate_password: "",
-                            createdby: "",
-                            id: selectedSupportTicket.assignedTo,
-                            isactive: false,
-                            requestedby: "",
-                          });
-                        }
-                      }}
-                    />
+                        onUserSelected={(user) => {
+                          if (user && user.id !== 0) {
+                            setSelectedResolvedBy(user);
+                            // handSupportTicketInfoSave();
+                          }
+                          if (user === null || user === undefined) {
+                            setSelectedResolvedBy({
+                              company_id: 0,
+                              email: "",
+                              fullname: selectedSupportTicket.assignedToName,
+                              mobilenumber: "",
+                              generate_password: "",
+                              createdby: "",
+                              id: selectedSupportTicket.assignedTo,
+                              isactive: false,
+                              requestedby: "",
+                            });
+                          }
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
