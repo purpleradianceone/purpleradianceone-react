@@ -7,7 +7,6 @@ import CompanyTeamSearchProps from "../../../../@types/team-management/CompanyTe
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -21,6 +20,7 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 /** simple debounce without external deps */
 function useDebouncedCallback<T extends (...args: any[]) => void>(
@@ -125,7 +125,7 @@ function CompanyTeamsNotAssignedToLead({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.CREATE_LEAD_COMPANY_TEAM,
         createLeadCompanyTeamPostData,
         { withCredentials: true }
@@ -217,7 +217,7 @@ function CompanyTeamsNotAssignedToLead({
         search_parameter_date: null,
       };
 
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_COMPANY_TEAMS_NOT_ASSIGNED_TO_LEAD,
         getCompanyTeamsPostData,
         { withCredentials: true }

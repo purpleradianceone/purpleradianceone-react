@@ -21,7 +21,6 @@ import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import LeadTaskHistoryModal from "./LeadTaskHistoryModal";
 import CalendarEventType from "../../../../@types/meeting/CalendarEventType";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import { useUserPreference } from "../../../../context/user/UserPreference";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
@@ -32,6 +31,7 @@ import EditMeetingDetailsModal from "../../meetings/EditMeetingDetailsModal";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import MeetingPlatforms from "../../../../@types/meeting/MeetingPlatform";
 import StatusChip from "../../../ui/StatusChip";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 function LeadTaskList({
   leadTaskPriority,
@@ -188,7 +188,7 @@ function LeadTaskList({
         company_user_id: loginStatus.id,
         requestedby: loginStatus.id,
       };
-      await axios
+      await axiosClient
         .post(POST_API.GET_GOOGLE_MEETINGS, getGoogleMeetingsPostData, {
           withCredentials: true,
         })
@@ -271,7 +271,7 @@ function LeadTaskList({
       company_user_id: loginStatus.id,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_ZOOM_MEETING, getZoomMeetingsPostData, {
         withCredentials: true,
       })

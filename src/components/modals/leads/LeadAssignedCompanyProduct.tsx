@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssignedCompanyProduct";
 import InterestType from "../../../@types/lead-management/InterestType";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -13,6 +12,7 @@ import toast from "react-hot-toast";
 import { Edit2, Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
 import Button from "../../ui/Button";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -65,7 +65,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     };
 
     try {
-      const response = await axios.put(
+      const response = await axiosClient.put(
         POST_API.UPDATE_LEAD_ASSINGED_PRODUCT,
         postData,
         {
@@ -172,7 +172,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       };
 
       try {
-        const response = await axios.put(
+        const response = await axiosClient.put(
           POST_API.UPDATE_LEAD_ASSINGED_PRODUCT,
           updatedProductPostData,
           {

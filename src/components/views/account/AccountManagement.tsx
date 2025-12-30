@@ -104,7 +104,7 @@ const savedFilters = JSON.parse(
       offset,
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
-      isactive: null,
+      isactive: isUsedForAccountLead ? true : null,
       search_parameter_date: concatDate,
     };
 

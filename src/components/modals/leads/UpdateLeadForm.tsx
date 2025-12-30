@@ -17,11 +17,11 @@ import {
 import MessageSnackBar from "../../ui/MessageSnackbar";
 
 import UpdateLeadProps from "../../../@types/lead-management/UpdateLeadProps";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function UpdateLeadForm({
   isOpen,
@@ -85,7 +85,7 @@ function UpdateLeadForm({
       updatedby_id: loginStatus.id,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD,
         postDataForLeadUpdate,
         { withCredentials: true }

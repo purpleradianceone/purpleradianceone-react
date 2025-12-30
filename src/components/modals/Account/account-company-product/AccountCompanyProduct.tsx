@@ -71,7 +71,7 @@ const AccountCompanyProduct = (
     {
       state: {
         productName: data.companyProductName,
-        accountName : data.accountName
+        // accountName : data.accountName
       },
     }
   );

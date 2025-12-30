@@ -4,7 +4,6 @@ import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
@@ -12,6 +11,7 @@ import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUse
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import GetCompanyUserListForLeadAssignment from "./GetCompanyUserListForLeadAssignment";
+import axiosClient from "../../../../axios-client/AxiosClient";
 // import ApiError from "../../../../@types/error/ApiError";
 
 function GetCompanyUsersForLead({
@@ -91,7 +91,7 @@ function GetCompanyUsersForLead({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         isUsedForSettings
           ? POST_API.GET_LEAD_COMPANY_USERS
           : POST_API.GET_COMPANY_USERS,

@@ -225,7 +225,7 @@ function AccountManagementAgGrid({
         headerName: "Status",
         sortable: true,
         filter: true,
-        hide: isUsedForAccountLead,
+        // hide: isUsedForAccountLead,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">

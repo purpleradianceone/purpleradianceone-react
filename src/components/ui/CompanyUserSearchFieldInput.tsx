@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, X } from "lucide-react";
+import { Edit3, Search, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import axiosClient from "../../axios-client/AxiosClient";
 import POST_API from "../../constants/PostApi";
@@ -13,7 +13,8 @@ import { STATUS_CODE } from "../../constants/AppConstants";
 import { useUserPreference } from "../../context/user/UserPreference";
 
 interface CompanyUserSearchFieldProps {
-  label: string;
+  label:string ,
+  labelClassname?: string
   required?: boolean;
   placeholder?: string;
   onUserSelected: (user: CompanyUser | null) => void;
@@ -23,10 +24,21 @@ interface CompanyUserSearchFieldProps {
   defaultValue?: string;
   isDisabled?: boolean;
   disabledMessage?: string | null;
+  hasXLogo?: boolean;
+  hasPenLogo?: boolean;
+  hasBorder?: boolean;
+  hasSearchLogo?: boolean;
+  has?:{
+    xLogo? : boolean,
+    penLogo? : boolean,
+    border? : boolean,
+    searchLogo? : boolean
+  }
 }
 
 export default function CompanyUserSearchFieldInput({
   label,
+  labelClassname,
   placeholder = "Search with name, email, mobilenumber...",
   required,
   error,
@@ -36,6 +48,17 @@ export default function CompanyUserSearchFieldInput({
   onUserSelected,
   isDisabled = false,
   disabledMessage = null,
+  // hasXLogo = true,
+  // hasPenLogo = false,
+  // hasBorder = true,
+  // hasSearchLogo = true,
+  has={
+    border:true,
+    penLogo:false ,
+    searchLogo:true,
+    xLogo:true
+  }
+  
 }: CompanyUserSearchFieldProps) {
   const [query, setQuery] = useState(defaultValue);
   const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
@@ -54,9 +77,10 @@ export default function CompanyUserSearchFieldInput({
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
 
-  const [lastSelectedUser, setLastSelectedUser] =
-  useState<CompanyUser | null>(null);
-const [isExplicitClear, setIsExplicitClear] = useState(false);
+  const [lastSelectedUser, setLastSelectedUser] = useState<CompanyUser | null>(
+    null
+  );
+  const [isExplicitClear, setIsExplicitClear] = useState(false);
 
 
   // ---------------- PRE POPULATE ----------------
@@ -72,7 +96,7 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
 
       setSelectedUser(user);
       // onUserSelected(user);
-      setLastSelectedUser(user)
+      setLastSelectedUser(user);
     }
   }, [defaultValue]);
 
@@ -192,20 +216,19 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
   const handleSelect = (user: CompanyUser) => {
     if (isDisabled) return handleDisabled();
 
-    setIsExplicitClear(false)
+    setIsExplicitClear(false);
     setLastSelectedUser(user); //  persist valid selection
     setSelectedUser(user);
     setQuery(user.fullname);
     setShowDropdown(false);
     onUserSelected(user);
-
   };
 
   // ---------------- CLEAR ----------------
   const clearSelected = () => {
     if (isDisabled) return handleDisabled();
 
-    setIsExplicitClear(true)
+    setIsExplicitClear(true);
 
     setSelectedUser(null);
     setQuery("");
@@ -225,17 +248,17 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
         setShowDropdown(false);
 
         // ✅ RESTORE PREVIOUS VALUE
-      if ( lastSelectedUser && !isExplicitClear) {
-        setSelectedUser(lastSelectedUser);
-        setQuery(lastSelectedUser.fullname);
-        onUserSelected(lastSelectedUser);
-      }
+        if (lastSelectedUser && !isExplicitClear) {
+          setSelectedUser(lastSelectedUser);
+          setQuery(lastSelectedUser.fullname);
+          onUserSelected(lastSelectedUser);
+        }
       }
     };
 
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
-  }, [query, lastSelectedUser , isExplicitClear]);
+  }, [query, lastSelectedUser, isExplicitClear]);
 
   //Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -263,6 +286,13 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
     }
   };
 
+  const textMeasureRef = useRef<HTMLSpanElement>(null);
+
+  const getIconLeft = () => {
+    if (!textMeasureRef.current) return 0;
+    return textMeasureRef.current.offsetWidth + 16; // input padding left
+  };
+
   // Auto-scroll active item into view
   useEffect(() => {
     if (!dropdownRef.current) return;
@@ -278,7 +308,7 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
 
   return (
     <div className="mt-0 w-full relative">
-      <label className="flex items-center input-label-custom">
+      <label className={`flex items-center ${labelClassname || "input-label-custom" } `} >
         {Icon && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR} />}
 
         {label}
@@ -287,7 +317,7 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
         )}
       </label>
 
-      <div className="relative w-full">
+      <div className="relative w-full justify-center input-label-custom ">
         <input
           ref={inputRef}
           type="text"
@@ -296,7 +326,7 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
           onKeyDown={handleKeyDown}
           onChange={(e) => {
             if (isDisabled) return handleDisabled();
-            setIsExplicitClear(false)
+            setIsExplicitClear(false);
             setQuery(e.target.value);
             setSelectedUser(null);
             setShowDropdown(true);
@@ -312,11 +342,29 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
               ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
               ? "appearance-none block w-full px-3 pb-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
-              : "appearance-none block w-full px-3 pb-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              : `appearance-none block w-full  ${
+                  has.border
+                    ? "border border-gray-300 px-3  pb-1 rounded-md shadow-sm focus:outline-none"
+                    : ""
+                }   focus:ring-blue-500 focus:border-blue-500`
           }
         />
+        {/* TEXT WIDTH MEASURER (hidden) */}
+        <span
+          ref={textMeasureRef}
+          className="absolute invisible whitespace-pre text-sm font-normal"
+        >
+          {query || placeholder}
+        </span>
+        {has.penLogo && (
+          <Edit3
+            size={12}
+            style={{ left: getIconLeft() }}
+            className="absolute top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
+        )}
 
-        {query && !readOnly && !isDisabled && (
+        {query && !readOnly && !isDisabled && has.xLogo && (
           <button
             onClick={clearSelected}
             className="absolute right-2 top-1.5 text-gray-400 hover:text-gray-600"
@@ -325,7 +373,7 @@ const [isExplicitClear, setIsExplicitClear] = useState(false);
           </button>
         )}
 
-        {!readOnly && !isDisabled && (
+        {!readOnly && !isDisabled && has.searchLogo && (
           <Search
             className={`absolute ${
               query ? "right-8" : "right-3"

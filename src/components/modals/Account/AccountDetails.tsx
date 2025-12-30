@@ -40,7 +40,7 @@ import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {  parseInt } from "lodash";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
@@ -48,6 +48,7 @@ import axiosClient from "../../../axios-client/AxiosClient";
 
 
 const AccountDetails: React.FC = () => {
+  const location = useLocation();
   const { accountId } = useParams();
   const { accountDetails: company, loading: accountDetailsLoading } =
     useAccountDetails(parseInt(accountId!));
@@ -389,7 +390,19 @@ const AccountDetails: React.FC = () => {
       }
 
       toast.success(response.data.message);
-
+      // PATCH #2
+if (fieldName === "name") {
+  navigate(
+    location.pathname,
+    {
+      replace: true,
+      state: {
+        ...location.state,
+        accountName: String(value).trim(),
+      },
+    }
+  );
+}
       //  Update local state correctly
       if (isDropdown) {
         setFormData((prev) => {

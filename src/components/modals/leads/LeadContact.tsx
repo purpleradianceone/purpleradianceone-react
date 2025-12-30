@@ -23,7 +23,6 @@ import {
   STATUS_CODE,
   VALIDATIONS,
 } from "../../../constants/AppConstants";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ApiError from "../../../@types/error/ApiError";
@@ -41,6 +40,7 @@ import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../ui/FormLayout";
 import TextAreaInput from "../../ui/TextAreaInput";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 type LeadContactFormType = {
   name: string;
@@ -187,7 +187,7 @@ const LeadContact = ({
     };
 
     const api = POST_API.UPDATE_LEAD_CONTACT;
-    await axios
+    await axiosClient
       .post(api, postData, {
         withCredentials: true,
       })
@@ -287,7 +287,7 @@ const LeadContact = ({
     const api = editingContactId
       ? POST_API.UPDATE_LEAD_CONTACT
       : POST_API.CREATE_LEAD_CONTACT;
-    await axios
+    await axiosClient
       .post(api, postData, {
         withCredentials: true,
       })

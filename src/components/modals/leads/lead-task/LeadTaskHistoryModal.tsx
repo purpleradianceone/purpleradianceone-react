@@ -4,7 +4,6 @@ import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -12,6 +11,7 @@ import { STATUS_CODE } from "../../../../constants/AppConstants";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 interface LeadTaskHistoryModalProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ function LeadTaskHistoryModal({
         requestedby_id : loginStatus.id 
     }
 
-    await axios.post(POST_API.GET_LEAD_TASK_HISTORY,getLeadTaskHistoryPostData,{
+    await axiosClient.post(POST_API.GET_LEAD_TASK_HISTORY,getLeadTaskHistoryPostData,{
         withCredentials : true
     }).then((response) =>{
          response.data.map((res : any) => {

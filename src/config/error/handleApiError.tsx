@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 
 export function handleApiError(error: unknown) {
   if (!(error instanceof AxiosError)) {
-    console.error(error);
     toast.error("Unexpected error occurred.");
     return;
   }

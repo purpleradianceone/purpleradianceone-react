@@ -15,7 +15,6 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -55,6 +54,9 @@ import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
 import { PageLayout } from "../../ui/PageLayout";
+import axiosClient from "../../../axios-client/AxiosClient";
+import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import LeadDataProps from "../../../@types/lead-management/LeadProps";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -83,7 +85,7 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
 
   //NOTE : THIS IS THE SELECTED LEAD
-  const [selectedLeadData, setSelectedLeadData] = useState(
+  const [selectedLeadData, setSelectedLeadData] = useState<LeadDataProps>(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
 
@@ -114,7 +116,7 @@ const ViewLeadManagement = () => {
         description: null,
         isactive: true,
       };
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatusData,
         { withCredentials: true }
@@ -155,7 +157,7 @@ const ViewLeadManagement = () => {
 
     try {
       setIsLeadStatusSaving(true);
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
         { withCredentials: true }
@@ -255,11 +257,11 @@ const ViewLeadManagement = () => {
     }
   };
 
-  const handleClickLeadOwnerChange = () => {
-    setIsLeadOwnerPopUpOpen(true);
-  };
+  // const handleClickLeadOwnerChange = () => {
+  //   setIsLeadOwnerPopUpOpen(true);
+  // };
 
-  const handleLeadOwnerChange = async () => {
+  const handleLeadOwnerChange = async () => {    
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       toast.error("Select new lead owner before procedding.");
@@ -273,7 +275,7 @@ const ViewLeadManagement = () => {
       updatedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_OWNER,
         PostDataLeadOwnerChange,
         { withCredentials: true }
@@ -359,10 +361,14 @@ const ViewLeadManagement = () => {
     };
 
     try {
-      const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_LEAD_DETAILS,
+        PostData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const data = response.data;
@@ -412,7 +418,7 @@ const ViewLeadManagement = () => {
   // API call to get lead interest data
   async function getLeadInterestData() {
     try {
-      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
+      const response = await axiosClient.get(POST_API.GET_LEAD_INTEREST_TYPE, {
         params: {
           id: null,
           name: null,
@@ -439,16 +445,19 @@ const ViewLeadManagement = () => {
   //fetch the lead assigned company product
   const fetchLeadCompanyProduct = async () => {
     try {
-      const response = await axios.get(POST_API.GET_LEAD_ASSIGED_PRODUCT, {
-        params: {
-          companyId: loginStatus.companyId,
-          leadId: selectedLeadData.id,
-          companyProductId: null,
-          leadInterestId: null,
-          requestedBy: loginStatus.id,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosClient.get(
+        POST_API.GET_LEAD_ASSIGED_PRODUCT,
+        {
+          params: {
+            companyId: loginStatus.companyId,
+            leadId: selectedLeadData.id,
+            companyProductId: null,
+            leadInterestId: null,
+            requestedBy: loginStatus.id,
+          },
+          withCredentials: true,
+        }
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const mappedData: LeadAssignedCompanyProduct[] = response.data.map(
@@ -524,7 +533,7 @@ const ViewLeadManagement = () => {
       lead_id: selectedLeadData.id,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_CONTACT, postDataGetLeadContact, {
         withCredentials: true,
       })
@@ -586,7 +595,6 @@ const ViewLeadManagement = () => {
         name: null,
       }));
     }
-    console.log(trimmedName);
 
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
@@ -599,7 +607,7 @@ const ViewLeadManagement = () => {
     console.log(PostDataForLeadUpdate);
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD,
         PostDataForLeadUpdate,
         { withCredentials: true }
@@ -679,11 +687,26 @@ const ViewLeadManagement = () => {
   const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
     useState<boolean>(false);
 
+  const [refreshkeyForLeadOwnerChange, setRefreshKeyForLeadOwnerChange] =
+    useState<number>(0);
   // Note : Clears the states when user clicks on lead owner change button
   function handleLeadOwnerChangeStateClear() {
     setReasonTextForLeadOwnerChange("");
     setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
     setPersistedSelectedUserId(selectedLeadData.companyUserId);
+    // window.location.reload();
+    setRefreshKeyForLeadOwnerChange((prev) => prev + 1);
+  }
+
+  function handleLeadOwnerSelected(user: CompanyUser | null) {
+    if (!user || user.id == 0) return null;
+
+    if (user.id == selectedLeadData.companyUserId) {
+      toast.error("Select another user.");
+      return;
+    }
+    setSelectedCompanyUser(user);
+    setReasonInputBoxOpenForLeadOwner(true);
   }
 
   const [showName, setShowName] = useState<boolean>(false);
@@ -992,7 +1015,7 @@ const ViewLeadManagement = () => {
                       label="Name"
                       // hasBorder={true}
                       type={userHasAccessToUpdateLead ? "text" : "none"}
-                      value={selectedLeadData?.name}
+                      value={selectedLeadData.name!}
                       onChange={(e) => {
                         setSelectedLeadData({
                           ...selectedLeadData,
@@ -1024,7 +1047,7 @@ const ViewLeadManagement = () => {
                     // hasBorder={true}
                     label="Email"
                     type={userHasAccessToUpdateLead ? "text" : "none"}
-                    value={selectedLeadData?.email}
+                    value={selectedLeadData.email!}
                     onChange={(e) => {
                       setSelectedLeadData({
                         ...selectedLeadData,
@@ -1056,7 +1079,7 @@ const ViewLeadManagement = () => {
                     label="Mobile number"
                     // hasBorder={true}
                     type={userHasAccessToUpdateLead ? "text" : "none"}
-                    value={selectedLeadData?.mobileNumber}
+                    value={selectedLeadData.mobileNumber!}
                     onChange={(e) => {
                       setSelectedLeadData({
                         ...selectedLeadData,
@@ -1101,12 +1124,31 @@ const ViewLeadManagement = () => {
                   }}
                 >
                   <div className="flex relative ">
-                    <Detail
+                    {/* <Detail
                       label="Lead owner"
                       hasBorder={true}
                       type={userHasAccessToUpdateLead ? "select" : "none"}
                       value={selectedLeadData?.leadOwner}
                       handleClickLeadOwnerChange={handleClickLeadOwnerChange}
+                    /> */}
+                    <CompanyUserSearchFieldInput
+                      key={refreshkeyForLeadOwnerChange}
+                      label="Lead Owner"
+                      labelClassname= "caption-custom"
+                      onUserSelected={handleLeadOwnerSelected}
+                      defaultValue={selectedLeadData?.leadOwner}
+                      // hasXLogo={false}
+                      // hasPenLogo={true}
+                      // hasBorder={false}
+                      // hasSearchLogo={false}
+                      has={
+                        {
+                          border :false,
+                          penLogo : true,
+                          xLogo:false,
+                          searchLogo:false
+                        }
+                      }
                     />
                     <button
                       title="Lead owner history"
@@ -1128,6 +1170,7 @@ const ViewLeadManagement = () => {
                         Reason (Optional)
                       </label>
                       <textarea
+                      autoFocus={true}
                         rows={7}
                         placeholder="Enter reason for lead owner update"
                         className="border rounded  p-1 input-label-custom"

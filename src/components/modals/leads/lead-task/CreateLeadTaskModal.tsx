@@ -31,7 +31,6 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
@@ -42,6 +41,7 @@ import FormHeader from "../../../ui/FormHeader";
 import MESSAGE from "../../../../constants/Messages";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../../ui/FormLayout";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -218,7 +218,7 @@ function CreateLeadTaskModal({
       createdby_id: loginStatus.id,
     };
     setIsSaving(true);
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_LEAD_TASK, createLeadTaskPostData, {
         withCredentials: true,
       })
@@ -257,7 +257,7 @@ function CreateLeadTaskModal({
       requestedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
         withCredentials: true,
       })

@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import LeadStatusHistoryProp from "../../../@types/lead-management/LeadStatusHistoryProp";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import LeadStatusHistoryData from "../../../@types/lead-management/LeadStatusHistoryData";
@@ -11,6 +10,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { History} from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
   isOpen,
@@ -38,7 +38,7 @@ const LeadStatusHistory: React.FC<LeadStatusHistoryProp> = ({
       requestedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS_HISTORY,
         PostDataToGetLeadStatusHistory,
         { withCredentials: true }
