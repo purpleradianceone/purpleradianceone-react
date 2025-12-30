@@ -7,7 +7,6 @@ import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
 import industryType from "../../../@types/general/industryType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -21,6 +20,7 @@ import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
 import {  Pen, Save } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -141,7 +141,7 @@ const LeadDetails = ({
       ? POST_API.CREATE_LEAD_DETAILS
       : POST_API.UPDATE_LEAD_DETAILS;
     try {
-      const response = await axios.post(url, PostDataCreateLead, {
+      const response = await axiosClient.post(url, PostDataCreateLead, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +185,7 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+      const response = await axiosClient.post(POST_API.GET_INDUSTRY_TYPE, postData, {
         withCredentials: true,
       });
 
@@ -219,7 +219,7 @@ const LeadDetails = ({
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+      const response = await axiosClient.post(POST_API.GET_COUNTRY, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
@@ -248,7 +248,7 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
+      const response = await axiosClient.post(POST_API.GET_STATE, PostDataForState, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +283,7 @@ const LeadDetails = ({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_DISTRICT,
         PostDataForDistrict,
         {

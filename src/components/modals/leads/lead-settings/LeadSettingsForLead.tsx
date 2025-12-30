@@ -3,11 +3,9 @@
 import { Settings } from "lucide-react";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import { createPortal } from "react-dom";
-import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useEffect, useState } from "react";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -15,6 +13,8 @@ import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import LeadDataProps from "../../../../@types/lead-management/LeadProps";
 
 function LeadSettingForLead({
   isOpen,
@@ -23,7 +23,8 @@ function LeadSettingForLead({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  lead: Lead;
+  // lead : Lead
+  lead: LeadDataProps;
 }) {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -39,7 +40,7 @@ function LeadSettingForLead({
         requestedby_id: loginStatus.id,
       };
 
-      await axios
+      await axiosClient
         .post(POST_API.GET_LEAD_SETTING_LEAD, companyLeadSettingPostData, {
           withCredentials: true,
         })
@@ -92,7 +93,7 @@ function LeadSettingForLead({
       isactive: isChecked,
       updatedby_id: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(
         POST_API.UPDATE_LEAD_SETTING_LEAD,
         updateLeadSettingCompanyPostData,

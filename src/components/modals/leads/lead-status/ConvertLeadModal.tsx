@@ -5,10 +5,9 @@ import RadioButtons from "../../../ui/RadioButton";
 import { useState } from "react";
 import GetAccounts from "../../../views/account/AccountManagement";
 import Account from "../../../../@types/account/Account";
-import Lead from "../../../../@types/lead-management/LeadManagementProps";
+// import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
@@ -18,6 +17,8 @@ import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../../ui/FormLayout";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import LeadDataProps from "../../../../@types/lead-management/LeadProps";
 
 function ConvertLeadModal({
   isOpen,
@@ -31,7 +32,8 @@ function ConvertLeadModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  leadData: Lead;
+  // leadData: Lead;
+  leadData : LeadDataProps
   handleLeadConversion: () => void;
   reasonText: string;
   onReasonChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -71,7 +73,7 @@ function ConvertLeadModal({
       createdby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.data.status) {
@@ -97,7 +99,7 @@ function ConvertLeadModal({
   if (!isOpen) return null;
   return (
     // <>
-    <FormLayout>
+    <FormLayout padding={2} width={accountTypeSelected==="noAccount" ? 4:7  }>
 
    
       {/* <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
@@ -109,7 +111,7 @@ function ConvertLeadModal({
    [&::-webkit-scrollbar-thumb]:rounded-s-lg [&::-webkit-scrollbar-track]:rounded-lg"
           > */}
               { isLeadStatusSaving && <LoadingPopUpAnimation show={isLeadStatusSaving} />}
-            <div className="py-4 px-3">
+            <div className="">
               <FormHeader
                 icon={Handshake}
                 onClose={onClose}
@@ -147,6 +149,7 @@ function ConvertLeadModal({
                   <div className="grid grid-cols-1">
                     <div>
                       <TextAreaInput
+                      autoFocus
                         placeholder="Enter reason for status update"
                         value={reasonText}
                         cols={3}

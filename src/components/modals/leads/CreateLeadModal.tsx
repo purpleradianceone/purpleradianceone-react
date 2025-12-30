@@ -20,7 +20,6 @@ import Button from "../../ui/Button";
 import React, { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import CustomDropdown from "./CustomDropdown";
@@ -39,6 +38,7 @@ import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function CreateLeadModal({
   isOpen,
@@ -171,7 +171,7 @@ function CreateLeadModal({
       isactive: true,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_SOURCE,
         postDataForLeadSource,
         {
@@ -205,7 +205,7 @@ function CreateLeadModal({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatus,
         {
@@ -334,7 +334,7 @@ function CreateLeadModal({
       };
 
       setIsSaving(true);
-      await axios
+      await axiosClient
         .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
           withCredentials: true,
         })

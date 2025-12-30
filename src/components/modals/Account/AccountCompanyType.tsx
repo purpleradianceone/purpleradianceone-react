@@ -193,7 +193,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
           {accountCompanyAccountType.map((item: AccountCompanyAccountType) => (
             <div
               key={item.id}
-              className="p-2 max-h-56 hover:white-text hover:shadow-md bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col"
+              className="p-2 relative max-h-56 hover:white-text hover:shadow-md bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col"
             >
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
@@ -214,6 +214,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
                     {item.accountTypeName}
                   </p>
                 </div>
+                <div className="absolute top-2 right-2">
                 {/* Toggle */}
                 <ToggleButton
                   checked={item.isActive}
@@ -222,8 +223,9 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
                     e.preventDefault();
                     handleAccountCompanyAccountStatusChange(item);
                   }}
-                />
-              </div>
+                  />
+                  </div>
+                  </div>
             </div>
           ))}
         </div>

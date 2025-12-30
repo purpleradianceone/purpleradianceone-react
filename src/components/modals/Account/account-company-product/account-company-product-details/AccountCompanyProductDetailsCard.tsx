@@ -280,6 +280,7 @@ export const AccountCompanyProductDetailsCard = ({
             readonly={!userHasAccessToUpdateAccount}
             value={productData?.purchaseDate}
             isClearable={false}
+            penLogo={true}
           />
           <ControlledDatePicker
             label="Delivery Date"
@@ -290,6 +291,7 @@ export const AccountCompanyProductDetailsCard = ({
             readonly={!userHasAccessToUpdateAccount}
             value={productData?.deliveryDate}
             isClearable={false}
+             penLogo={true}
           />
 
           <ControlledDatePicker
@@ -301,6 +303,7 @@ export const AccountCompanyProductDetailsCard = ({
             readonly={!userHasAccessToUpdateAccount}
             value={productData?.installationDate}
             isClearable={false}
+             penLogo={true}
           />
 
           <CompanyUserSearchFieldInput

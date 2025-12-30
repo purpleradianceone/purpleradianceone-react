@@ -3,7 +3,6 @@
 import LeadTaskTabs from "../../../tabs/LeadTasksTabs";
 import { useEffect, useState } from "react";
 import CreateLeadTaskModal from "./CreateLeadTaskModal";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import LeadActivityType from "../../../../@types/lead-management/LeadActivityType";
 import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
@@ -19,6 +18,7 @@ import Button from "../../../ui/Button";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 function LeadTasksModal({ ownerId }: { ownerId: number }) {
   const {userHasAccessToUpdateLead} = useUserAccessModules();
@@ -50,7 +50,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
       name: null,
       isactive: null,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_ACTIVITY, getLeadActivityPostData, {
         withCredentials: true,
       })
@@ -87,7 +87,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
       name: null,
       isactive: null,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_TASK_PRIORITY, getLeadTaskPriorityPostData, {
         withCredentials: true,
       })
@@ -124,7 +124,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
       name: null,
       isactive: null,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_TASK_STAGE, getLeadTaskStagePostData, {
         withCredentials: true,
       })
@@ -174,7 +174,7 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
       lead_task_stage_id: leadTaskStageId === 0 ? null : leadTaskStageId,
       requestedby_id: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_TASK, getLeadTaskPostData, {
         withCredentials: true,
       })

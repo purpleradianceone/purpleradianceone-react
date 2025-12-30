@@ -1,5 +1,4 @@
 import { Package, Save } from "lucide-react";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import React, { useEffect, useState } from "react";
@@ -20,6 +19,7 @@ import FormHeader from "../../ui/FormHeader";
 import Button from "../../ui/Button";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 const AssignProductToLead = ({
   selectedLeadData,
@@ -62,7 +62,7 @@ const AssignProductToLead = ({
     };
     setIsSaving(true)
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.ASSIGN_PRODUCT_TO_LEAD,
         PostDataAssignProductToLead,
         {

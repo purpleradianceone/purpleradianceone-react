@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useEffect, useState } from "react";
 import LeadCompanyTeam from "../../../@types/lead-management/LeadCompanyTeam";
@@ -20,6 +19,7 @@ import StatusChip from "../../ui/StatusChip";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
 import Button from "../../ui/Button";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
@@ -63,7 +63,7 @@ const LeadAssignedTeams = ({
       requestedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(
         POST_API.GET_LEAD_ASSIGNED_COMPANY_TEAM,
         postDataForLeadAssignedCompanyTeam,
@@ -124,7 +124,7 @@ const LeadAssignedTeams = ({
       requestedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.GET_COMPANY_TEAM_USERS, postDataToGetCompanyTeamUsers, {
         withCredentials: true,
       })
@@ -175,7 +175,7 @@ const LeadAssignedTeams = ({
       updatedbyid: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.UPDATE_LEAD_COMPANY_TEAM, postDataUpdateLeadCompanyTeam, {
         withCredentials: true,
       })
