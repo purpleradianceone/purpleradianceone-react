@@ -80,7 +80,7 @@ export function SupportTicketLIfecycleChangeModal({
           userName={selectedSupportTicketLifecycleName}
           description={`support ticket lifecycle is updating from ${previousSupportTicketStatus.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
-        <form className="mt-2">
+        <form className={`mt-2 ${isLoading? "cursor-wait": "cursor-default"}`}>
           <div className="gap-2">
             <TextAreaInput
               logo={LucideText}

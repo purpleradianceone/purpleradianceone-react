@@ -696,7 +696,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     <>
       <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
         {isTasksLoading && (
-          <div className="flex min-w-full justify-center items-center mt-16 pt-48 text-gray-600 text-lg">
+          <div className={`grid justify-center items-center min-h-[100vh] ${isTasksLoading?"cursor-wait":"cursor-default"}`}>
             <LoadingSpinner></LoadingSpinner>
           </div>
         )}

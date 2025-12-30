@@ -45,6 +45,7 @@ import GetAccountCompanyProductFroSupportTicket from "../../views/support-ticket
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import TextAreaInput from "../../ui/TextAreaInput";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 function CreateSupportTicketModal({
   isOpen,
@@ -384,17 +385,7 @@ function CreateSupportTicketModal({
         }
       })
       .catch(async (error: ApiError | any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: createSupportTicket,
-          });
-          if (refreshTokenResponse) {
-            createSupportTicket();
-          }
-        }
-        if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-          toast.error(error.response?.data);
-        }
+        handleApiError(error);
       })
       .finally(() => {
         setIsSupportTicketCreating(false);
@@ -424,7 +415,7 @@ function CreateSupportTicketModal({
           show={isSupportTicketCreating || isLoadingForAccountCompanyProducts}
         />
       )}
-      <div className="py-4 px-3">
+      <div className={`py-4 px-3 ${isSupportTicketCreating? "cursor-wait" : "cursor-default"}`}>
         <FormHeader
           icon={TicketPlus}
           onClose={() => {
