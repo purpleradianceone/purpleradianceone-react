@@ -57,6 +57,7 @@ import { PageLayout } from "../../ui/PageLayout";
 import axiosClient from "../../../axios-client/AxiosClient";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import LeadDataProps from "../../../@types/lead-management/LeadProps";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -295,7 +296,6 @@ const ViewLeadManagement = () => {
 
           //resetting the states
           setReasonTextForLeadOwnerChange("");
-          setReasonInputBoxOpenForLeadOwner(false);
           setSelectedLeadData((prev: any) => ({
             ...prev,
             leadOwner: selectedCompanyUser.fullname,
@@ -308,16 +308,18 @@ const ViewLeadManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunction: handleLeadOwnerChange,
-        });
-        if (refreshTokenStatus) {
-          handleLeadOwnerChange();
-        }
-      }
+      handleApiError(error)
+      // if (error.status === STATUS_CODE.UNATHORISED) {
+        //   const refreshTokenStatus = await RefreshToken({
+          //     callFunction: handleLeadOwnerChange,
+          //   });
+      //   if (refreshTokenStatus) {
+        //     handleLeadOwnerChange();
+      //   }
+      // }
     } finally {
       // selected company user should become null after this function runs
+      setReasonInputBoxOpenForLeadOwner(false);
       setSelectedCompanyUser({
         company_id: 0,
         id: 0,
@@ -329,6 +331,7 @@ const ViewLeadManagement = () => {
         requestedby: "",
         generate_password: "",
       });
+      setRefreshKeyForLeadOwnerChange(prev => prev+1)
     }
   };
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
