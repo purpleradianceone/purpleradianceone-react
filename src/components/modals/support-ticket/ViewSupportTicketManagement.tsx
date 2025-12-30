@@ -287,7 +287,6 @@ const ViewSupportTicketManagement = () => {
   }
 
   const handSupportTicketInfoSave = async () => {
-    setIsLoadingForSupportTicketInfoSave(true);
 
     if (
       selectedSupportTicketCategory?.id ===
@@ -307,6 +306,8 @@ const ViewSupportTicketManagement = () => {
     )
       return;
 
+    setIsLoadingForSupportTicketInfoSave(true);
+    
     const PostDataForSupportTicketUpdate = {
       company_id: loginStatus.companyId,
       id: selectedSupportTicket.id,
