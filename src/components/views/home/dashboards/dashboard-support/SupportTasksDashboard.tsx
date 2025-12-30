@@ -245,7 +245,7 @@ function SupportTasksDashboard({
                 return (
                   <div
                     key={task.id}
-                    className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group"
+                    className={`flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"}`}
                     style={{
                       animationDelay: `${index * 0.1}s`,
                     }}

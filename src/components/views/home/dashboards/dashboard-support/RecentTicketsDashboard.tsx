@@ -174,7 +174,7 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
                       <div>
-                        <h4 className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors">
+                        <h4 className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}>
                           Ticket Number: {ticket.ticket_number}
                         </h4>
                         <p className="caption-custom mt-1 line-clamp-2">
