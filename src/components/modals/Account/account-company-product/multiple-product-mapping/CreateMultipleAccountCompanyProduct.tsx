@@ -53,6 +53,7 @@ import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
 import { format } from "date-fns";
 import { calculateEndDate } from "../../../../../utils/date/calculateEndDate";
 import LoadingPopUpAnimation from "../../../../views/card/LoadingPopUpAnimation";
+import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -79,7 +80,7 @@ interface ProductRow {
   amc: number;
   conversionFactor: number;
   conversionFactorString: string;
-  unitName : string ,
+  unitName: string;
   productWarranty?: string;
   productAmc?: string;
   productWarrantyId?: number;
@@ -132,7 +133,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
       installedById: loginStatus.id,
       conversionFactor: 0,
       conversionFactorString: "",
-      unitName:""
+      unitName: "",
     },
   ]);
 
@@ -295,7 +296,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         installedById: loginStatus.id,
         conversionFactor: 0,
         conversionFactorString: "",
-        unitName : ""
+        unitName: "",
       },
     ]);
   };
@@ -643,7 +644,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
       }
 
       setUnitsForRows((prev) => ({ ...prev, [index]: units }));
-                                
+
       setRows((prev) =>
         prev.map((row, i) => {
           if (i !== index) return row;
@@ -655,7 +656,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             productQuantity: stock.quantity_live,
             isSerialNumber: item.isSerialNumber!,
             unit_id: item.isSerialNumber ? item.unitId : row.unit_id,
-            unitName : units[0].unitNameInStock,
+            unitName: units[0].unitNameInStock,
             productWarranty: item.defaultWarrantyName,
             productWarrantyNumber: item.defaultWarranty,
             productWarrantyId: item.defaultWarrantyIntervalTypeId,
@@ -690,7 +691,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }
   };
 
-  const [showLoadingAnimationForAssignApi, setShowLoadingAnimationForAssignApi]= useState<boolean>(false);
+  const [
+    showLoadingAnimationForAssignApi,
+    setShowLoadingAnimationForAssignApi,
+  ] = useState<boolean>(false);
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
     if (!validateRows()) {
@@ -753,8 +757,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-    }finally{
-      setShowLoadingAnimationForAssignApi(false)
+    } finally {
+      setShowLoadingAnimationForAssignApi(false);
     }
   };
 
@@ -786,7 +790,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
   // nonoid changes
   const [serialRowIndex, setSerialRowIndex] = useState<string | null>(null);
 
-  if (!userHasAccessToUpdateAccount) return <div>permission denied</div>;
+  if (!userHasAccessToUpdateAccount)
+    return (
+      <div>
+        <AccessDeniedMessagePage message="You do not have the necessary permissions to Update Account." />
+      </div>
+    );
 
   return (
     <>
@@ -970,8 +979,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               const finalFactor =
                                 qty * Number(selectedUnit.conversionFactor);
                               updateRow(index, "conversionFactor", finalFactor);
-
-                      
                             }
 
                             // if(qty){
@@ -1009,8 +1016,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
                             // if(unit){
                             updateRow(index, "unit_id", unit!);
                             // }
-
-                           
 
                             const finalFactor =
                               Number(row.quantity) *
@@ -1201,7 +1206,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       /> */}
                     </div>
                     <div
-                      className={`col-span-2 grid  ${row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"} gap-1 bg-pink-00 mt-1.5`}
+                      className={`col-span-2 grid  ${
+                        row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"
+                      } gap-1 bg-pink-00 mt-1.5`}
                     >
                       {/* INSTALLED BY */}
                       <div className="mt-1 ">
@@ -1257,7 +1264,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           <div className="flex items-center justify-end h-fit ">
                             <div className="w-full ">
                               <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
-                                <FileDigit className="text-blue-500" size={15} />
+                                <FileDigit
+                                  className="text-blue-500"
+                                  size={15}
+                                />
                                 <div>
                                   Serial Number :
                                   <span className="ml-0 text-red-400">*</span>
@@ -1269,8 +1279,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                   {row.serialNumber.length > 0 ? (
                                     <>
                                       <span className="">
-                                        Item count:{" "}
-                                        {row.serialNumber.length}
+                                        Item count: {row.serialNumber.length}
                                       </span>
                                     </>
                                   ) : (
@@ -1303,7 +1312,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                     <div className="col-span-2">
                       {/* Warranty terms */}
                       <TextAreaInput
-                      disabled={!row.productId}
+                        disabled={!row.productId}
                         readonly={!row.productId}
                         placeholder="Enter Warranty Terms "
                         logo={ShieldCheck}
@@ -1321,7 +1330,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                     <div className="col-span-4 grid grid-cols-2 gap-x-1">
                       {/* Billing address */}
                       <TextAreaInput
-                       disabled={!row.productId}
+                        disabled={!row.productId}
                         readonly={!row.productId}
                         placeholder="Enter Billing Address"
                         logo={MapPin}
@@ -1337,7 +1346,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       />
                       {/* Delivery address */}
                       <TextAreaInput
-                      disabled={!row.productId}
+                        disabled={!row.productId}
                         readonly={!row.productId}
                         placeholder="Enter Delivery Address"
                         logo={MapPin}
@@ -1375,11 +1384,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
           </div>
         </div>
       </form>
-      {
-        showLoadingAnimationForAssignApi && (
-          <LoadingPopUpAnimation show={showLoadingAnimationForAssignApi}/>
-        )
-      }
+      {showLoadingAnimationForAssignApi && (
+        <LoadingPopUpAnimation show={showLoadingAnimationForAssignApi} />
+      )}
       {showSerialNumberModule && serialRowIndex !== null && (
         <StockSerialNumber
           companyProductId={selectedCompanyProductId!} // required for API call
@@ -1484,7 +1491,7 @@ function CompanyUserSearchFieldInput({
         search_parameter: searchText.trim() === "" ? null : searchText.trim(),
         limit: userPreference.rowsInGrid,
         requestedby: loginStatus.id,
-        isactive:true
+        isactive: true,
       });
 
       if (response?.status === STATUS_CODE.OK) {
