@@ -80,7 +80,7 @@ const PanelCustomizer: React.FC = () => {
             </div>
           </div>
           <div className="p-4 flex justify-center">
-            <label className="flex items-center gap-2 section-header-custom">
+            <label className="flex items-center gap-2 cursor-pointer section-header-custom">
               <input
                 type="radio"
                 name="panel"
@@ -109,7 +109,7 @@ const PanelCustomizer: React.FC = () => {
             </div>
           </div>
           <div className="p-4 flex justify-center">
-            <label className="flex items-center gap-2 section-header-custom">
+            <label className="flex items-center gap-2 cursor-pointer  section-header-custom">
               <input
                 type="radio"
                 name="panel"

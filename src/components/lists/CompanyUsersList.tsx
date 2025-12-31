@@ -361,8 +361,8 @@ function GetCompanyUsersList({
             isUsedInAccountProductForAssingingInstalledBy
               ? `ag-theme-balham w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-122px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-130px)]"
+              ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-120px)]"
           }
         >
           <CompanyUserAgGrid

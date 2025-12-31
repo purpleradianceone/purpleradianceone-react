@@ -66,19 +66,26 @@ const StockManagementList = ({
     setOpenAllTransactionPage(true);
   }
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-  const { handleDateRangeIdChange, isCustomDateOptionSelected, setIsCustomDateOptionSelected } =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
-    const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
-  || "Date Filter";
+  const selectedDateName =
+    dateRangeDropdownOptions.find(
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+    )?.date_range || "Date Filter";
 
   useEffect(() => {
-        if(handleSearchOption.dateRangeId === 8){
-          setIsCustomDateOptionSelected(true);
-        }
-  }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
-  
-
+    if (handleSearchOption.dateRangeId === 8) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
 
   return (
     <div
@@ -92,37 +99,39 @@ const StockManagementList = ({
         <div className="flex items-center pl-1  gap-2">
           <Layers className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
           <span className="section-header-custom">Stock Management</span>
-        </div>
 
-        <div className="flex justify-center items-center  gap-1">
-          {/* search box flex div */}
+          <div className="flex justify-center items-center  gap-1">
+            {/* search box flex div */}
 
-          <div className="  flex items-start w-80">
-            <SearchInput
-              id="company-user-module-search-box"
-              onChange={(e) => {
-                handleSearchOption.handleSearchParameterChange(e.target.value);
-              }}
-              value={handleSearchOption.searchParameter}
-            ></SearchInput>
-          </div>
+            <div className="  flex items-start w-80">
+              <SearchInput
+                id="company-user-module-search-box"
+                onChange={(e) => {
+                  handleSearchOption.handleSearchParameterChange(
+                    e.target.value
+                  );
+                }}
+                value={handleSearchOption.searchParameter}
+              ></SearchInput>
+            </div>
 
-          {/* Date FIlters Dropdown */}
-          <div
-            className={`flex flex-wrap items-center gap-0.5 ${
-              isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
-            }`}
-          >
-            <div className="flex gap-1">
-              <div className="flex ">
-                <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                  <Calendar className="input-label-custom" />
+            {/* Date FIlters Dropdown */}
+            <div
+              className={`flex flex-wrap items-center gap-0.5 ${
+                isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
+              }`}
+            >
+              <div className="flex gap-1">
+                <div className="flex ">
+                  <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
+                    <Calendar className="input-label-custom" />
+                  </div>
+                  <DateRangeFilterDropdown
+                    dropdownOptions={dateRangeDropdownOptions}
+                    handleDateIdChange={handleDateRangeIdChange}
+                    selectedOption={selectedDateName}
+                  ></DateRangeFilterDropdown>
                 </div>
-                <DateRangeFilterDropdown
-                  dropdownOptions={dateRangeDropdownOptions}
-                  handleDateIdChange={handleDateRangeIdChange}
-                  selectedOption={selectedDateName}
-                ></DateRangeFilterDropdown>
               </div>
             </div>
             {/* Custom Date Picker Div Flex Box*/}
@@ -143,6 +152,8 @@ const StockManagementList = ({
               </div>
             )}
           </div>
+          </div>
+          <div id="company-users-module-add-button" className="flex gap-1 items-center">
           <Button
             type="button"
             onClick={handleShowAllTransactionButtonClick}
@@ -151,20 +162,16 @@ const StockManagementList = ({
                       focus:outline-none shadow-sm"
           >
             <span className="inline md:hidden">Transa...</span>
-           <span className="hidden md:inline"> Transactions</span>
+            <span className="hidden md:inline"> Transactions</span>
           </Button>
-        </div>
 
-        <div id="company-users-module-add-button" className="flex gap-1">
           <Button
             type="submit"
             disabled={!userHasAccessToAddStock}
             onClick={(e) => {
               e.preventDefault();
               if (!userHasAccessToAddStock) {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
-                );
+                toast.error(MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS);
                 return;
               } else {
                 setIsAddStockModalOpen(true);
@@ -182,8 +189,8 @@ const StockManagementList = ({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+              ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-120px)]"
           }
         >
           <StockLiveForCompanyProductAgGrid
