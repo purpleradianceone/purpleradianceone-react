@@ -306,7 +306,7 @@ const GenericValueMappingCard = forwardRef(
       <div ref={ref} className="border rounded-lg p-3 bg-gray-50/80 shadow-sm">
         <h3 className="table-header-custom mb-3">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={onSearch ? " mt-12 ": ""}>
+          <div className={onSearch ? " mt-12 " : ""}>
             <h4 className="input-label-custom text-center mb-2">
               Your CSV Values (Drag)
             </h4>
@@ -403,6 +403,11 @@ const LeadImportCsv = ({
   const [showPreImportReview, setShowPreImportReview] =
     useState<boolean>(false); // New state for pre-import review
 
+  // state for showing loading animation on review and finalize button
+  const [
+    showloadingAnimationForreviewAndFinalizeButton,
+    setShowloadingAnimationForreviewAndFinalizeButton,
+  ] = useState<boolean>(false);
   const [isLoadingLeadInterestData, setIsLoadingLeadInterestData] =
     useState<boolean>(true);
   const [
@@ -574,18 +579,20 @@ const LeadImportCsv = ({
       }
     };
 
-    try{
+    try {
       await callApi(POST_API.GET_LEAD_STATUS, setLeadStatus, fetchApiData);
       await callApi(POST_API.GET_LEAD_SOURCE, setLeadSource, fetchApiData);
-    }catch(err : any ){
-      toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
-    }finally{
-        setIsLoadingLeadSourceAndSourceData(false);
+    } catch (err: any) {
+      toast.error(
+        MESSAGE.ERROR.SOMETHING_WENT_WRONG + " Please refresh the page."
+      );
+    } finally {
+      setIsLoadingLeadSourceAndSourceData(false);
     }
   }, []);
 
   // API call to get lead interest data
-  const  getLeadInterestData = useCallback(async ()=> {
+  const getLeadInterestData = useCallback(async () => {
     try {
       const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
         params: {
@@ -608,16 +615,18 @@ const LeadImportCsv = ({
         if (refreshTokenStatus) {
           getLeadInterestData();
         }
-      }else{
-              toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG+" Please refresh the page.");
+      } else {
+        toast.error(
+          MESSAGE.ERROR.SOMETHING_WENT_WRONG + " Please refresh the page."
+        );
       }
-    }finally{
-        setIsLoadingLeadInterestData(false);
-      }
-  },[])
+    } finally {
+      setIsLoadingLeadInterestData(false);
+    }
+  }, []);
   // Note : called the above function , will get the data once the component renders
   useEffect(() => {
-      getLeadInterestData();
+    getLeadInterestData();
   }, []);
 
   // Note : api call to get company product
@@ -1125,7 +1134,7 @@ const LeadImportCsv = ({
 
   const processCsvForReview = useCallback(() => {
     if (!csvData || !originalCsvHeaders.length) return;
-
+    // setShowloadingAnimationForreviewAndFinalizeButton(true)
     const emailSet = new Set<string>();
     const mobileSet = new Set<string>();
     const duplicateEmails = new Set<string>();
@@ -1305,6 +1314,7 @@ const LeadImportCsv = ({
     //Note: error commented below line
     setProcessedLeads(finalProcessed);
     setShowPreImportReview(true);
+    // setShowloadingAnimationForreviewAndFinalizeButton(false);
   }, [
     csvData,
     originalCsvHeaders,
@@ -1407,6 +1417,7 @@ const LeadImportCsv = ({
         message: "No CSV data to import.",
         type: "error",
       });
+      setIsLoadingSpinnerAfterSubmission(false);
       return;
     }
 
@@ -1418,6 +1429,7 @@ const LeadImportCsv = ({
       toast.error(
         'Please map "Name" and either of "Email" or "Mobile Number".'
       );
+            setIsLoadingSpinnerAfterSubmission(false);
       return;
     }
     setError(null);
@@ -1432,6 +1444,8 @@ const LeadImportCsv = ({
         message: "No leads selected for import.",
         type: "error",
       });
+            setIsLoadingSpinnerAfterSubmission(false);
+
       return;
     }
 
@@ -1459,7 +1473,6 @@ const LeadImportCsv = ({
     // };
 
     // const csvFileFormatted = convertPayloadToCsv(payload);
-    setIsLoadingSpinnerAfterSubmission(true);
     const rowsData = leadsToImport.map((lead) => ({
       ...lead.mappedData,
       createdby: loginStatus.id,
@@ -1468,15 +1481,12 @@ const LeadImportCsv = ({
     }));
     const leadImportCsvFile = convertToCsvFile(rowsData, "importLeadFile.csv");
     const reader = new FileReader();
-    console.log("this is the row data");
 
-    console.log(rowsData);
 
     reader.onload = (e) => {
       console.log(e.target?.result);
     };
 
-    console.log("this is the csv file data ");
     reader.readAsText(leadImportCsvFile);
     // console.log("Submitting payload:", payload);
     try {
@@ -1560,6 +1570,26 @@ const LeadImportCsv = ({
   const showLeadInterestTypeMapping =
     fieldMappings.lead_interest_id?.length > 0 &&
     csvUniqueInterestType.length > 0;
+
+
+    // Note : useeffect is used to show the loading cursor when ant loading state becomes true
+  useEffect(() => {
+    if (
+      showloadingAnimationForreviewAndFinalizeButton ||
+      isLoadingSpinnerAfterSubmission
+    ) {
+      document.body.style.cursor = "wait";
+    } else {
+      document.body.style.cursor = "default";
+    }
+
+    return () => {
+      document.body.style.cursor = "default";
+    };
+  }, [
+    showloadingAnimationForreviewAndFinalizeButton,
+    isLoadingSpinnerAfterSubmission,
+  ]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -1894,9 +1924,17 @@ const LeadImportCsv = ({
               <div>
                 <Button
                   type="submit"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault();
-                    processCsvForReview();
+                    setShowloadingAnimationForreviewAndFinalizeButton(true);
+
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+
+                    try {
+                      processCsvForReview();
+                    } finally {
+                      setShowloadingAnimationForreviewAndFinalizeButton(false);
+                    }
                   }} // Changed to trigger review first
                   disabled={isParsing || !csvFile}
                   // className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm disabled:bg-gray-400"
@@ -1925,7 +1963,9 @@ const LeadImportCsv = ({
                 // className="bg-blue-500 p-1 rounded-md"
                 onClick={handleMarkAll}
               >
-                {previousSelections.length === 0 ? "Mark duplicate leads." : "Unmark duplicate leads."}
+                {previousSelections.length === 0
+                  ? "Mark duplicate leads."
+                  : "Unmark duplicate leads."}
               </Button>
             </div>
             <div className="w-full overflow-x-auto overflow-y-auto max-h-96  border rounded-md">
@@ -1992,9 +2032,14 @@ const LeadImportCsv = ({
               <div>
                 <Button
                   type="submit"
-                  onClick={(e) => {
+                  onClick={ async (e) => {
                     e.preventDefault();
-                    handleSubmitImport();
+                    
+                    setIsLoadingSpinnerAfterSubmission(true);
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+
+                      handleSubmitImport();
+                    
                   }}
                   disabled={
                     isParsing ||
@@ -2017,6 +2062,12 @@ const LeadImportCsv = ({
           text="Loading please wait..."
         />
       )}
+      {/* {showloadingAnimationForreviewAndFinalizeButton && ( */}
+      <LoadingPopUpAnimation
+        show={showloadingAnimationForreviewAndFinalizeButton}
+        text="Loading please wait..."
+      />
+      {/* )} */}
       {showLeadImportResultPopUp && (
         <LeadImportResultPopUp
           data={LeadImportResponse}

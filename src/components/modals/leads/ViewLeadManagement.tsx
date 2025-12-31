@@ -1018,7 +1018,7 @@ const ViewLeadManagement = () => {
                       label="Name"
                       // hasBorder={true}
                       type={userHasAccessToUpdateLead ? "text" : "none"}
-                      value={selectedLeadData.name!}
+                      value={selectedLeadData.name && selectedLeadData.name || ""}
                       onChange={(e) => {
                         setSelectedLeadData({
                           ...selectedLeadData,
