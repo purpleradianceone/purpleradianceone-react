@@ -1156,12 +1156,12 @@ useEffect(()=> {
   //     setShowAccountCompanyProductName(true);
   //     setShowAccountCompanyProductData(accountCompanyProductData)
   //   }
-  // }
+  // }\
   if (isIndustryTypeLoading || isBusinessTypeLoading || accountDetailsLoading) {
     return (
       <div
         className={` ${
-          userPreference.isLeftMenu ? " ml-11 " : ""
+          userPreference.isLeftMenu ? " ml-5 " : ""
         }fixed mt-11  inset-0 z-10 bg-white p-8`}
       >
         <Skeleton />
