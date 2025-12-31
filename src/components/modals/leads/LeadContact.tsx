@@ -471,9 +471,14 @@ const LeadContact = ({
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
                   } text-white flex items-center justify-center w-9 h-9 rounded-full border  font-semibold shadow-sm`}
                 >
-                  {contact.name
-                    ? contact.name.charAt(0).toUpperCase()
-                    : contact.email.charAt(0).toUpperCase() || "?"}
+                 {
+  contact?.name?.trim()
+    ? contact.name.trim().charAt(0).toUpperCase()
+    : contact?.email?.trim()
+      ? contact.email.trim().charAt(0).toUpperCase()
+      : "?"
+}
+
                 </div>
 
                 {/* Text Info */}
@@ -550,7 +555,7 @@ const LeadContact = ({
                       title={selectedContactCard.name ?? ""}
                       className="section-header-custom"
                     >
-                      {selectedContactCard.name !== null &&
+                      {selectedContactCard.name  &&
                       selectedContactCard.name.length > 40 ? (
                         selectedContactCard.name.substring(0, 49) + "..."
                       ) : selectedContactCard.name ? (

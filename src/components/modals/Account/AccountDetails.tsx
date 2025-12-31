@@ -533,15 +533,6 @@ if (fieldName === "name") {
   }
 };
 
-useEffect(()=> {
-  console.log("original value log");
-  
-  console.log(originalValues);
-  
-}, [originalValues])
-
-
-
   const handleInputChange = (fieldName: string, value: string) => {
     // Apply character limits during typing
     let processedValue = value;
