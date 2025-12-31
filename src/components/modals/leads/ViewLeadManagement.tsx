@@ -1376,27 +1376,6 @@ const ViewLeadManagement = () => {
             <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
               <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
                 {/* Header with Close Button */}
-                {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800">
-                  Select Company User
-                </h3>
-                <button
-                  onClick={() => {
-                    setIsLeadOwnerPopUpOpen(false);
-
-                    if (
-                      selectedCompanyUser.id !== 0 &&
-                      selectedCompanyUser.id !== null &&
-                      selectedCompanyUser.id === persistedSelectedUserId
-                    ) {
-                      setReasonInputBoxOpenForLeadOwner(true);
-                    }
-                  }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={20} />
-                </button>
-              </div> */}
                 <FormHeader
                   preText="Assign new lead owner."
                   description="Select and assign a new owner to manage this lead."

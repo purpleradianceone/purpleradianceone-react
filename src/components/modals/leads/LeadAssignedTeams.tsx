@@ -256,9 +256,9 @@ const LeadAssignedTeams = ({
         </div>
       ) : (
         // NOTE : if there are teams assiged already
-        <div className="w-full  px-1 mb-1">
+        <div className="w-full  px-1 ">
           {/* Header */}
-          <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+          <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
             <Button
               disabled={!userHasAccessToUpdateLead}
               onClick={() => {

@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import { useUserPreference } from "../../context/user/UserPreference";
 
+// Use this when showing the any details 
+// wrap the component in the page layout , so it will take care of the padding and the margin
+// on scroll of want to show any data then onScrollChange is usefull
 export const PageLayout = ({
   children,
   bgColor = "bg-white",
