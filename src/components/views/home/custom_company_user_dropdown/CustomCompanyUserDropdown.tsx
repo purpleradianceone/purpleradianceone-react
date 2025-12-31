@@ -105,7 +105,7 @@ const CompanyUserDropdown: React.FC<Props> = ({
     <div
     id="crmDashBoardCompanyUsersDropdown"
       className={`fixed ${
-        userPreference.isLeftMenu ? "top-12 mt-1" : "top-14 mt-1"
+        userPreference.isLeftMenu ? "top-10 mt-1" : "top-11 mt-1"
       } right-0 `}
     >
       <AsyncPaginate<OptionType, GroupBase<OptionType>, Additional>
