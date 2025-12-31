@@ -473,7 +473,7 @@ function SupportTicketManagementList({
             className={
               userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+                : "ag-theme-balham w-full h-[calc(100vh-122px)]"
             }
           >
             <SupportTicketManagementAgGrid

@@ -349,8 +349,8 @@ function LeadManagementList({
             className={
               !isUsedInLeadModule ? `ag-theme-balham w-full h-[60vh]`:
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
             }
           >
             <LeadManagementAgGrid

@@ -120,7 +120,7 @@ function AccountManagementList({
       className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
     >
       <div
-        className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        className={`sticky z-10 top-10 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center justify-center gap-1">
           {!isSmallScreen && (
@@ -247,8 +247,8 @@ function AccountManagementList({
           className={
             !isUsedForAccountLead
               ? userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
               : "ag-theme-balham w-full h-[calc(100vh-270px)]"
           }
         >

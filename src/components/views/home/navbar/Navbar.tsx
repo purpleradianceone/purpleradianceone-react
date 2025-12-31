@@ -403,19 +403,19 @@ function Navbar({ children }: { children: React.ReactNode }) {
         
         <header>
           <nav
-            className={`z-20 bg-white border-b border-gray-200 fixed w-full pt-1.5  top-0 ${
-              position === "left" ? "h-12" : "h-14"
+            className={`z-20 bg-white border-b border-gray-200 fixed w-full    top-0 ${
+              position === "left" ? `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT} pt-0.5` :   `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_RIGHT}`
             }`}
           >
-            <div className="px-2 lg:px-6">
+            <div className="px-2 lg:px-6 ">
               <div
                 className={`flex ${
-                  position === "left" ? "ml-10" : "ml-0"
+                  position === "left" ? "ml-7" : "ml-0"
                 }  items-center justify-between`}
               >
                 <div title={loginStatus.companyName} id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName.length>20  ? loginStatus.companyName.substring(0,19).concat("...") : loginStatus.companyName }</h2>
+                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName.length>20 && position==="top"  ? loginStatus.companyName.substring(0,19).concat("...") : loginStatus.companyName }</h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -872,8 +872,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
             position === "left"
               ? sidebarOpen
                 ? "mt-12 ml-60 flex justify-center items-center"
-                : "mt-12 ml-10 flex justify-center items-center"
-              : "mt-14 ml-0 flex justify-center items-center"
+                : "mt-10 ml-7 flex justify-center items-center"
+              : "mt-11 ml-0 flex justify-center items-center"
           }
         >
 

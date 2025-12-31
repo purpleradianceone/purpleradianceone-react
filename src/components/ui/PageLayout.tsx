@@ -1,34 +1,5 @@
-// import { ReactNode } from "react";
-// import { useUserPreference } from "../../context/user/UserPreference"
-
 import { ReactNode } from "react";
 import { useUserPreference } from "../../context/user/UserPreference";
-
-// export const PageLayout=(
-  
-//   {
-//     children,
-//     bgColor ="bg-white",
-//   }
-//   :
-//   {
-//     children : ReactNode,
-//     bgColor? : string,
-//   }
-
-// ) =>{
-
-//     const {userPreference} = useUserPreference();
-//     return(
-//          <div
-//       className={` fixed top-8 inset-0 z-10 ${bgColor} ${
-//         userPreference.isLeftMenu ? "ml-[58px] mr-0.5 mt-4" : " mt-6 p-1"
-//       }  overflow-auto`}
-//     >
-//         {children}
-//     </div>
-//     )
-// }
 
 export const PageLayout = ({
   children,
@@ -53,7 +24,7 @@ export const PageLayout = ({
     <div
       onScroll={handleScroll}
       className={`fixed top-8 inset-0 z-10 ${bgColor} ${
-        userPreference.isLeftMenu ? "ml-[58px] mr-0.5 mt-4" : "mt-6 p-1"
+        userPreference.isLeftMenu ? "ml-[50px] mr-0 mt-3" : "mt-4"
       } overflow-auto`}
     >
       {children}

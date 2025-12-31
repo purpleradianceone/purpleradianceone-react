@@ -17,6 +17,7 @@ import SideNavBarItem from "./SideNavBarItem";
 import { NavLink } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import { SIZE } from "../../../../constants/AppConstants";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -33,10 +34,10 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   return (
     <aside
       id="left-side-navbar"
-      className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
-          ${isOpen ? "w-64" : "w-14"}`}
+      className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
+          ${isOpen ? "w-64" : "w-12"}`}
     >
-      <div className="flex items-center border-b justify-between px-4 h-12">
+      <div className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}>
         {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
         )}
@@ -47,7 +48,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
-      <nav className="p-3 space-y-1">
+      <nav className="p-1 space-y-1">
         <NavLink to={ROUTES_URL.HOME}>
           {({ isActive }) => (
             <SideNavBarItem
