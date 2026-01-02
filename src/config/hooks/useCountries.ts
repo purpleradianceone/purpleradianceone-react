@@ -7,10 +7,12 @@
   import ApiError from "../../@types/error/ApiError";
 import Country from "../../@types/general/Country";
 import axiosClient from "../../axios-client/AxiosClient";
+import axios from "axios";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
   
   export const useCountries = () => {
-
-      const [countries, setCountries] = useState<Country[]>([]);
+    const { loginStatus } = useLoggedInUserContext();
+    const [countries, setCountries] = useState<Country[]>([]);
     const [loading , setLoading] = useState<boolean>(true); 
     const getAllCountries = async () => {
     const PostData: Country = {
@@ -23,7 +25,7 @@ import axiosClient from "../../axios-client/AxiosClient";
     };
 
     try {
-      const response = await axiosClient.post(POST_API.GET_COUNTRY, PostData, {
+      const response = await (loginStatus.status?axiosClient:axios).post(POST_API.GET_COUNTRY, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
