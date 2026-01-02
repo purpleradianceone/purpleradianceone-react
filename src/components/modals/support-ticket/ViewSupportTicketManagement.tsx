@@ -307,12 +307,22 @@ const ViewSupportTicketManagement = () => {
     setFormData((prev: any) => {
       return { ...prev, [name]: value };
     });
-    // setSelectedSupportTicket((prev: any) => {
-    //   return { ...prev, [name]: value };
-    // });
   }
 
-  const handSupportTicketInfoSave = async () => {
+  function handleOnBlur(e: any) {
+    const { name, value } = e.target;
+    if (value.trim() === "") {
+      setFormData((prev: any) => {
+        return { ...prev, [name]: selectedSupportTicket[name] };
+      });
+    } else {
+      if (userHasAccessToUpdateSupportTicket) {
+        handleSupportTicketInfoSave();
+      }
+    }
+  }
+
+  const handleSupportTicketInfoSave = async () => {
     if (
       selectedSupportTicketCategory?.id ===
         selectedSupportTicket.supportTicketCategoryId &&
@@ -321,18 +331,21 @@ const ViewSupportTicketManagement = () => {
       selectedAssignTo.id === selectedSupportTicket.assignedTo &&
       selectedSupportTicketSource.id ===
         selectedSupportTicket.supportTicketSourceId &&
-      formData.queryDescription.trim() ===
-        (selectedSupportTicket.queryDescription
-          ? selectedSupportTicket.queryDescription.trim()
-          : "") &&
-      formData.publicNotes.trim() ===
-        (selectedSupportTicket.publicNotes
-          ? selectedSupportTicket.publicNotes.trim()
-          : "") &&
-      formData.resolutionApplied.trim() ===
-        (selectedSupportTicket.resolutionApplied
-          ? selectedSupportTicket.resolutionApplied.trim()
-          : "") &&
+      (formData.queryDescription.trim() === "" ||
+        formData.queryDescription.trim() ===
+          (selectedSupportTicket.queryDescription
+            ? selectedSupportTicket.queryDescription.trim()
+            : "")) &&
+      (formData.publicNotes.trim() === "" ||
+        formData.publicNotes.trim() ===
+          (selectedSupportTicket.publicNotes
+            ? selectedSupportTicket.publicNotes.trim()
+            : "")) &&
+      (formData.resolutionApplied.trim() === "" ||
+        formData.resolutionApplied.trim() ===
+          (selectedSupportTicket.resolutionApplied
+            ? selectedSupportTicket.resolutionApplied.trim()
+            : "")) &&
       selectedResolvedBy.id === selectedSupportTicket.resolvedBy
     ) {
       return;
@@ -420,12 +433,14 @@ const ViewSupportTicketManagement = () => {
       setIsLoadingForSupportTicketInfoSave(false);
       setkeyForAssignTo((prev) => prev + 1);
       setkeyForResolvedBy((prev) => prev + 1);
+      setkeyForTextAreaInput((prev) => prev + 1);
     }
   };
 
   //
   const [keyForAssignTo, setkeyForAssignTo] = useState<number>(0);
   const [keyForResolvedBy, setkeyForResolvedBy] = useState<number>(0);
+  const [keyForTextAreaInput, setkeyForTextAreaInput] = useState<number>(0);
 
   useEffect(() => {
     if (
@@ -446,7 +461,7 @@ const ViewSupportTicketManagement = () => {
       if (!userHasAccessToUpdateSupportTicket) {
         return;
       }
-      handSupportTicketInfoSave();
+      handleSupportTicketInfoSave();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -703,7 +718,10 @@ const ViewSupportTicketManagement = () => {
             </div>
 
             {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            // data-refresh={keyForTextAreaInput}
+            key={keyForTextAreaInput}
+            >
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
                 {/* 4 DROPDOWNS GRID */}
@@ -730,7 +748,6 @@ const ViewSupportTicketManagement = () => {
                       onUserSelected={(user) => {
                         if (user && user.id !== 0) {
                           setSelectedAssignTo(user);
-                          // handSupportTicketInfoSave();
                         }
                         if (user === null || user === undefined) {
                           setSelectedAssignTo({
@@ -767,8 +784,8 @@ const ViewSupportTicketManagement = () => {
                         logo={ListTree}
                         labelName="Ticket Category"
                         options={supportTicketCategory}
-                        preselectedOption={selectedSupportTicketCategory?.id}
-                        selectedValue={selectedSupportTicketCategory?.id}
+                        preselectedOption={selectedSupportTicket?.supportTicketCategoryId}
+                        // selectedValue={selectedSupportTicketCategory?.id}
                         readOnly={!userHasAccessToUpdateSupportTicket}
                         onSelect={(value) => {
                           if (userHasAccessToUpdateSupportTicket) {
@@ -942,15 +959,15 @@ const ViewSupportTicketManagement = () => {
                         readOnly={!userHasAccessToUpdateSupportTicket}
                         onSelect={(value) => {
                           setSelectedSupportTicketEscalationId(value);
-                          const result = supportTickeEscalationLevel?.find(
-                            (item) => item.id === value
-                          );
+                          // const result = supportTickeEscalationLevel?.find(
+                          //   (item) => item.id === value
+                          // );
                           if (value) {
-                            setSelectedSupportTicket({
-                              ...selectedSupportTicket,
-                              supportTicketEscalationLevelName: result?.name,
-                              supportTicketEscalationLevelId: value,
-                            });
+                            // setSelectedSupportTicket({
+                            //   ...selectedSupportTicket,
+                            //   supportTicketEscalationLevelName: result?.name,
+                            //   supportTicketEscalationLevelId: value,
+                            // });
                             setErrorData((prev) => {
                               return {
                                 ...prev,
@@ -997,7 +1014,6 @@ const ViewSupportTicketManagement = () => {
                         onUserSelected={(user) => {
                           if (user && user.id !== 0) {
                             setSelectedResolvedBy(user);
-                            // handSupportTicketInfoSave();
                           }
                           if (user === null || user === undefined) {
                             setSelectedResolvedBy({
@@ -1050,14 +1066,18 @@ const ViewSupportTicketManagement = () => {
           </div>
 
           {/* Second Column */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full"
+            // data-refresh={keyForTextAreaInput}
+            // key={keyForTextAreaInput}
+          >
             {/* Query Description */}
             <TextAreaInput
               logo={LucideText}
               label="Query Description"
               name="queryDescription"
               value={formData.queryDescription}
-              defaultValue={selectedSupportTicket?.queryDescription}
+              // defaultValue={selectedSupportTicket?.queryDescription}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
                   handleFormDataChange(e);
@@ -1065,9 +1085,9 @@ const ViewSupportTicketManagement = () => {
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
               rows={2}
@@ -1080,15 +1100,15 @@ const ViewSupportTicketManagement = () => {
               label="Resolution Applied"
               name="resolutionApplied"
               value={formData.resolutionApplied}
-              defaultValue={selectedSupportTicket?.resolutionApplied}
+              // defaultValue={selectedSupportTicket?.resolutionApplied}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
               rows={2}
@@ -1101,15 +1121,15 @@ const ViewSupportTicketManagement = () => {
               label="Public Notes"
               name="publicNotes"
               value={formData.publicNotes}
-              defaultValue={selectedSupportTicket?.publicNotes}
+              // defaultValue={selectedSupportTicket?.publicNotes}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
               rows={2}
