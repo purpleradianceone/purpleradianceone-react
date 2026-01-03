@@ -26,6 +26,7 @@ import axiosClient from "../../../../../axios-client/AxiosClient";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../../constants/Messages";
+import { supportTicketDataUrlSearchParamKey } from "../../../../lists/SupportTicketManagementList";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: SupportTicketTaskDashboardProps) => {
@@ -135,7 +136,7 @@ function SupportTasksDashboard({
         .then((response) => {
           const supportTicketData = response.data.map((item: any) => {
             const queryParams = qs.stringify({
-              supportTicketData: JSON.stringify({
+              [supportTicketDataUrlSearchParamKey]: JSON.stringify({
                 count: item.count,
                 id: item.id,
                 ticketNumber: item.ticket_number,

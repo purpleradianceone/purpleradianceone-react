@@ -18,8 +18,9 @@ import { useUserAccessModules } from "../../../../../config/hooks/useAccessModul
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../../constants/Messages";
 import { useState } from "react";
+import { supportTicketDataUrlSearchParamKey } from "../../../../lists/SupportTicketManagementList";
 
-  const getSupportTicketLifecycleColor = (lifecycleId: number) => {
+const getSupportTicketLifecycleColor = (lifecycleId: number) => {
   switch (lifecycleId) {
     case 1: // Open
       return "bg-blue-100 text-blue-800 border-blue-200";
@@ -41,8 +42,6 @@ import { useState } from "react";
   }
 };
 
-
-
 interface Props {
   isLoading: boolean;
   recentTickets: RecentTicketDashboardProps[];
@@ -53,14 +52,13 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
 
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
+  const [isLoadingForNavigate, setIsLoadingForNavigate] =
+    useState<boolean>(false);
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
-  
-
   const getSupportTicketDetails = async (supportTicketId: number) => {
-    if(isLoadingForNavigate)return;
+    if (isLoadingForNavigate) return;
     setIsLoadingForNavigate(true);
     if (userHasAccessToViewSupportTicket) {
       try {
@@ -76,7 +74,7 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
         if (response.status === STATUS_CODE.OK) {
           const supportTicketData = response.data.map((item: any) => {
             const queryParams = qs.stringify({
-              supportTicketData: JSON.stringify({
+              [supportTicketDataUrlSearchParamKey]: JSON.stringify({
                 count: item.count,
                 id: item.id,
                 ticketNumber: item.ticket_number,
@@ -121,7 +119,7 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
         }
       } catch (error: any) {
         handleApiError(error);
-      }finally{
+      } finally {
         setIsLoadingForNavigate(false);
       }
     } else {
@@ -129,10 +127,12 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
     }
   };
 
-
-
   return (
-    <div className={`bg-white p-8 min-h-28 max-h-[640px] w-full flex flex-col rounded-2xl ${isLoadingForNavigate ? "cursor-wait" : "cursor-default"}`}>
+    <div
+      className={`bg-white p-8 min-h-28 max-h-[640px] w-full flex flex-col rounded-2xl ${
+        isLoadingForNavigate ? "cursor-wait" : "cursor-default"
+      }`}
+    >
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
@@ -163,18 +163,30 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
               {recentTickets.map((ticket, index) => (
                 <div
                   key={ticket.id}
-                  className={`flex items-start space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"}  group`}
+                  className={`flex items-start space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 ${
+                    isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"
+                  }  group`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => getSupportTicketDetails(ticket.id)}
                 >
-                  <div className={`p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0 ${getSupportTicketLifecycleColor(ticket.support_ticket_lifecycle_id)} `}>
+                  <div
+                    className={`p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0 ${getSupportTicketLifecycleColor(
+                      ticket.support_ticket_lifecycle_id
+                    )} `}
+                  >
                     <Ticket className={`w-5 h-5 text-blue-600`} />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
                       <div>
-                        <h4 className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}>
+                        <h4
+                          className={`table-header-custom ${
+                            isLoadingForNavigate
+                              ? "cursor-wait"
+                              : "cursor-pointer"
+                          } group-hover:text-blue-600 transition-colors`}
+                        >
                           Ticket Number: {ticket.ticket_number}
                         </h4>
                         <p className="caption-custom mt-1 line-clamp-2">
@@ -182,7 +194,11 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
                         </p>
                       </div>
 
-                      <span className={`px-2 py-0.5 rounded-full input-label-custom border ${getSupportTicketLifecycleColor(ticket.support_ticket_lifecycle_id)}`}>
+                      <span
+                        className={`px-2 py-0.5 rounded-full input-label-custom border ${getSupportTicketLifecycleColor(
+                          ticket.support_ticket_lifecycle_id
+                        )}`}
+                      >
                         {ticket.support_ticket_lifecycle_name}
                       </span>
                     </div>

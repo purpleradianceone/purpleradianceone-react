@@ -460,9 +460,12 @@ function SupportTicketManagement({
               startDate,
               endDate,
               searchParameter,
-              selectedSupportTicketCategory: selectedSupportTicketCategory ?? undefined,
-              selectedSupportTicketSource: selectedSupportTicketSource ?? undefined,
-              selectedSupportTicketLifecycle: selectedSupportTicketLifecycle ?? undefined ,
+              selectedSupportTicketCategory:
+                selectedSupportTicketCategory ?? undefined,
+              selectedSupportTicketSource:
+                selectedSupportTicketSource ?? undefined,
+              selectedSupportTicketLifecycle:
+                selectedSupportTicketLifecycle ?? undefined,
             }}
             supportTicketData={supportTicketData}
             onEndDateChange={handleEndDateChange}
@@ -478,17 +481,16 @@ function SupportTicketManagement({
             handleSelectedAssignToCheckBoxChange={
               handleSelectedAssignToCheckBoxChange
             }
-            // persistedSelectedUserId={persistedSelectedUserId}
-            persistedSelectedUserId={
-              selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
-            }
+            // persistedSelectedUserId={
+            //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
+            // }
             selectedResolvedBy={selectedResolvedBy}
             handleSelectedResolvedByCheckBoxChange={
               handleSelectedResolvedByCheckBoxChange
             }
-            persistedSelectedResolvedById={
-              selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
-            }
+            // persistedSelectedResolvedById={
+            //   selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
+            // }
             handleSelectedCompanyProductCheckBoxChange={
               handleSelectedCompanyProductCheckBoxChange
             }

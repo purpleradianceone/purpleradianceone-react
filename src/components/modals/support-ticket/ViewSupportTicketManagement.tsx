@@ -53,6 +53,7 @@ import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import { PageLayout } from "../../ui/PageLayout";
 import { handleApiError } from "../../../config/error/handleApiError";
+import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 const ViewSupportTicketManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -62,7 +63,7 @@ const ViewSupportTicketManagement = () => {
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
-    JSON.parse(searchParams.get("supportTicketData") || "{}")
+    JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}")
   );
 
   const [formData, setFormData] = useState<{
@@ -203,6 +204,11 @@ const ViewSupportTicketManagement = () => {
     setIsLoadingForSupportTicketInfoSave,
   ] = useState<boolean>(false);
 
+  //for re-rendering components when some activity is done without reloading the page
+  const [keyForAssignTo, setkeyForAssignTo] = useState<number>(0);
+  const [keyForResolvedBy, setkeyForResolvedBy] = useState<number>(0);
+  const [keyForPageDataChange, setkeyForPageDataChange] = useState<number>(0);
+
   const handleSaveSupportTicketLifecycleUpdate = async (
     lifecycleFormData: supportTicketLifecycleType
   ) => {
@@ -272,7 +278,9 @@ const ViewSupportTicketManagement = () => {
           //updating the url params
           const searchParams = new URLSearchParams(location.search);
 
-          const existingData = searchParams.get("supportTicketData");
+          const existingData = searchParams.get(
+            supportTicketDataUrlSearchParamKey
+          );
 
           const updatedQueryData = {
             ...(existingData ? JSON.parse(existingData) : {}),
@@ -280,7 +288,7 @@ const ViewSupportTicketManagement = () => {
           };
 
           searchParams.set(
-            "supportTicketData",
+            supportTicketDataUrlSearchParamKey,
             JSON.stringify(updatedQueryData)
           );
           setSelectedSupportTicketLifecycleId(undefined);
@@ -410,14 +418,19 @@ const ViewSupportTicketManagement = () => {
         //updating the url params
         const searchParams = new URLSearchParams(location.search);
 
-        const existingData = searchParams.get("supportTicketData");
+        const existingData = searchParams.get(
+          supportTicketDataUrlSearchParamKey
+        );
 
         const updatedQueryData = {
           ...(existingData ? JSON.parse(existingData) : {}),
           ...updatedSupportTicket,
         };
 
-        searchParams.set("supportTicketData", JSON.stringify(updatedQueryData));
+        searchParams.set(
+          supportTicketDataUrlSearchParamKey,
+          JSON.stringify(updatedQueryData)
+        );
 
         navigate(`${location.pathname}?${searchParams.toString()}`, {
           replace: true,
@@ -433,14 +446,9 @@ const ViewSupportTicketManagement = () => {
       setIsLoadingForSupportTicketInfoSave(false);
       setkeyForAssignTo((prev) => prev + 1);
       setkeyForResolvedBy((prev) => prev + 1);
-      setkeyForTextAreaInput((prev) => prev + 1);
+      setkeyForPageDataChange((prev) => prev + 1);
     }
   };
-
-  //
-  const [keyForAssignTo, setkeyForAssignTo] = useState<number>(0);
-  const [keyForResolvedBy, setkeyForResolvedBy] = useState<number>(0);
-  const [keyForTextAreaInput, setkeyForTextAreaInput] = useState<number>(0);
 
   useEffect(() => {
     if (
@@ -567,7 +575,6 @@ const ViewSupportTicketManagement = () => {
                           MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
                             .UPDATE_ACCESS_DENIED_MESSAGE
                         );
-                        //✔️
                       }
                     }}
                   >
@@ -718,9 +725,10 @@ const ViewSupportTicketManagement = () => {
             </div>
 
             {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            // data-refresh={keyForTextAreaInput}
-            key={keyForTextAreaInput}
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              // data-refresh={keyForTextAreaInput}
+              key={keyForPageDataChange}
             >
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
@@ -784,7 +792,9 @@ const ViewSupportTicketManagement = () => {
                         logo={ListTree}
                         labelName="Ticket Category"
                         options={supportTicketCategory}
-                        preselectedOption={selectedSupportTicket?.supportTicketCategoryId}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketCategoryId
+                        }
                         // selectedValue={selectedSupportTicketCategory?.id}
                         readOnly={!userHasAccessToUpdateSupportTicket}
                         onSelect={(value) => {
@@ -1139,9 +1149,7 @@ const ViewSupportTicketManagement = () => {
 
           {/* third Column */}
           <div className="mt-3">
-            <SupportTicketTasksModal
-            // ownerId ={selectedSupportTicket?.assignedToId}
-            />
+            <SupportTicketTasksModal />
           </div>
         </div>
 

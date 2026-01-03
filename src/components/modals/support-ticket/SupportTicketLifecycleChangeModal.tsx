@@ -19,12 +19,12 @@ import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import MESSAGE from "../../../constants/Messages";
 
-export  type supportTicketLifecycleType = {
-    queryDescription: string;
-    publicNotes: string;
-    resolutionApplied: string;
-    resolvedBy: CompanyUser;
-  }
+export type supportTicketLifecycleType = {
+  queryDescription: string;
+  publicNotes: string;
+  resolutionApplied: string;
+  resolvedBy: CompanyUser;
+};
 
 export function SupportTicketLIfecycleChangeModal({
   isLoading,
@@ -38,7 +38,7 @@ export function SupportTicketLIfecycleChangeModal({
   previousSupportTicketStatus: any;
   selectedSupportTicketLifecyclId: number | undefined;
   selectedSupportTicketLifecycleName: string | undefined;
-  handleSubmit: (supportTicketData: any) => void;
+  handleSubmit: (supportTicketLifecycleFormData: any) => void;
   onClose: () => void;
 }) {
   const [formData, setFormData] = useState<supportTicketLifecycleType>({
@@ -80,7 +80,9 @@ export function SupportTicketLIfecycleChangeModal({
           userName={selectedSupportTicketLifecycleName}
           description={`support ticket lifecycle is updating from ${previousSupportTicketStatus.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
-        <form className={`mt-2 ${isLoading? "cursor-wait": "cursor-default"}`}>
+        <form
+          className={`mt-2 ${isLoading ? "cursor-wait" : "cursor-default"}`}
+        >
           <div className="gap-2">
             <TextAreaInput
               logo={LucideText}
@@ -109,58 +111,66 @@ export function SupportTicketLIfecycleChangeModal({
               rows={2}
               cols={0}
             />
-            {selectedSupportTicketLifecyclId!>=4 &&<div className="mt-2">
-              <div className="grid grid-cols-1">
-              <CompanyUserSearchFieldInput
-                label="Resolved By:"
-                required
-                // placeholder={loginStatus.fullName}
-                defaultValue={
-                  formData.resolvedBy.fullname === ""
-                    ? previousSupportTicketStatus.assignedToName
-                    : formData.resolvedBy.fullname
-                }
-                logo={User}
-                onUserSelected={(user) => {
-                  if (user) {
-                    setFormData((prev) => {
-                      return {
-                        ...prev,
-                        resolvedBy: user,
-                      };
-                    });
-                  } else {
-                    setFormData((prev) => {
-                      return {
-                        ...prev,
-                        resolvedBy: {
-                          company_id: 0,
-                          id: previousSupportTicketStatus.assignedTo,
-                          fullname: previousSupportTicketStatus.assignedToName,
-                          email: "",
-                          mobilenumber: "",
-                          createdby: "",
-                          isactive: true,
-                          requestedby: "",
-                          generate_password: "",
-                          all_leads_visible: true,
-                        },
-                      };
-                    });
-                  }
-                }}
-                isDisabled={!userHasAccessToViewUser}
-                disabledMessage={
-                  MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
-                }
-                // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
-              /></div>
-              <span className="caption-custom">
-                <span className="">Note :</span> If “Resolved By” is not selected  or is removed, it will be set to the
-                <span className="table-header-custom active"> ticket creator</span> by
-                default.
-              </span>
-            </div>}
+            {selectedSupportTicketLifecyclId! >= 4 && (
+              <div className="mt-2">
+                <div className="grid grid-cols-1">
+                  <CompanyUserSearchFieldInput
+                    label="Resolved By:"
+                    required
+                    // placeholder={loginStatus.fullName}
+                    defaultValue={
+                      formData.resolvedBy.fullname === ""
+                        ? previousSupportTicketStatus.assignedToName
+                        : formData.resolvedBy.fullname
+                    }
+                    logo={User}
+                    onUserSelected={(user) => {
+                      if (user) {
+                        setFormData((prev) => {
+                          return {
+                            ...prev,
+                            resolvedBy: user,
+                          };
+                        });
+                      } else {
+                        setFormData((prev) => {
+                          return {
+                            ...prev,
+                            resolvedBy: {
+                              company_id: 0,
+                              id: previousSupportTicketStatus.assignedTo,
+                              fullname:
+                                previousSupportTicketStatus.assignedToName,
+                              email: "",
+                              mobilenumber: "",
+                              createdby: "",
+                              isactive: true,
+                              requestedby: "",
+                              generate_password: "",
+                              all_leads_visible: true,
+                            },
+                          };
+                        });
+                      }
+                    }}
+                    isDisabled={!userHasAccessToViewUser}
+                    disabledMessage={
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                    }
+                    // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
+                  />
+                </div>
+                <span className="caption-custom">
+                  <span className="">Note :</span> If “Resolved By” is not
+                  selected or is removed, it will be set to the
+                  <span className="table-header-custom active">
+                    {" "}
+                    ticket creator
+                  </span>{" "}
+                  by default.
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex items-center  justify-end gap-3 mt-3">
             <div className="flex gap-2">

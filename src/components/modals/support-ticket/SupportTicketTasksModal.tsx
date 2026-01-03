@@ -17,9 +17,9 @@ import SupportTicketTaskProps from "../../../@types/support-ticket-management/Su
 import SupportTicketProps from "../../../@types/support-ticket-management/SupportTicketProps";
 import CreateSupportTicketTaskModal from "./CreateSupportTicketTaskModal";
 import { handleApiError } from "../../../config/error/handleApiError";
+import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 function SupportTicketTasksModal() {
-// { ownerId }: { ownerId: number }
   const { userHasAccessToAddSupportTicket } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
@@ -31,7 +31,8 @@ function SupportTicketTasksModal() {
   const [visibleAssignUsersBtn, setVisibleAssignUsersBtn] =
     useState<boolean>(false);
 
-  const [supportTicketTaskStageId, setSupportTicketTaskStageId] = useState<number>(0);
+  const [supportTicketTaskStageId, setSupportTicketTaskStageId] =
+    useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [supportTicketTasks, setSupportTicketTasks] = useState<
@@ -40,7 +41,8 @@ function SupportTicketTasksModal() {
   const [supportTicketData, setSupportTicketData] =
     useState<SupportTicketProps>();
 
-  const [supportTicketTaskChangeCount, setSupportTicketTaskChangeCount] = useState<number>(0);
+  const [supportTicketTaskChangeCount, setSupportTicketTaskChangeCount] =
+    useState<number>(0);
 
   const handleSupportTicketTaskUpdate = () => {
     setSupportTicketTaskChangeCount(supportTicketTaskChangeCount + 1);
@@ -53,12 +55,13 @@ function SupportTicketTasksModal() {
   const getSupportTicketTasks = async () => {
     setIsLoading(true);
     setSupportTicketTasks([]);
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     const getSupportTicketTaskPostData = {
       company_id: loginStatus.companyId,
       support_ticket_id: supportTicketData!.id,
-      isactive:null,
-      support_ticket_task_stage_id: supportTicketTaskStageId === 0 ? null : supportTicketTaskStageId,
+      isactive: null,
+      support_ticket_task_stage_id:
+        supportTicketTaskStageId === 0 ? null : supportTicketTaskStageId,
       requestedby: loginStatus.id,
     };
     await axiosClient
@@ -103,16 +106,15 @@ function SupportTicketTasksModal() {
     setSupportTicketTaskStageId(stageId);
   };
 
-
   useEffect(() => {
     const supportTicketSearchParam = JSON.parse(
-      searchParams.get("supportTicketData") || "{}"
+      searchParams.get(supportTicketDataUrlSearchParamKey) || "{}"
     );
     setSupportTicketData(supportTicketSearchParam);
     setVisibleAssignUsersBtn(true);
   }, []);
   useEffect(() => {
-    if (supportTicketData || supportTicketTaskStageId !== 0) {
+    if (supportTicketData) {
       getSupportTicketTasks();
     }
   }, [
@@ -121,8 +123,10 @@ function SupportTicketTasksModal() {
     supportTicketTaskChangeCount,
   ]);
 
-  const [isCreateSupportTicketTaskModalOpen, setIsCreateSupportTicketTaskModalOpen] =
-    useState<boolean>(false);
+  const [
+    isCreateSupportTicketTaskModalOpen,
+    setIsCreateSupportTicketTaskModalOpen,
+  ] = useState<boolean>(false);
   return (
     <div className="w-full  shadow-lg ">
       <div className="w-full gap-1">
@@ -142,8 +146,7 @@ function SupportTicketTasksModal() {
                       setIsCreateSupportTicketTaskModalOpen(true);
                     } else {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                          .DENIED_ADD_ACCESS
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_ACCESS
                       );
                     }
                   }}

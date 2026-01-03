@@ -35,6 +35,9 @@ import SupportTicketManagementListProps from "../../@types/List/SupportTicketMan
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
 import ProductManagement from "../views/product-Management/ProductsManagement";
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
+
+export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
+
 function SupportTicketManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -45,11 +48,9 @@ function SupportTicketManagementList({
   handleSelectedCompanyProductCheckBoxChange,
 
   selectedAssignTo,
-  persistedSelectedUserId,
   handleSelectedAssignToCheckBoxChange,
 
   selectedResolvedBy,
-  persistedSelectedResolvedById,
   handleSelectedResolvedByCheckBoxChange,
   selectedCompanyProduct,
   supportTicketCategory,
@@ -61,10 +62,7 @@ function SupportTicketManagementList({
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
 }: SupportTicketManagementListProps) {
- 
-
   const [searchParams] = useSearchParams();
-
 
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -117,7 +115,7 @@ function SupportTicketManagementList({
     console.log(selectedSupportTicketForEdit);
   };
 
-  const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
+  const [openPopUpOfAssignToModal, setOpenPopUpOfAssignToModal] =
     useState(false);
   const [openPopUpOfResolvedByModal, setOpenPopUpOfResolvedByModal] =
     useState(false);
@@ -125,7 +123,7 @@ function SupportTicketManagementList({
     useState(false);
 
   const handleCompanyUserPopUp = () => {
-    setOpenPopUpOfCompanyUserModal(true);
+    setOpenPopUpOfAssignToModal(true);
   };
 
   const handleResolvedByPopUp = () => {
@@ -138,15 +136,18 @@ function SupportTicketManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected, setIsCustomDateOptionSelected} =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
   const handleRowClicked = (event: any) => {
     if (isUsedInSupportTicketModule) {
       const rowData: SupportTicketProps = event.data;
       const queryParams = qs.stringify({
-        supportTicketData: JSON.stringify(rowData),
+        [supportTicketDataUrlSearchParamKey]: JSON.stringify(rowData),
       });
       navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
     }
@@ -155,7 +156,7 @@ function SupportTicketManagementList({
   const handleRowSelected = (rowData: SupportTicketProps | any) => {
     if (isUsedInSupportTicketModule) {
       // const queryParams = qs.stringify({
-      //   supportTicketData: JSON.stringify(rowData),
+      //   [supportTicketDataUrlSearchParamKey]: JSON.stringify(rowData),
       // });
       // navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
     } else {
@@ -175,12 +176,15 @@ function SupportTicketManagementList({
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      if(handleSearchOption.dateRangeId === 8){
+      if (handleSearchOption.dateRangeId === 8) {
         setIsCustomDateOptionSelected(true);
       }
-    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
+    }, [
+      handleSearchOption.searchParameter,
+      handleSearchOption.dateRangeId,
+      setIsCustomDateOptionSelected,
+    ]);
 
-    
     return (
       <div
         className={`w-full ${
@@ -207,18 +211,17 @@ function SupportTicketManagementList({
                   />
                 )}
 
-                {(isMediumScreen || isLargeScreen) &&
-                  (
-                    <span
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "text-xs"
-                          : "section-header-custom"
-                      } `}
-                    >
-                      Support
-                    </span>
-                  )}
+                {(isMediumScreen || isLargeScreen) && (
+                  <span
+                    className={`${
+                      isCustomDateOptionSelected
+                        ? "text-xs"
+                        : "section-header-custom"
+                    } `}
+                  >
+                    Support
+                  </span>
+                )}
               </div>
             )}
 
@@ -502,15 +505,15 @@ function SupportTicketManagementList({
             onPageSizeChange={paginationData.selectedPageSize}
           />
         </div>
-        {(openPopUpOfCompanyUserModal || openPopUpOfResolvedByModal) &&
+        {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) &&
           createPortal(
             <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
                 <FormHeader
                   icon={User}
                   onClose={() => {
-                    if (openPopUpOfCompanyUserModal) {
-                      setOpenPopUpOfCompanyUserModal(false);
+                    if (openPopUpOfAssignToModal) {
+                      setOpenPopUpOfAssignToModal(false);
                     }
                     if (openPopUpOfResolvedByModal) {
                       setOpenPopUpOfResolvedByModal(false);
@@ -523,14 +526,14 @@ function SupportTicketManagementList({
                 <div className="p-1">
                   <GetCompanyUsersForLead
                     selectedUserId={
-                      openPopUpOfCompanyUserModal
-                        ? persistedSelectedUserId
-                        : persistedSelectedResolvedById
+                      openPopUpOfAssignToModal
+                        ? selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
+                        : selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
                     } // Pass the persisted ID
                     handleSelectedCompanyUserChange={(params) => {
-                      if (openPopUpOfCompanyUserModal) {
+                      if (openPopUpOfAssignToModal) {
                         handleSelectedAssignToCheckBoxChange(params);
-                        setOpenPopUpOfCompanyUserModal(false);
+                        setOpenPopUpOfAssignToModal(false);
                       }
                       if (openPopUpOfResolvedByModal) {
                         handleSelectedResolvedByCheckBoxChange(params);

@@ -32,6 +32,7 @@ import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { handleApiError } from "../../../config/error/handleApiError";
+import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 function CreateSupportTicketTaskModal({
   isOpen,
@@ -64,13 +65,12 @@ function CreateSupportTicketTaskModal({
     return options;
   };
 
-
-
   const timeOptions = useMemo(() => generateTimeOptions(), []);
 
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>(timeOptions[0]);
-  const [supportTicketTaskStageId, setSupportTicketTaskStageId] = useState<number>(0);
+  const [supportTicketTaskStageId, setSupportTicketTaskStageId] =
+    useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [supportTicketData, setSupportTicketData] =
     useState<SupportTicketProps>();
@@ -177,7 +177,7 @@ function CreateSupportTicketTaskModal({
       result_outcome: resultOutcome,
       assignedto:
         assignedTo.id === 0 ? supportTicketData?.assignedTo : assignedTo.id,
-      due_date_time: `${dueDate} ${dueTime || '00:00'}:00`,
+      due_date_time: `${dueDate} ${dueTime || "00:00"}:00`,
       createdby_id: loginStatus.id,
     };
     setIsSaving(true);
@@ -213,7 +213,7 @@ function CreateSupportTicketTaskModal({
   useEffect(() => {
     if (isOpen) {
       const supportTicketData = JSON.parse(
-        searchParams.get("supportTicketData") || "{}"
+        searchParams.get(supportTicketDataUrlSearchParamKey) || "{}"
       );
       setSupportTicketData(supportTicketData);
 
@@ -247,7 +247,11 @@ function CreateSupportTicketTaskModal({
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
       {/* Form Grid */}
-      <form className={`space-y-2 mt-2 ${isSaving?"cursor-wait": "cursor-default"}`}>
+      <form
+        className={`space-y-2 mt-2 ${
+          isSaving ? "cursor-wait" : "cursor-default"
+        }`}
+      >
         <div className="grid grid-cols-2 gap-3">
           {/* Stage */}
           <div>
@@ -370,8 +374,8 @@ function CreateSupportTicketTaskModal({
                       generate_password: "",
                     });
                   }
-                  console.log("selected user:")
-                  console.log(user)
+                  console.log("selected user:");
+                  console.log(user);
                 }}
                 isDisabled={!userHasAccessToViewUser}
                 disabledMessage={

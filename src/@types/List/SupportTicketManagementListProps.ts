@@ -16,12 +16,10 @@ type SupportTicketManagementListProps = {
 
 
     selectedAssignTo : CompanyUser;
-    persistedSelectedUserId : number | null;
     handleSelectedAssignToCheckBoxChange: ( params: CompanyUser | null) => void;
 
 
     selectedResolvedBy: CompanyUser;
-    persistedSelectedResolvedById: number | null;
     handleSelectedResolvedByCheckBoxChange:  ( params: CompanyUser | null) => void;
 
 
