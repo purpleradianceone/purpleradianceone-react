@@ -5,12 +5,9 @@ import POST_API from "../../../constants/PostApi";
 import ApiError from "../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import InventoryDashboard from "./dashboards/InventoryDashboard";
-import FinanceDashboard from "./dashboards/FinanceDashboard";
-import HRMSDashboard from "./dashboards/HRMSDashboard";
-import CompanyUserDropdown, {
-  UserResponse,
-} from "./custom_company_user_dropdown/CustomCompanyUserDropdown";
+import InventoryDashboard from "./dashboards/dashboard-inventory/InventoryDashboard";
+import FinanceDashboard from "./dashboards/dashboard-finance/FinanceDashboard";
+import HRMSDashboard from "./dashboards/dashboard-hrms/HRMSDashboard";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import DashboardCRM from "./dashboards/dashboard-crm/DashboardCRM";
 import AppTutorailManager from "../tutorails/AppTutorailManager";
@@ -18,14 +15,13 @@ import { DashboardTabsSteps } from "../../../constants/AppTutorailsSteps";
 import { useTutorailDataContext } from "../../../context/tutorail/useTutorailDataContext";
 import { TutorailColumnName } from "../../../constants/Tutorail";
 import DashboardSupport from "./dashboards/dashboard-support/DashboardSupport";
+import CustomCompanyUserDropdownForDashboard, {
+  UserResponse,
+} from "./dashboards/dashboards_components/CustomCompanyUserDropdownForDashboard";
 
 // ======= Dashboard Components =======
-const CRM: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => (
-  <DashboardCRM companyUserId={companyUserId} />
-);
-const Support: React.FC<{ companyUserId: number | null }> = ({
-  companyUserId,
-}) => <DashboardSupport companyUserId={companyUserId} />;
+const CRM: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => <DashboardCRM companyUserId={companyUserId} />;
+const Support: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => <DashboardSupport companyUserId={companyUserId} />;
 const Inventory: React.FC = () => <InventoryDashboard />;
 const Finance: React.FC = () => <FinanceDashboard />;
 const HRMS: React.FC = () => <HRMSDashboard />;
@@ -227,7 +223,7 @@ const Home: React.FC = () => {
       )}
       {loginStatus.isSuperUser && (
         <div className="">
-          <CompanyUserDropdown
+          <CustomCompanyUserDropdownForDashboard
             limit={userPreference.rowsInGrid}
             companyId={loginStatus.companyId}
             requestedBy={loginStatus.id}
