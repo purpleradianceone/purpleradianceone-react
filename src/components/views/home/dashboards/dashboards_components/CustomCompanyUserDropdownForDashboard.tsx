@@ -2,13 +2,13 @@ import React from "react";
 import { AsyncPaginate, LoadOptions } from "react-select-async-paginate";
 import { GroupBase } from "react-select";
 import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
+import POST_API from "../../../../../constants/PostApi";
 import { createPortal } from "react-dom";
-import { useUserPreference } from "../../../../context/user/UserPreference";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
-import RefreshToken from "../../../../config/validations/RefreshToken";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
+import { STATUS_CODE } from "../../../../../constants/AppConstants";
+import RefreshToken from "../../../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import ApiError from "../../../../@types/error/ApiError";
+import ApiError from "../../../../../@types/error/ApiError";
 
 export interface UserResponse {
   id: number;
@@ -40,7 +40,7 @@ interface Props {
   onChange: (user: OptionType | null) => void;
 }
 
-const CompanyUserDropdown: React.FC<Props> = ({
+const CustomCompanyUserDropdownForDashboard: React.FC<Props> = ({
   limit,
   companyId,
   requestedBy,
@@ -146,4 +146,4 @@ const CompanyUserDropdown: React.FC<Props> = ({
   );
 };
 
-export default CompanyUserDropdown;
+export default CustomCompanyUserDropdownForDashboard;
