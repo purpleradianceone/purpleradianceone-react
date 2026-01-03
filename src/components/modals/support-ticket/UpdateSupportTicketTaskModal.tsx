@@ -48,7 +48,6 @@ function UpdateSupportTicketTaskModal({
 }) {
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
-  //   const [searchParams] = useSearchParams();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const generateTimeOptions = () => {
@@ -126,7 +125,6 @@ function UpdateSupportTicketTaskModal({
   const updateSupportTicketTask = async (
     event: React.FormEvent<HTMLButtonElement>
   ) => {
-    // console.log(assignedTo);
     if (!userHasAccessToUpdateSupportTicket) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE

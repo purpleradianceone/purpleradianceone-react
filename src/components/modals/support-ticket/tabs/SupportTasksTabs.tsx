@@ -24,7 +24,6 @@ function SupportTasksTabs({
   isLoading: boolean;
 }) {
   const [activeTab, setActiveTab] = useState("allTasks");
-  //    const {meetingPlatform} = useMeetingPlatform();
 
   const data = [
     {
@@ -32,7 +31,7 @@ function SupportTasksTabs({
       value: "allTasks",
       desc: (
         <SupportTicketTaskList
-          taskId={0}  
+          taskId={0}
           isLoading={isLoading}
           supportTicketTasks={supportTicketTasks}
           supportTicketTaskStage={supportTicketTaskStage}
@@ -46,7 +45,7 @@ function SupportTasksTabs({
       value: supportTicketTaskStage[0]?.name,
       desc: (
         <SupportTicketTaskList
-          taskId={supportTicketTaskStage[0]?.id}  
+          taskId={supportTicketTaskStage[0]?.id}
           isLoading={isLoading}
           supportTicketTasks={supportTicketTasks}
           supportTicketTaskStage={supportTicketTaskStage}
@@ -60,7 +59,7 @@ function SupportTasksTabs({
       value: supportTicketTaskStage[1]?.name,
       desc: (
         <SupportTicketTaskList
-          taskId={supportTicketTaskStage[1]?.id}  
+          taskId={supportTicketTaskStage[1]?.id}
           isLoading={isLoading}
           supportTicketTasks={supportTicketTasks}
           supportTicketTaskStage={supportTicketTaskStage}
@@ -74,7 +73,7 @@ function SupportTasksTabs({
       value: supportTicketTaskStage[2]?.name,
       desc: (
         <SupportTicketTaskList
-          taskId={supportTicketTaskStage[2]?.id}  
+          taskId={supportTicketTaskStage[2]?.id}
           isLoading={isLoading}
           supportTicketTasks={supportTicketTasks}
           supportTicketTaskStage={supportTicketTaskStage}
