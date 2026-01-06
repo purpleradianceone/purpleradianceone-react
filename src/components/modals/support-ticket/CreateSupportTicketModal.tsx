@@ -19,6 +19,7 @@ import {
   LucidePhoneCall,
   Notebook,
   Package,
+  QrCodeIcon,
   Save,
   ShieldCheck,
   ShieldX,
@@ -99,7 +100,7 @@ function CreateSupportTicketModal({
       isWarranty: false,
       quantity: 0,
       barcode: "",
-      serialNumber: 0,
+      serialNumber: "",
       unitName: "",
       purchaseDate: "",
       isActive: false,
@@ -216,6 +217,12 @@ function CreateSupportTicketModal({
     }
   }, [selectedAccount]);
 
+  useEffect(()=>{
+    if(companyProductSla && companyProductSla.length!==0){
+      setSelectedCompanyProductSla(companyProductSla[0].id);
+    }
+  },[companyProductSla]);
+
   const clearSelectedAccount = () => {
     setSelectedAccont({
       count: 0,
@@ -230,7 +237,7 @@ function CreateSupportTicketModal({
       isWarranty: false,
       quantity: 0,
       barcode: "",
-      serialNumber: 0,
+      serialNumber: "",
       unitName: "",
       purchaseDate: "",
       isActive: false,
@@ -409,13 +416,16 @@ function CreateSupportTicketModal({
 
   if (!isOpen) return null;
   return (
-    <FormLayout>
+    <FormLayout
+    widthPercent={95}
+    padding={3}
+    >
       {(isSupportTicketCreating || isLoadingForAccountCompanyProducts) && (
         <LoadingPopUpAnimation
           show={isSupportTicketCreating || isLoadingForAccountCompanyProducts}
         />
       )}
-      <div className={`py-4 px-3 ${isSupportTicketCreating? "cursor-wait" : "cursor-default"}`}>
+      <div className={`${isSupportTicketCreating? "cursor-wait" : "cursor-default"}`}>
         <FormHeader
           icon={TicketPlus}
           onClose={() => {
@@ -425,7 +435,7 @@ function CreateSupportTicketModal({
           preText="Create support ticket "
           description="Create support ticket for account product."
         />
-        <div className="mb-4">
+        <div className="">
           <StageIndicator
             stage={stage}
             onStageChange={(value) => {
@@ -448,15 +458,15 @@ function CreateSupportTicketModal({
             {/* Selected Account */}
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
                 </div>
                 <div>
                   <p className="caption-custom">Account</p>
                   <p 
-                  title={selectedAccount.accountName.length > 25 ? selectedAccount.accountName : undefined}
+                  title={selectedAccount.accountName.length > 20 ? selectedAccount.accountName : undefined}
 
-                  className="table-header-custom max-w-[150px] select-text truncate">
+                  className="table-data-custom max-w-[120px] select-text truncate">
                     {selectedAccount.accountName
                       ? selectedAccount.accountName
                       : "No account selected"}
@@ -467,15 +477,15 @@ function CreateSupportTicketModal({
 
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-blue-100">
                   <LucideMail size={18} className="text-blue-600" />
                 </div>
                 <div>
                   <p className="caption-custom">Email</p>
                   <p
-                  title={selectedAccount.accountEmail.length > 25 ? selectedAccount.accountEmail : undefined}
+                  title={selectedAccount.accountEmail.length > 20 ? selectedAccount.accountEmail : undefined}
 
-                  className="table-header-custom max-w-[150px] select-text truncate">
+                  className="table-data-custom max-w-[120px] select-text truncate">
                     {selectedAccount.accountEmail
                       ? selectedAccount.accountEmail
                       : "NA"}
@@ -486,15 +496,15 @@ function CreateSupportTicketModal({
 
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-blue-100">
                   <LucidePhoneCall size={18} className="text-blue-600" />
                 </div>
                 <div>
                   <p className="caption-custom">Mobile Number</p>
                   <p 
-                  title={selectedAccount.accountMobileNumber.length > 25 ? selectedAccount.accountMobileNumber : undefined}
+                  title={selectedAccount.accountMobileNumber.length > 20 ? selectedAccount.accountMobileNumber : undefined}
 
-                  className="table-header-custom max-w-[150px] select-text truncate">
+                  className="table-data-custom max-w-[120px] select-text truncate">
                     {selectedAccount.accountMobileNumber
                       ? selectedAccount.accountMobileNumber
                       : "NA"}
@@ -506,14 +516,14 @@ function CreateSupportTicketModal({
             {/* Selected Product */}
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-green-100">
                   <Package size={18} className="text-blue-600" />
                 </div>
                 <div>
                   <p className="caption-custom">Selected Product</p>
                   <p
-                  title={selectedAccount.companyProductName.length > 30 ? selectedAccount.companyProductName : undefined}
-                   className="table-header-custom max-w-[200px] select-text truncate">
+                  title={selectedAccount.companyProductName.length > 20 ? selectedAccount.companyProductName : undefined}
+                   className="table-data-custom max-w-[150px] select-text truncate">
                     {selectedAccount.companyProductName
                       ? selectedAccount.companyProductName
                       : "No product selected"}
@@ -522,10 +532,29 @@ function CreateSupportTicketModal({
               </div>
             )}
 
+            {/* Product Serial Number */}
+            {selectedAccount.id !== 0 && stage >= 2 && selectedAccount.serialNumber && (
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-green-100">
+                  <QrCodeIcon size={18} className="text-blue-600" />
+                </div>
+                <div>
+                  <p className="caption-custom">Serial Number</p>
+                  <p
+                  title={selectedAccount.serialNumber.length > 20 ? selectedAccount.serialNumber : undefined}
+                   className="table-data-custom max-w-[150px] select-text truncate">
+                    {selectedAccount.companyProductName
+                      ? selectedAccount.serialNumber
+                      : "No Serial Number"}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-10 w-10 flex items-center justify-center rounded-full ${
+                  className={`h-9 w-9 flex items-center justify-center rounded-full ${
                     selectedAccount.isAmc ? "bg-green-100" : "bg-red-100"
                   }`}
                 >
@@ -537,7 +566,7 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">AMC</p>
-                  <p className="table-header-custom">
+                  <p className="table-data-custom">
                     {selectedAccount.companyProductName
                       ? selectedAccount.isAmc
                         ? `Active`
@@ -551,7 +580,7 @@ function CreateSupportTicketModal({
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-10 w-10 flex items-center justify-center rounded-full ${
+                  className={`h-9 w-9 flex items-center justify-center rounded-full ${
                     selectedAccount.isWarranty ? "bg-green-100" : "bg-red-100"
                   }`}
                 >
@@ -563,11 +592,11 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Warranty</p>
-                  <p className="table-header-custom">
+                  <p className="table-data-custom">
                     {selectedAccount.companyProductName
                       ? selectedAccount.isWarranty
                         ? `Active`
-                        : `Out of warranty`
+                        : `Expired`
                       : "No product selected"}
                   </p>
                 </div>
@@ -578,7 +607,7 @@ function CreateSupportTicketModal({
 
         <form className="space-y-0">
           {isOpenForAccountSelection && (
-            <div className="md:col-span-2  w-full h-96">
+            <div className="md:col-span-2  w-full h-fit">
               <GetAccountCompanyProductFroSupportTicket
                 handleRowSelect={(data) => {
                   setSelectedAccont(data);
@@ -655,7 +684,7 @@ function CreateSupportTicketModal({
                     </div>
 
                     {!isLoadingForTicketCategory ? (
-                      <div className="space-y-1">
+                      <div className="">
                         <CustomDropdown
                           logo={Clock}
                           preselectedOption={selectedSupportTicketCategory}
@@ -682,7 +711,7 @@ function CreateSupportTicketModal({
                     )}
 
                     {!isLoadingForTicketSource ? (
-                      <div className="space-y-1">
+                      <div className="">
                         <CustomDropdown
                           logo={Link}
                           preselectedOption={selectedSource}
@@ -708,7 +737,7 @@ function CreateSupportTicketModal({
                     )}
 
                     {!isLoadingForCompanyProductSla ? (
-                      <div className="space-y-1">
+                      <div className="">
                         <CustomDropdown
                           logo={Clock}
                           preselectedOption={selectedCompanyProductSla}
@@ -733,11 +762,8 @@ function CreateSupportTicketModal({
                         <div className="w-full h-8 bg-slate-200 rounded-md"></div>
                       </div>
                     )}
-
-
-
-                    
                   </div>
+
                   <div className="grid grid-cols-1">
                     <div className="grid grid-cols-3">
                       <CompanyUserSearchFieldInput
@@ -772,7 +798,6 @@ function CreateSupportTicketModal({
                         disabledMessage={
                           MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                         }
-                        // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
                       />
                       </div>
                       <span className="caption-custom">

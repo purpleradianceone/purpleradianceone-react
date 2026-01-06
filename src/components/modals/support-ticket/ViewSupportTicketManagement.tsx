@@ -10,6 +10,7 @@ import {
   LucideMail,
   LucidePhoneCall,
   LucideText,
+  QrCodeIcon,
   ShoppingBag,
   StickyNote,
   TicketIcon,
@@ -646,11 +647,11 @@ const ViewSupportTicketManagement = () => {
             {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
             <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
               <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
-                <div className="flex gap-6">
+                <div className="flex gap-3">
                   {/* Ticket Number */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
                     <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <TicketIcon size={30} strokeWidth={2} />
+                      <TicketIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Ticket Number"
@@ -660,9 +661,9 @@ const ViewSupportTicketManagement = () => {
                     />
                   </div>
                   {/* Account */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
                     <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <HeadsetIcon size={30} strokeWidth={2} />
+                      <HeadsetIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Account"
@@ -671,35 +672,11 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.accountName}
                     />
                   </div>
-                  {/* Account Email */}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <LucideMail size={30} strokeWidth={2} />
-                    </div>
-                    <Detail
-                      label="Email"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountEmail}
-                    />
-                  </div>
-                  {/* Account Mobile Number*/}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <LucidePhoneCall size={30} strokeWidth={2} />
-                    </div>
-                    <Detail
-                      label="Mobile Number"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountMobileNumber}
-                    />
-                  </div>
 
                   {/* Support Product Name*/}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <ShoppingBag size={30} strokeWidth={2} />
+                  <div className="flex items-center gap-1.5">
+                    <div className="bg-blue-600 p-1.5 rounded text-white ">
+                      <ShoppingBag size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Support Product"
@@ -708,6 +685,18 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.companyProductName}
                     />
                   </div>
+                  {/* Product SerialNumber */}
+                  {selectedSupportTicket?.serialNumber&&<div className="flex items-center gap-1.5">
+                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <QrCodeIcon size={27} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Serial Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.serialNumber}
+                    />
+                  </div>}
                 </div>
                 <Detail
                   type="none"
@@ -715,7 +704,7 @@ const ViewSupportTicketManagement = () => {
                     selectedSupportTicket?.resolvedByName !== "NA" &&
                     selectedSupportTicket?.resolvedByName
                       ? "Resolved By"
-                      : "Resolved Status"
+                      : "Status"
                   }
                   value={
                     selectedSupportTicket?.resolvedByName || "Not Resolved"
@@ -734,45 +723,7 @@ const ViewSupportTicketManagement = () => {
               <div className="flex flex-col gap-4">
                 {/* 4 DROPDOWNS GRID */}
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {/* Assign To */}
-                  <div
-                    className={` ${
-                      isLoadingForSupportTicketInfoSave
-                        ? "cursor-wait"
-                        : "cursor-pointer"
-                    }`}
-                  >
-                    <CompanyUserSearchFieldInput
-                      key={keyForAssignTo}
-                      logo={User}
-                      label="Assign To"
-                      // placeholder={selectedSupportTicket.assignedToName}
-                      defaultValue={selectedSupportTicket.assignedToName}
-                      isDisabled={!userHasAccessToUpdateSupportTicket}
-                      disabledMessage={
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                          .UPDATE_ACCESS_DENIED_MESSAGE
-                      }
-                      onUserSelected={(user) => {
-                        if (user && user.id !== 0) {
-                          setSelectedAssignTo(user);
-                        }
-                        if (user === null || user === undefined) {
-                          setSelectedAssignTo({
-                            company_id: 0,
-                            email: "",
-                            fullname: selectedSupportTicket.assignedToName,
-                            mobilenumber: "",
-                            generate_password: "",
-                            createdby: "",
-                            id: selectedSupportTicket.assignedTo,
-                            isactive: false,
-                            requestedby: "",
-                          });
-                        }
-                      }}
-                    />
-                  </div>
+                  
 
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
@@ -827,63 +778,6 @@ const ViewSupportTicketManagement = () => {
                       {errorData.ticketCatagoryError && (
                         <div className="text-red-500 text-xs">
                           Please select ticket category
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Product SLA */}
-                  {isLoadingForCompanyProductSla ? (
-                    <div className="flex flex-col gap-2 animate-pulse w-full">
-                      <div className="h-4 w-24 bg-gray-200 rounded" />
-                      <div className="h-10 bg-gray-200 rounded" />
-                    </div>
-                  ) : (
-                    <div
-                      className={`space-y-1 ${
-                        isLoadingForSupportTicketInfoSave
-                          ? "cursor-wait"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <CustomDropdown
-                        logo={Hourglass}
-                        labelName="Product SLA"
-                        options={companyProductSla}
-                        preselectedOption={
-                          selectedSupportTicket?.companyProductSlaId
-                        }
-                        readOnly={!userHasAccessToUpdateSupportTicket}
-                        onSelect={(value) => {
-                          if (userHasAccessToUpdateSupportTicket) {
-                            const result = companyProductSla?.find(
-                              (item) => item.id === value
-                            );
-                            if (value) {
-                              setSelectedCompanyProductSla({
-                                id: value || 0,
-                                name: result?.name || "",
-                              });
-                              setErrorData((prev) => {
-                                return {
-                                  ...prev,
-                                  productSlaError: false,
-                                };
-                              });
-                            } else {
-                              setErrorData((prev) => {
-                                return {
-                                  ...prev,
-                                  productSlaError: true,
-                                };
-                              });
-                            }
-                          }
-                        }}
-                      />
-                      {errorData.productSlaError && (
-                        <div className="text-red-500 text-xs">
-                          Please select company product SLA
                         </div>
                       )}
                     </div>
@@ -946,6 +840,65 @@ const ViewSupportTicketManagement = () => {
                     </div>
                   )}
 
+                  {/* Product SLA */}
+                  {isLoadingForCompanyProductSla ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CustomDropdown
+                        logo={Hourglass}
+                        labelName="Product SLA"
+                        options={companyProductSla}
+                        preselectedOption={
+                          selectedSupportTicket?.companyProductSlaId
+                        }
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = companyProductSla?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedCompanyProductSla({
+                                id: value || 0,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.productSlaError && (
+                        <div className="text-red-500 text-xs">
+                          Please select company product SLA
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  
+
                   {isLoadingForSupportTicketEscalationLevel ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
                       <div className="h-4 w-24 bg-gray-200 rounded" />
@@ -1002,6 +955,46 @@ const ViewSupportTicketManagement = () => {
                     </div>
                   )}
 
+                  {/* Assign To */}
+                  <div
+                    className={` ${
+                      isLoadingForSupportTicketInfoSave
+                        ? "cursor-wait"
+                        : "cursor-pointer"
+                    }`}
+                  >
+                    <CompanyUserSearchFieldInput
+                      key={keyForAssignTo}
+                      logo={User}
+                      label="Assign To"
+                      // placeholder={selectedSupportTicket.assignedToName}
+                      defaultValue={selectedSupportTicket.assignedToName}
+                      isDisabled={!userHasAccessToUpdateSupportTicket}
+                      disabledMessage={
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .UPDATE_ACCESS_DENIED_MESSAGE
+                      }
+                      onUserSelected={(user) => {
+                        if (user && user.id !== 0) {
+                          setSelectedAssignTo(user);
+                        }
+                        if (user === null || user === undefined) {
+                          setSelectedAssignTo({
+                            company_id: 0,
+                            email: "",
+                            fullname: selectedSupportTicket.assignedToName,
+                            mobilenumber: "",
+                            generate_password: "",
+                            createdby: "",
+                            id: selectedSupportTicket.assignedTo,
+                            isactive: false,
+                            requestedby: "",
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+
                   {selectedSupportTicket.resolvedBy && (
                     <div
                       className={` ${
@@ -1049,27 +1042,59 @@ const ViewSupportTicketManagement = () => {
               <div className="flex flex-col gap-4">
                 {/* Created/Updated Info */}
                 <div className="p-4 bg-white shadow rounded-lg border grid grid-cols-2 gap-1">
-                  <Detail
-                    label="Created By"
-                    type="none"
-                    value={selectedSupportTicket?.createdBy}
-                  />
-                  <Detail
-                    label="Created On"
-                    type="none"
-                    value={selectedSupportTicket?.createdOn}
-                  />
+                  {/* Account Email */}
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
+                      <LucideMail size={25} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Account Email"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountEmail}
+                    />
+                  </div>
+                  {/* Account Mobile Number*/}
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
+                      <LucidePhoneCall size={25} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Account Mobile Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountMobileNumber}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 ">
+                    <Detail
+                      label="Created By"
+                      type="none"
+                      value={selectedSupportTicket?.createdBy}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 ">
+                    <Detail
+                      label="Created On"
+                      type="none"
+                      value={selectedSupportTicket?.createdOn}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Detail
+                      label="Updated By"
+                      type="none"
+                      value={selectedSupportTicket?.updatedBy}
+                    />
+                  </div>
 
-                  <Detail
-                    label="Updated By"
-                    type="none"
-                    value={selectedSupportTicket?.updatedBy}
-                  />
-                  <Detail
-                    label="Updated On"
-                    type="none"
-                    value={selectedSupportTicket?.updatedOn}
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <Detail
+                      label="Updated On"
+                      type="none"
+                      value={selectedSupportTicket?.updatedOn}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1100,7 +1125,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={3}
               cols={0}
             />
 
@@ -1121,7 +1146,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={3}
               cols={0}
             />
 
@@ -1142,7 +1167,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={3}
               cols={0}
             />
           </div>
@@ -1167,7 +1192,7 @@ const ViewSupportTicketManagement = () => {
         {selectedSupportTicketLifecycleId && (
           <SupportTicketLIfecycleChangeModal
             isLoading={isLoadingForLifecycleChanging}
-            previousSupportTicketStatus={selectedSupportTicket}
+            selectedSupportTicketState={selectedSupportTicket}
             selectedSupportTicketLifecyclId={selectedSupportTicketLifecycleId}
             selectedSupportTicketLifecycleName={
               selectedSupportTicketLifecycleName
@@ -1327,10 +1352,10 @@ const Detail: React.FC<DetailProps> = ({
       type === "none" ? (
         <div>
           <p className="input-label-custom text-gray-800 whitespace-nowrap overflow-x-hidden text-clip">
-            {value ? (
+            {value && (
               <span
-                title={value.length > 30 ? value : undefined}
-                className={`inline-block max-w-[250px] select-text truncate ${
+                title={value.length > 25 ? value : undefined}
+                className={`inline-block max-w-[200px] select-text truncate ${
                   [
                     "Updated By",
                     "Updated On",
@@ -1338,9 +1363,13 @@ const Detail: React.FC<DetailProps> = ({
                     "Created On",
                     "Account",
                     "Support Product",
+                    "Serial Number",
                     "Resolved Status",
+                    "Status",
                     "Resolved By",
+                    "Account Email",
                     "Email",
+                    "Account Mobile Number",
                     "Mobile Number",
                     "Ticket Number",
                   ].includes(label)
@@ -1350,24 +1379,7 @@ const Detail: React.FC<DetailProps> = ({
               >
                 {value}
               </span>
-            ) : (
-              <span
-                className={`${
-                  [
-                    "Updated By",
-                    "Updated On",
-                    "Created By",
-                    "Created On",
-                  ].includes(label)
-                    ? ""
-                    : "border border-gray-200 rounded-md"
-                } caption-custom px-1`}
-              >
-                {["Updated By", "Created By", "Created On"].includes(label)
-                  ? "Data not found"
-                  : "Add here..."}
-              </span>
-            )}
+            ) }
           </p>
         </div>
       ) : type === "text" ? (
@@ -1390,7 +1402,7 @@ const Detail: React.FC<DetailProps> = ({
         >
           <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
             <span
-              className={`truncate ${label === "Name" ? "" : "max-w-[205px]"}`}
+              className={`truncate ${label === "Name" ? "" : "max-w-[200px]"}`}
             >
               {value || (
                 <span className="p-1 caption-custom italic">Add here...</span>

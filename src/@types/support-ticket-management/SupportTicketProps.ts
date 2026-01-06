@@ -7,6 +7,8 @@ type SupportTicketProps = {
     accountEmail : string,
     accountMobileNumber: string,
     companyProductName : string,
+    barcode : string,
+    serialNumber : string,
     accountCompanyProductId : number ,
     supportTicketCategoryId : number ,
     supportTicketCategoryName : string ,

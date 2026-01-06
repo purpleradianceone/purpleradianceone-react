@@ -11,7 +11,7 @@ type AccountCompanyProductForSupportTicket = {
     isWarranty: boolean,
     quantity : number,
     barcode : string,
-    serialNumber : number,
+    serialNumber : string,
     unitName : string,
     purchaseDate : string,
     isActive : boolean,
