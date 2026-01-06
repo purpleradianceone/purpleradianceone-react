@@ -63,7 +63,7 @@ function AccountCompanyProductForSupportTicketList({
 
   return (
     <div
-      className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
+      className={`w-full ${position === "left" ? "pl-1" : "pl-1"} pr-1 gap-1`}
     >
       <div
         className={`sticky z-10 top-12 mt-1 p-0.5  flex items-center text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
@@ -138,7 +138,7 @@ function AccountCompanyProductForSupportTicketList({
       </div>
 
       <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
-        <div className="w-full h-[40vh]">
+        <div className="w-full h-[42vh]">
           <AccountCompanyProductForSupportTicketAgGrid
             accountCompanyProductsForSupportTickt={
               accountCompanyProductsForSupportTicket

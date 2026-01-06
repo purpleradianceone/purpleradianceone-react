@@ -83,6 +83,8 @@ function SupportTicketManagementList({
       accountEmail: "",
       accountMobileNumber: "",
       companyProductName: "",
+      barcode: "",
+      serialNumber: "",
       accountCompanyProductId: 0,
       supportTicketCategoryId: 0,
       supportTicketCategoryName: "",

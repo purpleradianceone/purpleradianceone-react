@@ -38,7 +38,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
         minWidth: 140,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
-          {
+      {
         field: "accountEmail",
         headerName: "Email",
         sortable: true,
@@ -47,7 +47,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
         minWidth: 160,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
-          {
+      {
         field: "accountMobileNumber",
         headerName: "Mobile Number",
         sortable: true,
@@ -70,31 +70,38 @@ function AccountCompanyProductForSupportTicketAgGrid({
         minWidth: 200,
       },
       {
+        field: "serialNumber",
+        headerName: "Serial Number",
+        sortable: true,
+        filter: true,
+      },
+      {
         field: "isAmc",
         headerName: "AMC",
         sortable: true,
         filter: true,
-        minWidth:100,
+        minWidth: 100,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value}
-               />
+              <StatusIndicator isActive={params.value} />
             </div>
           );
         },
       },
-       {
+      {
         field: "isWarranty",
         headerName: "Warranty",
         sortable: true,
         filter: true,
-        minWidth:130,
+        minWidth: 130,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value}
-              inactiveLabel="Out Of Warranty" />
+              <StatusIndicator
+                isActive={params.value}
+                inactiveLabel="Out Of Warranty"
+              />
             </div>
           );
         },
@@ -104,14 +111,14 @@ function AccountCompanyProductForSupportTicketAgGrid({
         headerName: "Quantity",
         sortable: true,
         filter: true,
-        minWidth:90
+        minWidth: 90,
       },
       {
         field: "unitName",
         headerName: "Unit",
         sortable: true,
         filter: true,
-        minWidth: 90
+        minWidth: 90,
       },
       {
         field: "barcode",
@@ -119,13 +126,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
         sortable: true,
         filter: true,
       },
-      {
-        field: "serialNumber",
-        headerName: "Serial Number",
-        sortable: true,
-        filter: true,
-      },
-      
+
       {
         field: "purchaseDate",
         headerName: "Purchase Date",

@@ -210,6 +210,8 @@ function SupportTicketManagement({
             accountMobileNumber: item.account_mobilenumber,
             companyProductId: item.company_product_id,
             companyProductName: item.company_product_name,
+            barcode: item.barcode,
+            serialNumber: item.serial_number,
             accountCompanyProductId: item.account_company_product_id,
             supportTicketCategoryId: item.support_ticket_category_id,
             supportTicketCategoryName: item.support_ticket_category_name,

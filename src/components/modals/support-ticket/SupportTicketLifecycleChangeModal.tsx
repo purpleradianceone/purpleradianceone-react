@@ -28,14 +28,14 @@ export type supportTicketLifecycleType = {
 
 export function SupportTicketLIfecycleChangeModal({
   isLoading,
-  previousSupportTicketStatus,
+  selectedSupportTicketState,
   selectedSupportTicketLifecyclId,
   selectedSupportTicketLifecycleName,
   handleSubmit,
   onClose,
 }: {
   isLoading: boolean;
-  previousSupportTicketStatus: any;
+  selectedSupportTicketState: any;
   selectedSupportTicketLifecyclId: number | undefined;
   selectedSupportTicketLifecycleName: string | undefined;
   handleSubmit: (supportTicketLifecycleFormData: any) => void;
@@ -47,8 +47,8 @@ export function SupportTicketLIfecycleChangeModal({
     resolutionApplied: "",
     resolvedBy: {
       company_id: 0,
-      id: previousSupportTicketStatus.assignedTo,
-      fullname: previousSupportTicketStatus.assignedToName,
+      id: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedBy : selectedSupportTicketState.assignedTo,
+      fullname: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedByName : selectedSupportTicketState.assignedToName,
       email: "",
       mobilenumber: "",
       createdby: "",
@@ -78,7 +78,7 @@ export function SupportTicketLIfecycleChangeModal({
           onClose={onClose}
           preText={`Support ticket lifecycle updating to `}
           userName={selectedSupportTicketLifecycleName}
-          description={`support ticket lifecycle is updating from ${previousSupportTicketStatus.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
+          description={`support ticket lifecycle is updating from ${selectedSupportTicketState.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
         <form
           className={`mt-2 ${isLoading ? "cursor-wait" : "cursor-default"}`}
@@ -86,6 +86,7 @@ export function SupportTicketLIfecycleChangeModal({
           <div className="gap-2">
             <TextAreaInput
               logo={LucideText}
+              defaultValue={selectedSupportTicketState.queryDescription}
               label="Query Description"
               name="queryDescription"
               onChange={handleFormChange}
@@ -95,6 +96,7 @@ export function SupportTicketLIfecycleChangeModal({
             />
             <TextAreaInput
               logo={Wrench}
+              defaultValue={selectedSupportTicketState.resolutionApplied}
               label="Resolution Applied"
               name="resolutionApplied"
               onChange={handleFormChange}
@@ -104,6 +106,7 @@ export function SupportTicketLIfecycleChangeModal({
             />
             <TextAreaInput
               logo={StickyNote}
+              defaultValue={selectedSupportTicketState?.publicNotes}
               label="Public Note"
               name="publicNotes"
               onChange={(e) => handleFormChange(e)}
@@ -119,9 +122,9 @@ export function SupportTicketLIfecycleChangeModal({
                     required
                     // placeholder={loginStatus.fullName}
                     defaultValue={
-                      formData.resolvedBy.fullname === ""
-                        ? previousSupportTicketStatus.assignedToName
-                        : formData.resolvedBy.fullname
+                      formData.resolvedBy.id
+                      ? formData.resolvedBy.fullname
+                      : selectedSupportTicketState.assignedToName
                     }
                     logo={User}
                     onUserSelected={(user) => {
@@ -138,9 +141,9 @@ export function SupportTicketLIfecycleChangeModal({
                             ...prev,
                             resolvedBy: {
                               company_id: 0,
-                              id: previousSupportTicketStatus.assignedTo,
+                              id: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedBy : selectedSupportTicketState.assignedTo,
                               fullname:
-                                previousSupportTicketStatus.assignedToName,
+                                selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedByName : selectedSupportTicketState.assignedToName,
                               email: "",
                               mobilenumber: "",
                               createdby: "",
