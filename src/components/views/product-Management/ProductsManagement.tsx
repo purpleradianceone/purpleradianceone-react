@@ -88,7 +88,7 @@ const savedFilters = JSON.parse(
 
   const fetchCompanyProducts = async (signal : AbortSignal) => {
     if (dateRangeId === 8 && concatDate.trim() === "") return;
-    if (userHasAccessToViewProduct) {
+    if (userHasAccessToViewProduct || isGridForAccountProduct) {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
@@ -105,11 +105,12 @@ const savedFilters = JSON.parse(
         search_parameter: searchParameter,
         search_parameter_date: concatDate,
         requestedby_id: loginStatus.id,
+        requestedby: loginStatus.id,
       };
 
       try {
         const response = await axios.post(
-          POST_API.GET_PRODUCTS,
+          isGridForAccountProduct?POST_API.GET_LOOKUP_COMPANY_PRODUCT:POST_API.GET_PRODUCTS,
           getProductPostData,
           {
             signal,
@@ -197,7 +198,7 @@ const savedFilters = JSON.parse(
   ]);
 
   useEffect(() => {
-    if (!userHasAccessToViewProduct) {
+    if (!userHasAccessToViewProduct && !isGridForAccountProduct) {
       setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewProduct]);
@@ -246,7 +247,7 @@ const savedFilters = JSON.parse(
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {userHasAccessToViewProduct ? (
+        {userHasAccessToViewProduct || isGridForAccountProduct ? (
           <>
             <div>
               <ProductsManagementList

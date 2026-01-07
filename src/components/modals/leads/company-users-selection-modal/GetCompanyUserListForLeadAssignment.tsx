@@ -57,7 +57,7 @@ function GetCompanyUserListForLeadAssignment({
   const { userHasAccessToViewUser } = useUserAccessModules();
 
   return (
-    userHasAccessToViewUser && (
+    userHasAccessToViewUser || !isUsedForSettings && (
       <div className="w-full">
         <div className=" z-10  mt-1  mb-2 flex items-center justify-between p-0.5  bg-gray-50 rounded-lg shadow-sm   w-full">
           {isLargeScreen && (
@@ -75,7 +75,7 @@ function GetCompanyUserListForLeadAssignment({
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
+                {isUsedForSettings && <div className="flex mx-3">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
                       <Calendar className="mt-2" />
@@ -86,7 +86,7 @@ function GetCompanyUserListForLeadAssignment({
                       handleDateIdChange={handleDateRangeIdChange}
                     ></DateRangeFilterDropdown>
                   </div>
-                </div>
+                </div>}
               </div>
 
               {/* Custom Date Picker Div Flex Box*/}

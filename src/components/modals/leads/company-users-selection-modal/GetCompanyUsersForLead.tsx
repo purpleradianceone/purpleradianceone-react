@@ -94,7 +94,7 @@ function GetCompanyUsersForLead({
       const response = await axiosClient.post(
         isUsedForSettings
           ? POST_API.GET_LEAD_COMPANY_USERS
-          : POST_API.GET_COMPANY_USERS,
+          : POST_API.GET_LOOKUP_COMPANY_USERS,
         isUsedForSettings ? postDataForSettings : postDataForLeads,
         {
           withCredentials: true,
@@ -135,14 +135,14 @@ function GetCompanyUsersForLead({
   ]);
 
   useEffect(() => {
-    if (!userHasAccessToViewUser) {
+    if (!userHasAccessToViewUser && isUsedForSettings) {
       setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewUser]);
 
   return (
     <div className="w-full">
-      {userHasAccessToViewUser ? (
+      {userHasAccessToViewUser || !isUsedForSettings ? (
         <>
           <div>
             <GetCompanyUserListForLeadAssignment

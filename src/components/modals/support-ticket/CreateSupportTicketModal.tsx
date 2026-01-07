@@ -164,11 +164,11 @@ function CreateSupportTicketModal({
       company_id: loginStatus.companyId,
       company_product_id: selectedAccount.companyProductId,
       isactive: true,
-      requestedby_id: loginStatus.id,
+      requestedby: loginStatus.id,
     };
 
     await axiosClient
-      .post(POST_API.GET_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
+      .post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
         withCredentials: true,
       })
       .then((response) => {

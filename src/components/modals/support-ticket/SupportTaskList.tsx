@@ -16,20 +16,22 @@ import SupportTicketTaskStage from "../../../@types/support-ticket-management/Su
 import UpdateSupportTicketTaskModal from "./UpdateSupportTicketTaskModal";
 
 function SupportTicketTaskList({
-  taskId,  
+  taskId,
   supportTicketTaskStage,
   supportTicketTasks,
   handleSupportTicketTaskUpdate,
   isLoading,
 }: {
-  taskId: number;  
+  taskId: number;
   supportTicketTaskStage: SupportTicketTaskStage[];
   supportTicketTasks: SupportTicketTaskProps[];
   handleSupportTicketTaskUpdate: () => void;
   isLoading: boolean;
 }) {
-  const [isUpdateSupportTicketTaskModalOpen, setIsUpdateSupportTicketTaskModalOpen] =
-    useState<boolean>(false);
+  const [
+    isUpdateSupportTicketTaskModalOpen,
+    setIsUpdateSupportTicketTaskModalOpen,
+  ] = useState<boolean>(false);
   const [selecedSupportTicketTask, setSelecedSupportTicketTask] =
     useState<SupportTicketTaskProps>();
   // State to manage expanded card
@@ -71,10 +73,13 @@ function SupportTicketTaskList({
             <div className="flex min-h-72 items-center justify-center  py-10">
               <LoadingSpinner></LoadingSpinner>
             </div>
-          ) : supportTicketTasks.length === 0 ? (
+          ) : supportTicketTasks.length === 0 ||
+            supportTicketTasks[0].id === null ? (
             <div className=" min-h-72   flex items-center justify-center">
               <p className="text-center caption-custom italic ">
-                No activities found.
+                {supportTicketTasks.length
+                  ? `You don't have access to view.`
+                  : `No activities found.`}
               </p>
             </div>
           ) : (
@@ -106,14 +111,16 @@ function SupportTicketTaskList({
                     {expandedCardId === activity.id ? (
                       <div className="caption-custom">
                         <p className="pb-1 pt-2">
-                          {taskId===0&&<div className="mt-1">
-                            <span className="caption-custom-blue">
-                              Task Stage :{" "}
-                            </span>{" "}
-                            <span className="caption-custom">
-                              {activity.supportTicketTaskStageName || ""}
-                            </span>{" "}
-                          </div>}
+                          {taskId === 0 && (
+                            <div className="mt-1">
+                              <span className="caption-custom-blue">
+                                Task Stage :{" "}
+                              </span>{" "}
+                              <span className="caption-custom">
+                                {activity.supportTicketTaskStageName || ""}
+                              </span>{" "}
+                            </div>
+                          )}
                           <div>
                             <span className="caption-custom-blue">
                               Description :{" "}
@@ -161,14 +168,16 @@ function SupportTicketTaskList({
                     ) : (
                       <div className="text-xs text-gray-600">
                         <p className="truncate  mt-1">
-                          {taskId===0&&<div className="mt-1">
-                            <span className="caption-custom-blue">
-                              Task Stage :{" "}
-                            </span>{" "}
-                            <span className="caption-custom">
-                              {activity.supportTicketTaskStageName || ""}
-                            </span>{" "}
-                          </div>}
+                          {taskId === 0 && (
+                            <div className="mt-1">
+                              <span className="caption-custom-blue">
+                                Task Stage :{" "}
+                              </span>{" "}
+                              <span className="caption-custom">
+                                {activity.supportTicketTaskStageName || ""}
+                              </span>{" "}
+                            </div>
+                          )}
                           <div className="mt-1">
                             <span className="caption-custom-blue">
                               Description :{" "}

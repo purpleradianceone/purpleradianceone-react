@@ -125,7 +125,7 @@ export default function CompanyUserSearchFieldInput({
       setIsLoading(true);
 
       const response = await axiosClient.post(
-        POST_API.GET_COMPANY_USERS,
+        POST_API.GET_LOOKUP_COMPANY_USERS,
         {
           company_id: loginStatus.companyId,
           search_parameter: searchText.trim(),
