@@ -2,7 +2,6 @@
 import axios, {
   AxiosInstance,
   AxiosError,
-  AxiosRequestConfig,
   InternalAxiosRequestConfig,
   AxiosResponse,
 } from "axios";
@@ -10,15 +9,19 @@ import { STATUS_CODE } from "../constants/AppConstants";
 import RefreshToken from "../config/validations/RefreshToken";
 
 // ───────────────────────────────────────────────────────────────
-// 1. Manage AbortControllers for cancelling all active requests
+// 1. AbortController management (WeakMap + Set)
 // ───────────────────────────────────────────────────────────────
-const controllers = new Set<AbortController>();
+const controllerMap = new WeakMap<
+  InternalAxiosRequestConfig,
+  AbortController
+>();
+
+// Used ONLY for cancelAllRequests
+const controllerSet = new Set<AbortController>();
 
 export const cancelAllRequests = async (): Promise<void> => {
-  controllers.forEach((controller) => {
-    controller.abort();
-  });
-  controllers.clear();
+  controllerSet.forEach((controller) => controller.abort());
+  controllerSet.clear();
   await Promise.resolve();
 };
 
@@ -46,7 +49,6 @@ const processQueue = (error: unknown | null): void => {
     if (error) req.reject(error);
     else req.resolve();
   });
-
   failedQueue = [];
 };
 
@@ -55,7 +57,7 @@ const processQueue = (error: unknown | null): void => {
 // ───────────────────────────────────────────────────────────────
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const companyId = localStorage.getItem("companyId"); //For api call blocking after logout
+    const companyId = localStorage.getItem("companyId");
 
     if (!companyId || Number(companyId) === 0) {
       return Promise.reject({
@@ -64,17 +66,11 @@ axiosClient.interceptors.request.use(
       });
     }
 
-    // Add AbortController
     const controller = new AbortController();
     config.signal = controller.signal;
-    controllers.add(controller);
 
-    // Add Authorization header
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers = config.headers ?? {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    controllerMap.set(config, controller);
+    controllerSet.add(controller);
 
     return config;
   },
@@ -87,42 +83,43 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   // SUCCESS
   (response: AxiosResponse) => {
-    // remove controller when request completes
-    controllers.forEach((controller) => {
-      if (controller.signal === response.config.signal) {
-        controllers.delete(controller);
-      }
-    });
+    const config = response.config as InternalAxiosRequestConfig;
+    const controller = controllerMap.get(config);
+
+    if (controller) {
+      controllerSet.delete(controller);
+      controllerMap.delete(config);
+    }
 
     return response;
   },
 
   // ERROR
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
 
     const status = error.response?.status;
 
-    // remove controller on error
-    if (originalRequest?.signal) {
-      controllers.forEach((controller) => {
-        if (controller.signal === originalRequest.signal) {
-          controllers.delete(controller);
-        }
-      });
+    // cleanup controller
+    if (originalRequest) {
+      const controller = controllerMap.get(originalRequest);
+      if (controller) {
+        controllerSet.delete(controller);
+        controllerMap.delete(originalRequest);
+      }
     }
 
     // ───────────────────────────────────────────────────────────────
-    //  If NOT 401 → return error to caller directly
+    // If NOT 401 → return error
     // ───────────────────────────────────────────────────────────────
     if (status !== STATUS_CODE.UNATHORISED) {
       return Promise.reject(error);
     }
 
     // ───────────────────────────────────────────────────────────────
-    //  Handle ONLY 401 for Refresh Token
+    // Handle ONLY 401 refresh
     // ───────────────────────────────────────────────────────────────
     if (!originalRequest || originalRequest._retry) {
       return Promise.reject(error);
@@ -130,7 +127,6 @@ axiosClient.interceptors.response.use(
 
     originalRequest._retry = true;
 
-    // Already refreshing → queue this request
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
@@ -140,35 +136,27 @@ axiosClient.interceptors.response.use(
       });
     }
 
-    // Start refreshing
     isRefreshing = true;
 
     try {
       const refreshSuccess = await RefreshToken({});
 
       if (refreshSuccess) {
-        // Retry queued requests
         processQueue(null);
-
         isRefreshing = false;
-
         return axiosClient(originalRequest);
       } else {
-        // Refresh failed
         processQueue(new Error("Token refresh failed"));
-
         isRefreshing = false;
-
         return Promise.reject(error);
       }
     } catch (refreshError) {
-      // Refresh threw error
       processQueue(refreshError);
       isRefreshing = false;
-
       return Promise.reject(refreshError);
     }
   }
 );
 
 export default axiosClient;
+

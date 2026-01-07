@@ -443,6 +443,23 @@ const ViewSupportTicketManagement = () => {
       }
     } catch (error: any) {
       handleApiError(error);
+      setFormData({
+      queryDescription:
+        selectedSupportTicket.queryDescription !== null &&
+        selectedSupportTicket.queryDescription !== undefined
+          ? selectedSupportTicket.queryDescription
+          : "",
+      publicNotes:
+        selectedSupportTicket.publicNotes !== null &&
+        selectedSupportTicket.publicNotes !== undefined
+          ? selectedSupportTicket.publicNotes
+          : "",
+      resolutionApplied:
+        selectedSupportTicket.resolutionApplied != null &&
+        selectedSupportTicket.resolutionApplied !== undefined
+          ? selectedSupportTicket.resolutionApplied
+          : "",
+    });
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
       setkeyForAssignTo((prev) => prev + 1);
@@ -721,7 +738,6 @@ const ViewSupportTicketManagement = () => {
             >
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
-                {/* 4 DROPDOWNS GRID */}
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
                   
 
