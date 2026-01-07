@@ -195,6 +195,7 @@ export const AccountCompanyProductDetailsCard = ({
   if (selectedProductCard === null) return null;
   return (
     <div className="px-1  py-0.5">
+      {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
       {/* Header */}
       <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1    rounded p-0.5 pt-1">
         <div className=" col-span-4 flex items-center">

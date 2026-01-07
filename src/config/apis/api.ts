@@ -30,8 +30,13 @@ export const getAccountCompanyProductDetails  = async (payload: any
     return response;
 }
 
-export const fetchCompanyProductName  = async (payload: any
+export const fetchCompanyProduct  = async (payload: object
 ) => {
     const response = await axiosClient.post(POST_API.GET_PRODUCTS, payload, { withCredentials: true })
+    return response;
+}
+export const fetchAccount  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_ACCOUNT, payload, { withCredentials: true })
     return response;
 }

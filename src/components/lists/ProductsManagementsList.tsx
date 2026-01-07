@@ -297,7 +297,7 @@ ProductsManagementListProps) {
           <div
             className={
               isGridForAccountProduct
-                ? "ag-theme-balham w-full h-[40vh]"
+                ? "ag-theme-balham w-full h-[60vh]"
                 : userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
                 : "ag-theme-balham w-full h-[calc(100vh-120px)]"

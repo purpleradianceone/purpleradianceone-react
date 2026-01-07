@@ -45,6 +45,7 @@ import COLORS from "../../../../../constants/Colors";
 import { createPortal } from "react-dom";
 import {
   createMultipleAccountCompanyProduct,
+  fetchAccount,
   getStockLiveForCompanyProduct,
 } from "../../../../../config/apis/api";
 import MESSAGE from "../../../../../constants/Messages";
@@ -54,6 +55,7 @@ import { format } from "date-fns";
 import { calculateEndDate } from "../../../../../utils/date/calculateEndDate";
 import LoadingPopUpAnimation from "../../../../views/card/LoadingPopUpAnimation";
 import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
+import Account from "../../../../../@types/account/Account";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -105,7 +107,48 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const { userHasAccessToUpdateAccount } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
+  // Note : will get the accountId from the url params 
   const { accountId } = useParams<{ accountId: string }>();
+
+  // Note : state created to store the account details as per the account id 
+  const [accountDetails , setAccountDetails ] = useState<Account >();
+
+  // Note : On render call will go for account details 
+  // we require the account details to pre populate the billing and shipping address 
+  useEffect(() => {
+    const apiCall = async() => {
+      try{
+        if(!accountId || !loginStatus) return;
+        const  response= await fetchAccount({
+          company_id: loginStatus.companyId,
+          id: accountId,
+          isactive: null,
+          limit: 1,
+          offset: 0,
+          requestedby: loginStatus.id,
+          search_company_specific_date_range_id: null,
+          search_parameter: "",
+          search_parameter_date: "",
+        });
+        if(response){
+          const  data =response.data[0];
+
+          const formattedData :Account = {
+            ...data,
+            billingAddress : data.billing_address,
+            shippingAddress : data.shipping_address,
+            deliveryAddress : data.delivery_address
+          }
+          setAccountDetails(formattedData);
+          
+        }
+      }catch(err){
+        handleApiError(err)
+      }
+      
+    }
+    apiCall();
+  },[accountId , loginStatus]);
 
   const [rows, setRows] = useState<ProductRow[]>([
     {
@@ -117,11 +160,11 @@ export const CreateMultipleAccountCompanyProduct = () => {
       warranty: 0,
       amc: 0,
       installedBy:
-        loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
+      loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
       amcCycleEndDate: null,
       amcCycleStartDate: null,
-      billingAddress: "",
-      deliveryAddress: "",
+      billingAddress:"",
+      deliveryAddress:"",
       deliveryDate: null,
       installationDate: null,
       unit_id: 0,
@@ -137,6 +180,17 @@ export const CreateMultipleAccountCompanyProduct = () => {
     },
   ]);
 
+  // Note : when accountDetails state gets the data from api call then we populate the billing and shilling address state 
+  useEffect(()=>{
+    if(!accountDetails) return;
+    setRows((prev)=>
+      prev.map((row)=>({
+        ...row,
+        billingAddress: accountDetails.billingAddress ?? "",
+        deliveryAddress : accountDetails.shippingAddress ?? ""
+      }))
+    )
+  },[accountDetails])
   // Per-row product dropdown
   const [products, setProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -149,6 +203,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+
+  // Note : Used when user clicks outside of dropdown to close the dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -282,8 +338,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
           loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
         amcCycleEndDate: null,
         amcCycleStartDate: null,
-        billingAddress: "",
-        deliveryAddress: "",
+        billingAddress: accountDetails?.billingAddress ?? "",
+        deliveryAddress: accountDetails?.shippingAddress ?? "",
         deliveryDate: null,
         installationDate: null,
         quantity: 0,
@@ -501,99 +557,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
   // ==============================
   // HANDLE PRODUCT SELECT
   // ==============================
-  // const handleProductSelect = async (item: Product, index: number) => {
-
-  //   setSearchText("");
-  //   setActiveRow(null);
-  //   setProducts([]);
-
-  //   if (rows.some((r, i) => r.productId === item.id && i !== index)) {
-  //     toast.error("This product is already selected in another row!");
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     company_id: loginStatus.companyId,
-  //     search_company_specific_date_range_id: null,
-  //     company_product_id: item.id,
-  //     search_parameter: null,
-  //     search_parameter_date: "",
-  //     limit: 25,
-  //     offset: 0,
-  //     requestedby_id: loginStatus.id,
-  //   };
-
-  //   const response = await getStockLiveForCompanyProduct(payload);
-  //   const stock = response.data?.[0];
-
-  //   if (!stock || stock.quantity_live === 0) {
-  //     toast.error("Selected Product doesn't have stock.");
-  //     return;
-  //   }
-
-  //   setRows((prev) =>
-  //     prev.map((row, i) => {
-  //       if (i !== index) return row;
-
-  //       const newRow: ProductRow = {
-  //         ...row,
-  //         product: item.name,
-  //         productId: item.id!,
-  //         productQuantity: stock.quantity_live,
-  //         isSerialNumber: item.isSerialNumber!,
-  //         unit_id: item.isSerialNumber ? item.unitId : row.unit_id,
-
-  //         // warranty
-  //         productWarranty: item.defaultWarrantyName,
-  //         productWarrantyNumber: item.defaultWarranty,
-  //         productWarrantyId: item.defaultWarrantyIntervalTypeId,
-
-  //         // amc
-  //         productAmc: item.defaultAmcCycleName,
-  //         productAmcNumber: item.defaultAmcCycle,
-  //         productAmcId: item.defaultAmcCycleIntervalTypeId,
-  //       };
-
-  //       //  Force recalculation if purchase date exists
-  //       if (newRow.purchaseDate) {
-  //         const start = new Date(newRow.purchaseDate);
-
-  //         if (newRow.productWarrantyNumber && newRow.productWarrantyId) {
-  //           const end = new Date(start);
-  //           if (newRow.productWarrantyId === 1)
-  //             end.setFullYear(end.getFullYear() + newRow.productWarrantyNumber);
-  //           else if (newRow.productWarrantyId === 2)
-  //             end.setMonth(end.getMonth() + newRow.productWarrantyNumber);
-  //           else if (newRow.productWarrantyId === 3)
-  //             end.setDate(end.getDate() + newRow.productWarrantyNumber);
-
-  //           newRow.warrantyStartDate = newRow.purchaseDate;
-  //           newRow.warrantyEndDate = end.toISOString().split("T")[0];
-  //         }
-
-  //         if (newRow.productAmcNumber && newRow.productAmcId) {
-  //           const end = new Date(start);
-  //           if (newRow.productAmcId === 1)
-  //             end.setFullYear(end.getFullYear() + newRow.productAmcNumber);
-  //           else if (newRow.productAmcId === 2)
-  //             end.setMonth(end.getMonth() + newRow.productAmcNumber);
-  //           else if (newRow.productAmcId === 3)
-  //             end.setDate(end.getDate() + newRow.productAmcNumber);
-
-  //           newRow.amcCycleStartDate = newRow.purchaseDate;
-  //           newRow.amcCycleEndDate = end.toISOString().split("T")[0];
-  //         }
-  //       }
-
-  //       return newRow;
-  //     })
-  //   );
-
-  //   const units = await getUnitForProduct(item.id!);
-  //   setUnitsForRows((prev) => ({ ...prev, [index]: units }));
-
-  // };
-
   const handleProductSelect = async (item: Product, index: number) => {
     // Close dropdown immediately
     setSearchText("");
@@ -761,11 +724,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
       setShowLoadingAnimationForAssignApi(false);
     }
   };
-
-  useEffect(() => {
-    console.log(" this are the rows : ");
-    console.log(rows);
-  }, [rows]);
 
   const [unitsForRows, setUnitsForRows] = useState<
     Record<number, UnitForProduct[]>
@@ -981,10 +939,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               updateRow(index, "conversionFactor", finalFactor);
                             }
 
-                            // if(qty){
-
                             updateRow(index, "quantity", qty);
-                            // }
                           }}
                         />
                         {row.hasError?.zeroQuantity && (
@@ -1026,11 +981,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                             if (finalFactor) {
                               updateRow(index, "conversionFactor", finalFactor);
-                              // updateRow(
-                              //   index,
-                              //   "conversionFactorString",
-                              //   finalFactor + unnit!
-                              // );
                             }
                           }}
                           options={unitsForRows[index] || []}

@@ -516,6 +516,11 @@ if (fieldName === "name") {
   // };
 
   const handleFieldClick = (fieldName: string) => {
+     if(!userHasAccessToUpdateAccount){
+    toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+    )
+    return;
+  }
   if (!["createdOn", "createdBy"].includes(fieldName)) {
     setEditingField(fieldName);
 
@@ -531,6 +536,7 @@ if (fieldName === "name") {
     }));
     
   }
+ 
 };
 
   const handleInputChange = (fieldName: string, value: string) => {
@@ -675,14 +681,17 @@ if (fieldName === "name") {
     fieldName: string,
     value: string,
     options: BusinessType[] | industryType[],
-    placeholder: string = "Select option"
+    placeholder: string = "Select option",
+    hasUpdateAccess: boolean
   ) => {
+    
     const isEditing = editingField === fieldName;
     const hasError = errors[fieldName];
 
+
     return (
       <div className="relative">
-        {isEditing ? (
+        {isEditing && hasUpdateAccess ? (
           <div>
             <select
               value={
@@ -884,7 +893,8 @@ if (fieldName === "name") {
                     "countryName",
                     formData.countryName,
                     countries,
-                    "Select Country"
+                    "Select Country",
+                    userHasAccessToUpdateAccount
                   )}
                 </div>
               </div>
@@ -900,7 +910,8 @@ if (fieldName === "name") {
                     "industryTypeName",
                     formData.industryTypeName,
                     industryTypeData,
-                    "Select industry type"
+                    "Select industry type",
+                    userHasAccessToUpdateAccount
                   )}
                 </div>
               </div>
@@ -916,7 +927,8 @@ if (fieldName === "name") {
                     "stateName",
                     formData.stateName,
                     states,
-                    "Select State"
+                    "Select State",
+                    userHasAccessToUpdateAccount
                   )}
                 </div>
               </div>
@@ -935,7 +947,8 @@ if (fieldName === "name") {
                         "businessTypeName",
                         formData.businessTypeName,
                         businessType || [],
-                        "Select business type"
+                        "Select business type",
+                        userHasAccessToUpdateAccount
                       )}
                     </div>
                   </div>
@@ -956,7 +969,8 @@ if (fieldName === "name") {
                         "districtName",
                         formData.districtName,
                         districts,
-                        "Select District"
+                        "Select District",
+                        userHasAccessToUpdateAccount
                       )}
                     </div>
                   </div>
