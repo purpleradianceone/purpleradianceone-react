@@ -107,7 +107,8 @@ function AccountCompanyProductForSupportTicketAgGrid({
         },
       },
       {
-        field: "quantity",
+        // field: "quantity",
+        valueGetter: (params) => `${params.data?.quantity ?? ""}  ${params.data?.unitName ?? ""}`,
         headerName: "Quantity",
         sortable: true,
         filter: true,
@@ -119,6 +120,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
         sortable: true,
         filter: true,
         minWidth: 90,
+        hide: true,
       },
       {
         field: "barcode",
