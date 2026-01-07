@@ -16,7 +16,8 @@ export const  STRING_VALUES = {
 
 export enum ActionTypeForStockMOdule{
   DETAILS = "DETAILS",
-  TRANSACTIONS = "TRANSACTIONS"
+  TRANSACTIONS = "TRANSACTIONS",
+  CREATE_STOCK = "CREATE-STOCK"
 }
 
 export const DEBOUNCE_DELAY = 300;
@@ -135,8 +136,9 @@ export const JSX_CHILDREN_NAME = {
     UPDATE : "Update",
     MEETINGS : "Meetings",
     CREATE_SUPPORT_TICKET : "Create",
-
-
+    DETAILS :"Details",
+    TRANSACRTIONS : "Trans...",
+    ADD_STOCK :"Stock"
 }
 
 export const SIZE = {

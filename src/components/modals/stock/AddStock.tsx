@@ -25,20 +25,17 @@ import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import TextAreaInput from "../../ui/TextAreaInput";
-import {
-  useCompanyWarehouse,
-  Warehouse,
-} from "../../../config/hooks/useCompanyWarehouse";
-import CompanyWarehouseAgGrid from "../../ag-grid/CompanyWarehouseAgGrid";
+import { useCompanyWarehouse } from "../../../config/hooks/useCompanyWarehouse";
 import useAdjustmentReason from "../../../config/hooks/useAdjustmentReason";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import CustomDropdown from "../leads/CustomDropdown";
 import useUnitForProduct from "../../../config/hooks/useUnitForProduct";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import CustomSelect from "../../ui/CustomSelect";
+import { toSelectOptions } from "../../../utils/toSelectOption";
 
 const AddStock = ({
   isUsedInProductModal = false,
@@ -48,19 +45,17 @@ const AddStock = ({
 }: AddStockModalProps) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
-
   const { companyWarehouse, loading: companyWarehouseLoading } =
     useCompanyWarehouse();
   const { adjustmentReason, loading: adjustmentReasonLoading } =
     useAdjustmentReason();
-  const [selectedCompanyWarehouse, setSelectedCompanyWarehouse] =
-    useState<Warehouse | null>(null);
-  const [showWarehouseSelectionModule, setShowWarehouseSelectionModule] =
-    useState<boolean>(false);
 
+  // preselected adjustment => initial stock
   const [selectedAdjustmentReasonId, setSelectedAdjustmentReasonId] = useState<
     number | null
-  >(null);
+  >(1);
+
+  // it is used when we create stock from the stock module where we select the product and then continue
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const [showInputForm, setShowInputForm] = useState<boolean>(false);
@@ -68,19 +63,33 @@ const AddStock = ({
     companyProductId: selectedProduct?.id,
   });
   const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(
-    product?.parentUnitId || selectedProduct?.parentUnitId
+    undefined
   );
-  // Note : new Changes
+
+  // Note : if Product is given then set it to selected product AND if not then first show the selection module then select the product
   useEffect(() => {
-    if (product) {
-      setSelectedUnitId(product?.parentUnitId || selectedProduct?.parentUnitId);
-      setSelectedProduct(product);
-      setShowInputForm(true);
-    } else if (selectedProduct) {
-      // Selected from table
+    if (!product) return;
+
+    setSelectedProduct(product);
+    setShowInputForm(true);
+  }, [product]);
+
+  // Note : it will set the unit id if the selected product
+  useEffect(() => {
+    if (!selectedProduct) return;
+    if (
+      selectedUnitId == null &&
+      // selectedProduct?.isSerialNumber === true &&
+      selectedProduct?.parentUnitId
+    ) {
       setSelectedUnitId(selectedProduct.parentUnitId);
     }
-  }, [product, selectedProduct]);
+  }, [selectedProduct, selectedUnitId]);
+
+  // for warehouse id
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<number | null>(
+    null
+  );
 
   const [error, setError] = useState<{
     unitIdError: boolean;
@@ -122,24 +131,16 @@ const AddStock = ({
     }
   }
 
-  function handleSelectedWarehouse(selectedWarehouse: Warehouse) {
-    setSelectedCompanyWarehouse(selectedWarehouse);
-    if (selectedWarehouse.id > 0 && selectedCompanyWarehouse?.id !== null) {
-      setShowWarehouseSelectionModule(false);
-      setShowInputForm(true);
-      setError((prev) => ({
-        ...prev,
-        warehouseIdError: false,
-      }));
-    }
-  }
   function handleGoBackToProductSelection() {
     setSelectedProduct(null);
+    setSelectedUnitId(undefined)
     setShowInputForm(false);
   }
 
   const [productUnitConversionFactor, setProductUnitConversionFactor] =
     useState<number>(0);
+
+  // Note : Conversion factor calculation
   useEffect(() => {
     const factor = unitForProductData.find(
       (item) => item.id === selectedUnitId
@@ -155,10 +156,10 @@ const AddStock = ({
     selectedUnitId,
     unitForProductData,
     addStockFormData.quantity,
-    product?.parentUnitId,
     selectedProduct?.parentUnitId,
   ]);
 
+  // Note : Adjustment reason change function
   function handleAdjustmentReasonChange(option: number) {
     if (option !== 0) {
       setSelectedAdjustmentReasonId(option);
@@ -168,6 +169,8 @@ const AddStock = ({
       }));
     }
   }
+
+  // Note : on close Clear the states
   const handleCloseForm = () => {
     resetStockCreateForm();
 
@@ -176,10 +179,9 @@ const AddStock = ({
       description: "",
     });
     setSelectedAdjustmentReasonId(null);
-    setSelectedCompanyWarehouse(null);
+    setSelectedWarehouseId(null);
     setSelectedProduct(null);
     setSelectedUnitId(undefined);
-    // setSelectedUnitError(false);
     setError({
       unitIdError: false,
       warehouseIdError: false,
@@ -188,6 +190,7 @@ const AddStock = ({
     onClose();
   };
 
+  // Note : Validation before api call
   const validateForm = (): boolean => {
     if (addStockFormData.quantity === 0) {
       toast.error("Quantity is required");
@@ -195,26 +198,34 @@ const AddStock = ({
     }
 
     if (selectedUnitId === 0 || selectedUnitId === undefined) {
-      // setSelectedUnitError(true);
       setError((prev) => ({
         ...prev,
         unitIdError: true,
       }));
       return false;
-      // toast.error("Please select 'AMC Cycle Duration'");
     } else {
       setError((prev) => ({
         ...prev,
         unitIdError: false,
       }));
-      // setSelectedUnitError(false);
+    }
+
+    if (
+      selectedAdjustmentReasonId === 0 ||
+      selectedAdjustmentReasonId === null ||
+      selectedAdjustmentReasonId === undefined
+    ) {
+      setError((prev) => ({
+        ...prev,
+        adjustmentReasonId: true,
+      }));
+      return false;
     }
     if (
-      selectedCompanyWarehouse?.id === null ||
-      selectedCompanyWarehouse?.id === 0 ||
-      selectedCompanyWarehouse?.id === undefined
+      selectedWarehouseId === 0 ||
+      selectedWarehouseId === null ||
+      selectedWarehouseId === undefined
     ) {
-      // toast.error("Warehouse is required.")
       setError((prev) => ({
         ...prev,
         warehouseIdError: true,
@@ -225,19 +236,6 @@ const AddStock = ({
         ...prev,
         warehouseIdError: false,
       }));
-    }
-
-    if (
-      selectedAdjustmentReasonId === 0 ||
-      selectedAdjustmentReasonId === null ||
-      selectedAdjustmentReasonId === undefined
-    ) {
-      // toast.error("Adjustment reason is required.");
-      setError((prev) => ({
-        ...prev,
-        adjustmentReasonId: true,
-      }));
-      return false;
     }
 
     return true;
@@ -255,7 +253,7 @@ const AddStock = ({
     const postData = {
       company_id: loginStatus.companyId,
       company_product_id: selectedProduct?.id,
-      company_warehouse_id: selectedCompanyWarehouse?.id,
+      company_warehouse_id: selectedWarehouseId,
       serial_number: addStockFormData.serial_number,
       unit_id: selectedUnitId,
       quantity: addStockFormData.quantity,
@@ -295,17 +293,19 @@ const AddStock = ({
       });
   };
 
-  // useEffect(() => {
-  //   setSelectedUnitId(undefined);
-  // }, [selectedProduct]);
+  // Note : Data sanitization for dropdowns
+  const warehouseOptions = toSelectOptions(companyWarehouse, "id", "name");
+  const unitOptions = toSelectOptions(unitForProductData, "id", "name");
 
+  // if isOpen is false then return null
   if (!isOpen) return null;
+
+  // show loading animation till data comes from api
   if (companyWarehouseLoading || adjustmentReasonLoading)
     return (
-      
-        <LoadingPopUpAnimation
-          show={companyWarehouseLoading || adjustmentReasonLoading}
-        />
+      <LoadingPopUpAnimation
+        show={companyWarehouseLoading || adjustmentReasonLoading}
+      />
     );
 
   return (
@@ -318,13 +318,13 @@ const AddStock = ({
           preText="Add Stock"
         />
 
-        {!product && !showInputForm && !showWarehouseSelectionModule && (
+        {!selectedProduct && !showInputForm && (
           <ProductManagement
             isGridForAccountProduct={true}
             onRowSelect={onRowSelectProductForStock}
           />
         )}
-        {showInputForm && !showWarehouseSelectionModule && (
+        {showInputForm && (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
               {!isUsedInProductModal && (
@@ -362,29 +362,23 @@ const AddStock = ({
                     label="Quantity : "
                     logo={LucideIndianRupee}
                     required
-                    readonly={
-                      product?.isSerialNumber || selectedProduct?.isSerialNumber
-                    }
+                    readonly={selectedProduct?.isSerialNumber}
                     type="number"
                     name="quantity"
                     placeholder="Enter quantity here"
                     defaultValue={
-                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                      selectedProduct?.isSerialNumber
                         ? 1
-                        : !(
-                            product?.isSerialNumber ||
-                            selectedProduct?.isSerialNumber
-                          ) && addStockFormData.quantity === 0
+                        : !selectedProduct?.isSerialNumber &&
+                          addStockFormData.quantity === 0
                         ? ""
                         : addStockFormData.quantity
                     }
                     value={
-                      product?.isSerialNumber || selectedProduct?.isSerialNumber
+                      selectedProduct?.isSerialNumber
                         ? 1
-                        : !(
-                            product?.isSerialNumber ||
-                            selectedProduct?.isSerialNumber
-                          ) && addStockFormData.quantity === 0
+                        : !selectedProduct?.isSerialNumber &&
+                          addStockFormData.quantity === 0
                         ? ""
                         : addStockFormData.quantity
                     }
@@ -410,7 +404,7 @@ const AddStock = ({
                 {/* Unit */}
 
                 <div className="mt-1.5">
-                  <CustomDropdown
+                  {/* <CustomDropdown
                     labelName="Unit :"
                     logo={LucideTimer}
                     preselectedOption={
@@ -435,7 +429,37 @@ const AddStock = ({
                     }
                     options={unitForProductData}
                     requiredRedDot={true}
+                  /> */}
+                  <CustomSelect
+                    label="Unit :"
+                    isClearable={false}
+                    icon={LucideTimer}
+                    options={unitOptions}
+                    value={selectedUnitId ?? undefined}
+                    onChange={(value) => {
+                      if (value) {
+                        setError((prev) => ({
+                          ...prev,
+                          unitIdError: false,
+                        }));
+                      } else {
+                        setError((prev) => ({
+                          ...prev,
+                          unitIdError: true,
+                        }));
+                      }
+                      setSelectedUnitId(value);
+                    }}
+                    isDisabled={
+                      !!(
+                        selectedProduct?.isSerialNumber &&
+                        selectedProduct?.parentUnitId
+                      )
+                    }
+                    isRequired={true}
+                    placeholder="Select Unit"
                   />
+
                   {error.unitIdError && (
                     <div className="caption-custom-inactive">
                       Product Unit is required
@@ -449,53 +473,40 @@ const AddStock = ({
                     label="Serial Number : "
                     logo={ListOrdered}
                     type="text"
-                    required={
-                      product?.isSerialNumber || selectedProduct?.isSerialNumber
-                    }
+                    required={selectedProduct?.isSerialNumber}
                     name="serial_number"
                     placeholder="Enter serial number here"
-                    // value={addProductToAccountFormData.quantity}
                     defaultValue={addStockFormData.serial_number}
                     onChange={handleAddStockFormDataChange}
-                    // error={errors.serial_number}
                   />
                 </div>
 
                 {/* warehouse */}
                 <div className="">
                   <div className="w-full h-fit">
-                    <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
-                      <WarehouseIcon className="text-blue-500" size={15} />
-                      <div>
-                        Warehouse :<span className="ml-0 text-red-400">*</span>
-                      </div>
-                    </label>
-
-                    <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                      <span className="input-label-custom ">
-                        {selectedCompanyWarehouse ? (
-                          <>
-                            {selectedCompanyWarehouse?.name}{" "}
-                            <span className="text-sm">
-                              ({selectedCompanyWarehouse.warehouseTypeName})
-                            </span>
-                          </>
-                        ) : (
-                          "No Warehouse selected"
-                        )}
-                      </span>
-
-                      <Button
-                        type="button"
-                        className="text-blue-600 text-sm underline hover:text-blue-800"
-                        onClick={() => {
-                          setShowWarehouseSelectionModule(true);
-                          setShowInputForm(false);
-                        }}
-                      >
-                        {selectedCompanyWarehouse ? "Change" : "Select"}
-                      </Button>
-                    </div>
+                    <CustomSelect
+                      icon={WarehouseIcon}
+                      options={warehouseOptions}
+                      placeholder="Select Warehouse"
+                      label="Warehouse :"
+                      value={selectedWarehouseId ?? undefined}
+                      onChange={(value) => {
+                        if (value) {
+                          setError((prev) => ({
+                            ...prev,
+                            warehouseIdError: false,
+                          }));
+                        } else {
+                          setError((prev) => ({
+                            ...prev,
+                            warehouseIdError: true,
+                          }));
+                        }
+                        setSelectedWarehouseId(value ?? null);
+                      }}
+                      isDisabled={false}
+                      isRequired
+                    />
                   </div>
                   {error.warehouseIdError && (
                     <div className="caption-custom-inactive">
@@ -574,15 +585,6 @@ const AddStock = ({
               </div>
             </form>
           </>
-        )}
-
-        {showWarehouseSelectionModule && !showInputForm && (
-          <div className="ag-theme-balham w-full h-[calc(100vh-120px)] p-2">
-            <CompanyWarehouseAgGrid
-              data={companyWarehouse}
-              onRowSelect={handleSelectedWarehouse}
-            />
-          </div>
         )}
       </>
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}

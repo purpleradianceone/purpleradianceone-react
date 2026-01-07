@@ -95,7 +95,9 @@ function CompanyUserAccessManagementModal({
   };
 
   useEffect(() => {
-    fetchUserAccessModules();
+    if(isOpen){
+      fetchUserAccessModules();
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;

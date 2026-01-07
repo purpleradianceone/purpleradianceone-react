@@ -389,9 +389,9 @@ function ProductsManagementGrid({
                           }
                         }}
                       >
-                        <div className="flex text-nowrap">
+                        <div className="">
                           <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                          Stock
+                         {JSX_CHILDREN_NAME.ADD_STOCK}
                         </div>
                       </ActionsDropdownButton>
                     </>
