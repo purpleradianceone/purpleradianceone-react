@@ -61,7 +61,10 @@ const ViewSupportTicketManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
 
   const [searchParams] = useSearchParams();
-  const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
+  const {
+    userHasAccessToUpdateSupportTicket,
+    userHasAccessToViewSupportTicketTask,
+  } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
     JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}")
@@ -179,7 +182,7 @@ const ViewSupportTicketManagement = () => {
     companyProductSla,
     loading: isLoadingForCompanyProductSla,
     // refetch: refetchCompanyProductSla,
-  } = useCompanyProductSla(selectedSupportTicket.companyProductId);
+  } = useCompanyProductSla(selectedSupportTicket.companyProductId, true);
 
   const {
     supportTicketCategory,
@@ -444,22 +447,22 @@ const ViewSupportTicketManagement = () => {
     } catch (error: any) {
       handleApiError(error);
       setFormData({
-      queryDescription:
-        selectedSupportTicket.queryDescription !== null &&
-        selectedSupportTicket.queryDescription !== undefined
-          ? selectedSupportTicket.queryDescription
-          : "",
-      publicNotes:
-        selectedSupportTicket.publicNotes !== null &&
-        selectedSupportTicket.publicNotes !== undefined
-          ? selectedSupportTicket.publicNotes
-          : "",
-      resolutionApplied:
-        selectedSupportTicket.resolutionApplied != null &&
-        selectedSupportTicket.resolutionApplied !== undefined
-          ? selectedSupportTicket.resolutionApplied
-          : "",
-    });
+        queryDescription:
+          selectedSupportTicket.queryDescription !== null &&
+          selectedSupportTicket.queryDescription !== undefined
+            ? selectedSupportTicket.queryDescription
+            : "",
+        publicNotes:
+          selectedSupportTicket.publicNotes !== null &&
+          selectedSupportTicket.publicNotes !== undefined
+            ? selectedSupportTicket.publicNotes
+            : "",
+        resolutionApplied:
+          selectedSupportTicket.resolutionApplied != null &&
+          selectedSupportTicket.resolutionApplied !== undefined
+            ? selectedSupportTicket.resolutionApplied
+            : "",
+      });
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
       setkeyForAssignTo((prev) => prev + 1);
@@ -703,17 +706,19 @@ const ViewSupportTicketManagement = () => {
                     />
                   </div>
                   {/* Product SerialNumber */}
-                  {selectedSupportTicket?.serialNumber&&<div className="flex items-center gap-1.5">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <QrCodeIcon size={27} strokeWidth={2} />
+                  {selectedSupportTicket?.serialNumber && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="bg-blue-600 p-1.5 rounded text-white">
+                        <QrCodeIcon size={27} strokeWidth={2} />
+                      </div>
+                      <Detail
+                        label="Serial Number"
+                        hasBorder={false}
+                        type="none"
+                        value={selectedSupportTicket?.serialNumber}
+                      />
                     </div>
-                    <Detail
-                      label="Serial Number"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.serialNumber}
-                    />
-                  </div>}
+                  )}
                 </div>
                 <Detail
                   type="none"
@@ -739,8 +744,6 @@ const ViewSupportTicketManagement = () => {
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  
-
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
@@ -912,8 +915,6 @@ const ViewSupportTicketManagement = () => {
                       )}
                     </div>
                   )}
-
-                  
 
                   {isLoadingForSupportTicketEscalationLevel ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
@@ -1141,7 +1142,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask?3:9}
               cols={0}
             />
 
@@ -1162,7 +1163,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask?3:9}
               cols={0}
             />
 
@@ -1183,15 +1184,17 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask?3:9}
               cols={0}
             />
           </div>
 
           {/* third Column */}
-          <div className="mt-3">
-            <SupportTicketTasksModal />
-          </div>
+          {userHasAccessToViewSupportTicketTask && (
+            <div className="mt-3">
+              <SupportTicketTasksModal />
+            </div>
+          )}
         </div>
 
         {/* Support Ticket history */}
@@ -1395,7 +1398,7 @@ const Detail: React.FC<DetailProps> = ({
               >
                 {value}
               </span>
-            ) }
+            )}
           </p>
         </div>
       ) : type === "text" ? (

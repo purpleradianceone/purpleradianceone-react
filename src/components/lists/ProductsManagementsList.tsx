@@ -127,7 +127,7 @@ ProductsManagementListProps) {
     setIsCustomDateOptionSelected,
   ]);
 
-  if (userHasAccessToViewProduct) {
+  if (userHasAccessToViewProduct || isGridForAccountProduct) {
     return (
       <div
         className={`w-full  ${
@@ -165,7 +165,7 @@ ProductsManagementListProps) {
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex mx-3 mt-1 gap-1">
+                {!isGridForAccountProduct&&<div className="flex mx-3 mt-1 gap-1">
                   <div className="flex">
                     <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
                       <Calendar className="input-label-custom mt-1" />
@@ -195,7 +195,7 @@ ProductsManagementListProps) {
                       />
                     </div>
                   )}
-                </div>
+                </div>}
               </div>
 
               {/* </> */}

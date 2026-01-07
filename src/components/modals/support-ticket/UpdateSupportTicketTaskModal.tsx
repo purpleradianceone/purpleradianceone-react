@@ -46,7 +46,7 @@ function UpdateSupportTicketTaskModal({
   supportTicketTaskStage: SupportTicketTaskStage[];
   handleSupportTicketTaskUpdate: () => void;
 }) {
-  const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
+  const { userHasAccessToUpdateSupportTicketTask } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
@@ -125,7 +125,7 @@ function UpdateSupportTicketTaskModal({
   const updateSupportTicketTask = async (
     event: React.FormEvent<HTMLButtonElement>
   ) => {
-    if (!userHasAccessToUpdateSupportTicket) {
+    if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
       );
@@ -178,7 +178,7 @@ function UpdateSupportTicketTaskModal({
   const handleIsActiveCheckboxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (!userHasAccessToUpdateSupportTicket) {
+    if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
       );
@@ -256,7 +256,7 @@ function UpdateSupportTicketTaskModal({
             }}
             options={supportTicketTaskStage}
             selectedValue={supportTicketTask.supportTicketTaskStageId}
-            readOnly={!userHasAccessToUpdateSupportTicket}
+            readOnly={!userHasAccessToUpdateSupportTicketTask}
           ></CustomDropdown>
 
           <div className="grid grid-cols-2 gap-2">
@@ -270,7 +270,7 @@ function UpdateSupportTicketTaskModal({
                 }}
                 logo={Calendar}
                 required={true}
-                readonly={!userHasAccessToUpdateSupportTicket}
+                readonly={!userHasAccessToUpdateSupportTicketTask}
               />
             </div>
 
@@ -314,8 +314,8 @@ function UpdateSupportTicketTaskModal({
             }}
             maxLength={500}
             required={true}
-            readonly={!userHasAccessToUpdateSupportTicket}
-            disabled={!userHasAccessToUpdateSupportTicket}
+            readonly={!userHasAccessToUpdateSupportTicketTask}
+            disabled={!userHasAccessToUpdateSupportTicketTask}
           ></TextAreaInput>
 
           {/* outcome */}
@@ -329,8 +329,8 @@ function UpdateSupportTicketTaskModal({
               setResultOutcome(e.target.value);
             }}
             maxLength={500}
-            readonly={!userHasAccessToUpdateSupportTicket}
-            disabled={!userHasAccessToUpdateSupportTicket}
+            readonly={!userHasAccessToUpdateSupportTicketTask}
+            disabled={!userHasAccessToUpdateSupportTicketTask}
           ></TextAreaInput>
         </div>
 
@@ -359,7 +359,7 @@ function UpdateSupportTicketTaskModal({
                 }
               }}
               // isDisabled={!userHasAccessToUpdateSupportTicket}
-              readOnly={!userHasAccessToUpdateSupportTicket}
+              readOnly={!userHasAccessToUpdateSupportTicketTask}
             />
           </div>
           <span className="caption-custom">
@@ -404,7 +404,7 @@ function UpdateSupportTicketTaskModal({
               type="submit"
               disabled={isSaving}
               onClick={(event: React.FormEvent<HTMLButtonElement>) => {
-                if (!userHasAccessToUpdateSupportTicket) {
+                if (!userHasAccessToUpdateSupportTicketTask) {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
                       .UPDATE_ACCESS_DENIED_MESSAGE

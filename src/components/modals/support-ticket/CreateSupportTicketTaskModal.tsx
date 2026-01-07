@@ -47,7 +47,7 @@ function CreateSupportTicketTaskModal({
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
   const [isSaving, setIsSaving] = useState(false);
-  const { userHasAccessToAddSupportTicket, userHasAccessToViewUser } =
+  const { userHasAccessToAddSupportTicketTask } =
     useUserAccessModules();
 
   const [description, setDescription] = useState<string>("");
@@ -376,7 +376,7 @@ function CreateSupportTicketTaskModal({
                   console.log("selected user:");
                   console.log(user);
                 }}
-                isDisabled={!userHasAccessToViewUser}
+                // isDisabled={!userHasAccessToViewUser}
                 disabledMessage={
                   MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                 }
@@ -409,7 +409,7 @@ function CreateSupportTicketTaskModal({
             {/* Save */}
             <Button
               type="submit"
-              disabled={isSaving || !userHasAccessToAddSupportTicket}
+              disabled={isSaving || !userHasAccessToAddSupportTicketTask}
               onClick={(event: React.FormEvent<HTMLButtonElement>) => {
                 if (isSaving) return;
                 createSupportTicketTask(event);
