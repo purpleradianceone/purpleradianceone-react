@@ -82,6 +82,8 @@ export default function CompanyUserSearchFieldInput({
   );
   const [isExplicitClear, setIsExplicitClear] = useState(false);
 
+  
+
   // ---------------- PRE POPULATE ----------------
   useEffect(() => {
     if (defaultValue && defaultValue.trim().length > 0) {

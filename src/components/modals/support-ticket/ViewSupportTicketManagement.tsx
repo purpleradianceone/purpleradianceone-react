@@ -503,6 +503,9 @@ const ViewSupportTicketManagement = () => {
 
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
 
+  const inputRef = useRef<HTMLDivElement | null>(null);
+
+
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
       {/* Header */}
@@ -720,18 +723,26 @@ const ViewSupportTicketManagement = () => {
                     </div>
                   )}
                 </div>
-                <Detail
-                  type="none"
-                  label={
-                    selectedSupportTicket?.resolvedByName !== "NA" &&
-                    selectedSupportTicket?.resolvedByName
-                      ? "Resolved By"
-                      : "Status"
-                  }
-                  value={
-                    selectedSupportTicket?.resolvedByName || "Not Resolved"
-                  }
-                />
+
+                <div
+                  onClick={() => {
+                    inputRef.current?.focus();
+                    inputRef.current?.click();
+                  }}
+                >
+                  <Detail
+                    type="none"
+                    label={
+                      selectedSupportTicket?.resolvedByName !== "NA" &&
+                      selectedSupportTicket?.resolvedByName
+                        ? "Resolved By"
+                        : "Status"
+                    }
+                    value={
+                      selectedSupportTicket?.resolvedByName || "Not Resolved"
+                    }
+                  />
+                </div>
               </div>
             </div>
 
@@ -1014,6 +1025,7 @@ const ViewSupportTicketManagement = () => {
 
                   {selectedSupportTicket.resolvedBy && (
                     <div
+                    ref={inputRef}
                       className={` ${
                         isLoadingForSupportTicketInfoSave
                           ? "cursor-wait"
@@ -1142,7 +1154,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask?3:9}
+              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
               cols={0}
             />
 
@@ -1163,7 +1175,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask?3:9}
+              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
               cols={0}
             />
 
@@ -1184,7 +1196,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask?3:9}
+              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
               cols={0}
             />
           </div>
