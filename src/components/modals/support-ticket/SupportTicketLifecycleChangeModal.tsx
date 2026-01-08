@@ -59,7 +59,6 @@ export function SupportTicketLIfecycleChangeModal({
     },
   });
 
-  const { userHasAccessToViewUser } = useUserAccessModules();
 
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
@@ -156,7 +155,6 @@ export function SupportTicketLIfecycleChangeModal({
                         });
                       }
                     }}
-                    isDisabled={!userHasAccessToViewUser}
                     disabledMessage={
                       MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                     }

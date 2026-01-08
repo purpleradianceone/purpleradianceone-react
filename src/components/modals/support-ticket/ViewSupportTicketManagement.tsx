@@ -37,7 +37,9 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import SupportTicketHistoryView from "./SupportTicketHistoryView";
-import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import CompanyUserSearchFieldInput, {
+  CompanyUserSearchFieldRef,
+} from "../../ui/CompanyUserSearchFieldInput";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
 import {
@@ -57,6 +59,7 @@ import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 const ViewSupportTicketManagement = () => {
+  const searchRef = useRef<CompanyUserSearchFieldRef>(null);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
 
@@ -503,9 +506,6 @@ const ViewSupportTicketManagement = () => {
 
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
 
-  const inputRef = useRef<HTMLDivElement | null>(null);
-
-
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
       {/* Header */}
@@ -724,14 +724,12 @@ const ViewSupportTicketManagement = () => {
                   )}
                 </div>
 
-                <div
-                  onClick={() => {
-                    inputRef.current?.focus();
-                    inputRef.current?.click();
-                  }}
-                >
+                <div className="hover:cursor-cell">
                   <Detail
                     type="none"
+                    onClick={() => {
+                      searchRef.current?.focus();
+                    }}
                     label={
                       selectedSupportTicket?.resolvedByName !== "NA" &&
                       selectedSupportTicket?.resolvedByName
@@ -1025,7 +1023,6 @@ const ViewSupportTicketManagement = () => {
 
                   {selectedSupportTicket.resolvedBy && (
                     <div
-                    ref={inputRef}
                       className={` ${
                         isLoadingForSupportTicketInfoSave
                           ? "cursor-wait"
@@ -1033,10 +1030,10 @@ const ViewSupportTicketManagement = () => {
                       }`}
                     >
                       <CompanyUserSearchFieldInput
+                        ref={searchRef}
                         key={keyForResolvedBy}
                         logo={UserCheck2Icon}
                         label="Resolved By"
-                        // placeholder={selectedSupportTicket.assignedToName}
                         defaultValue={selectedSupportTicket.resolvedByName}
                         isDisabled={!userHasAccessToUpdateSupportTicket}
                         disabledMessage={
@@ -1246,6 +1243,7 @@ type DetailProps = {
   value: string;
   type?: "text" | "number" | "select" | "none";
   options?: string[];
+  onClick?: () => void;
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -1262,6 +1260,7 @@ const Detail: React.FC<DetailProps> = ({
   type,
   options = [],
   onChange,
+  onClick,
   handleSupportTicketInfoSave,
   hasBorder,
   rows = 3,
@@ -1385,6 +1384,7 @@ const Detail: React.FC<DetailProps> = ({
           <p className="input-label-custom text-gray-800 whitespace-nowrap overflow-x-hidden text-clip">
             {value && (
               <span
+                onClick={onClick}
                 title={value.length > 25 ? value : undefined}
                 className={`inline-block max-w-[200px] select-text truncate ${
                   [
