@@ -127,7 +127,7 @@ function UpdateSupportTicketTaskModal({
   ) => {
     if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
-        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS
       );
       return;
     }
@@ -180,7 +180,7 @@ function UpdateSupportTicketTaskModal({
   ) => {
     if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
-        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.UPDATE_ACCESS_DENIED_MESSAGE
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS
       );
       return;
     }
@@ -407,7 +407,7 @@ function UpdateSupportTicketTaskModal({
                 if (!userHasAccessToUpdateSupportTicketTask) {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                      .UPDATE_ACCESS_DENIED_MESSAGE
+                      .DENIED_UPDATE_TASK_ACCESS
                   );
                   return;
                 }

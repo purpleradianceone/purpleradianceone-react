@@ -146,7 +146,7 @@ function SupportTicketTasksModal() {
                       setIsCreateSupportTicketTaskModalOpen(true);
                     } else {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_ACCESS
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_TASK_ACCESS
                       );
                     }
                   }}
