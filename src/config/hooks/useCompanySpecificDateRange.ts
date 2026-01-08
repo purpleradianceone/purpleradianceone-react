@@ -5,7 +5,7 @@ import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
 import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
-import axiosClient from "../../axios-client/AxiosClient";
+import axios from "axios";
 
 export const useComapanySpecificSearchDateRange = () => {
 
@@ -29,12 +29,12 @@ export const useComapanySpecificSearchDateRange = () => {
 const {loginStatus} = useLoggedInUserContext()
 
     const fetchDateRange = async() => {
-        
+        if(loginStatus.companyId===0)return;
         const postData = {
             requestedby: loginStatus.id,
             company_id: loginStatus.companyId,
           };
-         await axiosClient.post(POST_API.COMPANY_SPECIFIC_CRITERIA_DATE_RANGE, postData, {
+         await axios.post(POST_API.COMPANY_SPECIFIC_CRITERIA_DATE_RANGE, postData, {
               withCredentials: true,
             })
             .then((response) => {

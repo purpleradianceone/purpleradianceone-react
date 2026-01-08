@@ -27,7 +27,6 @@ import LeadSummaryReportType from "../../../../../@types/home/dashboard/LeadSumm
 import ApiError from "../../../../../@types/error/ApiError";
 import LeadTaskType from "../../../../../@types/lead-management/LeadTaskType";
 import SalesChart from "./SalesChart";
-import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import MonthlyAverageLeads from "../../../../../@types/home/dashboard/MonthlyAverageLeads";
 import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
 import Tasks from "./Tasks";
@@ -37,6 +36,7 @@ import { DashboardCrmSteps } from "../../../../../constants/AppTutorailsSteps";
 import { TutorailColumnName } from "../../../../../constants/Tutorail";
 import { useTutorailDataContext } from "../../../../../context/tutorail/useTutorailDataContext";
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
+import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -97,7 +97,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const getCrmModuleAccessOfCompanyUser = async () => {
     setAccessModuleCompanyUser([]);
-   
+
     const getCrmModuleAccessData = {
       company_id: loginStatus.companyId,
       company_user_id: companyUserId,
@@ -113,7 +113,6 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
           setAccessModuleCompanyUser(accessModuleOfCompanyUser);
         }
-       
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -264,10 +263,10 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   useEffect(() => {
     if (loginStatus?.companyId && loginStatus?.id && companyUserId !== null) {
-       setIsTasksLoading(true);       
+      setIsTasksLoading(true);
       getCrmModuleAccessOfCompanyUser();
     }
-     getDashboardData();
+    getDashboardData();
   }, [companyUserId]);
 
   useEffect(() => {
@@ -286,7 +285,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const componentMapDefault: { [key: string]: JSX.Element } = {
     // Changed to ensure JSX.Element, not null
-    [DashboardComponentJsxKey.TOTAL_LEADS] : (
+    [DashboardComponentJsxKey.TOTAL_LEADS]: (
       <div
         key="Total Leads"
         className="flex col-span-2 w-full gap-4 justify-around"
@@ -503,8 +502,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             title="Total Pending Task"
             id="totalPendingTaskMetricCard"
             value={(
-              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK]?.[0]
-                ?.total_pending_task ?? 0
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK
+              ]?.[0]?.total_pending_task ?? 0
             ).toString()}
             icon={CalendarClock}
             color="bg-gradient-to-r from-red-500 to-red-600"
@@ -521,8 +521,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             title="Total Pending Task - Today"
             id="totalPendingTaskTodayMetricCard"
             value={(
-              dashboardData?.[REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY]?.[0]
-                ?.total_pending_task_today ?? 0
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PENDING_TASK_TODAY
+              ]?.[0]?.total_pending_task_today ?? 0
             ).toString()}
             icon={AlarmClock}
             color="bg-gradient-to-r from-emerald-500 to-emerald-600"
@@ -530,7 +531,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             visibility={
               dashboardVisiblity.length !== 0
                 ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Pending Task - Today"
+                    (visibility) =>
+                      visibility.key == "Total Pending Task - Today"
                   )!.value
                 : false
             }
@@ -568,7 +570,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
             visibility={
               dashboardVisiblity.length !== 0
                 ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Upcoming Task - Today"
+                    (visibility) =>
+                      visibility.key == "Total Upcoming Task - Today"
                   )!.value
                 : false
             }
@@ -696,8 +699,12 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     <>
       <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-blue-50 to-indigo-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
         {isTasksLoading && (
-          <div className={`grid justify-center items-center min-h-[100vh] ${isTasksLoading?"cursor-wait":"cursor-default"}`}>
-            <LoadingSpinner></LoadingSpinner>
+          <div
+            className={`grid justify-center items-center min-h-[100vh] ${
+              isTasksLoading ? "cursor-wait" : "cursor-default"
+            }`}
+          >
+            <DashboardLoadingSpinner/>
           </div>
         )}
         {!isTasksLoading && dashboardVisiblity.length !== 0 && (

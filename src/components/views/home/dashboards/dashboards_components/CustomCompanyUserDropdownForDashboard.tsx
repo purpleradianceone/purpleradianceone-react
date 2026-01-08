@@ -59,7 +59,7 @@ const CustomCompanyUserDropdownForDashboard: React.FC<Props> = ({
     };
 
     try{
-    const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+    const response = await axios.post(POST_API.GET_LOOKUP_COMPANY_USERS, postData, {
       withCredentials: true,
     });
     return response.data || [];
