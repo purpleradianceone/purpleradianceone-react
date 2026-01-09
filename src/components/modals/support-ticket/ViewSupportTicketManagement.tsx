@@ -103,6 +103,9 @@ const ViewSupportTicketManagement = () => {
   });
 
   function savePreviousSupportTicketState() {
+    setkeyForAssignTo((prev) => prev + 1);
+    setkeyForResolvedBy((prev) => prev + 1);
+    setkeyForPageDataChange((prev) => prev + 1);
     setFormData({
       queryDescription:
         selectedSupportTicket.queryDescription !== null &&
@@ -452,16 +455,12 @@ const ViewSupportTicketManagement = () => {
         toast.success(response.data.message);
       } else if (response.data.status === false) {
         toast.error(response.data.message);
-        savePreviousSupportTicketState();
       }
     } catch (error: any) {
       handleApiError(error);
-      savePreviousSupportTicketState();
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
-      setkeyForAssignTo((prev) => prev + 1);
-      setkeyForResolvedBy((prev) => prev + 1);
-      setkeyForPageDataChange((prev) => prev + 1);
+      savePreviousSupportTicketState();
     }
   };
 
