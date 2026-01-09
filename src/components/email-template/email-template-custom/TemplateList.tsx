@@ -368,8 +368,8 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
       </div>
 
       {loading && hasmore && (
-        <div className="flex justify-center items-center flex-1">
-          <Loader2 className="animate-spin text-blue-600" size={48} />
+        <div className="flex justify-center h-full items-center">
+          <Loader2 className="animate-spin text-blue-600" size={30} />
         </div>
       )}
 

@@ -202,7 +202,7 @@ function SupportTicketManagementList({
           >
             {/* LEFT SECTION - Support Label */}
             {isUsedInSupportTicketModule && (
-              <div className="flex gap-2 items-center w-fit">
+              <div className="flex gap-1 items-center w-fit">
                 {!isSmallScreen && (
                   <Headset
                     className={`${
