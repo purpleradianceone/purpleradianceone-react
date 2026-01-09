@@ -138,7 +138,8 @@ ProductsManagementListProps) {
           className={`sticky z-10 top-12 mt-1  flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1 w-full`}
         >
           <div className="flex  justify-between w-full ">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-5">
+              <div className="flex mt-1 gap-1">
               <Store
                 className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
               />
@@ -148,6 +149,7 @@ ProductsManagementListProps) {
                   <span className="section-header-custom ">Products</span>
                 </>
               )}
+              </div>
 
               {/* {isLargeScreen && ( */}
               {/* <> */}

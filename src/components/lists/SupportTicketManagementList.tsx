@@ -436,36 +436,34 @@ function SupportTicketManagementList({
                         )}
                       </div>
                     </div>
+                  </div>
+                )}
 
-                    {/* RIGHT SECTION - Create Button */}
-                    {isUsedInSupportTicketModule && (
-                      <div className="flex gap-1 justify-end w-fit">
-                        <Button
-                          type="submit"
-                          disabled={!userHasAccessToAddSupportTicket}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (!userHasAccessToAddSupportTicket) {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                                  .DENIED_ADD_ACCESS
-                              );
-                              return;
-                            }
-                            setIsCreateSupportTicketModalOpen(true);
-                          }}
-                        >
-                          <span className="flex items-center gap-1">
-                            {!isSmallScreen && (
-                              <TicketPlus size={SIZE.SIXTEEN} />
-                            )}
-                            {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                            {isLargeScreen &&
-                              JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                          </span>
-                        </Button>
-                      </div>
-                    )}
+                {/* RIGHT SECTION - Create Button */}
+                {isUsedInSupportTicketModule && (
+                  <div className="flex gap-1 justify-end w-fit">
+                    <Button
+                      type="submit"
+                      disabled={!userHasAccessToAddSupportTicket}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!userHasAccessToAddSupportTicket) {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                              .DENIED_ADD_ACCESS
+                          );
+                          return;
+                        }
+                        setIsCreateSupportTicketModalOpen(true);
+                      }}
+                    >
+                      <span className="flex items-center gap-1">
+                        {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                        {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                        {isLargeScreen &&
+                          JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                      </span>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -529,8 +527,12 @@ function SupportTicketManagementList({
                   <GetCompanyUsersForLead
                     selectedUserId={
                       openPopUpOfAssignToModal
-                        ? selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
-                        : selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
+                        ? selectedAssignTo.id !== 0
+                          ? selectedAssignTo.id
+                          : null
+                        : selectedResolvedBy.id !== 0
+                        ? selectedResolvedBy.id
+                        : null
                     } // Pass the persisted ID
                     handleSelectedCompanyUserChange={(params) => {
                       if (openPopUpOfAssignToModal) {

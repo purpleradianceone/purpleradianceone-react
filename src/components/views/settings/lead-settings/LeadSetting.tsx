@@ -21,6 +21,7 @@ import FormHeader from "../../../ui/FormHeader";
 import GetCompanyUsersForLead from "../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
@@ -41,7 +42,7 @@ const LeadSetting: React.FC = () => {
         requestedby_id: loginStatus.id,
       };
 
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_SETTING_COMPANY,
         companyLeadSettingPostData,
         { withCredentials: true }

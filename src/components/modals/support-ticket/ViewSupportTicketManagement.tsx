@@ -102,7 +102,7 @@ const ViewSupportTicketManagement = () => {
     escalationLevelError: false,
   });
 
-  function savePreviousSupportTicketState() {
+  function saveChangesOfSupportTicketState() {
     setkeyForAssignTo((prev) => prev + 1);
     setkeyForResolvedBy((prev) => prev + 1);
     setkeyForPageDataChange((prev) => prev + 1);
@@ -126,7 +126,7 @@ const ViewSupportTicketManagement = () => {
   }
 
   useEffect(() => {
-    savePreviousSupportTicketState();
+    saveChangesOfSupportTicketState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSupportTicket]);
 
@@ -460,7 +460,7 @@ const ViewSupportTicketManagement = () => {
       handleApiError(error);
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
-      savePreviousSupportTicketState();
+      saveChangesOfSupportTicketState();
     }
   };
 
@@ -1148,7 +1148,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -1169,7 +1169,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -1190,7 +1190,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={userHasAccessToViewSupportTicketTask ? 3 : 9}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
           </div>
