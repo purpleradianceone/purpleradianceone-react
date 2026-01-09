@@ -101,7 +101,8 @@ const ViewSupportTicketManagement = () => {
     ticketSourceError: false,
     escalationLevelError: false,
   });
-  useEffect(() => {
+
+  function savePreviousSupportTicketState() {
     setFormData({
       queryDescription:
         selectedSupportTicket.queryDescription !== null &&
@@ -119,6 +120,11 @@ const ViewSupportTicketManagement = () => {
           ? selectedSupportTicket.resolutionApplied
           : "",
     });
+  }
+
+  useEffect(() => {
+    savePreviousSupportTicketState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
@@ -446,26 +452,11 @@ const ViewSupportTicketManagement = () => {
         toast.success(response.data.message);
       } else if (response.data.status === false) {
         toast.error(response.data.message);
+        savePreviousSupportTicketState();
       }
     } catch (error: any) {
       handleApiError(error);
-      setFormData({
-        queryDescription:
-          selectedSupportTicket.queryDescription !== null &&
-          selectedSupportTicket.queryDescription !== undefined
-            ? selectedSupportTicket.queryDescription
-            : "",
-        publicNotes:
-          selectedSupportTicket.publicNotes !== null &&
-          selectedSupportTicket.publicNotes !== undefined
-            ? selectedSupportTicket.publicNotes
-            : "",
-        resolutionApplied:
-          selectedSupportTicket.resolutionApplied != null &&
-          selectedSupportTicket.resolutionApplied !== undefined
-            ? selectedSupportTicket.resolutionApplied
-            : "",
-      });
+      savePreviousSupportTicketState();
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
       setkeyForAssignTo((prev) => prev + 1);
@@ -724,7 +715,14 @@ const ViewSupportTicketManagement = () => {
                   )}
                 </div>
 
-                <div className="hover:cursor-cell">
+                <div
+                  className={`${
+                    selectedSupportTicket?.resolvedByName !== "NA" &&
+                    selectedSupportTicket?.resolvedByName
+                      ? "hover:cursor-cell"
+                      : "hover:cursor-not-allowed"
+                  }`}
+                >
                   <Detail
                     type="none"
                     onClick={() => {
