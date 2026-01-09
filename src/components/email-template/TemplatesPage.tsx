@@ -7,7 +7,7 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
-import { LucidePlus, Calendar, LayoutDashboard } from "lucide-react";
+import {  LayoutDashboard, LucideLayoutDashboard } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import Button from "../ui/Button";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
@@ -375,65 +375,68 @@ export const TemplatesPage: React.FC = () => {
     >
       {/* Header */}
       <div
-        className={`p-1 sticky z-10 top-12 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm w-full mb-2`}
+        className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-2 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+                      w-full
+                    `}
       >
-        <div className="flex  justify-start w-full items-center">
-          <div className="flex gap-2">
-            {
-              <LayoutDashboard
-                className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-              />
-            }
-            <span className="section-header-custom">Templates</span>
-          </div>
-          <div className="w-fit">
-            <EmailTypeDropdown
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-              templateTypes={templateTypes}
+        <div className="flex justify-start items-center w-fit gap-5">
+          <div className="flex justify-center items-center gap-1">
+            <LayoutDashboard
+              className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
             />
+            <span className="section-header-custom">Email Template</span>
           </div>
 
-          {/* search box flex div */}
-          <div className={`flex ${isCustomDateOptionSelected?"w-60":"w-64"} `}>
-            <SearchInput
-              onChange={(e) => {
-                handleSearchParameterChange(e.target.value);
-              }}
-            ></SearchInput>
-          </div>
-        </div>
-
-        {/* Date FIlters Dropdown */}
-        <div className="flex w-full gap-2">
-          <div className="flex">
-            <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-              <Calendar className="mt-1 input-label-custom" />
-            </div>
-            <DateRangeFilterDropdown
-              dropdownOptions={dateRangeDropdownOptions}
-              handleDateIdChange={handleDateRangeIdChange}
-              selectedOption={selectedDateName}
-            ></DateRangeFilterDropdown>
-          </div>
-
-          {/* Custom Date Picker Div Flex Box*/}
-          {isCustomDateOptionSelected && (
-            <div
-              style={
-                isCustomDateOptionSelected
-                  ? { visibility: "visible" }
-                  : { visibility: "hidden" }
-              }
-            >
-              <DateRangePicker
-                onStartDateChange={handleStartDateChange}
-                onEndDateChange={handleEndDateChange}
-                initialStartDate={startDate}
-                initialEndDate={endDate}
+          <div className="flex gap-2">
+            <div className="w-fit">
+              <EmailTypeDropdown
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                templateTypes={templateTypes}
               />
             </div>
-          )}
+
+            {/* search box flex div */}
+            <div
+              className={`flex ${
+                isCustomDateOptionSelected ? "w-48 h-5" : "w-64 h-5"
+              } `}
+            >
+              <SearchInput
+                onChange={(e) => {
+                  handleSearchParameterChange(e.target.value);
+                }}
+              ></SearchInput>
+            </div>
+            {/* Date FIlters Dropdown */}
+            <div className="flex w-fit gap-2">
+              <div className="flex">
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                  selectedOption={selectedDateName}
+                ></DateRangeFilterDropdown>
+              </div>
+
+              {/* Custom Date Picker Div Flex Box*/}
+              {isCustomDateOptionSelected && (
+                <div
+                  style={
+                    isCustomDateOptionSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
+                >
+                  <DateRangePicker
+                    onStartDateChange={handleStartDateChange}
+                    onEndDateChange={handleEndDateChange}
+                    initialStartDate={startDate}
+                    initialEndDate={endDate}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="flex max-w-60 min-h-7 h-8">
@@ -449,9 +452,9 @@ export const TemplatesPage: React.FC = () => {
               }
             }}
           >
-            <div className="flex items-center justify-center gap-0.5">
-              <LucidePlus size={SIZE.SIXTEEN} />
-              Template
+            <div className="flex items-center justify-center gap-1">
+              <LucideLayoutDashboard size={SIZE.SIXTEEN} />
+              <span>Create</span>
             </div>
           </Button>
         </div>
@@ -463,7 +466,7 @@ export const TemplatesPage: React.FC = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <>
+        <div>
           <div className="flex-1 overflow-x-auto" ref={containerRef}>
             <EmailTemplateList
               templates={templates}
@@ -477,9 +480,10 @@ export const TemplatesPage: React.FC = () => {
             <TemplateTypeModal
               onClose={() => setShowModal(false)}
               onCreate={handleTemplateCreate}
+              templateTypes={templateTypes}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );

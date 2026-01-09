@@ -15,7 +15,7 @@ export const EmailTypeDropdown: React.FC<TabsProps> = ({
     <select
       value={activeTab}
       onChange={(e) => onTabChange(e.target.value)}
-      className="w-fit p-1 border-2  rounded-lg ring-blue-400 bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-colors hover:border-gray-400"
+      className="w-fit p-1.5 border-2  rounded-lg ring-blue-400 bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-colors hover:border-gray-400"
     >
       {/* <option value="">Select Template Type</option> */}
       {templateTypes.map((tab) => (

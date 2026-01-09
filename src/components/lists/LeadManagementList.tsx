@@ -165,7 +165,7 @@ function LeadManagementList({
         <div className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
          {
           isUsedInLeadModule && (
-             <div className="flex gap-2">
+             <div className="flex gap-1">
             {!isSmallScreen && <Handshake className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
 
 
@@ -252,9 +252,8 @@ function LeadManagementList({
                       <Button
                         type="button"
                         onClick={handleCompanyUserPopUp}
-                        className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
-                      rounded-md bg-white  hover:bg-gray-50 
-                      focus:outline-none shadow-sm"
+                        className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
+                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
                       >
                         <User size={14} />
                         <span>Owner</span>
