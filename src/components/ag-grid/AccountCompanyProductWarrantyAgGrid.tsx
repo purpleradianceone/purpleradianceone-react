@@ -7,10 +7,13 @@ import { AgGridReact } from "ag-grid-react";
 
 interface AccountCompanyProductWarrantyAgGrid {
   data: AccountCompanyProductWarranty[];
+    onRowSelect : (data : AccountCompanyProductWarranty)=> void
+
 }
 export const AccountCompanyProductWarrantyAgGrid : React.FC<
   AccountCompanyProductWarrantyAgGrid
-> = ({ data }) => {
+   
+> = ({ data , onRowSelect }) => {
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -24,6 +27,10 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
       {
         field: "details",
         headerName: "Details",
+      },
+      {
+        field: "warrantyTerms",
+        headerName: "Warranty Terms",
       },
       {
         field: "isActive",
@@ -61,6 +68,27 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
         field: "updatedOn",
         headerName: "updated On ",
       },
+      {
+              headerName: "Actions",
+              field: "view",
+              pinned: "right",
+              maxWidth: 80,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              cellRenderer: (params: AccountCompanyProductWarranty | any) => {
+                return (
+                  <div className="flex items-center justify-center  ">
+                    <span
+                      className="lead-details cursor-pointer text-blue-600  "
+                      onClick={() => {
+                        params.context.handleRowSelect(params.data);
+                      }}
+                    >
+                      Update
+                    </span>
+                  </div>
+                );
+              },
+            },
     ],
     []
   );
@@ -85,6 +113,7 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
+         context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );

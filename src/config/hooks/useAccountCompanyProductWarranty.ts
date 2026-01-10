@@ -20,7 +20,7 @@ export const useAccountCompanyProductWarranty = (accountCompanyProductId : numbe
         const postData = {
             company_id: loginStatus.companyId,
             account_company_product_id: accountCompanyProductId,
-            isactive: true,
+            isactive: null,
             requestedby_id : loginStatus.id
         };
 
@@ -40,6 +40,7 @@ export const useAccountCompanyProductWarranty = (accountCompanyProductId : numbe
                     isActive: item.isactive,
                     warrantyStartDate: item.warranty_start_date,
                     warrantyEndDate: item.warranty_end_date ,
+                    warrantyTerms : item.warranty_terms,
                     details : item.details,
                     createdBy: item.createdby,
                     updatedBy : item.updatedby ,
@@ -66,6 +67,7 @@ export const useAccountCompanyProductWarranty = (accountCompanyProductId : numbe
 
     return {
         accountCompanyProductWarranty,
-        loading
+        loading,
+        getAccountCompanyProductWarranty
     }
 }

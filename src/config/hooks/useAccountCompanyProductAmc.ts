@@ -20,7 +20,7 @@ export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>
         const postData = {
             company_id: loginStatus.companyId,
             account_company_product_id: accountCompanyProductId,
-            isactive: true,
+            isactive: null,
             requestedby_id : loginStatus.id
         };
 
@@ -67,6 +67,8 @@ export const useAccountCompanyProductAmc = (accountCompanyProductId : number) =>
 
     return {
         accountCompanyProductAmc,
-        loading
+        loading,
+        getCompanyProductAmc
+        
     }
 }

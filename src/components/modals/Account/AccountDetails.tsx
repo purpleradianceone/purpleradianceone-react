@@ -524,10 +524,7 @@ if (fieldName === "name") {
   if (!["createdOn", "createdBy"].includes(fieldName)) {
     setEditingField(fieldName);
 
-    const idField = dropdownIdMap[fieldName];
-
-    console.log("idField : "+ idField);
-    
+    const idField = dropdownIdMap[fieldName];    
     setOriginalValues((prev) => ({
       ...prev,
       [fieldName]: idField
@@ -611,12 +608,6 @@ if (fieldName === "name") {
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
       handleUpdateAccountDetails(fieldName, currentValue);
-      console.log(" this are the values ");
-
-      console.log(fieldName);
-      console.log("this si the current  value : " +currentValue);
-      console.log("this si the original value : " + originalValue);
-      
     }
     setEditingField(null);
   };

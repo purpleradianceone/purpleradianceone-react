@@ -18,7 +18,8 @@ import { useAxiosForbiddenHandler } from "./config/hooks/useAxiosForbiddenHandle
 import { DialogueBox } from "./components/dialogue-box/Dialogue";
 import  { TutorailDataContextProvider } from "./context/tutorail/useTutorailDataContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const queryClient = new QueryClient();
 /**
@@ -30,6 +31,7 @@ function App() {
     useAxiosForbiddenHandler();
 
   return (
+     <LocalizationProvider dateAdapter={AdapterDayjs}>
     <LoggedInUserContextProvider>
       <TutorailDataContextProvider>
       <AccessManagementContextProvider>
@@ -66,6 +68,7 @@ function App() {
       </AccessManagementContextProvider>
       </TutorailDataContextProvider>
     </LoggedInUserContextProvider>
+     </LocalizationProvider>
   );
 }
 
