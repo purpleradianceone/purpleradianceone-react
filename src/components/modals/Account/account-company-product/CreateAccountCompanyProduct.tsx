@@ -398,6 +398,8 @@ const CreateAccountCompanyProduct = ({
   function handleStockSerialNumberChange(ids: number[]) {
     setSelectedInwardIds(ids);
   }
+
+  
   return (
     <FormLayout width={6}>
       {/* Header */}

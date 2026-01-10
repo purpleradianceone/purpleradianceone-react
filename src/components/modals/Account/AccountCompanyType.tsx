@@ -19,7 +19,7 @@ import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
 
 const AccountCompanyType = ({ accountId }: { accountId: number }) => {
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToAddAccountTypes , userHasAccessToUpdateAccountTypes , userHasAccessToViewAccountTypes} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   // States
@@ -118,7 +118,9 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   };
 
   useEffect(() => {
-    getAccountCompanyAccountType();
+    // if(!userHasAccessToViewAccountTypes){
+      getAccountCompanyAccountType();
+    // }
   }, []);
 
   // if (isLoadingCompanyAccountType) {
@@ -131,10 +133,12 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   //   );
   // }
 
+  if(!userHasAccessToViewAccountTypes){
+    return null;
+  }
+
   return (
   <div className="bg-white border flex flex-col h-full  rounded-lg p-1 max-h-96 overflow-auto">
-
-     
       {/* Header */}
     <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>
@@ -148,9 +152,9 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
         <div className="flex items-center justify-center h-full  " >
         <span className="italic caption-custom flex gap-1 items-center ">
             <Button
-              disabled={!userHasAccessToUpdateAccount}
+              disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountTypes) {
                   setShowCompanyAccountTypeForCreate(
                     !showCompanyAccountTypeForCreate
                   );
@@ -173,9 +177,9 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
         <div className="grid md:grid-cols-2 gap-1 w-full">
           <div className="col-span-2 flex justify-end p-0.5">
             <Button
-              disabled={!userHasAccessToUpdateAccount}
+              disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountTypes) {
                   setShowCompanyAccountTypeForCreate(
                     !showCompanyAccountTypeForCreate
                   );
@@ -221,6 +225,10 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
                   name={item.id.toString()}
                   onToggle={(e) => {
                     e.preventDefault();
+                    if(!userHasAccessToUpdateAccountTypes) {
+                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_UPDATE_ACCESS)
+                      return;
+                    };
                     handleAccountCompanyAccountStatusChange(item);
                   }}
                   />

@@ -95,9 +95,32 @@ const MESSAGE = {
             UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update support ticket details.",
             DENIED_ADD_TASK_ACCESS : "You do not have permission to create support ticket task.",
             DENIED_UPDATE_TASK_ACCESS : "You do not have permission to update support ticket task.",
+        },
+        ACCOUNT_COMPANY_PRODUCT_WARRANTY : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view warranty details.",
+            DENIED_ADD_ACCESS : "You do not have permission to add warranty.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update warranty details.",
+        },
+        ACCOUNT_COMPANY_PRODUCT_AMC : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view Amc details.",
+            DENIED_ADD_ACCESS : "You do not have permission to add Amc.",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update Amc details.",
+        },
+        ACCOUNT_COMPANY_PRODUCT : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
+            DENIED_ADD_ACCESS : "You do not have permission to add .",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
+        },
 
-
-
+         ACCOUNT_TYPES : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
+            DENIED_ADD_ACCESS : "You do not have permission to add .",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
+        },
+         ACCOUNT_LEADS : {
+            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
+            DENIED_ADD_ACCESS : "You do not have permission to add .",
+            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
         }
     }
 }

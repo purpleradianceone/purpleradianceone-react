@@ -46,7 +46,8 @@ import { createPortal } from "react-dom";
 import {
   createMultipleAccountCompanyProduct,
   fetchAccount,
-  getStockLiveForCompanyProduct,
+  getLookupQuantityLive,
+  
 } from "../../../../../config/apis/api";
 import MESSAGE from "../../../../../constants/Messages";
 import { handleApiError } from "../../../../../config/error/handleApiError";
@@ -104,7 +105,7 @@ interface ProductRow {
 export const CreateMultipleAccountCompanyProduct = () => {
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToAddAccountProducts  } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   // Note : will get the accountId from the url params 
@@ -577,24 +578,30 @@ export const CreateMultipleAccountCompanyProduct = () => {
     );
 
     try {
-      const payload = {
-        company_id: loginStatus.companyId,
-        search_company_specific_date_range_id: null,
-        company_product_id: item.id,
-        search_parameter: null,
-        search_parameter_date: "",
-        limit: 25,
-        offset: 0,
-        requestedby_id: loginStatus.id,
-      };
+      // const payload = {
+      //   company_id: loginStatus.companyId,
+      //   search_company_specific_date_range_id: null,
+      //   company_product_id: item.id,
+      //   search_parameter: null,
+      //   search_parameter_date: "",
+      //   limit: 25,
+      //   offset: 0,
+      //   requestedby_id: loginStatus.id,
+      // };
 
+      const payload ={
+        company_id : loginStatus.companyId,
+        company_product_id: item.id,
+        requestedby_id: loginStatus.id,
+      }
       // Run APIs in parallel
       const [stockRes, units] = await Promise.all([
-        getStockLiveForCompanyProduct(payload),
+        getLookupQuantityLive(payload),
+        // getStockLiveForCompanyProduct(payload),
         getUnitForProduct(item.id!),
       ]);
 
-      const stock = stockRes.data?.[0];
+      const stock = stockRes.data;
 
       if (!stock || stock.quantity_live === 0) {
         toast.error(MESSAGE.ERROR.STOCK_NOT_AVAILABLE_FOR_PRODUCT);
@@ -748,10 +755,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
   // nonoid changes
   const [serialRowIndex, setSerialRowIndex] = useState<string | null>(null);
 
-  if (!userHasAccessToUpdateAccount)
+  if (!userHasAccessToAddAccountProducts)
     return (
       <div>
-        <AccessDeniedMessagePage message="You do not have the necessary permissions to Update Account." />
+        <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS} />
       </div>
     );
 

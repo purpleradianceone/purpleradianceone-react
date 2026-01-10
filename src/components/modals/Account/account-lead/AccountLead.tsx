@@ -22,7 +22,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
-  const {userHasAccessToViewLead, userHasAccessToUpdateAccount} = useUserAccessModules();
+  const {userHasAccessToViewLead, userHasAccessToUpdateAccountLeads } = useUserAccessModules();
   const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
@@ -204,7 +204,7 @@ return (
     )}
 
     {/* Leads Grid */}
-    {accountLead.length > 0 && (
+    {accountLead.length > 0  && (
       <div className="grid md:grid-cols-2 gap-1 w-full">
         {accountLead.map((item: AccountLeadType) => (
           <div
@@ -235,10 +235,10 @@ return (
                   name={item.id.toString()}
                   onToggle={() => {
                     // e.stopPropagation();
-                    if(userHasAccessToUpdateAccount){
+                    if(userHasAccessToUpdateAccountLeads){
                       handleAccountLeadStatusChange(item);
                     }else{
-                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_UPDATE_ACCESS)
                     }
                   }}
                 />

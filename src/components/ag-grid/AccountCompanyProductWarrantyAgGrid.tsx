@@ -3,6 +3,10 @@ import { AccountCompanyProductWarranty } from "../../@types/account/AccountCompa
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import StatusIndicator from "../ui/StatusIndicator";
 import { AgGridReact } from "ag-grid-react";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import Button from "../ui/Button";
 
 
 interface AccountCompanyProductWarrantyAgGrid {
@@ -14,6 +18,8 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
   AccountCompanyProductWarrantyAgGrid
    
 > = ({ data , onRowSelect }) => {
+
+  const {userHasAccessToUpdateAccountProductsWarranty} = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -77,14 +83,20 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
               cellRenderer: (params: AccountCompanyProductWarranty | any) => {
                 return (
                   <div className="flex items-center justify-center  ">
-                    <span
-                      className="lead-details cursor-pointer text-blue-600  "
+                    <Button
+                    disabled={!userHasAccessToUpdateAccountProductsWarranty}
+                      className={`lead-details  text-blue-600 ${userHasAccessToUpdateAccountProductsWarranty ? "hover:cursor-not-allowed" : "cursor-pointer"}  `}
                       onClick={() => {
-                        params.context.handleRowSelect(params.data);
+                        if(!userHasAccessToUpdateAccountProductsWarranty){
+                          toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_WARRANTY.DENIED_UPDATE_ACCESS);
+                          return;
+                        }
+                          params.context.handleRowSelect(params.data);
+                        
                       }}
                     >
                       Update
-                    </span>
+                    </Button>
                   </div>
                 );
               },
