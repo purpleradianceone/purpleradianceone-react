@@ -454,6 +454,10 @@ if (fieldName === "name") {
   const handleAccountStatusToggle = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if(!userHasAccessToUpdateAccount){
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+      return;
+    }
     const { checked } = event.target;
     const postData = {
       id: formData.id,
