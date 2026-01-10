@@ -25,7 +25,7 @@ const AccountCompanyProduct = (
    }: AccountCompanyProductType) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToUpdateAccountProducts, userHasAccessToViewAccountProducts } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
   const [showCreateAccountCompanyProduct, setShowCreateAccountCompanyProduct] =
@@ -48,6 +48,8 @@ const AccountCompanyProduct = (
     
   // };
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
+    if(!userHasAccessToViewAccountProducts) return ;
+
   navigate(
     // `products/${data.id}`,
       `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/products/${data.id}`,
@@ -55,7 +57,7 @@ const AccountCompanyProduct = (
     {
       state: {
         productName: data.companyProductName,
-        accountName : data.accountName
+        // accountName : data.accountName
       },
     }
   );
@@ -63,6 +65,7 @@ const AccountCompanyProduct = (
 
 
   function handleRowClick(event :any){
+        if(!userHasAccessToViewAccountProducts) return ;
     const data = event.data;
     navigate(
     // `products/${data.id}`,
@@ -239,7 +242,7 @@ const AccountCompanyProduct = (
           //     assignProducts: true,
           //   }}
               onClick={(e) => {
-                if (!userHasAccessToUpdateAccount) {
+                if (!userHasAccessToUpdateAccountProducts) {
                   e.preventDefault();
                   toast.error(
                     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
@@ -247,14 +250,14 @@ const AccountCompanyProduct = (
                 }
               }}
               className={
-                !userHasAccessToUpdateAccount
+                !userHasAccessToUpdateAccountProducts
                   ? "pointer-events-none opacity-85"
                   : ""
               }
             >
               {" "}
               <Button
-                disabled={!userHasAccessToUpdateAccount}
+                disabled={!userHasAccessToUpdateAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccount) {
                 //     setShowCreateAccountCompanyProduct(
@@ -285,7 +288,7 @@ const AccountCompanyProduct = (
             }}
               // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
               onClick={(e) => {
-                if (!userHasAccessToUpdateAccount) {
+                if (!userHasAccessToUpdateAccountProducts) {
                   e.preventDefault();
                   toast.error(
                     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
@@ -293,19 +296,17 @@ const AccountCompanyProduct = (
                 }
               }}
               className={
-                !userHasAccessToUpdateAccount
-                  ? "pointer-events-none opacity-85"
+                !userHasAccessToUpdateAccountProducts
+                  ? "pointer-events-none opacity-55"
                   : ""
               }
             >
               <Button
-                disabled={!userHasAccessToUpdateAccount}
+                // disabled={!userHasAccessToUpdateAccountProducts}
                 // onClick={() => {
-                //   if (userHasAccessToUpdateAccount) {
-                //     setShowCreateAccountCompanyProduct(
-                //       !showCreateAccountCompanyProduct
-                //     );
-                //   } else {
+                //   if (userHasAccessToUpdateAccountProducts) {
+                    
+                  
                 //     toast.error(
                 //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
                 //     );

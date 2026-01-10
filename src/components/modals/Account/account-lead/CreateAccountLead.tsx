@@ -25,7 +25,7 @@ const CreateAccountLead = ({
   getAccountLead: () => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const {userHasAccessToUpdateAccount} = useUserAccessModules();
+  const {userHasAccessToAddAccountLeads} = useUserAccessModules();
 
   const [showLeadsData, setShowLeadsData] = useState<boolean>(false);
 
@@ -75,9 +75,9 @@ const CreateAccountLead = ({
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
         <Button 
-          disabled ={!userHasAccessToUpdateAccount}
+          disabled ={!userHasAccessToAddAccountLeads}
           onClick={() => {
-            if(userHasAccessToUpdateAccount){
+            if(userHasAccessToAddAccountLeads){
               setShowLeadsData(!showLeadsData);
             }else{
               toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)

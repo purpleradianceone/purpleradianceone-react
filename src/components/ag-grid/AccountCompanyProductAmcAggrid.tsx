@@ -3,6 +3,10 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { AccountCompanyProductAmc } from "../../@types/account/AccountCompanyProductAmc";
 import StatusIndicator from "../ui/StatusIndicator";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import Button from "../ui/Button";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 
 interface AccountCompanyProductAmcAgGrid {
   data: AccountCompanyProductAmc[];
@@ -11,6 +15,10 @@ interface AccountCompanyProductAmcAgGrid {
 export const AccountCompanyProductAmcAggrid: React.FC<
   AccountCompanyProductAmcAgGrid
 > = ({ data, onRowSelect }) => {
+
+    const {userHasAccessToUpdateAccountProductsAmc} = useUserAccessModules();
+  
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -70,14 +78,19 @@ export const AccountCompanyProductAmcAggrid: React.FC<
         cellRenderer: (params: AccountCompanyProductAmc | any) => {
           return (
             <div className="flex items-center justify-center  ">
-              <span
+              <Button
+              disabled={!userHasAccessToUpdateAccountProductsAmc}
                 className="lead-details cursor-pointer text-blue-600  "
                 onClick={() => {
+                  if(!userHasAccessToUpdateAccountProductsAmc){
+                    toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_AMC.DENIED_UPDATE_ACCESS)
+                    return;
+                  }
                   params.context.handleRowSelect(params.data);
                 }}
               >
                 Update
-              </span>
+              </Button>
             </div>
           );
         },

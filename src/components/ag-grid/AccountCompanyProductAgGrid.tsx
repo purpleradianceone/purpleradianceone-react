@@ -5,6 +5,7 @@ import { INNERHTML } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import AccountProduct from "../../@types/account/AccountProduct";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 const AccountCompanyProductAgGrid = ({
   accountProductData,
   onRowSelect, //selected user for view lead details
@@ -18,6 +19,7 @@ const AccountCompanyProductAgGrid = ({
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
+  const {userHasAccessToViewAccountProducts} = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -273,10 +275,11 @@ const AccountCompanyProductAgGrid = ({
     return (
       <div className="flex items-center justify-center">
         <button
+        disabled={!isUsedForSelection && !userHasAccessToViewAccountProducts}
           className="lead-details cursor-pointer text-blue-600"
           onClick={(e) => {
             e.preventDefault();
-            e.stopPropagation(); // ⭐ THIS IS THE FIX
+            e.stopPropagation(); //  THIS IS THE FIX
             params.context.handleRowSelect(params.data);
           }}
         >

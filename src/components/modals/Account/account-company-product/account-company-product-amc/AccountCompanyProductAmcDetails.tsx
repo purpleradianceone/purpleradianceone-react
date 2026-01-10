@@ -7,12 +7,17 @@ import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import { AccountCompanyProductAmcAggrid } from "../../../../ag-grid/AccountCompanyProductAmcAggrid";
 import Button from "../../../../ui/Button";
 import { AccountCompanyProductAmcCreate } from "./AccountCompanyProductAmcCreate";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../../constants/Messages";
 
 export const AccountCompanyProductAmcDetails = ({
   accountCompanyProductId,
 }: {
   accountCompanyProductId: number;
 }) => {
+
+  const {userHasAccessToAddAccountProductsAmc , userHasAccessToViewAccountProductsAmc} = useUserAccessModules();
   // Note : gets the data for the grid from this hook
   const { accountCompanyProductAmc, loading , getCompanyProductAmc : trigerRefreshCall} = useAccountCompanyProductAmc(
     accountCompanyProductId
@@ -36,21 +41,22 @@ export const AccountCompanyProductAmcDetails = ({
     setSelectedAmcForUpdate(null);
   }
 
+  if(!userHasAccessToViewAccountProductsAmc) return null;
   return (
     <div className="bg-white rounded-xl border p-1 grid gap-1 border-slate-200">
       <h3 className="flex items-center justify-between bg-gray-100 table-header-custom rounded-t-md px-2">
         <span>AMC Details</span>
         <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
           <Button
-            disabled={false}
+            disabled={!userHasAccessToAddAccountProductsAmc}
             onClick={() => {
-              // if (true) {
+              if (userHasAccessToAddAccountProductsAmc) {
                 setOpenCreateAmcForm(true);
-              // } else {
-              //   toast.error(
-              //     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
-              //   );
-              // }
+              } else {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_AMC.DENIED_ADD_ACCESS
+                );
+              }
             }}
             className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
           >

@@ -27,13 +27,15 @@ import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
 import { format } from "date-fns";
 import CompanyUserSearchFieldInput from "../../../../ui/CompanyUserSearchFieldInput";
 import { AccountCompanyProductAmcDetails } from "../account-company-product-amc/AccountCompanyProductAmcDetails";
+import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../../../constants/Messages";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
 }: {
   selectedProductCard: AccountProduct;
 }) => {
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToUpdateAccountProducts , userHasAccessToViewAccountProducts} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   const [productData, setProductData] = useState<AccountProduct | null>(
@@ -198,7 +200,10 @@ export const AccountCompanyProductDetailsCard = ({
     return () => clearTimeout(timer);
   }, [productData]);
 
-  if (selectedProductCard === null) return null;
+  if (selectedProductCard === null ) return null;
+  if(!userHasAccessToViewAccountProducts)
+    return( <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS}></AccessDeniedMessagePage>)
+  
   return (
     <div className="px-1  py-0.5">
       {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
@@ -284,7 +289,7 @@ export const AccountCompanyProductDetailsCard = ({
             handleDateCommit("purchaseDate", date);
           }}
           logo={Calendar}
-          readonly={!userHasAccessToUpdateAccount}
+          readonly={!userHasAccessToUpdateAccountProducts}
           value={productData?.purchaseDate}
           isClearable={false}
           penLogo={true}
@@ -295,7 +300,7 @@ export const AccountCompanyProductDetailsCard = ({
             handleDateCommit("deliveryDate", date);
           }}
           logo={Calendar}
-          readonly={!userHasAccessToUpdateAccount}
+          readonly={!userHasAccessToUpdateAccountProducts}
           value={productData?.deliveryDate}
           isClearable={false}
           penLogo={true}
@@ -307,14 +312,14 @@ export const AccountCompanyProductDetailsCard = ({
             handleDateCommit("installationDate", date);
           }}
           logo={Calendar}
-          readonly={!userHasAccessToUpdateAccount}
+          readonly={!userHasAccessToUpdateAccountProducts}
           value={productData?.installationDate}
           isClearable={false}
           penLogo={true}
         />
 
         <CompanyUserSearchFieldInput
-          readOnly={!userHasAccessToUpdateAccount}
+          readOnly={!userHasAccessToUpdateAccountProducts}
           label="Installed By:"
           required
           onUserSelected={handleInstalledBySelect}
@@ -335,11 +340,11 @@ export const AccountCompanyProductDetailsCard = ({
           onChange={(event) => {
             handleOnChange("deliveryAddress", event);
           }}
-          readonly={!userHasAccessToUpdateAccount}
+          readonly={!userHasAccessToUpdateAccountProducts}
           logo={MapPin}
         />
         <TextAreaInput
-          readonly={!userHasAccessToUpdateAccount}
+          readonly={!userHasAccessToUpdateAccountProducts}
           placeholder="Enter billing address"
           cols={2}
           label="Billing Address"

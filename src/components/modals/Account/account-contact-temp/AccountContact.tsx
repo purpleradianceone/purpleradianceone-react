@@ -44,7 +44,7 @@ type AccountContactFormType = {
 
 const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const {   userHasAccessToAddAccountContacts , userHasAccessToUpdateAccountContacts } = useUserAccessModules();
   const [accountContact, setAccountContact] = useState<AccountContactType[]>(
     []
   );
@@ -432,9 +432,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <Button
-              disabled={!userHasAccessToUpdateAccount}
+              disabled={!userHasAccessToAddAccountContacts}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountContacts) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
                 } else {
                   toast.error(
@@ -454,9 +454,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
             <Button
-            disabled={!userHasAccessToUpdateAccount}
+            disabled={!userHasAccessToAddAccountContacts}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountContacts) {
                   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
                 } else {
                   toast.error(
@@ -594,7 +594,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     </div>
                     <button
                       onClick={() => {
-                        if (userHasAccessToUpdateAccount) {
+                        if (userHasAccessToUpdateAccountContacts) {
                           handleEditLeadContactClick(selectedContactCard);
                         } else {
                           toast.error(
@@ -603,7 +603,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                           );
                         }
                       }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                      className={`bg-blue-600 hover:bg-blue-700 ${!userHasAccessToUpdateAccountContacts ? "opacity-25" : ""} text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors`}
                     >
                       <Edit3 size={16} />
                       Edit
@@ -730,7 +730,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             checked={isActive}
                             name="isActive"
                             onToggle={
-                              userHasAccessToUpdateAccount
+                              userHasAccessToUpdateAccountContacts
                                     ? () => {
                                         handleActiveStatusChange(
                                           selectedContactCard

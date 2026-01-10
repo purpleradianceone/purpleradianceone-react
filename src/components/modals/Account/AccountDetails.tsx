@@ -103,7 +103,7 @@ const AccountDetails: React.FC = () => {
     createdBy: "",
     createdOn: "",
   });
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToUpdateAccount , userHasAccessToViewAccountLeads, userHasAccessToViewAccountTypes , userHasAccessToViewAccountContacts } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -1272,21 +1272,32 @@ if (fieldName === "name") {
           </div>
 
           {/* Right Card - Empty for future use */}
-          <div className="bg-white rounded-xl border p-1 border-slate-200">
+          {
+            userHasAccessToViewAccountContacts && (
+              <div className="bg-white rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Account Contacts
             </h3>
             <AccountContact accountId={company!.id} />
           </div>
+            )
+          }
           {/* Account Lead */}
-          <div>
+         {
+          userHasAccessToViewAccountLeads && (
+             <div>
             <AccountLead account={company!} />
           </div>
+          )
+         }
           {/* Account company type */}
-          <div className="min-h-28">
-            
+          {
+            userHasAccessToViewAccountTypes && (
+              <div className="min-h-28">
             <AccountCompanyType accountId={company!.id} />
           </div>
+            )
+          }
           {/* Account company product */}
           <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
