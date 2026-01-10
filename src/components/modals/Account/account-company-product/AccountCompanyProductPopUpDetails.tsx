@@ -28,12 +28,12 @@ import FormInput from "../../../ui/FormInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
 import IntervalType from "../../../../@types/interval/IntervalType";
 import { Item } from "../../../../constants/NumberList";
-import { AccountCompanyProductAmcDetails } from "./AccountCompanyProductAmcDetails";
-import { AccountCompanyProductWarrantyDetails } from "./AccountCompanyProductWarrantyDetails";
+import { AccountCompanyProductWarrantyDetails } from "./account-company-product-warranty/AccountCompanyProductWarrantyDetails";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import { AccountCompanyProductAmcDetails } from "./account-company-product-amc/AccountCompanyProductAmcDetails";
 
 const AccountCompanyProductPopUpDetails = ({
   selectedProductCard,

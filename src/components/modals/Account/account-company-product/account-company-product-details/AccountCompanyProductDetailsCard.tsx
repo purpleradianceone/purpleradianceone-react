@@ -20,13 +20,13 @@ import {
   ShoppingBag,
   User,
 } from "lucide-react";
-import { AccountCompanyProductAmcDetails } from "../AccountCompanyProductAmcDetails";
-import { AccountCompanyProductWarrantyDetails } from "../AccountCompanyProductWarrantyDetails";
+import { AccountCompanyProductWarrantyDetails } from "../account-company-product-warranty/AccountCompanyProductWarrantyDetails";
 import COLORS from "../../../../../constants/Colors";
 import TextAreaInput from "../../../../ui/TextAreaInput";
 import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
 import { format } from "date-fns";
 import CompanyUserSearchFieldInput from "../../../../ui/CompanyUserSearchFieldInput";
+import { AccountCompanyProductAmcDetails } from "../account-company-product-amc/AccountCompanyProductAmcDetails";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
@@ -59,9 +59,6 @@ export const AccountCompanyProductDetailsCard = ({
     purchaseDate: "purchase_date",
     deliveryDate: "delivery_date",
     installationDate: "installation_date",
-
-    // companyProductId: "company_product_id",
-    // accountId: "account_id",
     // add mappings only where API differs
   };
 
@@ -70,6 +67,15 @@ export const AccountCompanyProductDetailsCard = ({
     value: AccountProduct[K]
   ) => {
     if (!productData || !originalProductData) return;
+
+    // Delivery address and billing address cannot be null
+    if (typeof value === "string" && value.trim() === "") {
+      toast.error("Field cannot be empty");
+      setProductData((prev) =>
+        prev ? { ...prev, [field]: originalProductData[field] } : prev
+      );
+      return;
+    }
 
     const apiField = ACCOUNT_PRODUCT_API_FIELD_MAP[field] ?? field;
 
@@ -146,10 +152,10 @@ export const AccountCompanyProductDetailsCard = ({
 
   const handleInstalledBySelect = (user: CompanyUser | null) => {
     if (!user) return null;
-    if(user.id===0) return ;
-    
+    if (user.id === 0) return;
+
     console.log(user);
-    
+
     setProductData((prev) => {
       if (!prev) return prev;
 
@@ -270,89 +276,89 @@ export const AccountCompanyProductDetailsCard = ({
 
       {/* Content */}
       {/* <div className="px-2 pb-2"> */}
-        {/* Left Section */}
-        <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
-          <ControlledDatePicker
-            label="Purchase Date"
-            onCommit={(date) => {
-              handleDateCommit("purchaseDate", date);
-            }}
-            logo={Calendar}
-            readonly={!userHasAccessToUpdateAccount}
-            value={productData?.purchaseDate}
-            isClearable={false}
-            penLogo={true}
-          />
-          <ControlledDatePicker
-            label="Delivery Date"
-            onCommit={(date) => {
-              handleDateCommit("deliveryDate", date);
-            }}
-            logo={Calendar}
-            readonly={!userHasAccessToUpdateAccount}
-            value={productData?.deliveryDate}
-            isClearable={false}
-             penLogo={true}
-          />
-
-          <ControlledDatePicker
-            label="Installation Date"
-            onCommit={(date) => {
-              handleDateCommit("installationDate", date);
-            }}
-            logo={Calendar}
-            readonly={!userHasAccessToUpdateAccount}
-            value={productData?.installationDate}
-            isClearable={false}
-             penLogo={true}
-          />
-
-          <CompanyUserSearchFieldInput
-            readOnly={!userHasAccessToUpdateAccount}
-            label="Installed By:"
-            required
-            onUserSelected={handleInstalledBySelect}
-            defaultValue={productData?.installedByName}
-            logo={User}
-            placeholder="Select User"
-          />
-        </div>
-
-        <div className=" grid grid-cols-2 gap-1 pb-1">
-          {/* Addresses */}
-          <TextAreaInput
-            cols={2}
-            placeholder="Enter delivery address"
-            label="Delivery Address"
-            value={productData?.deliveryAddress}
-            rows={4}
-            onChange={(event) => {
-              handleOnChange("deliveryAddress", event);
-            }}
-            readonly={!userHasAccessToUpdateAccount}
-            logo={MapPin}
-          />
-          <TextAreaInput
-            readonly={!userHasAccessToUpdateAccount}
-            placeholder="Enter billing address"
-            cols={2}
-            label="Billing Address"
-            value={productData?.billingAddress}
-            rows={4}
-            onChange={(event) => {
-              handleOnChange("billingAddress", event);
-            }}
-            logo={ReceiptText}
-          />
-        </div>
-        {/* Right Card - Empty for future use */}
-
-        <AccountCompanyProductAmcDetails
-          accountCompanyProductId={selectedProductCard.id}
+      {/* Left Section */}
+      <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+        <ControlledDatePicker
+          label="Purchase Date"
+          onCommit={(date) => {
+            handleDateCommit("purchaseDate", date);
+          }}
+          logo={Calendar}
+          readonly={!userHasAccessToUpdateAccount}
+          value={productData?.purchaseDate}
+          isClearable={false}
+          penLogo={true}
         />
-        <AccountCompanyProductWarrantyDetails
-          accountCompanyProductId={selectedProductCard.id}
+        <ControlledDatePicker
+          label="Delivery Date"
+          onCommit={(date) => {
+            handleDateCommit("deliveryDate", date);
+          }}
+          logo={Calendar}
+          readonly={!userHasAccessToUpdateAccount}
+          value={productData?.deliveryDate}
+          isClearable={false}
+          penLogo={true}
         />
+
+        <ControlledDatePicker
+          label="Installation Date"
+          onCommit={(date) => {
+            handleDateCommit("installationDate", date);
+          }}
+          logo={Calendar}
+          readonly={!userHasAccessToUpdateAccount}
+          value={productData?.installationDate}
+          isClearable={false}
+          penLogo={true}
+        />
+
+        <CompanyUserSearchFieldInput
+          readOnly={!userHasAccessToUpdateAccount}
+          label="Installed By:"
+          required
+          onUserSelected={handleInstalledBySelect}
+          defaultValue={productData?.installedByName}
+          logo={User}
+          placeholder="Select User"
+        />
+      </div>
+
+      <div className=" grid grid-cols-2 gap-1 pb-1">
+        {/* Addresses */}
+        <TextAreaInput
+          cols={2}
+          placeholder="Enter delivery address"
+          label="Delivery Address"
+          value={productData?.deliveryAddress}
+          rows={4}
+          onChange={(event) => {
+            handleOnChange("deliveryAddress", event);
+          }}
+          readonly={!userHasAccessToUpdateAccount}
+          logo={MapPin}
+        />
+        <TextAreaInput
+          readonly={!userHasAccessToUpdateAccount}
+          placeholder="Enter billing address"
+          cols={2}
+          label="Billing Address"
+          value={productData?.billingAddress}
+          rows={4}
+          onChange={(event) => {
+            handleOnChange("billingAddress", event);
+          }}
+          logo={ReceiptText}
+        />
+      </div>
+      {/* Right Card - Empty for future use */}
+
+      <AccountCompanyProductAmcDetails
+        accountCompanyProductId={selectedProductCard.id}
+      />
+      <AccountCompanyProductWarrantyDetails
+        accountCompanyProductId={selectedProductCard.id}
+      />
       {/* </div> */}
     </div>
   );
