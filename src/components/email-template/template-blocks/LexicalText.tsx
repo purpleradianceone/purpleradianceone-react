@@ -30,6 +30,7 @@ import { Trash2 } from "lucide-react";
 import Button from "../../ui/Button";
 import { SIZE } from "../../../constants/AppConstants";
 
+const buttonTextStyle = "input-label-custom-white";
 // Styled Components
 const EditorContainer = React.forwardRef<
   HTMLDivElement,
@@ -59,7 +60,7 @@ const DeleteButton = ({ onClick }: { onClick: () => void }) => (
     <Button type="button" onClick={onClick}>
       <div className="flex items-center justify-center gap-1">
         <Trash2 size={SIZE.SIXTEEN} />
-        Delete Text Block
+        <span className={buttonTextStyle}>Text Block</span>
       </div>
     </Button>
   </div>
