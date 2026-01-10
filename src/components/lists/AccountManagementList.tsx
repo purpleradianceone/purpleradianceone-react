@@ -122,7 +122,8 @@ function AccountManagementList({
       <div
         className={`sticky z-10 top-10 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center justify-center gap-5">
+          <div className="flex gap-1">
           {!isSmallScreen && (
             <UserRoundCogIcon
               className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
@@ -132,6 +133,7 @@ function AccountManagementList({
           {(isMediumScreen || isLargeScreen) && (
             <span className="section-header-custom mt-1">{" Accounts"} </span>
           )}
+          </div>
 
           {/* {isLargeScreen && ( */}
           {/* <> */}

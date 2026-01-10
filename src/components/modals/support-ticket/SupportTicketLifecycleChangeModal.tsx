@@ -47,8 +47,12 @@ export function SupportTicketLIfecycleChangeModal({
     resolutionApplied: "",
     resolvedBy: {
       company_id: 0,
-      id: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedBy : selectedSupportTicketState.assignedTo,
-      fullname: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedByName : selectedSupportTicketState.assignedToName,
+      id: selectedSupportTicketState.resolvedBy
+        ? selectedSupportTicketState.resolvedBy
+        : selectedSupportTicketState.assignedTo,
+      fullname: selectedSupportTicketState.resolvedBy
+        ? selectedSupportTicketState.resolvedByName
+        : selectedSupportTicketState.assignedToName,
       email: "",
       mobilenumber: "",
       createdby: "",
@@ -58,8 +62,6 @@ export function SupportTicketLIfecycleChangeModal({
       all_leads_visible: true,
     },
   });
-
-  const { userHasAccessToViewUser } = useUserAccessModules();
 
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
@@ -90,7 +92,12 @@ export function SupportTicketLIfecycleChangeModal({
               label="Query Description"
               name="queryDescription"
               onChange={handleFormChange}
-              autoFocus={true}
+              autoFocus={
+                selectedSupportTicketLifecyclId &&
+                selectedSupportTicketLifecyclId < 4
+                  ? true
+                  : false
+              }
               rows={2}
               cols={0}
             />
@@ -100,7 +107,12 @@ export function SupportTicketLIfecycleChangeModal({
               label="Resolution Applied"
               name="resolutionApplied"
               onChange={handleFormChange}
-              // autoFocus={true}
+              autoFocus={
+                selectedSupportTicketLifecyclId &&
+                selectedSupportTicketLifecyclId >= 4
+                  ? true
+                  : false
+              }
               rows={2}
               cols={0}
             />
@@ -123,8 +135,8 @@ export function SupportTicketLIfecycleChangeModal({
                     // placeholder={loginStatus.fullName}
                     defaultValue={
                       formData.resolvedBy.id
-                      ? formData.resolvedBy.fullname
-                      : selectedSupportTicketState.assignedToName
+                        ? formData.resolvedBy.fullname
+                        : selectedSupportTicketState.assignedToName
                     }
                     logo={User}
                     onUserSelected={(user) => {
@@ -141,9 +153,12 @@ export function SupportTicketLIfecycleChangeModal({
                             ...prev,
                             resolvedBy: {
                               company_id: 0,
-                              id: selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedBy : selectedSupportTicketState.assignedTo,
-                              fullname:
-                                selectedSupportTicketState.resolvedBy ? selectedSupportTicketState.resolvedByName : selectedSupportTicketState.assignedToName,
+                              id: selectedSupportTicketState.resolvedBy
+                                ? selectedSupportTicketState.resolvedBy
+                                : selectedSupportTicketState.assignedTo,
+                              fullname: selectedSupportTicketState.resolvedBy
+                                ? selectedSupportTicketState.resolvedByName
+                                : selectedSupportTicketState.assignedToName,
                               email: "",
                               mobilenumber: "",
                               createdby: "",
@@ -156,7 +171,6 @@ export function SupportTicketLIfecycleChangeModal({
                         });
                       }
                     }}
-                    isDisabled={!userHasAccessToViewUser}
                     disabledMessage={
                       MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                     }

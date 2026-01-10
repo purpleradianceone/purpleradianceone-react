@@ -20,7 +20,7 @@ import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 function SupportTicketTasksModal() {
-  const { userHasAccessToAddSupportTicket } = useUserAccessModules();
+  const { userHasAccessToAddSupportTicketTask, } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
 
@@ -139,14 +139,14 @@ function SupportTicketTasksModal() {
               <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
                 {/* <span>Add</span> */}
                 <Button
-                  disabled={!userHasAccessToAddSupportTicket}
+                  disabled={!userHasAccessToAddSupportTicketTask}
                   className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
                   onClick={() => {
-                    if (userHasAccessToAddSupportTicket) {
+                    if (userHasAccessToAddSupportTicketTask) {
                       setIsCreateSupportTicketTaskModalOpen(true);
                     } else {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_ACCESS
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_TASK_ACCESS
                       );
                     }
                   }}

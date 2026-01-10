@@ -19,7 +19,6 @@ import {
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../../constants/PostApi";
 import { STATUS_CODE } from "../../../../../constants/AppConstants";
-import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import MetricCard from "../dashboards_components/MetricCard";
@@ -30,6 +29,7 @@ import SupportTasksDashboard from "./SupportTasksDashboard";
 import SupportTicketTaskDashboardProps from "../../../../../@types/support-ticket-management/SupportTicketTaskDashboardProps";
 import RecentTicketDashboardProps from "../../../../../@types/support-ticket-management/RecentTicketDashboardProps";
 import RecentTicketsDashboard from "./RecentTicketsDashboard";
+import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 
 /* ---------------- TYPES ---------------- */
 
@@ -479,7 +479,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       {isTasksLoading ? (
         <div className={`grid justify-center items-center min-h-[100vh] ${isTasksLoading?"cursor-wait":"cursor-default"}`}>
-          <LoadingSpinner />
+          <DashboardLoadingSpinner/>
         </div>
       ) : (
         <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">

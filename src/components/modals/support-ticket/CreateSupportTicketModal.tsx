@@ -36,7 +36,6 @@ import CustomDropdown from "../leads/CustomDropdown";
 import MESSAGE from "../../../constants/Messages";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import CreateSupportTicket from "../../../@types/support-ticket-management/CreateSuppoetTicket";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import StageIndicator from "./StageIdicator";
@@ -58,7 +57,6 @@ function CreateSupportTicketModal({
   handleSupportTicketCreated: () => void;
 }) {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewUser } = useUserAccessModules();
 
   const { supportTicketCategory, isLoading: isLoadingForTicketCategory } =
     useSupportTicketCategory();
@@ -164,11 +162,11 @@ function CreateSupportTicketModal({
       company_id: loginStatus.companyId,
       company_product_id: selectedAccount.companyProductId,
       isactive: true,
-      requestedby_id: loginStatus.id,
+      requestedby: loginStatus.id,
     };
 
     await axiosClient
-      .post(POST_API.GET_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
+      .post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
         withCredentials: true,
       })
       .then((response) => {
@@ -794,7 +792,7 @@ function CreateSupportTicketModal({
                             });
                           }
                         }}
-                        isDisabled={!userHasAccessToViewUser}
+                        // isDisabled={!userHasAccessToViewUser}
                         disabledMessage={
                           MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                         }

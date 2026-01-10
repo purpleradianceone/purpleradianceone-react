@@ -87,10 +87,11 @@ function TeamManagementList({
       <div
         className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex  gap-2">
+        <div className="flex justify-center items-center gap-5">
+        <div className="flex gap-1">
           {!isSmallScreen && (
             <Network
-              className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-1`}
+              className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}
             />
           )}
 
@@ -100,7 +101,6 @@ function TeamManagementList({
         </div>
 
         {isLargeScreen && (
-          <>
             <div className="flex gap-1">
               {/* search box flex div */}
               <div className="relative flex items-start w-80 ">
@@ -146,8 +146,8 @@ function TeamManagementList({
                 )}
               </div>
             </div>
-          </>
         )}
+        </div>
 
         {/* new end */}
 

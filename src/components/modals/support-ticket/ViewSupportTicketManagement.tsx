@@ -37,7 +37,9 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import SupportTicketHistoryView from "./SupportTicketHistoryView";
-import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import CompanyUserSearchFieldInput, {
+  CompanyUserSearchFieldRef,
+} from "../../ui/CompanyUserSearchFieldInput";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
 import {
@@ -57,11 +59,15 @@ import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 const ViewSupportTicketManagement = () => {
+  const searchRef = useRef<CompanyUserSearchFieldRef>(null);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
 
   const [searchParams] = useSearchParams();
-  const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
+  const {
+    userHasAccessToUpdateSupportTicket,
+    userHasAccessToViewSupportTicketTask,
+  } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
     JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}")
@@ -95,7 +101,11 @@ const ViewSupportTicketManagement = () => {
     ticketSourceError: false,
     escalationLevelError: false,
   });
-  useEffect(() => {
+
+  function saveChangesOfSupportTicketState() {
+    setkeyForAssignTo((prev) => prev + 1);
+    setkeyForResolvedBy((prev) => prev + 1);
+    setkeyForPageDataChange((prev) => prev + 1);
     setFormData({
       queryDescription:
         selectedSupportTicket.queryDescription !== null &&
@@ -113,6 +123,11 @@ const ViewSupportTicketManagement = () => {
           ? selectedSupportTicket.resolutionApplied
           : "",
     });
+  }
+
+  useEffect(() => {
+    saveChangesOfSupportTicketState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
@@ -179,7 +194,7 @@ const ViewSupportTicketManagement = () => {
     companyProductSla,
     loading: isLoadingForCompanyProductSla,
     // refetch: refetchCompanyProductSla,
-  } = useCompanyProductSla(selectedSupportTicket.companyProductId);
+  } = useCompanyProductSla(selectedSupportTicket.companyProductId, true);
 
   const {
     supportTicketCategory,
@@ -443,28 +458,9 @@ const ViewSupportTicketManagement = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-      setFormData({
-      queryDescription:
-        selectedSupportTicket.queryDescription !== null &&
-        selectedSupportTicket.queryDescription !== undefined
-          ? selectedSupportTicket.queryDescription
-          : "",
-      publicNotes:
-        selectedSupportTicket.publicNotes !== null &&
-        selectedSupportTicket.publicNotes !== undefined
-          ? selectedSupportTicket.publicNotes
-          : "",
-      resolutionApplied:
-        selectedSupportTicket.resolutionApplied != null &&
-        selectedSupportTicket.resolutionApplied !== undefined
-          ? selectedSupportTicket.resolutionApplied
-          : "",
-    });
     } finally {
       setIsLoadingForSupportTicketInfoSave(false);
-      setkeyForAssignTo((prev) => prev + 1);
-      setkeyForResolvedBy((prev) => prev + 1);
-      setkeyForPageDataChange((prev) => prev + 1);
+      saveChangesOfSupportTicketState();
     }
   };
 
@@ -703,30 +699,45 @@ const ViewSupportTicketManagement = () => {
                     />
                   </div>
                   {/* Product SerialNumber */}
-                  {selectedSupportTicket?.serialNumber&&<div className="flex items-center gap-1.5">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <QrCodeIcon size={27} strokeWidth={2} />
+                  {selectedSupportTicket?.serialNumber && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="bg-blue-600 p-1.5 rounded text-white">
+                        <QrCodeIcon size={27} strokeWidth={2} />
+                      </div>
+                      <Detail
+                        label="Serial Number"
+                        hasBorder={false}
+                        type="none"
+                        value={selectedSupportTicket?.serialNumber}
+                      />
                     </div>
-                    <Detail
-                      label="Serial Number"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.serialNumber}
-                    />
-                  </div>}
+                  )}
                 </div>
-                <Detail
-                  type="none"
-                  label={
+
+                <div
+                  className={`${
                     selectedSupportTicket?.resolvedByName !== "NA" &&
                     selectedSupportTicket?.resolvedByName
-                      ? "Resolved By"
-                      : "Status"
-                  }
-                  value={
-                    selectedSupportTicket?.resolvedByName || "Not Resolved"
-                  }
-                />
+                      ? "hover:cursor-cell"
+                      : "hover:cursor-not-allowed"
+                  }`}
+                >
+                  <Detail
+                    type="none"
+                    onClick={() => {
+                      searchRef.current?.focus();
+                    }}
+                    label={
+                      selectedSupportTicket?.resolvedByName !== "NA" &&
+                      selectedSupportTicket?.resolvedByName
+                        ? "Resolved By"
+                        : "Status"
+                    }
+                    value={
+                      selectedSupportTicket?.resolvedByName || "Not Resolved"
+                    }
+                  />
+                </div>
               </div>
             </div>
 
@@ -739,8 +750,6 @@ const ViewSupportTicketManagement = () => {
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  
-
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
@@ -913,8 +922,6 @@ const ViewSupportTicketManagement = () => {
                     </div>
                   )}
 
-                  
-
                   {isLoadingForSupportTicketEscalationLevel ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
                       <div className="h-4 w-24 bg-gray-200 rounded" />
@@ -1020,10 +1027,10 @@ const ViewSupportTicketManagement = () => {
                       }`}
                     >
                       <CompanyUserSearchFieldInput
+                        ref={searchRef}
                         key={keyForResolvedBy}
                         logo={UserCheck2Icon}
                         label="Resolved By"
-                        // placeholder={selectedSupportTicket.assignedToName}
                         defaultValue={selectedSupportTicket.resolvedByName}
                         isDisabled={!userHasAccessToUpdateSupportTicket}
                         disabledMessage={
@@ -1141,7 +1148,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -1162,7 +1169,7 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -1183,15 +1190,17 @@ const ViewSupportTicketManagement = () => {
                   handleOnBlur(e);
                 }
               }}
-              rows={3}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
           </div>
 
           {/* third Column */}
-          <div className="mt-3">
-            <SupportTicketTasksModal />
-          </div>
+          {userHasAccessToViewSupportTicketTask && (
+            <div className="mt-3">
+              <SupportTicketTasksModal />
+            </div>
+          )}
         </div>
 
         {/* Support Ticket history */}
@@ -1231,6 +1240,7 @@ type DetailProps = {
   value: string;
   type?: "text" | "number" | "select" | "none";
   options?: string[];
+  onClick?: () => void;
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -1247,6 +1257,7 @@ const Detail: React.FC<DetailProps> = ({
   type,
   options = [],
   onChange,
+  onClick,
   handleSupportTicketInfoSave,
   hasBorder,
   rows = 3,
@@ -1370,6 +1381,7 @@ const Detail: React.FC<DetailProps> = ({
           <p className="input-label-custom text-gray-800 whitespace-nowrap overflow-x-hidden text-clip">
             {value && (
               <span
+                onClick={onClick}
                 title={value.length > 25 ? value : undefined}
                 className={`inline-block max-w-[200px] select-text truncate ${
                   [
@@ -1395,7 +1407,7 @@ const Detail: React.FC<DetailProps> = ({
               >
                 {value}
               </span>
-            ) }
+            )}
           </p>
         </div>
       ) : type === "text" ? (

@@ -259,57 +259,61 @@ function GetCompanyUsersList({
       <div
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex  gap-1">
-          <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-          <span className="section-header-custom">Company Users</span>
-        </div>
-
-        <div className="flex gap-1">
-          {/* search box flex div */}
-
-          <div className="relative flex items-start w-80">
-            <SearchInput
-              id="company-user-module-search-box"
-              onChange={(e) => {
-                handleSearchOption.handleSearchParameterChange(e.target.value);
-              }}
-              value={handleSearchOption.searchParameter}
-            ></SearchInput>
+        <div className="flex justify-center items-center gap-5">
+          <div className="flex gap-1">
+            <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+            <span className="section-header-custom">Company Users</span>
           </div>
 
-          {/* Date FIlters Dropdown */}
-          <div
-            id="company-users-module-date-range-filter"
-            className="flex mx-3 gap-1"
-          >
-            <div className="flex">
-              <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                <Calendar className="input-label-custom mt-1" />
-              </div>
+          <div className="flex gap-1">
+            {/* search box flex div */}
 
-              <DateRangeFilterDropdown
-                dropdownOptions={dateRangeDropdownOptions}
-                handleDateIdChange={handleDateRangeIdChange}
-                selectedOption={selectedDateName}
-              ></DateRangeFilterDropdown>
+            <div className="relative flex justify-start items-start w-80">
+              <SearchInput
+                id="company-user-module-search-box"
+                onChange={(e) => {
+                  handleSearchOption.handleSearchParameterChange(
+                    e.target.value
+                  );
+                }}
+                value={handleSearchOption.searchParameter}
+              ></SearchInput>
             </div>
-            {/* Custom Date Picker Div Flex Box*/}
-            {isCustomDateOptionSelected && (
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                  initialStartDate={handleSearchOption.startDate}
-                  initialEndDate={handleSearchOption.endDate}
-                />
+
+            {/* Date FIlters Dropdown */}
+            <div
+              id="company-users-module-date-range-filter"
+              className="flex mx-3 gap-1"
+            >
+              <div className="flex">
+                <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                  <Calendar className="input-label-custom mt-1" />
+                </div>
+
+                <DateRangeFilterDropdown
+                  dropdownOptions={dateRangeDropdownOptions}
+                  handleDateIdChange={handleDateRangeIdChange}
+                  selectedOption={selectedDateName}
+                ></DateRangeFilterDropdown>
               </div>
-            )}
+              {/* Custom Date Picker Div Flex Box*/}
+              {isCustomDateOptionSelected && (
+                <div
+                  style={
+                    isCustomDateOptionSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
+                >
+                  <DateRangePicker
+                    onStartDateChange={onStartDateChange}
+                    onEndDateChange={onEndDateChange}
+                    initialStartDate={handleSearchOption.startDate}
+                    initialEndDate={handleSearchOption.endDate}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
