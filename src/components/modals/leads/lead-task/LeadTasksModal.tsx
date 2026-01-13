@@ -21,7 +21,7 @@ import MESSAGE from "../../../../constants/Messages";
 import axiosClient from "../../../../axios-client/AxiosClient";
 
 function LeadTasksModal({ ownerId }: { ownerId: number }) {
-  const {userHasAccessToUpdateLead} = useUserAccessModules();
+  const { userHasAccessToAddLeadTasks, userHasAccessToViewLeadTasks} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
 
@@ -246,10 +246,14 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
     setVisibleAssignUsersBtn(true);
   }, []);
   useEffect(() => {
-    if (leadData || leadTaskStageId !== 0) {
-      getLeadTasks();
+    if(userHasAccessToViewLeadTasks){
+
+      if (leadData || leadTaskStageId !== 0) {
+        getLeadTasks();
+      }
     }
   }, [
+    userHasAccessToViewLeadTasks,
     leadData,
     leadTaskStageId,
     leadActivityId,
@@ -258,10 +262,13 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
   ]);
 
   useEffect(() => {
-    getLeadActivity();
-    getLeadTaskPriority();
-    getLeadTaskStage();
-  }, []);
+    if(userHasAccessToViewLeadTasks){
+
+      getLeadActivity();
+      getLeadTaskPriority();
+      getLeadTaskStage();
+    }
+  }, [userHasAccessToViewLeadTasks]);
 
   const [isCreateLeadTaskModalOpen, setIsCreateLeadTaskModalOpen] =
     useState<boolean>(false);
@@ -273,17 +280,17 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
             <span className="table-header-custom pl-1  text-center ">
               Tasks
             </span>
-            {visibleAssignUsersBtn && (
+            {visibleAssignUsersBtn && userHasAccessToViewLeadTasks && (
               <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
                 {/* <span>Add</span> */}
                 <Button
-                  disabled={!userHasAccessToUpdateLead}
+                  disabled={!userHasAccessToAddLeadTasks}
                   className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
                   onClick={() => {
-                    if(userHasAccessToUpdateLead){
+                    if(userHasAccessToAddLeadTasks){
                       setIsCreateLeadTaskModalOpen(true);
                     }else{
-                      toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+                      toast.error(MESSAGE.MODULE_ACCESS.LEAD_TASKS.DENIED_ADD_ACCESS)
                     }
                   }}
                 >

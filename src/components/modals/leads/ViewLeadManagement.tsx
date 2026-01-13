@@ -61,8 +61,15 @@ import { handleApiError } from "../../../config/error/handleApiError";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
-    useUserAccessModules();
+  const {
+    userHasAccessToUpdateLead,
+    userHasAccessToViewLead,
+    userHasAccessToViewLeadSettings,
+    userHasAccessToViewLeadContacts,
+    userHasAccessToViewLeadProduct,
+    userHasAccessToUpdateLeadDetails,
+    userHasAccessToViewLeadDetails
+  } = useUserAccessModules();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
@@ -262,7 +269,7 @@ const ViewLeadManagement = () => {
   //   setIsLeadOwnerPopUpOpen(true);
   // };
 
-  const handleLeadOwnerChange = async () => {    
+  const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       toast.error("Select new lead owner before procedding.");
@@ -308,13 +315,13 @@ const ViewLeadManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      handleApiError(error)
+      handleApiError(error);
       // if (error.status === STATUS_CODE.UNATHORISED) {
-        //   const refreshTokenStatus = await RefreshToken({
-          //     callFunction: handleLeadOwnerChange,
-          //   });
+      //   const refreshTokenStatus = await RefreshToken({
+      //     callFunction: handleLeadOwnerChange,
+      //   });
       //   if (refreshTokenStatus) {
-        //     handleLeadOwnerChange();
+      //     handleLeadOwnerChange();
       //   }
       // }
     } finally {
@@ -331,7 +338,7 @@ const ViewLeadManagement = () => {
         requestedby: "",
         generate_password: "",
       });
-      setRefreshKeyForLeadOwnerChange(prev => prev+1)
+      setRefreshKeyForLeadOwnerChange((prev) => prev + 1);
     }
   };
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
@@ -580,14 +587,33 @@ const ViewLeadManagement = () => {
   useEffect(() => {
     const apisCalls = () => {
       fetchLeadStatus();
-      getLeadDetails();
-      fetchLeadContact();
-      getLeadInterestData();
-      fetchLeadCompanyProduct();
+      // getLeadDetails();
+      // fetchLeadContact();
+      // getLeadInterestData();
+      // fetchLeadCompanyProduct();
     };
     apisCalls();
   }, []);
 
+  useEffect(()=>{
+    if(userHasAccessToViewLeadDetails){
+      getLeadDetails();
+    }
+
+  },[userHasAccessToViewLeadDetails])
+
+  useEffect(()=>{
+    if(userHasAccessToViewLeadContacts){
+      fetchLeadContact()
+    }
+  }, [userHasAccessToViewLeadContacts])
+
+  useEffect(()=>{
+    if(userHasAccessToViewLeadProduct){
+      getLeadInterestData();
+      fetchLeadCompanyProduct()
+    }
+  }, [userHasAccessToViewLeadProduct])
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
@@ -756,7 +782,7 @@ const ViewLeadManagement = () => {
             <div className="relative inline-block">
               <button
                 onClick={() => {
-                  if (userHasAccessToUpdateLead) {
+                  if (userHasAccessToViewLeadSettings) {
                     setIsLeadSettingModalOpen(true);
                   } else {
                     toast.error(
@@ -765,11 +791,19 @@ const ViewLeadManagement = () => {
                     );
                   }
                 }}
-                className="px-1 py-0.5 caption-custom flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
+                className={`px-1 py-0.5 caption-custom flex gap-1 items-center justify-center
+    border rounded transition
+    ${
+      userHasAccessToViewLeadSettings
+        ? "bg-white hover:bg-slate-400 hover:text-white text-gray-500 cursor-pointer"
+        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+    }
+  `}
               >
                 <Settings size={12} />
                 <span>Lead setting</span>
               </button>
+
               {isLeadSettingModalOpen && (
                 <LeadSettingForLead
                   isOpen={isLeadSettingModalOpen}
@@ -902,7 +936,7 @@ const ViewLeadManagement = () => {
                       "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
                   }}
                   onClick={() => {
-                    if (userHasAccessToUpdateLead) {
+                    if (userHasAccessToUpdateLeadDetails) {
                       setReasonInputBoxOpen(true);
                       setSelectedStatusId(item.id);
                     } else {
@@ -1018,7 +1052,9 @@ const ViewLeadManagement = () => {
                       label="Name"
                       // hasBorder={true}
                       type={userHasAccessToUpdateLead ? "text" : "none"}
-                      value={selectedLeadData.name && selectedLeadData.name || ""}
+                      value={
+                        (selectedLeadData.name && selectedLeadData.name) || ""
+                      }
                       onChange={(e) => {
                         setSelectedLeadData({
                           ...selectedLeadData,
@@ -1137,21 +1173,19 @@ const ViewLeadManagement = () => {
                     <CompanyUserSearchFieldInput
                       key={refreshkeyForLeadOwnerChange}
                       label="Lead Owner"
-                      labelClassname= "caption-custom"
+                      labelClassname="caption-custom"
                       onUserSelected={handleLeadOwnerSelected}
                       defaultValue={selectedLeadData?.leadOwner}
                       // hasXLogo={false}
                       // hasPenLogo={true}
                       // hasBorder={false}
                       // hasSearchLogo={false}
-                      has={
-                        {
-                          border :false,
-                          penLogo : true,
-                          xLogo:false,
-                          searchLogo:false
-                        }
-                      }
+                      has={{
+                        border: false,
+                        penLogo: true,
+                        xLogo: false,
+                        searchLogo: false,
+                      }}
                     />
                     <button
                       title="Lead owner history"
@@ -1173,7 +1207,7 @@ const ViewLeadManagement = () => {
                         Reason (Optional)
                       </label>
                       <textarea
-                      autoFocus={true}
+                        autoFocus={true}
                         rows={7}
                         placeholder="Enter reason for lead owner update"
                         className="border rounded  p-1 input-label-custom"
@@ -1227,6 +1261,7 @@ const ViewLeadManagement = () => {
 
             {/* Assigned Company Product */}
             <div className=" shadow-md rounded">
+              
               <LeadAssignedComponyProducts
                 setIsAddProductModalOpen={setIsAddProductModalOpen}
                 data={leadAssignedCompanyProduct}

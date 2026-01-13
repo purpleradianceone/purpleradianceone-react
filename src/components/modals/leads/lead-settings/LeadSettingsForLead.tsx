@@ -15,6 +15,8 @@ import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import LeadDataProps from "../../../../@types/lead-management/LeadProps";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 function LeadSettingForLead({
   isOpen,
@@ -26,6 +28,8 @@ function LeadSettingForLead({
   // lead : Lead
   lead: LeadDataProps;
 }) {
+
+  const {userHasAccessToUpdateLeadSettings} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
@@ -83,6 +87,11 @@ function LeadSettingForLead({
   const handleLeadSettingCheckBoxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    // NOTE: check if the user hase access to update the lead settings
+    if(!userHasAccessToUpdateLeadSettings) {
+      toast.error(MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_UPDATE_ACCESS);
+      return;
+    }
     const isChecked = event.target.checked;
     const id = parseInt(event.target.id);
 
@@ -220,6 +229,7 @@ function LeadSettingForLead({
                         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
                       </label> */}
                       <ToggleButton
+
                       checked={per.isActive}
                       name={per.id.toString()}
                       onToggle={handleLeadSettingCheckBoxChange}

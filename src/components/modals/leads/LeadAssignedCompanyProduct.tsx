@@ -3,7 +3,7 @@ import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssi
 import InterestType from "../../../@types/lead-management/InterestType";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { STATUS_CODE } from "../../../constants/AppConstants";
+import {  STATUS_CODE } from "../../../constants/AppConstants";
 
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -13,6 +13,8 @@ import { Edit2, Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -30,7 +32,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   setIsAddProductModalOpen,
 }) => {
   const { loginStatus } = useLoggedInUserContext();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  useEffect(()=>{
+    if(data){
+      setIsLoading(false)
+    }
+  },[data])
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [editedValues, setEditedValues] = useState<{
     quantityRequired: string;
@@ -47,7 +55,11 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const {
+    userHasAccessToViewLeadProduct,
+    userHasAccessToAddLeadProduct,
+    userHasAccessToUpdateLeadProduct,
+  } = useUserAccessModules();
 
   const handleUpdateLeadCompanyProductStatus = async (
     product: LeadAssignedCompanyProduct
@@ -207,6 +219,17 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   const handleAddProductToLeadButtonClick = () => {
     setIsAddProductModalOpen(true);
   };
+
+  if(isLoading && userHasAccessToViewLeadProduct){
+    return (
+      <>
+        <div className="w-full h-full  flex justify-center items-center">
+          <LoadingSpinner />
+        </div>
+      </>
+    );
+  }
+  
   return (
     <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
       {/* Header row */}
@@ -217,12 +240,14 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         <div className="table-header-custom">Interest</div>
         <div className="table-header-custom">Status</div>
       </div>
-      {data.length == 0 && (
+       {!userHasAccessToViewLeadProduct && (
+<AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_VIEW_ACCESS}/>      )}
+      { userHasAccessToViewLeadProduct && data.length == 0 && (
         <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
           <Button
-            disabled={!userHasAccessToUpdateLead}
+            disabled={!userHasAccessToAddLeadProduct}
             onClick={() =>{
-              if(userHasAccessToUpdateLead){
+              if(userHasAccessToAddLeadProduct){
                 handleAddProductToLeadButtonClick()
               }else{
                 toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
@@ -236,16 +261,18 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         </div>
       )}
       {/* Data rows */}
-      {data.length > 0 && (
+     
+      {userHasAccessToViewLeadProduct && data.length>0 && (
         <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
-         
-           <Button
-            disabled={!userHasAccessToUpdateLead}
-            onClick={() =>{
-              if(userHasAccessToUpdateLead){
-                handleAddProductToLeadButtonClick()
-              }else{
-                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
+          <Button
+            disabled={!userHasAccessToAddLeadProduct}
+            onClick={() => {
+              if (userHasAccessToAddLeadProduct) {
+                handleAddProductToLeadButtonClick();
+              } else {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_ADD_ACCESS
+                );
               }
             }}
             className={COLORS.ADD_BUTTON}
@@ -254,7 +281,8 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           </Button>
         </div>
       )}
-      {data.length > 0 &&
+      {userHasAccessToViewLeadProduct &&
+        data.length > 0 &&
         data.map(
           (
             product,
@@ -284,24 +312,24 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
 
                   {product.isActive &&
                   editingProductId === product.id &&
-                  userHasAccessToUpdateLead ? (
+                  userHasAccessToUpdateLeadProduct ? (
                     <>
                       <input
                         type="text"
-                        disabled={!userHasAccessToUpdateLead}
+                        disabled={!userHasAccessToUpdateLeadProduct}
                         value={editedValues.quantityRequired}
                         onChange={(e) => handleQuantityChange(e.target.value)}
                         className="border py-0.5 px-1 rounded w-16 input-label-custom "
                       />
                       <input
                         type="text"
-                        disabled={!userHasAccessToUpdateLead}
+                        disabled={!userHasAccessToUpdateLeadProduct}
                         value={editedValues.costExpected}
                         onChange={(e) => handleCostChange(e.target.value)}
                         className="border px-1 rounded w-16 input-label-custom"
                       />
                       <select
-                        disabled={!userHasAccessToUpdateLead}
+                        disabled={!userHasAccessToUpdateLeadProduct}
                         value={editedValues.leadInterestId ?? ""}
                         onChange={(e) =>
                           setEditedValues((prev) => ({
@@ -327,7 +355,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           type="button"
                           className="bg-blue-600 caption-custom white-text px-2 py-0.5 rounded"
                           onClick={() => {
-                            if (userHasAccessToUpdateLead) {
+                            if (userHasAccessToUpdateLeadProduct) {
                               handleSaveClick(product);
                             } else {
                               toast.error(
@@ -337,9 +365,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                             }
                           }}
                         >
-                        <div className="flex items-center gap-0.5">
-                           <Save size={12}/> Save
-                        </div>
+                          <div className="flex items-center gap-0.5">
+                            <Save size={12} /> Save
+                          </div>
                         </button>
                       </div>
                     </>
@@ -361,8 +389,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                       >
                         {product.quantityRequired}
                         <span>
-
-                        <Edit2 size={9}/>
+                          <Edit2 size={9} />
                         </span>
                       </div>
                       <div
@@ -379,9 +406,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           handleEditClick(product);
                         }}
                       >
-                        ₹{product.costExpected}<span>
-
-                        <Edit2 size={9}/>
+                        ₹{product.costExpected}
+                        <span>
+                          <Edit2 size={9} />
                         </span>
                       </div>
                       <div
@@ -398,9 +425,9 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           handleEditClick(product);
                         }}
                       >
-                        {product.leadInterestName}<span>
-
-                        <Edit2 size={9}/>
+                        {product.leadInterestName}
+                        <span>
+                          <Edit2 size={9} />
                         </span>
                       </div>
                       <div className="flex items-center justify-start sm:justify-center">
@@ -413,7 +440,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
-                            if (userHasAccessToUpdateLead) {
+                            if (userHasAccessToUpdateLeadProduct) {
                               handleUpdateLeadCompanyProductStatus(product);
                             } else {
                               toast.error(
@@ -430,7 +457,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                                 : "translate-x-0"
                             }`}
                           ></div>
-                        </button>                        
+                        </button>
                       </div>
                     </>
                   )}
@@ -439,6 +466,12 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
             </>
           )
         )}
+
+      {/* {userHasAccessToViewLeadProduct && data.length === 0 && (
+        <p className="caption-custom italic text-center p-3">
+          No product assigned
+        </p>
+      )} */}
     </div>
   );
 };

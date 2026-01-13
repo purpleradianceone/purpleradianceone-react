@@ -41,7 +41,7 @@ const FormHeader =({
     {isModal && (
       <button
       onClick={onClose}
-      className=" right-4 top-4 input-label-custom"
+      className=" right-4 top-4 input-label-custom rounded-xl p-0.5 hover:bg-gray-100"
     >
       <X size={SIZE.TWENTY} />
     </button>
