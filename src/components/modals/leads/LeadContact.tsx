@@ -41,6 +41,7 @@ import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../ui/FormLayout";
 import TextAreaInput from "../../ui/TextAreaInput";
 import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 type LeadContactFormType = {
   name: string;
@@ -62,7 +63,7 @@ const LeadContact = ({
   selectedLeadData: any;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const { userHasAccessToViewLeadContacts,  userHasAccessToAddLeadContacts , userHasAccessToUpdateLeadContacts} = useUserAccessModules();
   const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
     useState(false);
   const [editContactData, setEditContactData] =
@@ -195,7 +196,9 @@ const LeadContact = ({
         const data = response.data;
         if (response.data.status === true) {
           toast.success(data.message);
-          fetchLeadContact();
+          if(userHasAccessToViewLeadContacts){
+            fetchLeadContact();
+          }
         } else {
           toast.error(data.message);
         }
@@ -329,7 +332,10 @@ const LeadContact = ({
           address: "",
         });
         setSocialMediaHandles([]);
-        fetchLeadContact();
+        if(userHasAccessToViewLeadContacts){
+
+          fetchLeadContact();
+        }
       });
   };
 
@@ -409,15 +415,15 @@ const LeadContact = ({
       setIsActive(selectedContactCard.isActive);
     }
   }, [selectedContactCard]);
-
+  if(!userHasAccessToViewLeadContacts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_VIEW_ACCESS}/> ;
   return (
     <div className={`w-full z-10 px-1  `}>
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-1  text-gray-500">
         <Button
-          disabled={!userHasAccessToUpdateLead}
+          disabled={!userHasAccessToAddLeadContacts}
           onClick={() => {
-            if (userHasAccessToUpdateLead) {
+            if (userHasAccessToAddLeadContacts) {
               // RESET EVERYTHING RELATED TO EDIT MODE
               setEditingContactId(null);
               setEditContactData(null);
@@ -443,8 +449,7 @@ const LeadContact = ({
               // setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
             } else {
               toast.error(
-                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                  .UPDATE_LEAD_ACCESS_DENIED_message
+                MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS
               );
             }
           }}
@@ -455,12 +460,13 @@ const LeadContact = ({
       </div>
 
       {/* Contacts List */}
-      <div className="space-y-2">
-        {leadContact && leadContact.length > 0 ? (
+      <div className="space-y-2 ">
+        {userHasAccessToViewLeadContacts && leadContact  && leadContact.length > 0 ? (
           leadContact.map((contact, index) => (
             <div
+            
               key={index}
-              className={COLORS.CONTACT_CARD}
+              className={`${COLORS.CONTACT_CARD}  ${userHasAccessToUpdateLeadContacts ? "": ""}`}
               onClick={() => setSelectedContactCard(contact)}
             >
               {/* Left: Contact Info */}
@@ -523,7 +529,13 @@ const LeadContact = ({
             </div>
           ))
         ) : (
-          <p className="caption-custom text-center">No contacts available</p>
+          !userHasAccessToViewLeadContacts? (
+
+             <p className="caption-custom italic flex items-center justify-center text-center">No view access</p>
+          ) : (
+                         <p className="caption-custom text-center">No contacts available</p>
+
+          )
         )}
       </div>
       {/* view in pop up card  */}
@@ -583,15 +595,15 @@ const LeadContact = ({
                   </div>
                   <div>
                     <Button
+                    disabled={!userHasAccessToUpdateLeadContacts}
                       type="submit"
                       onClick={(e) => {
                         e.preventDefault();
-                        if (userHasAccessToUpdateLead) {
+                        if (userHasAccessToUpdateLeadContacts) {
                           handleEditLeadContactClick(selectedContactCard);
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                              .UPDATE_LEAD_ACCESS_DENIED_message
+                            MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -730,7 +742,7 @@ const LeadContact = ({
                             name="isActive"
                             onToggle={
                               !selectedContactCard.isPrimary &&
-                              userHasAccessToUpdateLead
+                              userHasAccessToUpdateLeadContacts
                                 ? () => {
                                     handleActiveStatusChange(
                                       selectedContactCard
@@ -743,8 +755,7 @@ const LeadContact = ({
                                       );
                                     } else {
                                       toast.error(
-                                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                          .UPDATE_LEAD_ACCESS_DENIED_message
+                                        MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
                                       );
                                     }
                                   }

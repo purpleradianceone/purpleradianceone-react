@@ -20,6 +20,7 @@ import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 type LeadAssignedTeamsProps = {
   isOpen: boolean;
@@ -32,7 +33,7 @@ const LeadAssignedTeams = ({
 }: LeadAssignedTeamsProps) => {
   // context
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const { userHasAccessToUpdateLeadTeams,userHasAccessToAddLeadTeams , userHasAccessToViewLeadTeams} = useUserAccessModules();
   //States
   const [leadCompanyTeam, setLeadCompnayTeam] = useState<LeadCompanyTeam[]>([]);
   const [openCreateLeadCompanyTeam, setOpenCreateLeadCompanyTeam] =
@@ -208,12 +209,15 @@ const LeadAssignedTeams = ({
   }, [selectedCompanyTeamCard]);
   // use effect
   useEffect(() => {
-    getLeadAssignedCompanyteam();
-  }, []);
+    if(userHasAccessToViewLeadTeams){
+      getLeadAssignedCompanyteam();
+    }
+  }, [userHasAccessToViewLeadTeams]);
 
   if (!isOpen) return null;
 
-  if (isLoading)
+  if(!userHasAccessToViewLeadTeams)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_VIEW_ACCESS}/>
+  if (isLoading && userHasAccessToViewLeadTeams)
     return (
       <>
         <div className="w-full h-full  flex justify-center items-center">
@@ -221,16 +225,15 @@ const LeadAssignedTeams = ({
         </div>
       </>
     );
-  return (
-    <>
-      {/* NOTE : if there is no any team  */}
-      {leadCompanyTeam && leadCompanyTeam.length == 0 ? (
-        <div className=" w-full h-full bg-slate-0">
+
+  if(userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0){
+    return(
+<div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <Button
-              disabled={!userHasAccessToUpdateLead}
+              disabled={!userHasAccessToAddLeadTeams}
               onClick={() => {
-                if (userHasAccessToUpdateLead) {
+                if (userHasAccessToAddLeadTeams) {
                   setOpenCreateLeadCompanyTeam(true);
                 } else {
                   // showMessageSnackbar({
@@ -240,8 +243,7 @@ const LeadAssignedTeams = ({
                   //   type: "error",
                   // });
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                      .UPDATE_LEAD_ACCESS_DENIED_message
+                    MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_ADD_ACCESS
                   );
                 }
               }}
@@ -254,15 +256,21 @@ const LeadAssignedTeams = ({
             </span>
           </div>
         </div>
-      ) : (
+    )
+  }
+  return (
+    <>
+      {/* NOTE : if there is no any team  */}
+      {leadCompanyTeam && leadCompanyTeam.length > 0 && (
+        
         // NOTE : if there are teams assiged already
         <div className="w-full  px-1 ">
           {/* Header */}
           <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
             <Button
-              disabled={!userHasAccessToUpdateLead}
+              disabled={!userHasAccessToAddLeadTeams}
               onClick={() => {
-                if (!userHasAccessToUpdateLead) {
+                if (!userHasAccessToAddLeadTeams) {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.LEAD_MODULE
                       .UPDATE_LEAD_ACCESS_DENIED_message
@@ -478,12 +486,11 @@ const LeadAssignedTeams = ({
                         checked={isActive}
                         name="isActive"
                         onToggle={() => {
-                              if (userHasAccessToUpdateLead) {
+                              if (userHasAccessToUpdateLeadTeams) {
                                 updateLeadCompanyTeam(selectedCompanyTeamCard);
                               } else {
                                 toast.error(
-                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                    .UPDATE_LEAD_ACCESS_DENIED_message
+                                  MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_UPDATE_ACCESS
                                 );
                               }
                             }}

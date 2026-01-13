@@ -22,18 +22,20 @@ const MESSAGE = {
         SUBSCRIPTION_CREATION_ERROR: "Error creating subscription",
         SUBSCRIPTION_PLAN_ERROR: "Subscription Needs Upgrade/inActive Users.",
         PRIMARY_LEAD_CONTACT_UPDATE_ERROR_MESSAGE: "Updating name, email, or phone number is not permitted for the primary lead contact from this section.",
-        NAME_SPACE_AND_DOT_ERROR : "Name must contain only alphanumeric characters, spaces, and dots.",
-        EMAIL_NOT_VALID_ERROR : "Please enter valid email id.",
-        PASSWORD_VALIDATION_ERROR :  "Password must be 8–20 characters long and include at least 1 uppercase , 1 lowercase, 1 number, and 1 special character.",
-        YOU_ARE_NOT_ON_YOUR_DASHBOARD : "You are not on your Dashboard.",
+        NAME_SPACE_AND_DOT_ERROR: "Name must contain only alphanumeric characters, spaces, and dots.",
+        EMAIL_NOT_VALID_ERROR: "Please enter valid email id.",
+        PASSWORD_VALIDATION_ERROR: "Password must be 8–20 characters long and include at least 1 uppercase , 1 lowercase, 1 number, and 1 special character.",
+        YOU_ARE_NOT_ON_YOUR_DASHBOARD: "You are not on your Dashboard.",
 
         // ACCOUNT PRODUCT MAPPING  / DETAILS 
         SELECT_PRODUCT_FIRST: "Select Product first.",
         QUANTITY_EXCEEDS: "Entered quantity exceeds available stock.",
-        DUPLICATE_PRODUCT :"This product is already selected in another row!",
-        STOCK_NOT_AVAILABLE_FOR_PRODUCT : "Selected Product doesn't have stock.",
-        FAILED_TO_LOAD_PRODUCT_DATA : "Failed to load product data",
-        SELECT_DIFFERENT_USER : "Select different user.",
+        DUPLICATE_PRODUCT: "This product is already selected in another row!",
+        STOCK_NOT_AVAILABLE_FOR_PRODUCT: "Selected Product doesn't have stock.",
+        FAILED_TO_LOAD_PRODUCT_DATA: "Failed to load product data",
+        SELECT_DIFFERENT_USER: "Select different user.",
+
+        MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
 
     },
     SUCCESS: {
@@ -48,12 +50,12 @@ const MESSAGE = {
     },
     MODULE_ACCESS: {
         LEAD_MODULE: {
-            DENIED_VIEW_ACCESS : "You do not have permission to view lead.",
-            DENIED_ADD_ACCESS : "You do not have permission to create lead.",
-            DENIED_ADD_LEAD_IMPORT_ACCESS : "You do not have permission to import leads.",
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead.",
+            DENIED_ADD_ACCESS: "You do not have permission to create lead.",
+            DENIED_ADD_LEAD_IMPORT_ACCESS: "You do not have permission to import leads.",
             UPDATE_LEAD_ACCESS_DENIED_message: "You do not have permission to update lead details."
         }, COMPANY_USER: {
-            DENIED_VIEW_ACCESS : "You do not have permission to view Company user.",
+            DENIED_VIEW_ACCESS: "You do not have permission to view Company user.",
             DENIED_ADD_ACCESS_COMPANY_USER: "You do not have permission to Add user.",
             DENIED_UPDATE_ACCESS_COMPANY_USER: "You do not have permission to update user details."
         }, DASHBOARD: {
@@ -68,60 +70,90 @@ const MESSAGE = {
             DENIED_UPDATE_ACCESS: "You do not have permission to update product information."
         }, PRODUCT_TEAM_MANAGEMENT: {
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team/users."
-        }, ACCOUNT_TYPE_ACCESS : {
-            DENIED_ADD_ACCESS : "You do not have permission to add account type.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update account type.",
-        },ACCOUNT_ACCESS : {
-            DENIED_ADD_ACCESS : "You do not have permission to add new account.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update account details.",
-            DENIED_ADD_ACCOUNT_IMPORT_ACCESS : "You do not have permission to import accounts.",
+        }, ACCOUNT_TYPE_ACCESS: {
+            DENIED_ADD_ACCESS: "You do not have permission to add account type.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account type.",
+        }, ACCOUNT_ACCESS: {
+            DENIED_ADD_ACCESS: "You do not have permission to add new account.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account details.",
+            DENIED_ADD_ACCOUNT_IMPORT_ACCESS: "You do not have permission to import accounts.",
 
-        },SUPPORT_TICKET_CATEGORY: {
-            DENIED_VIEW_ACCESS : "You do not have permission to view support ticket category.",
-            DENIED_ADD_ACCESS : "You do not have permission to add new support ticket category.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update support ticket category.",
+        }, SUPPORT_TICKET_CATEGORY: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view support ticket category.",
+            DENIED_ADD_ACCESS: "You do not have permission to add new support ticket category.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update support ticket category.",
 
-        }, COMPANY_WAREHOUSE:{
-            DENIED_VIEW_ACCESS : "You do not have permission to view Company Warehouse.",
-            DENIED_ADD_ACCESS : "You do not have permission to add new Company Warehouse.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update Company Warehouse.",
-        }, STOCK : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view Stock.",
-            DENIED_ADD_ACCESS : "You do not have permission to add new Stock.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update Stock.",
-        },SUPPORT_MODULE: {
-            DENIED_VIEW_ACCESS : "You do not have permission to view support ticket.",
-            DENIED_ADD_ACCESS : "You do not have permission to create support ticket.",
+        }, COMPANY_WAREHOUSE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view Company Warehouse.",
+            DENIED_ADD_ACCESS: "You do not have permission to add new Company Warehouse.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update Company Warehouse.",
+        }, STOCK: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view Stock.",
+            DENIED_ADD_ACCESS: "You do not have permission to add new Stock.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update Stock.",
+        }, SUPPORT_MODULE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view support ticket.",
+            DENIED_ADD_ACCESS: "You do not have permission to create support ticket.",
             UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update support ticket details.",
-            DENIED_ADD_TASK_ACCESS : "You do not have permission to create support ticket task.",
-            DENIED_UPDATE_TASK_ACCESS : "You do not have permission to update support ticket task.",
+            DENIED_ADD_TASK_ACCESS: "You do not have permission to create support ticket task.",
+            DENIED_UPDATE_TASK_ACCESS: "You do not have permission to update support ticket task.",
         },
-        ACCOUNT_COMPANY_PRODUCT_WARRANTY : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view warranty details.",
-            DENIED_ADD_ACCESS : "You do not have permission to add warranty.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update warranty details.",
+        ACCOUNT_COMPANY_PRODUCT_WARRANTY: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view warranty details.",
+            DENIED_ADD_ACCESS: "You do not have permission to add warranty.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update warranty details.",
         },
-        ACCOUNT_COMPANY_PRODUCT_AMC : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view Amc details.",
-            DENIED_ADD_ACCESS : "You do not have permission to add Amc.",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update Amc details.",
+        ACCOUNT_COMPANY_PRODUCT_AMC: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view Amc details.",
+            DENIED_ADD_ACCESS: "You do not have permission to add Amc.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update Amc details.",
         },
-        ACCOUNT_COMPANY_PRODUCT : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
-            DENIED_ADD_ACCESS : "You do not have permission to add .",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
+        ACCOUNT_COMPANY_PRODUCT: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view details.",
+            DENIED_ADD_ACCESS: "You do not have permission to add.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update details.",
         },
 
-         ACCOUNT_TYPES : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
-            DENIED_ADD_ACCESS : "You do not have permission to add .",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
+        ACCOUNT_TYPES: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view details.",
+            DENIED_ADD_ACCESS: "You do not have permission to add.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update details.",
         },
-         ACCOUNT_LEADS : {
-            DENIED_VIEW_ACCESS : "You do not have permission to view details.",
-            DENIED_ADD_ACCESS : "You do not have permission to add .",
-            DENIED_UPDATE_ACCESS : "You do not have permission to update details.",
+        ACCOUNT_LEADS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account leads.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account leads.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account leads.",
+        },
+        LEADS_SETTINGS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead settings.",
+            DENIED_ADD_ACCESS: "You do not have permission to add.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead settings.",
+        },
+        LEAD_CONTACT: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead contacts.",
+            DENIED_ADD_ACCESS: "You do not have permission to add lead contacts.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead contact.",
+        },
+         LEAD_PRODUCT: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead assigned product.",
+            DENIED_ADD_ACCESS: "You do not have permission to assign product to lead.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead product details.",
+        },
+         LEAD_TEAMS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead assigned teams.",
+            DENIED_ADD_ACCESS: "You do not have permission to assign teams to lead.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead teams details.",
+        },
+         LEAD_DETAILS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead details.",
+            DENIED_ADD_ACCESS: "You do not have permission add to lead details.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead details.",
+        }, LEAD_TASKS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead tasks.",
+            DENIED_ADD_ACCESS: "You do not have permission to create lead tasks.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead tasks.",
         }
+
     }
 }
 
