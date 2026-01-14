@@ -148,17 +148,17 @@ export const useUserAccessModules = () => {
   );
 
   //Setting - Email
-  const userHasAccessToViewEmailSetting = accessModules.some(
+  const userHasAccessToViewSettingPersonalEmail = accessModules.some(
     (accessModule)=>
         accessModule.crm_module_id === 10 && accessModule.view
   );
 
-   const userHasAccessToUpdateEmailSetting = accessModules.some(
+   const userHasAccessToUpdateSettingPersonalEmail = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 10 && accessModule.update
   );
 
-  const userHasAccessToAddEmailSetting = accessModules.some(
+  const userHasAccessToAddSettingPersonalEmail = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 10 && accessModule.add
   );
@@ -218,7 +218,7 @@ export const useUserAccessModules = () => {
       accessModules.crm_module_id === 14 && accessModules.add
   );
 
-   const userHasAccessToViewSettingLeady = accessModules.some(
+   const userHasAccessToViewSettingLead = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 14 && accessModule.view
   );
@@ -732,9 +732,9 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToViewSettingGeneral,
     userHasAccessToUpdateSettingGeneral,
 
-    userHasAccessToAddEmailSetting,
-    userHasAccessToViewEmailSetting,
-    userHasAccessToUpdateEmailSetting,
+    userHasAccessToViewSettingPersonalEmail,
+    userHasAccessToAddSettingPersonalEmail,
+    userHasAccessToUpdateSettingPersonalEmail,
 
     userHasAccessToViewMeetingSetting,
     userHasAccessToUpdateMeetingSetting,
@@ -749,7 +749,7 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToUpdateEmailSettingCompany,
 
     userHasAccessToAddSettingLead,
-    userHasAccessToViewSettingLeady,
+    userHasAccessToViewSettingLead,
     userHasAccessToUpdateSettingLead,
 
     userHasAccessToAddEmailTemplateSetting,

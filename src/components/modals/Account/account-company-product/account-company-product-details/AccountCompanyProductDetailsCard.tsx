@@ -341,6 +341,7 @@ export const AccountCompanyProductDetailsCard = ({
             handleOnChange("deliveryAddress", event);
           }}
           readonly={!userHasAccessToUpdateAccountProducts}
+          disabled={!userHasAccessToUpdateAccountProducts}
           logo={MapPin}
         />
         <TextAreaInput
@@ -353,6 +354,7 @@ export const AccountCompanyProductDetailsCard = ({
           onChange={(event) => {
             handleOnChange("billingAddress", event);
           }}
+          disabled={!userHasAccessToUpdateAccountProducts}
           logo={ReceiptText}
         />
       </div>

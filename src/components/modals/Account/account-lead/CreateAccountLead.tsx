@@ -80,7 +80,7 @@ const CreateAccountLead = ({
             if(userHasAccessToAddAccountLeads){
               setShowLeadsData(!showLeadsData);
             }else{
-              toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+              toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_ADD_ACCESS)
             }
           }}
           className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"

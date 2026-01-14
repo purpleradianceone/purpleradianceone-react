@@ -31,7 +31,7 @@ const UserPreference = () => {
 
   const navigate = useNavigate();
   const {
-    userHasAccessToUpdateUser,
+    // userHasAccessToUpdateUser,
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewSettingGeneral,
   } = useUserAccessModules();
@@ -433,7 +433,7 @@ const UserPreference = () => {
                   }}
                 `}
               onClick={() => {
-                if (userHasAccessToUpdateUser) {
+                if (userHasAccessToUpdateSettingGeneral) {
                   handleEditClick();
                 } else {
                   toast.error(

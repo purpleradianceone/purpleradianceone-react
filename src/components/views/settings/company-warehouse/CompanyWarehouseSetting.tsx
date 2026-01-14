@@ -25,8 +25,8 @@ const CompanyWarehouseSetting: React.FC = () => {
   const { warehouseTypeData } = useWarehouseType();
 
   const {
-    userHasAccessToAddSettingGeneral,
-    userHasAccessToUpdateSettingGeneral,
+    userHasAccessToUpdateSettingCompanyWarehouse,
+    userHasAccessToAddSettingCompanyWarehouse
   } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -108,6 +108,10 @@ const CompanyWarehouseSetting: React.FC = () => {
   }) => {
   
 
+    if(!userHasAccessToUpdateSettingCompanyWarehouse){
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS)
+      return;
+    }
     if (!validateName(editingTypeName)) {
       toast.error(
         "Invalid warehouse name. Only letters, numbers, spaces, '.', '&', and '-' are allowed."
@@ -202,15 +206,15 @@ const CompanyWarehouseSetting: React.FC = () => {
             <div>
               <Button
                 type="submit"
+                disabled={!userHasAccessToAddSettingCompanyWarehouse}
                 onClick={(e) => {
                   e.preventDefault();
-                  setShowAddForm(true);
                   // remove above line after code is done
-                  if (userHasAccessToAddSettingGeneral) {
+                  if (userHasAccessToAddSettingCompanyWarehouse) {
                     setShowAddForm(true);
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE.DENIED_ADD_ACCESS
+                      MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_ADD_ACCESS
                     );
                   }
                 }}
@@ -287,14 +291,13 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.name}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeName(item.name);
                           setEditingField("name");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -360,14 +363,13 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.description}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description ?? "");
                           setEditingField("description");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -431,15 +433,14 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.location}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description ?? "");
                           setEditingTypeLocation(item.location ?? "");
                           setEditingField("location");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}

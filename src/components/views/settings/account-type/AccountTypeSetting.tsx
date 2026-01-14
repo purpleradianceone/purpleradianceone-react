@@ -213,6 +213,7 @@ const AccountTypeSetting: React.FC = () => {
           {!showAddForm && (
             <div>
               <Button
+              disabled={!userHasAccessToAddCompanyAccountType}
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();

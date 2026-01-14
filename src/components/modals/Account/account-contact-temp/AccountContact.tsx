@@ -26,6 +26,7 @@ import ToggleButton from "../../../ui/ToggleButton";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
 
 type AccountContactTypeComponent = {
   accountId: number;
@@ -44,7 +45,7 @@ type AccountContactFormType = {
 
 const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   const { loginStatus } = useLoggedInUserContext();
-  const {   userHasAccessToAddAccountContacts , userHasAccessToUpdateAccountContacts } = useUserAccessModules();
+  const {   userHasAccessToViewAccountContacts,userHasAccessToAddAccountContacts , userHasAccessToUpdateAccountContacts } = useUserAccessModules();
   const [accountContact, setAccountContact] = useState<AccountContactType[]>(
     []
   );
@@ -388,8 +389,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   }
   //Note : call will go for the first render.
   useEffect(() => {
-    fetchAccountContact();
-  }, []);
+    if(userHasAccessToViewAccountContacts){
+
+      fetchAccountContact();
+    }
+  }, [userHasAccessToViewAccountContacts]);
 
   useEffect(() => {
     if (selectedContactCard?.isActive !== undefined) {
@@ -418,7 +422,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       preferredLanguage: "",
     });
   }
-  if (showLoadingSpinner)
+  if (userHasAccessToViewAccountContacts && showLoadingSpinner)
     return (
       <>
         <div className="w-full h-full  flex justify-center items-center">
@@ -426,6 +430,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
         </div>
       </>
     );
+    if(!userHasAccessToViewAccountContacts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_CONTACT.DENIED_VIEW_ACCESS}/>
   return (
     <>
       {accountContact.length === 0 ? (
