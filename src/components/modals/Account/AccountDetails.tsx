@@ -103,7 +103,7 @@ const AccountDetails: React.FC = () => {
     createdBy: "",
     createdOn: "",
   });
-  const { userHasAccessToUpdateAccount , userHasAccessToViewAccountLeads, userHasAccessToViewAccountTypes , userHasAccessToViewAccountContacts } = useUserAccessModules();
+  const { userHasAccessToUpdateAccount  } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -1276,32 +1276,35 @@ if (fieldName === "name") {
           </div>
 
           {/* Right Card - Empty for future use */}
-          {
-            userHasAccessToViewAccountContacts && (
+          
+             
               <div className="bg-white rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Account Contacts
             </h3>
             <AccountContact accountId={company!.id} />
           </div>
-            )
-          }
+            
+          
           {/* Account Lead */}
-         {
-          userHasAccessToViewAccountLeads && (
-             <div>
+         
+              <div className="bg-white rounded-xl border p-1 border-slate-200">
+              {/* Header */}
+    <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+      <span>Account related leads</span>
+    </div>
             <AccountLead account={company!} />
           </div>
-          )
-         }
+          
           {/* Account company type */}
-          {
-            userHasAccessToViewAccountTypes && (
-              <div className="min-h-28">
+          
+              <div className="bg-white rounded-xl border p-1 border-slate-200">
+                <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+      <span>Company Account Type</span>
+    </div>
             <AccountCompanyType accountId={company!.id} />
           </div>
-            )
-          }
+            
           {/* Account company product */}
           <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
             <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">

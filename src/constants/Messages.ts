@@ -109,20 +109,25 @@ const MESSAGE = {
             DENIED_UPDATE_ACCESS: "You do not have permission to update Amc details.",
         },
         ACCOUNT_COMPANY_PRODUCT: {
-            DENIED_VIEW_ACCESS: "You do not have permission to view details.",
-            DENIED_ADD_ACCESS: "You do not have permission to add.",
-            DENIED_UPDATE_ACCESS: "You do not have permission to update details.",
+            DENIED_VIEW_ACCESS: "You do not have permission to view assigned product.",
+            DENIED_ADD_ACCESS: "You do not have permission to assign product to account.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update product details.",
         },
 
         ACCOUNT_TYPES: {
-            DENIED_VIEW_ACCESS: "You do not have permission to view details.",
-            DENIED_ADD_ACCESS: "You do not have permission to add.",
-            DENIED_UPDATE_ACCESS: "You do not have permission to update details.",
+            DENIED_VIEW_ACCESS: "You do not have permission to view account company type.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account company type.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account company type.",
         },
         ACCOUNT_LEADS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view account leads.",
             DENIED_ADD_ACCESS: "You do not have permission to add account leads.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update account leads.",
+        },
+        ACCOUNT_CONTACT: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account contacts.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account contact.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account contact",
         },
         LEADS_SETTINGS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead settings.",
@@ -134,17 +139,17 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add lead contacts.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead contact.",
         },
-         LEAD_PRODUCT: {
+        LEAD_PRODUCT: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead assigned product.",
             DENIED_ADD_ACCESS: "You do not have permission to assign product to lead.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead product details.",
         },
-         LEAD_TEAMS: {
+        LEAD_TEAMS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead assigned teams.",
             DENIED_ADD_ACCESS: "You do not have permission to assign teams to lead.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead teams details.",
         },
-         LEAD_DETAILS: {
+        LEAD_DETAILS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead details.",
             DENIED_ADD_ACCESS: "You do not have permission add to lead details.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead details.",
@@ -152,6 +157,37 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead tasks.",
             DENIED_ADD_ACCESS: "You do not have permission to create lead tasks.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead tasks.",
+        }, SETTING: {
+            EMAIL_TYPE_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view email type setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create email type setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update email type setting .",
+            },
+            COMPANY_EMAIL_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view company email setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create company email setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update company email setting .",
+            },
+            PERSONAL_EMAIL_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view user email setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create user email setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update user email setting .",
+            },
+             COMPANY_PREFERENCE_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view company preference setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create company preference setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update company preference setting .",
+            },
+            SUPPORT_TICKET_CATEGORY_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view support ticket category setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create support ticket category setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update support ticket category setting .",
+            },
+             COMPANY_WAREHOUSE_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view company warehouse setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create company warehouse setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update company warehouse setting .",
+            },
         }
 
     }

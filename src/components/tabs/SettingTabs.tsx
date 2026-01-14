@@ -16,6 +16,7 @@ import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
 import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
 import SupportTicketCategorySetting from "../views/settings/support-ticket-category/SupportTicketCategorySetting";
 import CompanyWarehouseSetting from "../views/settings/company-warehouse/CompanyWarehouseSetting";
+import MESSAGE from "../../constants/Messages";
 
 // function SettingsTabs() {
 //   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -199,11 +200,14 @@ function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("onlineLead");
 
   const {
-    userHasAccessToViewSettingLeady,
+    userHasAccessToViewSettingLead,
     userHasAccessToViewCompanyPreferences,
     userHasAccessToViewMeetingSetting,
     userHasAccessToViewSettingGeneral,
+    userHasAccessToViewSettingCompanyWarehouse,
     userHasAccessToViewCompanyAccountType,
+    
+    userHasAccessToViewSettingSupposeTicketCategory
   } = useUserAccessModules();
 
   const data = [
@@ -211,16 +215,17 @@ function SettingsTabs() {
       label: "Lead",
       value: "onlineLead",
       render: () =>
-        userHasAccessToViewSettingLeady ? (
+        userHasAccessToViewSettingLead ? (
           <LeadSetting />
         ) : (
-          <AccessDeniedMessagePage />
+          <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_VIEW_ACCESS} />
         ),
     },
     {
       label: "Email",
       value: "emailSettings",
-      render: () => <EmailSetting />,
+      render: () =>    <EmailSetting /> 
+,
     },
     {
       label: "Meetings",
@@ -266,20 +271,20 @@ function SettingsTabs() {
       label: "Support Ticket Category",
       value: "setting",
       render: () =>
-        userHasAccessToViewSettingGeneral ? (
+         userHasAccessToViewSettingSupposeTicketCategory? (
           <SupportTicketCategorySetting />
         ) : (
-          <AccessDeniedMessagePage />
+          <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_VIEW_ACCESS}/>
         ),
     },
     {
       label: "Company Warehouse",
       value: "warehouse",
       render: () =>
-        userHasAccessToViewSettingGeneral ? (
+        userHasAccessToViewSettingCompanyWarehouse ? (
           <CompanyWarehouseSetting />
         ) : (
-          <AccessDeniedMessagePage />
+          <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_VIEW_ACCESS} />
         ),
     },
   ];

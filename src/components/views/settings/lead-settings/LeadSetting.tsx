@@ -15,13 +15,14 @@ import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatu
 import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
 import SettingToggleCard from "../../../ui/SettingToggleCard";
 // import Button from "../../../ui/Button";
-import { User2, } from "lucide-react";
+import { User2 } from "lucide-react";
 // import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
 import GetCompanyUsersForLead from "../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import MESSAGE from "../../../../constants/Messages";
 
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
@@ -33,7 +34,10 @@ const LeadSetting: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
 
-  const {userHasAccessToViewUser, userHasAccessToUpdateUser} = useUserAccessModules();
+  const {
+    userHasAccessToUpdateSettingLead,
+  } = useUserAccessModules();
+
   const getLeadSetting = async () => {
     setIsLoading(true);
     try {
@@ -83,6 +87,10 @@ const LeadSetting: React.FC = () => {
   const handleLeadSettingCheckBoxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!userHasAccessToUpdateSettingLead) {
+      toast.error(MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_UPDATE_ACCESS);
+      return;
+    }
     const isChecked = event.target.checked;
     const id = parseInt(event.target.id, 10);
 
@@ -125,12 +133,16 @@ const LeadSetting: React.FC = () => {
   };
 
   const handleUpdateLeadUser = (data: CompanyUser | null): boolean => {
+    if (!userHasAccessToUpdateSettingLead) {
+      toast.error(MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_UPDATE_ACCESS);
+      return false;
+    }
     if (data === null || data === undefined) {
       console.log("handleUpdateLeadUser false");
       return false;
     }
-//////////////////////////////////////
-if (
+    //////////////////////////////////////
+    if (
       data.id === null ||
       data.id === undefined ||
       data.all_leads_visible === null ||
@@ -152,17 +164,15 @@ if (
 
     let result = false;
     try {
-
-      console.log("previous value: "+ data.all_leads_visible);
-       axios
+      console.log("previous value: " + data.all_leads_visible);
+      axios
         .post(POST_API.UPDATE_LEAD_COMPANY_USERS, postData, {
           withCredentials: true,
         })
         .then((response) => {
           toast.success(response.data.message);
           result = true;
-          console.log("after value: "+ data.all_leads_visible)
-
+          console.log("after value: " + data.all_leads_visible);
         })
         .catch((error) => {
           result = false;
@@ -171,7 +181,7 @@ if (
     } catch (e) {
       console.log(e);
     }
-    console.log("handleUpdate "+result);
+    console.log("handleUpdate " + result);
 
     return result;
   };
@@ -234,38 +244,30 @@ if (
           ))}
         </div>
       )}
-      
-            {
-              userHasAccessToViewUser && userHasAccessToUpdateUser && (
-                <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
-              <FormHeader
-                preText="Assign Users to whom all leads are visible"
-                description="Select and assign a user to whom all the lead's will be visible."
-                onClose={() => {
-                  // setCompanyUserModalOpen(false);
-                }}
-                icon={User2}
-                isModal={false}
-              />
-              <div className="bg-white z-50 overflow-y-auto rounded-lg shadow-sm p-0">
-                <div
-                  className="ag-theme-balhal w-full"
-                  
-                >
-                  <GetCompanyUsersForLead
-                    handleSelectedCompanyUserChange={() => {
-                      // setCompanyUserModalOpen(false);
-                    }}
-                    selectedUserId={null}
-                    isUsedForSettings={true}
-                    handleUpdateLeadUser={handleUpdateLeadUser}
-                  />
-                </div>
-              </div>
-            </div>
-              )
-            }
-      
+
+      <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
+        <FormHeader
+          preText="Assign Users to whom all leads are visible"
+          description="Select and assign a user to whom all the lead's will be visible."
+          onClose={() => {
+            // setCompanyUserModalOpen(false);
+          }}
+          icon={User2}
+          isModal={false}
+        />
+        <div className="bg-white z-50 overflow-y-auto rounded-lg shadow-sm p-0">
+          <div className="ag-theme-balhal w-full">
+            <GetCompanyUsersForLead
+              handleSelectedCompanyUserChange={() => {
+                // setCompanyUserModalOpen(false);
+              }}
+              selectedUserId={null}
+              isUsedForSettings={true}
+              handleUpdateLeadUser={handleUpdateLeadUser}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

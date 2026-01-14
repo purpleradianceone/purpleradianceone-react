@@ -17,6 +17,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   const { userHasAccessToAddAccountTypes , userHasAccessToUpdateAccountTypes , userHasAccessToViewAccountTypes} = useUserAccessModules();
@@ -118,10 +119,10 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   };
 
   useEffect(() => {
-    // if(!userHasAccessToViewAccountTypes){
+    if(userHasAccessToViewAccountTypes){
       getAccountCompanyAccountType();
-    // }
-  }, []);
+    }
+  }, [userHasAccessToViewAccountTypes]);
 
   // if (isLoadingCompanyAccountType) {
   //   return (
@@ -133,16 +134,14 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   //   );
   // }
 
-  if(!userHasAccessToViewAccountTypes){
-    return null;
-  }
+  if(!userHasAccessToViewAccountTypes)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}/>
 
   return (
   <div className="bg-white border flex flex-col h-full  rounded-lg p-1 max-h-96 overflow-auto">
       {/* Header */}
-    <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+    {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>
-    </div>
+    </div> */}
       {isLoadingCompanyAccountType ? (
        <div className="h-20 flex items-center justify-center">
           <LoadingSpinner />
