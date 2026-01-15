@@ -332,7 +332,7 @@ function AddTeamModal({
   if (!isOpen) return null;
 
   return (
-    <FormLayout>
+    <FormLayout padding={2} width={5}>
   <>  
   
           <div className="">
@@ -344,35 +344,35 @@ function AddTeamModal({
               description="Set up a new team to manage tasks and responsibilities efficiently."
             />
 
-            <form className="space-y-3" onSubmit={handleAddTeamFormSubmit}>
+            <form className="space-y-1 " onSubmit={handleAddTeamFormSubmit}>
 
               <FormInput
               logo={Users}
-                label="Name : "
-                maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                type="text"
-                name="name"
-                required={true}
-                value={AddTeamFormData.name}
-                placeholder="Enter team name"
-                onBlur={handleBlur}
-                error={errors.name}
-                onChange={handleAddTeamFormDataChange}
+              label="Name : "
+              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+              minLength={VALIDATIONS.MIN_NAME_LENGTH}
+              type="text"
+              name="name"
+              required={true}
+              value={AddTeamFormData.name}
+              placeholder="Enter team name"
+              onBlur={handleBlur}
+              error={errors.name}
+              onChange={handleAddTeamFormDataChange}
               />
 
               <TextAreaInput
               logo={Text}
-                label="Description : "
-                name="description"
-                placeholder="Enter team description"
-                value={AddTeamFormData.description}
-                cols={5}
-                rows={3}
-                maxLength={256}
-                onBlur={handleBlur}
-                error={errors.description}
-                onChange={handleAddTeamFormDataChange}
+              label="Description : "
+              name="description"
+              placeholder="Enter team description"
+              value={AddTeamFormData.description}
+              cols={5}
+              rows={3}
+              maxLength={256}
+              onBlur={handleBlur}
+              error={errors.description}
+              onChange={handleAddTeamFormDataChange}
               />
               <div
                 style={{ height: "350px", width: "100%", marginBottom: "60px" }}

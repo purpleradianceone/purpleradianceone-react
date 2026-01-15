@@ -66,11 +66,20 @@ axiosClient.interceptors.request.use(
       });
     }
 
-    const controller = new AbortController();
-    config.signal = controller.signal;
+    // const controller = new AbortController();
+    // config.signal = controller.signal;
 
-    controllerMap.set(config, controller);
-    controllerSet.add(controller);
+    // controllerMap.set(config, controller);
+    // controllerSet.add(controller);
+
+    // Only create controller if caller did NOT provide one
+    if (!config.signal) {
+      const controller = new AbortController();
+      config.signal = controller.signal;
+
+      controllerMap.set(config, controller);
+      controllerSet.add(controller);
+    }
 
     return config;
   },
@@ -87,6 +96,7 @@ axiosClient.interceptors.response.use(
     const controller = controllerMap.get(config);
 
     if (controller) {
+      controller.abort(); // optional safety
       controllerSet.delete(controller);
       controllerMap.delete(config);
     }

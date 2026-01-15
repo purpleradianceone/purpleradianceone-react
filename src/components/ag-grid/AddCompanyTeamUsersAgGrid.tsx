@@ -126,7 +126,7 @@ function AddCompanyTeamUsersAgGrid({
               : false;
 
             return (
-              <div className="flex flex-col ml-2 mt-3 items-center">
+              <div className="flex justify-center mt-2 items-center">
                 <input
                   type="checkbox"
                   checked={isChecked}
