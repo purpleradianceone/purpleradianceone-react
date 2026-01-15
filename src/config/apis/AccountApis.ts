@@ -18,3 +18,9 @@ export const createAccountCompanyProductWarranty  = async (payload: object
     const response = await axiosClient.post(POST_API.CREATE_ACCOUNT_COMPANY_PRODUCT_WARRANTY, payload, { withCredentials: true })
     return response;
 }
+
+export const getLookupAccounts  = async (payload: object , signal? : AbortSignal
+) => {
+    const response = await axiosClient.post(POST_API.GET_LOOKUP_ACCOUNTS, payload, {signal, withCredentials: true })
+    return response;
+}
