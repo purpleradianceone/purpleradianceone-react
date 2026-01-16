@@ -157,7 +157,23 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead tasks.",
             DENIED_ADD_ACCESS: "You do not have permission to create lead tasks.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead tasks.",
-        }, SETTING: {
+        },TEAM_USERS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view team users.",
+            DENIED_ADD_ACCESS: "You do not have permission to add users to team.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update team users.",
+        },TEAMS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view team.",
+            DENIED_ADD_ACCESS: "You do not have permission to create team.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update team.",
+        }, PRODUCT_USERS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product users.",
+            DENIED_ADD_ACCESS: "You do not have permission to add users to product.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update product users.",
+        }, PRODUCT_TEAMS: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product teams.",
+            DENIED_ADD_ACCESS: "You do not have permission to assign team to product.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update product team.",
+        },SETTING: {
             EMAIL_TYPE_SETTING: {
                 DENIED_VIEW_ACCESS: "You do not have permission to view email type setting.",
                 DENIED_ADD_ACCESS: "You do not have permission to create email type setting.",

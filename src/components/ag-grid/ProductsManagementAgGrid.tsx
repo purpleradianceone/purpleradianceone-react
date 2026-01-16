@@ -29,7 +29,8 @@ function ProductsManagementGrid({
     userHasAccessToViewProduct,
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,
-    userHasAccessToUpdateProductTeam,
+    userHasAccessToViewProductTeam,
+    userHasAccessToViewProductUsers
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -415,16 +416,15 @@ function ProductsManagementGrid({
                       {/* {userHasAccessToUpdateProductTeam && ( */}
                       <>
                         <ActionsDropdownButton
-                          disabled={!userHasAccessToUpdateProductTeam}
+                          disabled={!userHasAccessToViewProductUsers}
                           onClick={() => {
-                            if (userHasAccessToUpdateProductTeam) {
+                            if (userHasAccessToViewProductUsers) {
                               setIsActionsDropDownOpen(false);
                               handleCompanyProductUserModalOpen(true);
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                  .DENIED_UPDATE_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_VIEW_ACCESS
                               );
                             }
                           }}
@@ -435,16 +435,15 @@ function ProductsManagementGrid({
                           {JSX_CHILDREN_NAME.USER}
                         </ActionsDropdownButton>
                         <ActionsDropdownButton
-                          disabled={!userHasAccessToUpdateProductTeam}
+                          disabled={!userHasAccessToViewProductTeam}
                           onClick={() => {
-                            if (userHasAccessToUpdateProductTeam) {
+                            if (userHasAccessToViewProductTeam) {
                               setIsActionsDropDownOpen(false);
                               handleCompanyProductTeamModalOpen(true);
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                  .DENIED_UPDATE_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS.DENIED_VIEW_ACCESS
                               );
                             }
                           }}
