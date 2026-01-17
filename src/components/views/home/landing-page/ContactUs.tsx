@@ -23,23 +23,17 @@ function ContactUs() {
   }, []);
 
   return (
-
-
-    <div className="contact-form-container">
-      <h2>Contact Form - Lead</h2>
       <div
+        className="flex w-full justify-center items-center"
         dangerouslySetInnerHTML={{
           __html: `<iframe 
             id="contact-form-iframe" 
-           src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=ac028b51-c7d1-4599-a730-e7d7dfa80575" 
-
-            width="50%" 
-            height="700px" 
-            frameborder="0"
+           src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=c0aacdf2-6d22-41db-9214-3e31d7c52734" 
+            height="500px" 
+            width="100%"
           ></iframe>`,
         }}
       />
-    </div>
   );
 }
 

@@ -6,7 +6,7 @@ import { Edit, Save, Trash2, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 
-export const SectionBlock: React.FC = () => {
+export const SectionBlockQuotation: React.FC = () => {
   const {
     connectors: { connect, drag },
     actions: { setProp },
@@ -175,7 +175,7 @@ export const SectionBlock: React.FC = () => {
   );
 };
 
-(SectionBlock as any).craft = {
+(SectionBlockQuotation as any).craft = {
   displayName: "Section Block",
   props: {
     background: "#f7f7f7",

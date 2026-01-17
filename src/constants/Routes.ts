@@ -27,9 +27,9 @@ const ROUTES_URL = {
     LEAD_DETAILS : "/home/manage-leads/leads/lead/view",
     SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
-    EMAIL_TEMPLATE : "/email-template",
-    EMAIL_TEMPLATE_CREATE : "/email-template/create",
-    EMAIL_TEMPLATE_UPDATE : "/email-template/update",
+    EMAIL_TEMPLATE : "/settings/email-template",
+    EMAIL_TEMPLATE_CREATE : "/settings/email-template/create",
+    EMAIL_TEMPLATE_UPDATE : "/settings/email-template/update",
 
     //for meetings
     GOOGLE_OAUTH : "/authenticate/google",
@@ -60,6 +60,7 @@ const ROUTES_URL = {
 
     FACEBOOK_OAUTH : "/authenticate/facebook",
     INTEGRATIONS_SETTINGS : "/settings/integrations",
+    QUOTATION_SETTINGS : "/settings/quotations",
 
     // Account module
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",

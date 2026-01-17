@@ -58,6 +58,7 @@ import { PageLayout } from "../../ui/PageLayout";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
+
 const ViewSupportTicketManagement = () => {
   const searchRef = useRef<CompanyUserSearchFieldRef>(null);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -495,6 +496,10 @@ const ViewSupportTicketManagement = () => {
   ]);
 
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
+
+  
+  
+
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -1118,6 +1123,7 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.updatedOn}
                     />
                   </div>
+                   
                 </div>
               </div>
             </div>
