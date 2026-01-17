@@ -43,7 +43,7 @@ function WebFormEmbed({
         (secret) => secret.companyFormID === 1
       );
       const secretCode = secret ? secret.secretCode : clientId;
-      return `<iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${secretCode}" width="50%" height="700px" frameborder="0"></iframe>`;
+      return `<div style="display:flex; width:100%; height:50vh; justify-content:center; align-items:center;"><iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${secretCode}" width="100%" height="500px"></iframe></div>`;
     }
     // For Product Form Integration
     if (integrationFor === "product") {
@@ -51,10 +51,10 @@ function WebFormEmbed({
         (secret) => secret.companyFormID === 2
       );
       const secretCode = secret ? secret.secretCode : clientId;
-      return `<iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${secretCode}" width="50%" height="700px" frameborder="0"></iframe>`;
+      return `<div style="display:flex; width:100%; height:50vh; justify-content:center; align-items:center;"><iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${secretCode}" width="100%" height="500px"></iframe></div>`;
     }
 
-    return `<iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${clientId}" width="50%" height="700px" frameborder="0"></iframe>`;
+    return `<div style="display:flex; width:100%; height:50vh; justify-content:center; align-items:center;"><iframe id="contact-form-iframe" src="${BASE_URL_FOR_FORM_INTEGRATION}/embed/contact_us_form.html?client_id=${clientId}" width="100%" height="500px"></iframe></div>`;
   };
 
   const frameworks: FrameworkTab[] = [

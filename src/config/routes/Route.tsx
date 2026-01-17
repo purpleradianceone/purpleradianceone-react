@@ -66,6 +66,7 @@ import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Acc
 import AccountDetails from "../../components/modals/Account/AccountDetails";
 import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
 import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
+import { EditorCanvasForQuotation} from "../../components/quotation-builder/builder/EditorCanvasForQuotation";
 
 export const router = createBrowserRouter([
   {
@@ -422,6 +423,20 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <EditorCanvasWithJson />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <EditorCanvasForQuotation />
             </Navbar>
           </div>
         </PrivateRoute>

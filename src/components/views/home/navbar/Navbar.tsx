@@ -16,6 +16,7 @@ import {
   Menu,
   MessageCircle,
   Network,
+  Quote,
   Settings,
   SettingsIcon,
   Store,
@@ -54,9 +55,10 @@ import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { loginStatus, setLoginStatus } = useLoggedInUserContext();
-    const [isDashboardRendered,setIsDashboardRendered] = useState<boolean>(false);
-    const {tutorailData,setTutorailData} = useTutorailDataContext();
-      const [istourFinished,setIsTourFinished] = useState<boolean>(false);
+  const [isDashboardRendered, setIsDashboardRendered] =
+    useState<boolean>(false);
+  const { tutorailData, setTutorailData } = useTutorailDataContext();
+  const [istourFinished, setIsTourFinished] = useState<boolean>(false);
 
   const {
     userHasAccessToViewLead,
@@ -67,8 +69,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewMeeting,
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewStock,
-    userHasAccessToViewSupportTicket
-    
+    userHasAccessToViewSupportTicket,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -115,31 +116,29 @@ function Navbar({ children }: { children: React.ReactNode }) {
     }
   }, [location]);
 
-
-
   useEffect(() => {
-
-    
-    const element =location.pathname;
-    if(element === ROUTES_URL.HOME){
+    const element = location.pathname;
+    if (element === ROUTES_URL.HOME) {
       setIsDashboardRendered(true);
       setIsTourFinished(tutorailData.isNavbarSeen);
-    }
-    else{
+    } else {
       setIsDashboardRendered(false);
       setIsTourFinished(tutorailData.isNavbarSeen);
     }
-  },[location])
- 
+  }, [location]);
 
   const handleLogout = async () => {
-   await cancelAllRequests();
+    await cancelAllRequests();
     await axios
       .post(POST_API.LOGOUT, {}, { withCredentials: true })
       .then((response) => {
         if (response.status === 200) {
-          localStorage.removeItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS);
-          localStorage.removeItem(LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET);
+          localStorage.removeItem(
+            LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+          );
+          localStorage.removeItem(
+            LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+          );
           toast.success(response.data);
           setLoginStatus({
             id: 0,
@@ -190,8 +189,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
   };
 
   const handleClickOnSettings = () => {
-    Navigate(ROUTES_URL.COMPANY_SETTING)
-  }
+    Navigate(ROUTES_URL.COMPANY_SETTING);
+  };
 
   // const notifications = useNotifications();
 
@@ -217,51 +216,55 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpenPopUpOfNotification, setIsOpenPopUpOfNotification] =
     useState<boolean>(false);
 
-    const handleNavbarTutorailFinish = async() => {
-      console.log(tutorailData);
-      const updateTutorailPostData = {
-        company_id : loginStatus.companyId,
-        id : tutorailData.id,
-        column_name : TutorailColumnName.IS_NAVBAR_SEEN,
-        status : true,
-        updatedby_id : loginStatus.id
-      }
-      axios.post(POST_API.UPDATE_COMPANY_USER_TUTORAIL,updateTutorailPostData,{
-        withCredentials:true,
-      }).then((response) => {
-        if(response.data.status){
-            setIsTourFinished(true);
+  const handleNavbarTutorailFinish = async () => {
+    console.log(tutorailData);
+    const updateTutorailPostData = {
+      company_id: loginStatus.companyId,
+      id: tutorailData.id,
+      column_name: TutorailColumnName.IS_NAVBAR_SEEN,
+      status: true,
+      updatedby_id: loginStatus.id,
+    };
+    axios
+      .post(POST_API.UPDATE_COMPANY_USER_TUTORAIL, updateTutorailPostData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          setIsTourFinished(true);
           setTutorailData({
             id: tutorailData.id,
-          companyUserId: tutorailData.companyUserId,
-          isNavbarSeen: true,
-          isDashboardSeen: tutorailData.isDashboardSeen,
-          isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
-          isCompanyUserSeen: tutorailData.isCompanyUserSeen,
-          isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
-          isLeadSeen: tutorailData.isLeadSeen,
-          isAccountSeen: tutorailData.isAccountSeen,
-          isProductSeen: tutorailData.isProductSeen,
-          isTeamSeen: tutorailData.isTeamSeen,
-          isSettingCompanySeen: tutorailData.isSettingCompanySeen,
-          isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
-          isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
-          createdBy: tutorailData.createdOn,
-          updatedBy: tutorailData.updatedBy,
-          createdOn: tutorailData.createdOn,
-          updatedOn: tutorailData.updatedOn,
+            companyUserId: tutorailData.companyUserId,
+            isNavbarSeen: true,
+            isDashboardSeen: tutorailData.isDashboardSeen,
+            isCrmDashboardSeen: tutorailData.isCrmDashboardSeen,
+            isCompanyUserSeen: tutorailData.isCompanyUserSeen,
+            isCompanyUserActionsSeen: tutorailData.isCompanyUserActionsSeen,
+            isLeadSeen: tutorailData.isLeadSeen,
+            isAccountSeen: tutorailData.isAccountSeen,
+            isProductSeen: tutorailData.isProductSeen,
+            isTeamSeen: tutorailData.isTeamSeen,
+            isSettingCompanySeen: tutorailData.isSettingCompanySeen,
+            isSettingEmailTemplateSeen: tutorailData.isSettingEmailTemplateSeen,
+            isSettingIntegrationSeen: tutorailData.isSettingIntegrationSeen,
+            createdBy: tutorailData.createdOn,
+            updatedBy: tutorailData.updatedBy,
+            createdOn: tutorailData.createdOn,
+            updatedOn: tutorailData.updatedOn,
           });
         }
-      }).catch(async(error) => {
-        if(error.status === STATUS_CODE.UNATHORISED){
-          const refreshTokenResponse = await RefreshToken({callFunction:handleNavbarTutorailFinish})
-          if(refreshTokenResponse){
+      })
+      .catch(async (error) => {
+        if (error.status === STATUS_CODE.UNATHORISED) {
+          const refreshTokenResponse = await RefreshToken({
+            callFunction: handleNavbarTutorailFinish,
+          });
+          if (refreshTokenResponse) {
             handleNavbarTutorailFinish();
           }
         }
-      })
-      
-    }
+      });
+  };
 
   // useEffect(() => {
   //   console.log("navbar condition : " + !loginStatus.status && loginStatus.isActiveSubscription && (loginStatus.activeUsersInCompany > loginStatus.subscriptionAllowedUsers));
@@ -291,7 +294,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
                   <div className=" justify-self-start">
-                    <img height={28} width={100} src={IMAGE_SOURCE.PR_ONE_LOGO} alt="Logo" />
+                    <img
+                      height={28}
+                      width={100}
+                      src={IMAGE_SOURCE.PR_ONE_LOGO}
+                      alt="Logo"
+                    />
                   </div>
                 </div>
 
@@ -399,12 +407,21 @@ function Navbar({ children }: { children: React.ReactNode }) {
   } else {
     return (
       <div>
-        {istourFinished ? null : isDashboardRendered  && <AppTutorailManager steps={NavbarSteps} handleTourEnd={handleNavbarTutorailFinish}/>}
-        
+        {istourFinished
+          ? null
+          : isDashboardRendered && (
+              <AppTutorailManager
+                steps={NavbarSteps}
+                handleTourEnd={handleNavbarTutorailFinish}
+              />
+            )}
+
         <header>
           <nav
             className={`z-20 bg-white border-b border-gray-200 fixed w-full    top-0 ${
-              position === "left" ? `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT} pt-0.5` :   `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_RIGHT}`
+              position === "left"
+                ? `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT} pt-0.5`
+                : `${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_RIGHT}`
             }`}
           >
             <div className="px-2 lg:px-6 ">
@@ -413,9 +430,21 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   position === "left" ? "ml-7" : "ml-0"
                 }  items-center justify-between`}
               >
-                <div title={loginStatus.companyName} id="company-name-navbar" className="flex items-center justify-between text-lg main-title-custom cursor-pointer">
+                <div
+                  title={loginStatus.companyName}
+                  id="company-name-navbar"
+                  className="flex items-center justify-between text-lg main-title-custom cursor-pointer"
+                >
                   <Link to={ROUTES_URL.HOME}>
-                    <h2 className={`section-header-custom ${sidebarOpen ? "ml-52" : ""}`}>{loginStatus.companyName.length>20 && position==="top"  ? loginStatus.companyName.substring(0,19).concat("...") : loginStatus.companyName }</h2>
+                    <h2
+                      className={`section-header-custom ${
+                        sidebarOpen ? "ml-52" : ""
+                      }`}
+                    >
+                      {loginStatus.companyName.length > 20 && position === "top"
+                        ? loginStatus.companyName.substring(0, 19).concat("...")
+                        : loginStatus.companyName}
+                    </h2>
                   </Link>
                 </div>
                 {position === "left" && (
@@ -440,20 +469,20 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Home"
                         />
                         {/* {userHasAccessToViewUser && ( */}
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewUser}
-                            to={ROUTES_URL.GET_COMPANY_USERS}
-                            icon={<Building2 size={SIZE.TWENTY} />}
-                            label="Manage Users"
-                          />
+                          to={ROUTES_URL.GET_COMPANY_USERS}
+                          icon={<Building2 size={SIZE.TWENTY} />}
+                          label="Manage Users"
+                        />
 
                         {/* {userHasAccessToViewLead && ( */}
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewLead}
-                            to={ROUTES_URL.GET_LEAD_MANAGEMENT}
-                            icon={<Handshake size={SIZE.TWENTY} />}
-                            label="Lead"
-                          />
+                          to={ROUTES_URL.GET_LEAD_MANAGEMENT}
+                          icon={<Handshake size={SIZE.TWENTY} />}
+                          label="Lead"
+                        />
                         {/* )} */}
                         {/* {!userHasAccessToViewLead && (
                           <NavItem
@@ -463,14 +492,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                         )} */}
 
-                       {/* {userHasAccessToViewAccount && ( */}
-                          <NavItem
+                        {/* {userHasAccessToViewAccount && ( */}
+                        <NavItem
                           disable={!userHasAccessToViewAccount}
-                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
-                            icon={<UserCogIcon size={SIZE.TWENTY} />}
-                            label="Accounts"
-                          />
-                          
+                          to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                          icon={<UserCogIcon size={SIZE.TWENTY} />}
+                          label="Accounts"
+                        />
+
                         {/* )} */}
                         {/* {!userHasAccessToViewAccount && (
                           <NavItem
@@ -480,36 +509,36 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                         )} */}
                         {/* {userHasAccessToViewProduct && ( */}
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewProduct}
-                            to={ROUTES_URL.PRODUCT_MANAGEMENT}
-                            icon={<Store size={SIZE.TWENTY} />}
-                            label="Products"
-                          />
-                           <NavItem
+                          to={ROUTES_URL.PRODUCT_MANAGEMENT}
+                          icon={<Store size={SIZE.TWENTY} />}
+                          label="Products"
+                        />
+                        <NavItem
                           disable={!userHasAccessToViewStock}
-                            to={ROUTES_URL.STOCK_MANAGEMENT}
-                            icon={<Layers size={SIZE.TWENTY} />}
-                            label="Stock"
-                          />
+                          to={ROUTES_URL.STOCK_MANAGEMENT}
+                          icon={<Layers size={SIZE.TWENTY} />}
+                          label="Stock"
+                        />
 
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewSupportTicket}
-                            to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
-                            icon={<Headset  size={SIZE.TWENTY} />}
-                            label="Support"
-                          />
-                          
+                          to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                          icon={<Headset size={SIZE.TWENTY} />}
+                          label="Support"
+                        />
+
                         {/* )} */}
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewTeamManagement}
-                            to={ROUTES_URL.TEAM_MANAGEMENT}
-                            icon={<Network size={SIZE.TWENTY} />}
-                            label="Team"
-                          />
+                          to={ROUTES_URL.TEAM_MANAGEMENT}
+                          icon={<Network size={SIZE.TWENTY} />}
+                          label="Team"
+                        />
                         {/* )} */}
                         {/* {userHasAccessToViewProductTeam && ( */}
-                          {/* <NavItem
+                        {/* <NavItem
                           disable={!userHasAccessToViewProductTeam}
                             to={ROUTES_URL.PRODUCT_TEAM_MANAGEMENT}
                             icon={<BoxesIcon size={SIZE.TWENTY} />}
@@ -518,13 +547,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         {/* )} */}
 
                         {/* {userHasAccessToViewMeeting && ( */}
-                          <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewMeeting}
-                            to={ROUTES_URL.MEETINGS}
-                            icon={<Calendar size={SIZE.TWENTY} />}
-                            label="Meetings"
-                            onClick={() => setIsDropdownOpen(false)}
-                          />
+                          to={ROUTES_URL.MEETINGS}
+                          icon={<Calendar size={SIZE.TWENTY} />}
+                          label="Meetings"
+                          onClick={() => setIsDropdownOpen(false)}
+                        />
                         {/* )} */}
 
                         <NavItem
@@ -539,13 +568,18 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             {
                               icon: <Aperture size={SIZE.TWENTY} />,
                               to: ROUTES_URL.EMAIL_TEMPLATE,
-                              label: "Email Template", 
+                              label: "Email Template",
                             },
                             {
-                              icon : <Layers size={SIZE.TWENTY}/>,
-                              to :ROUTES_URL.INTEGRATIONS_SETTINGS,
-                              label : "Integrations"
-                            }
+                              icon: <Layers size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.INTEGRATIONS_SETTINGS,
+                              label: "Integrations",
+                            },
+                            {
+                              icon: <Quote size={SIZE.TWENTY} />,
+                              to: ROUTES_URL.QUOTATION_SETTINGS,
+                              label: "Quotation",
+                            },
                           ]}
                         />
                       </div>
@@ -583,23 +617,21 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           )}
 
                           {userHasAccessToViewAccount && (
-                          <NavItem
-                          disable={!userHasAccessToViewAccount}
-                            to={ROUTES_URL.ACCOUNT_MANAGEMENT}
-                            icon={<UserCogIcon size={SIZE.TWENTY} />}
-                            label="Accounts"
-                          />
-                         )}
-                         {userHasAccessToViewSupportTicket && (
-                          <NavItem
-                          disable={!userHasAccessToViewSupportTicket}
-                          to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
-                          icon = {<Headset size={SIZE.TWENTY}/>}
-                          label="Support"
-                          />
-                         )
-
-                         }
+                            <NavItem
+                              disable={!userHasAccessToViewAccount}
+                              to={ROUTES_URL.ACCOUNT_MANAGEMENT}
+                              icon={<UserCogIcon size={SIZE.TWENTY} />}
+                              label="Accounts"
+                            />
+                          )}
+                          {userHasAccessToViewSupportTicket && (
+                            <NavItem
+                              disable={!userHasAccessToViewSupportTicket}
+                              to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}
+                              icon={<Headset size={SIZE.TWENTY} />}
+                              label="Support"
+                            />
+                          )}
                           {userHasAccessToViewProduct && (
                             <NavItem
                               to={ROUTES_URL.PRODUCT_MANAGEMENT}
@@ -643,6 +675,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           <NavItem
                             to={ROUTES_URL.EMAIL_TEMPLATE}
                             icon={<MessageCircle size={SIZE.TWENTY} />}
+                            onClick={() => setIsDropdownOpen(false)}
+                            label=""
+                          />
+                          <NavItem
+                            to={ROUTES_URL.QUOTATION_SETTINGS}
+                            icon={<Quote size={SIZE.TWENTY} />}
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />
@@ -782,7 +820,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             <span className="table-header-custom  block truncate w-40">
                               {loginStatus?.fullName || "User Name"}
                             </span>
-                            <span title={loginStatus?.email || "User email"} className="caption-custom block truncate w-40">
+                            <span
+                              title={loginStatus?.email || "User email"}
+                              className="caption-custom block truncate w-40"
+                            >
                               {loginStatus?.email || "User email"}
                             </span>
                           </div>
@@ -791,18 +832,20 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         {/* Menu Options */}
                         <div className="flex flex-col">
                           {/* {userHasAccessToViewUser ? ( */}
-                            <button
-                              onClick={handleClickOnUserProfile}
-                              className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
-                            >
-                              <div className="flex gap-2">
-                              <User2 className="input-label-custom"/>
-                              <span className="input-label-custom mt-1">Profile</span>
-                              </div>
-                              {/* 👤 Profile */}
-                            </button>
+                          <button
+                            onClick={handleClickOnUserProfile}
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                          >
+                            <div className="flex gap-2">
+                              <User2 className="input-label-custom" />
+                              <span className="input-label-custom mt-1">
+                                Profile
+                              </span>
+                            </div>
+                            {/* 👤 Profile */}
+                          </button>
                           {/* ) : ( */}
-                            {/* <button
+                          {/* <button
                               onClick={() => {
                                 setAccessDeniedPopUpView(true);
                               }}
@@ -811,15 +854,18 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               👤 Profile
                             </button>
                           )} */}
-                            <button 
+                          <button
                             onClick={handleClickOnSettings}
-                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1">
-                              {/* ⚙️ Settings */}
-                              <div className="flex gap-2">
-                              <Settings className="input-label-custom"/>
-                              <span className="input-label-custom mt-1">Settings</span>
-                              </div>
-                            </button>
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                          >
+                            {/* ⚙️ Settings */}
+                            <div className="flex gap-2">
+                              <Settings className="input-label-custom" />
+                              <span className="input-label-custom mt-1">
+                                Settings
+                              </span>
+                            </div>
+                          </button>
 
                           {userHasAccessToViewSubscription ? (
                             <button
@@ -827,8 +873,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
                             >
                               <div className="flex gap-2">
-                              <CreditCard className="input-label-custom"/>
-                              <span className="input-label-custom mt-1">Subscription</span>
+                                <CreditCard className="input-label-custom" />
+                                <span className="input-label-custom mt-1">
+                                  Subscription
+                                </span>
                               </div>
                               {/* 💳 Subscription */}
                             </button>
@@ -838,8 +886,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               className="px-4 py-2 input-label-custom text-left flex items-center gap-2 transition bg-gray-50 cursor-not-allowed hover:bg-gray-100 rounded-md mx-2 my-1"
                             >
                               <div className="flex gap-2">
-                              <CreditCard className="input-label-custom"/>
-                              <span className="input-label-custom mt-1">Subscription</span>
+                                <CreditCard className="input-label-custom" />
+                                <span className="input-label-custom mt-1">
+                                  Subscription
+                                </span>
                               </div>
                             </button>
                           )}
@@ -854,9 +904,11 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             {/* <LogOut className="input-label-custom" />
                             Sign Out */}
                             <div className="flex gap-2">
-                              <LogOut className="input-label-custom"/>
-                              <span className="input-label-custom mt-1">Sign Out</span>
-                              </div>
+                              <LogOut className="input-label-custom" />
+                              <span className="input-label-custom mt-1">
+                                Sign Out
+                              </span>
+                            </div>
                           </button>
                         </div>
                       </div>
@@ -876,7 +928,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
               : "mt-11 ml-0 flex justify-center items-center"
           }
         >
-
           {istourFinished && children}
         </main>
         {accessDeniedPopUpView && (

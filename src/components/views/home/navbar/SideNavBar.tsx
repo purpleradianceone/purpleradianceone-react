@@ -193,6 +193,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 </div>
               )}
             </NavLink>,
+            <NavLink key="quotations" to={ROUTES_URL.QUOTATION_SETTINGS}>
+              {({ isActive }) => (
+                <div
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
+                >
+                  Quotation
+                </div>
+              )}
+            </NavLink>,
           ]}
         />
       </nav>
