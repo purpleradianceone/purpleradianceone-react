@@ -29,7 +29,7 @@ const StockLiveForCompanyProductAgGrid = ({
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
-  const { userHasAccessToUpdateStock } = useUserAccessModules();
+  const { userHasAccessToUpdateStock , userHasAccessToViewStock } = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -184,15 +184,14 @@ const StockLiveForCompanyProductAgGrid = ({
                   >
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateStock}
+                        disabled={!userHasAccessToViewStock}
                         onClick={() => {
-                          if (userHasAccessToUpdateStock) {
+                          if (userHasAccessToViewStock) {
                             setIsActionsDropDownOpen(false);
                             handleClick(ActionTypeForStockMOdule.DETAILS)
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                                .DENIED_UPDATE_ACCESS
+                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_VIEW_ACCESS
                             );
                           }
                         }}
@@ -206,14 +205,14 @@ const StockLiveForCompanyProductAgGrid = ({
 
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateStock}
+                        disabled={!userHasAccessToViewStock}
                         onClick={() => {
-                          if (userHasAccessToUpdateStock) {
+                          if (userHasAccessToViewStock) {
                             setIsActionsDropDownOpen(false);
                             handleClick(ActionTypeForStockMOdule.TRANSACTIONS)
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
+                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_VIEW_ACCESS
                             );
                           }
                         }}
@@ -235,8 +234,7 @@ const StockLiveForCompanyProductAgGrid = ({
                               handleClick(ActionTypeForStockMOdule.CREATE_STOCK)
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                  .DENIED_UPDATE_ACCESS
+                                MESSAGE.MODULE_ACCESS.STOCK.DENIED_UPDATE_ACCESS
                               );
                             }
                           }}
