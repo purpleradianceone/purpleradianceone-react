@@ -7,7 +7,6 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
@@ -15,11 +14,12 @@ import SupportTicketManagementList from "../../lists/SupportTicketManagementList
 import SupportTicketProps from "../../../@types/support-ticket-management/SupportTicketProps";
 import PostDataToGetSupportTicketData from "../../../@types/support-ticket-management/PostDataToGetSupportTicketData";
 import axiosClient from "../../../axios-client/AxiosClient";
-import { Product } from "../../../@types/products/ProductsManagementProps";
 import { useSupportTicketLifecycle } from "../../../config/hooks/useSupportTicketLifecycle";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import LookupCompanyUser from "../../../@types/lookup/LookupCompanyUser";
+import LookupCompanyProduct from "../../../@types/lookup/LookupCompanyProduct";
 
 function SupportTicketManagement({
   isUsedInSupportTicketModule,
@@ -80,51 +80,29 @@ function SupportTicketManagement({
   const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
     useState<number | null>(savedFilters.selectedSupportTicketSource || null);
 
-  const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>(
+  const [selectedAssignTo, setSelectedAssignTo] = useState<LookupCompanyUser>(
     savedFilters.selectedAssignTo || {
-      company_id: 0,
       id: 0,
       fullname: "",
       email: "",
       mobilenumber: "",
-      createdby: "",
-      isactive: false,
-      requestedby: "",
-      generate_password: "",
     }
   );
 
-  const [selectedResolvedBy, setSelectedResolvedBy] = useState<CompanyUser>(
+  const [selectedResolvedBy, setSelectedResolvedBy] = useState<LookupCompanyUser>(
     savedFilters.selectedResolvedBy || {
-      company_id: 0,
       id: 0,
       fullname: "",
       email: "",
       mobilenumber: "",
-      createdby: "",
-      isactive: false,
-      requestedby: "",
-      generate_password: "",
     }
   );
 
-  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<Product>(
+  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<LookupCompanyProduct>(
     savedFilters.selectedCompanyProduct || {
       id: 0,
-      productTypeId: 0,
-      unitName: "",
-      unitId: 0,
-      unitNameInStock: "",
-      productTypeName: "",
-      defaultWarrantyIntervalTypeId: 0,
-      defaultWarranty: 0,
-      defaultWarrantyName: "",
-      defaultAmcCycleIntervalTypeId: 0,
-      defaultAmcCycle: 0,
-      defaultAmcCycleName: "",
       name: "",
-      barcode: "",
-      isActive: false,
+      
     }
   );
 
@@ -257,103 +235,62 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedAssignToCheckBoxChange = (params: CompanyUser | null) => {
+  const handleSelectedAssignToCheckBoxChange = (params: LookupCompanyUser | null) => {
     if (params) {
       setSelectedAssignTo({
-        company_id: params.company_id,
         id: params.id,
         fullname: params.fullname,
         email: params.email,
         mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
+       
       });
     } else {
       // Reset selectedCompanyUser to its initial state when null is received
       setSelectedAssignTo({
-        company_id: 0,
         id: 0,
         fullname: "",
         email: "",
         mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
+        
       });
     }
   };
 
   const handleSelectedCompanyProductCheckBoxChange = (
-    params: Product | null
+    params: LookupCompanyProduct | null
   ) => {
     if (params) {
       setSelectedCompanyProduct({
         id: params.id,
-        productTypeId: params.productTypeId,
-        unitName: params.unitName,
-        unitId: params.unitId,
-        unitNameInStock: params.unitNameInStock,
-        productTypeName: params.productTypeName,
-        defaultWarrantyIntervalTypeId: params.defaultWarrantyIntervalTypeId,
-        defaultWarranty: 0,
-        defaultWarrantyName: "",
-        defaultAmcCycleIntervalTypeId: 0,
-        defaultAmcCycle: 0,
-        defaultAmcCycleName: "",
         name: params.name,
-        barcode: "",
-        isActive: params.isActive,
+       
       });
     } else {
       setSelectedCompanyProduct({
         id: 0,
-        productTypeId: 0,
-        unitName: "",
-        unitId: 0,
-        unitNameInStock: "",
-        productTypeName: "",
-        defaultWarrantyIntervalTypeId: 0,
-        defaultWarranty: 0,
-        defaultWarrantyName: "",
-        defaultAmcCycleIntervalTypeId: 0,
-        defaultAmcCycle: 0,
-        defaultAmcCycleName: "",
-        name: "",
-        barcode: "",
-        isActive: false,
+        name: "", 
       });
     }
   };
 
   const handleSelectedResolvedByCheckBoxChange = (
-    params: CompanyUser | null
+    params: LookupCompanyUser | null
   ) => {
     if (params) {
       setSelectedResolvedBy({
-        company_id: params.company_id,
         id: params.id,
         fullname: params.fullname,
         email: params.email,
         mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
+       
       });
     } else {
       setSelectedResolvedBy({
-        company_id: 0,
         id: 0,
         fullname: "",
         email: "",
         mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
+        
       });
     }
   };

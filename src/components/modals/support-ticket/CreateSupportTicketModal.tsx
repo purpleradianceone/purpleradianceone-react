@@ -124,7 +124,7 @@ function CreateSupportTicketModal({
     useState<number | undefined>(undefined);
 
   const [selectedSource, setSelectedSource] = useState<number | undefined>(
-    undefined
+    undefined,
   );
 
   const [selectedCompanyProductSla, setSelectedCompanyProductSla] = useState<
@@ -132,7 +132,7 @@ function CreateSupportTicketModal({
   >(undefined);
 
   const handleLeadSelectedSupportTicketCategory = (
-    value: number | undefined
+    value: number | undefined,
   ) => {
     setSelectedSupportTicketCategory(value);
   };
@@ -166,9 +166,13 @@ function CreateSupportTicketModal({
     };
 
     await axiosClient
-      .post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_SLA, postDataForCompanyProductSla, {
-        withCredentials: true,
-      })
+      .post(
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT_SLA,
+        postDataForCompanyProductSla,
+        {
+          withCredentials: true,
+        },
+      )
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           const formattedData: CompanyProductSla[] = response.data.map(
@@ -183,7 +187,7 @@ function CreateSupportTicketModal({
               updatedBy: item.updatedby,
               createdOn: item.createdon,
               updatedOn: item.updatedon,
-            })
+            }),
           );
           setCompanyProductSla(formattedData);
         }
@@ -215,11 +219,11 @@ function CreateSupportTicketModal({
     }
   }, [selectedAccount]);
 
-  useEffect(()=>{
-    if(companyProductSla && companyProductSla.length!==0){
+  useEffect(() => {
+    if (companyProductSla && companyProductSla.length !== 0) {
       setSelectedCompanyProductSla(companyProductSla[0].id);
     }
-  },[companyProductSla]);
+  }, [companyProductSla]);
 
   const clearSelectedAccount = () => {
     setSelectedAccont({
@@ -280,7 +284,7 @@ function CreateSupportTicketModal({
     });
     clearSelectedAccount();
     localStorage.removeItem(
-      LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+      LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
     );
   };
 
@@ -414,16 +418,15 @@ function CreateSupportTicketModal({
 
   if (!isOpen) return null;
   return (
-    <FormLayout
-    widthPercent={95}
-    padding={3}
-    >
+    <FormLayout widthPercent={95} padding={3}>
       {(isSupportTicketCreating || isLoadingForAccountCompanyProducts) && (
         <LoadingPopUpAnimation
           show={isSupportTicketCreating || isLoadingForAccountCompanyProducts}
         />
       )}
-      <div className={`${isSupportTicketCreating? "cursor-wait" : "cursor-default"}`}>
+      <div
+        className={`${isSupportTicketCreating ? "cursor-wait" : "cursor-default"}`}
+      >
         <FormHeader
           icon={TicketPlus}
           onClose={() => {
@@ -461,10 +464,14 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Account</p>
-                  <p 
-                  title={selectedAccount.accountName.length > 20 ? selectedAccount.accountName : undefined}
-
-                  className="table-data-custom max-w-[120px] select-text truncate">
+                  <p
+                    title={
+                      selectedAccount.accountName.length > 20
+                        ? selectedAccount.accountName
+                        : undefined
+                    }
+                    className="table-data-custom max-w-[120px] select-text truncate"
+                  >
                     {selectedAccount.accountName
                       ? selectedAccount.accountName
                       : "No account selected"}
@@ -481,9 +488,13 @@ function CreateSupportTicketModal({
                 <div>
                   <p className="caption-custom">Email</p>
                   <p
-                  title={selectedAccount.accountEmail.length > 20 ? selectedAccount.accountEmail : undefined}
-
-                  className="table-data-custom max-w-[120px] select-text truncate">
+                    title={
+                      selectedAccount.accountEmail.length > 20
+                        ? selectedAccount.accountEmail
+                        : undefined
+                    }
+                    className="table-data-custom max-w-[120px] select-text truncate"
+                  >
                     {selectedAccount.accountEmail
                       ? selectedAccount.accountEmail
                       : "NA"}
@@ -499,10 +510,14 @@ function CreateSupportTicketModal({
                 </div>
                 <div>
                   <p className="caption-custom">Mobile Number</p>
-                  <p 
-                  title={selectedAccount.accountMobileNumber.length > 20 ? selectedAccount.accountMobileNumber : undefined}
-
-                  className="table-data-custom max-w-[120px] select-text truncate">
+                  <p
+                    title={
+                      selectedAccount.accountMobileNumber.length > 20
+                        ? selectedAccount.accountMobileNumber
+                        : undefined
+                    }
+                    className="table-data-custom max-w-[120px] select-text truncate"
+                  >
                     {selectedAccount.accountMobileNumber
                       ? selectedAccount.accountMobileNumber
                       : "NA"}
@@ -520,8 +535,13 @@ function CreateSupportTicketModal({
                 <div>
                   <p className="caption-custom">Selected Product</p>
                   <p
-                  title={selectedAccount.companyProductName.length > 20 ? selectedAccount.companyProductName : undefined}
-                   className="table-data-custom max-w-[150px] select-text truncate">
+                    title={
+                      selectedAccount.companyProductName.length > 20
+                        ? selectedAccount.companyProductName
+                        : undefined
+                    }
+                    className="table-data-custom max-w-[150px] select-text truncate"
+                  >
                     {selectedAccount.companyProductName
                       ? selectedAccount.companyProductName
                       : "No product selected"}
@@ -531,23 +551,30 @@ function CreateSupportTicketModal({
             )}
 
             {/* Product Serial Number */}
-            {selectedAccount.id !== 0 && stage >= 2 && selectedAccount.serialNumber && (
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-green-100">
-                  <QrCodeIcon size={18} className="text-blue-600" />
+            {selectedAccount.id !== 0 &&
+              stage >= 2 &&
+              selectedAccount.serialNumber && (
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 flex items-center justify-center rounded-full bg-green-100">
+                    <QrCodeIcon size={18} className="text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="caption-custom">Serial Number</p>
+                    <p
+                      title={
+                        selectedAccount.serialNumber.length > 20
+                          ? selectedAccount.serialNumber
+                          : undefined
+                      }
+                      className="table-data-custom max-w-[150px] select-text truncate"
+                    >
+                      {selectedAccount.companyProductName
+                        ? selectedAccount.serialNumber
+                        : "No Serial Number"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="caption-custom">Serial Number</p>
-                  <p
-                  title={selectedAccount.serialNumber.length > 20 ? selectedAccount.serialNumber : undefined}
-                   className="table-data-custom max-w-[150px] select-text truncate">
-                    {selectedAccount.companyProductName
-                      ? selectedAccount.serialNumber
-                      : "No Serial Number"}
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
 
             {selectedAccount.id !== 0 && stage >= 2 && (
               <div className="flex items-center gap-3">
@@ -797,18 +824,18 @@ function CreateSupportTicketModal({
                           MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                         }
                       />
-                      </div>
-                      <span className="caption-custom">
-                        <span className="">Note :</span> If a support ticket
-                        assign to is not selected or is removed, then ticket
-                        will assigned to
-                        <span className="table-header-custom active">
-                          {" "}
-                          creator
-                        </span>{" "}
-                        by default.
-                      </span>
                     </div>
+                    <span className="caption-custom">
+                      <span className="">Note :</span> If a support ticket
+                      assign to is not selected or is removed, then ticket will
+                      assigned to
+                      <span className="table-header-custom active">
+                        {" "}
+                        creator
+                      </span>{" "}
+                      by default.
+                    </span>
+                  </div>
 
                   <div className="flex justify-end ">
                     <div className="flex gap-2">

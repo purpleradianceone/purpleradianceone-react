@@ -9,12 +9,13 @@ import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompan
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
 
-import Pagination from "../ag-grid/Pagination";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import COLORS from "../../constants/Colors";
 import AccountCompanyProductForSupportTicket from "../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
 import AccountCompanyProductForSupportTicketAgGrid from "../ag-grid/AccountCompanyProductForSupportTicketAgGrid";
 import { useEffect } from "react";
+import PaginationWithoutCount, {
+  PaginationWithoutCountProps,
+} from "../ag-grid/PaginationWithoutCount";
 
 function AccountCompanyProductForSupportTicketList({
   accountCompanyProductsForSupportTicket,
@@ -28,7 +29,8 @@ function AccountCompanyProductForSupportTicketList({
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  paginationData: PaginationDataProps;
+  // paginationData: PaginationDataProps;
+  paginationData: PaginationWithoutCountProps;
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
 }) {
   const { position } = usePanel();
@@ -48,7 +50,7 @@ function AccountCompanyProductForSupportTicketList({
 
   const selectedDateName =
     dateRangeDropdownOptions.find(
-      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
     )?.date_range || "Date Filter";
 
   useEffect(() => {
@@ -92,7 +94,7 @@ function AccountCompanyProductForSupportTicketList({
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                   placeholder={"Search by Account's Email, mobilenumber"}
@@ -149,12 +151,12 @@ function AccountCompanyProductForSupportTicketList({
       </div>
 
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={paginationData.totalPages}
+        <PaginationWithoutCount
           currentPage={paginationData.currentPage}
           pageSize={paginationData.pageSize}
-          onPageChange={paginationData.handlePageChange}
-          onPageSizeChange={paginationData.selectedPageSize}
+          hasNextPage={paginationData.hasNextPage}
+          onPageChange={paginationData.onPageChange}
+          onPageSizeChange={paginationData.onPageSizeChange}
         />
       </div>
     </div>
