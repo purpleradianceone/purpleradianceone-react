@@ -43,7 +43,6 @@ function GetAccountCompanyProductFroSupportTicket({
     startDate,
     endDate,
     searchParameter,
-    totalPages,
     setTotalPages,
     handleDatePageIdChange,
     handleEndDateChange,
@@ -52,6 +51,9 @@ function GetAccountCompanyProductFroSupportTicket({
     handleSearchParameterChange,
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
+
+  const [hasNextPage, setHasNextPage] = useState(false);
+
 
   // Fetch data function
   const fetchAccountCompanyProductForSupportTicket = async () => {
@@ -105,6 +107,7 @@ function GetAccountCompanyProductFroSupportTicket({
           createdOn: res.createdon,
           updatedOn: res.updatedon,
         }));
+      setHasNextPage(formattedData.length>=pageSize);
       setAccounts(formattedData);
 
       if (response.data[0]?.count) {
@@ -203,12 +206,19 @@ function GetAccountCompanyProductFroSupportTicket({
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
+                // paginationData={{
+                //   selectedPageSize: handlePageSizeChange,
+                //   currentPage,
+                //   handlePageChange,
+                //   totalPages,
+                //   pageSize,
+                // }}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
+                  onPageSizeChange: handlePageSizeChange,
                   currentPage,
-                  handlePageChange,
-                  totalPages,
+                  onPageChange:handlePageChange,
                   pageSize,
+                  hasNextPage,
                 }}
                 handleRowSelect={handleRowSelect}
               />

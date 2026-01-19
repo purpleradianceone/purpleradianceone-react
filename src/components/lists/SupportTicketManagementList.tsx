@@ -12,7 +12,6 @@ import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useEffect, useState } from "react";
-import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -27,14 +26,13 @@ import { usePanel } from "../../context/panel/usePanel";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
-import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
-import { createPortal } from "react-dom";
 import SupportTicketManagementAgGrid from "../ag-grid/SupportTicketManagementAgGrid";
 import SupportTicketManagementListProps from "../../@types/List/SupportTicketManagementListProps";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
-import ProductManagement from "../views/product-Management/ProductsManagement";
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
+import LookupCompanyUserSelection from "../views/lookups/lookup-company-user-new/LookupCompanyUserSelection";
+import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -173,7 +171,7 @@ function SupportTicketManagementList({
 
     const selectedDateName =
       dateRangeDropdownOptions.find(
-        (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+        (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
       )?.date_range || "Date Filter";
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -238,7 +236,7 @@ function SupportTicketManagementList({
                   value={handleSearchOption.searchParameter}
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                 ></SearchInput>
@@ -424,7 +422,7 @@ function SupportTicketManagementList({
                                 title="Clear"
                                 onClick={() =>
                                   handleSelectedCompanyProductCheckBoxChange(
-                                    null
+                                    null,
                                   )
                                 }
                                 className="border-transparent"
@@ -450,7 +448,7 @@ function SupportTicketManagementList({
                         if (!userHasAccessToAddSupportTicket) {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .DENIED_ADD_ACCESS
+                              .DENIED_ADD_ACCESS,
                           );
                           return;
                         }
@@ -505,76 +503,63 @@ function SupportTicketManagementList({
             onPageSizeChange={paginationData.selectedPageSize}
           />
         </div>
-        {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) &&
-          createPortal(
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-                <FormHeader
-                  icon={User}
-                  onClose={() => {
-                    if (openPopUpOfAssignToModal) {
-                      setOpenPopUpOfAssignToModal(false);
-                    }
-                    if (openPopUpOfResolvedByModal) {
-                      setOpenPopUpOfResolvedByModal(false);
-                    }
-                  }}
-                  preText="Select Company User"
-                  description="Select the user to view him/her support tickets"
-                />
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="p-1">
-                  <GetCompanyUsersForLead
-                    selectedUserId={
-                      openPopUpOfAssignToModal
-                        ? selectedAssignTo.id !== 0
-                          ? selectedAssignTo.id
-                          : null
-                        : selectedResolvedBy.id !== 0
-                        ? selectedResolvedBy.id
-                        : null
-                    } // Pass the persisted ID
-                    handleSelectedCompanyUserChange={(params) => {
-                      if (openPopUpOfAssignToModal) {
-                        handleSelectedAssignToCheckBoxChange(params);
-                        setOpenPopUpOfAssignToModal(false);
-                      }
-                      if (openPopUpOfResolvedByModal) {
-                        handleSelectedResolvedByCheckBoxChange(params);
-                        setOpenPopUpOfResolvedByModal(false);
-                      }
-                    }}
-                    isUsedForSettings={false}
-                  />
-                </div>
-              </div>
-            </div>,
-            document.body
-          )}
-        {openPopUpOfCompanyProductModal &&
-          createPortal(
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-                <FormHeader
-                  icon={ShoppingBag}
-                  onClose={() => setOpenPopUpOfCompanyProductModal(false)}
-                  preText="Select Product"
-                  description="Select the product to view its support tickets"
-                />
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="p-1">
-                  <ProductManagement
-                    isGridForAccountProduct={true}
-                    onRowSelect={(params) => {
-                      handleSelectedCompanyProductCheckBoxChange(params);
-                      setOpenPopUpOfCompanyProductModal(false);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>,
-            document.body
-          )}
+        {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) && (
+          <div>
+            <LookupCompanyUserSelection
+              isOpen={openPopUpOfAssignToModal || openPopUpOfResolvedByModal}
+              onClose={() => {
+                if (openPopUpOfAssignToModal) {
+                  setOpenPopUpOfAssignToModal(false);
+                }
+                if (openPopUpOfResolvedByModal) {
+                  setOpenPopUpOfResolvedByModal(false);
+                }
+              }}
+              preText={
+                openPopUpOfAssignToModal
+                  ? "Select Support Ticket AssignTo"
+                  : "Select Support Ticket Resolved By"
+              }
+              description="Select the user to view him/her support tickets"
+              selectedUserId={
+                openPopUpOfAssignToModal
+                  ? selectedAssignTo.id !== 0
+                    ? selectedAssignTo.id
+                    : null
+                  : selectedResolvedBy.id !== 0
+                    ? selectedResolvedBy.id
+                    : null
+              }
+              handleSelectedCompanyUserChange={(params) => {
+                if (openPopUpOfAssignToModal) {
+                  handleSelectedAssignToCheckBoxChange(params);
+                  setOpenPopUpOfAssignToModal(false);
+                }
+                if (openPopUpOfResolvedByModal) {
+                  handleSelectedResolvedByCheckBoxChange(params);
+                  setOpenPopUpOfResolvedByModal(false);
+                }
+              }}
+            />
+          </div>
+        )}
+        {openPopUpOfCompanyProductModal && (
+          <LookupCompanyProductSelection
+            isOpen={openPopUpOfCompanyProductModal}
+            onClose={() => setOpenPopUpOfCompanyProductModal(false)}
+            preText="Select Company Product"
+            description="Select company product to view its support tickets"
+            selectedProductId={
+              selectedCompanyProduct && selectedCompanyProduct.id !== 0
+                ? selectedCompanyProduct.id!
+                : null
+            }
+            handleSelectedCompanyProductChange={(params) => {
+              handleSelectedCompanyProductCheckBoxChange(params);
+              setOpenPopUpOfCompanyProductModal(false);
+            }}
+          />
+        )}
       </div>
     );
   }
