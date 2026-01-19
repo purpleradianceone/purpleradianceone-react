@@ -14,6 +14,7 @@ import { useState } from "react";
 import SupportTicketTaskProps from "../../../@types/support-ticket-management/SupportTicketTaskProps";
 import SupportTicketTaskStage from "../../../@types/support-ticket-management/SupportTicketTaskStage";
 import UpdateSupportTicketTaskModal from "./UpdateSupportTicketTaskModal";
+import MESSAGE from "../../../constants/Messages";
 
 function SupportTicketTaskList({
   taskId,
@@ -78,7 +79,7 @@ function SupportTicketTaskList({
             <div className=" min-h-72   flex items-center justify-center">
               <p className="text-center caption-custom italic ">
                 {supportTicketTasks.length
-                  ? `You don't have access to view.`
+                  ? MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_TASK_ACCESS
                   : `No activities found.`}
               </p>
             </div>

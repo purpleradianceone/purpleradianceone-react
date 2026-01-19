@@ -97,6 +97,8 @@ const MESSAGE = {
             UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update support ticket details.",
             DENIED_ADD_TASK_ACCESS: "You do not have permission to create support ticket task.",
             DENIED_UPDATE_TASK_ACCESS: "You do not have permission to update support ticket task.",
+            DENIED_VIEW_TASK_ACCESS: "You do not have permission to view support ticket tasks.",
+
         },
         ACCOUNT_COMPANY_PRODUCT_WARRANTY: {
             DENIED_VIEW_ACCESS: "You do not have permission to view warranty details.",
