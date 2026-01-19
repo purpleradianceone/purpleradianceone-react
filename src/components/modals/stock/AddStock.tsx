@@ -2,7 +2,7 @@
 import AddStockModalProps from "../../../@types/stock/AddStockModalProps";
 import FormHeader from "../../ui/FormHeader";
 import {
-  ArrowLeft,
+  BoxIcon,
   ClipboardPen,
   Info,
   ListOrdered,
@@ -15,8 +15,6 @@ import {
   X,
 } from "lucide-react";
 import FormLayout from "../../ui/FormLayout";
-import ProductManagement from "../../views/product-Management/ProductsManagement";
-import { Product } from "../../../@types/products/ProductsManagementProps";
 import { useEffect, useState } from "react";
 import Button from "../../ui/Button";
 import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
@@ -34,11 +32,17 @@ import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import useUnitForProduct from "../../../config/hooks/useUnitForProduct";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
-import CustomSelect from "../../ui/CustomSelect";
+import CustomSelect, { SelectOption } from "../../ui/CustomSelect";
 import { toSelectOptions } from "../../../utils/toSelectOption";
+import axiosClient from "../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../config/error/handleApiError";
+import { LookupCompanyProductForStockCreation } from "../../../@types/lookup/LookupCompanyProductForStockCreation";
+import { getLookupCompanyProductForStockCreation } from "../../../config/apis/Lookups";
+
+
 
 const AddStock = ({
-  isUsedInProductModal = false,
+  // isUsedInProductModal = false,
   isOpen,
   onClose,
   product,
@@ -56,23 +60,14 @@ const AddStock = ({
   >(1);
 
   // it is used when we create stock from the stock module where we select the product and then continue
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<LookupCompanyProductForStockCreation | null>(null);
 
-  const [showInputForm, setShowInputForm] = useState<boolean>(false);
   const { unitForProduct: unitForProductData } = useUnitForProduct({
     companyProductId: selectedProduct?.id,
   });
   const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(
     undefined
   );
-
-  // Note : if Product is given then set it to selected product AND if not then first show the selection module then select the product
-  useEffect(() => {
-    if (!product) return;
-
-    setSelectedProduct(product);
-    setShowInputForm(true);
-  }, [product]);
 
   // Note : it will set the unit id if the selected product
   useEffect(() => {
@@ -95,10 +90,12 @@ const AddStock = ({
     unitIdError: boolean;
     warehouseIdError: boolean;
     adjustmentReasonId: boolean;
+    productId : boolean,
   }>({
     unitIdError: false,
     warehouseIdError: false,
     adjustmentReasonId: false,
+    productId : false
   });
 
   const intialAddStockFormData = {
@@ -122,20 +119,6 @@ const AddStock = ({
     addStockFormData,
     "registration"
   );
-
-  function onRowSelectProductForStock(product: Product) {
-    setSelectedProduct(null);
-    if (product !== null && product !== undefined) {
-      setSelectedProduct(product);
-      setShowInputForm(true);
-    }
-  }
-
-  function handleGoBackToProductSelection() {
-    setSelectedProduct(null);
-    setSelectedUnitId(undefined)
-    setShowInputForm(false);
-  }
 
   const [productUnitConversionFactor, setProductUnitConversionFactor] =
     useState<number>(0);
@@ -186,6 +169,7 @@ const AddStock = ({
       unitIdError: false,
       warehouseIdError: false,
       adjustmentReasonId: false,
+      productId : false
     });
     onClose();
   };
@@ -195,6 +179,19 @@ const AddStock = ({
     if (addStockFormData.quantity === 0) {
       toast.error("Quantity is required");
       return false;
+    }
+
+     if (productSelected === 0 || productSelected === undefined || productSelected ===null) {
+      setError((prev) => ({
+        ...prev,
+        productId: true,
+      }));
+      return false;
+    } else {
+      setError((prev) => ({
+        ...prev,
+        productId: false,
+      }));
     }
 
     if (selectedUnitId === 0 || selectedUnitId === undefined) {
@@ -293,10 +290,143 @@ const AddStock = ({
       });
   };
 
+  const PAGE_SIZE = 25;
+
+const [productOptions, setProductOptions] = useState<SelectOption[]>([]);
+const [offset, setOffset] = useState(0);
+const [hasMore, setHasMore] = useState(true);
+const [isLoading, setIsLoading] = useState(false);
+const [searchText, setSearchText] = useState("");
+
+const fetchProducts = async (
+  search: string,
+  currentOffset: number,
+  append = false
+) => {
+  if (isLoading || (!hasMore && append)) return;
+
+  setIsLoading(true);
+
+  const postData = {
+    company_id: loginStatus.companyId,
+    id: null,
+    isactive: true,
+    search_parameter: search || null,
+    offset: currentOffset,
+    limit: PAGE_SIZE,
+    requestedby: loginStatus.id,
+  };
+
+  try {
+    const response = await axiosClient.post(
+      POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_STOCK_CREATION,
+      postData,
+      { withCredentials: true }
+    );
+
+    if (response.status === 200) {
+      const mapped: SelectOption[] = response.data.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      }));
+
+      setProductOptions(prev =>
+        append ? [...prev, ...mapped] : mapped
+      );
+
+      setHasMore(mapped.length === PAGE_SIZE);
+      setOffset(currentOffset + PAGE_SIZE);
+    }
+  } catch (error) {
+    handleApiError(error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleMenuOpen = () => {
+  if (productOptions.length === 0) {
+    setOffset(0);
+    setHasMore(true);
+    fetchProducts("", 0, false);
+  }
+};
+
+const handleMenuScrollToBottom = () => {
+  if (hasMore) {
+    fetchProducts(searchText, offset, true);
+  }
+};
+
+const handleInputChange = (value: string) => {
+  setSearchText(value);
+  setOffset(0);
+  setHasMore(true);
+
+  // debounce-friendly approach
+  fetchProducts(value, 0, false);
+};
+
+
+  // Note: Need to work on this 
+  const [productSelected , setProductSelected ] = useState<number | null>(null);
+  // Note : when product is given bu parent component then do this
+  useEffect(()=>{
+    if(!product)return;
+    setProductSelected(product?.id || 0);
+  }, [product])
+  useEffect(()=>{
+    if (!productSelected) return;
+    if(productSelected){
+
+      const apiCall = async ()=>{
+
+        const postData = {
+          company_id: loginStatus.companyId,
+          id: productSelected,
+          isactive: true,
+          search_parameter:  null,
+          offset: 0,
+          limit: 1,
+          requestedby: loginStatus.id,
+        };
+        const response =await  getLookupCompanyProductForStockCreation(postData)
+        
+        if(response){
+
+        setSelectedUnitId(undefined)
+          const data = response.data[0]
+
+          const formattedData  : LookupCompanyProductForStockCreation= {
+            id : data.id,
+            isSerialNumber : data.is_serial_number,
+            name : data.name ,
+            parentUnitId : data.parent_unit_id,
+            unitId : data.unit_id,
+            unitName : data.unit_name,
+            barcode : data.barcode ,
+    unitNameInStock : data.unit_name_in_stock
+          }
+          setSelectedProduct(formattedData)
+        }
+      }
+
+      apiCall()
+    }
+  },[productSelected])
+
+
+  useEffect(()=>{
+    console.log("this is the product selcted");
+    console.log(selectedProduct);
+  }, [selectedProduct
+  ])
+
   // Note : Data sanitization for dropdowns
   const warehouseOptions = toSelectOptions(companyWarehouse, "id", "name");
   const unitOptions = toSelectOptions(unitForProductData, "id", "name");
 
+  // const productOptions = toSelectOptions(productList, 'id', 'name');
   // if isOpen is false then return null
   if (!isOpen) return null;
 
@@ -309,7 +439,7 @@ const AddStock = ({
     );
 
   return (
-    <FormLayout width={5}>
+    <FormLayout width={5} padding={2}>
       <>
         <FormHeader
           icon={Plus}
@@ -318,32 +448,17 @@ const AddStock = ({
           preText="Add Stock"
         />
 
-        {!selectedProduct && !showInputForm && (
-          <ProductManagement
-            isGridForAccountProduct={true}
-            onRowSelect={onRowSelectProductForStock}
-          />
-        )}
-        {showInputForm && (
+        
           <>
             <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
-              {!isUsedInProductModal && (
-                <Button
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-1 py-1.5 border border-blue-200 bg-blue-50 rounded-md transition-all"
-                  onClick={handleGoBackToProductSelection}
-                >
-                  <ArrowLeft size={14} />
-                  Change Product
-                </Button>
-              )}
-
               {selectedProduct && (
                 <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
                   <span className="text-gray-500">Product:</span>{" "}
                   {selectedProduct.name}
                 </div>
               )}
-              {selectedProduct?.barcode !== null && (
+              {/*Note : Need to add barcode in the get api response  */}
+              {selectedProduct && selectedProduct.barcode && (
                 <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
                   <span className="text-gray-500">Product Barcode:</span>{" "}
                   {selectedProduct?.barcode}
@@ -356,8 +471,42 @@ const AddStock = ({
               className="space-y-2 p-1"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* select the product when used from the stock creation button from stock module */}
+                {
+                  !product &&  
+                  <div className="">
+                <CustomSelect 
+                icon={BoxIcon}
+                label="Product"
+                onChange={(value )=>{
+                  if(!value) return;
+                  setProductSelected(value)
+                  setError((prev)=>({
+                    ...prev,
+                    productId : false
+                  }))
+                }}
+                options={productOptions}
+                isRequired={true}
+                placeholder="Select Product"
+                value={productSelected ||0}
+                onMenuOpen={handleMenuOpen}
+                onMenuScrollToBottom={handleMenuScrollToBottom}
+                onInputChange={handleInputChange}
+                isLoading={isLoading}
+                isClearable={false}
+                />
+                {
+                  error.productId && (
+                     <div className="caption-custom-inactive">
+                      Product is required
+                    </div>
+                  )
+                }
+                </div>
+              }
                 {/* Quantity */}
-                <div className="mt-1.5">
+                <div className="">
                   <FormInput
                     label="Quantity : "
                     logo={LucideIndianRupee}
@@ -397,39 +546,15 @@ const AddStock = ({
                   >
                     Quantity will be inserted into the stock :{" "}
                     {productUnitConversionFactor}
+                    {/* {selectedProduct?.unitName} */}
+                    {/* Note : need to work on this */}
                     {selectedProduct?.unitNameInStock}
                     <Info size={12} className="" />
                   </p>
                 </div>
                 {/* Unit */}
 
-                <div className="mt-1.5">
-                  {/* <CustomDropdown
-                    labelName="Unit :"
-                    logo={LucideTimer}
-                    preselectedOption={
-                      !selectedUnitId
-                        ? selectedProduct?.parentUnitId || product?.parentUnitId
-                        : selectedUnitId
-                    }
-                    onSelect={(data) => {
-                      if (data) {
-                        setError((prev) => ({
-                          ...prev,
-                          unitIdError: false,
-                        }));
-                      }
-                      setSelectedUnitId(data);
-                    }}
-                    readOnly={
-                      selectedProduct?.isSerialNumber &&
-                      (selectedProduct?.parentUnitId || product?.parentUnitId)
-                        ? true
-                        : false
-                    }
-                    options={unitForProductData}
-                    requiredRedDot={true}
-                  /> */}
+                <div className="">
                   <CustomSelect
                     label="Unit :"
                     isClearable={false}
@@ -585,7 +710,7 @@ const AddStock = ({
               </div>
             </form>
           </>
-        )}
+        
       </>
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
     </FormLayout>
