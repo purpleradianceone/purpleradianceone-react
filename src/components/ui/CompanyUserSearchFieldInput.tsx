@@ -67,15 +67,19 @@ const CompanyUserSearchFieldInput = forwardRef<
         xLogo: true,
       },
     },
-    ref
+    ref,
   ) => {
     const [query, setQuery] = useState(defaultValue);
     const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
     const [results, setResults] = useState<CompanyUser[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
-
     const [activeIndex, setActiveIndex] = useState(-1);
+
+    /** 🔹 Pagination states */
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => ({
       focus() {
@@ -95,6 +99,9 @@ const CompanyUserSearchFieldInput = forwardRef<
     const [lastSelectedUser, setLastSelectedUser] =
       useState<CompanyUser | null>(null);
     const [isExplicitClear, setIsExplicitClear] = useState(false);
+
+    const userPreferenceLimit = userPreference.rowsInGrid;
+    // const userPreferenceLimit = 5;
 
     // ---------------- PRE POPULATE ----------------
     useEffect(() => {
@@ -119,10 +126,15 @@ const CompanyUserSearchFieldInput = forwardRef<
     };
 
     // ---------------- SEARCH API ----------------
-    const fetchUsers = async (searchText: string) => {
-      if (!searchText.trim() || searchText.trim().length < 2 || isDisabled) {
-        abortController.abort();
-        setResults([]);
+    const fetchUsers = async (searchText: string, nextOffset = 0) => {
+      if (
+        !searchText.trim() ||
+        searchText.trim().length < 2 ||
+        isDisabled ||
+        isFetchingMore
+      ) {
+        // abortController.abort();
+        // setResults([]);
         return;
       }
 
@@ -136,7 +148,8 @@ const CompanyUserSearchFieldInput = forwardRef<
       abortController = new AbortController();
 
       try {
-        setIsLoading(true);
+        setIsLoading(nextOffset === 0);
+        setIsFetchingMore(true);
 
         const response = await axiosClient.post(
           POST_API.GET_LOOKUP_COMPANY_USERS,
@@ -144,20 +157,25 @@ const CompanyUserSearchFieldInput = forwardRef<
             company_id: loginStatus.companyId,
             search_parameter: searchText.trim(),
             isactive: true,
-            limit: userPreference.rowsInGrid,
+            limit: userPreferenceLimit,
+            offset: nextOffset,
             requestedby: loginStatus.id,
           },
           {
             withCredentials: true,
             signal: abortController.signal,
-          }
+          },
         );
 
         if (response?.status === STATUS_CODE.OK) {
-          setResults(response.data || []);
-          setActiveIndex(0); // set first as active
+          const newData: CompanyUser[] = response.data || [];
+          setResults((prev) =>
+            nextOffset === 0 ? newData : [...prev, ...newData],
+          );
+          setHasMore(newData.length === userPreferenceLimit);
+          setActiveIndex(0);
         } else {
-          setResults([]);
+          setHasMore(false);
         }
       } catch (err: any) {
         if (err.code === "ERR_CANCELED") {
@@ -167,12 +185,17 @@ const CompanyUserSearchFieldInput = forwardRef<
         console.error("SEARCH ERROR:", err);
       } finally {
         setIsLoading(false);
+        setIsFetchingMore(false);
       }
     };
 
     const debouncedSearch = useCallback(
-      debounce((txt: string) => fetchUsers(txt), 500),
-      [isDisabled]
+      debounce((txt: string) => {
+        setOffset(0);
+        setHasMore(true);
+        fetchUsers(txt, 0);
+      }, 500),
+      [isDisabled],
     );
 
     // cleanup AbortController on unmount
@@ -188,13 +211,24 @@ const CompanyUserSearchFieldInput = forwardRef<
     useEffect(() => {
       if (isDisabled) return;
 
-      if (query && !selectedUser) {
-        if (query !== defaultValue) {
-          debouncedSearch(query);
-          setShowDropdown(true);
-        }
+      if (query && !selectedUser && query !== defaultValue) {
+        debouncedSearch(query);
+        setShowDropdown(true);
       }
     }, [query, selectedUser, debouncedSearch, isDisabled]);
+
+    // ---------------- DROPDOWN SCROLL (LOAD MORE) ----------------
+    const handleDropdownScroll = () => {
+      if (!dropdownRef.current || !hasMore || isFetchingMore) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = dropdownRef.current;
+
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        const nextOffset = offset + userPreferenceLimit;
+        setOffset(nextOffset);
+        fetchUsers(query, nextOffset);
+      }
+    };
 
     // ---------------- POSITION DROPDOWN ----------------
     const updateDropdownPosition = () => {
@@ -246,6 +280,8 @@ const CompanyUserSearchFieldInput = forwardRef<
       setSelectedUser(null);
       setQuery("");
       setResults([]);
+      setOffset(0);
+      setHasMore(true);
       setShowDropdown(false);
       onUserSelected(null);
     };
@@ -260,7 +296,7 @@ const CompanyUserSearchFieldInput = forwardRef<
         ) {
           setShowDropdown(false);
 
-          // ✅ RESTORE PREVIOUS VALUE
+          // RESTORE PREVIOUS VALUE
           if (lastSelectedUser && !isExplicitClear) {
             setSelectedUser(lastSelectedUser);
             setQuery(lastSelectedUser.fullname);
@@ -360,12 +396,12 @@ const CompanyUserSearchFieldInput = forwardRef<
               isDisabled
                 ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
                 : readOnly
-                ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
-                : `appearance-none block w-full  ${
-                    has.border
-                      ? "border border-gray-300 px-1 pb-1 pt-1 rounded-md shadow-sm focus:outline-none"
-                      : ""
-                  }   focus:ring-blue-500 focus:border-blue-500`
+                  ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
+                  : `appearance-none block w-full  ${
+                      has.border
+                        ? "border border-gray-300 px-1 pb-1 pt-1 rounded-md shadow-sm focus:outline-none"
+                        : ""
+                    }   focus:ring-blue-500 focus:border-blue-500`
             }
           />
           {/* TEXT WIDTH MEASURER (hidden) */}
@@ -410,26 +446,39 @@ const CompanyUserSearchFieldInput = forwardRef<
             <div
               ref={dropdownRef}
               style={dropdownStyle}
+              onScroll={handleDropdownScroll} // ✅ SCROLL HANDLER
               className="bg-white shadow-lg rounded-md border max-h-[160px] overflow-y-auto scroll-smooth"
             >
               {isLoading ? (
                 <div className="p-2 table-header-custom">Searching...</div>
               ) : results.length > 0 ? (
-                results.map((user, index) => (
-                  <div
-                    key={user.id}
-                    onMouseDown={() => handleSelect(user)}
-                    className={`px-2 py-1 cursor-pointer 
+                <div>
+                  {results.map((user, index) => (
+                    <div
+                      key={user.id}
+                      onMouseDown={() => handleSelect(user)}
+                      className={`px-2 py-1 cursor-pointer 
                   ${
                     index === activeIndex
                       ? "bg-blue-100 active-item"
                       : "hover:bg-gray-100"
                   }`}
-                  >
-                    <div className="table-header-custom">{user.fullname}</div>
-                    <div className="caption-custom">{user.email}</div>
-                  </div>
-                ))
+                    >
+                      <div className="table-header-custom">{user.fullname}</div>
+                      <div className="caption-custom">{user.email}</div>
+                    </div>
+                  ))}
+                  {isFetchingMore && (
+                    <div className="p-2 text-center text-sm text-gray-400">
+                      Loading more...
+                    </div>
+                  )}
+                  {!hasMore && (
+                    <div className="p-2 text-center text-sm text-gray-400">
+                      No more data
+                    </div>
+                  )}
+                </div>
               ) : (
                 query.length >= 2 &&
                 query !== defaultValue && (
@@ -437,7 +486,7 @@ const CompanyUserSearchFieldInput = forwardRef<
                 )
               )}
             </div>,
-            document.body
+            document.body,
           )}
 
         {error && (
@@ -445,7 +494,7 @@ const CompanyUserSearchFieldInput = forwardRef<
         )}
       </div>
     );
-  }
+  },
 );
 
 export default CompanyUserSearchFieldInput;

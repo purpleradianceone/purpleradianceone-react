@@ -21,13 +21,13 @@ function GetAccountCompanyProductFroSupportTicket({
 }: {
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
 }) {
-  const [accounts, setAccounts] = useState<
+  const [accountsCompanyProductForSupportTicke, setAccountsCompanyProductForSupportTicke] = useState<
     AccountCompanyProductForSupportTicket[]
   >([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-  const { userHasAccessToViewAccount } = useUserAccessModules();
+  const { userHasAccessToViewSupportTicket } = useUserAccessModules();
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
@@ -108,7 +108,7 @@ function GetAccountCompanyProductFroSupportTicket({
           updatedOn: res.updatedon,
         }));
       setHasNextPage(formattedData.length>=pageSize);
-      setAccounts(formattedData);
+      setAccountsCompanyProductForSupportTicke(formattedData);
 
       if (response.data[0]?.count) {
         setTotalPages(Math.ceil(response.data[0].count / pageSize));
@@ -131,10 +131,10 @@ function GetAccountCompanyProductFroSupportTicket({
   }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
 
   useEffect(() => {
-    if (!userHasAccessToViewAccount) {
+    if (!userHasAccessToViewSupportTicket) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToViewAccount]);
+  }, [userHasAccessToViewSupportTicket]);
 
   // Save all filters to localStorage whenever they change
   useEffect(() => {
@@ -185,7 +185,7 @@ function GetAccountCompanyProductFroSupportTicket({
   }, []);
   return (
     <div className="w-full">
-      {userHasAccessToViewAccount ? (
+      {userHasAccessToViewSupportTicket ? (
         <>
           <div>
             <motion.section
@@ -195,7 +195,7 @@ function GetAccountCompanyProductFroSupportTicket({
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <AccountCompanyProductForSupportTicketList
-                accountCompanyProductsForSupportTicket={accounts}
+                accountCompanyProductsForSupportTicket={accountsCompanyProductForSupportTicke}
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
@@ -206,13 +206,6 @@ function GetAccountCompanyProductFroSupportTicket({
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
-                // paginationData={{
-                //   selectedPageSize: handlePageSizeChange,
-                //   currentPage,
-                //   handlePageChange,
-                //   totalPages,
-                //   pageSize,
-                // }}
                 paginationData={{
                   onPageSizeChange: handlePageSizeChange,
                   currentPage,
