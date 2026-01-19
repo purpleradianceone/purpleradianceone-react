@@ -1202,7 +1202,7 @@ const ViewSupportTicketManagement = () => {
           </div>
 
           {/* third Column */}
-          {userHasAccessToViewSupportTicketTask && (
+          {(
             <div className="mt-3">
               <SupportTicketTasksModal />
             </div>

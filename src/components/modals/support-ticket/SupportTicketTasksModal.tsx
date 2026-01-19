@@ -18,9 +18,13 @@ import SupportTicketProps from "../../../@types/support-ticket-management/Suppor
 import CreateSupportTicketTaskModal from "./CreateSupportTicketTaskModal";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 function SupportTicketTasksModal() {
-  const { userHasAccessToAddSupportTicketTask, } = useUserAccessModules();
+  const {
+    userHasAccessToAddSupportTicketTask,
+    userHasAccessToViewSupportTicketTask,
+  } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
 
@@ -108,7 +112,7 @@ function SupportTicketTasksModal() {
 
   useEffect(() => {
     const supportTicketSearchParam = JSON.parse(
-      searchParams.get(supportTicketDataUrlSearchParamKey) || "{}"
+      searchParams.get(supportTicketDataUrlSearchParamKey) || "{}",
     );
     setSupportTicketData(supportTicketSearchParam);
     setVisibleAssignUsersBtn(true);
@@ -146,7 +150,8 @@ function SupportTicketTasksModal() {
                       setIsCreateSupportTicketTaskModalOpen(true);
                     } else {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_ADD_TASK_ACCESS
+                        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                          .DENIED_ADD_TASK_ACCESS,
                       );
                     }
                   }}
@@ -187,13 +192,19 @@ function SupportTicketTasksModal() {
                 </div>
               </div>
             </div>
-          ) : (
+          ) : userHasAccessToViewSupportTicketTask ? (
             <SupportTasksTabs
               isLoading={isLoading}
               supportTicketTasks={supportTicketTasks}
               supportTicketTaskStage={supportTicketTaskStage}
               handleTaskTabChange={handleTaskTabChange}
               handleSupportTicketTaskUpdate={handleSupportTicketTaskUpdate}
+            />
+          ) : (
+            <AccessDeniedMessagePage
+              message={
+                MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_TASK_ACCESS
+              }
             />
           )}
         </div>
