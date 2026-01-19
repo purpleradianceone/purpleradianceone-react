@@ -31,7 +31,7 @@ import SupportTicketManagementAgGrid from "../ag-grid/SupportTicketManagementAgG
 import SupportTicketManagementListProps from "../../@types/List/SupportTicketManagementListProps";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
-import LookupCompanyUserSelection from "../views/lookups/lookup-company-user-new/LookupCompanyUserSelection";
+import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/LookupCompanyUserSelection";
 import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
