@@ -19,6 +19,12 @@ interface AppSelectProps {
   icon?: LucideIcon;
   className?: string;
   isClearable? : boolean
+
+  // New Props for scroll api data and onSearchApiCall
+  onMenuOpen?: () => void;
+  onMenuScrollToBottom?: () => void;
+  onInputChange?: (value: string) => void;
+  isLoading?: boolean;
 }
 
 
@@ -40,7 +46,11 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   isRequired = false,
   icon: Icon,
   className,
-  isClearable = true
+  isClearable = true,
+  isLoading,
+  onInputChange ,
+  onMenuOpen ,
+  onMenuScrollToBottom 
 }) => {
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value) ?? null,
@@ -73,6 +83,12 @@ const CustomSelect: React.FC<AppSelectProps> = ({
         classNamePrefix="app-select "
         menuPortalTarget={document.body}
         menuPosition="fixed"
+        // new props for api and text search
+        isLoading={isLoading}
+        onInputChange={onInputChange}
+        onMenuOpen={onMenuOpen}
+        onMenuScrollToBottom={onMenuScrollToBottom}
+        // above props are used for the search and scroll api call
         classNames={{
             placeholder : ()=> "input-label-custom placeholder-gray-400",
             input: ()=> "input-label-custom",
