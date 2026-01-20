@@ -37,14 +37,15 @@ function LookupCompanyProductSelection({
     LookupCompanyProduct[]
   >([]);
   const { loginStatus } = useLoggedInUserContext();
-  const [hasNextPage, setHasNextPage] = useState(false);
 
   const {
     currentPage,
     pageSize,
+    hasNextPage,
     searchParameter,
     handleSearchParameterChange,
     handlePageChange,
+    setHasNextPageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
@@ -72,7 +73,7 @@ function LookupCompanyProductSelection({
       );
 
       setCompanyProducts(response.data);
-      setHasNextPage(response.data.length >= pageSize);
+      setHasNextPageChange(response.data.length >= pageSize);
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {

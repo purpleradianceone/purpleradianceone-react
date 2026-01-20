@@ -54,14 +54,15 @@ function SupportTicketManagement({
   const {
     currentPage,
     pageSize,
+    hasNextPage,
     dateRangeId,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    setTotalPages,
     handleDatePageIdChange,
     handleEndDateChange,
+    setHasNextPageChange,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -105,7 +106,6 @@ function SupportTicketManagement({
     }
   );
 
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -174,11 +174,11 @@ function SupportTicketManagement({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+        // if (response.data.length > 0) {
+        //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        // }
 
-        setHasNextPage(response.data.length>=pageSize);
+        setHasNextPageChange(response.data.length>=pageSize);
 
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({

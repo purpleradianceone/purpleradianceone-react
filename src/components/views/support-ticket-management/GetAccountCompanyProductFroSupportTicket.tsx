@@ -11,10 +11,10 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import AccountCompanyProductForSupportTicket from "../../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
-import axiosClient from "../../../axios-client/AxiosClient";
 import AccountCompanyProductForSupportTicketList from "../../lists/AccountCompanyProductForSupportTicketList";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
+import axios from "axios";
 
 function GetAccountCompanyProductFroSupportTicket({
   handleRowSelect,
@@ -39,24 +39,25 @@ function GetAccountCompanyProductFroSupportTicket({
     currentPage,
     pageSize,
     dateRangeId,
+    hasNextPage,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    setTotalPages,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
+    setHasNextPageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
-  const [hasNextPage, setHasNextPage] = useState(false);
 
 
   // Fetch data function
   const fetchAccountCompanyProductForSupportTicket = async () => {
+    if(loginStatus.companyId === 0) return;
     if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
@@ -76,14 +77,14 @@ function GetAccountCompanyProductFroSupportTicket({
     };
 
     try {
-      const response = await axiosClient.post(
+      const response = await axios.post(
         POST_API.GET_ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
         postData,
         {
           withCredentials: true,
         }
       );
-
+      setHasNextPageChange(response.data.length>=pageSize);
       const formattedData: AccountCompanyProductForSupportTicket[] =
         response.data.map((res: any) => ({
           count: res.count,
@@ -107,12 +108,11 @@ function GetAccountCompanyProductFroSupportTicket({
           createdOn: res.createdon,
           updatedOn: res.updatedon,
         }));
-      setHasNextPage(formattedData.length>=pageSize);
       setAccountsCompanyProductForSupportTicke(formattedData);
 
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+      // if (response.data[0]?.count) {
+      //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
+      // }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({

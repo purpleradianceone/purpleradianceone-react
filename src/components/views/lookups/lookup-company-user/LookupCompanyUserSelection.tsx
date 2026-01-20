@@ -33,15 +33,16 @@ function LookupCompanyUserSelection({
 }) {
   const [companyUsers, setCompanyUsers] = useState<LookupCompanyUser[]>([]);
   const { loginStatus } = useLoggedInUserContext();
-  const [hasNextPage, setHasNextPage] = useState(false);
 
   const {
-    currentPage,
     pageSize,
+    currentPage,
+    hasNextPage,
     searchParameter,
-    handleSearchParameterChange,
-    handlePageChange,
     handlePageSizeChange,
+    handlePageChange,
+    setHasNextPageChange,
+    handleSearchParameterChange,
   } = useSearchFilterPaginationDateHandlers();
 
   // Fetch data function
@@ -68,7 +69,7 @@ function LookupCompanyUserSelection({
       );
 
       setCompanyUsers(response.data);
-      setHasNextPage(response.data.length >= pageSize);
+      setHasNextPageChange(response.data.length >= pageSize);
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {

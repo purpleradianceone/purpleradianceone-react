@@ -994,6 +994,12 @@ const ViewSupportTicketManagement = () => {
                     <CompanyUserSearchFieldInput
                       key={keyForAssignTo}
                       logo={User}
+                      has={{
+                          border: true,
+                          penLogo: true,
+                          searchLogo: true,
+                          xLogo:true
+                        }}
                       label="Assign To"
                       // placeholder={selectedSupportTicket.assignedToName}
                       defaultValue={selectedSupportTicket.assignedToName}
@@ -1007,6 +1013,7 @@ const ViewSupportTicketManagement = () => {
                           setSelectedAssignTo(user);
                         }
                         if (user === null || user === undefined) {
+                          setkeyForAssignTo((prev)=>prev+1);
                           setSelectedAssignTo({
                             company_id: 0,
                             email: "",
@@ -1035,6 +1042,12 @@ const ViewSupportTicketManagement = () => {
                         ref={searchRef}
                         key={keyForResolvedBy}
                         logo={UserCheck2Icon}
+                        has={{
+                          border: true,
+                          searchLogo: true,
+                          penLogo: true,
+                          xLogo:true
+                        }}
                         label="Resolved By"
                         defaultValue={selectedSupportTicket.resolvedByName}
                         isDisabled={!userHasAccessToUpdateSupportTicket}
@@ -1047,14 +1060,15 @@ const ViewSupportTicketManagement = () => {
                             setSelectedResolvedBy(user);
                           }
                           if (user === null || user === undefined) {
+                            setkeyForResolvedBy((prev) => prev + 1);
                             setSelectedResolvedBy({
                               company_id: 0,
                               email: "",
-                              fullname: selectedSupportTicket.assignedToName,
+                              fullname: selectedSupportTicket.resolvedByName,
                               mobilenumber: "",
                               generate_password: "",
                               createdby: "",
-                              id: selectedSupportTicket.assignedTo,
+                              id: selectedSupportTicket.resolvedBy,
                               isactive: false,
                               requestedby: "",
                             });
