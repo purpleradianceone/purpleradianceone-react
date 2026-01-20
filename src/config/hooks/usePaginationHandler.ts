@@ -6,6 +6,7 @@ interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
   currentPage: number;
   totalPages: number;
+  hasNextPage: boolean;
   startDate: string;
   endDate: string;
   dateRangeId: number;
@@ -14,6 +15,7 @@ interface UseSearchFilterPaginationDateHandlersResult {
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   handlePageSizeChange: (size: number) => void;
   handlePageChange: (page: number) => void;
+  setHasNextPageChange: (hasNextPage: boolean) => void;
   handleStartDateChange: (date: Date | null) => void;
   handleEndDateChange: (date: Date | null) => void;
   handleDatePageIdChange: (newDateRangeId?: number) => void;
@@ -38,6 +40,7 @@ export const useSearchFilterPaginationDateHandlers = (
   // const [searchParameter, setSearchParameter] = useState('');
   const [concatDate, setConcatDate] = useState('');
 
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
   const [pageSize, setPageSize] = useState(firstValue|| 25);
@@ -81,7 +84,18 @@ export const useSearchFilterPaginationDateHandlers = (
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+    if(page>=1 && hasNextPage){
+      setCurrentPage(page);
+    }
+    if(page>=1 && page<currentPage){
+      setCurrentPage(page);
+    }
+
   };
+
+  const setHasNextPageChange=(hasNextPage: boolean)=>{
+    setHasNextPage(hasNextPage);
+  }
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
@@ -164,6 +178,7 @@ export const useSearchFilterPaginationDateHandlers = (
     pageSize,
     currentPage,
     totalPages,
+    hasNextPage:hasNextPage,
     startDate,
     endDate,
     dateRangeId,
@@ -172,6 +187,7 @@ export const useSearchFilterPaginationDateHandlers = (
     setTotalPages,
     handlePageSizeChange,
     handlePageChange,
+    setHasNextPageChange,
     handleStartDateChange,
     handleEndDateChange,
     handleDatePageIdChange,
