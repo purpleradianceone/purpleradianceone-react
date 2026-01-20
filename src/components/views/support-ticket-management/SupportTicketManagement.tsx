@@ -177,7 +177,7 @@ function SupportTicketManagement({
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
-        setCurrentPageDataLength(response.data.length);
+        setCurrentPageDataLength(currentPage, response.data.length);
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({
             count: item.count,

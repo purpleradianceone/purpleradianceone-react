@@ -73,7 +73,7 @@ function LookupCompanyProductSelection({
       );
 
       setCompanyProducts(response.data);
-      setCurrentPageDataLength(response.data.length);
+      setCurrentPageDataLength(currentPage, response.data.length);
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {

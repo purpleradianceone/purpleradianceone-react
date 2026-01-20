@@ -41,11 +41,11 @@ import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSo
 import StageIndicator from "./StageIdicator";
 import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicketCategory";
 import AccountCompanyProductForSupportTicket from "../../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
-import GetAccountCompanyProductFroSupportTicket from "../../views/support-ticket-management/GetAccountCompanyProductFroSupportTicket";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { handleApiError } from "../../../config/error/handleApiError";
+import GetAccountCompanyProductForSupportTicket from "../../views/support-ticket-management/GetAccountCompanyProductForSupportTicket";
 
 function CreateSupportTicketModal({
   isOpen,
@@ -217,6 +217,7 @@ function CreateSupportTicketModal({
     } else {
       setCompanyProductSla([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount]);
 
   useEffect(() => {
@@ -633,7 +634,7 @@ function CreateSupportTicketModal({
         <form className="space-y-0">
           {isOpenForAccountSelection && (
             <div className="md:col-span-2  w-full h-fit">
-              <GetAccountCompanyProductFroSupportTicket
+              <GetAccountCompanyProductForSupportTicket
                 handleRowSelect={(data) => {
                   setSelectedAccont(data);
                   setIsOpenForAccountSelection(false);

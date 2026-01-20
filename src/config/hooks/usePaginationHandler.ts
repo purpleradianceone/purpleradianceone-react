@@ -15,7 +15,7 @@ interface UseSearchFilterPaginationDateHandlersResult {
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   handlePageSizeChange: (size: number) => void;
   handlePageChange: (page: number) => void;
-  setCurrentPageDataLength:(dataLength: number) => void;
+  setCurrentPageDataLength:(page:number, dataLength: number) => void;
   handleStartDateChange: (date: Date | null) => void;
   handleEndDateChange: (date: Date | null) => void;
   handleDatePageIdChange: (newDateRangeId?: number) => void;
@@ -27,19 +27,9 @@ export const useSearchFilterPaginationDateHandlers = (
   initialValue ? : any
 ): UseSearchFilterPaginationDateHandlersResult => {
   const { userPreference } = useUserPreference();
-  // const firstValue= PAGINATION.DROPDOWN_OPTION_FOR_COMPANY_USER_PAGINATION[0]
   const firstValue = userPreference.rowsInGrid;
-
-  // const [pageSize, setPageSize] = useState(firstValue ?? 25);
-  // const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1); // Initialize totalPages
-  // const [startDate, setStartDate] = useState('');
-  // const [endDate, setEndDate] = useState('');
-
-  // const [dateRangeId, setDateRangeId] = useState(0);
-  // const [searchParameter, setSearchParameter] = useState('');
+  const [totalPages, setTotalPages] = useState(1); 
   const [concatDate, setConcatDate] = useState('');
-
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
@@ -48,6 +38,8 @@ export const useSearchFilterPaginationDateHandlers = (
   const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
   const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
   const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
+  const mapOfPageAndDataLength = new Map<number, number>();
+
 
   useEffect(() => {
     setPageSize(firstValue)
@@ -76,6 +68,7 @@ export const useSearchFilterPaginationDateHandlers = (
   };
 
   const handlePageSizeChange = (size: number) => {
+    mapOfPageAndDataLength.clear();
     setPageSize(size);
     setCurrentPage(1);
   };
@@ -84,21 +77,19 @@ export const useSearchFilterPaginationDateHandlers = (
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
-    if(page>=1 && hasNextPage){
+    if(page>=1 && hasNextPage && (page == (currentPage+1)) ){
       setCurrentPage(page);
     }
     if(page>=1 && page<currentPage){
-      setCurrentPage(page);
+          setCurrentPage(page);
     }
 
   };
 
-  const setCurrentPageDataLength = (pageDataLength: number) => {
-      setHasNextPage(pageDataLength>=pageSize);
-    
+  const setCurrentPageDataLength = (page:number, pageDataLength: number) => {
+    mapOfPageAndDataLength.set(page, pageDataLength);
+      setHasNextPage(pageDataLength >= pageSize);
   }
-
-
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
@@ -172,10 +163,6 @@ export const useSearchFilterPaginationDateHandlers = (
     }
   }, [startDate, endDate, dateRangeId]);
 
-  // useEffect(() => {
-  //   setCurrentPage(1);
-
-  // }, []);
 
   return {
     pageSize,
@@ -195,6 +182,5 @@ export const useSearchFilterPaginationDateHandlers = (
     handleEndDateChange,
     handleDatePageIdChange,
     handleSearchParameterChange,
-    // initialized
   };
 };
