@@ -100,7 +100,7 @@ const Home: React.FC = () => {
         .post(
           POST_API.GET_COMPANY_USER_DASHBOARD_ASSIGNED,
           getCompanyUserDashboardPostData,
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((response) => {
           if (response.data != null) {
@@ -111,7 +111,7 @@ const Home: React.FC = () => {
             setModules(
               fetchedModules
                 .filter((m) => m.isactive)
-                .sort((a, b) => a.dashboard_id - b.dashboard_id)
+                .sort((a, b) => a.dashboard_id - b.dashboard_id),
             );
 
             if (fetchedModules.length > 0) {
@@ -189,19 +189,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     setTourFinished(tutorailData.isDashboardSeen);
     fetchCompanyUserDashboardAssigned();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser]);
-
-  if (loading) {
-    return (
-      <div
-        className={`grid justify-center items-center min-h-[100vh] ${
-          loading ? "cursor-wait" : "cursor-default"
-        }`}
-      >
-        <DashboardLoadingSpinner />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
@@ -210,6 +199,15 @@ const Home: React.FC = () => {
           steps={DashboardTabsSteps}
           handleTourEnd={handleTourEnd}
         />
+      )}
+      {loading && (
+        <div
+          className={`grid justify-center items-center min-h-[100vh] ${
+            loading ? "cursor-wait" : "cursor-default"
+          }`}
+        >
+          <DashboardLoadingSpinner />
+        </div>
       )}
       {loginStatus.isSuperUser && (
         <div className="">

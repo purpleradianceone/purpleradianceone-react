@@ -16,7 +16,7 @@ import AccountCompanyProductForSupportTicketList from "../../lists/AccountCompan
 import ApiError from "../../../@types/error/ApiError";
 import axios from "axios";
 
-function GetAccountCompanyProductFroSupportTicket({
+function GetAccountCompanyProductForSupportTicket({
   handleRowSelect,
 }: {
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
@@ -84,7 +84,7 @@ function GetAccountCompanyProductFroSupportTicket({
           withCredentials: true,
         }
       );
-      setCurrentPageDataLength(response.data.length);
+      setCurrentPageDataLength(currentPage, response.data.length);
       const formattedData: AccountCompanyProductForSupportTicket[] =
         response.data.map((res: any) => ({
           count: res.count,
@@ -233,4 +233,4 @@ function GetAccountCompanyProductFroSupportTicket({
   );
 }
 
-export default GetAccountCompanyProductFroSupportTicket;
+export default GetAccountCompanyProductForSupportTicket;
