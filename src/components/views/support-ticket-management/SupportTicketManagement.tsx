@@ -59,7 +59,6 @@ function SupportTicketManagement({
     startDate,
     endDate,
     searchParameter,
-    totalPages,
     setTotalPages,
     handleDatePageIdChange,
     handleEndDateChange,
@@ -105,6 +104,8 @@ function SupportTicketManagement({
       
     }
   );
+
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -176,6 +177,8 @@ function SupportTicketManagement({
         if (response.data.length > 0) {
           setTotalPages(Math.ceil(response.data[0].count / pageSize));
         }
+
+        setHasNextPage(response.data.length>=pageSize);
 
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({
@@ -410,11 +413,11 @@ function SupportTicketManagement({
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
             paginationData={{
-              selectedPageSize: handlePageSizeChange,
-              currentPage,
-              handlePageChange,
-              totalPages,
               pageSize,
+              currentPage,
+              hasNextPage:hasNextPage,
+              handlePageChange,
+              onPageSizeChange: handlePageSizeChange,
             }}
             selectedAssignTo={selectedAssignTo}
             handleSelectedAssignToCheckBoxChange={

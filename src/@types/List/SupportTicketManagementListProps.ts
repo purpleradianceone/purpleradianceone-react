@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import PaginationDataProps from "../ag-grid/PaginationDataProps";
+import PaginationDataWithoutCountProps from "../ag-grid/PaginationDataWithoutCountProps";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import LookupCompanyProduct from "../lookup/LookupCompanyProduct";
@@ -12,7 +12,7 @@ type SupportTicketManagementListProps = {
     onEndDateChange: (date: Date) => void;
     supportTicketData : SupportTicketProps[];
     handleAddSupportTicket : () => void;
-    paginationData: PaginationDataProps;
+    paginationData: PaginationDataWithoutCountProps;
 
 
     selectedAssignTo : LookupCompanyUser;
