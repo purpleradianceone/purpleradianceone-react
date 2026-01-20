@@ -41,7 +41,7 @@ function LookupCompanyUserSelection({
     searchParameter,
     handlePageSizeChange,
     handlePageChange,
-    setHasNextPageChange,
+    setCurrentPageDataLength,
     handleSearchParameterChange,
   } = useSearchFilterPaginationDateHandlers();
 
@@ -69,7 +69,7 @@ function LookupCompanyUserSelection({
       );
 
       setCompanyUsers(response.data);
-      setHasNextPageChange(response.data.length >= pageSize);
+      setCurrentPageDataLength(response.data.length);
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
