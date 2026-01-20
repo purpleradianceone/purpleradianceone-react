@@ -17,7 +17,6 @@ import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import Pagination from "../ag-grid/Pagination";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import qs from "query-string";
@@ -33,6 +32,7 @@ import SupportTicketProps from "../../@types/support-ticket-management/SupportTi
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
 import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/LookupCompanyUserSelection";
 import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -494,13 +494,20 @@ function SupportTicketManagementList({
           ></CreateSupportTicketModal>
         </div>
 
-        <div className="flex items-center justify-end ">
-          <Pagination
+        <div className="flex items-center justify-end col-span-1 ">
+          {/* <Pagination
             totalPages={paginationData.totalPages}
             currentPage={paginationData.currentPage}
             pageSize={paginationData.pageSize}
             onPageChange={paginationData.handlePageChange}
             onPageSizeChange={paginationData.selectedPageSize}
+          /> */}
+          <PaginationWithoutCount
+            pageSize={paginationData.pageSize}
+            currentPage={paginationData.currentPage}
+            hasNextPage={paginationData.hasNextPage}
+            onPageSizeChange={paginationData.onPageSizeChange}
+            onPageChange={paginationData.handlePageChange}
           />
         </div>
         {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) && (
