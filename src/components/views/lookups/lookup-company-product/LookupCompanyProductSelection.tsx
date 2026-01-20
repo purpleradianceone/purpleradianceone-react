@@ -45,7 +45,7 @@ function LookupCompanyProductSelection({
     searchParameter,
     handleSearchParameterChange,
     handlePageChange,
-    setHasNextPageChange,
+    setCurrentPageDataLength,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
@@ -73,7 +73,7 @@ function LookupCompanyProductSelection({
       );
 
       setCompanyProducts(response.data);
-      setHasNextPageChange(response.data.length >= pageSize);
+      setCurrentPageDataLength(response.data.length);
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {

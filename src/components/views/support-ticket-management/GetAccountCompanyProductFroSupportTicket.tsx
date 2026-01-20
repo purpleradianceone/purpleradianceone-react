@@ -47,7 +47,7 @@ function GetAccountCompanyProductFroSupportTicket({
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
-    setHasNextPageChange,
+    setCurrentPageDataLength,
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
@@ -84,7 +84,7 @@ function GetAccountCompanyProductFroSupportTicket({
           withCredentials: true,
         }
       );
-      setHasNextPageChange(response.data.length>=pageSize);
+      setCurrentPageDataLength(response.data.length);
       const formattedData: AccountCompanyProductForSupportTicket[] =
         response.data.map((res: any) => ({
           count: res.count,

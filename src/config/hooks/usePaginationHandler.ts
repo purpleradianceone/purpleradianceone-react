@@ -15,7 +15,7 @@ interface UseSearchFilterPaginationDateHandlersResult {
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   handlePageSizeChange: (size: number) => void;
   handlePageChange: (page: number) => void;
-  setHasNextPageChange: (hasNextPage: boolean) => void;
+  setCurrentPageDataLength:(dataLength: number) => void;
   handleStartDateChange: (date: Date | null) => void;
   handleEndDateChange: (date: Date | null) => void;
   handleDatePageIdChange: (newDateRangeId?: number) => void;
@@ -93,9 +93,12 @@ export const useSearchFilterPaginationDateHandlers = (
 
   };
 
-  const setHasNextPageChange=(hasNextPage: boolean)=>{
-    setHasNextPage(hasNextPage);
+  const setCurrentPageDataLength = (pageDataLength: number) => {
+      setHasNextPage(pageDataLength>=pageSize);
+    
   }
+
+
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
@@ -187,7 +190,7 @@ export const useSearchFilterPaginationDateHandlers = (
     setTotalPages,
     handlePageSizeChange,
     handlePageChange,
-    setHasNextPageChange,
+    setCurrentPageDataLength,
     handleStartDateChange,
     handleEndDateChange,
     handleDatePageIdChange,

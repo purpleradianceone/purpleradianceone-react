@@ -62,7 +62,7 @@ function SupportTicketManagement({
     searchParameter,
     handleDatePageIdChange,
     handleEndDateChange,
-    setHasNextPageChange,
+    setCurrentPageDataLength,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -177,9 +177,7 @@ function SupportTicketManagement({
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
-
-        setHasNextPageChange(response.data.length>=pageSize);
-
+        setCurrentPageDataLength(response.data.length);
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({
             count: item.count,
