@@ -69,7 +69,7 @@ const StockLiveForCompanyProductAgGrid = ({
         minWidth: 180,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
-      // NOTE : IT IS HIDDEN , NEW ACTIONS TAB IS USED i.e WIRTTEN BELOW
+      // NOTE : IT IS HIDDEN , NEW ACTIONS TAB IS USED i.e WRITTEN BELOW
       {
         hide: true, 
         headerName: "Actions",
