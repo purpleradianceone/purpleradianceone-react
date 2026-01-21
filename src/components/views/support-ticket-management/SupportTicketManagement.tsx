@@ -411,7 +411,7 @@ function SupportTicketManagement({
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
             paginationData={{
-              pageSize,
+              pageSize:pageSize,
               currentPage,
               hasNextPage:hasNextPage,
               handlePageChange,

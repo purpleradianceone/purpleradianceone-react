@@ -33,17 +33,17 @@ export const useSearchFilterPaginationDateHandlers = (
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
-  const [pageSize, setPageSize] = useState(firstValue|| 25);
+  const [pageSize, setPageSize] = useState(initialValue?.size || firstValue || 25);
   const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
   const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
   const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
   const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
-  const mapOfPageAndDataLength = new Map<number, number>();
-
+const [pageDataMap, setPageDataMap] =
+  useState<Map<number, number>>(new Map());
 
   useEffect(() => {
-    setPageSize(firstValue)
-  }, [firstValue])
+    setPageSize(initialValue?.size || firstValue)
+  }, [firstValue, initialValue?.size])
 
 
   const formatDate = (date: Date): string => {
@@ -68,7 +68,7 @@ export const useSearchFilterPaginationDateHandlers = (
   };
 
   const handlePageSizeChange = (size: number) => {
-    mapOfPageAndDataLength.clear();
+    setPageDataMap(new Map());
     setPageSize(size);
     setCurrentPage(1);
   };
@@ -77,19 +77,35 @@ export const useSearchFilterPaginationDateHandlers = (
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
-    if(page>=1 && hasNextPage && (page == (currentPage+1)) ){
+
+    // if (page >= 1 && hasNextPage && page == currentPage + 1) {
+    if (page >= 1 && hasNextPage ) {
       setCurrentPage(page);
     }
-    if(page>=1 && page<currentPage){
-          setCurrentPage(page);
+
+    if(page>=1 && page < currentPage){
+      setCurrentPage(page);
     }
 
   };
 
-  const setCurrentPageDataLength = (page:number, pageDataLength: number) => {
-    mapOfPageAndDataLength.set(page, pageDataLength);
-      setHasNextPage(pageDataLength >= pageSize);
-  }
+  const setCurrentPageDataLength = (page: number, pageDataLength: number) => {
+    setHasNextPage(pageDataLength >= pageSize);
+    pageDataMap.set(page, pageDataLength);
+    let zeroCount = 0;
+    for (const value of pageDataMap.values()) {
+      if (value === 0) {
+        zeroCount++;
+        if (zeroCount === 2) {
+          console.log("Resetting the current page to 1");
+          setCurrentPage(1);
+          setPageDataMap(new Map());
+          zeroCount = 0;
+          break;
+        }
+      }
+    }
+  };
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
@@ -123,6 +139,8 @@ export const useSearchFilterPaginationDateHandlers = (
     const id = newDateRangeId || 0;
     setCurrentPage(1);
     setDateRangeId(id);
+    setPageDataMap(new Map());
+
 
     if (id !== 8) {
       setStartDate('');
@@ -134,6 +152,8 @@ export const useSearchFilterPaginationDateHandlers = (
   const handleSearchParameterChange = (inputSearchParam?: string) => {
     setSearchParameter(inputSearchParam || '');
     setCurrentPage(1);
+    setPageDataMap(new Map());
+
   };
 
   // Update concatenated date string
