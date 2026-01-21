@@ -691,7 +691,9 @@ export const router = createBrowserRouter([
   element: (
     <MobileRedirectWrapper>
       <PrivateRoute>
+        <Navbar>
         <AccountNavbarBreadcrumb/>
+        </Navbar>
         {/* <AccountLayout /> */}
       </PrivateRoute>
     </MobileRedirectWrapper>

@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
-import Navbar from "../../../views/home/navbar/Navbar";
 import { PageLayout } from "../../../ui/PageLayout";
 import { useEffect, useState } from "react";
 import { getAccountCompanyProductDetails } from "../../../../config/apis/api";
@@ -84,7 +83,6 @@ export default function AccountNavbarBreadcrumb() {
   const [showName, setShowName] = useState<boolean>(false);
   return (
     <>
-      <Navbar>
         <PageLayout onScrollChange={setShowName}>
           {/* Sticky Navigation Header */}
           <div className="sticky top-0 z-20 bg-white py-0.5 border-b">
@@ -161,7 +159,6 @@ export default function AccountNavbarBreadcrumb() {
 
           <Outlet />
         </PageLayout>
-      </Navbar>
     </>
   );
 }
