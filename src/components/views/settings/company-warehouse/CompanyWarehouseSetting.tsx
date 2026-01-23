@@ -190,15 +190,16 @@ const CompanyWarehouseSetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-56 flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-          <span>Loading...</span> <LoadingSpinner />
+          {/* <span>Loading...</span> */}
+           <LoadingSpinner />
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50 rounded-md">
+    <div className="min-h-screen bg-gray-50 rounded-md ">
       <div className="max-w-6xl mx-auto p-1">
         <div className="flex justify-between">
           <h1 className="table-header-custom my-3">Company Warehouse</h1>
@@ -240,7 +241,7 @@ const CompanyWarehouseSetting: React.FC = () => {
           ></CreateCompanyWarehouse>
         )}
 
-        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white">
+        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white border rounded-md">
           {companyWarehouse.length === 0 ? (
             <p className="flex items-center justify-center caption-custom h-56 text-center ">
               No Company Warehouse is Available.

@@ -171,9 +171,10 @@ const SupportTicketCategorySetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-56 flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-          <span>Loading...</span> <LoadingSpinner />
+          {/* <span>Loading...</span> */}
+           <LoadingSpinner />
         </div>
       </div>
     );
@@ -220,7 +221,7 @@ const SupportTicketCategorySetting: React.FC = () => {
         )}
 
         {/* <div className="space-y-6 border p-2  rounded-md hover:scale-[1.01] transition-all duration-200 ease-in-out bg-white"> */}
-        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white">
+        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white border rounded-md">
           {supportTicketCategory.length === 0 ? (
             <p className="flex items-center justify-center caption-custom h-56 text-center ">
               No Support Ticket Category is Available.

@@ -199,16 +199,17 @@ const AccountTypeSetting: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-56 flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-          <span>Loading...</span> <LoadingSpinner />
+          {/* <span>Loading...</span> */}
+           <LoadingSpinner />
         </div>
       </div>
     );
   }
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
-      <div className="max-w-6xl mx-auto p-1">
+      <div className=" mx-auto p-1">
         <div className="flex justify-between">
           <h1 className="section-header-custom my-3">
             Company Account Type 
@@ -278,7 +279,7 @@ const AccountTypeSetting: React.FC = () => {
               return (
                 <div
                   key={parentType}
-                  className="bg-white border  border-gray-200 rounded-2xl shadow-md overflow-hidden"
+                  className="bg-white border  border-gray-200 rounded-md shadow-sm overflow-hidden"
                 >
                   {/* Parent Header */}
                   <div className="grid ">
@@ -305,6 +306,8 @@ const AccountTypeSetting: React.FC = () => {
                         key={item.id}
                         className="p-2 grid grid-col rounded-xl border border-gray-00 bg-white shadow-sm hover:bg-emerald-0 hover:shadow-md "
                       >
+                        <label htmlFor="" className="caption-custom">Name</label>
+                        {/*  */}
                         {/* Editable Name */}
                         {editingTypeId === item.id ? (
                           <>
@@ -332,13 +335,13 @@ const AccountTypeSetting: React.FC = () => {
                                 }
                               }}
                               autoFocus
-                              className="w-full px-2  border border-blue-400 bg-white rounded-md focus:ring-1 focus:ring-blue-500"
+                              className="w-full px-2  border border-blue-400 bg-white rounded-md focus:ring focus:ring-blue-200"
                             />
                           </>
                         ) : (
                           <h4
                             title={item.companyAccountTypeName}
-                            className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
+                            className="hover:bg-gray-00 flex items-center gap-1 table-header-custom md-2 cursor-pointer "
                             onClick={() => {
                               if (userHasAccessToUpdateCompanyAccountType) {
                                 setEditingTypeId(item.id);
@@ -353,7 +356,7 @@ const AccountTypeSetting: React.FC = () => {
                           >
                             <div className="grid items-center   w-full">
                               {/* <span className="text-gray-600 text-xs">Name : </span> */}
-                              <div className="flex items-center   w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-0">
+                              <div className="flex items-center   w-full gap-1  hover:border border-blue-100 hover:rounded px-1 hover:bg-gray-0">
                                 {item.companyAccountTypeName}
                                 <Pen size={10} className="text-blue-500 " />
                               </div>
