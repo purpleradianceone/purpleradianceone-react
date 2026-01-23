@@ -6,11 +6,11 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import POST_API from "../../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import Pagination from "../../../ag-grid/Pagination";
 import LookupLeadsAgGrid from "../../../ag-grid/LookupLeadsAgGrid";
 import { LookupLead } from "../../../../@types/lookup/LookupLead";
 import SearchInput from "../../../ui/SearchInput";
 import COLORS from "../../../../constants/Colors";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const LookupLeadManagement = ({
   handleRowSelectedForShowAccountLead,
@@ -21,10 +21,10 @@ export const LookupLeadManagement = ({
   const [lookupLeadData, setLookupLeadData] = useState<LookupLead[]>([]);
   const {
     currentPage,
+    currentPageData,
     pageSize,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -52,11 +52,10 @@ export const LookupLeadManagement = ({
         }
       );
       if (response.status === STATUS_CODE.OK) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+       
 
         const formattedData = responseData.map((item: any) => ({
           id: item.id,
@@ -124,10 +123,10 @@ export const LookupLeadManagement = ({
         />
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
+        <PaginationWithoutCount
           pageSize={pageSize}
+          currentPage={currentPage}
+          currentPageData={currentPageData}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
         />

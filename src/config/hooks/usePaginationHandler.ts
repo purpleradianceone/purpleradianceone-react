@@ -7,13 +7,13 @@ interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
   currentPage: number;
   currentPageData: PageData;
-  totalPages: number;
+  // totalPages: number;
   startDate: string;
   endDate: string;
   dateRangeId: number;
   searchParameter: string;
   concatDate: string;
-  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  // setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   setCurrentPageData: (currentPageData: PageData) => void;
   handlePageSizeChange: (size: number) => void;
   handlePageChange: (page: number) => void;
@@ -29,18 +29,15 @@ export const useSearchFilterPaginationDateHandlers = (
 ): UseSearchFilterPaginationDateHandlersResult => {
   const { userPreference } = useUserPreference();
   const firstValue = userPreference.rowsInGrid;
-  const [totalPages, setTotalPages] = useState(1); 
+  // const [totalPages, setTotalPages] = useState(1); 
   const [concatDate, setConcatDate] = useState('');
-  // const [hasNextPage, setHasNextPage] = useState<boolean>(false);
-
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
-  // const [pageData, setPageData] = useState<PageData>({currentPage:currentPage, dataLength:0});
   const [pageSize, setPageSize] = useState(initialValue?.size || firstValue || 25);
   const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
   const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
   const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
   const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
-  const [pageData, setPageData] = useState<PageData>({currentPage:0,pageDataLength:0});
+  const [pageData, setPageData] = useState<PageData>({currentPage:0, pageDataLength:0});
   
 
 
@@ -79,9 +76,9 @@ export const useSearchFilterPaginationDateHandlers = (
   };
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    // if (page >= 1 && page <= totalPages) {
+    //   setCurrentPage(page);
+    // }
 
     // if (page >= 1 && hasNextPage && page == currentPage + 1) {
     if (page >= 1) {
@@ -174,14 +171,14 @@ export const useSearchFilterPaginationDateHandlers = (
     pageSize,
     currentPage,
     currentPageData: pageData,
-    totalPages,
+    // totalPages,
     startDate,
     endDate,
     dateRangeId,
     searchParameter,
     concatDate,
     setCurrentPageData,
-    setTotalPages,
+    // setTotalPages,
     handlePageSizeChange,
     handlePageChange,
     handleStartDateChange,
