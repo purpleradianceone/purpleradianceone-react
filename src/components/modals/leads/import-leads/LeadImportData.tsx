@@ -2,13 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { useEffect, useState } from "react";
 import POST_API from "../../../../constants/PostApi";
-import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import LeadImportDataType from "../../../../@types/lead-management/LeadImportData";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import LeadImportPreSaveDataAgGrid from "../../../ag-grid/LeadImportPreSaveDataAgGrid";
-import Pagination from "../../../ag-grid/Pagination";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import {
   MessageSnackbarState,
@@ -21,6 +19,8 @@ import FinalConfirmationModal from "./FinalConfirmationalModal";
 import { LucideImport, Search, X } from "lucide-react";
 import Button from "../../../ui/Button";
 import toast from "react-hot-toast";
+import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 const LeadImportData = ({ 
     selectedLeadTag, 
@@ -31,22 +31,26 @@ const LeadImportData = ({
     getLeadImportTags : () => Promise<void>
     CancelSelectedLeadTag : ()=> void
  }) => {
-  const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   const [leadImportData, setLeadImportData] = useState<LeadImportDataType[]>(
     []
   );
-  const [pageSize, setPageSize] = useState<number>(
-    userPreference.rowsInGrid || 25
-  );
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [totalCount, setTotalCount] = useState<number>(0);
+
   const [responseCame, setResponeCame] = useState<boolean>(true);
   const [showLoadingSpinner , setShowLoadingSpinner] = useState<boolean>(false);
   const [openFinalPopup, setOpenFinalPopup] = useState<boolean>(false);
+  const {
+    pageSize,
+    currentPage,
+    currentPageData,
+    searchParameter,
+    setCurrentPageData,
+    handleSearchParameterChange,
+    handlePageChange,
+    handlePageSizeChange,
+  } = useSearchFilterPaginationDateHandlers();
   //note : Message Snackbar
   const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
     open: false,
@@ -63,15 +67,14 @@ const LeadImportData = ({
   };
 
   const getLeadImportData = async () => {
-    setLeadImportData([]);
-    const offset = (pageNumber - 1) * pageSize;
+    const offset = (currentPage - 1) * pageSize;
 
     const postDataToGetLeadImportData = {
       import_tag: selectedLeadTag,
       requestedby: loginStatus.id,
       company_id: loginStatus.companyId,
       search_company_specific_date_range_id: null,
-      search_parameter: searchInput.trim() !== "" ? searchInput : null,
+      search_parameter: searchParameter.trim() !== "" ? searchParameter : null,
       search_parameter_date: null,
       offset,
       limit: pageSize,
@@ -84,15 +87,12 @@ const LeadImportData = ({
         postDataToGetLeadImportData,
         { withCredentials: true }
       );
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
 
       const data = response.data;
       setLeadImportData(data);
       setResponeCame(false);
-      if (data.length > 0 && data[0].count !== undefined) {
-        setTotalCount(data[0].count);
-      } else {
-        setTotalCount(0);
-      }
+     
     } catch (error: any) {
       setResponeCame(false);
 
@@ -110,23 +110,22 @@ const LeadImportData = ({
   };
 
   const handleOnPageChange = (page: number) => {
-    setPageNumber(page);
+    handlePageChange(page);
   };
 
   const handleOnPageSizeChange = (size: number) => {
-    setPageSize(size);
-    setPageNumber(1); // Reset to first page on size change
+    handlePageSizeChange(size);
+    handlePageChange(1); // Reset to first page on size change
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-    setPageNumber(1); // Reset to first page on search
+    handleSearchParameterChange(e.target.value);
+    handlePageChange(1); // Reset to first page on search
   };
 
   useEffect(() => {
-    setLeadImportData([]);
     getLeadImportData();
-  }, [selectedLeadTag, pageSize, pageNumber, searchInput]);
+  }, [selectedLeadTag, pageSize, currentPage, searchParameter]);
 
   //   Note : for persistance data
   //   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -249,7 +248,7 @@ const LeadImportData = ({
   };
 
   useEffect(() => {
-    setSearchInput("");
+    handleSearchParameterChange("");
     setSelectedIds([]);
   }, [selectedLeadTag]);
 
@@ -317,7 +316,7 @@ const LeadImportData = ({
           <input
             type="text"
             placeholder="Search by Name, Email, or Mobile..."
-            value={searchInput}
+            value={searchParameter}
             onChange={handleSearchChange}
             className="border border-gray-300 pl-9 pr-3 py-1.5 caption-custom rounded-lg w-80 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
@@ -344,12 +343,12 @@ const LeadImportData = ({
 
     {/* Pagination */}
     <div className="flex justify-end mt-3">
-      <Pagination
-        currentPage={pageNumber}
+      <PaginationWithoutCount
+        pageSize={pageSize}
+        currentPage={currentPage}
+        currentPageData={currentPageData}
         onPageChange={handleOnPageChange}
         onPageSizeChange={handleOnPageSizeChange}
-        pageSize={pageSize}
-        totalPages={Math.ceil(totalCount / pageSize)}
       />
     </div>
 

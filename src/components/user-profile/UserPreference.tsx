@@ -312,7 +312,6 @@ const UserPreference = () => {
       });
 
       const newTimezones: Timezone[] = response.data || [];
-      const count: number = response.data[0].count;
 
       if (newOffset === 0) {
         setTimezoneList(newTimezones);
@@ -328,10 +327,7 @@ const UserPreference = () => {
 
       const nextOffset = newOffset + effectiveLimit;
       setOffset(nextOffset);
-
       if (searchTextToUse) {
-        setHasMore(nextOffset < count);
-      } else {
         setHasMore(newTimezones.length === effectiveLimit);
       }
     } catch (err) {

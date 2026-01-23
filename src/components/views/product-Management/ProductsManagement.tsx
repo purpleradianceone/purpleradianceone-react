@@ -265,7 +265,7 @@ const savedFilters = JSON.parse(
                 paginationData={{
                   currentPage,
                   currentPageData,
-                  onPageChange:handlePageChange,
+                  onPageChange: handlePageChange,
                   pageSize,
                   onPageSizeChange: handlePageSizeChange,
                 }}
