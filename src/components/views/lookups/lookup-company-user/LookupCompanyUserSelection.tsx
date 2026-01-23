@@ -33,15 +33,16 @@ function LookupCompanyUserSelection({
 }) {
   const [companyUsers, setCompanyUsers] = useState<LookupCompanyUser[]>([]);
   const { loginStatus } = useLoggedInUserContext();
+  
 
   const {
-    pageSize,
     currentPage,
-    hasNextPage,
+    currentPageData,
+    pageSize,
     searchParameter,
+    setCurrentPageData,
     handlePageSizeChange,
     handlePageChange,
-    setCurrentPageDataLength,
     handleSearchParameterChange,
   } = useSearchFilterPaginationDateHandlers();
 
@@ -69,7 +70,7 @@ function LookupCompanyUserSelection({
       );
 
       setCompanyUsers(response.data);
-      setCurrentPageDataLength(currentPage, response.data.length);
+      setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -131,8 +132,8 @@ function LookupCompanyUserSelection({
 
             <div className="flex items-center justify-end ">
               <PaginationWithoutCount
-                hasNextPage={hasNextPage}
                 currentPage={currentPage}
+                currentPageData={currentPageData}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}

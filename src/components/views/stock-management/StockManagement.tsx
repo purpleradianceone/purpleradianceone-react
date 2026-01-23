@@ -56,14 +56,14 @@ const StockManagement = () => {
   );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -94,11 +94,8 @@ const StockManagement = () => {
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
           const responseData = response.data;
-
-          if (response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
           const formattedData: LiveStockForCompanyProduct[] = responseData.map(
             (item: any) => ({
               count: item.count,
@@ -190,11 +187,11 @@ const StockManagement = () => {
             <StockManagementList
               liveStockForCompanyProduct={liveStockForCompanyProduct}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
+                onPageSizeChange: handlePageSizeChange,
                 currentPage,
-                handlePageChange,
-                totalPages,
+                onPageChange: handlePageChange,
                 pageSize,
+                currentPageData,
               }}
               onStartDateChange={handleStartDateChange}
               onEndDateChange={handleEndDateChange}

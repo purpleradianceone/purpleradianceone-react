@@ -57,14 +57,14 @@ const savedFilters = JSON.parse(
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -119,6 +119,7 @@ const savedFilters = JSON.parse(
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
           const formattedData: Product[] = response.data.map((res: any) => ({
             count: res.count,
             id: res.id,
@@ -152,9 +153,6 @@ const savedFilters = JSON.parse(
 
           }));
           setProductsData(formattedData);
-          if (response.data[0]?.count) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
         }
       } catch (error: ApiError | any) {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -265,11 +263,11 @@ const savedFilters = JSON.parse(
                   searchParameter
                 }}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
                   currentPage,
-                  handlePageChange,
-                  totalPages,
+                  currentPageData,
+                  onPageChange:handlePageChange,
                   pageSize,
+                  onPageSizeChange: handlePageSizeChange,
                 }}
                 products={productsData}
                 isGridForAccountProduct ={isGridForAccountProduct}

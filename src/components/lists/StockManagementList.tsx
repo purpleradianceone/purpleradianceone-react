@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import AddStock from "../modals/stock/AddStock";
 import StockManagementListProps from "../../@types/stock/StockManagementListProps";
 import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
-import Pagination from "../ag-grid/Pagination";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -23,6 +22,7 @@ import { fetchCompanyProduct } from "../../config/apis/api";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { handleApiError } from "../../config/error/handleApiError";
 import { Product } from "../../@types/products/ProductsManagementProps";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 
 type StockView = ActionTypeForStockMOdule | null;
 
@@ -211,8 +211,8 @@ const StockManagementList = ({
       >
         <div className="flex items-center pl-1 gap-5">
           <div className="flex gap-1">
-          <Layers className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-          <span className="section-header-custom">Stock Management</span>
+            <Layers className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+            <span className="section-header-custom">Stock Management</span>
           </div>
 
           <div className="flex justify-center items-center  gap-1">
@@ -223,7 +223,7 @@ const StockManagementList = ({
                 id="company-user-module-search-box"
                 onChange={(e) => {
                   handleSearchOption.handleSearchParameterChange(
-                    e.target.value
+                    e.target.value,
                   );
                 }}
                 value={handleSearchOption.searchParameter}
@@ -317,12 +317,12 @@ const StockManagementList = ({
           />
         </div>
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
       </div>

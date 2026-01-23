@@ -77,14 +77,14 @@ useEffect(()=>{
 //   }, []);
     const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     endDate,
     startDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -162,11 +162,10 @@ useEffect(()=>{
         withCredentials: true,
       });
       if (response.status === STATUS_CODE.OK) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+        
 
         const formattedData: LeadDataProps[] = responseData.map(
           (item: any) => ({
@@ -428,11 +427,11 @@ useEffect(()=>{
               // startDate
             } }
             paginationData={{
-              selectedPageSize: handlePageSizeChange,
-              currentPage,
-              handlePageChange,
-              totalPages,
               pageSize,
+              currentPage,
+              currentPageData,
+              onPageSizeChange: handlePageSizeChange,
+              onPageChange: handlePageChange,
             }}
             handleSelectedCompanyUserCheckBoxChange={
               handleSelectedCompanyUserCheckBoxChange

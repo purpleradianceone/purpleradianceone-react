@@ -495,19 +495,12 @@ function SupportTicketManagementList({
         </div>
 
         <div className="flex items-center justify-end col-span-1 ">
-          {/* <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
-            pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
-          /> */}
           <PaginationWithoutCount
             pageSize={paginationData.pageSize}
             currentPage={paginationData.currentPage}
-            hasNextPage={paginationData.hasNextPage}
+            currentPageData={paginationData.currentPageData}
             onPageSizeChange={paginationData.onPageSizeChange}
-            onPageChange={paginationData.handlePageChange}
+            onPageChange={paginationData.onPageChange}
           />
         </div>
         {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) && (

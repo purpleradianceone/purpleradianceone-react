@@ -12,7 +12,6 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import Pagination from "../ag-grid/Pagination";
 import EditCompanyProductModal from "../modals/products/EditProductModal";
 import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
@@ -22,6 +21,7 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import COLORS from "../../constants/Colors";
 import AddStock from "../modals/stock/AddStock";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 
 function ProductsManagementList({
   products,
@@ -140,15 +140,15 @@ ProductsManagementListProps) {
           <div className="flex  justify-between w-full ">
             <div className="flex items-center gap-5">
               <div className="flex mt-1 gap-1">
-              <Store
-                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
-              />
+                <Store
+                  className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
+                />
 
-              {(isMediumScreen || isLargeScreen) && (
-                <>
-                  <span className="section-header-custom ">Products</span>
-                </>
-              )}
+                {(isMediumScreen || isLargeScreen) && (
+                  <>
+                    <span className="section-header-custom ">Products</span>
+                  </>
+                )}
               </div>
 
               {/* {isLargeScreen && ( */}
@@ -159,7 +159,7 @@ ProductsManagementListProps) {
                   <SearchInput
                     onChange={(e) => {
                       handleSearchOption.handleSearchParameterChange(
-                        e.target.value
+                        e.target.value,
                       );
                     }}
                     value={handleSearchOption.searchParameter}
@@ -167,37 +167,39 @@ ProductsManagementListProps) {
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                {!isGridForAccountProduct&&<div className="flex mx-3 mt-1 gap-1">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                      <Calendar className="input-label-custom mt-1" />
-                    </div>
+                {!isGridForAccountProduct && (
+                  <div className="flex mx-3 mt-1 gap-1">
+                    <div className="flex">
+                      <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                        <Calendar className="input-label-custom mt-1" />
+                      </div>
 
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                      selectedOption={selectedDateName}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                  {/* Custom Date Picker Div Flex Box*/}
-                  {isCustomDateOptionSelected && (
-                    <div
-                      className="flex"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                        initialStartDate={handleSearchOption.startDate}
-                        initialEndDate={handleSearchOption.endDate}
-                      />
+                      <DateRangeFilterDropdown
+                        dropdownOptions={dateRangeDropdownOptions}
+                        handleDateIdChange={handleDateRangeIdChange}
+                        selectedOption={selectedDateName}
+                      ></DateRangeFilterDropdown>
                     </div>
-                  )}
-                </div>}
+                    {/* Custom Date Picker Div Flex Box*/}
+                    {isCustomDateOptionSelected && (
+                      <div
+                        className="flex"
+                        style={
+                          isCustomDateOptionSelected
+                            ? { visibility: "visible" }
+                            : { visibility: "hidden" }
+                        }
+                      >
+                        <DateRangePicker
+                          onStartDateChange={onStartDateChange}
+                          onEndDateChange={onEndDateChange}
+                          initialStartDate={handleSearchOption.startDate}
+                          initialEndDate={handleSearchOption.endDate}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* </> */}
@@ -228,7 +230,7 @@ ProductsManagementListProps) {
                         e.preventDefault();
                         toast.error(
                           MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                            .DENIED_ADD_ACCESS
+                            .DENIED_ADD_ACCESS,
                         );
                       }}
                     >
@@ -301,8 +303,8 @@ ProductsManagementListProps) {
               isGridForAccountProduct
                 ? "ag-theme-balham w-full h-[60vh]"
                 : userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                  ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
+                  : "ag-theme-balham w-full h-[calc(100vh-120px)]"
             }
           >
             <ProductsManagementGrid
@@ -325,12 +327,12 @@ ProductsManagementListProps) {
           </div>
         </div>
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import PaginationDataProps from "../ag-grid/PaginationDataProps";
+import { PaginationDataWithoutCountProps } from "../../components/ag-grid/PaginationWithoutCount";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import CompanyTeamSearchProps from "../team-management/CompanyTeamListProps";
 
@@ -7,7 +7,7 @@ type TeamManagementListProps = {
     handleSearchOption: HandleSearchOptionProps;
     onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  paginationData : PaginationDataProps;
+  paginationData : PaginationDataWithoutCountProps;
   handleCompanyTeamChangeOnUpdate : (teamId : number) => void;
   handleCompanyTeamChangeOnAdd : ()=> void;
 }

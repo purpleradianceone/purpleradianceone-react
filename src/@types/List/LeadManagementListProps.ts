@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import PaginationDataProps from "../ag-grid/PaginationDataProps";
+import { PaginationDataWithoutCountProps } from "../../components/ag-grid/PaginationWithoutCount";
 import CompanyUser from "../company-users/CompanyUser";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import LeadDataProps from "../lead-management/LeadProps";
@@ -28,7 +28,7 @@ type LeadManagementListProps = {
     onEndDateChange: OnEndDateChange;
     leadData : LeadDataProps[];
     handleAddLead : () => void;
-    paginationData: PaginationDataProps;
+    paginationData: PaginationDataWithoutCountProps;
     persistedSelectedUserId : number | null;
     handleSelectedCompanyUserCheckBoxChange: ( params: CompanyUser | null) => void;
     selectedLeadOwner : CompanyUser;

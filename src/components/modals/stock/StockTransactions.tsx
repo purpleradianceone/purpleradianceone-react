@@ -13,11 +13,11 @@ import { useFormattedForPostData } from "../../../config/hooks/useFormatDateForP
 import useTransactionType from "../../../config/hooks/useTransactionType";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import Transaction from "../../../@types/stock/Transaction";
-import Pagination from "../../ag-grid/Pagination";
 import TransactionAgGrid from "../../ag-grid/TransactionAgGrid";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import FormHeader from "../../ui/FormHeader";
+import PaginationWithoutCount from "../../ag-grid/PaginationWithoutCount";
 
 const StockTransactions = ({
   companyProductId = null,
@@ -50,9 +50,9 @@ const StockTransactions = ({
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
@@ -76,11 +76,8 @@ const StockTransactions = ({
         .post(POST_API.GET_STOCK, postData, { withCredentials: true })
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
+            setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
             const data = response.data;
-            if (data.length > 0) {
-              setTotalPages(Math.ceil(response.data[0].count / pageSize));
-            }
-
             const formattedData: Transaction[] = data.map((item: any) => ({
               count: item.count,
               id: item.id,
@@ -200,12 +197,13 @@ const StockTransactions = ({
         <TransactionAgGrid data={transactions} />
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
+        <PaginationWithoutCount
+        pageSize={pageSize}
+        currentPage={currentPage}
+        currentPageData={currentPageData}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        
         />
       </div>
     </FormLayout>
