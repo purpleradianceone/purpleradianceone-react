@@ -46,12 +46,12 @@ function ProductManagementLead({
   // hook to handle pagination and search filters
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -212,6 +212,8 @@ function ProductManagementLead({
      * Validate response before processing
      */
       if (response.status === STATUS_CODE.OK && Array.isArray(response.data)) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+
          /**
        * Map API response into UI-friendly product structure
        */
@@ -246,14 +248,7 @@ function ProductManagementLead({
 
         // Update products list state
         setProductsData(mappedProducts);
-
-        /**
-         * Total count is provided in the first record
-         * Used to calculate total pagination pages
-         */
-        if (response.data[0]?.count) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+        
       }
     } catch (error) {
       /**
@@ -277,9 +272,6 @@ function ProductManagementLead({
   useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
-
-    // Clear previous data before fetching new page/filter results
-    setProductsData([]);
 
     // Trigger API call
     fetchCompanyProducts(signal);
@@ -310,11 +302,11 @@ function ProductManagementLead({
                 handleDateRangeIdChange: handleDatePageIdChange,
               }}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
                 pageSize,
+                currentPage,
+                currentPageData,
+                onPageSizeChange: handlePageSizeChange,
+                onPageChange:handlePageChange,
               }}
               products={productsData}
               // handleSelectedProductChange={handleSelectedProductChange}
