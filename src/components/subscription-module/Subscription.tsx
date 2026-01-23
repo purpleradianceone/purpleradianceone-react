@@ -12,12 +12,12 @@ import SubscriptionManagementList from "../lists/SubscriptionManagementList";
 function SubscriptionManagement() {
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -63,6 +63,7 @@ function SubscriptionManagement() {
       .post(POST_API.GET_SUBSCRIPTION_API, postData, { withCredentials: true })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
           response.data.map((res: any) => {
             setSubscriptionList((prev) => [
               ...prev,
@@ -80,9 +81,6 @@ function SubscriptionManagement() {
               },
             ]);
           });
-          if (response.data[0]?.count) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
         }
       });
   };
@@ -95,7 +93,7 @@ function SubscriptionManagement() {
 
     return () => clearTimeout(timeoutId);
     
-  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate ,subscriptionListUpdateCount ]);
+  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate , subscriptionListUpdateCount]);
   return (
     <div className="w-full">
       <div>
@@ -108,10 +106,10 @@ function SubscriptionManagement() {
             handleDateRangeIdChange: handleDatePageIdChange,
           }}
           paginationData={{
-            selectedPageSize: handlePageSizeChange,
+            onPageSizeChange: handlePageSizeChange,
             currentPage,
-            handlePageChange,
-            totalPages,
+            currentPageData,
+            onPageChange:handlePageChange,
             pageSize,
           }}
           handleSubscriptionListChange={handleSubscriptionListChange}

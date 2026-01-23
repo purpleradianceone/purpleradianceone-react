@@ -97,6 +97,16 @@ function UpdateSupportTicketTaskModal({
 
   const [isActive, setIsActive] = useState<boolean>(supportTicketTask.isActive);
 
+  const previousData = {
+    dueDate: dueDateValue,
+    dueTime: dueTimeValue,
+    description: supportTicketTask.description || "",
+    supportTicketTaskStageId: supportTicketTask.supportTicketTaskStageId,
+    assignedToId: supportTicketTask.assignedTo,
+    resultOutcome: supportTicketTask.resultOutcome || "",
+    isActive: supportTicketTask.isActive,
+  }
+
   useEffect(() => {
     if (parsedDate instanceof Date && !isNaN(parsedDate.getTime())) {
       setDueDate(format(parsedDate, "yyyy-MM-dd"));
@@ -125,6 +135,18 @@ function UpdateSupportTicketTaskModal({
   const updateSupportTicketTask = async (
     event: React.FormEvent<HTMLButtonElement>
   ) => {
+    if (
+      previousData.supportTicketTaskStageId == supportTicketTaskStageId &&
+      previousData.description === description &&
+      previousData.resultOutcome === resultOutcome &&
+      previousData.assignedToId === assignedTo?.id &&
+      previousData.dueDate === dueDate &&
+      previousData.dueTime === dueTime &&
+      previousData.isActive === isActive
+    ) {
+      toast.error("No data changed.");
+      return;
+    }
     if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS

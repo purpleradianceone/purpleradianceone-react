@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import PaginationDataWithoutCountProps from "../ag-grid/PaginationDataWithoutCountProps";
+import { PaginationDataWithoutCountProps } from "../../components/ag-grid/PaginationWithoutCount";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
 import LookupCompanyProduct from "../lookup/LookupCompanyProduct";

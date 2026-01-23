@@ -7,12 +7,10 @@ import {
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { SIZE, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import Pagination from "../ag-grid/Pagination";
 import SubscriptionListAggrid from "../ag-grid/SubscriptionListAggrid";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SubscriptionListProps from "../../@types/subscription/SubscriptionListProps";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
 import Button from "../ui/Button";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
@@ -23,6 +21,7 @@ import UpdateSubscription from "../subscription-module/UpdateSubscription";
 import { useUserPreference } from "../../context/user/UserPreference";
 import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
+import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
 
 function SubscriptionManagementList({
   subscriptionList,
@@ -33,7 +32,7 @@ function SubscriptionManagementList({
   handleSubscriptionListChange,
 }: {
   subscriptionList: SubscriptionListProps[];
-  paginationData: PaginationDataProps;
+  paginationData: PaginationDataWithoutCountProps;
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
@@ -240,12 +239,12 @@ function SubscriptionManagementList({
         </div>
 
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
+          <PaginationWithoutCount
             currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
 

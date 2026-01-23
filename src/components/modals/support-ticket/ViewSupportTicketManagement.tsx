@@ -400,6 +400,7 @@ const ViewSupportTicketManagement = () => {
           ? selectedAssignTo.id
           : selectedSupportTicket.assignTo,
       resolvedby: selectedResolvedBy.id,
+      support_ticket_lifecycle_id: selectedSupportTicket.supportTicketLifecycleId,
       updatedby_id: loginStatus.id,
     };
     console.log(PostDataForSupportTicketUpdate);

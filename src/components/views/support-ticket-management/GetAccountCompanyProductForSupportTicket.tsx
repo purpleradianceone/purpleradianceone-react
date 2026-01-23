@@ -29,6 +29,7 @@ function GetAccountCompanyProductForSupportTicket({
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const { userHasAccessToViewSupportTicket } = useUserAccessModules();
 
+
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(
@@ -37,17 +38,17 @@ function GetAccountCompanyProductForSupportTicket({
   );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
-    hasNextPage,
     concatDate,
     startDate,
     endDate,
     searchParameter,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
-    setCurrentPageDataLength,
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
@@ -84,7 +85,8 @@ function GetAccountCompanyProductForSupportTicket({
           withCredentials: true,
         }
       );
-      setCurrentPageDataLength(currentPage, response.data.length);
+      // setCurrentPageDataLength(currentPage, response.data.length);
+      setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
       const formattedData: AccountCompanyProductForSupportTicket[] =
         response.data.map((res: any) => ({
           count: res.count,
@@ -207,11 +209,12 @@ function GetAccountCompanyProductForSupportTicket({
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
                 paginationData={{
-                  onPageSizeChange: handlePageSizeChange,
                   currentPage,
-                  onPageChange:handlePageChange,
+                  currentPageData,
                   pageSize,
-                  hasNextPage,
+                  onPageChange: handlePageChange,
+                  onPageSizeChange: handlePageSizeChange,
+                  
                 }}
                 handleRowSelect={handleRowSelect}
               />

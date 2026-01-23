@@ -1,7 +1,6 @@
 import { Users, UserPlus, Calendar } from "lucide-react";
 import Button from "../ui/Button";
 import { useEffect, useState } from "react";
-import Pagination from "../ag-grid/Pagination";
 import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -29,6 +28,7 @@ import axios from "axios";
 import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
 import { TutorailColumnName } from "../../constants/Tutorail";
 import RefreshToken from "../../config/validations/RefreshToken";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 
 function GetCompanyUsersList({
   users,
@@ -273,7 +273,7 @@ function GetCompanyUsersList({
                 id="company-user-module-search-box"
                 onChange={(e) => {
                   handleSearchOption.handleSearchParameterChange(
-                    e.target.value
+                    e.target.value,
                   );
                 }}
                 value={handleSearchOption.searchParameter}
@@ -331,7 +331,7 @@ function GetCompanyUsersList({
                     if (!userHasAccessToAddUser) {
                       toast.error(
                         MESSAGE.MODULE_ACCESS.COMPANY_USER
-                          .DENIED_ADD_ACCESS_COMPANY_USER
+                          .DENIED_ADD_ACCESS_COMPANY_USER,
                       );
                       return;
                     } else {
@@ -365,8 +365,8 @@ function GetCompanyUsersList({
             isUsedInAccountProductForAssingingInstalledBy
               ? `ag-theme-balham w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
+                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
           }
         >
           <CompanyUserAgGrid
@@ -407,12 +407,12 @@ function GetCompanyUsersList({
       </div>
       {/* pagination component */}
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={paginationData.totalPages}
-          currentPage={paginationData.currentPage}
+        <PaginationWithoutCount
           pageSize={paginationData.pageSize}
-          onPageChange={paginationData.handlePageChange}
-          onPageSizeChange={paginationData.selectedPageSize}
+          currentPage={paginationData.currentPage}
+          currentPageData={paginationData.currentPageData}
+          onPageChange={paginationData.onPageChange}
+          onPageSizeChange={paginationData.onPageSizeChange}
         />
       </div>
     </div>

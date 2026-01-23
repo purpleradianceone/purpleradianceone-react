@@ -1,11 +1,11 @@
-import PaginationDataProps from "../ag-grid/PaginationDataProps";
+import { PaginationDataWithoutCountProps } from "../../components/ag-grid/PaginationWithoutCount";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import LiveStockForCompanyProduct from "./LiveStockForCompanyProduct";
 
 type StockManagementListProps = {
     handleSearchOption: HandleSearchOptionProps;
     liveStockForCompanyProduct: LiveStockForCompanyProduct[],
-    paginationData: PaginationDataProps;
+    paginationData: PaginationDataWithoutCountProps;
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
 }

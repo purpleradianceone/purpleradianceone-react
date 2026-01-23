@@ -12,11 +12,11 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AddTeamModal from "../modals/teams/AddTeamModal";
 import CompanyTeamSearchProps from "../../@types/team-management/CompanyTeamListProps";
 import TeamManagementAgGrid from "../ag-grid/TeamManagementAgGrid";
-import Pagination from "../ag-grid/Pagination";
 import EditCompanyTeamModal from "../modals/teams/EditCompanyTeamModal";
 import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
 import { useUserPreference } from "../../context/user/UserPreference";
 import COLORS from "../../constants/Colors";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 
 function TeamManagementList({
   companyTeamList,
@@ -88,26 +88,26 @@ function TeamManagementList({
         className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex justify-center items-center gap-5">
-        <div className="flex gap-1">
-          {!isSmallScreen && (
-            <Network
-              className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}
-            />
-          )}
+          <div className="flex gap-1">
+            {!isSmallScreen && (
+              <Network
+                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}
+              />
+            )}
 
-          {(isMediumScreen || isLargeScreen) && (
-            <span className="section-header-custom">Teams</span>
-          )}
-        </div>
+            {(isMediumScreen || isLargeScreen) && (
+              <span className="section-header-custom">Teams</span>
+            )}
+          </div>
 
-        {isLargeScreen && (
+          {isLargeScreen && (
             <div className="flex gap-1">
               {/* search box flex div */}
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                   value={handleSearchOption.searchParameter}
@@ -146,7 +146,7 @@ function TeamManagementList({
                 )}
               </div>
             </div>
-        )}
+          )}
         </div>
 
         {/* new end */}
@@ -217,12 +217,12 @@ function TeamManagementList({
         </div>
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={paginationData.totalPages}
+        <PaginationWithoutCount
           currentPage={paginationData.currentPage}
+          currentPageData={paginationData.currentPageData}
           pageSize={paginationData.pageSize}
-          onPageChange={paginationData.handlePageChange}
-          onPageSizeChange={paginationData.selectedPageSize}
+          onPageChange={paginationData.onPageChange}
+          onPageSizeChange={paginationData.onPageSizeChange}
         />
       </div>
     </div>

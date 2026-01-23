@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { STRING_VALUES } from '../../constants/AppConstants';
 import { useUserPreference } from '../../context/user/UserPreference';
+import { PageData } from '../../components/ag-grid/PaginationWithoutCount';
 
 interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
   currentPage: number;
+  currentPageData: PageData;
   totalPages: number;
-  hasNextPage: boolean;
   startDate: string;
   endDate: string;
   dateRangeId: number;
   searchParameter: string;
   concatDate: string;
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentPageData: (currentPageData: PageData) => void;
   handlePageSizeChange: (size: number) => void;
   handlePageChange: (page: number) => void;
-  setCurrentPageDataLength:(page:number, dataLength: number) => void;
   handleStartDateChange: (date: Date | null) => void;
   handleEndDateChange: (date: Date | null) => void;
   handleDatePageIdChange: (newDateRangeId?: number) => void;
@@ -30,16 +31,18 @@ export const useSearchFilterPaginationDateHandlers = (
   const firstValue = userPreference.rowsInGrid;
   const [totalPages, setTotalPages] = useState(1); 
   const [concatDate, setConcatDate] = useState('');
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
+  // const [hasNextPage, setHasNextPage] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
+  // const [pageData, setPageData] = useState<PageData>({currentPage:currentPage, dataLength:0});
   const [pageSize, setPageSize] = useState(initialValue?.size || firstValue || 25);
   const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
   const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
   const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
   const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
-const [pageDataMap, setPageDataMap] =
-  useState<Map<number, number>>(new Map());
+  const [pageData, setPageData] = useState<PageData>({currentPage:0,pageDataLength:0});
+  
+
 
   useEffect(() => {
     setPageSize(initialValue?.size || firstValue)
@@ -67,8 +70,10 @@ const [pageDataMap, setPageDataMap] =
     return `${day}-${month}-${today.getFullYear()}`;
   };
 
+  const setCurrentPageData = (currentPageData: PageData)=>{
+    setPageData(currentPageData);
+  }
   const handlePageSizeChange = (size: number) => {
-    setPageDataMap(new Map());
     setPageSize(size);
     setCurrentPage(1);
   };
@@ -79,7 +84,7 @@ const [pageDataMap, setPageDataMap] =
     }
 
     // if (page >= 1 && hasNextPage && page == currentPage + 1) {
-    if (page >= 1 && hasNextPage ) {
+    if (page >= 1) {
       setCurrentPage(page);
     }
 
@@ -89,23 +94,6 @@ const [pageDataMap, setPageDataMap] =
 
   };
 
-  const setCurrentPageDataLength = (page: number, pageDataLength: number) => {
-    setHasNextPage(pageDataLength >= pageSize);
-    pageDataMap.set(page, pageDataLength);
-    let zeroCount = 0;
-    for (const value of pageDataMap.values()) {
-      if (value === 0) {
-        zeroCount++;
-        if (zeroCount === 2) {
-          console.log("Resetting the current page to 1");
-          setCurrentPage(1);
-          setPageDataMap(new Map());
-          zeroCount = 0;
-          break;
-        }
-      }
-    }
-  };
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
@@ -139,7 +127,6 @@ const [pageDataMap, setPageDataMap] =
     const id = newDateRangeId || 0;
     setCurrentPage(1);
     setDateRangeId(id);
-    setPageDataMap(new Map());
 
 
     if (id !== 8) {
@@ -152,7 +139,6 @@ const [pageDataMap, setPageDataMap] =
   const handleSearchParameterChange = (inputSearchParam?: string) => {
     setSearchParameter(inputSearchParam || '');
     setCurrentPage(1);
-    setPageDataMap(new Map());
 
   };
 
@@ -187,17 +173,17 @@ const [pageDataMap, setPageDataMap] =
   return {
     pageSize,
     currentPage,
+    currentPageData: pageData,
     totalPages,
-    hasNextPage:hasNextPage,
     startDate,
     endDate,
     dateRangeId,
     searchParameter,
     concatDate,
+    setCurrentPageData,
     setTotalPages,
     handlePageSizeChange,
     handlePageChange,
-    setCurrentPageDataLength,
     handleStartDateChange,
     handleEndDateChange,
     handleDatePageIdChange,

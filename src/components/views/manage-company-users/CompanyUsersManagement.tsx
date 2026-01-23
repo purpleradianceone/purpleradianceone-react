@@ -69,14 +69,14 @@ const savedFilters = JSON.parse(
 );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -118,12 +118,9 @@ const savedFilters = JSON.parse(
         signal,
         withCredentials: true,
       });
-
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
       setCompanyUsers(response.data);
-      // console.log(response.data);
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -227,11 +224,11 @@ const savedFilters = JSON.parse(
                   searchParameter
                 }}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
-                  currentPage,
-                  handlePageChange,
-                  totalPages,
                   pageSize,
+                  currentPage,
+                  currentPageData,
+                  onPageSizeChange: handlePageSizeChange,
+                  onPageChange:handlePageChange,
                 }}
                 users={companyUsers}
                 isUsedInAccountProductForAssingingInstalledBy={

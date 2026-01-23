@@ -55,18 +55,18 @@ const savedFilters = JSON.parse(
 );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     startDate,
     endDate,
     searchParameter,
-    totalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handleSearchParameterChange,
     handleStartDateChange,
-    setTotalPages,
     handlePageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
@@ -96,9 +96,7 @@ const savedFilters = JSON.parse(
         })
         .then((response) => {
           if (response.data && response.status === STATUS_CODE.OK) {
-            if (response.data[0]?.count) {
-              setTotalPages(Math.ceil(response.data[0].count / pageSize));
-            }
+            setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
             const formattedData: CompanyTeamSearchProps[] = response.data.map(
               (res: any) => ({
                 companyId: res.company_id,
@@ -226,10 +224,10 @@ const savedFilters = JSON.parse(
               onEndDateChange={handleEndDateChange}
               onStartDateChange={handleStartDateChange}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
+                onPageSizeChange: handlePageSizeChange,
                 currentPage,
-                handlePageChange,
-                totalPages,
+                currentPageData,
+                onPageChange: handlePageChange,
                 pageSize,
               }}
             ></TeamManagementList>

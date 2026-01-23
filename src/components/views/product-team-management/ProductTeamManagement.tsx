@@ -31,12 +31,12 @@ function ProductTeamManagement() {
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -77,6 +77,7 @@ function ProductTeamManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
  const formattedData: Product[] = response.data.map(
           (res: any) => ({
                 code: res.code,
@@ -97,11 +98,7 @@ function ProductTeamManagement() {
             })
         );
           setProductsData(formattedData)
-          if (response.data[0]?.count) {
-            setTotalPages(
-              Math.ceil(response.data[0].count / pageSize)
-            );
-          }
+        
         }
       } catch (error: ApiError | any) {
         console.log(error);
@@ -163,11 +160,12 @@ function ProductTeamManagement() {
                 handleDateRangeIdChange: handleDatePageIdChange,
               }}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
                 pageSize,
+                currentPage,
+                currentPageData,
+                onPageSizeChange: handlePageSizeChange,
+                onPageChange: handlePageChange,
+
               }}
               products={productsData}
               // isListForProductUser={true}

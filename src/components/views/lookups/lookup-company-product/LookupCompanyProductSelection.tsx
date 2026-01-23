@@ -36,16 +36,17 @@ function LookupCompanyProductSelection({
   const [companyProducts, setCompanyProducts] = useState<
     LookupCompanyProduct[]
   >([]);
+  
   const { loginStatus } = useLoggedInUserContext();
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
-    hasNextPage,
     searchParameter,
+    setCurrentPageData,
     handleSearchParameterChange,
     handlePageChange,
-    setCurrentPageDataLength,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
@@ -73,7 +74,8 @@ function LookupCompanyProductSelection({
       );
 
       setCompanyProducts(response.data);
-      setCurrentPageDataLength(currentPage, response.data.length);
+      // setCurrentPageDataLength(currentPage, response.data.length);
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -135,8 +137,8 @@ function LookupCompanyProductSelection({
 
             <div className="flex items-center justify-end ">
               <PaginationWithoutCount
-                hasNextPage={hasNextPage}
                 currentPage={currentPage}
+                currentPageData={currentPageData}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}

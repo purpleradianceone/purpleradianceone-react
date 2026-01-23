@@ -53,8 +53,8 @@ function SupportTicketManagement({
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
-    hasNextPage,
     dateRangeId,
     concatDate,
     startDate,
@@ -62,7 +62,7 @@ function SupportTicketManagement({
     searchParameter,
     handleDatePageIdChange,
     handleEndDateChange,
-    setCurrentPageDataLength,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -177,7 +177,8 @@ function SupportTicketManagement({
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
-        setCurrentPageDataLength(currentPage, response.data.length);
+        // setCurrentPageDataLength(currentPage, response.data.length);
+        setCurrentPageData({currentPage:currentPage,pageDataLength:response.data.length});
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({
             count: item.count,
@@ -413,8 +414,8 @@ function SupportTicketManagement({
             paginationData={{
               pageSize:pageSize,
               currentPage,
-              hasNextPage:hasNextPage,
-              handlePageChange,
+              currentPageData,
+              onPageChange: handlePageChange,
               onPageSizeChange: handlePageSizeChange,
             }}
             selectedAssignTo={selectedAssignTo}

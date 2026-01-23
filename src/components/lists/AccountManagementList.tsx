@@ -11,8 +11,6 @@ import DateRangePicker from "../ui/DateRangePicker";
 import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
-import Pagination from "../ag-grid/Pagination";
-import PaginationDataProps from "../../@types/ag-grid/PaginationDataProps";
 import Account from "../../@types/account/Account";
 import AccountManagementAgGrid from "../ag-grid/AccountManagementAgGrid";
 import CreateAccount from "../modals/Account/CreateAccount";
@@ -23,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
+import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
 
 function AccountManagementList({
   accounts,
@@ -41,7 +40,7 @@ function AccountManagementList({
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
-  paginationData: PaginationDataProps;
+  paginationData: PaginationDataWithoutCountProps;
   handleCreateCompanyAccountType: () => void;
   isUsedForAccountLead: boolean;
   handleRowSelectedForLead?: (data: Account | any) => void;
@@ -124,15 +123,15 @@ function AccountManagementList({
       >
         <div className="flex items-center justify-center gap-5">
           <div className="flex gap-1">
-          {!isSmallScreen && (
-            <UserRoundCogIcon
-              className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-            />
-          )}
+            {!isSmallScreen && (
+              <UserRoundCogIcon
+                className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+              />
+            )}
 
-          {(isMediumScreen || isLargeScreen) && (
-            <span className="section-header-custom mt-1">{" Accounts"} </span>
-          )}
+            {(isMediumScreen || isLargeScreen) && (
+              <span className="section-header-custom mt-1">{" Accounts"} </span>
+            )}
           </div>
 
           {/* {isLargeScreen && ( */}
@@ -145,7 +144,7 @@ function AccountManagementList({
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                   value={handleSearchOption.searchParameter}
@@ -200,7 +199,7 @@ function AccountManagementList({
                   } else {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
-                        .DENIED_ADD_ACCOUNT_IMPORT_ACCESS
+                        .DENIED_ADD_ACCOUNT_IMPORT_ACCESS,
                     );
                   }
                 }}
@@ -224,7 +223,7 @@ function AccountManagementList({
                     setOpenAccountForm(!openCreateAccountForm);
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS,
                     );
                   }
                 }}
@@ -264,12 +263,12 @@ function AccountManagementList({
       </div>
 
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={paginationData.totalPages}
+        <PaginationWithoutCount
           currentPage={paginationData.currentPage}
+          currentPageData={paginationData.currentPageData}
           pageSize={paginationData.pageSize}
-          onPageChange={paginationData.handlePageChange}
-          onPageSizeChange={paginationData.selectedPageSize}
+          onPageChange={paginationData.onPageChange}
+          onPageSizeChange={paginationData.onPageSizeChange}
         />
       </div>
 
