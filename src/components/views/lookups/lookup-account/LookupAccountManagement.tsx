@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import Pagination from "../../../ag-grid/Pagination";
 import SearchInput from "../../../ui/SearchInput";
 import COLORS from "../../../../constants/Colors";
 import { LookupAccount } from "../../../../@types/lookup/LookupAccount";
 import LookupAccountAgGrid from "../../../ag-grid/LookupAccountAgGrid";
 import { getLookupAccounts } from "../../../../config/apis/AccountApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const LookupAccountManagement = ({
   handleAccountSelectionWhileConvertingLead,
@@ -26,10 +26,10 @@ export const LookupAccountManagement = ({
 //   Note : pagination hook  
   const {
     currentPage,
+    currentPageData,
     pageSize,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -55,11 +55,10 @@ export const LookupAccountManagement = ({
         signal
       );
       if (response.status === STATUS_CODE.OK) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+       
 
         const formattedData = responseData.map((item: any) => ({
           id: item.id,
@@ -119,10 +118,10 @@ export const LookupAccountManagement = ({
         />
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
+        <PaginationWithoutCount
           pageSize={pageSize}
+          currentPage={currentPage}
+          currentPageData={currentPageData}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
         />
