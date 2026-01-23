@@ -66,7 +66,15 @@ import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Acc
 import AccountDetails from "../../components/modals/Account/AccountDetails";
 import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
 import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
-import { EditorCanvasForQuotation} from "../../components/quotation-builder/builder/EditorCanvasForQuotation";
+import { EditorCanvasForQuotation } from "../../components/quotation-builder/builder/EditorCanvasForQuotation";
+import LeadSetting from "../../components/views/settings/lead-settings/LeadSetting";
+import MeetingSettings from "../../components/views/settings/meeting-settings/MeetingSetting";
+import AccountTypeSetting from "../../components/views/settings/account-type/AccountTypeSetting";
+import CompanyPreferenceSetting from "../../components/views/settings/company-preferences/CompanyPreferenceSetting";
+import SupportTicketCategorySetting from "../../components/views/settings/support-ticket-category/SupportTicketCategorySetting";
+import CompanyWarehouseSetting from "../../components/views/settings/company-warehouse/CompanyWarehouseSetting";
+import { ModuleGuard } from "../guard/ModuleGuard";
+import MESSAGE from "../../constants/Messages";
 
 export const router = createBrowserRouter([
   {
@@ -269,6 +277,21 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
+  // {
+  //   path: ROUTES_URL.COMPANY_SETTING,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <SettingsPage />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
   {
     path: ROUTES_URL.COMPANY_SETTING,
     element: (
@@ -282,7 +305,94 @@ export const router = createBrowserRouter([
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewSettingLead"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.LEAD_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <LeadSetting />
+          </ModuleGuard>
+        ),
+      },
+      { path: ROUTES_URL.SETTING_EMAIL, element: <EmailSetting /> },
+      {
+        path: ROUTES_URL.SETTING_MEETINGS,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMeetingSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.MEETING_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <MeetingSettings />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_ACCOUNT_TYPE,
+        element: <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyAccountType"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.ACCOUNT_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <AccountTypeSetting />
+          </ModuleGuard>
+      },
+      {
+        path: ROUTES_URL.SETTING_NOTIFICATIONS,
+        element: <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyPreferences"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+
+            <CompanyPreferenceSetting />,
+          </ModuleGuard>
+      },
+      {
+        path: ROUTES_URL.SETTING_GENERAL,
+        element: <ModuleGuard
+            permissionKey="userHasAccessToViewSettingGeneral"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <UserPrerefenceManagement />,
+            </ModuleGuard>
+      },
+      {
+        path: ROUTES_URL.SETTING_SUPPORT_TICKET_CATEGORY,
+        element:
+         <ModuleGuard
+            permissionKey="userHasAccessToViewSettingSupposeTicketCategory"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <SupportTicketCategorySetting />,
+          </ModuleGuard>
+      },
+      {
+        path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE,
+        element: <ModuleGuard
+            permissionKey="userHasAccessToViewSettingCompanyWarehouse"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_VIEW_ACCESS
+            }
+            >
+              <CompanyWarehouseSetting />,
+            </ModuleGuard> 
+      },
+    ],
   },
+
   {
     path: ROUTES_URL.TEAM_MANAGEMENT,
     element: (
@@ -683,36 +793,35 @@ export const router = createBrowserRouter([
   //   ),
   // },
 
-
-  // this is new 
+  // this is new
 
   {
-  path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
-  element: (
-    <MobileRedirectWrapper>
-      <PrivateRoute>
-        <Navbar>
-        <AccountNavbarBreadcrumb/>
-        </Navbar>
-        {/* <AccountLayout /> */}
-      </PrivateRoute>
-    </MobileRedirectWrapper>
-  ),
-  children: [
-    {
-      index: true,
-      element: <AccountDetails />,
-    },
-    {
-      path: "products/:productId",
-      element: <AccountCompanyProductDetails />,
-    },
-    {
-      path : ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
-      element: <CreateMultipleAccountCompanyProduct/>
-    }
-  ],
-},
+    path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <AccountNavbarBreadcrumb />
+          </Navbar>
+          {/* <AccountLayout /> */}
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: <AccountDetails />,
+      },
+      {
+        path: "products/:productId",
+        element: <AccountCompanyProductDetails />,
+      },
+      {
+        path: ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
+        element: <CreateMultipleAccountCompanyProduct />,
+      },
+    ],
+  },
 
   //  {
   //   path: ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS,
@@ -756,9 +865,9 @@ export const router = createBrowserRouter([
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
-          <Navbar>
-            <StockManagement />
-          </Navbar>
+            <Navbar>
+              <StockManagement />
+            </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
@@ -785,7 +894,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <ViewSupportTicketManagement/>
+              <ViewSupportTicketManagement />
             </Navbar>
           </div>
         </PrivateRoute>
